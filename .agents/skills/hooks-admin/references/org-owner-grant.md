@@ -7,8 +7,8 @@ Records of ownership transfers and grants between members
 ## Usage
 
 ```typescript
-useOrgOwnerGrantsQuery({ selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } } })
-useOrgOwnerGrantQuery({ id: '<UUID>', selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } } })
+useOrgOwnerGrantsQuery({ selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } } })
+useOrgOwnerGrantQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } } })
 useCreateOrgOwnerGrantMutation({ selection: { fields: { id: true } } })
 useUpdateOrgOwnerGrantMutation({ selection: { fields: { id: true } } })
 useDeleteOrgOwnerGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgOwnerGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgOwnerGrantsQuery({
-  selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgOwnerGrantsQuery({
 const { mutate } = useCreateOrgOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
+mutate({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```

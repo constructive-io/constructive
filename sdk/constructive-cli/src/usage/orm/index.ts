@@ -5,24 +5,24 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { AppLimitCapsDefaultModel } from './models/appLimitCapsDefault';
-import { OrgLimitCapsDefaultModel } from './models/orgLimitCapsDefault';
 import { AppLimitCapModel } from './models/appLimitCap';
-import { OrgLimitCapModel } from './models/orgLimitCap';
-import { AppLimitDefaultModel } from './models/appLimitDefault';
-import { AppLimitCreditModel } from './models/appLimitCredit';
-import { AppLimitCreditCodeItemModel } from './models/appLimitCreditCodeItem';
-import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption';
-import { OrgLimitDefaultModel } from './models/orgLimitDefault';
-import { OrgLimitCreditModel } from './models/orgLimitCredit';
-import { AppLimitWarningModel } from './models/appLimitWarning';
-import { OrgLimitWarningModel } from './models/orgLimitWarning';
-import { AppLimitCreditCodeModel } from './models/appLimitCreditCode';
-import { AppLimitEventModel } from './models/appLimitEvent';
-import { OrgLimitEventModel } from './models/orgLimitEvent';
+import { AppLimitCapsDefaultModel } from './models/appLimitCapsDefault';
 import { AppLimitModel } from './models/appLimit';
+import { AppLimitCreditCodeModel } from './models/appLimitCreditCode';
+import { AppLimitCreditCodeItemModel } from './models/appLimitCreditCodeItem';
+import { AppLimitCreditModel } from './models/appLimitCredit';
+import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption';
+import { AppLimitDefaultModel } from './models/appLimitDefault';
+import { AppLimitEventModel } from './models/appLimitEvent';
+import { AppLimitWarningModel } from './models/appLimitWarning';
 import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
+import { OrgLimitCapModel } from './models/orgLimitCap';
+import { OrgLimitCapsDefaultModel } from './models/orgLimitCapsDefault';
 import { OrgLimitModel } from './models/orgLimit';
+import { OrgLimitCreditModel } from './models/orgLimitCredit';
+import { OrgLimitDefaultModel } from './models/orgLimitDefault';
+import { OrgLimitEventModel } from './models/orgLimitEvent';
+import { OrgLimitWarningModel } from './models/orgLimitWarning';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
@@ -56,24 +56,24 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    appLimitCapsDefault: new AppLimitCapsDefaultModel(client),
-    orgLimitCapsDefault: new OrgLimitCapsDefaultModel(client),
     appLimitCap: new AppLimitCapModel(client),
-    orgLimitCap: new OrgLimitCapModel(client),
-    appLimitDefault: new AppLimitDefaultModel(client),
-    appLimitCredit: new AppLimitCreditModel(client),
-    appLimitCreditCodeItem: new AppLimitCreditCodeItemModel(client),
-    appLimitCreditRedemption: new AppLimitCreditRedemptionModel(client),
-    orgLimitDefault: new OrgLimitDefaultModel(client),
-    orgLimitCredit: new OrgLimitCreditModel(client),
-    appLimitWarning: new AppLimitWarningModel(client),
-    orgLimitWarning: new OrgLimitWarningModel(client),
-    appLimitCreditCode: new AppLimitCreditCodeModel(client),
-    appLimitEvent: new AppLimitEventModel(client),
-    orgLimitEvent: new OrgLimitEventModel(client),
+    appLimitCapsDefault: new AppLimitCapsDefaultModel(client),
     appLimit: new AppLimitModel(client),
+    appLimitCreditCode: new AppLimitCreditCodeModel(client),
+    appLimitCreditCodeItem: new AppLimitCreditCodeItemModel(client),
+    appLimitCredit: new AppLimitCreditModel(client),
+    appLimitCreditRedemption: new AppLimitCreditRedemptionModel(client),
+    appLimitDefault: new AppLimitDefaultModel(client),
+    appLimitEvent: new AppLimitEventModel(client),
+    appLimitWarning: new AppLimitWarningModel(client),
     orgLimitAggregate: new OrgLimitAggregateModel(client),
+    orgLimitCap: new OrgLimitCapModel(client),
+    orgLimitCapsDefault: new OrgLimitCapsDefaultModel(client),
     orgLimit: new OrgLimitModel(client),
+    orgLimitCredit: new OrgLimitCreditModel(client),
+    orgLimitDefault: new OrgLimitDefaultModel(client),
+    orgLimitEvent: new OrgLimitEventModel(client),
+    orgLimitWarning: new OrgLimitWarningModel(client),
     mutation: createMutationOperations(client),
   };
 }

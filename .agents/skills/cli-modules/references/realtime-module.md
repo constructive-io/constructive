@@ -12,8 +12,8 @@ csdk realtime-module list --where.<field>.<op> <value> --orderBy <values>
 csdk realtime-module list --limit 10 --after <cursor>
 csdk realtime-module find-first --where.<field>.<op> <value>
 csdk realtime-module get --id <UUID>
-csdk realtime-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--subscriptionsSchemaId <UUID>] [--changeLogTableId <UUID>] [--listenerNodeTableId <UUID>] [--sourceRegistryTableId <UUID>] [--retentionHours <Int>] [--premake <Int>] [--interval <String>] [--notifyChannel <String>] [--apiName <String>] [--privateApiName <String>]
-csdk realtime-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--subscriptionsSchemaId <UUID>] [--changeLogTableId <UUID>] [--listenerNodeTableId <UUID>] [--sourceRegistryTableId <UUID>] [--retentionHours <Int>] [--premake <Int>] [--interval <String>] [--notifyChannel <String>] [--apiName <String>] [--privateApiName <String>]
+csdk realtime-module create --databaseId <UUID> [--apiName <String>] [--changeLogTableId <UUID>] [--interval <String>] [--listenerNodeTableId <UUID>] [--notifyChannel <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--retentionHours <Int>] [--schemaId <UUID>] [--sourceRegistryTableId <UUID>] [--subscriptionsSchemaId <UUID>]
+csdk realtime-module update --id <UUID> [--apiName <String>] [--changeLogTableId <UUID>] [--databaseId <UUID>] [--interval <String>] [--listenerNodeTableId <UUID>] [--notifyChannel <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--retentionHours <Int>] [--schemaId <UUID>] [--sourceRegistryTableId <UUID>] [--subscriptionsSchemaId <UUID>]
 csdk realtime-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk realtime-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a realtimeModule
 
 ```bash
-csdk realtime-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--subscriptionsSchemaId <UUID>] [--changeLogTableId <UUID>] [--listenerNodeTableId <UUID>] [--sourceRegistryTableId <UUID>] [--retentionHours <Int>] [--premake <Int>] [--interval <String>] [--notifyChannel <String>] [--apiName <String>] [--privateApiName <String>]
+csdk realtime-module create --databaseId <UUID> [--apiName <String>] [--changeLogTableId <UUID>] [--interval <String>] [--listenerNodeTableId <UUID>] [--notifyChannel <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--retentionHours <Int>] [--schemaId <UUID>] [--sourceRegistryTableId <UUID>] [--subscriptionsSchemaId <UUID>]
 ```
 
 ### Get a realtimeModule by id

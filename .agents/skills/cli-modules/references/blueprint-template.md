@@ -12,8 +12,8 @@ csdk blueprint-template list --where.<field>.<op> <value> --orderBy <values>
 csdk blueprint-template list --limit 10 --after <cursor>
 csdk blueprint-template find-first --where.<field>.<op> <value>
 csdk blueprint-template get --id <UUID>
-csdk blueprint-template create --name <String> --displayName <String> --ownerId <UUID> --definition <JSON> [--version <String>] [--description <String>] [--visibility <String>] [--categories <String>] [--tags <String>] [--definitionSchemaVersion <String>] [--source <String>] [--complexity <String>] [--copyCount <Int>] [--forkCount <Int>] [--forkedFromId <UUID>] [--definitionHash <UUID>] [--tableHashes <JSON>]
-csdk blueprint-template update --id <UUID> [--name <String>] [--version <String>] [--displayName <String>] [--description <String>] [--ownerId <UUID>] [--visibility <String>] [--categories <String>] [--tags <String>] [--definition <JSON>] [--definitionSchemaVersion <String>] [--source <String>] [--complexity <String>] [--copyCount <Int>] [--forkCount <Int>] [--forkedFromId <UUID>] [--definitionHash <UUID>] [--tableHashes <JSON>]
+csdk blueprint-template create --definition <JSON> --displayName <String> --name <String> --ownerId <UUID> [--categories <String>] [--complexity <String>] [--copyCount <Int>] [--definitionHash <UUID>] [--definitionSchemaVersion <String>] [--description <String>] [--forkCount <Int>] [--forkedFromId <UUID>] [--source <String>] [--tableHashes <JSON>] [--tags <String>] [--version <String>] [--visibility <String>]
+csdk blueprint-template update --id <UUID> [--categories <String>] [--complexity <String>] [--copyCount <Int>] [--definition <JSON>] [--definitionHash <UUID>] [--definitionSchemaVersion <String>] [--description <String>] [--displayName <String>] [--forkCount <Int>] [--forkedFromId <UUID>] [--name <String>] [--ownerId <UUID>] [--source <String>] [--tableHashes <JSON>] [--tags <String>] [--version <String>] [--visibility <String>]
 csdk blueprint-template delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk blueprint-template list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a blueprintTemplate
 
 ```bash
-csdk blueprint-template create --name <String> --displayName <String> --ownerId <UUID> --definition <JSON> [--version <String>] [--description <String>] [--visibility <String>] [--categories <String>] [--tags <String>] [--definitionSchemaVersion <String>] [--source <String>] [--complexity <String>] [--copyCount <Int>] [--forkCount <Int>] [--forkedFromId <UUID>] [--definitionHash <UUID>] [--tableHashes <JSON>]
+csdk blueprint-template create --definition <JSON> --displayName <String> --name <String> --ownerId <UUID> [--categories <String>] [--complexity <String>] [--copyCount <Int>] [--definitionHash <UUID>] [--definitionSchemaVersion <String>] [--description <String>] [--forkCount <Int>] [--forkedFromId <UUID>] [--source <String>] [--tableHashes <JSON>] [--tags <String>] [--version <String>] [--visibility <String>]
 ```
 
 ### Get a blueprintTemplate by id

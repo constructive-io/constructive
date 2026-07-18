@@ -13,7 +13,7 @@ csdk org-limit-default list --limit 10 --after <cursor>
 csdk org-limit-default find-first --where.<field>.<op> <value>
 csdk org-limit-default get --id <UUID>
 csdk org-limit-default create --name <String> [--max <BigInt>] [--softMax <BigInt>]
-csdk org-limit-default update --id <UUID> [--name <String>] [--max <BigInt>] [--softMax <BigInt>]
+csdk org-limit-default update --id <UUID> [--max <BigInt>] [--name <String>] [--softMax <BigInt>]
 csdk org-limit-default delete --id <UUID>
 ```
 

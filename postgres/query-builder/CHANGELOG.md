@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.24.0...@constructive-io/query-builder@2.25.0) (2026-07-18)
+
+### Features
+
+- **query-spec:** shared query language spec package; wire codegen + query-builder ([9412943](https://github.com/constructive-io/constructive/commit/9412943be8ccbe7bc2e6feac3ac0fdfbe52ff553))
+
+# [2.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.23.0...@constructive-io/query-builder@2.24.0) (2026-07-18)
+
+### Features
+
+- **query-builder:** insert exprs, join ON filters, fromFunction, orderBy/groupBy exprs, clone ([ab7a603](https://github.com/constructive-io/constructive/commit/ab7a603240db461ce01faa2dcfd6f7b8caa025d1))
+
+# [2.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.22.0...@constructive-io/query-builder@2.23.0) (2026-07-14)
+
+### Features
+
+- **query-builder:** SDK-style JSON where filters, expression helpers, call aliases ([23b000e](https://github.com/constructive-io/constructive/commit/23b000e57035c4fac04a38a4476ed00febdb7293))
+- **query-builder:** where()/having() accept expressions directly, drop whereExpr/havingExpr ([4d9b1f5](https://github.com/constructive-io/constructive/commit/4d9b1f5ccc17a55f5152e52a421fbeb94389971e))
+
+# [2.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.21.1...@constructive-io/query-builder@2.22.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [2.21.1](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.21.0...@constructive-io/query-builder@2.21.1) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+# [2.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.20.0...@constructive-io/query-builder@2.21.0) (2026-07-11)
+
+### Features
+
+- **query-builder:** expression args (col/lit/param/fn) + computed SELECT columns ([98e3649](https://github.com/constructive-io/constructive/commit/98e364910ad57263534d2d9b9562d4f163eb0914))
+
 # [2.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.19.0...@constructive-io/query-builder@2.20.0) (2026-06-28)
 
 **Note:** Version bump only for package @constructive-io/query-builder

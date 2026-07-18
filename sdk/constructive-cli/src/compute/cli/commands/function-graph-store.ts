@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
+  hash: 'uuid',
   id: 'uuid',
   name: 'string',
-  databaseId: 'uuid',
-  hash: 'uuid',
-  createdAt: 'string',
+  scopeId: 'uuid',
 };
 const usage =
   '\nfunction-graph-store <command>\n\nCommands:\n  list                  List functionGraphStore records\n  find-first            Find first matching functionGraphStore record\n  get                   Get a functionGraphStore by ID\n  create                Create a new functionGraphStore\n  update                Update an existing functionGraphStore\n  delete                Delete a functionGraphStore\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      hash: true,
       id: true,
       name: true,
-      databaseId: true,
-      hash: true,
-      createdAt: true,
+      scopeId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -102,11 +102,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      hash: true,
       id: true,
       name: true,
-      databaseId: true,
-      hash: true,
-      createdAt: true,
+      scopeId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -143,11 +143,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
+          hash: true,
           id: true,
           name: true,
-          databaseId: true,
-          hash: true,
-          createdAt: true,
+          scopeId: true,
         },
       })
       .execute();
@@ -165,22 +165,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'hash',
+        message: 'hash',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
         required: true,
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'hash',
-        message: 'hash',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -192,16 +192,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.functionGraphStore
       .create({
         data: {
-          name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
           hash: cleanedData.hash,
+          name: cleanedData.name,
+          scopeId: cleanedData.scopeId,
         },
         select: {
+          createdAt: true,
+          hash: true,
           id: true,
           name: true,
-          databaseId: true,
-          hash: true,
-          createdAt: true,
+          scopeId: true,
         },
       })
       .execute();
@@ -225,22 +225,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'hash',
+        message: 'hash',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
         required: false,
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'hash',
-        message: 'hash',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -252,16 +252,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
           hash: cleanedData.hash,
+          name: cleanedData.name,
+          scopeId: cleanedData.scopeId,
         },
         select: {
+          createdAt: true,
+          hash: true,
           id: true,
           name: true,
-          databaseId: true,
-          hash: true,
-          createdAt: true,
+          scopeId: true,
         },
       })
       .execute();

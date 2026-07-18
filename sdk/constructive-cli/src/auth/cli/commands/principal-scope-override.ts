@@ -16,14 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  createdAt: 'string',
-  updatedAt: 'string',
-  principalId: 'uuid',
-  membershipType: 'int',
   allowedMask: 'string',
-  isAdmin: 'boolean',
+  createdAt: 'string',
+  id: 'uuid',
+  isActive: 'boolean',
   isReadOnly: 'boolean',
+  membershipType: 'int',
+  principalId: 'uuid',
+  updatedAt: 'string',
+  useAdminOwner: 'boolean',
 };
 const usage =
   '\nprincipal-scope-override <command>\n\nCommands:\n  list                  List principalScopeOverride records\n  find-first            Find first matching principalScopeOverride record\n  create                Create a new principalScopeOverride\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -70,14 +71,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      principalId: true,
-      membershipType: true,
       allowedMask: true,
-      isAdmin: true,
+      createdAt: true,
+      id: true,
+      isActive: true,
       isReadOnly: true,
+      membershipType: true,
+      principalId: true,
+      updatedAt: true,
+      useAdminOwner: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -102,14 +104,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      principalId: true,
-      membershipType: true,
       allowedMask: true,
-      isAdmin: true,
+      createdAt: true,
+      id: true,
+      isActive: true,
       isReadOnly: true,
+      membershipType: true,
+      principalId: true,
+      updatedAt: true,
+      useAdminOwner: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -136,8 +139,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'principalId',
-        message: 'principalId',
+        name: 'allowedMask',
+        message: 'allowedMask',
+        required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isActive',
+        message: 'isActive',
+        required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isReadOnly',
+        message: 'isReadOnly',
         required: true,
       },
       {
@@ -148,20 +163,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'allowedMask',
-        message: 'allowedMask',
+        name: 'principalId',
+        message: 'principalId',
         required: true,
       },
       {
         type: 'boolean',
-        name: 'isAdmin',
-        message: 'isAdmin',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isReadOnly',
-        message: 'isReadOnly',
+        name: 'useAdminOwner',
+        message: 'useAdminOwner',
         required: true,
       },
     ]);
@@ -174,21 +183,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.principalScopeOverride
       .create({
         data: {
-          principalId: cleanedData.principalId,
-          membershipType: cleanedData.membershipType,
           allowedMask: cleanedData.allowedMask,
-          isAdmin: cleanedData.isAdmin,
+          isActive: cleanedData.isActive,
           isReadOnly: cleanedData.isReadOnly,
+          membershipType: cleanedData.membershipType,
+          principalId: cleanedData.principalId,
+          useAdminOwner: cleanedData.useAdminOwner,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          principalId: true,
-          membershipType: true,
           allowedMask: true,
-          isAdmin: true,
+          createdAt: true,
+          id: true,
+          isActive: true,
           isReadOnly: true,
+          membershipType: true,
+          principalId: true,
+          updatedAt: true,
+          useAdminOwner: true,
         },
       })
       .execute();

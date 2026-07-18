@@ -7,23 +7,11 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  ExecuteSqlInput,
-  RunMigrationInput,
   ProvisionBucketInput,
-  ExecuteSqlPayload,
-  RunMigrationPayload,
   ProvisionBucketPayload,
-  ExecuteSqlPayloadSelect,
-  RunMigrationPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface ExecuteSqlVariables {
-  input: ExecuteSqlInput;
-}
-export interface RunMigrationVariables {
-  input: RunMigrationInput;
-}
 /**
  * Variables for provisionBucket
  * Provision an S3 bucket for a logical bucket in the database.
@@ -36,64 +24,6 @@ export interface ProvisionBucketVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
-    executeSql: <S extends ExecuteSqlPayloadSelect>(
-      args: ExecuteSqlVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ExecuteSqlPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        executeSql: InferSelectResult<ExecuteSqlPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ExecuteSql',
-        fieldName: 'executeSql',
-        ...buildCustomDocument(
-          'mutation',
-          'ExecuteSql',
-          'executeSql',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ExecuteSqlInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ExecuteSqlPayload'
-        ),
-      }),
-    runMigration: <S extends RunMigrationPayloadSelect>(
-      args: RunMigrationVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RunMigrationPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        runMigration: InferSelectResult<RunMigrationPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RunMigration',
-        fieldName: 'runMigration',
-        ...buildCustomDocument(
-          'mutation',
-          'RunMigration',
-          'runMigration',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RunMigrationInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RunMigrationPayload'
-        ),
-      }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
       args: ProvisionBucketVariables,
       options: {

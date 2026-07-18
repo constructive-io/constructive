@@ -7,8 +7,8 @@ Audit log of permission additions and removals from the defaults bitmask
 ## Usage
 
 ```typescript
-useAppPermissionDefaultGrantsQuery({ selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } } })
-useAppPermissionDefaultGrantQuery({ id: '<UUID>', selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } } })
+useAppPermissionDefaultGrantsQuery({ selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } } })
+useAppPermissionDefaultGrantQuery({ id: '<UUID>', selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } } })
 useCreateAppPermissionDefaultGrantMutation({ selection: { fields: { id: true } } })
 useUpdateAppPermissionDefaultGrantMutation({ selection: { fields: { id: true } } })
 useDeleteAppPermissionDefaultGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteAppPermissionDefaultGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useAppPermissionDefaultGrantsQuery({
-  selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppPermissionDefaultGrantsQuery({
 const { mutate } = useCreateAppPermissionDefaultGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>' });
+mutate({ grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' });
 ```

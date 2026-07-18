@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.31.0...@pgpmjs/core@6.32.0) (2026-07-18)
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
+# [6.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.30.0...@pgpmjs/core@6.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.29.2...@pgpmjs/core@6.30.0) (2026-07-17)
+
+### Features
+
+- **export:** install app-scope + function-resolution in exported databases ([84fa76f](https://github.com/constructive-io/constructive/commit/84fa76f75144b1a654d6811ff284988d1942730b))
+
+## [6.29.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.29.1...@pgpmjs/core@6.29.2) (2026-07-13)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.29.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.29.0...@pgpmjs/core@6.29.1) (2026-07-13)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.29.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.28.3...@pgpmjs/core@6.29.0) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.28.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.28.2...@pgpmjs/core@6.28.3) (2026-07-12)
+
+### Bug Fixes
+
+- **pgpm:** drop authenticated_client from default roles map, default it in client role generator ([4b26a76](https://github.com/constructive-io/constructive/commit/4b26a760f853826489e86f27c9c547d12554096e))
+
+## [6.28.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.28.1...@pgpmjs/core@6.28.2) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.28.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.28.0...@pgpmjs/core@6.28.1) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.28.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.27.2...@pgpmjs/core@6.28.0) (2026-07-11)
+
+### Features
+
+- **pgpm:** add --pglite flag to init with workspace inheritance ([1cbe2e4](https://github.com/constructive-io/constructive/commit/1cbe2e447638d970016a0920a3feba5a84b5e12e))
+- **pgpm:** harden `pgpm extension` as the canonical enable-later path ([41c60dc](https://github.com/constructive-io/constructive/commit/41c60dc9fd42ccff03443a61f698fd12c669e835))
+
+## [6.27.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.27.1...@pgpmjs/core@6.27.2) (2026-07-10)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.27.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.27.0...@pgpmjs/core@6.27.1) (2026-07-10)
+
+**Note:** Version bump only for package @pgpmjs/core
+
 # [6.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.26.1...@pgpmjs/core@6.27.0) (2026-07-08)
 
 ### Features

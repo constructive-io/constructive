@@ -5,6 +5,8 @@
  */
 
 import type {
+  DbPreset,
+  DeclaredCapacity,
   FunctionApiBinding,
   FunctionDefinition,
   FunctionDeployment,
@@ -19,14 +21,55 @@ import type {
   FunctionGraphRef,
   FunctionGraphStore,
   FunctionInvocation,
-  GetAllRecord,
-  OrgFunctionExecutionLog,
-  OrgFunctionInvocation,
+  GetAllTreeNodesRecord,
+  InfraCommit,
+  InfraGetAllTreeNodesRecord,
+  InfraObject,
+  InfraRef,
+  InfraStore,
+  IntegrationProvider,
+  Namespace,
+  NamespaceEvent,
+  PlatformDeclaredCapacity,
+  PlatformFunctionApiBinding,
+  PlatformFunctionDefinition,
+  PlatformFunctionDeployment,
+  PlatformFunctionDeploymentEvent,
+  PlatformFunctionExecutionLog,
+  PlatformFunctionInvocation,
+  PlatformInfraCommit,
+  PlatformInfraGetAllTreeNodesRecord,
+  PlatformInfraObject,
+  PlatformInfraRef,
+  PlatformInfraStore,
   PlatformNamespace,
   PlatformNamespaceEvent,
+  PlatformResource,
+  PlatformResourceDefinition,
+  PlatformResourceEvent,
+  PlatformResourceInstallation,
+  PlatformResourceStatusCheck,
+  PlatformResourceUsageLog,
+  PlatformResourceUsageSummary,
+  PlatformResourceUtilizationDaily,
+  PlatformResourcesHealth,
+  PlatformResourcesRequirementsState,
+  PlatformResourcesResolvedRequirement,
+  PlatformWebhookEndpoint,
+  PlatformWebhookEvent,
   Resource,
+  ResourceDefinition,
   ResourceEvent,
-  SecretDefinition,
+  ResourceInstallation,
+  ResourceStatusCheck,
+  ResourceUsageLog,
+  ResourceUsageSummary,
+  ResourceUtilizationDaily,
+  ResourcesHealth,
+  ResourcesRequirementsState,
+  ResourcesResolvedRequirement,
+  WebhookEndpoint,
+  WebhookEvent,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -46,89 +89,1193 @@ import type {
   VectorFilter,
 } from './types';
 export type Base64EncodedBinary = unknown;
-/** Methods to use when ordering `FunctionApiBinding`. */
-export type FunctionApiBindingOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'ALIAS_ASC'
-  | 'ALIAS_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC';
-/** Methods to use when ordering `FunctionDeployment`. */
-export type FunctionDeploymentOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
+export type ConstructiveInternalTypeImage = unknown;
+/** Methods to use when ordering `DbPreset`. */
+export type DbPresetOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'SERVICE_URL_ASC'
-  | 'SERVICE_URL_DESC'
-  | 'SERVICE_NAME_ASC'
-  | 'SERVICE_NAME_DESC'
-  | 'REVISION_ASC'
-  | 'REVISION_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'CONCURRENCY_ASC'
-  | 'CONCURRENCY_DESC'
-  | 'SCALE_MIN_ASC'
-  | 'SCALE_MIN_DESC'
-  | 'SCALE_MAX_ASC'
-  | 'SCALE_MAX_DESC'
-  | 'TIMEOUT_SECONDS_ASC'
-  | 'TIMEOUT_SECONDS_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'LAST_ERROR_AT_ASC'
-  | 'LAST_ERROR_AT_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `Resource`. */
-export type ResourceOrderBy =
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'MODULES_HASH_ASC'
+  | 'MODULES_HASH_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `DeclaredCapacity`. */
+export type DeclaredCapacityOrderBy =
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_TRANSIENT_ASC'
+  | 'IS_TRANSIENT_DESC'
   | 'KIND_ASC'
   | 'KIND_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'POD_COUNT_MAX_ASC'
+  | 'POD_COUNT_MAX_DESC'
+  | 'POD_COUNT_MIN_ASC'
+  | 'POD_COUNT_MIN_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'SOURCE_ID_ASC'
+  | 'SOURCE_ID_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC';
+/** Methods to use when ordering `FunctionApiBinding`. */
+export type FunctionApiBindingOrderBy =
+  | 'ALIAS_ASC'
+  | 'ALIAS_DESC'
+  | 'API_ID_ASC'
+  | 'API_ID_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `FunctionDefinition`. */
+export type FunctionDefinitionOrderBy =
+  | 'ACCESS_CHANNELS_ASC'
+  | 'ACCESS_CHANNELS_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'FN_CATEGORY_ASC'
+  | 'FN_CATEGORY_DESC'
+  | 'FUNCTION_COLUMNS_ASC'
+  | 'FUNCTION_COLUMNS_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ICON_ASC'
+  | 'ICON_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'INPUTS_ASC'
+  | 'INPUTS_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'MAX_ATTEMPTS_ASC'
+  | 'MAX_ATTEMPTS_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MODULE_TABLE_ASC'
+  | 'MODULE_TABLE_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OUTPUTS_ASC'
+  | 'OUTPUTS_DESC'
+  | 'PAYLOAD_ARGS_ASC'
+  | 'PAYLOAD_ARGS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'PROPS_ASC'
+  | 'PROPS_DESC'
+  | 'PROTECTED_ASC'
+  | 'PROTECTED_DESC'
+  | 'PUBLISHED_AT_ASC'
+  | 'PUBLISHED_AT_DESC'
+  | 'QUEUE_NAME_ASC'
+  | 'QUEUE_NAME_DESC'
+  | 'REQUIRED_BUCKETS_ASC'
+  | 'REQUIRED_BUCKETS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_MODELS_ASC'
+  | 'REQUIRED_MODELS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'RUNTIME_ASC'
+  | 'RUNTIME_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'TARGET_FUNCTION_ASC'
+  | 'TARGET_FUNCTION_DESC'
+  | 'TARGET_SCHEMA_ASC'
+  | 'TARGET_SCHEMA_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VOLATILE_ASC'
+  | 'VOLATILE_DESC';
+/** Methods to use when ordering `FunctionDeploymentEvent`. */
+export type FunctionDeploymentEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEPLOYMENT_ID_ASC'
+  | 'DEPLOYMENT_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `FunctionDeployment`. */
+export type FunctionDeploymentOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'HANDLER_NAME_ASC'
+  | 'HANDLER_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'IMAGE_VERSION_ASC'
+  | 'IMAGE_VERSION_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_AT_ASC'
+  | 'LAST_ERROR_AT_DESC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'SERVICE_NAME_ASC'
+  | 'SERVICE_NAME_DESC'
+  | 'SERVICE_URL_ASC'
+  | 'SERVICE_URL_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `FunctionExecutionLog`. */
+export type FunctionExecutionLogOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LOG_LEVEL_ASC'
+  | 'LOG_LEVEL_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+/** Methods to use when ordering `FunctionGraphCommit`. */
+export type FunctionGraphCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+/** Methods to use when ordering `FunctionGraphExecutionNodeState`. */
+export type FunctionGraphExecutionNodeStateOrderBy =
+  | 'CALLBACK_INPUTS_ASC'
+  | 'CALLBACK_INPUTS_DESC'
+  | 'CALLBACK_META_ASC'
+  | 'CALLBACK_META_DESC'
+  | 'CALLBACK_TOKEN_HASH_ASC'
+  | 'CALLBACK_TOKEN_HASH_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ERROR_CODE_ASC'
+  | 'ERROR_CODE_DESC'
+  | 'ERROR_MESSAGE_ASC'
+  | 'ERROR_MESSAGE_DESC'
+  | 'EXECUTION_ID_ASC'
+  | 'EXECUTION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'NODE_NAME_ASC'
+  | 'NODE_NAME_DESC'
+  | 'NODE_PATH_ASC'
+  | 'NODE_PATH_DESC'
+  | 'OUTPUT_ID_ASC'
+  | 'OUTPUT_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+/** Methods to use when ordering `FunctionGraphExecution`. */
+export type FunctionGraphExecutionOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CURRENT_WAVE_ASC'
+  | 'CURRENT_WAVE_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ERROR_CODE_ASC'
+  | 'ERROR_CODE_DESC'
+  | 'ERROR_MESSAGE_ASC'
+  | 'ERROR_MESSAGE_DESC'
+  | 'EXECUTION_PLAN_ASC'
+  | 'EXECUTION_PLAN_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INPUT_PAYLOAD_ASC'
+  | 'INPUT_PAYLOAD_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LAST_PROGRESS_AT_ASC'
+  | 'LAST_PROGRESS_AT_DESC'
+  | 'MAX_PENDING_JOBS_ASC'
+  | 'MAX_PENDING_JOBS_DESC'
+  | 'MAX_TICKS_ASC'
+  | 'MAX_TICKS_DESC'
+  | 'NATURAL'
+  | 'NODE_OUTPUTS_ASC'
+  | 'NODE_OUTPUTS_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'OUTPUT_NAMES_ASC'
+  | 'OUTPUT_NAMES_DESC'
+  | 'OUTPUT_NODE_ASC'
+  | 'OUTPUT_NODE_DESC'
+  | 'OUTPUT_PAYLOAD_ASC'
+  | 'OUTPUT_PAYLOAD_DESC'
+  | 'OUTPUT_PORT_ASC'
+  | 'OUTPUT_PORT_DESC'
+  | 'PARENT_EXECUTION_ID_ASC'
+  | 'PARENT_EXECUTION_ID_DESC'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PARENT_NODE_NAME_ASC'
+  | 'PARENT_NODE_NAME_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TICK_COUNT_ASC'
+  | 'TICK_COUNT_DESC'
+  | 'TIMEOUT_AT_ASC'
+  | 'TIMEOUT_AT_DESC';
+/** Methods to use when ordering `FunctionGraphExecutionOutput`. */
+export type FunctionGraphExecutionOutputOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `FunctionGraphObject`. */
+export type FunctionGraphObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `FunctionGraph`. */
+export type FunctionGraphOrderBy =
+  | 'CONTEXT_ASC'
+  | 'CONTEXT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_VALID_ASC'
+  | 'IS_VALID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALIDATION_ERRORS_ASC'
+  | 'VALIDATION_ERRORS_DESC';
+/** Methods to use when ordering `FunctionGraphRef`. */
+export type FunctionGraphRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+/** Methods to use when ordering `FunctionGraphStore`. */
+export type FunctionGraphStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `FunctionInvocation`. */
+export type FunctionInvocationOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'API_BINDING_ID_ASC'
+  | 'API_BINDING_ID_DESC'
+  | 'CHANNEL_ASC'
+  | 'CHANNEL_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFINITION_SCOPE_ASC'
+  | 'DEFINITION_SCOPE_DESC'
+  | 'DURATION_MS_ASC'
+  | 'DURATION_MS_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'GRAPH_EXECUTION_ID_ASC'
+  | 'GRAPH_EXECUTION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'JOB_ID_ASC'
+  | 'JOB_ID_DESC'
+  | 'NATURAL'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVENANCE_ASC'
+  | 'PROVENANCE_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+/** Methods to use when ordering `InfraCommit`. */
+export type InfraCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+/** Methods to use when ordering `InfraObject`. */
+export type InfraObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `InfraRef`. */
+export type InfraRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+/** Methods to use when ordering `InfraStore`. */
+export type InfraStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `IntegrationProvider`. */
+export type IntegrationProviderOrderBy =
+  | 'BRAND_ASC'
+  | 'BRAND_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ICON_ASC'
+  | 'ICON_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LOGO_ASC'
+  | 'LOGO_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `NamespaceEvent`. */
+export type NamespaceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `Namespace`. */
+export type NamespaceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformDeclaredCapacity`. */
+export type PlatformDeclaredCapacityOrderBy =
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_TRANSIENT_ASC'
+  | 'IS_TRANSIENT_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'POD_COUNT_MAX_ASC'
+  | 'POD_COUNT_MAX_DESC'
+  | 'POD_COUNT_MIN_ASC'
+  | 'POD_COUNT_MIN_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'SOURCE_ID_ASC'
+  | 'SOURCE_ID_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC';
+/** Methods to use when ordering `PlatformFunctionApiBinding`. */
+export type PlatformFunctionApiBindingOrderBy =
+  | 'ALIAS_ASC'
+  | 'ALIAS_DESC'
+  | 'API_ID_ASC'
+  | 'API_ID_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlatformFunctionDefinition`. */
+export type PlatformFunctionDefinitionOrderBy =
+  | 'ACCESS_CHANNELS_ASC'
+  | 'ACCESS_CHANNELS_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'FN_CATEGORY_ASC'
+  | 'FN_CATEGORY_DESC'
+  | 'FUNCTION_COLUMNS_ASC'
+  | 'FUNCTION_COLUMNS_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ICON_ASC'
+  | 'ICON_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'INPUTS_ASC'
+  | 'INPUTS_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'MAX_ATTEMPTS_ASC'
+  | 'MAX_ATTEMPTS_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MODULE_TABLE_ASC'
+  | 'MODULE_TABLE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OUTPUTS_ASC'
+  | 'OUTPUTS_DESC'
+  | 'PAYLOAD_ARGS_ASC'
+  | 'PAYLOAD_ARGS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'PROPS_ASC'
+  | 'PROPS_DESC'
+  | 'PROTECTED_ASC'
+  | 'PROTECTED_DESC'
+  | 'PUBLISHED_AT_ASC'
+  | 'PUBLISHED_AT_DESC'
+  | 'QUEUE_NAME_ASC'
+  | 'QUEUE_NAME_DESC'
+  | 'REQUIRED_BUCKETS_ASC'
+  | 'REQUIRED_BUCKETS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_MODELS_ASC'
+  | 'REQUIRED_MODELS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'RUNTIME_ASC'
+  | 'RUNTIME_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'TARGET_FUNCTION_ASC'
+  | 'TARGET_FUNCTION_DESC'
+  | 'TARGET_SCHEMA_ASC'
+  | 'TARGET_SCHEMA_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VOLATILE_ASC'
+  | 'VOLATILE_DESC';
+/** Methods to use when ordering `PlatformFunctionDeploymentEvent`. */
+export type PlatformFunctionDeploymentEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEPLOYMENT_ID_ASC'
+  | 'DEPLOYMENT_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlatformFunctionDeployment`. */
+export type PlatformFunctionDeploymentOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'HANDLER_NAME_ASC'
+  | 'HANDLER_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'IMAGE_VERSION_ASC'
+  | 'IMAGE_VERSION_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_AT_ASC'
+  | 'LAST_ERROR_AT_DESC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'SERVICE_NAME_ASC'
+  | 'SERVICE_NAME_DESC'
+  | 'SERVICE_URL_ASC'
+  | 'SERVICE_URL_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformFunctionExecutionLog`. */
+export type PlatformFunctionExecutionLogOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LOG_LEVEL_ASC'
+  | 'LOG_LEVEL_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+/** Methods to use when ordering `PlatformFunctionInvocation`. */
+export type PlatformFunctionInvocationOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'API_BINDING_ID_ASC'
+  | 'API_BINDING_ID_DESC'
+  | 'CHANNEL_ASC'
+  | 'CHANNEL_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_SCOPE_ASC'
+  | 'DEFINITION_SCOPE_DESC'
+  | 'DURATION_MS_ASC'
+  | 'DURATION_MS_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'GRAPH_EXECUTION_ID_ASC'
+  | 'GRAPH_EXECUTION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'JOB_ID_ASC'
+  | 'JOB_ID_DESC'
+  | 'NATURAL'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVENANCE_ASC'
+  | 'PROVENANCE_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+/** Methods to use when ordering `PlatformInfraCommit`. */
+export type PlatformInfraCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+/** Methods to use when ordering `PlatformInfraObject`. */
+export type PlatformInfraObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `PlatformInfraRef`. */
+export type PlatformInfraRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+/** Methods to use when ordering `PlatformInfraStore`. */
+export type PlatformInfraStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `PlatformNamespaceEvent`. */
+export type PlatformNamespaceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `PlatformNamespace`. */
+export type PlatformNamespaceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformResourceDefinition`. */
+export type PlatformResourceDefinitionOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DEFAULT_SPEC_ASC'
+  | 'DEFAULT_SPEC_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STEP_UP_MIN_AGE_ASC'
+  | 'STEP_UP_MIN_AGE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `PlatformResourceEvent`. */
+export type PlatformResourceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC';
+/** Methods to use when ordering `PlatformResourceInstallation`. */
+export type PlatformResourceInstallationOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PARAMS_ASC'
+  | 'PARAMS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `PlatformResource`. */
+export type PlatformResourceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC'
   | 'SPEC_ASC'
@@ -137,2841 +1284,1216 @@ export type ResourceOrderBy =
   | 'STATUS_DESC'
   | 'STATUS_OBSERVED_ASC'
   | 'STATUS_OBSERVED_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `FunctionGraphRef`. */
-export type FunctionGraphRefOrderBy =
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `PlatformResourceStatusCheck`. */
+export type PlatformResourceStatusCheckOrderBy =
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC';
-/** Methods to use when ordering `FunctionGraphStore`. */
-export type FunctionGraphStoreOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
-/** Methods to use when ordering `FunctionGraphObject`. */
-export type FunctionGraphObjectOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
-/** Methods to use when ordering `FunctionDeploymentEvent`. */
-export type FunctionDeploymentEventOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DEPLOYMENT_ID_ASC'
-  | 'DEPLOYMENT_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `OrgFunctionExecutionLog`. */
-export type OrgFunctionExecutionLogOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'LOG_LEVEL_ASC'
-  | 'LOG_LEVEL_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC';
-/** Methods to use when ordering `ResourceEvent`. */
-export type ResourceEventOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
+  | 'REQUESTED_AT_ASC'
+  | 'REQUESTED_AT_DESC'
+  | 'REQUESTED_BY_ASC'
+  | 'REQUESTED_BY_DESC'
   | 'RESOURCE_ID_ASC'
   | 'RESOURCE_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `FunctionGraphExecutionOutput`. */
-export type FunctionGraphExecutionOutputOrderBy =
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+/** Methods to use when ordering `PlatformResourceUsageLog`. */
+export type PlatformResourceUsageLogOrderBy =
+  | 'CPU_MILLICORES_ASC'
+  | 'CPU_MILLICORES_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTERVAL_SECONDS_ASC'
+  | 'INTERVAL_SECONDS_DESC'
+  | 'MEMORY_BYTES_ASC'
+  | 'MEMORY_BYTES_DESC'
+  | 'METRICS_ASC'
+  | 'METRICS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC';
-/** Methods to use when ordering `FunctionGraphCommit`. */
-export type FunctionGraphCommitOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SAMPLED_AT_ASC'
+  | 'SAMPLED_AT_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC';
+/** Methods to use when ordering `PlatformResourceUsageSummary`. */
+export type PlatformResourceUsageSummaryOrderBy =
   | 'DATE_ASC'
-  | 'DATE_DESC';
-/** Methods to use when ordering `SecretDefinition`. */
-export type SecretDefinitionOrderBy =
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'IS_BUILT_IN_ASC'
-  | 'IS_BUILT_IN_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+/** Methods to use when ordering `PlatformResourceUtilizationDaily`. */
+export type PlatformResourceUtilizationDailyOrderBy =
+  | 'AVG_MEMORY_BYTES_ASC'
+  | 'AVG_MEMORY_BYTES_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_PEAK_UTILIZATION_ASC'
+  | 'CPU_PEAK_UTILIZATION_DESC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_ASC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_PEAK_UTILIZATION_ASC'
+  | 'MEMORY_PEAK_UTILIZATION_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_ASC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+/** Methods to use when ordering `PlatformResourcesHealth`. */
+export type PlatformResourcesHealthOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `FunctionExecutionLog`. */
-export type FunctionExecutionLogOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'LOG_LEVEL_ASC'
-  | 'LOG_LEVEL_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `FunctionGraph`. */
-export type FunctionGraphOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'CONTEXT_ASC'
-  | 'CONTEXT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'IS_VALID_ASC'
-  | 'IS_VALID_DESC'
-  | 'VALIDATION_ERRORS_ASC'
-  | 'VALIDATION_ERRORS_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `FunctionGraphExecutionNodeState`. */
-export type FunctionGraphExecutionNodeStateOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'EXECUTION_ID_ASC'
-  | 'EXECUTION_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'NODE_NAME_ASC'
-  | 'NODE_NAME_DESC'
-  | 'NODE_PATH_ASC'
-  | 'NODE_PATH_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'ERROR_CODE_ASC'
-  | 'ERROR_CODE_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC'
-  | 'OUTPUT_ID_ASC'
-  | 'OUTPUT_ID_DESC';
-/** Methods to use when ordering `PlatformNamespace`. */
-export type PlatformNamespaceOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NAMESPACE_NAME_ASC'
-  | 'NAMESPACE_NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
   | 'LABELS_ASC'
   | 'LABELS_DESC'
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SOURCE_DATABASE_ID_ASC'
-  | 'SOURCE_DATABASE_ID_DESC'
-  | 'SOURCE_SCOPE_ASC'
-  | 'SOURCE_SCOPE_DESC'
-  | 'IS_MANAGED_ASC'
-  | 'IS_MANAGED_DESC';
-/** Methods to use when ordering `OrgFunctionInvocation`. */
-export type OrgFunctionInvocationOrderBy =
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
   | 'STATUS_ASC'
   | 'STATUS_DESC'
-  | 'RESULT_ASC'
-  | 'RESULT_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'DURATION_MS_ASC'
-  | 'DURATION_MS_DESC'
-  | 'JOB_ID_ASC'
-  | 'JOB_ID_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'PARENT_INVOCATION_ID_ASC'
-  | 'PARENT_INVOCATION_ID_DESC'
-  | 'GRAPH_EXECUTION_ID_ASC'
-  | 'GRAPH_EXECUTION_ID_DESC';
-/** Methods to use when ordering `FunctionInvocation`. */
-export type FunctionInvocationOrderBy =
+  | 'STATUS_DETAIL_ASC'
+  | 'STATUS_DETAIL_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `PlatformResourcesRequirementsState`. */
+export type PlatformResourcesRequirementsStateOrderBy =
+  | 'CONFIG_HASH_ASC'
+  | 'CONFIG_HASH_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
   | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
+  | 'REQUIREMENTS_HASH_ASC'
+  | 'REQUIREMENTS_HASH_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_HASH_ASC'
+  | 'SECRETS_HASH_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+/** Methods to use when ordering `PlatformResourcesResolvedRequirement`. */
+export type PlatformResourcesResolvedRequirementOrderBy =
+  | 'ATOM_ID_ASC'
+  | 'ATOM_ID_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRESENT_ASC'
+  | 'PRESENT_DESC'
+  | 'REQUIRED_ASC'
+  | 'REQUIRED_DESC'
+  | 'REQUIREMENT_KIND_ASC'
+  | 'REQUIREMENT_KIND_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+/** Methods to use when ordering `PlatformWebhookEndpoint`. */
+export type PlatformWebhookEndpointOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'RESULT_ASC'
-  | 'RESULT_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'DURATION_MS_ASC'
-  | 'DURATION_MS_DESC'
-  | 'JOB_ID_ASC'
-  | 'JOB_ID_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'PARENT_INVOCATION_ID_ASC'
-  | 'PARENT_INVOCATION_ID_DESC'
-  | 'GRAPH_EXECUTION_ID_ASC'
-  | 'GRAPH_EXECUTION_ID_DESC';
-/** Methods to use when ordering `PlatformNamespaceEvent`. */
-export type PlatformNamespaceEventOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'HOST_ASC'
+  | 'HOST_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAMESPACE_ID_ASC'
   | 'NAMESPACE_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REPLAY_WINDOW_SECONDS_ASC'
+  | 'REPLAY_WINDOW_SECONDS_DESC'
+  | 'SIGNING_SECRET_NAME_ASC'
+  | 'SIGNING_SECRET_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `PlatformWebhookEvent`. */
+export type PlatformWebhookEventOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENDPOINT_ID_ASC'
+  | 'ENDPOINT_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXTERNAL_EVENT_ID_ASC'
+  | 'EXTERNAL_EVENT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PROVIDER_TIMESTAMP_ASC'
+  | 'PROVIDER_TIMESTAMP_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `ResourceDefinition`. */
+export type ResourceDefinitionOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_SPEC_ASC'
+  | 'DEFAULT_SPEC_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STEP_UP_MIN_AGE_ASC'
+  | 'STEP_UP_MIN_AGE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `ResourceEvent`. */
+export type ResourceEventOrderBy =
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'MESSAGE_ASC'
   | 'MESSAGE_DESC'
   | 'METADATA_ASC'
   | 'METADATA_DESC'
-  | 'CPU_MILLICORES_ASC'
-  | 'CPU_MILLICORES_DESC'
-  | 'MEMORY_BYTES_ASC'
-  | 'MEMORY_BYTES_DESC'
-  | 'STORAGE_BYTES_ASC'
-  | 'STORAGE_BYTES_DESC'
-  | 'NETWORK_INGRESS_BYTES_ASC'
-  | 'NETWORK_INGRESS_BYTES_DESC'
-  | 'NETWORK_EGRESS_BYTES_ASC'
-  | 'NETWORK_EGRESS_BYTES_DESC'
-  | 'POD_COUNT_ASC'
-  | 'POD_COUNT_DESC'
-  | 'METRICS_ASC'
-  | 'METRICS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `FunctionGraphExecution`. */
-export type FunctionGraphExecutionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'GRAPH_ID_ASC'
-  | 'GRAPH_ID_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'OUTPUT_NODE_ASC'
-  | 'OUTPUT_NODE_DESC'
-  | 'OUTPUT_PORT_ASC'
-  | 'OUTPUT_PORT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'INPUT_PAYLOAD_ASC'
-  | 'INPUT_PAYLOAD_DESC'
-  | 'OUTPUT_PAYLOAD_ASC'
-  | 'OUTPUT_PAYLOAD_DESC'
-  | 'NODE_OUTPUTS_ASC'
-  | 'NODE_OUTPUTS_DESC'
-  | 'EXECUTION_PLAN_ASC'
-  | 'EXECUTION_PLAN_DESC'
-  | 'CURRENT_WAVE_ASC'
-  | 'CURRENT_WAVE_DESC'
-  | 'PARENT_EXECUTION_ID_ASC'
-  | 'PARENT_EXECUTION_ID_DESC'
-  | 'PARENT_NODE_NAME_ASC'
-  | 'PARENT_NODE_NAME_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'TICK_COUNT_ASC'
-  | 'TICK_COUNT_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'MAX_TICKS_ASC'
-  | 'MAX_TICKS_DESC'
-  | 'MAX_PENDING_JOBS_ASC'
-  | 'MAX_PENDING_JOBS_DESC'
-  | 'TIMEOUT_AT_ASC'
-  | 'TIMEOUT_AT_DESC'
-  | 'ERROR_CODE_ASC'
-  | 'ERROR_CODE_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC';
-/** Methods to use when ordering `FunctionDefinition`. */
-export type FunctionDefinitionOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC';
+/** Methods to use when ordering `ResourceInstallation`. */
+export type ResourceInstallationOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'IS_INVOCABLE_ASC'
-  | 'IS_INVOCABLE_DESC'
-  | 'MAX_ATTEMPTS_ASC'
-  | 'MAX_ATTEMPTS_DESC'
-  | 'PRIORITY_ASC'
-  | 'PRIORITY_DESC'
-  | 'QUEUE_NAME_ASC'
-  | 'QUEUE_NAME_DESC'
-  | 'RUNTIME_ASC'
-  | 'RUNTIME_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'CONCURRENCY_ASC'
-  | 'CONCURRENCY_DESC'
-  | 'SCALE_MIN_ASC'
-  | 'SCALE_MIN_DESC'
-  | 'SCALE_MAX_ASC'
-  | 'SCALE_MAX_DESC'
-  | 'TIMEOUT_SECONDS_ASC'
-  | 'TIMEOUT_SECONDS_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'IS_BUILT_IN_ASC'
-  | 'IS_BUILT_IN_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
+  | 'NATURAL'
+  | 'PARAMS_ASC'
+  | 'PARAMS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `Resource`. */
+export type ResourceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
   | 'REQUIRED_CONFIGS_ASC'
   | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_BUCKETS_ASC'
-  | 'REQUIRED_BUCKETS_DESC'
-  | 'REQUIRED_MODELS_ASC'
-  | 'REQUIRED_MODELS_DESC'
-  | 'INPUTS_ASC'
-  | 'INPUTS_DESC'
-  | 'OUTPUTS_ASC'
-  | 'OUTPUTS_DESC'
-  | 'PROPS_ASC'
-  | 'PROPS_DESC'
-  | 'VOLATILE_ASC'
-  | 'VOLATILE_DESC'
-  | 'ICON_ASC'
-  | 'ICON_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC';
-/** A filter to be used against `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionApiBindingFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `functionDefinitionId` field. */
-  functionDefinitionId?: UUIDFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `alias` field. */
-  alias?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionApiBindingFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionApiBindingFilter[];
-  /** Negates the expression. */
-  not?: FunctionApiBindingFilter;
-  /** Filter by the object’s `functionDefinition` relation. */
-  functionDefinition?: FunctionDefinitionFilter;
-}
-/** A filter to be used against `FunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionDefinitionFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `isInvocable` field. */
-  isInvocable?: BooleanFilter;
-  /** Filter by the object’s `maxAttempts` field. */
-  maxAttempts?: IntFilter;
-  /** Filter by the object’s `priority` field. */
-  priority?: IntFilter;
-  /** Filter by the object’s `queueName` field. */
-  queueName?: StringFilter;
-  /** Filter by the object’s `runtime` field. */
-  runtime?: StringFilter;
-  /** Filter by the object’s `image` field. */
-  image?: StringFilter;
-  /** Filter by the object’s `concurrency` field. */
-  concurrency?: IntFilter;
-  /** Filter by the object’s `scaleMin` field. */
-  scaleMin?: IntFilter;
-  /** Filter by the object’s `scaleMax` field. */
-  scaleMax?: IntFilter;
-  /** Filter by the object’s `timeoutSeconds` field. */
-  timeoutSeconds?: IntFilter;
-  /** Filter by the object’s `resources` field. */
-  resources?: JSONFilter;
-  /** Filter by the object’s `isBuiltIn` field. */
-  isBuiltIn?: BooleanFilter;
-  /** Filter by the object’s `requiredBuckets` field. */
-  requiredBuckets?: StringListFilter;
-  /** Filter by the object’s `requiredModels` field. */
-  requiredModels?: StringListFilter;
-  /** Filter by the object’s `inputs` field. */
-  inputs?: JSONFilter;
-  /** Filter by the object’s `outputs` field. */
-  outputs?: JSONFilter;
-  /** Filter by the object’s `props` field. */
-  props?: JSONFilter;
-  /** Filter by the object’s `volatile` field. */
-  volatile?: BooleanFilter;
-  /** Filter by the object’s `icon` field. */
-  icon?: StringFilter;
-  /** Filter by the object’s `category` field. */
-  category?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionDefinitionFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionDefinitionFilter[];
-  /** Negates the expression. */
-  not?: FunctionDefinitionFilter;
-  /** Filter by the object’s `functionApiBindings` relation. */
-  functionApiBindings?: FunctionDefinitionToManyFunctionApiBindingFilter;
-  /** `functionApiBindings` exist. */
-  functionApiBindingsExist?: boolean;
-  /** Filter by the object’s `functionDeployments` relation. */
-  functionDeployments?: FunctionDefinitionToManyFunctionDeploymentFilter;
-  /** `functionDeployments` exist. */
-  functionDeploymentsExist?: boolean;
-}
-/** A filter to be used against many `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionDefinitionToManyFunctionApiBindingFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: FunctionApiBindingFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: FunctionApiBindingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: FunctionApiBindingFilter;
-}
-/** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionDefinitionToManyFunctionDeploymentFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: FunctionDeploymentFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: FunctionDeploymentFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: FunctionDeploymentFilter;
-}
-/** A filter to be used against `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionDeploymentFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `functionDefinitionId` field. */
-  functionDefinitionId?: UUIDFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `serviceUrl` field. */
-  serviceUrl?: StringFilter;
-  /** Filter by the object’s `serviceName` field. */
-  serviceName?: StringFilter;
-  /** Filter by the object’s `revision` field. */
-  revision?: IntFilter;
-  /** Filter by the object’s `image` field. */
-  image?: StringFilter;
-  /** Filter by the object’s `concurrency` field. */
-  concurrency?: IntFilter;
-  /** Filter by the object’s `scaleMin` field. */
-  scaleMin?: IntFilter;
-  /** Filter by the object’s `scaleMax` field. */
-  scaleMax?: IntFilter;
-  /** Filter by the object’s `timeoutSeconds` field. */
-  timeoutSeconds?: IntFilter;
-  /** Filter by the object’s `resources` field. */
-  resources?: JSONFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `lastErrorAt` field. */
-  lastErrorAt?: DatetimeFilter;
-  /** Filter by the object’s `errorCount` field. */
-  errorCount?: IntFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionDeploymentFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionDeploymentFilter[];
-  /** Negates the expression. */
-  not?: FunctionDeploymentFilter;
-  /** Filter by the object’s `functionDefinition` relation. */
-  functionDefinition?: FunctionDefinitionFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: PlatformNamespaceFilter;
-}
-/** A filter to be used against `PlatformNamespace` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformNamespaceFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `namespaceName` field. */
-  namespaceName?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `sourceDatabaseId` field. */
-  sourceDatabaseId?: UUIDFilter;
-  /** Filter by the object’s `sourceScope` field. */
-  sourceScope?: StringFilter;
-  /** Filter by the object’s `isManaged` field. */
-  isManaged?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: PlatformNamespaceFilter[];
-  /** Checks for any expressions in this list. */
-  or?: PlatformNamespaceFilter[];
-  /** Negates the expression. */
-  not?: PlatformNamespaceFilter;
-  /** Filter by the object’s `functionDeploymentsByNamespaceId` relation. */
-  functionDeploymentsByNamespaceId?: PlatformNamespaceToManyFunctionDeploymentFilter;
-  /** `functionDeploymentsByNamespaceId` exist. */
-  functionDeploymentsByNamespaceIdExist?: boolean;
-  /** Filter by the object’s `resourcesByNamespaceId` relation. */
-  resourcesByNamespaceId?: PlatformNamespaceToManyResourceFilter;
-  /** `resourcesByNamespaceId` exist. */
-  resourcesByNamespaceIdExist?: boolean;
-}
-/** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformNamespaceToManyFunctionDeploymentFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: FunctionDeploymentFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: FunctionDeploymentFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: FunctionDeploymentFilter;
-}
-/** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformNamespaceToManyResourceFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: ResourceFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: ResourceFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ResourceFilter;
-}
-/** A filter to be used against `Resource` object types. All fields are combined with a logical ‘and.’ */
-export interface ResourceFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Filter by the object’s `kind` field. */
-  kind?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringFilter;
-  /** Filter by the object’s `spec` field. */
-  spec?: JSONFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `statusObserved` field. */
-  statusObserved?: JSONFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `errorCount` field. */
-  errorCount?: IntFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: ResourceFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ResourceFilter[];
-  /** Negates the expression. */
-  not?: ResourceFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: PlatformNamespaceFilter;
-}
-/** A filter to be used against `FunctionGraphRef` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphRefFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `commitId` field. */
-  commitId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphRefFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphRefFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphRefFilter;
-}
-/** A filter to be used against `FunctionGraphStore` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphStoreFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `hash` field. */
-  hash?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphStoreFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphStoreFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphStoreFilter;
-}
-/** A filter to be used against `FunctionGraphObject` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphObjectFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `kids` field. */
-  kids?: UUIDListFilter;
-  /** Filter by the object’s `ktree` field. */
-  ktree?: StringListFilter;
-  /** Filter by the object’s `data` field. */
-  data?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphObjectFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphObjectFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphObjectFilter;
-}
-/** A filter to be used against `FunctionDeploymentEvent` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionDeploymentEventFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `deploymentId` field. */
-  deploymentId?: UUIDFilter;
-  /** Filter by the object’s `eventType` field. */
-  eventType?: StringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionDeploymentEventFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionDeploymentEventFilter[];
-  /** Negates the expression. */
-  not?: FunctionDeploymentEventFilter;
-}
-/** A filter to be used against `OrgFunctionExecutionLog` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgFunctionExecutionLogFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `invocationId` field. */
-  invocationId?: UUIDFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Filter by the object’s `logLevel` field. */
-  logLevel?: StringFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgFunctionExecutionLogFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgFunctionExecutionLogFilter[];
-  /** Negates the expression. */
-  not?: OrgFunctionExecutionLogFilter;
-}
-/** A filter to be used against `ResourceEvent` object types. All fields are combined with a logical ‘and.’ */
-export interface ResourceEventFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `resourceId` field. */
-  resourceId?: UUIDFilter;
-  /** Filter by the object’s `eventType` field. */
-  eventType?: StringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: ResourceEventFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ResourceEventFilter[];
-  /** Negates the expression. */
-  not?: ResourceEventFilter;
-}
-/** A filter to be used against `FunctionGraphExecutionOutput` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphExecutionOutputFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `hash` field. */
-  hash?: Base64EncodedBinaryFilter;
-  /** Filter by the object’s `data` field. */
-  data?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphExecutionOutputFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphExecutionOutputFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphExecutionOutputFilter;
-}
-/** A filter to be used against Base64EncodedBinary fields. All fields are combined with a logical ‘and.’ */
-export interface Base64EncodedBinaryFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: Base64EncodedBinary;
-  /** Not equal to the specified value. */
-  notEqualTo?: Base64EncodedBinary;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: Base64EncodedBinary;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: Base64EncodedBinary;
-  /** Included in the specified list. */
-  in?: Base64EncodedBinary[];
-  /** Not included in the specified list. */
-  notIn?: Base64EncodedBinary[];
-}
-/** A filter to be used against `FunctionGraphCommit` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphCommitFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `parentIds` field. */
-  parentIds?: UUIDListFilter;
-  /** Filter by the object’s `authorId` field. */
-  authorId?: UUIDFilter;
-  /** Filter by the object’s `committerId` field. */
-  committerId?: UUIDFilter;
-  /** Filter by the object’s `treeId` field. */
-  treeId?: UUIDFilter;
-  /** Filter by the object’s `date` field. */
-  date?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphCommitFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphCommitFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphCommitFilter;
-}
-/** A filter to be used against `SecretDefinition` object types. All fields are combined with a logical ‘and.’ */
-export interface SecretDefinitionFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `isBuiltIn` field. */
-  isBuiltIn?: BooleanFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: SecretDefinitionFilter[];
-  /** Checks for any expressions in this list. */
-  or?: SecretDefinitionFilter[];
-  /** Negates the expression. */
-  not?: SecretDefinitionFilter;
-}
-/** A filter to be used against `FunctionExecutionLog` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionExecutionLogFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `invocationId` field. */
-  invocationId?: UUIDFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Filter by the object’s `logLevel` field. */
-  logLevel?: StringFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionExecutionLogFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionExecutionLogFilter[];
-  /** Negates the expression. */
-  not?: FunctionExecutionLogFilter;
-}
-/** A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `context` field. */
-  context?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `definitionsCommitId` field. */
-  definitionsCommitId?: UUIDFilter;
-  /** Filter by the object’s `isValid` field. */
-  isValid?: BooleanFilter;
-  /** Filter by the object’s `validationErrors` field. */
-  validationErrors?: JSONFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphFilter;
-}
-/** A filter to be used against `FunctionGraphExecutionNodeState` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphExecutionNodeStateFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `executionId` field. */
-  executionId?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `nodeName` field. */
-  nodeName?: StringFilter;
-  /** Filter by the object’s `nodePath` field. */
-  nodePath?: StringListFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `startedAt` field. */
-  startedAt?: DatetimeFilter;
-  /** Filter by the object’s `completedAt` field. */
-  completedAt?: DatetimeFilter;
-  /** Filter by the object’s `errorCode` field. */
-  errorCode?: StringFilter;
-  /** Filter by the object’s `errorMessage` field. */
-  errorMessage?: StringFilter;
-  /** Filter by the object’s `outputId` field. */
-  outputId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphExecutionNodeStateFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphExecutionNodeStateFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphExecutionNodeStateFilter;
-}
-/** A filter to be used against `OrgFunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgFunctionInvocationFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Filter by the object’s `payload` field. */
-  payload?: JSONFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `result` field. */
-  result?: JSONFilter;
-  /** Filter by the object’s `error` field. */
-  error?: StringFilter;
-  /** Filter by the object’s `durationMs` field. */
-  durationMs?: IntFilter;
-  /** Filter by the object’s `jobId` field. */
-  jobId?: BigIntFilter;
-  /** Filter by the object’s `startedAt` field. */
-  startedAt?: DatetimeFilter;
-  /** Filter by the object’s `completedAt` field. */
-  completedAt?: DatetimeFilter;
-  /** Filter by the object’s `parentInvocationId` field. */
-  parentInvocationId?: UUIDFilter;
-  /** Filter by the object’s `graphExecutionId` field. */
-  graphExecutionId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgFunctionInvocationFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgFunctionInvocationFilter[];
-  /** Negates the expression. */
-  not?: OrgFunctionInvocationFilter;
-}
-/** A filter to be used against `FunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionInvocationFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Filter by the object’s `payload` field. */
-  payload?: JSONFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `result` field. */
-  result?: JSONFilter;
-  /** Filter by the object’s `error` field. */
-  error?: StringFilter;
-  /** Filter by the object’s `durationMs` field. */
-  durationMs?: IntFilter;
-  /** Filter by the object’s `jobId` field. */
-  jobId?: BigIntFilter;
-  /** Filter by the object’s `startedAt` field. */
-  startedAt?: DatetimeFilter;
-  /** Filter by the object’s `completedAt` field. */
-  completedAt?: DatetimeFilter;
-  /** Filter by the object’s `parentInvocationId` field. */
-  parentInvocationId?: UUIDFilter;
-  /** Filter by the object’s `graphExecutionId` field. */
-  graphExecutionId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionInvocationFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionInvocationFilter[];
-  /** Negates the expression. */
-  not?: FunctionInvocationFilter;
-}
-/** A filter to be used against `PlatformNamespaceEvent` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformNamespaceEventFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Filter by the object’s `eventType` field. */
-  eventType?: StringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `cpuMillicores` field. */
-  cpuMillicores?: IntFilter;
-  /** Filter by the object’s `memoryBytes` field. */
-  memoryBytes?: BigIntFilter;
-  /** Filter by the object’s `storageBytes` field. */
-  storageBytes?: BigIntFilter;
-  /** Filter by the object’s `networkIngressBytes` field. */
-  networkIngressBytes?: BigIntFilter;
-  /** Filter by the object’s `networkEgressBytes` field. */
-  networkEgressBytes?: BigIntFilter;
-  /** Filter by the object’s `podCount` field. */
-  podCount?: IntFilter;
-  /** Filter by the object’s `metrics` field. */
-  metrics?: JSONFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: PlatformNamespaceEventFilter[];
-  /** Checks for any expressions in this list. */
-  or?: PlatformNamespaceEventFilter[];
-  /** Negates the expression. */
-  not?: PlatformNamespaceEventFilter;
-}
-/** A filter to be used against `FunctionGraphExecution` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphExecutionFilter {
-  /** Filter by the object’s `startedAt` field. */
-  startedAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `graphId` field. */
-  graphId?: UUIDFilter;
-  /** Filter by the object’s `invocationId` field. */
-  invocationId?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `outputNode` field. */
-  outputNode?: StringFilter;
-  /** Filter by the object’s `outputPort` field. */
-  outputPort?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `inputPayload` field. */
-  inputPayload?: JSONFilter;
-  /** Filter by the object’s `outputPayload` field. */
-  outputPayload?: JSONFilter;
-  /** Filter by the object’s `nodeOutputs` field. */
-  nodeOutputs?: JSONFilter;
-  /** Filter by the object’s `executionPlan` field. */
-  executionPlan?: JSONFilter;
-  /** Filter by the object’s `currentWave` field. */
-  currentWave?: IntFilter;
-  /** Filter by the object’s `parentExecutionId` field. */
-  parentExecutionId?: UUIDFilter;
-  /** Filter by the object’s `parentNodeName` field. */
-  parentNodeName?: StringFilter;
-  /** Filter by the object’s `definitionsCommitId` field. */
-  definitionsCommitId?: UUIDFilter;
-  /** Filter by the object’s `tickCount` field. */
-  tickCount?: IntFilter;
-  /** Filter by the object’s `completedAt` field. */
-  completedAt?: DatetimeFilter;
-  /** Filter by the object’s `maxTicks` field. */
-  maxTicks?: IntFilter;
-  /** Filter by the object’s `maxPendingJobs` field. */
-  maxPendingJobs?: IntFilter;
-  /** Filter by the object’s `timeoutAt` field. */
-  timeoutAt?: DatetimeFilter;
-  /** Filter by the object’s `errorCode` field. */
-  errorCode?: StringFilter;
-  /** Filter by the object’s `errorMessage` field. */
-  errorMessage?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphExecutionFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphExecutionFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphExecutionFilter;
-  /** Filter by the object’s `graph` relation. */
-  graph?: FunctionGraphFilter;
-}
-export interface ValidateFunctionGraphInput {
-  clientMutationId?: string;
-  graphId?: string;
-}
-export interface InitEmptyRepoInput {
-  clientMutationId?: string;
-  sId?: string;
-  storeId?: string;
-}
-export interface SetDataAtPathInput {
-  clientMutationId?: string;
-  sId?: string;
-  root?: string;
-  path?: string[];
-  data?: unknown;
-}
-export interface ImportDefinitionsInput {
-  clientMutationId?: string;
-  graphId?: string;
-  sourceScopeId?: string;
-  sourceCommitId?: string;
-  contexts?: string[];
-}
-export interface CopyGraphInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  graphId?: string;
-  name?: string;
-}
-export interface SaveGraphInput {
-  clientMutationId?: string;
-  graphId?: string;
-  rootHash?: string;
-  message?: string;
-}
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `ResourceStatusCheck`. */
+export type ResourceStatusCheckOrderBy =
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUESTED_AT_ASC'
+  | 'REQUESTED_AT_DESC'
+  | 'REQUESTED_BY_ASC'
+  | 'REQUESTED_BY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+/** Methods to use when ordering `ResourceUsageLog`. */
+export type ResourceUsageLogOrderBy =
+  | 'CPU_MILLICORES_ASC'
+  | 'CPU_MILLICORES_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTERVAL_SECONDS_ASC'
+  | 'INTERVAL_SECONDS_DESC'
+  | 'MEMORY_BYTES_ASC'
+  | 'MEMORY_BYTES_DESC'
+  | 'METRICS_ASC'
+  | 'METRICS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SAMPLED_AT_ASC'
+  | 'SAMPLED_AT_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC';
+/** Methods to use when ordering `ResourceUsageSummary`. */
+export type ResourceUsageSummaryOrderBy =
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+/** Methods to use when ordering `ResourceUtilizationDaily`. */
+export type ResourceUtilizationDailyOrderBy =
+  | 'AVG_MEMORY_BYTES_ASC'
+  | 'AVG_MEMORY_BYTES_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_PEAK_UTILIZATION_ASC'
+  | 'CPU_PEAK_UTILIZATION_DESC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_ASC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_PEAK_UTILIZATION_ASC'
+  | 'MEMORY_PEAK_UTILIZATION_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_ASC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+/** Methods to use when ordering `ResourcesHealth`. */
+export type ResourcesHealthOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_DETAIL_ASC'
+  | 'STATUS_DETAIL_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `ResourcesRequirementsState`. */
+export type ResourcesRequirementsStateOrderBy =
+  | 'CONFIG_HASH_ASC'
+  | 'CONFIG_HASH_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NATURAL'
+  | 'REQUIREMENTS_HASH_ASC'
+  | 'REQUIREMENTS_HASH_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_HASH_ASC'
+  | 'SECRETS_HASH_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+/** Methods to use when ordering `ResourcesResolvedRequirement`. */
+export type ResourcesResolvedRequirementOrderBy =
+  | 'ATOM_ID_ASC'
+  | 'ATOM_ID_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRESENT_ASC'
+  | 'PRESENT_DESC'
+  | 'REQUIRED_ASC'
+  | 'REQUIRED_DESC'
+  | 'REQUIREMENT_KIND_ASC'
+  | 'REQUIREMENT_KIND_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+/** Methods to use when ordering `WebhookEndpoint`. */
+export type WebhookEndpointOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'HOST_ASC'
+  | 'HOST_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REPLAY_WINDOW_SECONDS_ASC'
+  | 'REPLAY_WINDOW_SECONDS_DESC'
+  | 'SIGNING_SECRET_NAME_ASC'
+  | 'SIGNING_SECRET_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `WebhookEvent`. */
+export type WebhookEventOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENDPOINT_ID_ASC'
+  | 'ENDPOINT_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXTERNAL_EVENT_ID_ASC'
+  | 'EXTERNAL_EVENT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PROVIDER_TIMESTAMP_ASC'
+  | 'PROVIDER_TIMESTAMP_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export interface AddEdgeAndSaveInput {
   clientMutationId?: string;
-  graphId?: string;
-  srcNode?: string;
-  srcPort?: string;
   dstNode?: string;
   dstPort?: string;
+  graphId?: string;
   message?: string;
+  srcNode?: string;
+  srcPort?: string;
+}
+export interface AddEdgeInput {
+  clientMutationId?: string;
+  context?: string;
+  dstNode?: string;
+  dstPort?: string;
+  graphName?: string;
+  rootHash?: string;
+  scopeId?: string;
+  srcNode?: string;
+  srcPort?: string;
 }
 export interface AddNodeAndSaveInput {
   clientMutationId?: string;
   graphId?: string;
+  message?: string;
+  meta?: unknown;
   nodeName?: string;
   nodeType?: string;
   props?: unknown;
-  meta?: unknown;
-  message?: string;
-}
-export interface CreateFunctionGraphInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  context?: string;
-  description?: string;
-  createdBy?: string;
-  definitionsCommitId?: string;
-}
-export interface ImportGraphJsonInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  graphJson?: unknown;
-  context?: string;
-  description?: string;
-  createdBy?: string;
-  definitionsCommitId?: string;
-}
-export interface AddEdgeInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  rootHash?: string;
-  srcNode?: string;
-  srcPort?: string;
-  dstNode?: string;
-  dstPort?: string;
-  context?: string;
-  graphName?: string;
 }
 export interface AddNodeInput {
   clientMutationId?: string;
-  databaseId?: string;
-  rootHash?: string;
-  nodeName?: string;
-  nodeType?: string;
   context?: string;
   graphName?: string;
-  props?: unknown;
   meta?: unknown;
+  nodeName?: string;
+  nodeType?: string;
+  props?: unknown;
+  rootHash?: string;
+  scopeId?: string;
 }
-export interface InsertNodeAtPathInput {
-  clientMutationId?: string;
-  sId?: string;
-  root?: string;
-  path?: string[];
-  data?: unknown;
-  kids?: string[];
-  ktree?: string[];
+/** A filter to be used against Base64EncodedBinary fields. All fields are combined with a logical ‘and.’ */
+export interface Base64EncodedBinaryFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Base64EncodedBinary;
+  /** Equal to the specified value. */
+  equalTo?: Base64EncodedBinary;
+  /** Included in the specified list. */
+  in?: Base64EncodedBinary[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Base64EncodedBinary;
+  /** Not equal to the specified value. */
+  notEqualTo?: Base64EncodedBinary;
+  /** Not included in the specified list. */
+  notIn?: Base64EncodedBinary[];
 }
-export interface StartExecutionInput {
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+}
+export interface CopyGraphInput {
   clientMutationId?: string;
   graphId?: string;
-  inputPayload?: unknown;
-  outputNode?: string;
-  outputPort?: string;
-  maxTicks?: number;
-  maxPendingJobs?: number;
-  timeoutInterval?: IntervalInput;
-  parentExecutionId?: string;
-  parentNodeName?: string;
+  name?: string;
+  scopeId?: string;
 }
-/** An interval of time that has passed where the smallest distinct unit is a second. */
-export interface IntervalInput {
-  /**
-   * A quantity of seconds. This is the only non-integer field, as all the other
-   * fields will dump their overflow into a smaller unit of time. Intervals don’t
-   * have a smaller unit than seconds.
-   */
-  seconds?: number;
-  /** A quantity of minutes. */
-  minutes?: number;
-  /** A quantity of hours. */
-  hours?: number;
-  /** A quantity of days. */
-  days?: number;
-  /** A quantity of months. */
-  months?: number;
-  /** A quantity of years. */
-  years?: number;
+export interface CreateDbPresetInput {
+  clientMutationId?: string;
+  /** The `DbPreset` to be created by this mutation. */
+  dbPreset: DbPresetInput;
 }
 export interface CreateFunctionApiBindingInput {
   clientMutationId?: string;
   /** The `FunctionApiBinding` to be created by this mutation. */
   functionApiBinding: FunctionApiBindingInput;
 }
-/** An input for mutations affecting `FunctionApiBinding` */
-export interface FunctionApiBindingInput {
-  id?: string;
-  /** Function definition this binding belongs to */
-  functionDefinitionId: string;
-  /** API endpoint this function is bound to */
-  apiId: string;
-  /** Binding alias (e.g. default, staging, production) */
-  alias?: string;
-  /** Per-binding configuration (overrides, routing rules, etc.) */
-  config?: unknown;
-}
-export interface CreateFunctionGraphRefInput {
+export interface CreateFunctionDefinitionInput {
   clientMutationId?: string;
-  /** The `FunctionGraphRef` to be created by this mutation. */
-  functionGraphRef: FunctionGraphRefInput;
-}
-/** An input for mutations affecting `FunctionGraphRef` */
-export interface FunctionGraphRefInput {
-  /** Unique ref identifier */
-  id?: string;
-  /** Ref name (e.g. HEAD, main) */
-  name: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Store this ref belongs to */
-  storeId: string;
-  /** Commit this ref points to */
-  commitId?: string;
-}
-export interface CreateFunctionGraphStoreInput {
-  clientMutationId?: string;
-  /** The `FunctionGraphStore` to be created by this mutation. */
-  functionGraphStore: FunctionGraphStoreInput;
-}
-/** An input for mutations affecting `FunctionGraphStore` */
-export interface FunctionGraphStoreInput {
-  /** Unique store identifier */
-  id?: string;
-  /** Human-readable store name */
-  name: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Current root object hash of this store */
-  hash?: string;
-  /** Timestamp of store creation */
-  createdAt?: string;
-}
-export interface CreateFunctionGraphObjectInput {
-  clientMutationId?: string;
-  /** The `FunctionGraphObject` to be created by this mutation. */
-  functionGraphObject: FunctionGraphObjectInput;
-}
-/** An input for mutations affecting `FunctionGraphObject` */
-export interface FunctionGraphObjectInput {
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Ordered array of child object IDs */
-  kids?: string[];
-  /** Ordered array of child path names (parallel to kids) */
-  ktree?: string[];
-  /** Payload data for this object node */
-  data?: unknown;
-  /** Timestamp of object creation */
-  createdAt?: string;
+  /** The `FunctionDefinition` to be created by this mutation. */
+  functionDefinition: FunctionDefinitionInput;
 }
 export interface CreateFunctionDeploymentEventInput {
   clientMutationId?: string;
   /** The `FunctionDeploymentEvent` to be created by this mutation. */
   functionDeploymentEvent: FunctionDeploymentEventInput;
 }
-/** An input for mutations affecting `FunctionDeploymentEvent` */
-export interface FunctionDeploymentEventInput {
-  /** Event timestamp (partition key) */
-  createdAt?: string;
-  /** Unique event identifier */
-  id?: string;
-  /** Deployment this event belongs to */
-  deploymentId: string;
-  /** Event type: provisioned, scaled, failed, deactivated, redeployed, health_check */
-  eventType: string;
-  /** User who triggered this event (NULL for system/automated) */
-  actorId?: string;
-  /** Human-readable description of the event */
-  message?: string;
-  /** Structured context (old/new values, error details, etc.) */
-  metadata?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-}
-export interface CreateOrgFunctionExecutionLogInput {
+export interface CreateFunctionDeploymentInput {
   clientMutationId?: string;
-  /** The `OrgFunctionExecutionLog` to be created by this mutation. */
-  orgFunctionExecutionLog: OrgFunctionExecutionLogInput;
-}
-/** An input for mutations affecting `OrgFunctionExecutionLog` */
-export interface OrgFunctionExecutionLogInput {
-  /** Log entry timestamp (partition key) */
-  createdAt?: string;
-  /** Unique log entry identifier */
-  id?: string;
-  /** Invocation this log entry belongs to (NULL for standalone job logs) */
-  invocationId?: string;
-  /** Function routing key (NULL for generic job logs) */
-  taskIdentifier?: string;
-  /** Log severity: debug, info, warn, error */
-  logLevel?: string;
-  /** Log message text */
-  message: string;
-  /** Structured context (labels, trace data, extra fields) */
-  metadata?: unknown;
-  /** User who triggered the execution (NULL for system/cron) */
-  actorId?: string;
-}
-export interface CreateResourceEventInput {
-  clientMutationId?: string;
-  /** The `ResourceEvent` to be created by this mutation. */
-  resourceEvent: ResourceEventInput;
-}
-/** An input for mutations affecting `ResourceEvent` */
-export interface ResourceEventInput {
-  /** Event timestamp (partition key) */
-  createdAt?: string;
-  /** Unique event identifier */
-  id?: string;
-  /** Resource this event belongs to */
-  resourceId: string;
-  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
-  eventType: string;
-  /** User who triggered this event (NULL for system/automated) */
-  actorId?: string;
-  /** Human-readable description of the event */
-  message?: string;
-  /** Structured context (old/new values, error details, etc.) */
-  metadata?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-}
-export interface CreateFunctionGraphExecutionOutputInput {
-  clientMutationId?: string;
-  /** The `FunctionGraphExecutionOutput` to be created by this mutation. */
-  functionGraphExecutionOutput: FunctionGraphExecutionOutputInput;
-}
-/** An input for mutations affecting `FunctionGraphExecutionOutput` */
-export interface FunctionGraphExecutionOutputInput {
-  /** Timestamp of output creation */
-  createdAt?: string;
-  /** Unique execution output identifier */
-  id?: string;
-  /** Scope for multi-tenant isolation */
-  databaseId: string;
-  /** SHA-256 hash of the data JSONB — content-addressed deduplication */
-  hash: Base64EncodedBinary;
-  /** The actual output payload from a completed node */
-  data: unknown;
-}
-export interface CreateFunctionGraphCommitInput {
-  clientMutationId?: string;
-  /** The `FunctionGraphCommit` to be created by this mutation. */
-  functionGraphCommit: FunctionGraphCommitInput;
-}
-/** An input for mutations affecting `FunctionGraphCommit` */
-export interface FunctionGraphCommitInput {
-  /** Unique commit identifier */
-  id?: string;
-  /** Optional commit message */
-  message?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Store this commit belongs to */
-  storeId: string;
-  /** Parent commit IDs (supports merge commits) */
-  parentIds?: string[];
-  /** User who authored the changes */
-  authorId?: string;
-  /** User who committed (may differ from author) */
-  committerId?: string;
-  /** Root object ID of the tree snapshot at this commit */
-  treeId?: string;
-  /** Commit timestamp */
-  date?: string;
-}
-export interface CreateSecretDefinitionInput {
-  clientMutationId?: string;
-  /** The `SecretDefinition` to be created by this mutation. */
-  secretDefinition: SecretDefinitionInput;
-}
-/** An input for mutations affecting `SecretDefinition` */
-export interface SecretDefinitionInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Secret name (must match app_secrets.name for resolution) */
-  name: string;
-  /** Human-readable description of what this secret is used for */
-  description?: string;
-  /** Whether this row was seeded as a built-in secret definition. Built-in rows are immutable. */
-  isBuiltIn?: boolean;
-  /** Key-value metadata for filtering and grouping secret definitions */
-  labels?: unknown;
-  /** Freeform metadata annotations for secret definitions */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
+  /** The `FunctionDeployment` to be created by this mutation. */
+  functionDeployment: FunctionDeploymentInput;
 }
 export interface CreateFunctionExecutionLogInput {
   clientMutationId?: string;
   /** The `FunctionExecutionLog` to be created by this mutation. */
   functionExecutionLog: FunctionExecutionLogInput;
 }
-/** An input for mutations affecting `FunctionExecutionLog` */
-export interface FunctionExecutionLogInput {
-  /** Log entry timestamp (partition key) */
-  createdAt?: string;
-  /** Unique log entry identifier */
-  id?: string;
-  /** Invocation this log entry belongs to (NULL for standalone job logs) */
-  invocationId?: string;
-  /** Function routing key (NULL for generic job logs) */
-  taskIdentifier?: string;
-  /** Log severity: debug, info, warn, error */
-  logLevel?: string;
-  /** Log message text */
-  message: string;
-  /** Structured context (labels, trace data, extra fields) */
-  metadata?: unknown;
-  /** User who triggered the execution (NULL for system/cron) */
-  actorId?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-}
-export interface CreateFunctionGraphExecutionNodeStateInput {
+export interface CreateFunctionGraphCommitInput {
   clientMutationId?: string;
-  /** The `FunctionGraphExecutionNodeState` to be created by this mutation. */
-  functionGraphExecutionNodeState: FunctionGraphExecutionNodeStateInput;
-}
-/** An input for mutations affecting `FunctionGraphExecutionNodeState` */
-export interface FunctionGraphExecutionNodeStateInput {
-  /** Timestamp of node state creation (partition key) */
-  createdAt?: string;
-  /** Unique node state identifier */
-  id?: string;
-  /** FK to the parent graph execution */
-  executionId: string;
-  /** Scope for multi-tenant isolation */
-  databaseId: string;
-  /** Name of the node within the graph (e.g. send-email1) */
-  nodeName: string;
-  /** Full merkle tree path to this node (e.g. {function,graphs,myflow,nodes,send-email1}) — enables subnet hierarchy tracking */
-  nodePath?: string[];
-  /** Node lifecycle: pending → queued → running → completed/failed */
-  status?: string;
-  /** Timestamp when the node began executing */
-  startedAt?: string;
-  /** Timestamp when the node finished (success or failure) */
-  completedAt?: string;
-  /** Machine-readable error code when status = failed */
-  errorCode?: string;
-  /** Human-readable error description when status = failed */
-  errorMessage?: string;
-  /** FK to execution_outputs — content-addressed output blob for this node */
-  outputId?: string;
-}
-export interface CreatePlatformNamespaceInput {
-  clientMutationId?: string;
-  /** The `PlatformNamespace` to be created by this mutation. */
-  platformNamespace: PlatformNamespaceInput;
-}
-/** An input for mutations affecting `PlatformNamespace` */
-export interface PlatformNamespaceInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Human-readable namespace name (e.g. default, production, oauth) */
-  name: string;
-  /** Globally unique computed namespace identifier via inflection.underscore */
-  namespaceName: string;
-  /** Optional human-readable description of this namespace */
-  description?: string;
-  /** Whether this namespace is active (soft-disable for filtering) */
-  isActive?: boolean;
-  /** Key/value pairs for selecting and filtering namespaces */
-  labels?: unknown;
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  /** Database that created this namespace (NULL for platform-native namespaces) */
-  sourceDatabaseId?: string;
-  /** Origin scope: platform, org, app — indicates where this namespace was created */
-  sourceScope?: string;
-  /** true = created by a child scope mirror trigger, false = platform-native */
-  isManaged?: boolean;
-}
-export interface CreateOrgFunctionInvocationInput {
-  clientMutationId?: string;
-  /** The `OrgFunctionInvocation` to be created by this mutation. */
-  orgFunctionInvocation: OrgFunctionInvocationInput;
-}
-/** An input for mutations affecting `OrgFunctionInvocation` */
-export interface OrgFunctionInvocationInput {
-  /** Invocation creation timestamp (partition key) */
-  createdAt?: string;
-  /** Unique invocation identifier */
-  id?: string;
-  /** Who triggered the invocation (NULL for system/cron) */
-  actorId?: string;
-  /** Function routing slug (scope:name). Links to function_definitions.task_identifier by convention — no FK. */
-  taskIdentifier: string;
-  /** Function input payload */
-  payload?: unknown;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
-  status?: string;
-  /** Function return value (success) or structured error (failure) */
-  result?: unknown;
-  /** Error message when status is failed */
-  error?: string;
-  /** Wall-clock execution time in milliseconds */
-  durationMs?: number;
-  /** FK to app_jobs.jobs — the underlying transport */
-  jobId?: string;
-  /** When execution started */
-  startedAt?: string;
-  /** When execution completed */
-  completedAt?: string;
-  /** Parent invocation when this is a child node of a flow graph execution */
-  parentInvocationId?: string;
-  /** Groups all node invocations from a single flow graph execution */
-  graphExecutionId?: string;
-}
-export interface CreateFunctionInvocationInput {
-  clientMutationId?: string;
-  /** The `FunctionInvocation` to be created by this mutation. */
-  functionInvocation: FunctionInvocationInput;
-}
-/** An input for mutations affecting `FunctionInvocation` */
-export interface FunctionInvocationInput {
-  /** Invocation creation timestamp (partition key) */
-  createdAt?: string;
-  /** Unique invocation identifier */
-  id?: string;
-  /** Who triggered the invocation (NULL for system/cron) */
-  actorId?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  /** Function routing slug (scope:name). Links to function_definitions.task_identifier by convention — no FK. */
-  taskIdentifier: string;
-  /** Function input payload */
-  payload?: unknown;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
-  status?: string;
-  /** Function return value (success) or structured error (failure) */
-  result?: unknown;
-  /** Error message when status is failed */
-  error?: string;
-  /** Wall-clock execution time in milliseconds */
-  durationMs?: number;
-  /** FK to app_jobs.jobs — the underlying transport */
-  jobId?: string;
-  /** When execution started */
-  startedAt?: string;
-  /** When execution completed */
-  completedAt?: string;
-  /** Parent invocation when this is a child node of a flow graph execution */
-  parentInvocationId?: string;
-  /** Groups all node invocations from a single flow graph execution */
-  graphExecutionId?: string;
-}
-export interface CreateResourceInput {
-  clientMutationId?: string;
-  /** The `Resource` to be created by this mutation. */
-  resource: ResourceInput;
-}
-/** An input for mutations affecting `Resource` */
-export interface ResourceInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
-  namespaceId: string;
-  /** Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate */
-  kind: string;
-  /** Human-readable resource name */
-  name: string;
-  /** URL-safe identifier, unique within (namespace_id, kind) */
-  slug: string;
-  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
-  spec?: unknown;
-  /** Resource lifecycle status: pending, provisioning, active, failed, draining, deleting */
-  status?: string;
-  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
-  statusObserved?: unknown;
-  /** Most recent provisioning or runtime error message */
-  lastError?: string;
-  /** Cumulative error count for this resource */
-  errorCount?: number;
-  /** Key/value pairs for selecting and filtering resources */
-  labels?: unknown;
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-}
-export interface CreatePlatformNamespaceEventInput {
-  clientMutationId?: string;
-  /** The `PlatformNamespaceEvent` to be created by this mutation. */
-  platformNamespaceEvent: PlatformNamespaceEventInput;
-}
-/** An input for mutations affecting `PlatformNamespaceEvent` */
-export interface PlatformNamespaceEventInput {
-  /** Event timestamp (partition key) */
-  createdAt?: string;
-  /** Unique event identifier */
-  id?: string;
-  /** Namespace this event belongs to */
-  namespaceId: string;
-  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
-  eventType: string;
-  /** User who triggered this event (NULL for system/automated) */
-  actorId?: string;
-  /** Human-readable description of the event */
-  message?: string;
-  /** Structured context (old/new values, labels diff, etc.) */
-  metadata?: unknown;
-  /** CPU usage in millicores at time of event */
-  cpuMillicores?: number;
-  /** Memory usage in bytes at time of event */
-  memoryBytes?: string;
-  /** Storage usage in bytes at time of event */
-  storageBytes?: string;
-  /** Network ingress in bytes during event window */
-  networkIngressBytes?: string;
-  /** Network egress in bytes during event window */
-  networkEgressBytes?: string;
-  /** Number of active pods in the namespace at time of event */
-  podCount?: number;
-  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
-  metrics?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-}
-export interface CreateFunctionDeploymentInput {
-  clientMutationId?: string;
-  /** The `FunctionDeployment` to be created by this mutation. */
-  functionDeployment: FunctionDeploymentInput;
-}
-/** An input for mutations affecting `FunctionDeployment` */
-export interface FunctionDeploymentInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Function definition being deployed to this namespace */
-  functionDefinitionId: string;
-  /** Target namespace for this deployment (maps to a K8s namespace) */
-  namespaceId: string;
-  /** Deployment lifecycle status: pending, provisioning, active, failed, scaled_to_zero, deactivated */
-  status?: string;
-  /** Knative service URL (http://{service-name}.{namespace}.svc.cluster.local) — populated after provisioning */
-  serviceUrl?: string;
-  /** Knative service name — derived from task_identifier at provision time */
-  serviceName?: string;
-  /** Deployment revision number (incremented on each redeployment) */
-  revision?: number;
-  /** Container image override (NULL = inherit from function definition) */
-  image?: string;
-  /** Max concurrent requests per pod (NULL = inherit from definition) */
-  concurrency?: number;
-  /** Minimum replica count (NULL = inherit from definition or Knative default) */
-  scaleMin?: number;
-  /** Maximum replica count (NULL = inherit from definition or Knative default) */
-  scaleMax?: number;
-  /** Request timeout override in seconds (NULL = inherit from definition) */
-  timeoutSeconds?: number;
-  /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
-  resources?: unknown;
-  /** Most recent provisioning or runtime error message */
-  lastError?: string;
-  /** Timestamp of the most recent error */
-  lastErrorAt?: string;
-  /** Cumulative error count for this deployment */
-  errorCount?: number;
-  /** Key/value pairs for selecting and filtering deployments */
-  labels?: unknown;
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
+  /** The `FunctionGraphCommit` to be created by this mutation. */
+  functionGraphCommit: FunctionGraphCommitInput;
 }
 export interface CreateFunctionGraphExecutionInput {
   clientMutationId?: string;
   /** The `FunctionGraphExecution` to be created by this mutation. */
   functionGraphExecution: FunctionGraphExecutionInput;
 }
-/** An input for mutations affecting `FunctionGraphExecution` */
-export interface FunctionGraphExecutionInput {
-  /** Execution start timestamp */
-  startedAt?: string;
-  /** Unique execution identifier */
-  id?: string;
-  /** FK to the graph definition being executed */
-  graphId: string;
-  /** Parent function_invocations row (for metering) */
-  invocationId?: string;
-  /** Scope for multi-tenant isolation */
-  databaseId: string;
-  /** Target output boundary node name to resolve */
-  outputNode: string;
-  /** Target output port name (default: value) */
-  outputPort?: string;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
-  status?: string;
-  /** Initial inputs provided at invocation time */
-  inputPayload?: unknown;
-  /** Final result extracted from terminal output node */
-  outputPayload?: unknown;
-  /** Map of node_name → execution output id (content-addressed hash reference) */
-  nodeOutputs?: unknown;
-  /** Pre-computed topological sort as array of wave objects */
-  executionPlan?: unknown;
-  /** Index into execution_plan — tick only processes this wave */
-  currentWave?: number;
-  /** Parent execution when this is a sub-execution */
-  parentExecutionId?: string;
-  /** Node name in parent execution that spawned this sub-execution */
-  parentNodeName?: string;
-  /** Pinned definitions store commit for deterministic evaluation */
-  definitionsCommitId?: string;
-  /** Number of evaluate_step ticks executed */
-  tickCount?: number;
-  /** Execution completion timestamp */
-  completedAt?: string;
-  /** Maximum ticks before execution is failed (default 100) */
-  maxTicks?: number;
-  /** Maximum pending jobs before execution is failed (default 50) */
-  maxPendingJobs?: number;
-  /** Absolute deadline — execution fails if still running after this time */
-  timeoutAt?: string;
-  /** Machine-readable error code when status = failed */
-  errorCode?: string;
-  /** Human-readable error description when status = failed */
-  errorMessage?: string;
-}
-export interface CreateFunctionDefinitionInput {
+export interface CreateFunctionGraphExecutionNodeStateInput {
   clientMutationId?: string;
-  /** The `FunctionDefinition` to be created by this mutation. */
-  functionDefinition: FunctionDefinitionInput;
+  /** The `FunctionGraphExecutionNodeState` to be created by this mutation. */
+  functionGraphExecutionNodeState: FunctionGraphExecutionNodeStateInput;
 }
-/** An input for mutations affecting `FunctionDefinition` */
-export interface FunctionDefinitionInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Function grouping scope (e.g. email, embed, chunk, custom) */
-  scope: string;
-  /** Function name within scope (e.g. send_verification_link, process_file_embedding) */
-  name: string;
-  /** Computed routing slug: scope:name (used by Knative job worker for dispatch) */
-  taskIdentifier: string;
-  /** Human-readable description of what this function does */
-  description?: string;
-  /** Whether this function can be called via function_invocations (public API). Default false = internal-only via add_job() */
-  isInvocable?: boolean;
-  /** Maximum retry attempts for the underlying job */
-  maxAttempts?: number;
-  /** Job priority (lower = higher priority) */
-  priority?: number;
-  /** Job queue name for serialization (e.g. email, ai, default) */
-  queueName?: string;
-  /** Execution mode: http (Knative Service dispatch) or inline (in-process in compute worker) */
-  runtime?: string;
-  /** Docker image reference (e.g. ghcr.io/constructive-io/email-send-fn:latest). Required when runtime=http. NULL for inline functions. */
-  image?: string;
-  /** Knative containerConcurrency — max concurrent requests per pod instance */
-  concurrency?: number;
-  /** Minimum pod count for Knative autoscaling (minScale) */
-  scaleMin?: number;
-  /** Maximum pod count for Knative autoscaling (maxScale) */
-  scaleMax?: number;
-  /** Knative request timeout in seconds */
-  timeoutSeconds?: number;
-  /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
-  resources?: unknown;
-  /** Whether this function is a built-in platform function (synced from platform) vs user-created */
-  isBuiltIn?: boolean;
-  /** Embedded secret requirements: array of (name, required) tuples */
-  requiredSecrets?: FunctionRequirementInput[];
-  /** Embedded config requirements: array of (name, required) tuples */
-  requiredConfigs?: FunctionRequirementInput[];
-  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
-  requiredBuckets?: string[];
-  /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
-  requiredModels?: string[];
-  /** Data input ports: [{name, type, description?, optional?, multi?, schema?}] */
-  inputs?: unknown;
-  /** Data output ports: [{name, type, description?, optional?, multi?, schema?}] */
-  outputs?: unknown;
-  /** Configuration properties: [{name, type, default?, description?, required?, schema?}] */
-  props?: unknown;
-  /** Whether this function has side effects and cannot be cached or memoized */
-  volatile?: boolean;
-  /** Icon identifier for UI palette rendering (e.g. mail, database, code) */
-  icon?: string;
-  /** Palette grouping category (e.g. email, data, ai, custom) */
-  category?: string;
-}
-/** An input for mutations affecting `FunctionRequirement` */
-export interface FunctionRequirementInput {
-  name?: string;
-  required?: boolean;
-}
-export interface UpdateFunctionApiBindingInput {
+export interface CreateFunctionGraphExecutionOutputInput {
   clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionApiBinding` being updated. */
-  functionApiBindingPatch: FunctionApiBindingPatch;
+  /** The `FunctionGraphExecutionOutput` to be created by this mutation. */
+  functionGraphExecutionOutput: FunctionGraphExecutionOutputInput;
 }
-/** Represents an update to a `FunctionApiBinding`. Fields that are set will be updated. */
-export interface FunctionApiBindingPatch {
-  id?: string;
-  /** Function definition this binding belongs to */
-  functionDefinitionId?: string;
-  /** API endpoint this function is bound to */
-  apiId?: string;
-  /** Binding alias (e.g. default, staging, production) */
-  alias?: string;
-  /** Per-binding configuration (overrides, routing rules, etc.) */
-  config?: unknown;
-}
-export interface UpdateFunctionGraphRefInput {
+export interface CreateFunctionGraphInput {
   clientMutationId?: string;
-  /** Unique ref identifier */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** An object where the defined keys will be set on the `FunctionGraphRef` being updated. */
-  functionGraphRefPatch: FunctionGraphRefPatch;
-}
-/** Represents an update to a `FunctionGraphRef`. Fields that are set will be updated. */
-export interface FunctionGraphRefPatch {
-  /** Unique ref identifier */
-  id?: string;
-  /** Ref name (e.g. HEAD, main) */
-  name?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Store this ref belongs to */
-  storeId?: string;
-  /** Commit this ref points to */
-  commitId?: string;
-}
-export interface UpdateFunctionGraphStoreInput {
-  clientMutationId?: string;
-  /** Unique store identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionGraphStore` being updated. */
-  functionGraphStorePatch: FunctionGraphStorePatch;
-}
-/** Represents an update to a `FunctionGraphStore`. Fields that are set will be updated. */
-export interface FunctionGraphStorePatch {
-  /** Unique store identifier */
-  id?: string;
-  /** Human-readable store name */
-  name?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Current root object hash of this store */
-  hash?: string;
-  /** Timestamp of store creation */
-  createdAt?: string;
-}
-export interface UpdateFunctionGraphObjectInput {
-  clientMutationId?: string;
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** An object where the defined keys will be set on the `FunctionGraphObject` being updated. */
-  functionGraphObjectPatch: FunctionGraphObjectPatch;
-}
-/** Represents an update to a `FunctionGraphObject`. Fields that are set will be updated. */
-export interface FunctionGraphObjectPatch {
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Ordered array of child object IDs */
-  kids?: string[];
-  /** Ordered array of child path names (parallel to kids) */
-  ktree?: string[];
-  /** Payload data for this object node */
-  data?: unknown;
-  /** Timestamp of object creation */
-  createdAt?: string;
-}
-export interface UpdateFunctionDeploymentEventInput {
-  clientMutationId?: string;
-  /** Event timestamp (partition key) */
-  createdAt: string;
-  /** Unique event identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionDeploymentEvent` being updated. */
-  functionDeploymentEventPatch: FunctionDeploymentEventPatch;
-}
-/** Represents an update to a `FunctionDeploymentEvent`. Fields that are set will be updated. */
-export interface FunctionDeploymentEventPatch {
-  /** Event timestamp (partition key) */
-  createdAt?: string;
-  /** Unique event identifier */
-  id?: string;
-  /** Deployment this event belongs to */
-  deploymentId?: string;
-  /** Event type: provisioned, scaled, failed, deactivated, redeployed, health_check */
-  eventType?: string;
-  /** User who triggered this event (NULL for system/automated) */
-  actorId?: string;
-  /** Human-readable description of the event */
-  message?: string;
-  /** Structured context (old/new values, error details, etc.) */
-  metadata?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-}
-export interface UpdateOrgFunctionExecutionLogInput {
-  clientMutationId?: string;
-  /** Log entry timestamp (partition key) */
-  createdAt: string;
-  /** Unique log entry identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `OrgFunctionExecutionLog` being updated. */
-  orgFunctionExecutionLogPatch: OrgFunctionExecutionLogPatch;
-}
-/** Represents an update to a `OrgFunctionExecutionLog`. Fields that are set will be updated. */
-export interface OrgFunctionExecutionLogPatch {
-  /** Log entry timestamp (partition key) */
-  createdAt?: string;
-  /** Unique log entry identifier */
-  id?: string;
-  /** Invocation this log entry belongs to (NULL for standalone job logs) */
-  invocationId?: string;
-  /** Function routing key (NULL for generic job logs) */
-  taskIdentifier?: string;
-  /** Log severity: debug, info, warn, error */
-  logLevel?: string;
-  /** Log message text */
-  message?: string;
-  /** Structured context (labels, trace data, extra fields) */
-  metadata?: unknown;
-  /** User who triggered the execution (NULL for system/cron) */
-  actorId?: string;
-}
-export interface UpdateResourceEventInput {
-  clientMutationId?: string;
-  /** Event timestamp (partition key) */
-  createdAt: string;
-  /** Unique event identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `ResourceEvent` being updated. */
-  resourceEventPatch: ResourceEventPatch;
-}
-/** Represents an update to a `ResourceEvent`. Fields that are set will be updated. */
-export interface ResourceEventPatch {
-  /** Event timestamp (partition key) */
-  createdAt?: string;
-  /** Unique event identifier */
-  id?: string;
-  /** Resource this event belongs to */
-  resourceId?: string;
-  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
-  eventType?: string;
-  /** User who triggered this event (NULL for system/automated) */
-  actorId?: string;
-  /** Human-readable description of the event */
-  message?: string;
-  /** Structured context (old/new values, error details, etc.) */
-  metadata?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-}
-export interface UpdateFunctionGraphExecutionOutputInput {
-  clientMutationId?: string;
-  /** Timestamp of output creation */
-  createdAt: string;
-  /** Unique execution output identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionGraphExecutionOutput` being updated. */
-  functionGraphExecutionOutputPatch: FunctionGraphExecutionOutputPatch;
-}
-/** Represents an update to a `FunctionGraphExecutionOutput`. Fields that are set will be updated. */
-export interface FunctionGraphExecutionOutputPatch {
-  /** Timestamp of output creation */
-  createdAt?: string;
-  /** Unique execution output identifier */
-  id?: string;
-  /** Scope for multi-tenant isolation */
-  databaseId?: string;
-  /** SHA-256 hash of the data JSONB — content-addressed deduplication */
-  hash?: Base64EncodedBinary;
-  /** The actual output payload from a completed node */
-  data?: unknown;
-}
-export interface UpdateFunctionGraphCommitInput {
-  clientMutationId?: string;
-  /** Unique commit identifier */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** An object where the defined keys will be set on the `FunctionGraphCommit` being updated. */
-  functionGraphCommitPatch: FunctionGraphCommitPatch;
-}
-/** Represents an update to a `FunctionGraphCommit`. Fields that are set will be updated. */
-export interface FunctionGraphCommitPatch {
-  /** Unique commit identifier */
-  id?: string;
-  /** Optional commit message */
-  message?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Store this commit belongs to */
-  storeId?: string;
-  /** Parent commit IDs (supports merge commits) */
-  parentIds?: string[];
-  /** User who authored the changes */
-  authorId?: string;
-  /** User who committed (may differ from author) */
-  committerId?: string;
-  /** Root object ID of the tree snapshot at this commit */
-  treeId?: string;
-  /** Commit timestamp */
-  date?: string;
-}
-export interface UpdateSecretDefinitionInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `SecretDefinition` being updated. */
-  secretDefinitionPatch: SecretDefinitionPatch;
-}
-/** Represents an update to a `SecretDefinition`. Fields that are set will be updated. */
-export interface SecretDefinitionPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Secret name (must match app_secrets.name for resolution) */
-  name?: string;
-  /** Human-readable description of what this secret is used for */
-  description?: string;
-  /** Whether this row was seeded as a built-in secret definition. Built-in rows are immutable. */
-  isBuiltIn?: boolean;
-  /** Key-value metadata for filtering and grouping secret definitions */
-  labels?: unknown;
-  /** Freeform metadata annotations for secret definitions */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-}
-export interface UpdateFunctionExecutionLogInput {
-  clientMutationId?: string;
-  /** Log entry timestamp (partition key) */
-  createdAt: string;
-  /** Unique log entry identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionExecutionLog` being updated. */
-  functionExecutionLogPatch: FunctionExecutionLogPatch;
-}
-/** Represents an update to a `FunctionExecutionLog`. Fields that are set will be updated. */
-export interface FunctionExecutionLogPatch {
-  /** Log entry timestamp (partition key) */
-  createdAt?: string;
-  /** Unique log entry identifier */
-  id?: string;
-  /** Invocation this log entry belongs to (NULL for standalone job logs) */
-  invocationId?: string;
-  /** Function routing key (NULL for generic job logs) */
-  taskIdentifier?: string;
-  /** Log severity: debug, info, warn, error */
-  logLevel?: string;
-  /** Log message text */
-  message?: string;
-  /** Structured context (labels, trace data, extra fields) */
-  metadata?: unknown;
-  /** User who triggered the execution (NULL for system/cron) */
-  actorId?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-}
-export interface UpdateFunctionGraphInput {
-  clientMutationId?: string;
-  /** Unique graph identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionGraph` being updated. */
-  functionGraphPatch: FunctionGraphPatch;
-}
-/** Represents an update to a `FunctionGraph`. Fields that are set will be updated. */
-export interface FunctionGraphPatch {
-  /** Unique graph identifier */
-  id?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Graph store (Merkle store) holding the graph definition */
-  storeId?: string;
-  /** Evaluator/runtime context (function, js, sql, system) */
   context?: string;
-  /** Graph name (unique per database) */
-  name?: string;
-  /** Human-readable description of the graph */
-  description?: string;
-  /** Pinned definitions store commit for deterministic evaluation */
-  definitionsCommitId?: string;
-  /** Whether graph passes structural validation */
-  isValid?: boolean;
-  /** Array of validation error objects when is_valid = false */
-  validationErrors?: unknown;
-  /** Actor who created this graph */
   createdBy?: string;
-  /** Timestamp of graph creation */
+  definitionsCommitId?: string;
+  description?: string;
+  name?: string;
+  scopeId?: string;
+}
+export interface CreateFunctionGraphObjectInput {
+  clientMutationId?: string;
+  /** The `FunctionGraphObject` to be created by this mutation. */
+  functionGraphObject: FunctionGraphObjectInput;
+}
+export interface CreateFunctionGraphRefInput {
+  clientMutationId?: string;
+  /** The `FunctionGraphRef` to be created by this mutation. */
+  functionGraphRef: FunctionGraphRefInput;
+}
+export interface CreateFunctionGraphStoreInput {
+  clientMutationId?: string;
+  /** The `FunctionGraphStore` to be created by this mutation. */
+  functionGraphStore: FunctionGraphStoreInput;
+}
+export interface CreateFunctionInvocationInput {
+  clientMutationId?: string;
+  /** The `FunctionInvocation` to be created by this mutation. */
+  functionInvocation: FunctionInvocationInput;
+}
+export interface CreateInfraCommitInput {
+  clientMutationId?: string;
+  /** The `InfraCommit` to be created by this mutation. */
+  infraCommit: InfraCommitInput;
+}
+export interface CreateInfraObjectInput {
+  clientMutationId?: string;
+  /** The `InfraObject` to be created by this mutation. */
+  infraObject: InfraObjectInput;
+}
+export interface CreateInfraRefInput {
+  clientMutationId?: string;
+  /** The `InfraRef` to be created by this mutation. */
+  infraRef: InfraRefInput;
+}
+export interface CreateInfraStoreInput {
+  clientMutationId?: string;
+  /** The `InfraStore` to be created by this mutation. */
+  infraStore: InfraStoreInput;
+}
+export interface CreateIntegrationProviderInput {
+  clientMutationId?: string;
+  /** The `IntegrationProvider` to be created by this mutation. */
+  integrationProvider: IntegrationProviderInput;
+}
+export interface CreateNamespaceEventInput {
+  clientMutationId?: string;
+  /** The `NamespaceEvent` to be created by this mutation. */
+  namespaceEvent: NamespaceEventInput;
+}
+export interface CreateNamespaceInput {
+  clientMutationId?: string;
+  /** The `Namespace` to be created by this mutation. */
+  namespace: NamespaceInput;
+}
+export interface CreatePlatformFunctionApiBindingInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionApiBinding` to be created by this mutation. */
+  platformFunctionApiBinding: PlatformFunctionApiBindingInput;
+}
+export interface CreatePlatformFunctionDefinitionInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionDefinition` to be created by this mutation. */
+  platformFunctionDefinition: PlatformFunctionDefinitionInput;
+}
+export interface CreatePlatformFunctionDeploymentEventInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionDeploymentEvent` to be created by this mutation. */
+  platformFunctionDeploymentEvent: PlatformFunctionDeploymentEventInput;
+}
+export interface CreatePlatformFunctionDeploymentInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionDeployment` to be created by this mutation. */
+  platformFunctionDeployment: PlatformFunctionDeploymentInput;
+}
+export interface CreatePlatformFunctionExecutionLogInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionExecutionLog` to be created by this mutation. */
+  platformFunctionExecutionLog: PlatformFunctionExecutionLogInput;
+}
+export interface CreatePlatformFunctionInvocationInput {
+  clientMutationId?: string;
+  /** The `PlatformFunctionInvocation` to be created by this mutation. */
+  platformFunctionInvocation: PlatformFunctionInvocationInput;
+}
+export interface CreatePlatformInfraCommitInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraCommit` to be created by this mutation. */
+  platformInfraCommit: PlatformInfraCommitInput;
+}
+export interface CreatePlatformInfraObjectInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraObject` to be created by this mutation. */
+  platformInfraObject: PlatformInfraObjectInput;
+}
+export interface CreatePlatformInfraRefInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraRef` to be created by this mutation. */
+  platformInfraRef: PlatformInfraRefInput;
+}
+export interface CreatePlatformInfraStoreInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraStore` to be created by this mutation. */
+  platformInfraStore: PlatformInfraStoreInput;
+}
+export interface CreatePlatformNamespaceEventInput {
+  clientMutationId?: string;
+  /** The `PlatformNamespaceEvent` to be created by this mutation. */
+  platformNamespaceEvent: PlatformNamespaceEventInput;
+}
+export interface CreatePlatformNamespaceInput {
+  clientMutationId?: string;
+  /** The `PlatformNamespace` to be created by this mutation. */
+  platformNamespace: PlatformNamespaceInput;
+}
+export interface CreatePlatformResourceDefinitionInput {
+  clientMutationId?: string;
+  /** The `PlatformResourceDefinition` to be created by this mutation. */
+  platformResourceDefinition: PlatformResourceDefinitionInput;
+}
+export interface CreatePlatformResourceEventInput {
+  clientMutationId?: string;
+  /** The `PlatformResourceEvent` to be created by this mutation. */
+  platformResourceEvent: PlatformResourceEventInput;
+}
+export interface CreatePlatformResourceInput {
+  clientMutationId?: string;
+  /** The `PlatformResource` to be created by this mutation. */
+  platformResource: PlatformResourceInput;
+}
+export interface CreatePlatformResourceInstallationInput {
+  clientMutationId?: string;
+  /** The `PlatformResourceInstallation` to be created by this mutation. */
+  platformResourceInstallation: PlatformResourceInstallationInput;
+}
+export interface CreatePlatformResourceStatusCheckInput {
+  clientMutationId?: string;
+  /** The `PlatformResourceStatusCheck` to be created by this mutation. */
+  platformResourceStatusCheck: PlatformResourceStatusCheckInput;
+}
+export interface CreatePlatformResourceUsageLogInput {
+  clientMutationId?: string;
+  /** The `PlatformResourceUsageLog` to be created by this mutation. */
+  platformResourceUsageLog: PlatformResourceUsageLogInput;
+}
+export interface CreatePlatformResourceUsageSummaryInput {
+  clientMutationId?: string;
+  /** The `PlatformResourceUsageSummary` to be created by this mutation. */
+  platformResourceUsageSummary: PlatformResourceUsageSummaryInput;
+}
+export interface CreatePlatformWebhookEndpointInput {
+  clientMutationId?: string;
+  /** The `PlatformWebhookEndpoint` to be created by this mutation. */
+  platformWebhookEndpoint: PlatformWebhookEndpointInput;
+}
+export interface CreatePlatformWebhookEventInput {
+  clientMutationId?: string;
+  /** The `PlatformWebhookEvent` to be created by this mutation. */
+  platformWebhookEvent: PlatformWebhookEventInput;
+}
+export interface CreateResourceDefinitionInput {
+  clientMutationId?: string;
+  /** The `ResourceDefinition` to be created by this mutation. */
+  resourceDefinition: ResourceDefinitionInput;
+}
+export interface CreateResourceEventInput {
+  clientMutationId?: string;
+  /** The `ResourceEvent` to be created by this mutation. */
+  resourceEvent: ResourceEventInput;
+}
+export interface CreateResourceInput {
+  clientMutationId?: string;
+  /** The `Resource` to be created by this mutation. */
+  resource: ResourceInput;
+}
+export interface CreateResourceInstallationInput {
+  clientMutationId?: string;
+  /** The `ResourceInstallation` to be created by this mutation. */
+  resourceInstallation: ResourceInstallationInput;
+}
+export interface CreateResourceStatusCheckInput {
+  clientMutationId?: string;
+  /** The `ResourceStatusCheck` to be created by this mutation. */
+  resourceStatusCheck: ResourceStatusCheckInput;
+}
+export interface CreateResourceUsageLogInput {
+  clientMutationId?: string;
+  /** The `ResourceUsageLog` to be created by this mutation. */
+  resourceUsageLog: ResourceUsageLogInput;
+}
+export interface CreateResourceUsageSummaryInput {
+  clientMutationId?: string;
+  /** The `ResourceUsageSummary` to be created by this mutation. */
+  resourceUsageSummary: ResourceUsageSummaryInput;
+}
+export interface CreateWebhookEndpointInput {
+  clientMutationId?: string;
+  /** The `WebhookEndpoint` to be created by this mutation. */
+  webhookEndpoint: WebhookEndpointInput;
+}
+export interface CreateWebhookEventInput {
+  clientMutationId?: string;
+  /** The `WebhookEvent` to be created by this mutation. */
+  webhookEvent: WebhookEventInput;
+}
+/** A filter to be used against `DbPreset` object types. All fields are combined with a logical ‘and.’ */
+export interface DbPresetFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: DbPresetFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `modulesHash` field. */
+  modulesHash?: UUIDFilter;
+  /** Negates the expression. */
+  not?: DbPresetFilter;
+  /** Checks for any expressions in this list. */
+  or?: DbPresetFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `DbPreset` */
+export interface DbPresetInput {
+  /** Whether this preset is selectable for new databases */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of preset creation */
   createdAt?: string;
+  /** Preset definition (modules + options) — the readily-cached head; history lives in the infra store */
+  definition: unknown;
+  /** Human-readable description of the preset */
+  description?: string;
+  /** Unique preset identifier */
+  id?: string;
+  /** Human-readable preset name */
+  label?: string;
+  /** Content-address of definition->modules via metaschema_private.modules_hash (stamped by the versioned trigger); fast exact-match lookup key for provisioning requests */
+  modulesHash?: string;
+  /** Preset slug (unique per scope); the preset's path in the infra tree is [db_preset, slug] */
+  slug: string;
+  /** Infra Merkle store holding this preset's history (stamped by the versioned trigger) */
+  storeId?: string;
   /** Timestamp of last modification */
   updatedAt?: string;
 }
-export interface UpdateFunctionGraphExecutionNodeStateInput {
-  clientMutationId?: string;
-  /** Timestamp of node state creation (partition key) */
-  createdAt: string;
-  /** Unique node state identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionGraphExecutionNodeState` being updated. */
-  functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
-}
-/** Represents an update to a `FunctionGraphExecutionNodeState`. Fields that are set will be updated. */
-export interface FunctionGraphExecutionNodeStatePatch {
-  /** Timestamp of node state creation (partition key) */
+/** Represents an update to a `DbPreset`. Fields that are set will be updated. */
+export interface DbPresetPatch {
+  /** Whether this preset is selectable for new databases */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of preset creation */
   createdAt?: string;
-  /** Unique node state identifier */
-  id?: string;
-  /** FK to the parent graph execution */
-  executionId?: string;
-  /** Scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Name of the node within the graph (e.g. send-email1) */
-  nodeName?: string;
-  /** Full merkle tree path to this node (e.g. {function,graphs,myflow,nodes,send-email1}) — enables subnet hierarchy tracking */
-  nodePath?: string[];
-  /** Node lifecycle: pending → queued → running → completed/failed */
-  status?: string;
-  /** Timestamp when the node began executing */
-  startedAt?: string;
-  /** Timestamp when the node finished (success or failure) */
-  completedAt?: string;
-  /** Machine-readable error code when status = failed */
-  errorCode?: string;
-  /** Human-readable error description when status = failed */
-  errorMessage?: string;
-  /** FK to execution_outputs — content-addressed output blob for this node */
-  outputId?: string;
-}
-export interface UpdatePlatformNamespaceInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `PlatformNamespace` being updated. */
-  platformNamespacePatch: PlatformNamespacePatch;
-}
-/** Represents an update to a `PlatformNamespace`. Fields that are set will be updated. */
-export interface PlatformNamespacePatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Human-readable namespace name (e.g. default, production, oauth) */
-  name?: string;
-  /** Globally unique computed namespace identifier via inflection.underscore */
-  namespaceName?: string;
-  /** Optional human-readable description of this namespace */
+  /** Preset definition (modules + options) — the readily-cached head; history lives in the infra store */
+  definition?: unknown;
+  /** Human-readable description of the preset */
   description?: string;
-  /** Whether this namespace is active (soft-disable for filtering) */
-  isActive?: boolean;
-  /** Key/value pairs for selecting and filtering namespaces */
-  labels?: unknown;
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  /** Database that created this namespace (NULL for platform-native namespaces) */
-  sourceDatabaseId?: string;
-  /** Origin scope: platform, org, app — indicates where this namespace was created */
-  sourceScope?: string;
-  /** true = created by a child scope mirror trigger, false = platform-native */
-  isManaged?: boolean;
-}
-export interface UpdateOrgFunctionInvocationInput {
-  clientMutationId?: string;
-  /** Invocation creation timestamp (partition key) */
-  createdAt: string;
-  /** Unique invocation identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `OrgFunctionInvocation` being updated. */
-  orgFunctionInvocationPatch: OrgFunctionInvocationPatch;
-}
-/** Represents an update to a `OrgFunctionInvocation`. Fields that are set will be updated. */
-export interface OrgFunctionInvocationPatch {
-  /** Invocation creation timestamp (partition key) */
-  createdAt?: string;
-  /** Unique invocation identifier */
+  /** Unique preset identifier */
   id?: string;
-  /** Who triggered the invocation (NULL for system/cron) */
-  actorId?: string;
-  /** Function routing slug (scope:name). Links to function_definitions.task_identifier by convention — no FK. */
-  taskIdentifier?: string;
-  /** Function input payload */
-  payload?: unknown;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
-  status?: string;
-  /** Function return value (success) or structured error (failure) */
-  result?: unknown;
-  /** Error message when status is failed */
-  error?: string;
-  /** Wall-clock execution time in milliseconds */
-  durationMs?: number;
-  /** FK to app_jobs.jobs — the underlying transport */
-  jobId?: string;
-  /** When execution started */
-  startedAt?: string;
-  /** When execution completed */
-  completedAt?: string;
-  /** Parent invocation when this is a child node of a flow graph execution */
-  parentInvocationId?: string;
-  /** Groups all node invocations from a single flow graph execution */
-  graphExecutionId?: string;
-}
-export interface UpdateFunctionInvocationInput {
-  clientMutationId?: string;
-  /** Invocation creation timestamp (partition key) */
-  createdAt: string;
-  /** Unique invocation identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionInvocation` being updated. */
-  functionInvocationPatch: FunctionInvocationPatch;
-}
-/** Represents an update to a `FunctionInvocation`. Fields that are set will be updated. */
-export interface FunctionInvocationPatch {
-  /** Invocation creation timestamp (partition key) */
-  createdAt?: string;
-  /** Unique invocation identifier */
-  id?: string;
-  /** Who triggered the invocation (NULL for system/cron) */
-  actorId?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  /** Function routing slug (scope:name). Links to function_definitions.task_identifier by convention — no FK. */
-  taskIdentifier?: string;
-  /** Function input payload */
-  payload?: unknown;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
-  status?: string;
-  /** Function return value (success) or structured error (failure) */
-  result?: unknown;
-  /** Error message when status is failed */
-  error?: string;
-  /** Wall-clock execution time in milliseconds */
-  durationMs?: number;
-  /** FK to app_jobs.jobs — the underlying transport */
-  jobId?: string;
-  /** When execution started */
-  startedAt?: string;
-  /** When execution completed */
-  completedAt?: string;
-  /** Parent invocation when this is a child node of a flow graph execution */
-  parentInvocationId?: string;
-  /** Groups all node invocations from a single flow graph execution */
-  graphExecutionId?: string;
-}
-export interface UpdateResourceInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Resource` being updated. */
-  resourcePatch: ResourcePatch;
-}
-/** Represents an update to a `Resource`. Fields that are set will be updated. */
-export interface ResourcePatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
-  namespaceId?: string;
-  /** Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate */
-  kind?: string;
-  /** Human-readable resource name */
-  name?: string;
-  /** URL-safe identifier, unique within (namespace_id, kind) */
+  /** Human-readable preset name */
+  label?: string;
+  /** Content-address of definition->modules via metaschema_private.modules_hash (stamped by the versioned trigger); fast exact-match lookup key for provisioning requests */
+  modulesHash?: string;
+  /** Preset slug (unique per scope); the preset's path in the infra tree is [db_preset, slug] */
   slug?: string;
-  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
-  spec?: unknown;
-  /** Resource lifecycle status: pending, provisioning, active, failed, draining, deleting */
-  status?: string;
-  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
-  statusObserved?: unknown;
-  /** Most recent provisioning or runtime error message */
-  lastError?: string;
-  /** Cumulative error count for this resource */
-  errorCount?: number;
-  /** Key/value pairs for selecting and filtering resources */
-  labels?: unknown;
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-}
-export interface UpdatePlatformNamespaceEventInput {
-  clientMutationId?: string;
-  /** Event timestamp (partition key) */
-  createdAt: string;
-  /** Unique event identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `PlatformNamespaceEvent` being updated. */
-  platformNamespaceEventPatch: PlatformNamespaceEventPatch;
-}
-/** Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated. */
-export interface PlatformNamespaceEventPatch {
-  /** Event timestamp (partition key) */
-  createdAt?: string;
-  /** Unique event identifier */
-  id?: string;
-  /** Namespace this event belongs to */
-  namespaceId?: string;
-  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
-  eventType?: string;
-  /** User who triggered this event (NULL for system/automated) */
-  actorId?: string;
-  /** Human-readable description of the event */
-  message?: string;
-  /** Structured context (old/new values, labels diff, etc.) */
-  metadata?: unknown;
-  /** CPU usage in millicores at time of event */
-  cpuMillicores?: number;
-  /** Memory usage in bytes at time of event */
-  memoryBytes?: string;
-  /** Storage usage in bytes at time of event */
-  storageBytes?: string;
-  /** Network ingress in bytes during event window */
-  networkIngressBytes?: string;
-  /** Network egress in bytes during event window */
-  networkEgressBytes?: string;
-  /** Number of active pods in the namespace at time of event */
-  podCount?: number;
-  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
-  metrics?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-}
-export interface UpdateFunctionDeploymentInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionDeployment` being updated. */
-  functionDeploymentPatch: FunctionDeploymentPatch;
-}
-/** Represents an update to a `FunctionDeployment`. Fields that are set will be updated. */
-export interface FunctionDeploymentPatch {
-  id?: string;
-  createdAt?: string;
+  /** Infra Merkle store holding this preset's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
   updatedAt?: string;
-  /** Function definition being deployed to this namespace */
-  functionDefinitionId?: string;
-  /** Target namespace for this deployment (maps to a K8s namespace) */
-  namespaceId?: string;
-  /** Deployment lifecycle status: pending, provisioning, active, failed, scaled_to_zero, deactivated */
-  status?: string;
-  /** Knative service URL (http://{service-name}.{namespace}.svc.cluster.local) — populated after provisioning */
-  serviceUrl?: string;
-  /** Knative service name — derived from task_identifier at provision time */
-  serviceName?: string;
-  /** Deployment revision number (incremented on each redeployment) */
-  revision?: number;
-  /** Container image override (NULL = inherit from function definition) */
-  image?: string;
-  /** Max concurrent requests per pod (NULL = inherit from definition) */
-  concurrency?: number;
-  /** Minimum replica count (NULL = inherit from definition or Knative default) */
-  scaleMin?: number;
-  /** Maximum replica count (NULL = inherit from definition or Knative default) */
-  scaleMax?: number;
-  /** Request timeout override in seconds (NULL = inherit from definition) */
-  timeoutSeconds?: number;
-  /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
-  resources?: unknown;
-  /** Most recent provisioning or runtime error message */
-  lastError?: string;
-  /** Timestamp of the most recent error */
-  lastErrorAt?: string;
-  /** Cumulative error count for this deployment */
-  errorCount?: number;
-  /** Key/value pairs for selecting and filtering deployments */
-  labels?: unknown;
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
 }
-export interface UpdateFunctionGraphExecutionInput {
+/** A filter to be used against `DeclaredCapacity` object types. All fields are combined with a logical ‘and.’ */
+export interface DeclaredCapacityFilter {
+  /** Checks for all expressions in this list. */
+  and?: DeclaredCapacityFilter[];
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isTransient` field. */
+  isTransient?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: DeclaredCapacityFilter;
+  /** Checks for any expressions in this list. */
+  or?: DeclaredCapacityFilter[];
+  /** Filter by the object’s `podCountMax` field. */
+  podCountMax?: IntFilter;
+  /** Filter by the object’s `podCountMin` field. */
+  podCountMin?: IntFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `sourceId` field. */
+  sourceId?: UUIDFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+}
+export interface DeleteDbPresetInput {
   clientMutationId?: string;
-  /** Execution start timestamp */
-  startedAt: string;
-  /** Unique execution identifier */
+  /** Unique preset identifier */
   id: string;
-  /** An object where the defined keys will be set on the `FunctionGraphExecution` being updated. */
-  functionGraphExecutionPatch: FunctionGraphExecutionPatch;
-}
-/** Represents an update to a `FunctionGraphExecution`. Fields that are set will be updated. */
-export interface FunctionGraphExecutionPatch {
-  /** Execution start timestamp */
-  startedAt?: string;
-  /** Unique execution identifier */
-  id?: string;
-  /** FK to the graph definition being executed */
-  graphId?: string;
-  /** Parent function_invocations row (for metering) */
-  invocationId?: string;
-  /** Scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Target output boundary node name to resolve */
-  outputNode?: string;
-  /** Target output port name (default: value) */
-  outputPort?: string;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
-  status?: string;
-  /** Initial inputs provided at invocation time */
-  inputPayload?: unknown;
-  /** Final result extracted from terminal output node */
-  outputPayload?: unknown;
-  /** Map of node_name → execution output id (content-addressed hash reference) */
-  nodeOutputs?: unknown;
-  /** Pre-computed topological sort as array of wave objects */
-  executionPlan?: unknown;
-  /** Index into execution_plan — tick only processes this wave */
-  currentWave?: number;
-  /** Parent execution when this is a sub-execution */
-  parentExecutionId?: string;
-  /** Node name in parent execution that spawned this sub-execution */
-  parentNodeName?: string;
-  /** Pinned definitions store commit for deterministic evaluation */
-  definitionsCommitId?: string;
-  /** Number of evaluate_step ticks executed */
-  tickCount?: number;
-  /** Execution completion timestamp */
-  completedAt?: string;
-  /** Maximum ticks before execution is failed (default 100) */
-  maxTicks?: number;
-  /** Maximum pending jobs before execution is failed (default 50) */
-  maxPendingJobs?: number;
-  /** Absolute deadline — execution fails if still running after this time */
-  timeoutAt?: string;
-  /** Machine-readable error code when status = failed */
-  errorCode?: string;
-  /** Human-readable error description when status = failed */
-  errorMessage?: string;
-}
-export interface UpdateFunctionDefinitionInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionDefinition` being updated. */
-  functionDefinitionPatch: FunctionDefinitionPatch;
-}
-/** Represents an update to a `FunctionDefinition`. Fields that are set will be updated. */
-export interface FunctionDefinitionPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Function grouping scope (e.g. email, embed, chunk, custom) */
-  scope?: string;
-  /** Function name within scope (e.g. send_verification_link, process_file_embedding) */
-  name?: string;
-  /** Computed routing slug: scope:name (used by Knative job worker for dispatch) */
-  taskIdentifier?: string;
-  /** Human-readable description of what this function does */
-  description?: string;
-  /** Whether this function can be called via function_invocations (public API). Default false = internal-only via add_job() */
-  isInvocable?: boolean;
-  /** Maximum retry attempts for the underlying job */
-  maxAttempts?: number;
-  /** Job priority (lower = higher priority) */
-  priority?: number;
-  /** Job queue name for serialization (e.g. email, ai, default) */
-  queueName?: string;
-  /** Execution mode: http (Knative Service dispatch) or inline (in-process in compute worker) */
-  runtime?: string;
-  /** Docker image reference (e.g. ghcr.io/constructive-io/email-send-fn:latest). Required when runtime=http. NULL for inline functions. */
-  image?: string;
-  /** Knative containerConcurrency — max concurrent requests per pod instance */
-  concurrency?: number;
-  /** Minimum pod count for Knative autoscaling (minScale) */
-  scaleMin?: number;
-  /** Maximum pod count for Knative autoscaling (maxScale) */
-  scaleMax?: number;
-  /** Knative request timeout in seconds */
-  timeoutSeconds?: number;
-  /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
-  resources?: unknown;
-  /** Whether this function is a built-in platform function (synced from platform) vs user-created */
-  isBuiltIn?: boolean;
-  /** Embedded secret requirements: array of (name, required) tuples */
-  requiredSecrets?: FunctionRequirementInput[];
-  /** Embedded config requirements: array of (name, required) tuples */
-  requiredConfigs?: FunctionRequirementInput[];
-  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
-  requiredBuckets?: string[];
-  /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
-  requiredModels?: string[];
-  /** Data input ports: [{name, type, description?, optional?, multi?, schema?}] */
-  inputs?: unknown;
-  /** Data output ports: [{name, type, description?, optional?, multi?, schema?}] */
-  outputs?: unknown;
-  /** Configuration properties: [{name, type, default?, description?, required?, schema?}] */
-  props?: unknown;
-  /** Whether this function has side effects and cannot be cached or memoized */
-  volatile?: boolean;
-  /** Icon identifier for UI palette rendering (e.g. mail, database, code) */
-  icon?: string;
-  /** Palette grouping category (e.g. email, data, ai, custom) */
-  category?: string;
 }
 export interface DeleteFunctionApiBindingInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteFunctionGraphRefInput {
+export interface DeleteFunctionDefinitionInput {
   clientMutationId?: string;
-  /** Unique ref identifier */
   id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-}
-export interface DeleteFunctionGraphStoreInput {
-  clientMutationId?: string;
-  /** Unique store identifier */
-  id: string;
-}
-export interface DeleteFunctionGraphObjectInput {
-  clientMutationId?: string;
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
 }
 export interface DeleteFunctionDeploymentEventInput {
-  clientMutationId?: string;
-  /** Event timestamp (partition key) */
-  createdAt: string;
-  /** Unique event identifier */
-  id: string;
-}
-export interface DeleteOrgFunctionExecutionLogInput {
-  clientMutationId?: string;
-  /** Log entry timestamp (partition key) */
-  createdAt: string;
-  /** Unique log entry identifier */
-  id: string;
-}
-export interface DeleteResourceEventInput {
-  clientMutationId?: string;
-  /** Event timestamp (partition key) */
-  createdAt: string;
-  /** Unique event identifier */
-  id: string;
-}
-export interface DeleteFunctionGraphExecutionOutputInput {
-  clientMutationId?: string;
-  /** Timestamp of output creation */
-  createdAt: string;
-  /** Unique execution output identifier */
-  id: string;
-}
-export interface DeleteFunctionGraphCommitInput {
-  clientMutationId?: string;
-  /** Unique commit identifier */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-}
-export interface DeleteSecretDefinitionInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteFunctionExecutionLogInput {
-  clientMutationId?: string;
-  /** Log entry timestamp (partition key) */
-  createdAt: string;
-  /** Unique log entry identifier */
-  id: string;
-}
-export interface DeleteFunctionGraphInput {
-  clientMutationId?: string;
-  /** Unique graph identifier */
-  id: string;
-}
-export interface DeleteFunctionGraphExecutionNodeStateInput {
-  clientMutationId?: string;
-  /** Timestamp of node state creation (partition key) */
-  createdAt: string;
-  /** Unique node state identifier */
-  id: string;
-}
-export interface DeletePlatformNamespaceInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgFunctionInvocationInput {
-  clientMutationId?: string;
-  /** Invocation creation timestamp (partition key) */
-  createdAt: string;
-  /** Unique invocation identifier */
-  id: string;
-}
-export interface DeleteFunctionInvocationInput {
-  clientMutationId?: string;
-  /** Invocation creation timestamp (partition key) */
-  createdAt: string;
-  /** Unique invocation identifier */
-  id: string;
-}
-export interface DeleteResourceInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeletePlatformNamespaceEventInput {
   clientMutationId?: string;
   /** Event timestamp (partition key) */
   createdAt: string;
@@ -2982,16 +2504,4470 @@ export interface DeleteFunctionDeploymentInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteFunctionGraphExecutionInput {
+export interface DeleteFunctionExecutionLogInput {
   clientMutationId?: string;
-  /** Execution start timestamp */
-  startedAt: string;
-  /** Unique execution identifier */
+  /** Log entry timestamp (partition key) */
+  createdAt: string;
+  /** Unique log entry identifier */
   id: string;
 }
-export interface DeleteFunctionDefinitionInput {
+export interface DeleteFunctionGraphCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeleteFunctionGraphExecutionInput {
+  clientMutationId?: string;
+  /** Unique execution identifier */
+  id: string;
+  /** Execution start timestamp */
+  startedAt: string;
+}
+export interface DeleteFunctionGraphExecutionNodeStateInput {
+  clientMutationId?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt: string;
+  /** Unique node state identifier */
+  id: string;
+}
+export interface DeleteFunctionGraphExecutionOutputInput {
+  clientMutationId?: string;
+  /** Timestamp of output creation */
+  createdAt: string;
+  /** Unique execution output identifier */
+  id: string;
+}
+export interface DeleteFunctionGraphInput {
+  clientMutationId?: string;
+  /** Unique graph identifier */
+  id: string;
+}
+export interface DeleteFunctionGraphObjectInput {
+  clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeleteFunctionGraphRefInput {
+  clientMutationId?: string;
+  /** Unique ref identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeleteFunctionGraphStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
+  id: string;
+}
+export interface DeleteFunctionInvocationInput {
+  clientMutationId?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt: string;
+  /** Unique invocation identifier */
+  id: string;
+}
+export interface DeleteInfraCommitInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique commit identifier */
+  id: string;
+}
+export interface DeleteInfraObjectInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+}
+export interface DeleteInfraRefInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id: string;
+}
+export interface DeleteInfraStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
+  id: string;
+}
+export interface DeleteIntegrationProviderInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DeleteNamespaceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+}
+export interface DeleteNamespaceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformFunctionApiBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformFunctionDefinitionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformFunctionDeploymentEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+}
+export interface DeletePlatformFunctionDeploymentInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformFunctionExecutionLogInput {
+  clientMutationId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt: string;
+  /** Unique log entry identifier */
+  id: string;
+}
+export interface DeletePlatformFunctionInvocationInput {
+  clientMutationId?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt: string;
+  /** Unique invocation identifier */
+  id: string;
+}
+export interface DeletePlatformInfraCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeletePlatformInfraObjectInput {
+  clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeletePlatformInfraRefInput {
+  clientMutationId?: string;
+  /** Unique ref identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeletePlatformInfraStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
+  id: string;
+}
+export interface DeletePlatformNamespaceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+}
+export interface DeletePlatformNamespaceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformResourceDefinitionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformResourceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+}
+export interface DeletePlatformResourceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformResourceInstallationInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformResourceStatusCheckInput {
+  clientMutationId?: string;
+  /** Unique status check identifier */
+  id: string;
+}
+export interface DeletePlatformResourceUsageLogInput {
+  clientMutationId?: string;
+  /** Unique sample identifier */
+  id: string;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt: string;
+}
+export interface DeletePlatformResourceUsageSummaryInput {
+  clientMutationId?: string;
+  /** Day this summary covers (partition key) */
+  date: string;
+  /** Unique usage summary identifier */
+  id: string;
+}
+export interface DeletePlatformWebhookEndpointInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformWebhookEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteResourceDefinitionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteResourceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+}
+export interface DeleteResourceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteResourceInstallationInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteResourceStatusCheckInput {
+  clientMutationId?: string;
+  /** Unique status check identifier */
+  id: string;
+}
+export interface DeleteResourceUsageLogInput {
+  clientMutationId?: string;
+  /** Unique sample identifier */
+  id: string;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt: string;
+}
+export interface DeleteResourceUsageSummaryInput {
+  clientMutationId?: string;
+  /** Day this summary covers (partition key) */
+  date: string;
+  /** Unique usage summary identifier */
+  id: string;
+}
+export interface DeleteWebhookEndpointInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteWebhookEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+/** A filter to be used against `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionApiBindingFilter {
+  /** Filter by the object’s `alias` field. */
+  alias?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionApiBindingFilter[];
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `functionDefinition` relation. */
+  functionDefinition?: FunctionDefinitionFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `functionInvocationsByApiBindingId` relation. */
+  functionInvocationsByApiBindingId?: FunctionApiBindingToManyFunctionInvocationFilter;
+  /** `functionInvocationsByApiBindingId` exist. */
+  functionInvocationsByApiBindingIdExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: FunctionApiBindingFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionApiBindingFilter[];
+}
+/** An input for mutations affecting `FunctionApiBinding` */
+export interface FunctionApiBindingInput {
+  /** Binding alias (e.g. default, staging, production) */
+  alias?: string;
+  /** API endpoint this function is bound to */
+  apiId: string;
+  /** Per-binding configuration (overrides, routing rules, etc.) */
+  config?: unknown;
+  /** Function definition this binding belongs to */
+  functionDefinitionId: string;
+  id?: string;
+}
+/** Represents an update to a `FunctionApiBinding`. Fields that are set will be updated. */
+export interface FunctionApiBindingPatch {
+  /** Binding alias (e.g. default, staging, production) */
+  alias?: string;
+  /** API endpoint this function is bound to */
+  apiId?: string;
+  /** Per-binding configuration (overrides, routing rules, etc.) */
+  config?: unknown;
+  /** Function definition this binding belongs to */
+  functionDefinitionId?: string;
+  id?: string;
+}
+/** A filter to be used against many `FunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionApiBindingToManyFunctionInvocationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionInvocationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionInvocationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionInvocationFilter;
+}
+/** A filter to be used against `FunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDefinitionFilter {
+  /** Filter by the object’s `accessChannels` field. */
+  accessChannels?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionDefinitionFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `concurrency` field. */
+  concurrency?: IntFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `fnCategory` field. */
+  fnCategory?: StringFilter;
+  /** Filter by the object’s `functionApiBindings` relation. */
+  functionApiBindings?: FunctionDefinitionToManyFunctionApiBindingFilter;
+  /** `functionApiBindings` exist. */
+  functionApiBindingsExist?: boolean;
+  /** Filter by the object’s `functionColumns` field. */
+  functionColumns?: JSONFilter;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `icon` field. */
+  icon?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` field. */
+  image?: StringFilter;
+  /** Filter by the object’s `inputs` field. */
+  inputs?: JSONFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `maxAttempts` field. */
+  maxAttempts?: IntFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `moduleTable` field. */
+  moduleTable?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: FunctionDefinitionFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionDefinitionFilter[];
+  /** Filter by the object’s `outputs` field. */
+  outputs?: JSONFilter;
+  /** Filter by the object’s `payloadArgs` field. */
+  payloadArgs?: JSONFilter;
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `props` field. */
+  props?: JSONFilter;
+  /** Filter by the object’s `protected` field. */
+  protected?: BooleanFilter;
+  /** Filter by the object’s `publishedAt` field. */
+  publishedAt?: DatetimeFilter;
+  /** Filter by the object’s `queueName` field. */
+  queueName?: StringFilter;
+  /** Filter by the object’s `requiredBuckets` field. */
+  requiredBuckets?: StringListFilter;
+  /** Filter by the object’s `requiredModels` field. */
+  requiredModels?: StringListFilter;
+  /** Filter by the object’s `resources` field. */
+  resources?: JSONFilter;
+  /** Filter by the object’s `runtime` field. */
+  runtime?: StringFilter;
+  /** Filter by the object’s `scaleMax` field. */
+  scaleMax?: IntFilter;
+  /** Filter by the object’s `scaleMin` field. */
+  scaleMin?: IntFilter;
+  /** Filter by the object’s `targetFunction` field. */
+  targetFunction?: StringFilter;
+  /** Filter by the object’s `targetSchema` field. */
+  targetSchema?: StringFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Filter by the object’s `timeoutSeconds` field. */
+  timeoutSeconds?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `volatile` field. */
+  volatile?: BooleanFilter;
+  /** Filter by the object’s `webhookEndpoints` relation. */
+  webhookEndpoints?: FunctionDefinitionToManyWebhookEndpointFilter;
+  /** `webhookEndpoints` exist. */
+  webhookEndpointsExist?: boolean;
+}
+/** An input for mutations affecting `FunctionDefinition` */
+export interface FunctionDefinitionInput {
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  accessChannels?: string[];
+  /** Function task category (e.g. email, embed, chunk, custom) */
+  category: string;
+  /** Knative containerConcurrency — max concurrent requests per pod instance */
+  concurrency?: number;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Human-readable description of what this function does */
+  description?: string;
+  /** Palette grouping category (e.g. email, data, ai, custom) */
+  fnCategory?: string;
+  /** Ordered array of module_table column names holding the generated function names to invoke when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  functionColumns?: unknown;
+  /** Existing flow graph invoked when runtime=graph. Required for graph runtime and forbidden for all other runtimes. */
+  graphId?: string;
+  /** Icon identifier for UI palette rendering (e.g. mail, database, code) */
+  icon?: string;
+  id?: string;
+  /** Docker image reference (e.g. ghcr.io/constructive-io/email-send-fn:latest). Required when runtime=http or runtime=resource. NULL for inline functions. */
+  image?: string;
+  /** Data input ports: [{name, type, description?, optional?, multi?, schema?}] */
+  inputs?: unknown;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this function. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Whether this function definition is published to the public catalog for direct authenticated invocation. Default false = internal-only via add_job() */
+  isPublished?: boolean;
+  /** Maximum retry attempts for the underlying job */
+  maxAttempts?: number;
+  /** metaschema_modules_public table whose per-database row carries the generated function names when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  moduleTable?: string;
+  /** Function name within category (e.g. send_verification_link, process_file_embedding) */
+  name: string;
+  /** Data output ports: [{name, type, description?, optional?, multi?, schema?}] */
+  outputs?: unknown;
+  /** Ordered bind-parameter mapping for runtime=sql: [{name, type}]. payload[name] is bound as $n::type. */
+  payloadArgs?: unknown;
+  /** Job priority (lower = higher priority) */
+  priority?: number;
+  /** Configuration properties: [{name, type, default?, description?, required?, schema?}] */
+  props?: unknown;
+  /** Protected platform definition: narrower scopes cannot register the same task_identifier */
+  protected?: boolean;
+  /** Timestamp when this function was published. NULL means immediately published when is_published is true; future timestamps delay public visibility */
+  publishedAt?: string;
+  /** Job queue name for serialization (e.g. email, ai, default) */
+  queueName?: string;
+  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  requiredBuckets?: string[];
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
+  requiredModels?: string[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
+  resources?: unknown;
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  runtime?: string;
+  /** Maximum pod count for Knative autoscaling (maxScale) */
+  scaleMax?: number;
+  /** Minimum pod count for Knative autoscaling (minScale) */
+  scaleMin?: number;
+  /** Name of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetFunction?: string;
+  /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetSchema?: string;
+  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
+  taskIdentifier: string;
+  /** Knative request timeout in seconds */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+  /** Whether this function has side effects and cannot be cached or memoized */
+  volatile?: boolean;
+}
+/** Represents an update to a `FunctionDefinition`. Fields that are set will be updated. */
+export interface FunctionDefinitionPatch {
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  accessChannels?: string[];
+  /** Function task category (e.g. email, embed, chunk, custom) */
+  category?: string;
+  /** Knative containerConcurrency — max concurrent requests per pod instance */
+  concurrency?: number;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Human-readable description of what this function does */
+  description?: string;
+  /** Palette grouping category (e.g. email, data, ai, custom) */
+  fnCategory?: string;
+  /** Ordered array of module_table column names holding the generated function names to invoke when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  functionColumns?: unknown;
+  /** Existing flow graph invoked when runtime=graph. Required for graph runtime and forbidden for all other runtimes. */
+  graphId?: string;
+  /** Icon identifier for UI palette rendering (e.g. mail, database, code) */
+  icon?: string;
+  id?: string;
+  /** Docker image reference (e.g. ghcr.io/constructive-io/email-send-fn:latest). Required when runtime=http or runtime=resource. NULL for inline functions. */
+  image?: string;
+  /** Data input ports: [{name, type, description?, optional?, multi?, schema?}] */
+  inputs?: unknown;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this function. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Whether this function definition is published to the public catalog for direct authenticated invocation. Default false = internal-only via add_job() */
+  isPublished?: boolean;
+  /** Maximum retry attempts for the underlying job */
+  maxAttempts?: number;
+  /** metaschema_modules_public table whose per-database row carries the generated function names when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  moduleTable?: string;
+  /** Function name within category (e.g. send_verification_link, process_file_embedding) */
+  name?: string;
+  /** Data output ports: [{name, type, description?, optional?, multi?, schema?}] */
+  outputs?: unknown;
+  /** Ordered bind-parameter mapping for runtime=sql: [{name, type}]. payload[name] is bound as $n::type. */
+  payloadArgs?: unknown;
+  /** Job priority (lower = higher priority) */
+  priority?: number;
+  /** Configuration properties: [{name, type, default?, description?, required?, schema?}] */
+  props?: unknown;
+  /** Protected platform definition: narrower scopes cannot register the same task_identifier */
+  protected?: boolean;
+  /** Timestamp when this function was published. NULL means immediately published when is_published is true; future timestamps delay public visibility */
+  publishedAt?: string;
+  /** Job queue name for serialization (e.g. email, ai, default) */
+  queueName?: string;
+  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  requiredBuckets?: string[];
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
+  requiredModels?: string[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
+  resources?: unknown;
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  runtime?: string;
+  /** Maximum pod count for Knative autoscaling (maxScale) */
+  scaleMax?: number;
+  /** Minimum pod count for Knative autoscaling (minScale) */
+  scaleMin?: number;
+  /** Name of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetFunction?: string;
+  /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetSchema?: string;
+  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
+  taskIdentifier?: string;
+  /** Knative request timeout in seconds */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+  /** Whether this function has side effects and cannot be cached or memoized */
+  volatile?: boolean;
+}
+/** A filter to be used against many `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDefinitionToManyFunctionApiBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionApiBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionApiBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionApiBindingFilter;
+}
+/** A filter to be used against many `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDefinitionToManyWebhookEndpointFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookEndpointFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookEndpointFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookEndpointFilter;
+}
+/** A filter to be used against `FunctionDeploymentEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDeploymentEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionDeploymentEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploymentId` field. */
+  deploymentId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: FunctionDeploymentEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionDeploymentEventFilter[];
+}
+/** An input for mutations affecting `FunctionDeploymentEvent` */
+export interface FunctionDeploymentEventInput {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Deployment this event belongs to */
+  deploymentId: string;
+  /** Event type: provisioned, scaled, failed, deactivated, redeployed, health_check */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+}
+/** Represents an update to a `FunctionDeploymentEvent`. Fields that are set will be updated. */
+export interface FunctionDeploymentEventPatch {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Deployment this event belongs to */
+  deploymentId?: string;
+  /** Event type: provisioned, scaled, failed, deactivated, redeployed, health_check */
+  eventType?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+}
+/** A filter to be used against `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDeploymentFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionDeploymentFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `concurrency` field. */
+  concurrency?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `handlerName` field. */
+  handlerName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` field. */
+  image?: StringFilter;
+  /** Filter by the object’s `imageVersion` field. */
+  imageVersion?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `lastErrorAt` field. */
+  lastErrorAt?: DatetimeFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: FunctionDeploymentFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionDeploymentFilter[];
+  /** Filter by the object’s `resources` field. */
+  resources?: JSONFilter;
+  /** Filter by the object’s `revision` field. */
+  revision?: IntFilter;
+  /** Filter by the object’s `scaleMax` field. */
+  scaleMax?: IntFilter;
+  /** Filter by the object’s `scaleMin` field. */
+  scaleMin?: IntFilter;
+  /** Filter by the object’s `serviceName` field. */
+  serviceName?: StringFilter;
+  /** Filter by the object’s `serviceUrl` field. */
+  serviceUrl?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `timeoutSeconds` field. */
+  timeoutSeconds?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `FunctionDeployment` */
+export interface FunctionDeploymentInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  /** Max concurrent requests per pod (NULL = inherit from definition) */
+  concurrency?: number;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Cumulative error count for this deployment */
+  errorCount?: number;
+  /** Handler directory name (e.g. email, document) — used as FN_HANDLER_NAME in combined-image mode to select the entry point */
+  handlerName?: string;
+  id?: string;
+  /** Logical image name — the handler identity and grouping key (e.g. fn-email). No registry host or tag; tag lives in image_version. */
+  image: string;
+  /** Image tag/version for the handler container (e.g. latest, 2.6.4) */
+  imageVersion?: string;
+  /** Key/value pairs for selecting and filtering deployments */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Timestamp of the most recent error */
+  lastErrorAt?: string;
+  /** Target namespace for this deployment (maps to a K8s namespace) */
+  namespaceId: string;
+  /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
+  resources?: unknown;
+  /** Deployment revision number (incremented on each redeployment) */
+  revision?: number;
+  /** Maximum replica count (NULL = inherit from definition or Knative default) */
+  scaleMax?: number;
+  /** Minimum replica count (NULL = inherit from definition or Knative default) */
+  scaleMin?: number;
+  /** Knative service name — a randomly minted cute name (unique_names.generate_name() + random hex suffix) assigned by the service_url trigger; unique per namespace, not derived from the image */
+  serviceName?: string;
+  /** Knative service URL (http://{service-name}.{namespace}.svc.cluster.local) — populated after provisioning */
+  serviceUrl?: string;
+  /** Deployment lifecycle status: pending, provisioning, active, failed, scaled_to_zero, deactivated */
+  status?: string;
+  /** Request timeout override in seconds (NULL = inherit from definition) */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+}
+/** Represents an update to a `FunctionDeployment`. Fields that are set will be updated. */
+export interface FunctionDeploymentPatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  /** Max concurrent requests per pod (NULL = inherit from definition) */
+  concurrency?: number;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Cumulative error count for this deployment */
+  errorCount?: number;
+  /** Handler directory name (e.g. email, document) — used as FN_HANDLER_NAME in combined-image mode to select the entry point */
+  handlerName?: string;
+  id?: string;
+  /** Logical image name — the handler identity and grouping key (e.g. fn-email). No registry host or tag; tag lives in image_version. */
+  image?: string;
+  /** Image tag/version for the handler container (e.g. latest, 2.6.4) */
+  imageVersion?: string;
+  /** Key/value pairs for selecting and filtering deployments */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Timestamp of the most recent error */
+  lastErrorAt?: string;
+  /** Target namespace for this deployment (maps to a K8s namespace) */
+  namespaceId?: string;
+  /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
+  resources?: unknown;
+  /** Deployment revision number (incremented on each redeployment) */
+  revision?: number;
+  /** Maximum replica count (NULL = inherit from definition or Knative default) */
+  scaleMax?: number;
+  /** Minimum replica count (NULL = inherit from definition or Knative default) */
+  scaleMin?: number;
+  /** Knative service name — a randomly minted cute name (unique_names.generate_name() + random hex suffix) assigned by the service_url trigger; unique per namespace, not derived from the image */
+  serviceName?: string;
+  /** Knative service URL (http://{service-name}.{namespace}.svc.cluster.local) — populated after provisioning */
+  serviceUrl?: string;
+  /** Deployment lifecycle status: pending, provisioning, active, failed, scaled_to_zero, deactivated */
+  status?: string;
+  /** Request timeout override in seconds (NULL = inherit from definition) */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+}
+/** A filter to be used against `FunctionExecutionLog` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionExecutionLogFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionExecutionLogFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Filter by the object’s `logLevel` field. */
+  logLevel?: StringFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: FunctionExecutionLogFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionExecutionLogFilter[];
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+}
+/** An input for mutations affecting `FunctionExecutionLog` */
+export interface FunctionExecutionLogInput {
+  /** User who triggered the execution (NULL for system/cron) */
+  actorId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Unique log entry identifier */
+  id?: string;
+  /** Invocation this log entry belongs to (NULL for standalone job logs) */
+  invocationId?: string;
+  /** Log severity: debug, info, warn, error */
+  logLevel?: string;
+  /** Log message text */
+  message: string;
+  /** Structured context (labels, trace data, extra fields) */
+  metadata?: unknown;
+  /** Function routing key (NULL for generic job logs) */
+  taskIdentifier?: string;
+}
+/** Represents an update to a `FunctionExecutionLog`. Fields that are set will be updated. */
+export interface FunctionExecutionLogPatch {
+  /** User who triggered the execution (NULL for system/cron) */
+  actorId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Unique log entry identifier */
+  id?: string;
+  /** Invocation this log entry belongs to (NULL for standalone job logs) */
+  invocationId?: string;
+  /** Log severity: debug, info, warn, error */
+  logLevel?: string;
+  /** Log message text */
+  message?: string;
+  /** Structured context (labels, trace data, extra fields) */
+  metadata?: unknown;
+  /** Function routing key (NULL for generic job logs) */
+  taskIdentifier?: string;
+}
+/** A filter to be used against `FunctionGraphCommit` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphCommitFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphCommitFilter[];
+  /** Filter by the object’s `authorId` field. */
+  authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
+  committerId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphCommitFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphCommitFilter[];
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
+  treeId?: UUIDFilter;
+}
+/** An input for mutations affecting `FunctionGraphCommit` */
+export interface FunctionGraphCommitInput {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Store this commit belongs to */
+  storeId: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** Represents an update to a `FunctionGraphCommit`. Fields that are set will be updated. */
+export interface FunctionGraphCommitPatch {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Store this commit belongs to */
+  storeId?: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** A filter to be used against `FunctionGraphExecution` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphExecutionFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphExecutionFilter[];
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `currentWave` field. */
+  currentWave?: IntFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `errorCode` field. */
+  errorCode?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
+  errorMessage?: StringFilter;
+  /** Filter by the object’s `executionPlan` field. */
+  executionPlan?: JSONFilter;
+  /** Filter by the object’s `graph` relation. */
+  graph?: FunctionGraphFilter;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `inputPayload` field. */
+  inputPayload?: JSONFilter;
+  /** Filter by the object’s `invocationCreatedAt` field. */
+  invocationCreatedAt?: DatetimeFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Filter by the object’s `lastProgressAt` field. */
+  lastProgressAt?: DatetimeFilter;
+  /** Filter by the object’s `maxPendingJobs` field. */
+  maxPendingJobs?: IntFilter;
+  /** Filter by the object’s `maxTicks` field. */
+  maxTicks?: IntFilter;
+  /** Filter by the object’s `nodeOutputs` field. */
+  nodeOutputs?: JSONFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphExecutionFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphExecutionFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `outputNames` field. */
+  outputNames?: StringListFilter;
+  /** Filter by the object’s `outputNode` field. */
+  outputNode?: StringFilter;
+  /** Filter by the object’s `outputPayload` field. */
+  outputPayload?: JSONFilter;
+  /** Filter by the object’s `outputPort` field. */
+  outputPort?: StringFilter;
+  /** Filter by the object’s `parentExecutionId` field. */
+  parentExecutionId?: UUIDFilter;
+  /** Filter by the object’s `parentInvocationId` field. */
+  parentInvocationId?: UUIDFilter;
+  /** Filter by the object’s `parentNodeName` field. */
+  parentNodeName?: StringFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `tickCount` field. */
+  tickCount?: IntFilter;
+  /** Filter by the object’s `timeoutAt` field. */
+  timeoutAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `FunctionGraphExecution` */
+export interface FunctionGraphExecutionInput {
+  /** User actor propagated to asynchronous graph jobs */
+  actorId?: string;
+  /** Execution completion timestamp */
+  completedAt?: string;
+  /** Index into execution_plan — tick only processes this wave */
+  currentWave?: number;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Entity context propagated to asynchronous graph jobs */
+  entityId?: string;
+  /** Scope discriminator propagated to asynchronous graph jobs */
+  entityType?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** Pre-computed topological sort as array of wave objects */
+  executionPlan?: unknown;
+  /** FK to the graph definition being executed */
+  graphId: string;
+  /** Unique execution identifier */
+  id?: string;
+  /** Initial inputs provided at invocation time */
+  inputPayload?: unknown;
+  /** Partition coordinate for the function invocation that launched this graph execution */
+  invocationCreatedAt?: string;
+  /** Function invocation that launched this top-level graph execution */
+  invocationId?: string;
+  /** Timestamp of the last real progress (node enqueue, node output, completion) — drives the activity-debounced watchdog */
+  lastProgressAt?: string;
+  /** Maximum pending jobs before execution is failed (default 50) */
+  maxPendingJobs?: number;
+  /** Maximum ticks before execution is failed (default 100) */
+  maxTicks?: number;
+  /** Map of node_name → execution output id (content-addressed hash reference) */
+  nodeOutputs?: unknown;
+  /** Organization context propagated to asynchronous graph jobs */
+  organizationId?: string;
+  /** Selected graphOutput portName values; NULL or empty returns all graph outputs */
+  outputNames?: string[];
+  /** Target output boundary node name to resolve; NULL derives completion from the graph's graphOutput nodes */
+  outputNode?: string;
+  /** Final result extracted from terminal output node */
+  outputPayload?: unknown;
+  /** Target output port name (default: value) */
+  outputPort?: string;
+  /** Parent execution when this is a sub-execution */
+  parentExecutionId?: string;
+  /** Function invocation parent assigned to node invocations spawned by this execution */
+  parentInvocationId?: string;
+  /** Node name in parent execution that spawned this sub-execution */
+  parentNodeName?: string;
+  /** Principal identity propagated to asynchronous graph jobs */
+  principalId?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Execution start timestamp */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Number of evaluate_step ticks executed */
+  tickCount?: number;
+  /** Absolute deadline — execution fails if still running after this time */
+  timeoutAt?: string;
+}
+/** A filter to be used against `FunctionGraphExecutionNodeState` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphExecutionNodeStateFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphExecutionNodeStateFilter[];
+  /** Filter by the object’s `callbackInputs` field. */
+  callbackInputs?: JSONFilter;
+  /** Filter by the object’s `callbackMeta` field. */
+  callbackMeta?: JSONFilter;
+  /** Filter by the object’s `callbackTokenHash` field. */
+  callbackTokenHash?: StringFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `errorCode` field. */
+  errorCode?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
+  errorMessage?: StringFilter;
+  /** Filter by the object’s `executionId` field. */
+  executionId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `nodeName` field. */
+  nodeName?: StringFilter;
+  /** Filter by the object’s `nodePath` field. */
+  nodePath?: StringListFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphExecutionNodeStateFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphExecutionNodeStateFilter[];
+  /** Filter by the object’s `outputId` field. */
+  outputId?: UUIDFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+}
+/** An input for mutations affecting `FunctionGraphExecutionNodeState` */
+export interface FunctionGraphExecutionNodeStateInput {
+  /** Snapshot of the node's resolved inputs for resource-runtime nodes — served by the node gateway GET /inputs endpoint */
+  callbackInputs?: unknown;
+  /** Metering/attribution context stamped at resource dispatch (namespace_id, task_identifier, entity_id, scope, resource identity, dispatched_at, attempt) — lets the node gateway settle and attribute without extra lookups */
+  callbackMeta?: unknown;
+  /** SHA-256 hex digest of the node callback token — set for resource-runtime nodes so the node gateway can authenticate result/error/heartbeat callbacks */
+  callbackTokenHash?: string;
+  /** Timestamp when the node finished (success or failure) */
+  completedAt?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** FK to the parent graph execution */
+  executionId: string;
+  /** Unique node state identifier */
+  id?: string;
+  /** Name of the node within the graph (e.g. send-email1) */
+  nodeName: string;
+  /** Full merkle tree path to this node (e.g. {function,graphs,myflow,nodes,send-email1}) — enables subnet hierarchy tracking */
+  nodePath?: string[];
+  /** FK to execution_outputs — content-addressed output blob for this node */
+  outputId?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Timestamp when the node began executing */
+  startedAt?: string;
+  /** Node lifecycle: pending → queued → running → completed/failed */
+  status?: string;
+}
+/** Represents an update to a `FunctionGraphExecutionNodeState`. Fields that are set will be updated. */
+export interface FunctionGraphExecutionNodeStatePatch {
+  /** Snapshot of the node's resolved inputs for resource-runtime nodes — served by the node gateway GET /inputs endpoint */
+  callbackInputs?: unknown;
+  /** Metering/attribution context stamped at resource dispatch (namespace_id, task_identifier, entity_id, scope, resource identity, dispatched_at, attempt) — lets the node gateway settle and attribute without extra lookups */
+  callbackMeta?: unknown;
+  /** SHA-256 hex digest of the node callback token — set for resource-runtime nodes so the node gateway can authenticate result/error/heartbeat callbacks */
+  callbackTokenHash?: string;
+  /** Timestamp when the node finished (success or failure) */
+  completedAt?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** FK to the parent graph execution */
+  executionId?: string;
+  /** Unique node state identifier */
+  id?: string;
+  /** Name of the node within the graph (e.g. send-email1) */
+  nodeName?: string;
+  /** Full merkle tree path to this node (e.g. {function,graphs,myflow,nodes,send-email1}) — enables subnet hierarchy tracking */
+  nodePath?: string[];
+  /** FK to execution_outputs — content-addressed output blob for this node */
+  outputId?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Timestamp when the node began executing */
+  startedAt?: string;
+  /** Node lifecycle: pending → queued → running → completed/failed */
+  status?: string;
+}
+/** A filter to be used against `FunctionGraphExecutionOutput` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphExecutionOutputFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphExecutionOutputFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: Base64EncodedBinaryFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphExecutionOutputFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphExecutionOutputFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `FunctionGraphExecutionOutput` */
+export interface FunctionGraphExecutionOutputInput {
+  /** Timestamp of output creation */
+  createdAt?: string;
+  /** The actual output payload from a completed node */
+  data: unknown;
+  /** SHA-256 hash of the data JSONB — content-addressed deduplication */
+  hash: Base64EncodedBinary;
+  /** Unique execution output identifier */
+  id?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `FunctionGraphExecutionOutput`. Fields that are set will be updated. */
+export interface FunctionGraphExecutionOutputPatch {
+  /** Timestamp of output creation */
+  createdAt?: string;
+  /** The actual output payload from a completed node */
+  data?: unknown;
+  /** SHA-256 hash of the data JSONB — content-addressed deduplication */
+  hash?: Base64EncodedBinary;
+  /** Unique execution output identifier */
+  id?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
+/** Represents an update to a `FunctionGraphExecution`. Fields that are set will be updated. */
+export interface FunctionGraphExecutionPatch {
+  /** User actor propagated to asynchronous graph jobs */
+  actorId?: string;
+  /** Execution completion timestamp */
+  completedAt?: string;
+  /** Index into execution_plan — tick only processes this wave */
+  currentWave?: number;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Entity context propagated to asynchronous graph jobs */
+  entityId?: string;
+  /** Scope discriminator propagated to asynchronous graph jobs */
+  entityType?: string;
+  /** Machine-readable error code when status = failed */
+  errorCode?: string;
+  /** Human-readable error description when status = failed */
+  errorMessage?: string;
+  /** Pre-computed topological sort as array of wave objects */
+  executionPlan?: unknown;
+  /** FK to the graph definition being executed */
+  graphId?: string;
+  /** Unique execution identifier */
+  id?: string;
+  /** Initial inputs provided at invocation time */
+  inputPayload?: unknown;
+  /** Partition coordinate for the function invocation that launched this graph execution */
+  invocationCreatedAt?: string;
+  /** Function invocation that launched this top-level graph execution */
+  invocationId?: string;
+  /** Timestamp of the last real progress (node enqueue, node output, completion) — drives the activity-debounced watchdog */
+  lastProgressAt?: string;
+  /** Maximum pending jobs before execution is failed (default 50) */
+  maxPendingJobs?: number;
+  /** Maximum ticks before execution is failed (default 100) */
+  maxTicks?: number;
+  /** Map of node_name → execution output id (content-addressed hash reference) */
+  nodeOutputs?: unknown;
+  /** Organization context propagated to asynchronous graph jobs */
+  organizationId?: string;
+  /** Selected graphOutput portName values; NULL or empty returns all graph outputs */
+  outputNames?: string[];
+  /** Target output boundary node name to resolve; NULL derives completion from the graph's graphOutput nodes */
+  outputNode?: string;
+  /** Final result extracted from terminal output node */
+  outputPayload?: unknown;
+  /** Target output port name (default: value) */
+  outputPort?: string;
+  /** Parent execution when this is a sub-execution */
+  parentExecutionId?: string;
+  /** Function invocation parent assigned to node invocations spawned by this execution */
+  parentInvocationId?: string;
+  /** Node name in parent execution that spawned this sub-execution */
+  parentNodeName?: string;
+  /** Principal identity propagated to asynchronous graph jobs */
+  principalId?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Execution start timestamp */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Number of evaluate_step ticks executed */
+  tickCount?: number;
+  /** Absolute deadline — execution fails if still running after this time */
+  timeoutAt?: string;
+}
+/** A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphFilter[];
+  /** Filter by the object’s `context` field. */
+  context?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `functionGraphExecutionsByGraphId` relation. */
+  functionGraphExecutionsByGraphId?: FunctionGraphToManyFunctionGraphExecutionFilter;
+  /** `functionGraphExecutionsByGraphId` exist. */
+  functionGraphExecutionsByGraphIdExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isValid` field. */
+  isValid?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphFilter[];
+  /** Filter by the object’s `platformFunctionDefinitionsByGraphId` relation. */
+  platformFunctionDefinitionsByGraphId?: FunctionGraphToManyPlatformFunctionDefinitionFilter;
+  /** `platformFunctionDefinitionsByGraphId` exist. */
+  platformFunctionDefinitionsByGraphIdExist?: boolean;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `validationErrors` field. */
+  validationErrors?: JSONFilter;
+}
+/** A filter to be used against `FunctionGraphObject` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphObjectFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphObjectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphObjectFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphObjectFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `FunctionGraphObject` */
+export interface FunctionGraphObjectInput {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `FunctionGraphObject`. Fields that are set will be updated. */
+export interface FunctionGraphObjectPatch {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id?: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
+/** Represents an update to a `FunctionGraph`. Fields that are set will be updated. */
+export interface FunctionGraphPatch {
+  /** Evaluator/runtime context (function, js, sql, system) */
+  context?: string;
+  /** Timestamp of graph creation */
+  createdAt?: string;
+  /** Actor who created this graph */
+  createdBy?: string;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Human-readable description of the graph */
+  description?: string;
+  /** Unique graph identifier */
+  id?: string;
+  /** Whether graph passes structural validation */
+  isValid?: boolean;
+  /** Graph name (unique per database) */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Graph store (Merkle store) holding the graph definition */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+  /** Array of validation error objects when is_valid = false */
+  validationErrors?: unknown;
+}
+/** A filter to be used against `FunctionGraphRef` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphRefFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphRefFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphRefFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphRefFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+}
+/** An input for mutations affecting `FunctionGraphRef` */
+export interface FunctionGraphRefInput {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Store this ref belongs to */
+  storeId: string;
+}
+/** Represents an update to a `FunctionGraphRef`. Fields that are set will be updated. */
+export interface FunctionGraphRefPatch {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Store this ref belongs to */
+  storeId?: string;
+}
+/** A filter to be used against `FunctionGraphStore` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphStoreFilter {
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphStoreFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: FunctionGraphStoreFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphStoreFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `FunctionGraphStore` */
+export interface FunctionGraphStoreInput {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `FunctionGraphStore`. Fields that are set will be updated. */
+export interface FunctionGraphStorePatch {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
+/** A filter to be used against many `FunctionGraphExecution` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphToManyFunctionGraphExecutionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionGraphExecutionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionGraphExecutionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionGraphExecutionFilter;
+}
+/** A filter to be used against many `PlatformFunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphToManyPlatformFunctionDefinitionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformFunctionDefinitionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformFunctionDefinitionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformFunctionDefinitionFilter;
+}
+/** A filter to be used against `FunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionInvocationFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionInvocationFilter[];
+  /** Filter by the object’s `apiBinding` relation. */
+  apiBinding?: FunctionApiBindingFilter;
+  /** A related `apiBinding` exists. */
+  apiBindingExists?: boolean;
+  /** Filter by the object’s `apiBindingId` field. */
+  apiBindingId?: UUIDFilter;
+  /** Filter by the object’s `channel` field. */
+  channel?: StringFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `definitionScope` field. */
+  definitionScope?: StringFilter;
+  /** Filter by the object’s `durationMs` field. */
+  durationMs?: IntFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `graphExecutionId` field. */
+  graphExecutionId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `jobId` field. */
+  jobId?: BigIntFilter;
+  /** Negates the expression. */
+  not?: FunctionInvocationFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionInvocationFilter[];
+  /** Filter by the object’s `parentInvocationId` field. */
+  parentInvocationId?: UUIDFilter;
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `provenance` field. */
+  provenance?: JSONFilter;
+  /** Filter by the object’s `result` field. */
+  result?: JSONFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+}
+/** An input for mutations affecting `FunctionInvocation` */
+export interface FunctionInvocationInput {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string;
+  /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
+  apiBindingId?: string;
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
+  channel?: string;
+  /** When execution completed */
+  completedAt?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
+  definitionScope?: string;
+  /** Wall-clock execution time in milliseconds */
+  durationMs?: number;
+  /** Error message when status is failed */
+  error?: string;
+  /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
+  functionDefinitionId?: string;
+  /** Groups all node invocations from a single flow graph execution */
+  graphExecutionId?: string;
+  /** Unique invocation identifier */
+  id?: string;
+  /** FK to app_jobs.jobs — the underlying transport */
+  jobId?: string;
+  /** Parent invocation when this is a child node of a flow graph execution */
+  parentInvocationId?: string;
+  /** Function input payload */
+  payload?: unknown;
+  /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
+  provenance?: unknown;
+  /** Function return value (success) or structured error (failure) */
+  result?: unknown;
+  /** When execution started */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
+  taskIdentifier: string;
+}
+/** Represents an update to a `FunctionInvocation`. Fields that are set will be updated. */
+export interface FunctionInvocationPatch {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string;
+  /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
+  apiBindingId?: string;
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
+  channel?: string;
+  /** When execution completed */
+  completedAt?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
+  definitionScope?: string;
+  /** Wall-clock execution time in milliseconds */
+  durationMs?: number;
+  /** Error message when status is failed */
+  error?: string;
+  /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
+  functionDefinitionId?: string;
+  /** Groups all node invocations from a single flow graph execution */
+  graphExecutionId?: string;
+  /** Unique invocation identifier */
+  id?: string;
+  /** FK to app_jobs.jobs — the underlying transport */
+  jobId?: string;
+  /** Parent invocation when this is a child node of a flow graph execution */
+  parentInvocationId?: string;
+  /** Function input payload */
+  payload?: unknown;
+  /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
+  provenance?: unknown;
+  /** Function return value (success) or structured error (failure) */
+  result?: unknown;
+  /** When execution started */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
+  taskIdentifier?: string;
+}
+export interface ImportDefinitionsInput {
+  clientMutationId?: string;
+  contexts?: string[];
+  graphId?: string;
+  sourceCommitId?: string;
+  sourceScopeId?: string;
+}
+export interface ImportGraphJsonInput {
+  clientMutationId?: string;
+  context?: string;
+  createdBy?: string;
+  definitionsCommitId?: string;
+  description?: string;
+  graphJson?: unknown;
+  name?: string;
+  scopeId?: string;
+}
+/** A filter to be used against `InfraCommit` object types. All fields are combined with a logical ‘and.’ */
+export interface InfraCommitFilter {
+  /** Checks for all expressions in this list. */
+  and?: InfraCommitFilter[];
+  /** Filter by the object’s `authorId` field. */
+  authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
+  committerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Negates the expression. */
+  not?: InfraCommitFilter;
+  /** Checks for any expressions in this list. */
+  or?: InfraCommitFilter[];
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
+  treeId?: UUIDFilter;
+}
+/** An input for mutations affecting `InfraCommit` */
+export interface InfraCommitInput {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Store this commit belongs to */
+  storeId: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** Represents an update to a `InfraCommit`. Fields that are set will be updated. */
+export interface InfraCommitPatch {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Store this commit belongs to */
+  storeId?: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+export interface InfraInitEmptyRepoInput {
+  clientMutationId?: string;
+  sId?: string;
+  storeId?: string;
+}
+export interface InfraInsertNodeAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `InfraObject` object types. All fields are combined with a logical ‘and.’ */
+export interface InfraObjectFilter {
+  /** Checks for all expressions in this list. */
+  and?: InfraObjectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Negates the expression. */
+  not?: InfraObjectFilter;
+  /** Checks for any expressions in this list. */
+  or?: InfraObjectFilter[];
+}
+/** An input for mutations affecting `InfraObject` */
+export interface InfraObjectInput {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+}
+/** Represents an update to a `InfraObject`. Fields that are set will be updated. */
+export interface InfraObjectPatch {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id?: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+}
+/** A filter to be used against `InfraRef` object types. All fields are combined with a logical ‘and.’ */
+export interface InfraRefFilter {
+  /** Checks for all expressions in this list. */
+  and?: InfraRefFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: InfraRefFilter;
+  /** Checks for any expressions in this list. */
+  or?: InfraRefFilter[];
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+}
+/** An input for mutations affecting `InfraRef` */
+export interface InfraRefInput {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name: string;
+  /** Store this ref belongs to */
+  storeId: string;
+}
+/** Represents an update to a `InfraRef`. Fields that are set will be updated. */
+export interface InfraRefPatch {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name?: string;
+  /** Store this ref belongs to */
+  storeId?: string;
+}
+export interface InfraSetDataAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `InfraStore` object types. All fields are combined with a logical ‘and.’ */
+export interface InfraStoreFilter {
+  /** Checks for all expressions in this list. */
+  and?: InfraStoreFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: InfraStoreFilter;
+  /** Checks for any expressions in this list. */
+  or?: InfraStoreFilter[];
+}
+/** An input for mutations affecting `InfraStore` */
+export interface InfraStoreInput {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name: string;
+}
+/** Represents an update to a `InfraStore`. Fields that are set will be updated. */
+export interface InfraStorePatch {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name?: string;
+}
+export interface InitEmptyRepoInput {
+  clientMutationId?: string;
+  sId?: string;
+  storeId?: string;
+}
+export interface InsertNodeAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `IntegrationProvider` object types. All fields are combined with a logical ‘and.’ */
+export interface IntegrationProviderFilter {
+  /** Checks for all expressions in this list. */
+  and?: IntegrationProviderFilter[];
+  /** Filter by the object’s `brand` field. */
+  brand?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `icon` field. */
+  icon?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `logo` field. */
+  logo?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: IntegrationProviderFilter;
+  /** Checks for any expressions in this list. */
+  or?: IntegrationProviderFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `IntegrationProvider` */
+export interface IntegrationProviderInput {
+  /** Brand metadata: colors, fonts, and other provider-specific styling. Not a foreign key. */
+  brand?: unknown;
+  /** Browser category (e.g. email, database, storage, ai, analytics) */
+  category?: string;
+  createdAt?: string;
+  /** Short description of what this integration provides and when to use it */
+  description?: string;
+  /** Icon identifier for the UI (e.g. mail, database, cloud) */
+  icon?: string;
+  id?: string;
+  /** Provider logo as an image domain value (url, id, key, bucket, provider) */
+  logo?: ConstructiveInternalTypeImage;
+  /** Human-readable brand name (e.g. 'Mailgun', 'PostgreSQL') */
+  name: string;
+  /** Canonical config requirements for this provider: array of (name, required, provider) tuples. Used by the UI to auto-fill function/resource required_configs. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Canonical secret requirements for this provider: array of (name, required, provider) tuples. Used by the UI to auto-fill function/resource required_secrets. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Stable URL-safe identifier for the provider. Other tables match by this string, not by FK. */
+  slug: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `IntegrationProvider`. Fields that are set will be updated. */
+export interface IntegrationProviderPatch {
+  /** Brand metadata: colors, fonts, and other provider-specific styling. Not a foreign key. */
+  brand?: unknown;
+  /** Browser category (e.g. email, database, storage, ai, analytics) */
+  category?: string;
+  createdAt?: string;
+  /** Short description of what this integration provides and when to use it */
+  description?: string;
+  /** Icon identifier for the UI (e.g. mail, database, cloud) */
+  icon?: string;
+  id?: string;
+  /** Provider logo as an image domain value (url, id, key, bucket, provider) */
+  logo?: ConstructiveInternalTypeImage;
+  /** Upload for Provider logo as an image domain value (url, id, key, bucket, provider) */
+  logoUpload?: File;
+  /** Human-readable brand name (e.g. 'Mailgun', 'PostgreSQL') */
+  name?: string;
+  /** Canonical config requirements for this provider: array of (name, required, provider) tuples. Used by the UI to auto-fill function/resource required_configs. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Canonical secret requirements for this provider: array of (name, required, provider) tuples. Used by the UI to auto-fill function/resource required_secrets. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Stable URL-safe identifier for the provider. Other tables match by this string, not by FK. */
+  slug?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against Interval fields. All fields are combined with a logical ‘and.’ */
+export interface IntervalFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: IntervalInput;
+  /** Equal to the specified value. */
+  equalTo?: IntervalInput;
+  /** Greater than the specified value. */
+  greaterThan?: IntervalInput;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: IntervalInput;
+  /** Included in the specified list. */
+  in?: IntervalInput[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: IntervalInput;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: IntervalInput;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: IntervalInput;
+  /** Not equal to the specified value. */
+  notEqualTo?: IntervalInput;
+  /** Not included in the specified list. */
+  notIn?: IntervalInput[];
+}
+/** An interval of time that has passed where the smallest distinct unit is a second. */
+export interface IntervalInput {
+  /** A quantity of days. */
+  days?: number;
+  /** A quantity of hours. */
+  hours?: number;
+  /** A quantity of minutes. */
+  minutes?: number;
+  /** A quantity of months. */
+  months?: number;
+  /**
+   * A quantity of seconds. This is the only non-integer field, as all the other
+   * fields will dump their overflow into a smaller unit of time. Intervals don’t
+   * have a smaller unit than seconds.
+   */
+  seconds?: number;
+  /** A quantity of years. */
+  years?: number;
+}
+/** A filter to be used against `NamespaceEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: NamespaceEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: NamespaceEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: NamespaceEventFilter[];
+}
+/** An input for mutations affecting `NamespaceEvent` */
+export interface NamespaceEventInput {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, labels diff, etc.) */
+  metadata?: unknown;
+  /** Namespace this event belongs to */
+  namespaceId: string;
+}
+/** Represents an update to a `NamespaceEvent`. Fields that are set will be updated. */
+export interface NamespaceEventPatch {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
+  eventType?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, labels diff, etc.) */
+  metadata?: unknown;
+  /** Namespace this event belongs to */
+  namespaceId?: string;
+}
+/** A filter to be used against `Namespace` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceFilter {
+  /** Checks for all expressions in this list. */
+  and?: NamespaceFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `functionDeployments` relation. */
+  functionDeployments?: NamespaceToManyFunctionDeploymentFilter;
+  /** `functionDeployments` exist. */
+  functionDeploymentsExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isManaged` field. */
+  isManaged?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceName` field. */
+  namespaceName?: StringFilter;
+  /** Negates the expression. */
+  not?: NamespaceFilter;
+  /** Checks for any expressions in this list. */
+  or?: NamespaceFilter[];
+  /** Filter by the object’s `resourceDefinitions` relation. */
+  resourceDefinitions?: NamespaceToManyResourceDefinitionFilter;
+  /** `resourceDefinitions` exist. */
+  resourceDefinitionsExist?: boolean;
+  /** Filter by the object’s `resourceInstallations` relation. */
+  resourceInstallations?: NamespaceToManyResourceInstallationFilter;
+  /** `resourceInstallations` exist. */
+  resourceInstallationsExist?: boolean;
+  /** Filter by the object’s `resources` relation. */
+  resources?: NamespaceToManyResourceFilter;
+  /** `resources` exist. */
+  resourcesExist?: boolean;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webhookEndpoints` relation. */
+  webhookEndpoints?: NamespaceToManyWebhookEndpointFilter;
+  /** `webhookEndpoints` exist. */
+  webhookEndpointsExist?: boolean;
+}
+/** An input for mutations affecting `Namespace` */
+export interface NamespaceInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Optional human-readable description of this namespace */
+  description?: string;
+  id?: string;
+  /** Whether this namespace is active (soft-disable for filtering) */
+  isActive?: boolean;
+  /** true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally) */
+  isManaged?: boolean;
+  /** Key/value pairs for selecting and filtering namespaces */
+  labels?: unknown;
+  /** Most recent provisioning or reconcile error message */
+  lastError?: string;
+  /** Human-readable namespace name (e.g. default, production, oauth) */
+  name: string;
+  /** Globally unique computed namespace identifier via inflection.underscore */
+  namespaceName: string;
+  /** Namespace provisioning lifecycle status: pending, provisioning, active, failed */
+  status?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `Namespace`. Fields that are set will be updated. */
+export interface NamespacePatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Optional human-readable description of this namespace */
+  description?: string;
+  id?: string;
+  /** Whether this namespace is active (soft-disable for filtering) */
+  isActive?: boolean;
+  /** true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally) */
+  isManaged?: boolean;
+  /** Key/value pairs for selecting and filtering namespaces */
+  labels?: unknown;
+  /** Most recent provisioning or reconcile error message */
+  lastError?: string;
+  /** Human-readable namespace name (e.g. default, production, oauth) */
+  name?: string;
+  /** Globally unique computed namespace identifier via inflection.underscore */
+  namespaceName?: string;
+  /** Namespace provisioning lifecycle status: pending, provisioning, active, failed */
+  status?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyFunctionDeploymentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionDeploymentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionDeploymentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionDeploymentFilter;
+}
+/** A filter to be used against many `ResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyResourceDefinitionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceDefinitionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceDefinitionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceDefinitionFilter;
+}
+/** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyResourceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceFilter;
+}
+/** A filter to be used against many `ResourceInstallation` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyResourceInstallationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceInstallationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceInstallationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceInstallationFilter;
+}
+/** A filter to be used against many `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyWebhookEndpointFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookEndpointFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookEndpointFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookEndpointFilter;
+}
+/** A filter to be used against `PlatformDeclaredCapacity` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformDeclaredCapacityFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformDeclaredCapacityFilter[];
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isTransient` field. */
+  isTransient?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformDeclaredCapacityFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDeclaredCapacityFilter[];
+  /** Filter by the object’s `podCountMax` field. */
+  podCountMax?: IntFilter;
+  /** Filter by the object’s `podCountMin` field. */
+  podCountMin?: IntFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `sourceId` field. */
+  sourceId?: UUIDFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+}
+/** A filter to be used against `PlatformFunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionApiBindingFilter {
+  /** Filter by the object’s `alias` field. */
+  alias?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionApiBindingFilter[];
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `functionDefinition` relation. */
+  functionDefinition?: PlatformFunctionDefinitionFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionApiBindingFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionApiBindingFilter[];
+  /** Filter by the object’s `platformFunctionInvocationsByApiBindingId` relation. */
+  platformFunctionInvocationsByApiBindingId?: PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter;
+  /** `platformFunctionInvocationsByApiBindingId` exist. */
+  platformFunctionInvocationsByApiBindingIdExist?: boolean;
+}
+/** An input for mutations affecting `PlatformFunctionApiBinding` */
+export interface PlatformFunctionApiBindingInput {
+  /** Binding alias (e.g. default, staging, production) */
+  alias?: string;
+  /** API endpoint this function is bound to */
+  apiId: string;
+  /** Per-binding configuration (overrides, routing rules, etc.) */
+  config?: unknown;
+  /** Function definition this binding belongs to */
+  functionDefinitionId: string;
+  id?: string;
+}
+/** Represents an update to a `PlatformFunctionApiBinding`. Fields that are set will be updated. */
+export interface PlatformFunctionApiBindingPatch {
+  /** Binding alias (e.g. default, staging, production) */
+  alias?: string;
+  /** API endpoint this function is bound to */
+  apiId?: string;
+  /** Per-binding configuration (overrides, routing rules, etc.) */
+  config?: unknown;
+  /** Function definition this binding belongs to */
+  functionDefinitionId?: string;
+  id?: string;
+}
+/** A filter to be used against many `PlatformFunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformFunctionInvocationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformFunctionInvocationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformFunctionInvocationFilter;
+}
+/** A filter to be used against `PlatformFunctionDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionDefinitionFilter {
+  /** Filter by the object’s `accessChannels` field. */
+  accessChannels?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionDefinitionFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `concurrency` field. */
+  concurrency?: IntFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `fnCategory` field. */
+  fnCategory?: StringFilter;
+  /** Filter by the object’s `functionColumns` field. */
+  functionColumns?: JSONFilter;
+  /** Filter by the object’s `graph` relation. */
+  graph?: FunctionGraphFilter;
+  /** A related `graph` exists. */
+  graphExists?: boolean;
+  /** Filter by the object’s `graphId` field. */
+  graphId?: UUIDFilter;
+  /** Filter by the object’s `icon` field. */
+  icon?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` field. */
+  image?: StringFilter;
+  /** Filter by the object’s `inputs` field. */
+  inputs?: JSONFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `maxAttempts` field. */
+  maxAttempts?: IntFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `moduleTable` field. */
+  moduleTable?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionDefinitionFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionDefinitionFilter[];
+  /** Filter by the object’s `outputs` field. */
+  outputs?: JSONFilter;
+  /** Filter by the object’s `payloadArgs` field. */
+  payloadArgs?: JSONFilter;
+  /** Filter by the object’s `platformFunctionApiBindingsByFunctionDefinitionId` relation. */
+  platformFunctionApiBindingsByFunctionDefinitionId?: PlatformFunctionDefinitionToManyPlatformFunctionApiBindingFilter;
+  /** `platformFunctionApiBindingsByFunctionDefinitionId` exist. */
+  platformFunctionApiBindingsByFunctionDefinitionIdExist?: boolean;
+  /** Filter by the object’s `platformWebhookEndpointsByFunctionDefinitionId` relation. */
+  platformWebhookEndpointsByFunctionDefinitionId?: PlatformFunctionDefinitionToManyPlatformWebhookEndpointFilter;
+  /** `platformWebhookEndpointsByFunctionDefinitionId` exist. */
+  platformWebhookEndpointsByFunctionDefinitionIdExist?: boolean;
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `props` field. */
+  props?: JSONFilter;
+  /** Filter by the object’s `protected` field. */
+  protected?: BooleanFilter;
+  /** Filter by the object’s `publishedAt` field. */
+  publishedAt?: DatetimeFilter;
+  /** Filter by the object’s `queueName` field. */
+  queueName?: StringFilter;
+  /** Filter by the object’s `requiredBuckets` field. */
+  requiredBuckets?: StringListFilter;
+  /** Filter by the object’s `requiredModels` field. */
+  requiredModels?: StringListFilter;
+  /** Filter by the object’s `resources` field. */
+  resources?: JSONFilter;
+  /** Filter by the object’s `runtime` field. */
+  runtime?: StringFilter;
+  /** Filter by the object’s `scaleMax` field. */
+  scaleMax?: IntFilter;
+  /** Filter by the object’s `scaleMin` field. */
+  scaleMin?: IntFilter;
+  /** Filter by the object’s `targetFunction` field. */
+  targetFunction?: StringFilter;
+  /** Filter by the object’s `targetSchema` field. */
+  targetSchema?: StringFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Filter by the object’s `timeoutSeconds` field. */
+  timeoutSeconds?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `volatile` field. */
+  volatile?: BooleanFilter;
+}
+/** An input for mutations affecting `PlatformFunctionDefinition` */
+export interface PlatformFunctionDefinitionInput {
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  accessChannels?: string[];
+  /** Function task category (e.g. email, embed, chunk, custom) */
+  category: string;
+  /** Knative containerConcurrency — max concurrent requests per pod instance */
+  concurrency?: number;
+  createdAt?: string;
+  /** Human-readable description of what this function does */
+  description?: string;
+  /** Palette grouping category (e.g. email, data, ai, custom) */
+  fnCategory?: string;
+  /** Ordered array of module_table column names holding the generated function names to invoke when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  functionColumns?: unknown;
+  /** Existing flow graph invoked when runtime=graph. Required for graph runtime and forbidden for all other runtimes. */
+  graphId?: string;
+  /** Icon identifier for UI palette rendering (e.g. mail, database, code) */
+  icon?: string;
+  id?: string;
+  /** Docker image reference (e.g. ghcr.io/constructive-io/email-send-fn:latest). Required when runtime=http or runtime=resource. NULL for inline functions. */
+  image?: string;
+  /** Data input ports: [{name, type, description?, optional?, multi?, schema?}] */
+  inputs?: unknown;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this function. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Whether this function definition is published to the public catalog for direct authenticated invocation. Default false = internal-only via add_job() */
+  isPublished?: boolean;
+  /** Maximum retry attempts for the underlying job */
+  maxAttempts?: number;
+  /** metaschema_modules_public table whose per-database row carries the generated function names when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  moduleTable?: string;
+  /** Function name within category (e.g. send_verification_link, process_file_embedding) */
+  name: string;
+  /** Data output ports: [{name, type, description?, optional?, multi?, schema?}] */
+  outputs?: unknown;
+  /** Ordered bind-parameter mapping for runtime=sql: [{name, type}]. payload[name] is bound as $n::type. */
+  payloadArgs?: unknown;
+  /** Job priority (lower = higher priority) */
+  priority?: number;
+  /** Configuration properties: [{name, type, default?, description?, required?, schema?}] */
+  props?: unknown;
+  /** Protected platform definition: narrower scopes cannot register the same task_identifier */
+  protected?: boolean;
+  /** Timestamp when this function was published. NULL means immediately published when is_published is true; future timestamps delay public visibility */
+  publishedAt?: string;
+  /** Job queue name for serialization (e.g. email, ai, default) */
+  queueName?: string;
+  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  requiredBuckets?: string[];
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
+  requiredModels?: string[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
+  resources?: unknown;
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  runtime?: string;
+  /** Maximum pod count for Knative autoscaling (maxScale) */
+  scaleMax?: number;
+  /** Minimum pod count for Knative autoscaling (minScale) */
+  scaleMin?: number;
+  /** Name of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetFunction?: string;
+  /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetSchema?: string;
+  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
+  taskIdentifier: string;
+  /** Knative request timeout in seconds */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+  /** Whether this function has side effects and cannot be cached or memoized */
+  volatile?: boolean;
+}
+/** Represents an update to a `PlatformFunctionDefinition`. Fields that are set will be updated. */
+export interface PlatformFunctionDefinitionPatch {
+  /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
+  accessChannels?: string[];
+  /** Function task category (e.g. email, embed, chunk, custom) */
+  category?: string;
+  /** Knative containerConcurrency — max concurrent requests per pod instance */
+  concurrency?: number;
+  createdAt?: string;
+  /** Human-readable description of what this function does */
+  description?: string;
+  /** Palette grouping category (e.g. email, data, ai, custom) */
+  fnCategory?: string;
+  /** Ordered array of module_table column names holding the generated function names to invoke when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  functionColumns?: unknown;
+  /** Existing flow graph invoked when runtime=graph. Required for graph runtime and forbidden for all other runtimes. */
+  graphId?: string;
+  /** Icon identifier for UI palette rendering (e.g. mail, database, code) */
+  icon?: string;
+  id?: string;
+  /** Docker image reference (e.g. ghcr.io/constructive-io/email-send-fn:latest). Required when runtime=http or runtime=resource. NULL for inline functions. */
+  image?: string;
+  /** Data input ports: [{name, type, description?, optional?, multi?, schema?}] */
+  inputs?: unknown;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this function. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Whether this function definition is published to the public catalog for direct authenticated invocation. Default false = internal-only via add_job() */
+  isPublished?: boolean;
+  /** Maximum retry attempts for the underlying job */
+  maxAttempts?: number;
+  /** metaschema_modules_public table whose per-database row carries the generated function names when runtime=sql (module mode). NULL for direct mode and other runtimes. */
+  moduleTable?: string;
+  /** Function name within category (e.g. send_verification_link, process_file_embedding) */
+  name?: string;
+  /** Data output ports: [{name, type, description?, optional?, multi?, schema?}] */
+  outputs?: unknown;
+  /** Ordered bind-parameter mapping for runtime=sql: [{name, type}]. payload[name] is bound as $n::type. */
+  payloadArgs?: unknown;
+  /** Job priority (lower = higher priority) */
+  priority?: number;
+  /** Configuration properties: [{name, type, default?, description?, required?, schema?}] */
+  props?: unknown;
+  /** Protected platform definition: narrower scopes cannot register the same task_identifier */
+  protected?: boolean;
+  /** Timestamp when this function was published. NULL means immediately published when is_published is true; future timestamps delay public visibility */
+  publishedAt?: string;
+  /** Job queue name for serialization (e.g. email, ai, default) */
+  queueName?: string;
+  /** Bucket keys this function needs (e.g. uploads, exports). Empty = no bucket requirements. */
+  requiredBuckets?: string[];
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Inference model whitelist (e.g. gpt-4o, claude-3). Empty = no model requirements. */
+  requiredModels?: string[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Container resource requests and limits: {requests: {memory, cpu}, limits: {memory, cpu}} */
+  resources?: unknown;
+  /** Execution mode: http (Knative Service dispatch), inline (in-process in compute worker), handler (registered infrastructure handler), sql (generic SQL dispatch via a trusted direct target or module-resolved function names), resource (Kubernetes Job via the resource module with node-gateway callbacks), or graph (existing flow graph referenced by graph_id) */
+  runtime?: string;
+  /** Maximum pod count for Knative autoscaling (maxScale) */
+  scaleMax?: number;
+  /** Minimum pod count for Knative autoscaling (minScale) */
+  scaleMin?: number;
+  /** Name of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetFunction?: string;
+  /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
+  targetSchema?: string;
+  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
+  taskIdentifier?: string;
+  /** Knative request timeout in seconds */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+  /** Whether this function has side effects and cannot be cached or memoized */
+  volatile?: boolean;
+}
+/** A filter to be used against many `PlatformFunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionDefinitionToManyPlatformFunctionApiBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformFunctionApiBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformFunctionApiBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformFunctionApiBindingFilter;
+}
+/** A filter to be used against many `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionDefinitionToManyPlatformWebhookEndpointFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformWebhookEndpointFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformWebhookEndpointFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformWebhookEndpointFilter;
+}
+/** A filter to be used against `PlatformFunctionDeploymentEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionDeploymentEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionDeploymentEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `deploymentId` field. */
+  deploymentId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionDeploymentEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionDeploymentEventFilter[];
+}
+/** An input for mutations affecting `PlatformFunctionDeploymentEvent` */
+export interface PlatformFunctionDeploymentEventInput {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Deployment this event belongs to */
+  deploymentId: string;
+  /** Event type: provisioned, scaled, failed, deactivated, redeployed, health_check */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+}
+/** Represents an update to a `PlatformFunctionDeploymentEvent`. Fields that are set will be updated. */
+export interface PlatformFunctionDeploymentEventPatch {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Deployment this event belongs to */
+  deploymentId?: string;
+  /** Event type: provisioned, scaled, failed, deactivated, redeployed, health_check */
+  eventType?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+}
+/** A filter to be used against `PlatformFunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionDeploymentFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionDeploymentFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `concurrency` field. */
+  concurrency?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `handlerName` field. */
+  handlerName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `image` field. */
+  image?: StringFilter;
+  /** Filter by the object’s `imageVersion` field. */
+  imageVersion?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `lastErrorAt` field. */
+  lastErrorAt?: DatetimeFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionDeploymentFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionDeploymentFilter[];
+  /** Filter by the object’s `resources` field. */
+  resources?: JSONFilter;
+  /** Filter by the object’s `revision` field. */
+  revision?: IntFilter;
+  /** Filter by the object’s `scaleMax` field. */
+  scaleMax?: IntFilter;
+  /** Filter by the object’s `scaleMin` field. */
+  scaleMin?: IntFilter;
+  /** Filter by the object’s `serviceName` field. */
+  serviceName?: StringFilter;
+  /** Filter by the object’s `serviceUrl` field. */
+  serviceUrl?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `timeoutSeconds` field. */
+  timeoutSeconds?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformFunctionDeployment` */
+export interface PlatformFunctionDeploymentInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  /** Max concurrent requests per pod (NULL = inherit from definition) */
+  concurrency?: number;
+  createdAt?: string;
+  /** Cumulative error count for this deployment */
+  errorCount?: number;
+  /** Handler directory name (e.g. email, document) — used as FN_HANDLER_NAME in combined-image mode to select the entry point */
+  handlerName?: string;
+  id?: string;
+  /** Logical image name — the handler identity and grouping key (e.g. fn-email). No registry host or tag; tag lives in image_version. */
+  image: string;
+  /** Image tag/version for the handler container (e.g. latest, 2.6.4) */
+  imageVersion?: string;
+  /** Key/value pairs for selecting and filtering deployments */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Timestamp of the most recent error */
+  lastErrorAt?: string;
+  /** Target namespace for this deployment (maps to a K8s namespace) */
+  namespaceId: string;
+  /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
+  resources?: unknown;
+  /** Deployment revision number (incremented on each redeployment) */
+  revision?: number;
+  /** Maximum replica count (NULL = inherit from definition or Knative default) */
+  scaleMax?: number;
+  /** Minimum replica count (NULL = inherit from definition or Knative default) */
+  scaleMin?: number;
+  /** Knative service name — a randomly minted cute name (unique_names.generate_name() + random hex suffix) assigned by the service_url trigger; unique per namespace, not derived from the image */
+  serviceName?: string;
+  /** Knative service URL (http://{service-name}.{namespace}.svc.cluster.local) — populated after provisioning */
+  serviceUrl?: string;
+  /** Deployment lifecycle status: pending, provisioning, active, failed, scaled_to_zero, deactivated */
+  status?: string;
+  /** Request timeout override in seconds (NULL = inherit from definition) */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformFunctionDeployment`. Fields that are set will be updated. */
+export interface PlatformFunctionDeploymentPatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  /** Max concurrent requests per pod (NULL = inherit from definition) */
+  concurrency?: number;
+  createdAt?: string;
+  /** Cumulative error count for this deployment */
+  errorCount?: number;
+  /** Handler directory name (e.g. email, document) — used as FN_HANDLER_NAME in combined-image mode to select the entry point */
+  handlerName?: string;
+  id?: string;
+  /** Logical image name — the handler identity and grouping key (e.g. fn-email). No registry host or tag; tag lives in image_version. */
+  image?: string;
+  /** Image tag/version for the handler container (e.g. latest, 2.6.4) */
+  imageVersion?: string;
+  /** Key/value pairs for selecting and filtering deployments */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Timestamp of the most recent error */
+  lastErrorAt?: string;
+  /** Target namespace for this deployment (maps to a K8s namespace) */
+  namespaceId?: string;
+  /** K8s resource spec override: {"requests":{"cpu":"100m","memory":"128Mi"},"limits":{...}} */
+  resources?: unknown;
+  /** Deployment revision number (incremented on each redeployment) */
+  revision?: number;
+  /** Maximum replica count (NULL = inherit from definition or Knative default) */
+  scaleMax?: number;
+  /** Minimum replica count (NULL = inherit from definition or Knative default) */
+  scaleMin?: number;
+  /** Knative service name — a randomly minted cute name (unique_names.generate_name() + random hex suffix) assigned by the service_url trigger; unique per namespace, not derived from the image */
+  serviceName?: string;
+  /** Knative service URL (http://{service-name}.{namespace}.svc.cluster.local) — populated after provisioning */
+  serviceUrl?: string;
+  /** Deployment lifecycle status: pending, provisioning, active, failed, scaled_to_zero, deactivated */
+  status?: string;
+  /** Request timeout override in seconds (NULL = inherit from definition) */
+  timeoutSeconds?: number;
+  updatedAt?: string;
+}
+/** A filter to be used against `PlatformFunctionExecutionLog` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionExecutionLogFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionExecutionLogFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Filter by the object’s `logLevel` field. */
+  logLevel?: StringFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionExecutionLogFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionExecutionLogFilter[];
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+}
+/** An input for mutations affecting `PlatformFunctionExecutionLog` */
+export interface PlatformFunctionExecutionLogInput {
+  /** User who triggered the execution (NULL for system/cron) */
+  actorId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt?: string;
+  /** Unique log entry identifier */
+  id?: string;
+  /** Invocation this log entry belongs to (NULL for standalone job logs) */
+  invocationId?: string;
+  /** Log severity: debug, info, warn, error */
+  logLevel?: string;
+  /** Log message text */
+  message: string;
+  /** Structured context (labels, trace data, extra fields) */
+  metadata?: unknown;
+  /** Function routing key (NULL for generic job logs) */
+  taskIdentifier?: string;
+}
+/** Represents an update to a `PlatformFunctionExecutionLog`. Fields that are set will be updated. */
+export interface PlatformFunctionExecutionLogPatch {
+  /** User who triggered the execution (NULL for system/cron) */
+  actorId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt?: string;
+  /** Unique log entry identifier */
+  id?: string;
+  /** Invocation this log entry belongs to (NULL for standalone job logs) */
+  invocationId?: string;
+  /** Log severity: debug, info, warn, error */
+  logLevel?: string;
+  /** Log message text */
+  message?: string;
+  /** Structured context (labels, trace data, extra fields) */
+  metadata?: unknown;
+  /** Function routing key (NULL for generic job logs) */
+  taskIdentifier?: string;
+}
+/** A filter to be used against `PlatformFunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformFunctionInvocationFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionInvocationFilter[];
+  /** Filter by the object’s `apiBinding` relation. */
+  apiBinding?: PlatformFunctionApiBindingFilter;
+  /** A related `apiBinding` exists. */
+  apiBindingExists?: boolean;
+  /** Filter by the object’s `apiBindingId` field. */
+  apiBindingId?: UUIDFilter;
+  /** Filter by the object’s `channel` field. */
+  channel?: StringFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `definitionScope` field. */
+  definitionScope?: StringFilter;
+  /** Filter by the object’s `durationMs` field. */
+  durationMs?: IntFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `graphExecutionId` field. */
+  graphExecutionId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `jobId` field. */
+  jobId?: BigIntFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionInvocationFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionInvocationFilter[];
+  /** Filter by the object’s `parentInvocationId` field. */
+  parentInvocationId?: UUIDFilter;
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `provenance` field. */
+  provenance?: JSONFilter;
+  /** Filter by the object’s `result` field. */
+  result?: JSONFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+}
+/** An input for mutations affecting `PlatformFunctionInvocation` */
+export interface PlatformFunctionInvocationInput {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string;
+  /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
+  apiBindingId?: string;
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
+  channel?: string;
+  /** When execution completed */
+  completedAt?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt?: string;
+  /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
+  definitionScope?: string;
+  /** Wall-clock execution time in milliseconds */
+  durationMs?: number;
+  /** Error message when status is failed */
+  error?: string;
+  /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
+  functionDefinitionId?: string;
+  /** Groups all node invocations from a single flow graph execution */
+  graphExecutionId?: string;
+  /** Unique invocation identifier */
+  id?: string;
+  /** FK to app_jobs.jobs — the underlying transport */
+  jobId?: string;
+  /** Parent invocation when this is a child node of a flow graph execution */
+  parentInvocationId?: string;
+  /** Function input payload */
+  payload?: unknown;
+  /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
+  provenance?: unknown;
+  /** Function return value (success) or structured error (failure) */
+  result?: unknown;
+  /** When execution started */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
+  taskIdentifier: string;
+}
+/** Represents an update to a `PlatformFunctionInvocation`. Fields that are set will be updated. */
+export interface PlatformFunctionInvocationPatch {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string;
+  /** API binding this invocation arrived through (NULL for cron/graph/system/worker paths) */
+  apiBindingId?: string;
+  /** Invocation trigger channel: api, graph, cron, sync, webhook, or worker */
+  channel?: string;
+  /** When execution completed */
+  completedAt?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt?: string;
+  /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
+  definitionScope?: string;
+  /** Wall-clock execution time in milliseconds */
+  durationMs?: number;
+  /** Error message when status is failed */
+  error?: string;
+  /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
+  functionDefinitionId?: string;
+  /** Groups all node invocations from a single flow graph execution */
+  graphExecutionId?: string;
+  /** Unique invocation identifier */
+  id?: string;
+  /** FK to app_jobs.jobs — the underlying transport */
+  jobId?: string;
+  /** Parent invocation when this is a child node of a flow graph execution */
+  parentInvocationId?: string;
+  /** Function input payload */
+  payload?: unknown;
+  /** Non-secret channel-specific invocation provenance (route/binding/event identifiers only) */
+  provenance?: unknown;
+  /** Function return value (success) or structured error (failure) */
+  result?: unknown;
+  /** When execution started */
+  startedAt?: string;
+  /** Lifecycle: pending → running → completed/failed/cancelled */
+  status?: string;
+  /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
+  taskIdentifier?: string;
+}
+/** A filter to be used against `PlatformInfraCommit` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraCommitFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraCommitFilter[];
+  /** Filter by the object’s `authorId` field. */
+  authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
+  committerId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraCommitFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraCommitFilter[];
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
+  treeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraCommit` */
+export interface PlatformInfraCommitInput {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Store this commit belongs to */
+  storeId: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** Represents an update to a `PlatformInfraCommit`. Fields that are set will be updated. */
+export interface PlatformInfraCommitPatch {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Store this commit belongs to */
+  storeId?: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+export interface PlatformInfraInitEmptyRepoInput {
+  clientMutationId?: string;
+  sId?: string;
+  storeId?: string;
+}
+export interface PlatformInfraInsertNodeAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `PlatformInfraObject` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraObjectFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraObjectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraObjectFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraObjectFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraObject` */
+export interface PlatformInfraObjectInput {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `PlatformInfraObject`. Fields that are set will be updated. */
+export interface PlatformInfraObjectPatch {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id?: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
+/** A filter to be used against `PlatformInfraRef` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraRefFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraRefFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraRefFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraRefFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraRef` */
+export interface PlatformInfraRefInput {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Store this ref belongs to */
+  storeId: string;
+}
+/** Represents an update to a `PlatformInfraRef`. Fields that are set will be updated. */
+export interface PlatformInfraRefPatch {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Store this ref belongs to */
+  storeId?: string;
+}
+export interface PlatformInfraSetDataAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `PlatformInfraStore` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraStoreFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraStoreFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraStoreFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraStoreFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraStore` */
+export interface PlatformInfraStoreInput {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `PlatformInfraStore`. Fields that are set will be updated. */
+export interface PlatformInfraStorePatch {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
+/** A filter to be used against `PlatformNamespaceEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformNamespaceEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformNamespaceEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformNamespaceEventFilter[];
+}
+/** An input for mutations affecting `PlatformNamespaceEvent` */
+export interface PlatformNamespaceEventInput {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, labels diff, etc.) */
+  metadata?: unknown;
+  /** Namespace this event belongs to */
+  namespaceId: string;
+}
+/** Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated. */
+export interface PlatformNamespaceEventPatch {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
+  eventType?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, labels diff, etc.) */
+  metadata?: unknown;
+  /** Namespace this event belongs to */
+  namespaceId?: string;
+}
+/** A filter to be used against `PlatformNamespace` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformNamespaceFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isManaged` field. */
+  isManaged?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceName` field. */
+  namespaceName?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformNamespaceFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformNamespaceFilter[];
+  /** Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation. */
+  platformFunctionDeploymentsByNamespaceId?: PlatformNamespaceToManyPlatformFunctionDeploymentFilter;
+  /** `platformFunctionDeploymentsByNamespaceId` exist. */
+  platformFunctionDeploymentsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformResourceDefinitionsByNamespaceId` relation. */
+  platformResourceDefinitionsByNamespaceId?: PlatformNamespaceToManyPlatformResourceDefinitionFilter;
+  /** `platformResourceDefinitionsByNamespaceId` exist. */
+  platformResourceDefinitionsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformResourceInstallationsByNamespaceId` relation. */
+  platformResourceInstallationsByNamespaceId?: PlatformNamespaceToManyPlatformResourceInstallationFilter;
+  /** `platformResourceInstallationsByNamespaceId` exist. */
+  platformResourceInstallationsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformResourcesByNamespaceId` relation. */
+  platformResourcesByNamespaceId?: PlatformNamespaceToManyPlatformResourceFilter;
+  /** `platformResourcesByNamespaceId` exist. */
+  platformResourcesByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformWebhookEndpointsByNamespaceId` relation. */
+  platformWebhookEndpointsByNamespaceId?: PlatformNamespaceToManyPlatformWebhookEndpointFilter;
+  /** `platformWebhookEndpointsByNamespaceId` exist. */
+  platformWebhookEndpointsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformNamespace` */
+export interface PlatformNamespaceInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  /** Optional human-readable description of this namespace */
+  description?: string;
+  id?: string;
+  /** Whether this namespace is active (soft-disable for filtering) */
+  isActive?: boolean;
+  /** true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally) */
+  isManaged?: boolean;
+  /** Key/value pairs for selecting and filtering namespaces */
+  labels?: unknown;
+  /** Most recent provisioning or reconcile error message */
+  lastError?: string;
+  /** Human-readable namespace name (e.g. default, production, oauth) */
+  name: string;
+  /** Globally unique computed namespace identifier via inflection.underscore */
+  namespaceName: string;
+  /** Namespace provisioning lifecycle status: pending, provisioning, active, failed */
+  status?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformNamespace`. Fields that are set will be updated. */
+export interface PlatformNamespacePatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  /** Optional human-readable description of this namespace */
+  description?: string;
+  id?: string;
+  /** Whether this namespace is active (soft-disable for filtering) */
+  isActive?: boolean;
+  /** true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally) */
+  isManaged?: boolean;
+  /** Key/value pairs for selecting and filtering namespaces */
+  labels?: unknown;
+  /** Most recent provisioning or reconcile error message */
+  lastError?: string;
+  /** Human-readable namespace name (e.g. default, production, oauth) */
+  name?: string;
+  /** Globally unique computed namespace identifier via inflection.underscore */
+  namespaceName?: string;
+  /** Namespace provisioning lifecycle status: pending, provisioning, active, failed */
+  status?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against many `PlatformFunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformFunctionDeploymentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformFunctionDeploymentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformFunctionDeploymentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformFunctionDeploymentFilter;
+}
+/** A filter to be used against many `PlatformResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformResourceDefinitionFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformResourceDefinitionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformResourceDefinitionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformResourceDefinitionFilter;
+}
+/** A filter to be used against many `PlatformResource` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformResourceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformResourceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformResourceFilter;
+}
+/** A filter to be used against many `PlatformResourceInstallation` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformResourceInstallationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformResourceInstallationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformResourceInstallationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformResourceInstallationFilter;
+}
+/** A filter to be used against many `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformWebhookEndpointFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformWebhookEndpointFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformWebhookEndpointFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformWebhookEndpointFilter;
+}
+/** A filter to be used against `PlatformResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceDefinitionFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceDefinitionFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `defaultSpec` field. */
+  defaultSpec?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceDefinitionFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceDefinitionFilter[];
+  /** Filter by the object’s `platformResourcesByResourceDefinitionId` relation. */
+  platformResourcesByResourceDefinitionId?: PlatformResourceDefinitionToManyPlatformResourceFilter;
+  /** `platformResourcesByResourceDefinitionId` exist. */
+  platformResourcesByResourceDefinitionIdExist?: boolean;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `stepUpMinAge` field. */
+  stepUpMinAge?: IntervalFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformResourceDefinition` */
+export interface PlatformResourceDefinitionInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Template spec for creating resource instances of this kind */
+  defaultSpec?: unknown;
+  /** What this resource definition provides */
+  description?: string;
+  id?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  kind: string;
+  /** Key/value pairs for selecting and filtering definitions */
+  labels?: unknown;
+  /** Human-readable definition name */
+  name: string;
+  /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
+  namespaceId: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug: string;
+  /** Min age before DELETE of a resource of this kind requires step-up; NULL inherits the 6h default */
+  stepUpMinAge?: IntervalInput;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `PlatformResourceDefinition`. Fields that are set will be updated. */
+export interface PlatformResourceDefinitionPatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Template spec for creating resource instances of this kind */
+  defaultSpec?: unknown;
+  /** What this resource definition provides */
+  description?: string;
+  id?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  kind?: string;
+  /** Key/value pairs for selecting and filtering definitions */
+  labels?: unknown;
+  /** Human-readable definition name */
+  name?: string;
+  /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
+  namespaceId?: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug?: string;
+  /** Min age before DELETE of a resource of this kind requires step-up; NULL inherits the 6h default */
+  stepUpMinAge?: IntervalInput;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `PlatformResource` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceDefinitionToManyPlatformResourceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformResourceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformResourceFilter;
+}
+/** A filter to be used against `PlatformResourceEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceEventFilter[];
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformResourceEvent` */
+export interface PlatformResourceEventInput {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+  /** Resource this event belongs to */
+  resourceId: string;
+}
+/** Represents an update to a `PlatformResourceEvent`. Fields that are set will be updated. */
+export interface PlatformResourceEventPatch {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
+  eventType?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+  /** Resource this event belongs to */
+  resourceId?: string;
+}
+/** A filter to be used against `PlatformResource` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installation` relation. */
+  installation?: PlatformResourceInstallationFilter;
+  /** A related `installation` exists. */
+  installationExists?: boolean;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `lastHeartbeatAt` field. */
+  lastHeartbeatAt?: DatetimeFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceFilter[];
+  /** Filter by the object’s `platformResourceStatusChecksByResourceId` relation. */
+  platformResourceStatusChecksByResourceId?: PlatformResourceToManyPlatformResourceStatusCheckFilter;
+  /** `platformResourceStatusChecksByResourceId` exist. */
+  platformResourceStatusChecksByResourceIdExist?: boolean;
+  /** Filter by the object’s `replicas` field. */
+  replicas?: IntFilter;
+  /** Filter by the object’s `resourceDefinition` relation. */
+  resourceDefinition?: PlatformResourceDefinitionFilter;
+  /** A related `resourceDefinition` exists. */
+  resourceDefinitionExists?: boolean;
+  /** Filter by the object’s `resourceDefinitionId` field. */
+  resourceDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `spec` field. */
+  spec?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `statusObserved` field. */
+  statusObserved?: JSONFilter;
+  /** Filter by the object’s `storageClass` field. */
+  storageClass?: StringFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformResource` */
+export interface PlatformResourceInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Cumulative error count for this resource */
+  errorCount?: number;
+  id?: string;
+  /** Installation ("release") this resource belongs to (NULL for standalone resources) */
+  installationId?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  kind: string;
+  /** Key/value pairs for selecting and filtering resources */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Last time a usage heartbeat was received for this resource (NULL until first heartbeat) */
+  lastHeartbeatAt?: string;
+  /** Human-readable resource name */
+  name: string;
+  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
+  namespaceId: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Definition template this resource was created from (NULL for standalone resources) */
+  resourceDefinitionId?: string;
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug: string;
+  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
+  spec?: unknown;
+  /** Resource lifecycle status: pending, provisioning, active, completed, failed, draining, deleting */
+  status?: string;
+  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
+  statusObserved?: unknown;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against `PlatformResourceInstallation` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceInstallationFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceInstallationFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceInstallationFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceInstallationFilter[];
+  /** Filter by the object’s `params` field. */
+  params?: JSONFilter;
+  /** Filter by the object’s `platformResourcesByInstallationId` relation. */
+  platformResourcesByInstallationId?: PlatformResourceInstallationToManyPlatformResourceFilter;
+  /** `platformResourcesByInstallationId` exist. */
+  platformResourcesByInstallationIdExist?: boolean;
+  /** Filter by the object’s `revision` field. */
+  revision?: IntFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformResourceInstallation` */
+export interface PlatformResourceInstallationInput {
+  /** Infra store commit for the current params (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  createdBy?: string;
+  id?: string;
+  /** Human-readable release name */
+  name: string;
+  /** Namespace this installation belongs to (security boundary) */
+  namespaceId: string;
+  /** Release parameters — the readily-cached head; history lives in the infra store. Never contains secret/config literals. */
+  params?: unknown;
+  /** Monotonic release revision counter: install starts at 1, bumped on every upgrade/rollback */
+  revision?: number;
+  /** URL-safe release identifier, unique within the namespace; the release's path in the infra tree is [resource_installation, slug] */
+  slug: string;
+  /** Installation lifecycle status: pending, installed, uninstalled, failed */
+  status?: string;
+  /** Infra merkle store holding this installation's history (stamped by the versioned trigger) */
+  storeId?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `PlatformResourceInstallation`. Fields that are set will be updated. */
+export interface PlatformResourceInstallationPatch {
+  /** Infra store commit for the current params (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  createdBy?: string;
+  id?: string;
+  /** Human-readable release name */
+  name?: string;
+  /** Namespace this installation belongs to (security boundary) */
+  namespaceId?: string;
+  /** Release parameters — the readily-cached head; history lives in the infra store. Never contains secret/config literals. */
+  params?: unknown;
+  /** Monotonic release revision counter: install starts at 1, bumped on every upgrade/rollback */
+  revision?: number;
+  /** URL-safe release identifier, unique within the namespace; the release's path in the infra tree is [resource_installation, slug] */
+  slug?: string;
+  /** Installation lifecycle status: pending, installed, uninstalled, failed */
+  status?: string;
+  /** Infra merkle store holding this installation's history (stamped by the versioned trigger) */
+  storeId?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `PlatformResource` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceInstallationToManyPlatformResourceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformResourceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformResourceFilter;
+}
+export interface PlatformResourceInstallationsInstallInput {
+  clientMutationId?: string;
+  pName?: string;
+  pNamespaceId?: string;
+  pParams?: unknown;
+  pSlug?: string;
+}
+export interface PlatformResourceInstallationsRollbackInput {
+  clientMutationId?: string;
+  pCommitId?: string;
+  pInstallationId?: string;
+}
+export interface PlatformResourceInstallationsUninstallInput {
+  clientMutationId?: string;
+  pInstallationId?: string;
+}
+export interface PlatformResourceInstallationsUpgradeInput {
+  clientMutationId?: string;
+  pInstallationId?: string;
+  pParams?: unknown;
+}
+/** Represents an update to a `PlatformResource`. Fields that are set will be updated. */
+export interface PlatformResourcePatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Cumulative error count for this resource */
+  errorCount?: number;
+  id?: string;
+  /** Installation ("release") this resource belongs to (NULL for standalone resources) */
+  installationId?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  kind?: string;
+  /** Key/value pairs for selecting and filtering resources */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Last time a usage heartbeat was received for this resource (NULL until first heartbeat) */
+  lastHeartbeatAt?: string;
+  /** Human-readable resource name */
+  name?: string;
+  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
+  namespaceId?: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Definition template this resource was created from (NULL for standalone resources) */
+  resourceDefinitionId?: string;
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug?: string;
+  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
+  spec?: unknown;
+  /** Resource lifecycle status: pending, provisioning, active, completed, failed, draining, deleting */
+  status?: string;
+  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
+  statusObserved?: unknown;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against `PlatformResourceStatusCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceStatusCheckFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceStatusCheckFilter[];
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceStatusCheckFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceStatusCheckFilter[];
+  /** Filter by the object’s `requestedAt` field. */
+  requestedAt?: DatetimeFilter;
+  /** Filter by the object’s `requestedBy` field. */
+  requestedBy?: UUIDFilter;
+  /** Filter by the object’s `resource` relation. */
+  resource?: PlatformResourceFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `result` field. */
+  result?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+}
+/** An input for mutations affecting `PlatformResourceStatusCheck` */
+export interface PlatformResourceStatusCheckInput {
+  /** When the check completed (NULL while pending/running) */
+  completedAt?: string;
+  /** Unique status check identifier */
+  id?: string;
+  /** When the check was requested */
+  requestedAt?: string;
+  /** User who requested the check (NULL for system/scheduled) */
+  requestedBy?: string;
+  /** Resource to check */
+  resourceId: string;
+  /** Diagnostic snapshot: k8s_status, conditions, pod_logs_tail, events */
+  result?: unknown;
+  /** Check lifecycle: pending, running, completed, failed */
+  status?: string;
+}
+/** Represents an update to a `PlatformResourceStatusCheck`. Fields that are set will be updated. */
+export interface PlatformResourceStatusCheckPatch {
+  /** When the check completed (NULL while pending/running) */
+  completedAt?: string;
+  /** Unique status check identifier */
+  id?: string;
+  /** When the check was requested */
+  requestedAt?: string;
+  /** User who requested the check (NULL for system/scheduled) */
+  requestedBy?: string;
+  /** Resource to check */
+  resourceId?: string;
+  /** Diagnostic snapshot: k8s_status, conditions, pod_logs_tail, events */
+  result?: unknown;
+  /** Check lifecycle: pending, running, completed, failed */
+  status?: string;
+}
+/** A filter to be used against many `PlatformResourceStatusCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceToManyPlatformResourceStatusCheckFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformResourceStatusCheckFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformResourceStatusCheckFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformResourceStatusCheckFilter;
+}
+/** A filter to be used against `PlatformResourceUsageLog` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceUsageLogFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceUsageLogFilter[];
+  /** Filter by the object’s `cpuMillicores` field. */
+  cpuMillicores?: BigIntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `intervalSeconds` field. */
+  intervalSeconds?: IntFilter;
+  /** Filter by the object’s `memoryBytes` field. */
+  memoryBytes?: BigIntFilter;
+  /** Filter by the object’s `metrics` field. */
+  metrics?: JSONFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceUsageLogFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceUsageLogFilter[];
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `sampledAt` field. */
+  sampledAt?: DatetimeFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+}
+/** An input for mutations affecting `PlatformResourceUsageLog` */
+export interface PlatformResourceUsageLogInput {
+  /** CPU gauge in millicores at sample time (NULL when unknown) */
+  cpuMillicores?: string;
+  /** Unique sample identifier */
+  id?: string;
+  /** Seconds covered by this sample — runtime is SUM(interval_seconds) */
+  intervalSeconds: number;
+  /** Memory gauge in bytes at sample time (NULL when unknown) */
+  memoryBytes?: string;
+  /** Structured gauges: replicas, pod counts, phases, and other producer-specific metrics */
+  metrics?: unknown;
+  /** Namespace the measured workload runs in */
+  namespaceId: string;
+  /** Resource this sample measures (NULL for namespace-grain catch-all rows) */
+  resourceId?: string;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt?: string;
+  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  source: string;
+}
+/** Represents an update to a `PlatformResourceUsageLog`. Fields that are set will be updated. */
+export interface PlatformResourceUsageLogPatch {
+  /** CPU gauge in millicores at sample time (NULL when unknown) */
+  cpuMillicores?: string;
+  /** Unique sample identifier */
+  id?: string;
+  /** Seconds covered by this sample — runtime is SUM(interval_seconds) */
+  intervalSeconds?: number;
+  /** Memory gauge in bytes at sample time (NULL when unknown) */
+  memoryBytes?: string;
+  /** Structured gauges: replicas, pod counts, phases, and other producer-specific metrics */
+  metrics?: unknown;
+  /** Namespace the measured workload runs in */
+  namespaceId?: string;
+  /** Resource this sample measures (NULL for namespace-grain catch-all rows) */
+  resourceId?: string;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt?: string;
+  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  source?: string;
+}
+/** A filter to be used against `PlatformResourceUsageSummary` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceUsageSummaryFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceUsageSummaryFilter[];
+  /** Filter by the object’s `date` field. */
+  date?: DateFilter;
+  /** Filter by the object’s `gbSeconds` field. */
+  gbSeconds?: BigFloatFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `maxCpuMillicores` field. */
+  maxCpuMillicores?: BigIntFilter;
+  /** Filter by the object’s `maxMemoryBytes` field. */
+  maxMemoryBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceUsageSummaryFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceUsageSummaryFilter[];
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `runtimeSeconds` field. */
+  runtimeSeconds?: BigIntFilter;
+  /** Filter by the object’s `sampleCount` field. */
+  sampleCount?: IntFilter;
+}
+/** An input for mutations affecting `PlatformResourceUsageSummary` */
+export interface PlatformResourceUsageSummaryInput {
+  /** Day this summary covers (partition key) */
+  date: string;
+  /** Memory usage for the day — SUM(memory_bytes * interval_seconds) normalized to GB-seconds */
+  gbSeconds?: string;
+  /** Unique usage summary identifier */
+  id?: string;
+  /** Maximum CPU gauge observed during the day (NULL when never reported) */
+  maxCpuMillicores?: string;
+  /** Maximum memory gauge observed during the day (NULL when never reported) */
+  maxMemoryBytes?: string;
+  /** Namespace the resource runs in */
+  namespaceId: string;
+  /** Resource this summary covers (NULL for namespace-grain catch-all summaries) */
+  resourceId?: string;
+  /** Total measured runtime for the day — SUM(interval_seconds) */
+  runtimeSeconds?: string;
+  /** Number of raw samples aggregated into this summary */
+  sampleCount?: number;
+}
+/** Represents an update to a `PlatformResourceUsageSummary`. Fields that are set will be updated. */
+export interface PlatformResourceUsageSummaryPatch {
+  /** Day this summary covers (partition key) */
+  date?: string;
+  /** Memory usage for the day — SUM(memory_bytes * interval_seconds) normalized to GB-seconds */
+  gbSeconds?: string;
+  /** Unique usage summary identifier */
+  id?: string;
+  /** Maximum CPU gauge observed during the day (NULL when never reported) */
+  maxCpuMillicores?: string;
+  /** Maximum memory gauge observed during the day (NULL when never reported) */
+  maxMemoryBytes?: string;
+  /** Namespace the resource runs in */
+  namespaceId?: string;
+  /** Resource this summary covers (NULL for namespace-grain catch-all summaries) */
+  resourceId?: string;
+  /** Total measured runtime for the day — SUM(interval_seconds) */
+  runtimeSeconds?: string;
+  /** Number of raw samples aggregated into this summary */
+  sampleCount?: number;
+}
+/** A filter to be used against `PlatformResourceUtilizationDaily` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourceUtilizationDailyFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceUtilizationDailyFilter[];
+  /** Filter by the object’s `avgMemoryBytes` field. */
+  avgMemoryBytes?: BigIntFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuPeakUtilization` field. */
+  cpuPeakUtilization?: BigFloatFilter;
+  /** Filter by the object’s `cpuRequestHeadroomMillicores` field. */
+  cpuRequestHeadroomMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DateFilter;
+  /** Filter by the object’s `gbSeconds` field. */
+  gbSeconds?: BigFloatFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `maxCpuMillicores` field. */
+  maxCpuMillicores?: BigIntFilter;
+  /** Filter by the object’s `maxMemoryBytes` field. */
+  maxMemoryBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryPeakUtilization` field. */
+  memoryPeakUtilization?: BigFloatFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestHeadroomBytes` field. */
+  memoryRequestHeadroomBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceUtilizationDailyFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceUtilizationDailyFilter[];
+  /** Filter by the object’s `replicas` field. */
+  replicas?: IntFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `runtimeSeconds` field. */
+  runtimeSeconds?: BigIntFilter;
+  /** Filter by the object’s `sampleCount` field. */
+  sampleCount?: IntFilter;
+}
+/** A filter to be used against `PlatformResourcesHealth` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourcesHealthFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourcesHealthFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `lastHeartbeatAt` field. */
+  lastHeartbeatAt?: DatetimeFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourcesHealthFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourcesHealthFilter[];
+  /** Filter by the object’s `replicas` field. */
+  replicas?: IntFilter;
+  /** Filter by the object’s `resourceDefinitionId` field. */
+  resourceDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `spec` field. */
+  spec?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `statusDetail` field. */
+  statusDetail?: StringFilter;
+  /** Filter by the object’s `statusObserved` field. */
+  statusObserved?: JSONFilter;
+  /** Filter by the object’s `storageClass` field. */
+  storageClass?: StringFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** A filter to be used against `PlatformResourcesRequirementsState` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourcesRequirementsStateFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourcesRequirementsStateFilter[];
+  /** Filter by the object’s `configHash` field. */
+  configHash?: StringFilter;
+  /** Filter by the object’s `configObjectName` field. */
+  configObjectName?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformResourcesRequirementsStateFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourcesRequirementsStateFilter[];
+  /** Filter by the object’s `requirementsHash` field. */
+  requirementsHash?: StringFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `secretsHash` field. */
+  secretsHash?: StringFilter;
+  /** Filter by the object’s `secretsObjectName` field. */
+  secretsObjectName?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+}
+/** A filter to be used against `PlatformResourcesResolvedRequirement` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformResourcesResolvedRequirementFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourcesResolvedRequirementFilter[];
+  /** Filter by the object’s `atomId` field. */
+  atomId?: UUIDFilter;
+  /** Filter by the object’s `configObjectName` field. */
+  configObjectName?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourcesResolvedRequirementFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourcesResolvedRequirementFilter[];
+  /** Filter by the object’s `present` field. */
+  present?: BooleanFilter;
+  /** Filter by the object’s `required` field. */
+  required?: BooleanFilter;
+  /** Filter by the object’s `requirementKind` field. */
+  requirementKind?: StringFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `secretsObjectName` field. */
+  secretsObjectName?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+}
+/** A filter to be used against `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformWebhookEndpointFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformWebhookEndpointFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `functionDefinition` relation. */
+  functionDefinition?: PlatformFunctionDefinitionFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `host` field. */
+  host?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformWebhookEndpointFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformWebhookEndpointFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `platformWebhookEventsByEndpointId` relation. */
+  platformWebhookEventsByEndpointId?: PlatformWebhookEndpointToManyPlatformWebhookEventFilter;
+  /** `platformWebhookEventsByEndpointId` exist. */
+  platformWebhookEventsByEndpointIdExist?: boolean;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `replayWindowSeconds` field. */
+  replayWindowSeconds?: IntFilter;
+  /** Filter by the object’s `signingSecretName` field. */
+  signingSecretName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformWebhookEndpoint` */
+export interface PlatformWebhookEndpointInput {
+  /** Whether this endpoint currently accepts deliveries */
+  active?: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
+  functionDefinitionId: string;
+  /** Inbound Host header this endpoint matches (normalized lower-case, no port) */
+  host: string;
+  id?: string;
+  /** Namespace that owns this endpoint and contains its signing secret */
+  namespaceId: string;
+  /** Exact request path this endpoint matches (e.g. /webhooks/stripe) */
+  path: string;
+  /** Verification scheme: generic (HMAC), stripe, or github */
+  provider?: string;
+  /** Maximum age (seconds) of a signed provider timestamp before the delivery is rejected as a replay */
+  replayWindowSeconds?: number;
+  /** Name of the signing secret in the infra secrets store. The gateway resolves the value through the generated secrets getter — the plaintext secret is never stored here. */
+  signingSecretName: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `PlatformWebhookEndpoint`. Fields that are set will be updated. */
+export interface PlatformWebhookEndpointPatch {
+  /** Whether this endpoint currently accepts deliveries */
+  active?: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
+  functionDefinitionId?: string;
+  /** Inbound Host header this endpoint matches (normalized lower-case, no port) */
+  host?: string;
+  id?: string;
+  /** Namespace that owns this endpoint and contains its signing secret */
+  namespaceId?: string;
+  /** Exact request path this endpoint matches (e.g. /webhooks/stripe) */
+  path?: string;
+  /** Verification scheme: generic (HMAC), stripe, or github */
+  provider?: string;
+  /** Maximum age (seconds) of a signed provider timestamp before the delivery is rejected as a replay */
+  replayWindowSeconds?: number;
+  /** Name of the signing secret in the infra secrets store. The gateway resolves the value through the generated secrets getter — the plaintext secret is never stored here. */
+  signingSecretName?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `PlatformWebhookEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformWebhookEndpointToManyPlatformWebhookEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformWebhookEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformWebhookEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformWebhookEventFilter;
+}
+/** A filter to be used against `PlatformWebhookEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformWebhookEventFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformWebhookEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `endpoint` relation. */
+  endpoint?: PlatformWebhookEndpointFilter;
+  /** Filter by the object’s `endpointId` field. */
+  endpointId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `externalEventId` field. */
+  externalEventId?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `invocationCreatedAt` field. */
+  invocationCreatedAt?: DatetimeFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformWebhookEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformWebhookEventFilter[];
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `providerTimestamp` field. */
+  providerTimestamp?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformWebhookEvent` */
+export interface PlatformWebhookEventInput {
+  createdAt?: string;
+  /** Endpoint that accepted this delivery */
+  endpointId: string;
+  /** Failure detail when status = failed */
+  error?: string;
+  /** Provider-supplied delivery/event id used for idempotent dedup */
+  externalEventId: string;
+  id?: string;
+  /** created_at of the enqueued invocation (partition key companion to invocation_id) */
+  invocationCreatedAt?: string;
+  /** Pending function invocation enqueued for this delivery (NULL until enqueued) */
+  invocationId?: string;
+  /** Parsed delivery payload (parsed only after signature verification over the exact raw bytes) */
+  payload?: unknown;
+  /** Provider that produced this delivery (copied from the endpoint at acceptance) */
+  provider: string;
+  /** Signed provider timestamp used for replay-window validation (NULL when the provider supplies none) */
+  providerTimestamp?: string;
+  /** Acceptance lifecycle: accepted, processed, failed */
+  status?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformWebhookEvent`. Fields that are set will be updated. */
+export interface PlatformWebhookEventPatch {
+  createdAt?: string;
+  /** Endpoint that accepted this delivery */
+  endpointId?: string;
+  /** Failure detail when status = failed */
+  error?: string;
+  /** Provider-supplied delivery/event id used for idempotent dedup */
+  externalEventId?: string;
+  id?: string;
+  /** created_at of the enqueued invocation (partition key companion to invocation_id) */
+  invocationCreatedAt?: string;
+  /** Pending function invocation enqueued for this delivery (NULL until enqueued) */
+  invocationId?: string;
+  /** Parsed delivery payload (parsed only after signature verification over the exact raw bytes) */
+  payload?: unknown;
+  /** Provider that produced this delivery (copied from the endpoint at acceptance) */
+  provider?: string;
+  /** Signed provider timestamp used for replay-window validation (NULL when the provider supplies none) */
+  providerTimestamp?: string;
+  /** Acceptance lifecycle: accepted, processed, failed */
+  status?: string;
+  updatedAt?: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -3002,183 +6978,1963 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
-/** A connection to a list of `GetAllRecord` values. */
-export interface GetAllConnection {
-  nodes: GetAllRecord[];
-  edges: GetAllEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against `ResourceDefinition` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceDefinitionFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceDefinitionFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultSpec` field. */
+  defaultSpec?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceDefinitionFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceDefinitionFilter[];
+  /** Filter by the object’s `resources` relation. */
+  resources?: ResourceDefinitionToManyResourceFilter;
+  /** `resources` exist. */
+  resourcesExist?: boolean;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `stepUpMinAge` field. */
+  stepUpMinAge?: IntervalFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
 }
-/** A connection to a list of `FunctionApiBinding` values. */
-export interface FunctionApiBindingConnection {
-  nodes: FunctionApiBinding[];
-  edges: FunctionApiBindingEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** An input for mutations affecting `ResourceDefinition` */
+export interface ResourceDefinitionInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Template spec for creating resource instances of this kind */
+  defaultSpec?: unknown;
+  /** What this resource definition provides */
+  description?: string;
+  id?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  kind: string;
+  /** Key/value pairs for selecting and filtering definitions */
+  labels?: unknown;
+  /** Human-readable definition name */
+  name: string;
+  /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
+  namespaceId: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug: string;
+  /** Min age before DELETE of a resource of this kind requires step-up; NULL inherits the 6h default */
+  stepUpMinAge?: IntervalInput;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A connection to a list of `FunctionGraphRef` values. */
-export interface FunctionGraphRefConnection {
-  nodes: FunctionGraphRef[];
-  edges: FunctionGraphRefEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Represents an update to a `ResourceDefinition`. Fields that are set will be updated. */
+export interface ResourceDefinitionPatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Template spec for creating resource instances of this kind */
+  defaultSpec?: unknown;
+  /** What this resource definition provides */
+  description?: string;
+  id?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  kind?: string;
+  /** Key/value pairs for selecting and filtering definitions */
+  labels?: unknown;
+  /** Human-readable definition name */
+  name?: string;
+  /** Namespace this definition belongs to (security boundary, maps to K8s namespace) */
+  namespaceId?: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug?: string;
+  /** Min age before DELETE of a resource of this kind requires step-up; NULL inherits the 6h default */
+  stepUpMinAge?: IntervalInput;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A connection to a list of `FunctionGraphStore` values. */
-export interface FunctionGraphStoreConnection {
-  nodes: FunctionGraphStore[];
-  edges: FunctionGraphStoreEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceDefinitionToManyResourceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceFilter;
 }
-/** A connection to a list of `FunctionGraphObject` values. */
-export interface FunctionGraphObjectConnection {
-  nodes: FunctionGraphObject[];
-  edges: FunctionGraphObjectEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against `ResourceEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ResourceEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: ResourceEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceEventFilter[];
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
 }
-/** A connection to a list of `FunctionDeploymentEvent` values. */
-export interface FunctionDeploymentEventConnection {
-  nodes: FunctionDeploymentEvent[];
-  edges: FunctionDeploymentEventEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** An input for mutations affecting `ResourceEvent` */
+export interface ResourceEventInput {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+  /** Resource this event belongs to */
+  resourceId: string;
 }
-/** A connection to a list of `OrgFunctionExecutionLog` values. */
-export interface OrgFunctionExecutionLogConnection {
-  nodes: OrgFunctionExecutionLog[];
-  edges: OrgFunctionExecutionLogEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Represents an update to a `ResourceEvent`. Fields that are set will be updated. */
+export interface ResourceEventPatch {
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
+  eventType?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: unknown;
+  /** Resource this event belongs to */
+  resourceId?: string;
 }
-/** A connection to a list of `ResourceEvent` values. */
-export interface ResourceEventConnection {
-  nodes: ResourceEvent[];
-  edges: ResourceEventEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against `Resource` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installation` relation. */
+  installation?: ResourceInstallationFilter;
+  /** A related `installation` exists. */
+  installationExists?: boolean;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `lastHeartbeatAt` field. */
+  lastHeartbeatAt?: DatetimeFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceFilter[];
+  /** Filter by the object’s `replicas` field. */
+  replicas?: IntFilter;
+  /** Filter by the object’s `resourceDefinition` relation. */
+  resourceDefinition?: ResourceDefinitionFilter;
+  /** A related `resourceDefinition` exists. */
+  resourceDefinitionExists?: boolean;
+  /** Filter by the object’s `resourceDefinitionId` field. */
+  resourceDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `resourceStatusChecks` relation. */
+  resourceStatusChecks?: ResourceToManyResourceStatusCheckFilter;
+  /** `resourceStatusChecks` exist. */
+  resourceStatusChecksExist?: boolean;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `spec` field. */
+  spec?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `statusObserved` field. */
+  statusObserved?: JSONFilter;
+  /** Filter by the object’s `storageClass` field. */
+  storageClass?: StringFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
 }
-/** A connection to a list of `FunctionGraphExecutionOutput` values. */
-export interface FunctionGraphExecutionOutputConnection {
-  nodes: FunctionGraphExecutionOutput[];
-  edges: FunctionGraphExecutionOutputEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** An input for mutations affecting `Resource` */
+export interface ResourceInput {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Cumulative error count for this resource */
+  errorCount?: number;
+  id?: string;
+  /** Installation ("release") this resource belongs to (NULL for standalone resources) */
+  installationId?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  kind: string;
+  /** Key/value pairs for selecting and filtering resources */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Last time a usage heartbeat was received for this resource (NULL until first heartbeat) */
+  lastHeartbeatAt?: string;
+  /** Human-readable resource name */
+  name: string;
+  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
+  namespaceId: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Definition template this resource was created from (NULL for standalone resources) */
+  resourceDefinitionId?: string;
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug: string;
+  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
+  spec?: unknown;
+  /** Resource lifecycle status: pending, provisioning, active, completed, failed, draining, deleting */
+  status?: string;
+  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
+  statusObserved?: unknown;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A connection to a list of `FunctionGraphCommit` values. */
-export interface FunctionGraphCommitConnection {
-  nodes: FunctionGraphCommit[];
-  edges: FunctionGraphCommitEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against `ResourceInstallation` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceInstallationFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceInstallationFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceInstallationFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceInstallationFilter[];
+  /** Filter by the object’s `params` field. */
+  params?: JSONFilter;
+  /** Filter by the object’s `resourcesByInstallationId` relation. */
+  resourcesByInstallationId?: ResourceInstallationToManyResourceFilter;
+  /** `resourcesByInstallationId` exist. */
+  resourcesByInstallationIdExist?: boolean;
+  /** Filter by the object’s `revision` field. */
+  revision?: IntFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
 }
-/** A connection to a list of `SecretDefinition` values. */
-export interface SecretDefinitionConnection {
-  nodes: SecretDefinition[];
-  edges: SecretDefinitionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** An input for mutations affecting `ResourceInstallation` */
+export interface ResourceInstallationInput {
+  /** Infra store commit for the current params (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Human-readable release name */
+  name: string;
+  /** Namespace this installation belongs to (security boundary) */
+  namespaceId: string;
+  /** Release parameters — the readily-cached head; history lives in the infra store. Never contains secret/config literals. */
+  params?: unknown;
+  /** Monotonic release revision counter: install starts at 1, bumped on every upgrade/rollback */
+  revision?: number;
+  /** URL-safe release identifier, unique within the namespace; the release's path in the infra tree is [resource_installation, slug] */
+  slug: string;
+  /** Installation lifecycle status: pending, installed, uninstalled, failed */
+  status?: string;
+  /** Infra merkle store holding this installation's history (stamped by the versioned trigger) */
+  storeId?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A connection to a list of `FunctionExecutionLog` values. */
-export interface FunctionExecutionLogConnection {
-  nodes: FunctionExecutionLog[];
-  edges: FunctionExecutionLogEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Represents an update to a `ResourceInstallation`. Fields that are set will be updated. */
+export interface ResourceInstallationPatch {
+  /** Infra store commit for the current params (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Human-readable release name */
+  name?: string;
+  /** Namespace this installation belongs to (security boundary) */
+  namespaceId?: string;
+  /** Release parameters — the readily-cached head; history lives in the infra store. Never contains secret/config literals. */
+  params?: unknown;
+  /** Monotonic release revision counter: install starts at 1, bumped on every upgrade/rollback */
+  revision?: number;
+  /** URL-safe release identifier, unique within the namespace; the release's path in the infra tree is [resource_installation, slug] */
+  slug?: string;
+  /** Installation lifecycle status: pending, installed, uninstalled, failed */
+  status?: string;
+  /** Infra merkle store holding this installation's history (stamped by the versioned trigger) */
+  storeId?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A connection to a list of `FunctionGraph` values. */
-export interface FunctionGraphConnection {
-  nodes: FunctionGraph[];
-  edges: FunctionGraphEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceInstallationToManyResourceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceFilter;
 }
-/** A connection to a list of `FunctionGraphExecutionNodeState` values. */
-export interface FunctionGraphExecutionNodeStateConnection {
-  nodes: FunctionGraphExecutionNodeState[];
-  edges: FunctionGraphExecutionNodeStateEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface ResourceInstallationsInstallInput {
+  clientMutationId?: string;
+  pName?: string;
+  pNamespaceId?: string;
+  pParams?: unknown;
+  pSlug?: string;
 }
-/** A connection to a list of `PlatformNamespace` values. */
-export interface PlatformNamespaceConnection {
-  nodes: PlatformNamespace[];
-  edges: PlatformNamespaceEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface ResourceInstallationsRollbackInput {
+  clientMutationId?: string;
+  pCommitId?: string;
+  pInstallationId?: string;
 }
-/** A connection to a list of `OrgFunctionInvocation` values. */
-export interface OrgFunctionInvocationConnection {
-  nodes: OrgFunctionInvocation[];
-  edges: OrgFunctionInvocationEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface ResourceInstallationsUninstallInput {
+  clientMutationId?: string;
+  pInstallationId?: string;
 }
-/** A connection to a list of `FunctionInvocation` values. */
-export interface FunctionInvocationConnection {
-  nodes: FunctionInvocation[];
-  edges: FunctionInvocationEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface ResourceInstallationsUpgradeInput {
+  clientMutationId?: string;
+  pInstallationId?: string;
+  pParams?: unknown;
 }
-/** A connection to a list of `Resource` values. */
-export interface ResourceConnection {
-  nodes: Resource[];
-  edges: ResourceEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Represents an update to a `Resource`. Fields that are set will be updated. */
+export interface ResourcePatch {
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Cumulative error count for this resource */
+  errorCount?: number;
+  id?: string;
+  /** Installation ("release") this resource belongs to (NULL for standalone resources) */
+  installationId?: string;
+  /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
+  integrations?: string[];
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  kind?: string;
+  /** Key/value pairs for selecting and filtering resources */
+  labels?: unknown;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Last time a usage heartbeat was received for this resource (NULL until first heartbeat) */
+  lastHeartbeatAt?: string;
+  /** Human-readable resource name */
+  name?: string;
+  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
+  namespaceId?: string;
+  /** Embedded config requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredConfigs?: ResourceRequirementInput[];
+  /** Embedded secret requirements: array of (name, required, provider) tuples — extends the linked definition's requirements. provider is the integration slug this requirement belongs to, if any. */
+  requiredSecrets?: ResourceRequirementInput[];
+  /** Definition template this resource was created from (NULL for standalone resources) */
+  resourceDefinitionId?: string;
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug?: string;
+  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
+  spec?: unknown;
+  /** Resource lifecycle status: pending, provisioning, active, completed, failed, draining, deleting */
+  status?: string;
+  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
+  statusObserved?: unknown;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A connection to a list of `PlatformNamespaceEvent` values. */
-export interface PlatformNamespaceEventConnection {
-  nodes: PlatformNamespaceEvent[];
-  edges: PlatformNamespaceEventEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** An input for mutations affecting `ResourceRequirement` */
+export interface ResourceRequirementInput {
+  name?: string;
+  provider?: string;
+  required?: boolean;
 }
-/** A connection to a list of `FunctionDeployment` values. */
-export interface FunctionDeploymentConnection {
-  nodes: FunctionDeployment[];
-  edges: FunctionDeploymentEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against `ResourceStatusCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceStatusCheckFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceStatusCheckFilter[];
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceStatusCheckFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceStatusCheckFilter[];
+  /** Filter by the object’s `requestedAt` field. */
+  requestedAt?: DatetimeFilter;
+  /** Filter by the object’s `requestedBy` field. */
+  requestedBy?: UUIDFilter;
+  /** Filter by the object’s `resource` relation. */
+  resource?: ResourceFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `result` field. */
+  result?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
 }
-/** A connection to a list of `FunctionGraphExecution` values. */
-export interface FunctionGraphExecutionConnection {
-  nodes: FunctionGraphExecution[];
-  edges: FunctionGraphExecutionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** An input for mutations affecting `ResourceStatusCheck` */
+export interface ResourceStatusCheckInput {
+  /** When the check completed (NULL while pending/running) */
+  completedAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Unique status check identifier */
+  id?: string;
+  /** When the check was requested */
+  requestedAt?: string;
+  /** User who requested the check (NULL for system/scheduled) */
+  requestedBy?: string;
+  /** Resource to check */
+  resourceId: string;
+  /** Diagnostic snapshot: k8s_status, conditions, pod_logs_tail, events */
+  result?: unknown;
+  /** Check lifecycle: pending, running, completed, failed */
+  status?: string;
 }
-/** A connection to a list of `FunctionDefinition` values. */
-export interface FunctionDefinitionConnection {
-  nodes: FunctionDefinition[];
-  edges: FunctionDefinitionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Represents an update to a `ResourceStatusCheck`. Fields that are set will be updated. */
+export interface ResourceStatusCheckPatch {
+  /** When the check completed (NULL while pending/running) */
+  completedAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Unique status check identifier */
+  id?: string;
+  /** When the check was requested */
+  requestedAt?: string;
+  /** User who requested the check (NULL for system/scheduled) */
+  requestedBy?: string;
+  /** Resource to check */
+  resourceId?: string;
+  /** Diagnostic snapshot: k8s_status, conditions, pod_logs_tail, events */
+  result?: unknown;
+  /** Check lifecycle: pending, running, completed, failed */
+  status?: string;
+}
+/** A filter to be used against many `ResourceStatusCheck` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceToManyResourceStatusCheckFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceStatusCheckFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceStatusCheckFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceStatusCheckFilter;
+}
+/** A filter to be used against `ResourceUsageLog` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceUsageLogFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceUsageLogFilter[];
+  /** Filter by the object’s `cpuMillicores` field. */
+  cpuMillicores?: BigIntFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `intervalSeconds` field. */
+  intervalSeconds?: IntFilter;
+  /** Filter by the object’s `memoryBytes` field. */
+  memoryBytes?: BigIntFilter;
+  /** Filter by the object’s `metrics` field. */
+  metrics?: JSONFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceUsageLogFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceUsageLogFilter[];
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `sampledAt` field. */
+  sampledAt?: DatetimeFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+}
+/** An input for mutations affecting `ResourceUsageLog` */
+export interface ResourceUsageLogInput {
+  /** CPU gauge in millicores at sample time (NULL when unknown) */
+  cpuMillicores?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Unique sample identifier */
+  id?: string;
+  /** Seconds covered by this sample — runtime is SUM(interval_seconds) */
+  intervalSeconds: number;
+  /** Memory gauge in bytes at sample time (NULL when unknown) */
+  memoryBytes?: string;
+  /** Structured gauges: replicas, pod counts, phases, and other producer-specific metrics */
+  metrics?: unknown;
+  /** Namespace the measured workload runs in */
+  namespaceId: string;
+  /** Resource this sample measures (NULL for namespace-grain catch-all rows) */
+  resourceId?: string;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt?: string;
+  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  source: string;
+}
+/** Represents an update to a `ResourceUsageLog`. Fields that are set will be updated. */
+export interface ResourceUsageLogPatch {
+  /** CPU gauge in millicores at sample time (NULL when unknown) */
+  cpuMillicores?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Unique sample identifier */
+  id?: string;
+  /** Seconds covered by this sample — runtime is SUM(interval_seconds) */
+  intervalSeconds?: number;
+  /** Memory gauge in bytes at sample time (NULL when unknown) */
+  memoryBytes?: string;
+  /** Structured gauges: replicas, pod counts, phases, and other producer-specific metrics */
+  metrics?: unknown;
+  /** Namespace the measured workload runs in */
+  namespaceId?: string;
+  /** Resource this sample measures (NULL for namespace-grain catch-all rows) */
+  resourceId?: string;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt?: string;
+  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  source?: string;
+}
+/** A filter to be used against `ResourceUsageSummary` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceUsageSummaryFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceUsageSummaryFilter[];
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DateFilter;
+  /** Filter by the object’s `gbSeconds` field. */
+  gbSeconds?: BigFloatFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `maxCpuMillicores` field. */
+  maxCpuMillicores?: BigIntFilter;
+  /** Filter by the object’s `maxMemoryBytes` field. */
+  maxMemoryBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceUsageSummaryFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceUsageSummaryFilter[];
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `runtimeSeconds` field. */
+  runtimeSeconds?: BigIntFilter;
+  /** Filter by the object’s `sampleCount` field. */
+  sampleCount?: IntFilter;
+}
+/** An input for mutations affecting `ResourceUsageSummary` */
+export interface ResourceUsageSummaryInput {
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Day this summary covers (partition key) */
+  date: string;
+  /** Memory usage for the day — SUM(memory_bytes * interval_seconds) normalized to GB-seconds */
+  gbSeconds?: string;
+  /** Unique usage summary identifier */
+  id?: string;
+  /** Maximum CPU gauge observed during the day (NULL when never reported) */
+  maxCpuMillicores?: string;
+  /** Maximum memory gauge observed during the day (NULL when never reported) */
+  maxMemoryBytes?: string;
+  /** Namespace the resource runs in */
+  namespaceId: string;
+  /** Resource this summary covers (NULL for namespace-grain catch-all summaries) */
+  resourceId?: string;
+  /** Total measured runtime for the day — SUM(interval_seconds) */
+  runtimeSeconds?: string;
+  /** Number of raw samples aggregated into this summary */
+  sampleCount?: number;
+}
+/** Represents an update to a `ResourceUsageSummary`. Fields that are set will be updated. */
+export interface ResourceUsageSummaryPatch {
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Day this summary covers (partition key) */
+  date?: string;
+  /** Memory usage for the day — SUM(memory_bytes * interval_seconds) normalized to GB-seconds */
+  gbSeconds?: string;
+  /** Unique usage summary identifier */
+  id?: string;
+  /** Maximum CPU gauge observed during the day (NULL when never reported) */
+  maxCpuMillicores?: string;
+  /** Maximum memory gauge observed during the day (NULL when never reported) */
+  maxMemoryBytes?: string;
+  /** Namespace the resource runs in */
+  namespaceId?: string;
+  /** Resource this summary covers (NULL for namespace-grain catch-all summaries) */
+  resourceId?: string;
+  /** Total measured runtime for the day — SUM(interval_seconds) */
+  runtimeSeconds?: string;
+  /** Number of raw samples aggregated into this summary */
+  sampleCount?: number;
+}
+/** A filter to be used against `ResourceUtilizationDaily` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceUtilizationDailyFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceUtilizationDailyFilter[];
+  /** Filter by the object’s `avgMemoryBytes` field. */
+  avgMemoryBytes?: BigIntFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuPeakUtilization` field. */
+  cpuPeakUtilization?: BigFloatFilter;
+  /** Filter by the object’s `cpuRequestHeadroomMillicores` field. */
+  cpuRequestHeadroomMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DateFilter;
+  /** Filter by the object’s `gbSeconds` field. */
+  gbSeconds?: BigFloatFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `maxCpuMillicores` field. */
+  maxCpuMillicores?: BigIntFilter;
+  /** Filter by the object’s `maxMemoryBytes` field. */
+  maxMemoryBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryPeakUtilization` field. */
+  memoryPeakUtilization?: BigFloatFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestHeadroomBytes` field. */
+  memoryRequestHeadroomBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceUtilizationDailyFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceUtilizationDailyFilter[];
+  /** Filter by the object’s `replicas` field. */
+  replicas?: IntFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `runtimeSeconds` field. */
+  runtimeSeconds?: BigIntFilter;
+  /** Filter by the object’s `sampleCount` field. */
+  sampleCount?: IntFilter;
+}
+/** A filter to be used against `ResourcesHealth` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourcesHealthFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourcesHealthFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `integrations` field. */
+  integrations?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `lastHeartbeatAt` field. */
+  lastHeartbeatAt?: DatetimeFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourcesHealthFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourcesHealthFilter[];
+  /** Filter by the object’s `replicas` field. */
+  replicas?: IntFilter;
+  /** Filter by the object’s `resourceDefinitionId` field. */
+  resourceDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `spec` field. */
+  spec?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `statusDetail` field. */
+  statusDetail?: StringFilter;
+  /** Filter by the object’s `statusObserved` field. */
+  statusObserved?: JSONFilter;
+  /** Filter by the object’s `storageClass` field. */
+  storageClass?: StringFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** A filter to be used against `ResourcesRequirementsState` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourcesRequirementsStateFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourcesRequirementsStateFilter[];
+  /** Filter by the object’s `configHash` field. */
+  configHash?: StringFilter;
+  /** Filter by the object’s `configObjectName` field. */
+  configObjectName?: StringFilter;
+  /** Negates the expression. */
+  not?: ResourcesRequirementsStateFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourcesRequirementsStateFilter[];
+  /** Filter by the object’s `requirementsHash` field. */
+  requirementsHash?: StringFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `secretsHash` field. */
+  secretsHash?: StringFilter;
+  /** Filter by the object’s `secretsObjectName` field. */
+  secretsObjectName?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+}
+/** A filter to be used against `ResourcesResolvedRequirement` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourcesResolvedRequirementFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourcesResolvedRequirementFilter[];
+  /** Filter by the object’s `atomId` field. */
+  atomId?: UUIDFilter;
+  /** Filter by the object’s `configObjectName` field. */
+  configObjectName?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourcesResolvedRequirementFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourcesResolvedRequirementFilter[];
+  /** Filter by the object’s `present` field. */
+  present?: BooleanFilter;
+  /** Filter by the object’s `required` field. */
+  required?: BooleanFilter;
+  /** Filter by the object’s `requirementKind` field. */
+  requirementKind?: StringFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `secretsObjectName` field. */
+  secretsObjectName?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+}
+export interface SaveGraphInput {
+  clientMutationId?: string;
+  graphId?: string;
+  message?: string;
+  rootHash?: string;
+}
+export interface SetDataAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+export interface StartExecutionInput {
+  clientMutationId?: string;
+  graphId?: string;
+  inputPayload?: unknown;
+  maxPendingJobs?: number;
+  maxTicks?: number;
+  outputNames?: string[];
+  outputNode?: string;
+  outputPort?: string;
+  parentExecutionId?: string;
+  parentNodeName?: string;
+  timeoutInterval?: IntervalInput;
+}
+export interface UpdateDbPresetInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `DbPreset` being updated. */
+  dbPresetPatch: DbPresetPatch;
+  /** Unique preset identifier */
+  id: string;
+}
+export interface UpdateFunctionApiBindingInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionApiBinding` being updated. */
+  functionApiBindingPatch: FunctionApiBindingPatch;
+  id: string;
+}
+export interface UpdateFunctionDefinitionInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionDefinition` being updated. */
+  functionDefinitionPatch: FunctionDefinitionPatch;
+  id: string;
+}
+export interface UpdateFunctionDeploymentEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `FunctionDeploymentEvent` being updated. */
+  functionDeploymentEventPatch: FunctionDeploymentEventPatch;
+  /** Unique event identifier */
+  id: string;
+}
+export interface UpdateFunctionDeploymentInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionDeployment` being updated. */
+  functionDeploymentPatch: FunctionDeploymentPatch;
+  id: string;
+}
+export interface UpdateFunctionExecutionLogInput {
+  clientMutationId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `FunctionExecutionLog` being updated. */
+  functionExecutionLogPatch: FunctionExecutionLogPatch;
+  /** Unique log entry identifier */
+  id: string;
+}
+export interface UpdateFunctionGraphCommitInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionGraphCommit` being updated. */
+  functionGraphCommitPatch: FunctionGraphCommitPatch;
+  /** Unique commit identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdateFunctionGraphExecutionInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionGraphExecution` being updated. */
+  functionGraphExecutionPatch: FunctionGraphExecutionPatch;
+  /** Unique execution identifier */
+  id: string;
+  /** Execution start timestamp */
+  startedAt: string;
+}
+export interface UpdateFunctionGraphExecutionNodeStateInput {
+  clientMutationId?: string;
+  /** Timestamp of node state creation (partition key) */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `FunctionGraphExecutionNodeState` being updated. */
+  functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
+  /** Unique node state identifier */
+  id: string;
+}
+export interface UpdateFunctionGraphExecutionOutputInput {
+  clientMutationId?: string;
+  /** Timestamp of output creation */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `FunctionGraphExecutionOutput` being updated. */
+  functionGraphExecutionOutputPatch: FunctionGraphExecutionOutputPatch;
+  /** Unique execution output identifier */
+  id: string;
+}
+export interface UpdateFunctionGraphInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionGraph` being updated. */
+  functionGraphPatch: FunctionGraphPatch;
+  /** Unique graph identifier */
+  id: string;
+}
+export interface UpdateFunctionGraphObjectInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionGraphObject` being updated. */
+  functionGraphObjectPatch: FunctionGraphObjectPatch;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdateFunctionGraphRefInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionGraphRef` being updated. */
+  functionGraphRefPatch: FunctionGraphRefPatch;
+  /** Unique ref identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdateFunctionGraphStoreInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `FunctionGraphStore` being updated. */
+  functionGraphStorePatch: FunctionGraphStorePatch;
+  /** Unique store identifier */
+  id: string;
+}
+export interface UpdateFunctionInvocationInput {
+  clientMutationId?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt: string;
+  /** An object where the defined keys will be set on the `FunctionInvocation` being updated. */
+  functionInvocationPatch: FunctionInvocationPatch;
+  /** Unique invocation identifier */
+  id: string;
+}
+export interface UpdateInfraCommitInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique commit identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `InfraCommit` being updated. */
+  infraCommitPatch: InfraCommitPatch;
+}
+export interface UpdateInfraObjectInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** An object where the defined keys will be set on the `InfraObject` being updated. */
+  infraObjectPatch: InfraObjectPatch;
+}
+export interface UpdateInfraRefInput {
+  clientMutationId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `InfraRef` being updated. */
+  infraRefPatch: InfraRefPatch;
+}
+export interface UpdateInfraStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `InfraStore` being updated. */
+  infraStorePatch: InfraStorePatch;
+}
+export interface UpdateIntegrationProviderInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `IntegrationProvider` being updated. */
+  integrationProviderPatch: IntegrationProviderPatch;
+}
+export interface UpdateNamespaceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `NamespaceEvent` being updated. */
+  namespaceEventPatch: NamespaceEventPatch;
+}
+export interface UpdateNamespaceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Namespace` being updated. */
+  namespacePatch: NamespacePatch;
+}
+export interface UpdatePlatformFunctionApiBindingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionApiBinding` being updated. */
+  platformFunctionApiBindingPatch: PlatformFunctionApiBindingPatch;
+}
+export interface UpdatePlatformFunctionDefinitionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionDefinition` being updated. */
+  platformFunctionDefinitionPatch: PlatformFunctionDefinitionPatch;
+}
+export interface UpdatePlatformFunctionDeploymentEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionDeploymentEvent` being updated. */
+  platformFunctionDeploymentEventPatch: PlatformFunctionDeploymentEventPatch;
+}
+export interface UpdatePlatformFunctionDeploymentInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionDeployment` being updated. */
+  platformFunctionDeploymentPatch: PlatformFunctionDeploymentPatch;
+}
+export interface UpdatePlatformFunctionExecutionLogInput {
+  clientMutationId?: string;
+  /** Log entry timestamp (partition key) */
+  createdAt: string;
+  /** Unique log entry identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionExecutionLog` being updated. */
+  platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
+}
+export interface UpdatePlatformFunctionInvocationInput {
+  clientMutationId?: string;
+  /** Invocation creation timestamp (partition key) */
+  createdAt: string;
+  /** Unique invocation identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformFunctionInvocation` being updated. */
+  platformFunctionInvocationPatch: PlatformFunctionInvocationPatch;
+}
+export interface UpdatePlatformInfraCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraCommit` being updated. */
+  platformInfraCommitPatch: PlatformInfraCommitPatch;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdatePlatformInfraObjectInput {
+  clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraObject` being updated. */
+  platformInfraObjectPatch: PlatformInfraObjectPatch;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdatePlatformInfraRefInput {
+  clientMutationId?: string;
+  /** Unique ref identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraRef` being updated. */
+  platformInfraRefPatch: PlatformInfraRefPatch;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdatePlatformInfraStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraStore` being updated. */
+  platformInfraStorePatch: PlatformInfraStorePatch;
+}
+export interface UpdatePlatformNamespaceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformNamespaceEvent` being updated. */
+  platformNamespaceEventPatch: PlatformNamespaceEventPatch;
+}
+export interface UpdatePlatformNamespaceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformNamespace` being updated. */
+  platformNamespacePatch: PlatformNamespacePatch;
+}
+export interface UpdatePlatformResourceDefinitionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResourceDefinition` being updated. */
+  platformResourceDefinitionPatch: PlatformResourceDefinitionPatch;
+}
+export interface UpdatePlatformResourceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResourceEvent` being updated. */
+  platformResourceEventPatch: PlatformResourceEventPatch;
+}
+export interface UpdatePlatformResourceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResource` being updated. */
+  platformResourcePatch: PlatformResourcePatch;
+}
+export interface UpdatePlatformResourceInstallationInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResourceInstallation` being updated. */
+  platformResourceInstallationPatch: PlatformResourceInstallationPatch;
+}
+export interface UpdatePlatformResourceStatusCheckInput {
+  clientMutationId?: string;
+  /** Unique status check identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResourceStatusCheck` being updated. */
+  platformResourceStatusCheckPatch: PlatformResourceStatusCheckPatch;
+}
+export interface UpdatePlatformResourceUsageLogInput {
+  clientMutationId?: string;
+  /** Unique sample identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResourceUsageLog` being updated. */
+  platformResourceUsageLogPatch: PlatformResourceUsageLogPatch;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt: string;
+}
+export interface UpdatePlatformResourceUsageSummaryInput {
+  clientMutationId?: string;
+  /** Day this summary covers (partition key) */
+  date: string;
+  /** Unique usage summary identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformResourceUsageSummary` being updated. */
+  platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
+}
+export interface UpdatePlatformWebhookEndpointInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformWebhookEndpoint` being updated. */
+  platformWebhookEndpointPatch: PlatformWebhookEndpointPatch;
+}
+export interface UpdatePlatformWebhookEventInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformWebhookEvent` being updated. */
+  platformWebhookEventPatch: PlatformWebhookEventPatch;
+}
+export interface UpdateResourceDefinitionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ResourceDefinition` being updated. */
+  resourceDefinitionPatch: ResourceDefinitionPatch;
+}
+export interface UpdateResourceEventInput {
+  clientMutationId?: string;
+  /** Event timestamp (partition key) */
+  createdAt: string;
+  /** Unique event identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `ResourceEvent` being updated. */
+  resourceEventPatch: ResourceEventPatch;
+}
+export interface UpdateResourceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Resource` being updated. */
+  resourcePatch: ResourcePatch;
+}
+export interface UpdateResourceInstallationInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ResourceInstallation` being updated. */
+  resourceInstallationPatch: ResourceInstallationPatch;
+}
+export interface UpdateResourceStatusCheckInput {
+  clientMutationId?: string;
+  /** Unique status check identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `ResourceStatusCheck` being updated. */
+  resourceStatusCheckPatch: ResourceStatusCheckPatch;
+}
+export interface UpdateResourceUsageLogInput {
+  clientMutationId?: string;
+  /** Unique sample identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `ResourceUsageLog` being updated. */
+  resourceUsageLogPatch: ResourceUsageLogPatch;
+  /** Sample timestamp (partition key) — end of the measured interval */
+  sampledAt: string;
+}
+export interface UpdateResourceUsageSummaryInput {
+  clientMutationId?: string;
+  /** Day this summary covers (partition key) */
+  date: string;
+  /** Unique usage summary identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `ResourceUsageSummary` being updated. */
+  resourceUsageSummaryPatch: ResourceUsageSummaryPatch;
+}
+export interface UpdateWebhookEndpointInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `WebhookEndpoint` being updated. */
+  webhookEndpointPatch: WebhookEndpointPatch;
+}
+export interface UpdateWebhookEventInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `WebhookEvent` being updated. */
+  webhookEventPatch: WebhookEventPatch;
+}
+export interface ValidateFunctionGraphInput {
+  clientMutationId?: string;
+  graphId?: string;
+}
+/** A filter to be used against `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
+export interface WebhookEndpointFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: WebhookEndpointFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `functionDefinition` relation. */
+  functionDefinition?: FunctionDefinitionFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `host` field. */
+  host?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: WebhookEndpointFilter;
+  /** Checks for any expressions in this list. */
+  or?: WebhookEndpointFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `replayWindowSeconds` field. */
+  replayWindowSeconds?: IntFilter;
+  /** Filter by the object’s `signingSecretName` field. */
+  signingSecretName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `webhookEventsByEndpointId` relation. */
+  webhookEventsByEndpointId?: WebhookEndpointToManyWebhookEventFilter;
+  /** `webhookEventsByEndpointId` exist. */
+  webhookEventsByEndpointIdExist?: boolean;
+}
+/** An input for mutations affecting `WebhookEndpoint` */
+export interface WebhookEndpointInput {
+  /** Whether this endpoint currently accepts deliveries */
+  active?: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
+  functionDefinitionId: string;
+  /** Inbound Host header this endpoint matches (normalized lower-case, no port) */
+  host: string;
+  id?: string;
+  /** Namespace that owns this endpoint and contains its signing secret */
+  namespaceId: string;
+  /** Exact request path this endpoint matches (e.g. /webhooks/stripe) */
+  path: string;
+  /** Verification scheme: generic (HMAC), stripe, or github */
+  provider?: string;
+  /** Maximum age (seconds) of a signed provider timestamp before the delivery is rejected as a replay */
+  replayWindowSeconds?: number;
+  /** Name of the signing secret in the infra secrets store. The gateway resolves the value through the generated secrets getter — the plaintext secret is never stored here. */
+  signingSecretName: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `WebhookEndpoint`. Fields that are set will be updated. */
+export interface WebhookEndpointPatch {
+  /** Whether this endpoint currently accepts deliveries */
+  active?: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Same-scope function definition invoked on delivery. The function must list the webhook channel in access_channels. */
+  functionDefinitionId?: string;
+  /** Inbound Host header this endpoint matches (normalized lower-case, no port) */
+  host?: string;
+  id?: string;
+  /** Namespace that owns this endpoint and contains its signing secret */
+  namespaceId?: string;
+  /** Exact request path this endpoint matches (e.g. /webhooks/stripe) */
+  path?: string;
+  /** Verification scheme: generic (HMAC), stripe, or github */
+  provider?: string;
+  /** Maximum age (seconds) of a signed provider timestamp before the delivery is rejected as a replay */
+  replayWindowSeconds?: number;
+  /** Name of the signing secret in the infra secrets store. The gateway resolves the value through the generated secrets getter — the plaintext secret is never stored here. */
+  signingSecretName?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `WebhookEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface WebhookEndpointToManyWebhookEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebhookEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebhookEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebhookEventFilter;
+}
+/** A filter to be used against `WebhookEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface WebhookEventFilter {
+  /** Checks for all expressions in this list. */
+  and?: WebhookEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `endpoint` relation. */
+  endpoint?: WebhookEndpointFilter;
+  /** Filter by the object’s `endpointId` field. */
+  endpointId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `externalEventId` field. */
+  externalEventId?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `invocationCreatedAt` field. */
+  invocationCreatedAt?: DatetimeFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: WebhookEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: WebhookEventFilter[];
+  /** Filter by the object’s `payload` field. */
+  payload?: JSONFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `providerTimestamp` field. */
+  providerTimestamp?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `WebhookEvent` */
+export interface WebhookEventInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Endpoint that accepted this delivery */
+  endpointId: string;
+  /** Failure detail when status = failed */
+  error?: string;
+  /** Provider-supplied delivery/event id used for idempotent dedup */
+  externalEventId: string;
+  id?: string;
+  /** created_at of the enqueued invocation (partition key companion to invocation_id) */
+  invocationCreatedAt?: string;
+  /** Pending function invocation enqueued for this delivery (NULL until enqueued) */
+  invocationId?: string;
+  /** Parsed delivery payload (parsed only after signature verification over the exact raw bytes) */
+  payload?: unknown;
+  /** Provider that produced this delivery (copied from the endpoint at acceptance) */
+  provider: string;
+  /** Signed provider timestamp used for replay-window validation (NULL when the provider supplies none) */
+  providerTimestamp?: string;
+  /** Acceptance lifecycle: accepted, processed, failed */
+  status?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `WebhookEvent`. Fields that are set will be updated. */
+export interface WebhookEventPatch {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Endpoint that accepted this delivery */
+  endpointId?: string;
+  /** Failure detail when status = failed */
+  error?: string;
+  /** Provider-supplied delivery/event id used for idempotent dedup */
+  externalEventId?: string;
+  id?: string;
+  /** created_at of the enqueued invocation (partition key companion to invocation_id) */
+  invocationCreatedAt?: string;
+  /** Pending function invocation enqueued for this delivery (NULL until enqueued) */
+  invocationId?: string;
+  /** Parsed delivery payload (parsed only after signature verification over the exact raw bytes) */
+  payload?: unknown;
+  /** Provider that produced this delivery (copied from the endpoint at acceptance) */
+  provider?: string;
+  /** Signed provider timestamp used for replay-window validation (NULL when the provider supplies none) */
+  providerTimestamp?: string;
+  /** Acceptance lifecycle: accepted, processed, failed */
+  status?: string;
+  updatedAt?: string;
 }
 /** Root meta schema type */
 export interface MetaSchema {
   tables: MetaTable[];
 }
-export interface ValidateFunctionGraphPayload {
-  clientMutationId?: string | null;
-  result?: boolean | null;
+/** A connection to a list of `DbPreset` values. */
+export interface DbPresetConnection {
+  edges: DbPresetEdge[];
+  nodes: DbPreset[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
-export interface InitEmptyRepoPayload {
-  clientMutationId?: string | null;
+/** A connection to a list of `DeclaredCapacity` values. */
+export interface DeclaredCapacityConnection {
+  edges: DeclaredCapacityEdge[];
+  nodes: DeclaredCapacity[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
-export interface SetDataAtPathPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
+/** A connection to a list of `FunctionApiBinding` values. */
+export interface FunctionApiBindingConnection {
+  edges: FunctionApiBindingEdge[];
+  nodes: FunctionApiBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
-export interface ImportDefinitionsPayload {
-  clientMutationId?: string | null;
+/** A connection to a list of `FunctionDefinition` values. */
+export interface FunctionDefinitionConnection {
+  edges: FunctionDefinitionEdge[];
+  nodes: FunctionDefinition[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
-export interface CopyGraphPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
+/** A connection to a list of `FunctionDeploymentEvent` values. */
+export interface FunctionDeploymentEventConnection {
+  edges: FunctionDeploymentEventEdge[];
+  nodes: FunctionDeploymentEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
-export interface SaveGraphPayload {
+/** A connection to a list of `FunctionDeployment` values. */
+export interface FunctionDeploymentConnection {
+  edges: FunctionDeploymentEdge[];
+  nodes: FunctionDeployment[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionExecutionLog` values. */
+export interface FunctionExecutionLogConnection {
+  edges: FunctionExecutionLogEdge[];
+  nodes: FunctionExecutionLog[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphCommit` values. */
+export interface FunctionGraphCommitConnection {
+  edges: FunctionGraphCommitEdge[];
+  nodes: FunctionGraphCommit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphExecutionNodeState` values. */
+export interface FunctionGraphExecutionNodeStateConnection {
+  edges: FunctionGraphExecutionNodeStateEdge[];
+  nodes: FunctionGraphExecutionNodeState[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphExecutionOutput` values. */
+export interface FunctionGraphExecutionOutputConnection {
+  edges: FunctionGraphExecutionOutputEdge[];
+  nodes: FunctionGraphExecutionOutput[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphExecution` values. */
+export interface FunctionGraphExecutionConnection {
+  edges: FunctionGraphExecutionEdge[];
+  nodes: FunctionGraphExecution[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphObject` values. */
+export interface FunctionGraphObjectConnection {
+  edges: FunctionGraphObjectEdge[];
+  nodes: FunctionGraphObject[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphRef` values. */
+export interface FunctionGraphRefConnection {
+  edges: FunctionGraphRefEdge[];
+  nodes: FunctionGraphRef[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphStore` values. */
+export interface FunctionGraphStoreConnection {
+  edges: FunctionGraphStoreEdge[];
+  nodes: FunctionGraphStore[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraph` values. */
+export interface FunctionGraphConnection {
+  edges: FunctionGraphEdge[];
+  nodes: FunctionGraph[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionInvocation` values. */
+export interface FunctionInvocationConnection {
+  edges: FunctionInvocationEdge[];
+  nodes: FunctionInvocation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `GetAllTreeNodesRecord` values. */
+export interface GetAllTreeNodesConnection {
+  edges: GetAllTreeNodesEdge[];
+  nodes: GetAllTreeNodesRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `InfraCommit` values. */
+export interface InfraCommitConnection {
+  edges: InfraCommitEdge[];
+  nodes: InfraCommit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `InfraGetAllTreeNodesRecord` values. */
+export interface InfraGetAllTreeNodesConnection {
+  edges: InfraGetAllTreeNodesEdge[];
+  nodes: InfraGetAllTreeNodesRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `InfraObject` values. */
+export interface InfraObjectConnection {
+  edges: InfraObjectEdge[];
+  nodes: InfraObject[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `InfraRef` values. */
+export interface InfraRefConnection {
+  edges: InfraRefEdge[];
+  nodes: InfraRef[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `InfraStore` values. */
+export interface InfraStoreConnection {
+  edges: InfraStoreEdge[];
+  nodes: InfraStore[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `IntegrationProvider` values. */
+export interface IntegrationProviderConnection {
+  edges: IntegrationProviderEdge[];
+  nodes: IntegrationProvider[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `NamespaceEvent` values. */
+export interface NamespaceEventConnection {
+  edges: NamespaceEventEdge[];
+  nodes: NamespaceEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Namespace` values. */
+export interface NamespaceConnection {
+  edges: NamespaceEdge[];
+  nodes: Namespace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformDeclaredCapacity` values. */
+export interface PlatformDeclaredCapacityConnection {
+  edges: PlatformDeclaredCapacityEdge[];
+  nodes: PlatformDeclaredCapacity[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionApiBinding` values. */
+export interface PlatformFunctionApiBindingConnection {
+  edges: PlatformFunctionApiBindingEdge[];
+  nodes: PlatformFunctionApiBinding[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionDefinition` values. */
+export interface PlatformFunctionDefinitionConnection {
+  edges: PlatformFunctionDefinitionEdge[];
+  nodes: PlatformFunctionDefinition[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionDeploymentEvent` values. */
+export interface PlatformFunctionDeploymentEventConnection {
+  edges: PlatformFunctionDeploymentEventEdge[];
+  nodes: PlatformFunctionDeploymentEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionDeployment` values. */
+export interface PlatformFunctionDeploymentConnection {
+  edges: PlatformFunctionDeploymentEdge[];
+  nodes: PlatformFunctionDeployment[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionExecutionLog` values. */
+export interface PlatformFunctionExecutionLogConnection {
+  edges: PlatformFunctionExecutionLogEdge[];
+  nodes: PlatformFunctionExecutionLog[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformFunctionInvocation` values. */
+export interface PlatformFunctionInvocationConnection {
+  edges: PlatformFunctionInvocationEdge[];
+  nodes: PlatformFunctionInvocation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraCommit` values. */
+export interface PlatformInfraCommitConnection {
+  edges: PlatformInfraCommitEdge[];
+  nodes: PlatformInfraCommit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraGetAllTreeNodesRecord` values. */
+export interface PlatformInfraGetAllTreeNodesConnection {
+  edges: PlatformInfraGetAllTreeNodesEdge[];
+  nodes: PlatformInfraGetAllTreeNodesRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraObject` values. */
+export interface PlatformInfraObjectConnection {
+  edges: PlatformInfraObjectEdge[];
+  nodes: PlatformInfraObject[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraRef` values. */
+export interface PlatformInfraRefConnection {
+  edges: PlatformInfraRefEdge[];
+  nodes: PlatformInfraRef[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraStore` values. */
+export interface PlatformInfraStoreConnection {
+  edges: PlatformInfraStoreEdge[];
+  nodes: PlatformInfraStore[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformNamespaceEvent` values. */
+export interface PlatformNamespaceEventConnection {
+  edges: PlatformNamespaceEventEdge[];
+  nodes: PlatformNamespaceEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformNamespace` values. */
+export interface PlatformNamespaceConnection {
+  edges: PlatformNamespaceEdge[];
+  nodes: PlatformNamespace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceDefinition` values. */
+export interface PlatformResourceDefinitionConnection {
+  edges: PlatformResourceDefinitionEdge[];
+  nodes: PlatformResourceDefinition[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceEvent` values. */
+export interface PlatformResourceEventConnection {
+  edges: PlatformResourceEventEdge[];
+  nodes: PlatformResourceEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceInstallation` values. */
+export interface PlatformResourceInstallationConnection {
+  edges: PlatformResourceInstallationEdge[];
+  nodes: PlatformResourceInstallation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceStatusCheck` values. */
+export interface PlatformResourceStatusCheckConnection {
+  edges: PlatformResourceStatusCheckEdge[];
+  nodes: PlatformResourceStatusCheck[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceUsageLog` values. */
+export interface PlatformResourceUsageLogConnection {
+  edges: PlatformResourceUsageLogEdge[];
+  nodes: PlatformResourceUsageLog[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceUsageSummary` values. */
+export interface PlatformResourceUsageSummaryConnection {
+  edges: PlatformResourceUsageSummaryEdge[];
+  nodes: PlatformResourceUsageSummary[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourceUtilizationDaily` values. */
+export interface PlatformResourceUtilizationDailyConnection {
+  edges: PlatformResourceUtilizationDailyEdge[];
+  nodes: PlatformResourceUtilizationDaily[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResource` values. */
+export interface PlatformResourceConnection {
+  edges: PlatformResourceEdge[];
+  nodes: PlatformResource[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourcesHealth` values. */
+export interface PlatformResourcesHealthConnection {
+  edges: PlatformResourcesHealthEdge[];
+  nodes: PlatformResourcesHealth[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourcesRequirementsState` values. */
+export interface PlatformResourcesRequirementsStateConnection {
+  edges: PlatformResourcesRequirementsStateEdge[];
+  nodes: PlatformResourcesRequirementsState[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformResourcesResolvedRequirement` values. */
+export interface PlatformResourcesResolvedRequirementConnection {
+  edges: PlatformResourcesResolvedRequirementEdge[];
+  nodes: PlatformResourcesResolvedRequirement[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformWebhookEndpoint` values. */
+export interface PlatformWebhookEndpointConnection {
+  edges: PlatformWebhookEndpointEdge[];
+  nodes: PlatformWebhookEndpoint[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformWebhookEvent` values. */
+export interface PlatformWebhookEventConnection {
+  edges: PlatformWebhookEventEdge[];
+  nodes: PlatformWebhookEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceDefinition` values. */
+export interface ResourceDefinitionConnection {
+  edges: ResourceDefinitionEdge[];
+  nodes: ResourceDefinition[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceEvent` values. */
+export interface ResourceEventConnection {
+  edges: ResourceEventEdge[];
+  nodes: ResourceEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceInstallation` values. */
+export interface ResourceInstallationConnection {
+  edges: ResourceInstallationEdge[];
+  nodes: ResourceInstallation[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceStatusCheck` values. */
+export interface ResourceStatusCheckConnection {
+  edges: ResourceStatusCheckEdge[];
+  nodes: ResourceStatusCheck[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceUsageLog` values. */
+export interface ResourceUsageLogConnection {
+  edges: ResourceUsageLogEdge[];
+  nodes: ResourceUsageLog[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceUsageSummary` values. */
+export interface ResourceUsageSummaryConnection {
+  edges: ResourceUsageSummaryEdge[];
+  nodes: ResourceUsageSummary[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourceUtilizationDaily` values. */
+export interface ResourceUtilizationDailyConnection {
+  edges: ResourceUtilizationDailyEdge[];
+  nodes: ResourceUtilizationDaily[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Resource` values. */
+export interface ResourceConnection {
+  edges: ResourceEdge[];
+  nodes: Resource[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourcesHealth` values. */
+export interface ResourcesHealthConnection {
+  edges: ResourcesHealthEdge[];
+  nodes: ResourcesHealth[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourcesRequirementsState` values. */
+export interface ResourcesRequirementsStateConnection {
+  edges: ResourcesRequirementsStateEdge[];
+  nodes: ResourcesRequirementsState[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ResourcesResolvedRequirement` values. */
+export interface ResourcesResolvedRequirementConnection {
+  edges: ResourcesResolvedRequirementEdge[];
+  nodes: ResourcesResolvedRequirement[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `WebhookEndpoint` values. */
+export interface WebhookEndpointConnection {
+  edges: WebhookEndpointEdge[];
+  nodes: WebhookEndpoint[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `WebhookEvent` values. */
+export interface WebhookEventConnection {
+  edges: WebhookEventEdge[];
+  nodes: WebhookEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+export interface AddEdgePayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -3186,39 +8942,87 @@ export interface AddEdgeAndSavePayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export interface AddNodeAndSavePayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface CreateFunctionGraphPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface ImportGraphJsonPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface AddEdgePayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
 export interface AddNodePayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export interface InsertNodeAtPathPayload {
+export interface AddNodeAndSavePayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export interface StartExecutionPayload {
+export interface CopyGraphPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface CreateDbPresetPayload {
+  clientMutationId?: string | null;
+  /** The `DbPreset` that was created by this mutation. */
+  dbPreset?: DbPreset | null;
+  dbPresetEdge?: DbPresetEdge | null;
 }
 export interface CreateFunctionApiBindingPayload {
   clientMutationId?: string | null;
   /** The `FunctionApiBinding` that was created by this mutation. */
   functionApiBinding?: FunctionApiBinding | null;
   functionApiBindingEdge?: FunctionApiBindingEdge | null;
+}
+export interface CreateFunctionDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDefinition` that was created by this mutation. */
+  functionDefinition?: FunctionDefinition | null;
+  functionDefinitionEdge?: FunctionDefinitionEdge | null;
+}
+export interface CreateFunctionDeploymentPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeployment` that was created by this mutation. */
+  functionDeployment?: FunctionDeployment | null;
+  functionDeploymentEdge?: FunctionDeploymentEdge | null;
+}
+export interface CreateFunctionDeploymentEventPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeploymentEvent` that was created by this mutation. */
+  functionDeploymentEvent?: FunctionDeploymentEvent | null;
+  functionDeploymentEventEdge?: FunctionDeploymentEventEdge | null;
+}
+export interface CreateFunctionExecutionLogPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionExecutionLog` that was created by this mutation. */
+  functionExecutionLog?: FunctionExecutionLog | null;
+  functionExecutionLogEdge?: FunctionExecutionLogEdge | null;
+}
+export interface CreateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface CreateFunctionGraphCommitPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphCommit` that was created by this mutation. */
+  functionGraphCommit?: FunctionGraphCommit | null;
+  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
+}
+export interface CreateFunctionGraphExecutionPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecution` that was created by this mutation. */
+  functionGraphExecution?: FunctionGraphExecution | null;
+  functionGraphExecutionEdge?: FunctionGraphExecutionEdge | null;
+}
+export interface CreateFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionNodeState` that was created by this mutation. */
+  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
+  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
+}
+export interface CreateFunctionGraphExecutionOutputPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionOutput` that was created by this mutation. */
+  functionGraphExecutionOutput?: FunctionGraphExecutionOutput | null;
+  functionGraphExecutionOutputEdge?: FunctionGraphExecutionOutputEdge | null;
+}
+export interface CreateFunctionGraphObjectPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphObject` that was created by this mutation. */
+  functionGraphObject?: FunctionGraphObject | null;
+  functionGraphObjectEdge?: FunctionGraphObjectEdge | null;
 }
 export interface CreateFunctionGraphRefPayload {
   clientMutationId?: string | null;
@@ -3232,59 +9036,113 @@ export interface CreateFunctionGraphStorePayload {
   functionGraphStore?: FunctionGraphStore | null;
   functionGraphStoreEdge?: FunctionGraphStoreEdge | null;
 }
-export interface CreateFunctionGraphObjectPayload {
+export interface CreateFunctionInvocationPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphObject` that was created by this mutation. */
-  functionGraphObject?: FunctionGraphObject | null;
-  functionGraphObjectEdge?: FunctionGraphObjectEdge | null;
+  /** The `FunctionInvocation` that was created by this mutation. */
+  functionInvocation?: FunctionInvocation | null;
+  functionInvocationEdge?: FunctionInvocationEdge | null;
 }
-export interface CreateFunctionDeploymentEventPayload {
+export interface CreateInfraCommitPayload {
   clientMutationId?: string | null;
-  /** The `FunctionDeploymentEvent` that was created by this mutation. */
-  functionDeploymentEvent?: FunctionDeploymentEvent | null;
-  functionDeploymentEventEdge?: FunctionDeploymentEventEdge | null;
+  /** The `InfraCommit` that was created by this mutation. */
+  infraCommit?: InfraCommit | null;
+  infraCommitEdge?: InfraCommitEdge | null;
 }
-export interface CreateOrgFunctionExecutionLogPayload {
+export interface CreateInfraObjectPayload {
   clientMutationId?: string | null;
-  /** The `OrgFunctionExecutionLog` that was created by this mutation. */
-  orgFunctionExecutionLog?: OrgFunctionExecutionLog | null;
-  orgFunctionExecutionLogEdge?: OrgFunctionExecutionLogEdge | null;
+  /** The `InfraObject` that was created by this mutation. */
+  infraObject?: InfraObject | null;
+  infraObjectEdge?: InfraObjectEdge | null;
 }
-export interface CreateResourceEventPayload {
+export interface CreateInfraRefPayload {
   clientMutationId?: string | null;
-  /** The `ResourceEvent` that was created by this mutation. */
-  resourceEvent?: ResourceEvent | null;
-  resourceEventEdge?: ResourceEventEdge | null;
+  /** The `InfraRef` that was created by this mutation. */
+  infraRef?: InfraRef | null;
+  infraRefEdge?: InfraRefEdge | null;
 }
-export interface CreateFunctionGraphExecutionOutputPayload {
+export interface CreateInfraStorePayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionOutput` that was created by this mutation. */
-  functionGraphExecutionOutput?: FunctionGraphExecutionOutput | null;
-  functionGraphExecutionOutputEdge?: FunctionGraphExecutionOutputEdge | null;
+  /** The `InfraStore` that was created by this mutation. */
+  infraStore?: InfraStore | null;
+  infraStoreEdge?: InfraStoreEdge | null;
 }
-export interface CreateFunctionGraphCommitPayload {
+export interface CreateIntegrationProviderPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphCommit` that was created by this mutation. */
-  functionGraphCommit?: FunctionGraphCommit | null;
-  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
+  /** The `IntegrationProvider` that was created by this mutation. */
+  integrationProvider?: IntegrationProvider | null;
+  integrationProviderEdge?: IntegrationProviderEdge | null;
 }
-export interface CreateSecretDefinitionPayload {
+export interface CreateNamespacePayload {
   clientMutationId?: string | null;
-  /** The `SecretDefinition` that was created by this mutation. */
-  secretDefinition?: SecretDefinition | null;
-  secretDefinitionEdge?: SecretDefinitionEdge | null;
+  /** The `Namespace` that was created by this mutation. */
+  namespace?: Namespace | null;
+  namespaceEdge?: NamespaceEdge | null;
 }
-export interface CreateFunctionExecutionLogPayload {
+export interface CreateNamespaceEventPayload {
   clientMutationId?: string | null;
-  /** The `FunctionExecutionLog` that was created by this mutation. */
-  functionExecutionLog?: FunctionExecutionLog | null;
-  functionExecutionLogEdge?: FunctionExecutionLogEdge | null;
+  /** The `NamespaceEvent` that was created by this mutation. */
+  namespaceEvent?: NamespaceEvent | null;
+  namespaceEventEdge?: NamespaceEventEdge | null;
 }
-export interface CreateFunctionGraphExecutionNodeStatePayload {
+export interface CreatePlatformFunctionApiBindingPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionNodeState` that was created by this mutation. */
-  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
-  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
+  /** The `PlatformFunctionApiBinding` that was created by this mutation. */
+  platformFunctionApiBinding?: PlatformFunctionApiBinding | null;
+  platformFunctionApiBindingEdge?: PlatformFunctionApiBindingEdge | null;
+}
+export interface CreatePlatformFunctionDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDefinition` that was created by this mutation. */
+  platformFunctionDefinition?: PlatformFunctionDefinition | null;
+  platformFunctionDefinitionEdge?: PlatformFunctionDefinitionEdge | null;
+}
+export interface CreatePlatformFunctionDeploymentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDeployment` that was created by this mutation. */
+  platformFunctionDeployment?: PlatformFunctionDeployment | null;
+  platformFunctionDeploymentEdge?: PlatformFunctionDeploymentEdge | null;
+}
+export interface CreatePlatformFunctionDeploymentEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDeploymentEvent` that was created by this mutation. */
+  platformFunctionDeploymentEvent?: PlatformFunctionDeploymentEvent | null;
+  platformFunctionDeploymentEventEdge?: PlatformFunctionDeploymentEventEdge | null;
+}
+export interface CreatePlatformFunctionExecutionLogPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionExecutionLog` that was created by this mutation. */
+  platformFunctionExecutionLog?: PlatformFunctionExecutionLog | null;
+  platformFunctionExecutionLogEdge?: PlatformFunctionExecutionLogEdge | null;
+}
+export interface CreatePlatformFunctionInvocationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionInvocation` that was created by this mutation. */
+  platformFunctionInvocation?: PlatformFunctionInvocation | null;
+  platformFunctionInvocationEdge?: PlatformFunctionInvocationEdge | null;
+}
+export interface CreatePlatformInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraCommit` that was created by this mutation. */
+  platformInfraCommit?: PlatformInfraCommit | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+}
+export interface CreatePlatformInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraObject` that was created by this mutation. */
+  platformInfraObject?: PlatformInfraObject | null;
+  platformInfraObjectEdge?: PlatformInfraObjectEdge | null;
+}
+export interface CreatePlatformInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraRef` that was created by this mutation. */
+  platformInfraRef?: PlatformInfraRef | null;
+  platformInfraRefEdge?: PlatformInfraRefEdge | null;
+}
+export interface CreatePlatformInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraStore` that was created by this mutation. */
+  platformInfraStore?: PlatformInfraStore | null;
+  platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
 export interface CreatePlatformNamespacePayload {
   clientMutationId?: string | null;
@@ -3292,17 +9150,65 @@ export interface CreatePlatformNamespacePayload {
   platformNamespace?: PlatformNamespace | null;
   platformNamespaceEdge?: PlatformNamespaceEdge | null;
 }
-export interface CreateOrgFunctionInvocationPayload {
+export interface CreatePlatformNamespaceEventPayload {
   clientMutationId?: string | null;
-  /** The `OrgFunctionInvocation` that was created by this mutation. */
-  orgFunctionInvocation?: OrgFunctionInvocation | null;
-  orgFunctionInvocationEdge?: OrgFunctionInvocationEdge | null;
+  /** The `PlatformNamespaceEvent` that was created by this mutation. */
+  platformNamespaceEvent?: PlatformNamespaceEvent | null;
+  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
 }
-export interface CreateFunctionInvocationPayload {
+export interface CreatePlatformResourcePayload {
   clientMutationId?: string | null;
-  /** The `FunctionInvocation` that was created by this mutation. */
-  functionInvocation?: FunctionInvocation | null;
-  functionInvocationEdge?: FunctionInvocationEdge | null;
+  /** The `PlatformResource` that was created by this mutation. */
+  platformResource?: PlatformResource | null;
+  platformResourceEdge?: PlatformResourceEdge | null;
+}
+export interface CreatePlatformResourceDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceDefinition` that was created by this mutation. */
+  platformResourceDefinition?: PlatformResourceDefinition | null;
+  platformResourceDefinitionEdge?: PlatformResourceDefinitionEdge | null;
+}
+export interface CreatePlatformResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceEvent` that was created by this mutation. */
+  platformResourceEvent?: PlatformResourceEvent | null;
+  platformResourceEventEdge?: PlatformResourceEventEdge | null;
+}
+export interface CreatePlatformResourceInstallationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceInstallation` that was created by this mutation. */
+  platformResourceInstallation?: PlatformResourceInstallation | null;
+  platformResourceInstallationEdge?: PlatformResourceInstallationEdge | null;
+}
+export interface CreatePlatformResourceStatusCheckPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceStatusCheck` that was created by this mutation. */
+  platformResourceStatusCheck?: PlatformResourceStatusCheck | null;
+  platformResourceStatusCheckEdge?: PlatformResourceStatusCheckEdge | null;
+}
+export interface CreatePlatformResourceUsageLogPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceUsageLog` that was created by this mutation. */
+  platformResourceUsageLog?: PlatformResourceUsageLog | null;
+  platformResourceUsageLogEdge?: PlatformResourceUsageLogEdge | null;
+}
+export interface CreatePlatformResourceUsageSummaryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceUsageSummary` that was created by this mutation. */
+  platformResourceUsageSummary?: PlatformResourceUsageSummary | null;
+  platformResourceUsageSummaryEdge?: PlatformResourceUsageSummaryEdge | null;
+}
+export interface CreatePlatformWebhookEndpointPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformWebhookEndpoint` that was created by this mutation. */
+  platformWebhookEndpoint?: PlatformWebhookEndpoint | null;
+  platformWebhookEndpointEdge?: PlatformWebhookEndpointEdge | null;
+}
+export interface CreatePlatformWebhookEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformWebhookEvent` that was created by this mutation. */
+  platformWebhookEvent?: PlatformWebhookEvent | null;
+  platformWebhookEventEdge?: PlatformWebhookEventEdge | null;
 }
 export interface CreateResourcePayload {
   clientMutationId?: string | null;
@@ -3310,155 +9216,59 @@ export interface CreateResourcePayload {
   resource?: Resource | null;
   resourceEdge?: ResourceEdge | null;
 }
-export interface CreatePlatformNamespaceEventPayload {
+export interface CreateResourceDefinitionPayload {
   clientMutationId?: string | null;
-  /** The `PlatformNamespaceEvent` that was created by this mutation. */
-  platformNamespaceEvent?: PlatformNamespaceEvent | null;
-  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+  /** The `ResourceDefinition` that was created by this mutation. */
+  resourceDefinition?: ResourceDefinition | null;
+  resourceDefinitionEdge?: ResourceDefinitionEdge | null;
 }
-export interface CreateFunctionDeploymentPayload {
+export interface CreateResourceEventPayload {
   clientMutationId?: string | null;
-  /** The `FunctionDeployment` that was created by this mutation. */
-  functionDeployment?: FunctionDeployment | null;
-  functionDeploymentEdge?: FunctionDeploymentEdge | null;
-}
-export interface CreateFunctionGraphExecutionPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphExecution` that was created by this mutation. */
-  functionGraphExecution?: FunctionGraphExecution | null;
-  functionGraphExecutionEdge?: FunctionGraphExecutionEdge | null;
-}
-export interface CreateFunctionDefinitionPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionDefinition` that was created by this mutation. */
-  functionDefinition?: FunctionDefinition | null;
-  functionDefinitionEdge?: FunctionDefinitionEdge | null;
-}
-export interface UpdateFunctionApiBindingPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionApiBinding` that was updated by this mutation. */
-  functionApiBinding?: FunctionApiBinding | null;
-  functionApiBindingEdge?: FunctionApiBindingEdge | null;
-}
-export interface UpdateFunctionGraphRefPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphRef` that was updated by this mutation. */
-  functionGraphRef?: FunctionGraphRef | null;
-  functionGraphRefEdge?: FunctionGraphRefEdge | null;
-}
-export interface UpdateFunctionGraphStorePayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphStore` that was updated by this mutation. */
-  functionGraphStore?: FunctionGraphStore | null;
-  functionGraphStoreEdge?: FunctionGraphStoreEdge | null;
-}
-export interface UpdateFunctionGraphObjectPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphObject` that was updated by this mutation. */
-  functionGraphObject?: FunctionGraphObject | null;
-  functionGraphObjectEdge?: FunctionGraphObjectEdge | null;
-}
-export interface UpdateFunctionDeploymentEventPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionDeploymentEvent` that was updated by this mutation. */
-  functionDeploymentEvent?: FunctionDeploymentEvent | null;
-  functionDeploymentEventEdge?: FunctionDeploymentEventEdge | null;
-}
-export interface UpdateOrgFunctionExecutionLogPayload {
-  clientMutationId?: string | null;
-  /** The `OrgFunctionExecutionLog` that was updated by this mutation. */
-  orgFunctionExecutionLog?: OrgFunctionExecutionLog | null;
-  orgFunctionExecutionLogEdge?: OrgFunctionExecutionLogEdge | null;
-}
-export interface UpdateResourceEventPayload {
-  clientMutationId?: string | null;
-  /** The `ResourceEvent` that was updated by this mutation. */
+  /** The `ResourceEvent` that was created by this mutation. */
   resourceEvent?: ResourceEvent | null;
   resourceEventEdge?: ResourceEventEdge | null;
 }
-export interface UpdateFunctionGraphExecutionOutputPayload {
+export interface CreateResourceInstallationPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionOutput` that was updated by this mutation. */
-  functionGraphExecutionOutput?: FunctionGraphExecutionOutput | null;
-  functionGraphExecutionOutputEdge?: FunctionGraphExecutionOutputEdge | null;
+  /** The `ResourceInstallation` that was created by this mutation. */
+  resourceInstallation?: ResourceInstallation | null;
+  resourceInstallationEdge?: ResourceInstallationEdge | null;
 }
-export interface UpdateFunctionGraphCommitPayload {
+export interface CreateResourceStatusCheckPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphCommit` that was updated by this mutation. */
-  functionGraphCommit?: FunctionGraphCommit | null;
-  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
+  /** The `ResourceStatusCheck` that was created by this mutation. */
+  resourceStatusCheck?: ResourceStatusCheck | null;
+  resourceStatusCheckEdge?: ResourceStatusCheckEdge | null;
 }
-export interface UpdateSecretDefinitionPayload {
+export interface CreateResourceUsageLogPayload {
   clientMutationId?: string | null;
-  /** The `SecretDefinition` that was updated by this mutation. */
-  secretDefinition?: SecretDefinition | null;
-  secretDefinitionEdge?: SecretDefinitionEdge | null;
+  /** The `ResourceUsageLog` that was created by this mutation. */
+  resourceUsageLog?: ResourceUsageLog | null;
+  resourceUsageLogEdge?: ResourceUsageLogEdge | null;
 }
-export interface UpdateFunctionExecutionLogPayload {
+export interface CreateResourceUsageSummaryPayload {
   clientMutationId?: string | null;
-  /** The `FunctionExecutionLog` that was updated by this mutation. */
-  functionExecutionLog?: FunctionExecutionLog | null;
-  functionExecutionLogEdge?: FunctionExecutionLogEdge | null;
+  /** The `ResourceUsageSummary` that was created by this mutation. */
+  resourceUsageSummary?: ResourceUsageSummary | null;
+  resourceUsageSummaryEdge?: ResourceUsageSummaryEdge | null;
 }
-export interface UpdateFunctionGraphPayload {
+export interface CreateWebhookEndpointPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraph` that was updated by this mutation. */
-  functionGraph?: FunctionGraph | null;
-  functionGraphEdge?: FunctionGraphEdge | null;
+  /** The `WebhookEndpoint` that was created by this mutation. */
+  webhookEndpoint?: WebhookEndpoint | null;
+  webhookEndpointEdge?: WebhookEndpointEdge | null;
 }
-export interface UpdateFunctionGraphExecutionNodeStatePayload {
+export interface CreateWebhookEventPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionNodeState` that was updated by this mutation. */
-  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
-  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
+  /** The `WebhookEvent` that was created by this mutation. */
+  webhookEvent?: WebhookEvent | null;
+  webhookEventEdge?: WebhookEventEdge | null;
 }
-export interface UpdatePlatformNamespacePayload {
+export interface DeleteDbPresetPayload {
   clientMutationId?: string | null;
-  /** The `PlatformNamespace` that was updated by this mutation. */
-  platformNamespace?: PlatformNamespace | null;
-  platformNamespaceEdge?: PlatformNamespaceEdge | null;
-}
-export interface UpdateOrgFunctionInvocationPayload {
-  clientMutationId?: string | null;
-  /** The `OrgFunctionInvocation` that was updated by this mutation. */
-  orgFunctionInvocation?: OrgFunctionInvocation | null;
-  orgFunctionInvocationEdge?: OrgFunctionInvocationEdge | null;
-}
-export interface UpdateFunctionInvocationPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionInvocation` that was updated by this mutation. */
-  functionInvocation?: FunctionInvocation | null;
-  functionInvocationEdge?: FunctionInvocationEdge | null;
-}
-export interface UpdateResourcePayload {
-  clientMutationId?: string | null;
-  /** The `Resource` that was updated by this mutation. */
-  resource?: Resource | null;
-  resourceEdge?: ResourceEdge | null;
-}
-export interface UpdatePlatformNamespaceEventPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformNamespaceEvent` that was updated by this mutation. */
-  platformNamespaceEvent?: PlatformNamespaceEvent | null;
-  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
-}
-export interface UpdateFunctionDeploymentPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionDeployment` that was updated by this mutation. */
-  functionDeployment?: FunctionDeployment | null;
-  functionDeploymentEdge?: FunctionDeploymentEdge | null;
-}
-export interface UpdateFunctionGraphExecutionPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphExecution` that was updated by this mutation. */
-  functionGraphExecution?: FunctionGraphExecution | null;
-  functionGraphExecutionEdge?: FunctionGraphExecutionEdge | null;
-}
-export interface UpdateFunctionDefinitionPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionDefinition` that was updated by this mutation. */
-  functionDefinition?: FunctionDefinition | null;
-  functionDefinitionEdge?: FunctionDefinitionEdge | null;
+  /** The `DbPreset` that was deleted by this mutation. */
+  dbPreset?: DbPreset | null;
+  dbPresetEdge?: DbPresetEdge | null;
 }
 export interface DeleteFunctionApiBindingPayload {
   clientMutationId?: string | null;
@@ -3466,59 +9276,23 @@ export interface DeleteFunctionApiBindingPayload {
   functionApiBinding?: FunctionApiBinding | null;
   functionApiBindingEdge?: FunctionApiBindingEdge | null;
 }
-export interface DeleteFunctionGraphRefPayload {
+export interface DeleteFunctionDefinitionPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphRef` that was deleted by this mutation. */
-  functionGraphRef?: FunctionGraphRef | null;
-  functionGraphRefEdge?: FunctionGraphRefEdge | null;
+  /** The `FunctionDefinition` that was deleted by this mutation. */
+  functionDefinition?: FunctionDefinition | null;
+  functionDefinitionEdge?: FunctionDefinitionEdge | null;
 }
-export interface DeleteFunctionGraphStorePayload {
+export interface DeleteFunctionDeploymentPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphStore` that was deleted by this mutation. */
-  functionGraphStore?: FunctionGraphStore | null;
-  functionGraphStoreEdge?: FunctionGraphStoreEdge | null;
-}
-export interface DeleteFunctionGraphObjectPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphObject` that was deleted by this mutation. */
-  functionGraphObject?: FunctionGraphObject | null;
-  functionGraphObjectEdge?: FunctionGraphObjectEdge | null;
+  /** The `FunctionDeployment` that was deleted by this mutation. */
+  functionDeployment?: FunctionDeployment | null;
+  functionDeploymentEdge?: FunctionDeploymentEdge | null;
 }
 export interface DeleteFunctionDeploymentEventPayload {
   clientMutationId?: string | null;
   /** The `FunctionDeploymentEvent` that was deleted by this mutation. */
   functionDeploymentEvent?: FunctionDeploymentEvent | null;
   functionDeploymentEventEdge?: FunctionDeploymentEventEdge | null;
-}
-export interface DeleteOrgFunctionExecutionLogPayload {
-  clientMutationId?: string | null;
-  /** The `OrgFunctionExecutionLog` that was deleted by this mutation. */
-  orgFunctionExecutionLog?: OrgFunctionExecutionLog | null;
-  orgFunctionExecutionLogEdge?: OrgFunctionExecutionLogEdge | null;
-}
-export interface DeleteResourceEventPayload {
-  clientMutationId?: string | null;
-  /** The `ResourceEvent` that was deleted by this mutation. */
-  resourceEvent?: ResourceEvent | null;
-  resourceEventEdge?: ResourceEventEdge | null;
-}
-export interface DeleteFunctionGraphExecutionOutputPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionOutput` that was deleted by this mutation. */
-  functionGraphExecutionOutput?: FunctionGraphExecutionOutput | null;
-  functionGraphExecutionOutputEdge?: FunctionGraphExecutionOutputEdge | null;
-}
-export interface DeleteFunctionGraphCommitPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphCommit` that was deleted by this mutation. */
-  functionGraphCommit?: FunctionGraphCommit | null;
-  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
-}
-export interface DeleteSecretDefinitionPayload {
-  clientMutationId?: string | null;
-  /** The `SecretDefinition` that was deleted by this mutation. */
-  secretDefinition?: SecretDefinition | null;
-  secretDefinitionEdge?: SecretDefinitionEdge | null;
 }
 export interface DeleteFunctionExecutionLogPayload {
   clientMutationId?: string | null;
@@ -3532,47 +9306,11 @@ export interface DeleteFunctionGraphPayload {
   functionGraph?: FunctionGraph | null;
   functionGraphEdge?: FunctionGraphEdge | null;
 }
-export interface DeleteFunctionGraphExecutionNodeStatePayload {
+export interface DeleteFunctionGraphCommitPayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionNodeState` that was deleted by this mutation. */
-  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
-  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
-}
-export interface DeletePlatformNamespacePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformNamespace` that was deleted by this mutation. */
-  platformNamespace?: PlatformNamespace | null;
-  platformNamespaceEdge?: PlatformNamespaceEdge | null;
-}
-export interface DeleteOrgFunctionInvocationPayload {
-  clientMutationId?: string | null;
-  /** The `OrgFunctionInvocation` that was deleted by this mutation. */
-  orgFunctionInvocation?: OrgFunctionInvocation | null;
-  orgFunctionInvocationEdge?: OrgFunctionInvocationEdge | null;
-}
-export interface DeleteFunctionInvocationPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionInvocation` that was deleted by this mutation. */
-  functionInvocation?: FunctionInvocation | null;
-  functionInvocationEdge?: FunctionInvocationEdge | null;
-}
-export interface DeleteResourcePayload {
-  clientMutationId?: string | null;
-  /** The `Resource` that was deleted by this mutation. */
-  resource?: Resource | null;
-  resourceEdge?: ResourceEdge | null;
-}
-export interface DeletePlatformNamespaceEventPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformNamespaceEvent` that was deleted by this mutation. */
-  platformNamespaceEvent?: PlatformNamespaceEvent | null;
-  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
-}
-export interface DeleteFunctionDeploymentPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionDeployment` that was deleted by this mutation. */
-  functionDeployment?: FunctionDeployment | null;
-  functionDeploymentEdge?: FunctionDeploymentEdge | null;
+  /** The `FunctionGraphCommit` that was deleted by this mutation. */
+  functionGraphCommit?: FunctionGraphCommit | null;
+  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
 }
 export interface DeleteFunctionGraphExecutionPayload {
   clientMutationId?: string | null;
@@ -3580,48 +9318,772 @@ export interface DeleteFunctionGraphExecutionPayload {
   functionGraphExecution?: FunctionGraphExecution | null;
   functionGraphExecutionEdge?: FunctionGraphExecutionEdge | null;
 }
-export interface DeleteFunctionDefinitionPayload {
+export interface DeleteFunctionGraphExecutionNodeStatePayload {
   clientMutationId?: string | null;
-  /** The `FunctionDefinition` that was deleted by this mutation. */
-  functionDefinition?: FunctionDefinition | null;
-  functionDefinitionEdge?: FunctionDefinitionEdge | null;
+  /** The `FunctionGraphExecutionNodeState` that was deleted by this mutation. */
+  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
+  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
+}
+export interface DeleteFunctionGraphExecutionOutputPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionOutput` that was deleted by this mutation. */
+  functionGraphExecutionOutput?: FunctionGraphExecutionOutput | null;
+  functionGraphExecutionOutputEdge?: FunctionGraphExecutionOutputEdge | null;
+}
+export interface DeleteFunctionGraphObjectPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphObject` that was deleted by this mutation. */
+  functionGraphObject?: FunctionGraphObject | null;
+  functionGraphObjectEdge?: FunctionGraphObjectEdge | null;
+}
+export interface DeleteFunctionGraphRefPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphRef` that was deleted by this mutation. */
+  functionGraphRef?: FunctionGraphRef | null;
+  functionGraphRefEdge?: FunctionGraphRefEdge | null;
+}
+export interface DeleteFunctionGraphStorePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphStore` that was deleted by this mutation. */
+  functionGraphStore?: FunctionGraphStore | null;
+  functionGraphStoreEdge?: FunctionGraphStoreEdge | null;
+}
+export interface DeleteFunctionInvocationPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionInvocation` that was deleted by this mutation. */
+  functionInvocation?: FunctionInvocation | null;
+  functionInvocationEdge?: FunctionInvocationEdge | null;
+}
+export interface DeleteInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `InfraCommit` that was deleted by this mutation. */
+  infraCommit?: InfraCommit | null;
+  infraCommitEdge?: InfraCommitEdge | null;
+}
+export interface DeleteInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `InfraObject` that was deleted by this mutation. */
+  infraObject?: InfraObject | null;
+  infraObjectEdge?: InfraObjectEdge | null;
+}
+export interface DeleteInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `InfraRef` that was deleted by this mutation. */
+  infraRef?: InfraRef | null;
+  infraRefEdge?: InfraRefEdge | null;
+}
+export interface DeleteInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `InfraStore` that was deleted by this mutation. */
+  infraStore?: InfraStore | null;
+  infraStoreEdge?: InfraStoreEdge | null;
+}
+export interface DeleteIntegrationProviderPayload {
+  clientMutationId?: string | null;
+  /** The `IntegrationProvider` that was deleted by this mutation. */
+  integrationProvider?: IntegrationProvider | null;
+  integrationProviderEdge?: IntegrationProviderEdge | null;
+}
+export interface DeleteNamespacePayload {
+  clientMutationId?: string | null;
+  /** The `Namespace` that was deleted by this mutation. */
+  namespace?: Namespace | null;
+  namespaceEdge?: NamespaceEdge | null;
+}
+export interface DeleteNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `NamespaceEvent` that was deleted by this mutation. */
+  namespaceEvent?: NamespaceEvent | null;
+  namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface DeletePlatformFunctionApiBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionApiBinding` that was deleted by this mutation. */
+  platformFunctionApiBinding?: PlatformFunctionApiBinding | null;
+  platformFunctionApiBindingEdge?: PlatformFunctionApiBindingEdge | null;
+}
+export interface DeletePlatformFunctionDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDefinition` that was deleted by this mutation. */
+  platformFunctionDefinition?: PlatformFunctionDefinition | null;
+  platformFunctionDefinitionEdge?: PlatformFunctionDefinitionEdge | null;
+}
+export interface DeletePlatformFunctionDeploymentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDeployment` that was deleted by this mutation. */
+  platformFunctionDeployment?: PlatformFunctionDeployment | null;
+  platformFunctionDeploymentEdge?: PlatformFunctionDeploymentEdge | null;
+}
+export interface DeletePlatformFunctionDeploymentEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDeploymentEvent` that was deleted by this mutation. */
+  platformFunctionDeploymentEvent?: PlatformFunctionDeploymentEvent | null;
+  platformFunctionDeploymentEventEdge?: PlatformFunctionDeploymentEventEdge | null;
+}
+export interface DeletePlatformFunctionExecutionLogPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionExecutionLog` that was deleted by this mutation. */
+  platformFunctionExecutionLog?: PlatformFunctionExecutionLog | null;
+  platformFunctionExecutionLogEdge?: PlatformFunctionExecutionLogEdge | null;
+}
+export interface DeletePlatformFunctionInvocationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionInvocation` that was deleted by this mutation. */
+  platformFunctionInvocation?: PlatformFunctionInvocation | null;
+  platformFunctionInvocationEdge?: PlatformFunctionInvocationEdge | null;
+}
+export interface DeletePlatformInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraCommit` that was deleted by this mutation. */
+  platformInfraCommit?: PlatformInfraCommit | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+}
+export interface DeletePlatformInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraObject` that was deleted by this mutation. */
+  platformInfraObject?: PlatformInfraObject | null;
+  platformInfraObjectEdge?: PlatformInfraObjectEdge | null;
+}
+export interface DeletePlatformInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraRef` that was deleted by this mutation. */
+  platformInfraRef?: PlatformInfraRef | null;
+  platformInfraRefEdge?: PlatformInfraRefEdge | null;
+}
+export interface DeletePlatformInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraStore` that was deleted by this mutation. */
+  platformInfraStore?: PlatformInfraStore | null;
+  platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
+}
+export interface DeletePlatformNamespacePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespace` that was deleted by this mutation. */
+  platformNamespace?: PlatformNamespace | null;
+  platformNamespaceEdge?: PlatformNamespaceEdge | null;
+}
+export interface DeletePlatformNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespaceEvent` that was deleted by this mutation. */
+  platformNamespaceEvent?: PlatformNamespaceEvent | null;
+  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export interface DeletePlatformResourcePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResource` that was deleted by this mutation. */
+  platformResource?: PlatformResource | null;
+  platformResourceEdge?: PlatformResourceEdge | null;
+}
+export interface DeletePlatformResourceDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceDefinition` that was deleted by this mutation. */
+  platformResourceDefinition?: PlatformResourceDefinition | null;
+  platformResourceDefinitionEdge?: PlatformResourceDefinitionEdge | null;
+}
+export interface DeletePlatformResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceEvent` that was deleted by this mutation. */
+  platformResourceEvent?: PlatformResourceEvent | null;
+  platformResourceEventEdge?: PlatformResourceEventEdge | null;
+}
+export interface DeletePlatformResourceInstallationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceInstallation` that was deleted by this mutation. */
+  platformResourceInstallation?: PlatformResourceInstallation | null;
+  platformResourceInstallationEdge?: PlatformResourceInstallationEdge | null;
+}
+export interface DeletePlatformResourceStatusCheckPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceStatusCheck` that was deleted by this mutation. */
+  platformResourceStatusCheck?: PlatformResourceStatusCheck | null;
+  platformResourceStatusCheckEdge?: PlatformResourceStatusCheckEdge | null;
+}
+export interface DeletePlatformResourceUsageLogPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceUsageLog` that was deleted by this mutation. */
+  platformResourceUsageLog?: PlatformResourceUsageLog | null;
+  platformResourceUsageLogEdge?: PlatformResourceUsageLogEdge | null;
+}
+export interface DeletePlatformResourceUsageSummaryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceUsageSummary` that was deleted by this mutation. */
+  platformResourceUsageSummary?: PlatformResourceUsageSummary | null;
+  platformResourceUsageSummaryEdge?: PlatformResourceUsageSummaryEdge | null;
+}
+export interface DeletePlatformWebhookEndpointPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformWebhookEndpoint` that was deleted by this mutation. */
+  platformWebhookEndpoint?: PlatformWebhookEndpoint | null;
+  platformWebhookEndpointEdge?: PlatformWebhookEndpointEdge | null;
+}
+export interface DeletePlatformWebhookEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformWebhookEvent` that was deleted by this mutation. */
+  platformWebhookEvent?: PlatformWebhookEvent | null;
+  platformWebhookEventEdge?: PlatformWebhookEventEdge | null;
+}
+export interface DeleteResourcePayload {
+  clientMutationId?: string | null;
+  /** The `Resource` that was deleted by this mutation. */
+  resource?: Resource | null;
+  resourceEdge?: ResourceEdge | null;
+}
+export interface DeleteResourceDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceDefinition` that was deleted by this mutation. */
+  resourceDefinition?: ResourceDefinition | null;
+  resourceDefinitionEdge?: ResourceDefinitionEdge | null;
+}
+export interface DeleteResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceEvent` that was deleted by this mutation. */
+  resourceEvent?: ResourceEvent | null;
+  resourceEventEdge?: ResourceEventEdge | null;
+}
+export interface DeleteResourceInstallationPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceInstallation` that was deleted by this mutation. */
+  resourceInstallation?: ResourceInstallation | null;
+  resourceInstallationEdge?: ResourceInstallationEdge | null;
+}
+export interface DeleteResourceStatusCheckPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceStatusCheck` that was deleted by this mutation. */
+  resourceStatusCheck?: ResourceStatusCheck | null;
+  resourceStatusCheckEdge?: ResourceStatusCheckEdge | null;
+}
+export interface DeleteResourceUsageLogPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceUsageLog` that was deleted by this mutation. */
+  resourceUsageLog?: ResourceUsageLog | null;
+  resourceUsageLogEdge?: ResourceUsageLogEdge | null;
+}
+export interface DeleteResourceUsageSummaryPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceUsageSummary` that was deleted by this mutation. */
+  resourceUsageSummary?: ResourceUsageSummary | null;
+  resourceUsageSummaryEdge?: ResourceUsageSummaryEdge | null;
+}
+export interface DeleteWebhookEndpointPayload {
+  clientMutationId?: string | null;
+  /** The `WebhookEndpoint` that was deleted by this mutation. */
+  webhookEndpoint?: WebhookEndpoint | null;
+  webhookEndpointEdge?: WebhookEndpointEdge | null;
+}
+export interface DeleteWebhookEventPayload {
+  clientMutationId?: string | null;
+  /** The `WebhookEvent` that was deleted by this mutation. */
+  webhookEvent?: WebhookEvent | null;
+  webhookEventEdge?: WebhookEventEdge | null;
+}
+export interface ImportDefinitionsPayload {
+  clientMutationId?: string | null;
+}
+export interface ImportGraphJsonPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface InfraInitEmptyRepoPayload {
+  clientMutationId?: string | null;
+}
+export interface InfraInsertNodeAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface InfraSetDataAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface InitEmptyRepoPayload {
+  clientMutationId?: string | null;
+}
+export interface InsertNodeAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformInfraInitEmptyRepoPayload {
+  clientMutationId?: string | null;
+}
+export interface PlatformInfraInsertNodeAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformInfraSetDataAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformResourceInstallationsInstallPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformResourceInstallationsRollbackPayload {
+  clientMutationId?: string | null;
+}
+export interface PlatformResourceInstallationsUninstallPayload {
+  clientMutationId?: string | null;
+}
+export interface PlatformResourceInstallationsUpgradePayload {
+  clientMutationId?: string | null;
 }
 export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
   /** The access type applied */
   accessType: string;
-  /** The storage provider used */
-  provider: string;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
   /** The S3 endpoint (null for AWS S3 default) */
   endpoint?: string | null;
   /** Error message if provisioning failed */
   error?: string | null;
+  /** The storage provider used */
+  provider: string;
+  /** Whether provisioning succeeded */
+  success: boolean;
 }
-/** A `GetAllRecord` edge in the connection. */
-export interface GetAllEdge {
+export interface ResourceInstallationsInstallPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface ResourceInstallationsRollbackPayload {
+  clientMutationId?: string | null;
+}
+export interface ResourceInstallationsUninstallPayload {
+  clientMutationId?: string | null;
+}
+export interface ResourceInstallationsUpgradePayload {
+  clientMutationId?: string | null;
+}
+export interface SaveGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface SetDataAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface StartExecutionPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface UpdateDbPresetPayload {
+  clientMutationId?: string | null;
+  /** The `DbPreset` that was updated by this mutation. */
+  dbPreset?: DbPreset | null;
+  dbPresetEdge?: DbPresetEdge | null;
+}
+export interface UpdateFunctionApiBindingPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionApiBinding` that was updated by this mutation. */
+  functionApiBinding?: FunctionApiBinding | null;
+  functionApiBindingEdge?: FunctionApiBindingEdge | null;
+}
+export interface UpdateFunctionDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDefinition` that was updated by this mutation. */
+  functionDefinition?: FunctionDefinition | null;
+  functionDefinitionEdge?: FunctionDefinitionEdge | null;
+}
+export interface UpdateFunctionDeploymentPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeployment` that was updated by this mutation. */
+  functionDeployment?: FunctionDeployment | null;
+  functionDeploymentEdge?: FunctionDeploymentEdge | null;
+}
+export interface UpdateFunctionDeploymentEventPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeploymentEvent` that was updated by this mutation. */
+  functionDeploymentEvent?: FunctionDeploymentEvent | null;
+  functionDeploymentEventEdge?: FunctionDeploymentEventEdge | null;
+}
+export interface UpdateFunctionExecutionLogPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionExecutionLog` that was updated by this mutation. */
+  functionExecutionLog?: FunctionExecutionLog | null;
+  functionExecutionLogEdge?: FunctionExecutionLogEdge | null;
+}
+export interface UpdateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraph` that was updated by this mutation. */
+  functionGraph?: FunctionGraph | null;
+  functionGraphEdge?: FunctionGraphEdge | null;
+}
+export interface UpdateFunctionGraphCommitPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphCommit` that was updated by this mutation. */
+  functionGraphCommit?: FunctionGraphCommit | null;
+  functionGraphCommitEdge?: FunctionGraphCommitEdge | null;
+}
+export interface UpdateFunctionGraphExecutionPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecution` that was updated by this mutation. */
+  functionGraphExecution?: FunctionGraphExecution | null;
+  functionGraphExecutionEdge?: FunctionGraphExecutionEdge | null;
+}
+export interface UpdateFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionNodeState` that was updated by this mutation. */
+  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
+  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
+}
+export interface UpdateFunctionGraphExecutionOutputPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionOutput` that was updated by this mutation. */
+  functionGraphExecutionOutput?: FunctionGraphExecutionOutput | null;
+  functionGraphExecutionOutputEdge?: FunctionGraphExecutionOutputEdge | null;
+}
+export interface UpdateFunctionGraphObjectPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphObject` that was updated by this mutation. */
+  functionGraphObject?: FunctionGraphObject | null;
+  functionGraphObjectEdge?: FunctionGraphObjectEdge | null;
+}
+export interface UpdateFunctionGraphRefPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphRef` that was updated by this mutation. */
+  functionGraphRef?: FunctionGraphRef | null;
+  functionGraphRefEdge?: FunctionGraphRefEdge | null;
+}
+export interface UpdateFunctionGraphStorePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphStore` that was updated by this mutation. */
+  functionGraphStore?: FunctionGraphStore | null;
+  functionGraphStoreEdge?: FunctionGraphStoreEdge | null;
+}
+export interface UpdateFunctionInvocationPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionInvocation` that was updated by this mutation. */
+  functionInvocation?: FunctionInvocation | null;
+  functionInvocationEdge?: FunctionInvocationEdge | null;
+}
+export interface UpdateInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `InfraCommit` that was updated by this mutation. */
+  infraCommit?: InfraCommit | null;
+  infraCommitEdge?: InfraCommitEdge | null;
+}
+export interface UpdateInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `InfraObject` that was updated by this mutation. */
+  infraObject?: InfraObject | null;
+  infraObjectEdge?: InfraObjectEdge | null;
+}
+export interface UpdateInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `InfraRef` that was updated by this mutation. */
+  infraRef?: InfraRef | null;
+  infraRefEdge?: InfraRefEdge | null;
+}
+export interface UpdateInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `InfraStore` that was updated by this mutation. */
+  infraStore?: InfraStore | null;
+  infraStoreEdge?: InfraStoreEdge | null;
+}
+export interface UpdateIntegrationProviderPayload {
+  clientMutationId?: string | null;
+  /** The `IntegrationProvider` that was updated by this mutation. */
+  integrationProvider?: IntegrationProvider | null;
+  integrationProviderEdge?: IntegrationProviderEdge | null;
+}
+export interface UpdateNamespacePayload {
+  clientMutationId?: string | null;
+  /** The `Namespace` that was updated by this mutation. */
+  namespace?: Namespace | null;
+  namespaceEdge?: NamespaceEdge | null;
+}
+export interface UpdateNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `NamespaceEvent` that was updated by this mutation. */
+  namespaceEvent?: NamespaceEvent | null;
+  namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface UpdatePlatformFunctionApiBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionApiBinding` that was updated by this mutation. */
+  platformFunctionApiBinding?: PlatformFunctionApiBinding | null;
+  platformFunctionApiBindingEdge?: PlatformFunctionApiBindingEdge | null;
+}
+export interface UpdatePlatformFunctionDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDefinition` that was updated by this mutation. */
+  platformFunctionDefinition?: PlatformFunctionDefinition | null;
+  platformFunctionDefinitionEdge?: PlatformFunctionDefinitionEdge | null;
+}
+export interface UpdatePlatformFunctionDeploymentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDeployment` that was updated by this mutation. */
+  platformFunctionDeployment?: PlatformFunctionDeployment | null;
+  platformFunctionDeploymentEdge?: PlatformFunctionDeploymentEdge | null;
+}
+export interface UpdatePlatformFunctionDeploymentEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionDeploymentEvent` that was updated by this mutation. */
+  platformFunctionDeploymentEvent?: PlatformFunctionDeploymentEvent | null;
+  platformFunctionDeploymentEventEdge?: PlatformFunctionDeploymentEventEdge | null;
+}
+export interface UpdatePlatformFunctionExecutionLogPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionExecutionLog` that was updated by this mutation. */
+  platformFunctionExecutionLog?: PlatformFunctionExecutionLog | null;
+  platformFunctionExecutionLogEdge?: PlatformFunctionExecutionLogEdge | null;
+}
+export interface UpdatePlatformFunctionInvocationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionInvocation` that was updated by this mutation. */
+  platformFunctionInvocation?: PlatformFunctionInvocation | null;
+  platformFunctionInvocationEdge?: PlatformFunctionInvocationEdge | null;
+}
+export interface UpdatePlatformInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraCommit` that was updated by this mutation. */
+  platformInfraCommit?: PlatformInfraCommit | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+}
+export interface UpdatePlatformInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraObject` that was updated by this mutation. */
+  platformInfraObject?: PlatformInfraObject | null;
+  platformInfraObjectEdge?: PlatformInfraObjectEdge | null;
+}
+export interface UpdatePlatformInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraRef` that was updated by this mutation. */
+  platformInfraRef?: PlatformInfraRef | null;
+  platformInfraRefEdge?: PlatformInfraRefEdge | null;
+}
+export interface UpdatePlatformInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraStore` that was updated by this mutation. */
+  platformInfraStore?: PlatformInfraStore | null;
+  platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
+}
+export interface UpdatePlatformNamespacePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespace` that was updated by this mutation. */
+  platformNamespace?: PlatformNamespace | null;
+  platformNamespaceEdge?: PlatformNamespaceEdge | null;
+}
+export interface UpdatePlatformNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespaceEvent` that was updated by this mutation. */
+  platformNamespaceEvent?: PlatformNamespaceEvent | null;
+  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export interface UpdatePlatformResourcePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResource` that was updated by this mutation. */
+  platformResource?: PlatformResource | null;
+  platformResourceEdge?: PlatformResourceEdge | null;
+}
+export interface UpdatePlatformResourceDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceDefinition` that was updated by this mutation. */
+  platformResourceDefinition?: PlatformResourceDefinition | null;
+  platformResourceDefinitionEdge?: PlatformResourceDefinitionEdge | null;
+}
+export interface UpdatePlatformResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceEvent` that was updated by this mutation. */
+  platformResourceEvent?: PlatformResourceEvent | null;
+  platformResourceEventEdge?: PlatformResourceEventEdge | null;
+}
+export interface UpdatePlatformResourceInstallationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceInstallation` that was updated by this mutation. */
+  platformResourceInstallation?: PlatformResourceInstallation | null;
+  platformResourceInstallationEdge?: PlatformResourceInstallationEdge | null;
+}
+export interface UpdatePlatformResourceStatusCheckPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceStatusCheck` that was updated by this mutation. */
+  platformResourceStatusCheck?: PlatformResourceStatusCheck | null;
+  platformResourceStatusCheckEdge?: PlatformResourceStatusCheckEdge | null;
+}
+export interface UpdatePlatformResourceUsageLogPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceUsageLog` that was updated by this mutation. */
+  platformResourceUsageLog?: PlatformResourceUsageLog | null;
+  platformResourceUsageLogEdge?: PlatformResourceUsageLogEdge | null;
+}
+export interface UpdatePlatformResourceUsageSummaryPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformResourceUsageSummary` that was updated by this mutation. */
+  platformResourceUsageSummary?: PlatformResourceUsageSummary | null;
+  platformResourceUsageSummaryEdge?: PlatformResourceUsageSummaryEdge | null;
+}
+export interface UpdatePlatformWebhookEndpointPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformWebhookEndpoint` that was updated by this mutation. */
+  platformWebhookEndpoint?: PlatformWebhookEndpoint | null;
+  platformWebhookEndpointEdge?: PlatformWebhookEndpointEdge | null;
+}
+export interface UpdatePlatformWebhookEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformWebhookEvent` that was updated by this mutation. */
+  platformWebhookEvent?: PlatformWebhookEvent | null;
+  platformWebhookEventEdge?: PlatformWebhookEventEdge | null;
+}
+export interface UpdateResourcePayload {
+  clientMutationId?: string | null;
+  /** The `Resource` that was updated by this mutation. */
+  resource?: Resource | null;
+  resourceEdge?: ResourceEdge | null;
+}
+export interface UpdateResourceDefinitionPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceDefinition` that was updated by this mutation. */
+  resourceDefinition?: ResourceDefinition | null;
+  resourceDefinitionEdge?: ResourceDefinitionEdge | null;
+}
+export interface UpdateResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceEvent` that was updated by this mutation. */
+  resourceEvent?: ResourceEvent | null;
+  resourceEventEdge?: ResourceEventEdge | null;
+}
+export interface UpdateResourceInstallationPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceInstallation` that was updated by this mutation. */
+  resourceInstallation?: ResourceInstallation | null;
+  resourceInstallationEdge?: ResourceInstallationEdge | null;
+}
+export interface UpdateResourceStatusCheckPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceStatusCheck` that was updated by this mutation. */
+  resourceStatusCheck?: ResourceStatusCheck | null;
+  resourceStatusCheckEdge?: ResourceStatusCheckEdge | null;
+}
+export interface UpdateResourceUsageLogPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceUsageLog` that was updated by this mutation. */
+  resourceUsageLog?: ResourceUsageLog | null;
+  resourceUsageLogEdge?: ResourceUsageLogEdge | null;
+}
+export interface UpdateResourceUsageSummaryPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceUsageSummary` that was updated by this mutation. */
+  resourceUsageSummary?: ResourceUsageSummary | null;
+  resourceUsageSummaryEdge?: ResourceUsageSummaryEdge | null;
+}
+export interface UpdateWebhookEndpointPayload {
+  clientMutationId?: string | null;
+  /** The `WebhookEndpoint` that was updated by this mutation. */
+  webhookEndpoint?: WebhookEndpoint | null;
+  webhookEndpointEdge?: WebhookEndpointEdge | null;
+}
+export interface UpdateWebhookEventPayload {
+  clientMutationId?: string | null;
+  /** The `WebhookEvent` that was updated by this mutation. */
+  webhookEvent?: WebhookEvent | null;
+  webhookEventEdge?: WebhookEventEdge | null;
+}
+export interface ValidateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+/** Information about a database table */
+export interface MetaTable {
+  constraints: MetaConstraints;
+  fields: MetaField[];
+  foreignKeyConstraints: MetaForeignKeyConstraint[];
+  /** i18n metadata (null if no @i18n tag) */
+  i18n?: MetaI18n | null;
+  indexes: MetaIndex[];
+  inflection: MetaInflection;
+  name: string;
+  primaryKeyConstraints: MetaPrimaryKeyConstraint[];
+  query: MetaQuery;
+  /** Realtime metadata (null if no @realtime tag) */
+  realtime?: MetaRealtime | null;
+  relations: MetaRelations;
+  schemaName: string;
+  /** Search metadata (null if no search configured) */
+  search?: MetaSearch | null;
+  /** Storage metadata (null if not a storage table) */
+  storage?: MetaStorage | null;
+  uniqueConstraints: MetaUniqueConstraint[];
+}
+/** A `DbPreset` edge in the connection. */
+export interface DbPresetEdge {
   cursor?: string | null;
-  /** The `GetAllRecord` at the end of the edge. */
-  node?: GetAllRecord | null;
+  /** The `DbPreset` at the end of the edge. */
+  node?: DbPreset | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
+  /** When paginating forwards, the cursor to continue. */
+  endCursor?: string | null;
   /** When paginating forwards, are there more items? */
   hasNextPage: boolean;
   /** When paginating backwards, are there more items? */
   hasPreviousPage: boolean;
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
-  /** When paginating forwards, the cursor to continue. */
-  endCursor?: string | null;
+}
+/** A `DeclaredCapacity` edge in the connection. */
+export interface DeclaredCapacityEdge {
+  cursor?: string | null;
+  /** The `DeclaredCapacity` at the end of the edge. */
+  node?: DeclaredCapacity | null;
 }
 /** A `FunctionApiBinding` edge in the connection. */
 export interface FunctionApiBindingEdge {
   cursor?: string | null;
   /** The `FunctionApiBinding` at the end of the edge. */
   node?: FunctionApiBinding | null;
+}
+/** A `FunctionDefinition` edge in the connection. */
+export interface FunctionDefinitionEdge {
+  cursor?: string | null;
+  /** The `FunctionDefinition` at the end of the edge. */
+  node?: FunctionDefinition | null;
+}
+/** A `FunctionDeploymentEvent` edge in the connection. */
+export interface FunctionDeploymentEventEdge {
+  cursor?: string | null;
+  /** The `FunctionDeploymentEvent` at the end of the edge. */
+  node?: FunctionDeploymentEvent | null;
+}
+/** A `FunctionDeployment` edge in the connection. */
+export interface FunctionDeploymentEdge {
+  cursor?: string | null;
+  /** The `FunctionDeployment` at the end of the edge. */
+  node?: FunctionDeployment | null;
+}
+/** A `FunctionExecutionLog` edge in the connection. */
+export interface FunctionExecutionLogEdge {
+  cursor?: string | null;
+  /** The `FunctionExecutionLog` at the end of the edge. */
+  node?: FunctionExecutionLog | null;
+}
+/** A `FunctionGraphCommit` edge in the connection. */
+export interface FunctionGraphCommitEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphCommit` at the end of the edge. */
+  node?: FunctionGraphCommit | null;
+}
+/** A `FunctionGraphExecutionNodeState` edge in the connection. */
+export interface FunctionGraphExecutionNodeStateEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphExecutionNodeState` at the end of the edge. */
+  node?: FunctionGraphExecutionNodeState | null;
+}
+/** A `FunctionGraphExecutionOutput` edge in the connection. */
+export interface FunctionGraphExecutionOutputEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphExecutionOutput` at the end of the edge. */
+  node?: FunctionGraphExecutionOutput | null;
+}
+/** A `FunctionGraphExecution` edge in the connection. */
+export interface FunctionGraphExecutionEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphExecution` at the end of the edge. */
+  node?: FunctionGraphExecution | null;
+}
+/** A `FunctionGraphObject` edge in the connection. */
+export interface FunctionGraphObjectEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphObject` at the end of the edge. */
+  node?: FunctionGraphObject | null;
 }
 /** A `FunctionGraphRef` edge in the connection. */
 export interface FunctionGraphRefEdge {
@@ -3635,77 +10097,11 @@ export interface FunctionGraphStoreEdge {
   /** The `FunctionGraphStore` at the end of the edge. */
   node?: FunctionGraphStore | null;
 }
-/** A `FunctionGraphObject` edge in the connection. */
-export interface FunctionGraphObjectEdge {
-  cursor?: string | null;
-  /** The `FunctionGraphObject` at the end of the edge. */
-  node?: FunctionGraphObject | null;
-}
-/** A `FunctionDeploymentEvent` edge in the connection. */
-export interface FunctionDeploymentEventEdge {
-  cursor?: string | null;
-  /** The `FunctionDeploymentEvent` at the end of the edge. */
-  node?: FunctionDeploymentEvent | null;
-}
-/** A `OrgFunctionExecutionLog` edge in the connection. */
-export interface OrgFunctionExecutionLogEdge {
-  cursor?: string | null;
-  /** The `OrgFunctionExecutionLog` at the end of the edge. */
-  node?: OrgFunctionExecutionLog | null;
-}
-/** A `ResourceEvent` edge in the connection. */
-export interface ResourceEventEdge {
-  cursor?: string | null;
-  /** The `ResourceEvent` at the end of the edge. */
-  node?: ResourceEvent | null;
-}
-/** A `FunctionGraphExecutionOutput` edge in the connection. */
-export interface FunctionGraphExecutionOutputEdge {
-  cursor?: string | null;
-  /** The `FunctionGraphExecutionOutput` at the end of the edge. */
-  node?: FunctionGraphExecutionOutput | null;
-}
-/** A `FunctionGraphCommit` edge in the connection. */
-export interface FunctionGraphCommitEdge {
-  cursor?: string | null;
-  /** The `FunctionGraphCommit` at the end of the edge. */
-  node?: FunctionGraphCommit | null;
-}
-/** A `SecretDefinition` edge in the connection. */
-export interface SecretDefinitionEdge {
-  cursor?: string | null;
-  /** The `SecretDefinition` at the end of the edge. */
-  node?: SecretDefinition | null;
-}
-/** A `FunctionExecutionLog` edge in the connection. */
-export interface FunctionExecutionLogEdge {
-  cursor?: string | null;
-  /** The `FunctionExecutionLog` at the end of the edge. */
-  node?: FunctionExecutionLog | null;
-}
 /** A `FunctionGraph` edge in the connection. */
 export interface FunctionGraphEdge {
   cursor?: string | null;
   /** The `FunctionGraph` at the end of the edge. */
   node?: FunctionGraph | null;
-}
-/** A `FunctionGraphExecutionNodeState` edge in the connection. */
-export interface FunctionGraphExecutionNodeStateEdge {
-  cursor?: string | null;
-  /** The `FunctionGraphExecutionNodeState` at the end of the edge. */
-  node?: FunctionGraphExecutionNodeState | null;
-}
-/** A `PlatformNamespace` edge in the connection. */
-export interface PlatformNamespaceEdge {
-  cursor?: string | null;
-  /** The `PlatformNamespace` at the end of the edge. */
-  node?: PlatformNamespace | null;
-}
-/** A `OrgFunctionInvocation` edge in the connection. */
-export interface OrgFunctionInvocationEdge {
-  cursor?: string | null;
-  /** The `OrgFunctionInvocation` at the end of the edge. */
-  node?: OrgFunctionInvocation | null;
 }
 /** A `FunctionInvocation` edge in the connection. */
 export interface FunctionInvocationEdge {
@@ -3713,11 +10109,131 @@ export interface FunctionInvocationEdge {
   /** The `FunctionInvocation` at the end of the edge. */
   node?: FunctionInvocation | null;
 }
-/** A `Resource` edge in the connection. */
-export interface ResourceEdge {
+/** A `GetAllTreeNodesRecord` edge in the connection. */
+export interface GetAllTreeNodesEdge {
   cursor?: string | null;
-  /** The `Resource` at the end of the edge. */
-  node?: Resource | null;
+  /** The `GetAllTreeNodesRecord` at the end of the edge. */
+  node?: GetAllTreeNodesRecord | null;
+}
+/** A `InfraCommit` edge in the connection. */
+export interface InfraCommitEdge {
+  cursor?: string | null;
+  /** The `InfraCommit` at the end of the edge. */
+  node?: InfraCommit | null;
+}
+/** A `InfraGetAllTreeNodesRecord` edge in the connection. */
+export interface InfraGetAllTreeNodesEdge {
+  cursor?: string | null;
+  /** The `InfraGetAllTreeNodesRecord` at the end of the edge. */
+  node?: InfraGetAllTreeNodesRecord | null;
+}
+/** A `InfraObject` edge in the connection. */
+export interface InfraObjectEdge {
+  cursor?: string | null;
+  /** The `InfraObject` at the end of the edge. */
+  node?: InfraObject | null;
+}
+/** A `InfraRef` edge in the connection. */
+export interface InfraRefEdge {
+  cursor?: string | null;
+  /** The `InfraRef` at the end of the edge. */
+  node?: InfraRef | null;
+}
+/** A `InfraStore` edge in the connection. */
+export interface InfraStoreEdge {
+  cursor?: string | null;
+  /** The `InfraStore` at the end of the edge. */
+  node?: InfraStore | null;
+}
+/** A `IntegrationProvider` edge in the connection. */
+export interface IntegrationProviderEdge {
+  cursor?: string | null;
+  /** The `IntegrationProvider` at the end of the edge. */
+  node?: IntegrationProvider | null;
+}
+/** A `NamespaceEvent` edge in the connection. */
+export interface NamespaceEventEdge {
+  cursor?: string | null;
+  /** The `NamespaceEvent` at the end of the edge. */
+  node?: NamespaceEvent | null;
+}
+/** A `Namespace` edge in the connection. */
+export interface NamespaceEdge {
+  cursor?: string | null;
+  /** The `Namespace` at the end of the edge. */
+  node?: Namespace | null;
+}
+/** A `PlatformDeclaredCapacity` edge in the connection. */
+export interface PlatformDeclaredCapacityEdge {
+  cursor?: string | null;
+  /** The `PlatformDeclaredCapacity` at the end of the edge. */
+  node?: PlatformDeclaredCapacity | null;
+}
+/** A `PlatformFunctionApiBinding` edge in the connection. */
+export interface PlatformFunctionApiBindingEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionApiBinding` at the end of the edge. */
+  node?: PlatformFunctionApiBinding | null;
+}
+/** A `PlatformFunctionDefinition` edge in the connection. */
+export interface PlatformFunctionDefinitionEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionDefinition` at the end of the edge. */
+  node?: PlatformFunctionDefinition | null;
+}
+/** A `PlatformFunctionDeploymentEvent` edge in the connection. */
+export interface PlatformFunctionDeploymentEventEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionDeploymentEvent` at the end of the edge. */
+  node?: PlatformFunctionDeploymentEvent | null;
+}
+/** A `PlatformFunctionDeployment` edge in the connection. */
+export interface PlatformFunctionDeploymentEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionDeployment` at the end of the edge. */
+  node?: PlatformFunctionDeployment | null;
+}
+/** A `PlatformFunctionExecutionLog` edge in the connection. */
+export interface PlatformFunctionExecutionLogEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionExecutionLog` at the end of the edge. */
+  node?: PlatformFunctionExecutionLog | null;
+}
+/** A `PlatformFunctionInvocation` edge in the connection. */
+export interface PlatformFunctionInvocationEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionInvocation` at the end of the edge. */
+  node?: PlatformFunctionInvocation | null;
+}
+/** A `PlatformInfraCommit` edge in the connection. */
+export interface PlatformInfraCommitEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraCommit` at the end of the edge. */
+  node?: PlatformInfraCommit | null;
+}
+/** A `PlatformInfraGetAllTreeNodesRecord` edge in the connection. */
+export interface PlatformInfraGetAllTreeNodesEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraGetAllTreeNodesRecord` at the end of the edge. */
+  node?: PlatformInfraGetAllTreeNodesRecord | null;
+}
+/** A `PlatformInfraObject` edge in the connection. */
+export interface PlatformInfraObjectEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraObject` at the end of the edge. */
+  node?: PlatformInfraObject | null;
+}
+/** A `PlatformInfraRef` edge in the connection. */
+export interface PlatformInfraRefEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraRef` at the end of the edge. */
+  node?: PlatformInfraRef | null;
+}
+/** A `PlatformInfraStore` edge in the connection. */
+export interface PlatformInfraStoreEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraStore` at the end of the edge. */
+  node?: PlatformInfraStore | null;
 }
 /** A `PlatformNamespaceEvent` edge in the connection. */
 export interface PlatformNamespaceEventEdge {
@@ -3725,128 +10241,250 @@ export interface PlatformNamespaceEventEdge {
   /** The `PlatformNamespaceEvent` at the end of the edge. */
   node?: PlatformNamespaceEvent | null;
 }
-/** A `FunctionDeployment` edge in the connection. */
-export interface FunctionDeploymentEdge {
+/** A `PlatformNamespace` edge in the connection. */
+export interface PlatformNamespaceEdge {
   cursor?: string | null;
-  /** The `FunctionDeployment` at the end of the edge. */
-  node?: FunctionDeployment | null;
+  /** The `PlatformNamespace` at the end of the edge. */
+  node?: PlatformNamespace | null;
 }
-/** A `FunctionGraphExecution` edge in the connection. */
-export interface FunctionGraphExecutionEdge {
+/** A `PlatformResourceDefinition` edge in the connection. */
+export interface PlatformResourceDefinitionEdge {
   cursor?: string | null;
-  /** The `FunctionGraphExecution` at the end of the edge. */
-  node?: FunctionGraphExecution | null;
+  /** The `PlatformResourceDefinition` at the end of the edge. */
+  node?: PlatformResourceDefinition | null;
 }
-/** A `FunctionDefinition` edge in the connection. */
-export interface FunctionDefinitionEdge {
+/** A `PlatformResourceEvent` edge in the connection. */
+export interface PlatformResourceEventEdge {
   cursor?: string | null;
-  /** The `FunctionDefinition` at the end of the edge. */
-  node?: FunctionDefinition | null;
+  /** The `PlatformResourceEvent` at the end of the edge. */
+  node?: PlatformResourceEvent | null;
 }
-/** Information about a database table */
-export interface MetaTable {
-  name: string;
-  schemaName: string;
-  fields: MetaField[];
-  indexes: MetaIndex[];
-  constraints: MetaConstraints;
-  foreignKeyConstraints: MetaForeignKeyConstraint[];
-  primaryKeyConstraints: MetaPrimaryKeyConstraint[];
-  uniqueConstraints: MetaUniqueConstraint[];
-  relations: MetaRelations;
-  inflection: MetaInflection;
-  query: MetaQuery;
-  /** Storage metadata (null if not a storage table) */
-  storage?: MetaStorage | null;
-  /** Search metadata (null if no search configured) */
-  search?: MetaSearch | null;
-  /** i18n metadata (null if no @i18n tag) */
-  i18n?: MetaI18n | null;
-  /** Realtime metadata (null if no @realtime tag) */
-  realtime?: MetaRealtime | null;
+/** A `PlatformResourceInstallation` edge in the connection. */
+export interface PlatformResourceInstallationEdge {
+  cursor?: string | null;
+  /** The `PlatformResourceInstallation` at the end of the edge. */
+  node?: PlatformResourceInstallation | null;
 }
-/** Information about a table field/column */
-export interface MetaField {
-  name: string;
-  type: MetaType;
-  isNotNull: boolean;
-  hasDefault: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
-  description?: string | null;
-  /** Enum metadata if this field has an enum type */
-  enumValues?: MetaEnum | null;
+/** A `PlatformResourceStatusCheck` edge in the connection. */
+export interface PlatformResourceStatusCheckEdge {
+  cursor?: string | null;
+  /** The `PlatformResourceStatusCheck` at the end of the edge. */
+  node?: PlatformResourceStatusCheck | null;
 }
-/** Information about a database index */
-export interface MetaIndex {
-  name: string;
-  isUnique: boolean;
-  isPrimary: boolean;
-  columns: string[];
-  fields?: MetaField[] | null;
+/** A `PlatformResourceUsageLog` edge in the connection. */
+export interface PlatformResourceUsageLogEdge {
+  cursor?: string | null;
+  /** The `PlatformResourceUsageLog` at the end of the edge. */
+  node?: PlatformResourceUsageLog | null;
+}
+/** A `PlatformResourceUsageSummary` edge in the connection. */
+export interface PlatformResourceUsageSummaryEdge {
+  cursor?: string | null;
+  /** The `PlatformResourceUsageSummary` at the end of the edge. */
+  node?: PlatformResourceUsageSummary | null;
+}
+/** A `PlatformResourceUtilizationDaily` edge in the connection. */
+export interface PlatformResourceUtilizationDailyEdge {
+  cursor?: string | null;
+  /** The `PlatformResourceUtilizationDaily` at the end of the edge. */
+  node?: PlatformResourceUtilizationDaily | null;
+}
+/** A `PlatformResource` edge in the connection. */
+export interface PlatformResourceEdge {
+  cursor?: string | null;
+  /** The `PlatformResource` at the end of the edge. */
+  node?: PlatformResource | null;
+}
+/** A `PlatformResourcesHealth` edge in the connection. */
+export interface PlatformResourcesHealthEdge {
+  cursor?: string | null;
+  /** The `PlatformResourcesHealth` at the end of the edge. */
+  node?: PlatformResourcesHealth | null;
+}
+/** A `PlatformResourcesRequirementsState` edge in the connection. */
+export interface PlatformResourcesRequirementsStateEdge {
+  cursor?: string | null;
+  /** The `PlatformResourcesRequirementsState` at the end of the edge. */
+  node?: PlatformResourcesRequirementsState | null;
+}
+/** A `PlatformResourcesResolvedRequirement` edge in the connection. */
+export interface PlatformResourcesResolvedRequirementEdge {
+  cursor?: string | null;
+  /** The `PlatformResourcesResolvedRequirement` at the end of the edge. */
+  node?: PlatformResourcesResolvedRequirement | null;
+}
+/** A `PlatformWebhookEndpoint` edge in the connection. */
+export interface PlatformWebhookEndpointEdge {
+  cursor?: string | null;
+  /** The `PlatformWebhookEndpoint` at the end of the edge. */
+  node?: PlatformWebhookEndpoint | null;
+}
+/** A `PlatformWebhookEvent` edge in the connection. */
+export interface PlatformWebhookEventEdge {
+  cursor?: string | null;
+  /** The `PlatformWebhookEvent` at the end of the edge. */
+  node?: PlatformWebhookEvent | null;
+}
+/** A `ResourceDefinition` edge in the connection. */
+export interface ResourceDefinitionEdge {
+  cursor?: string | null;
+  /** The `ResourceDefinition` at the end of the edge. */
+  node?: ResourceDefinition | null;
+}
+/** A `ResourceEvent` edge in the connection. */
+export interface ResourceEventEdge {
+  cursor?: string | null;
+  /** The `ResourceEvent` at the end of the edge. */
+  node?: ResourceEvent | null;
+}
+/** A `ResourceInstallation` edge in the connection. */
+export interface ResourceInstallationEdge {
+  cursor?: string | null;
+  /** The `ResourceInstallation` at the end of the edge. */
+  node?: ResourceInstallation | null;
+}
+/** A `ResourceStatusCheck` edge in the connection. */
+export interface ResourceStatusCheckEdge {
+  cursor?: string | null;
+  /** The `ResourceStatusCheck` at the end of the edge. */
+  node?: ResourceStatusCheck | null;
+}
+/** A `ResourceUsageLog` edge in the connection. */
+export interface ResourceUsageLogEdge {
+  cursor?: string | null;
+  /** The `ResourceUsageLog` at the end of the edge. */
+  node?: ResourceUsageLog | null;
+}
+/** A `ResourceUsageSummary` edge in the connection. */
+export interface ResourceUsageSummaryEdge {
+  cursor?: string | null;
+  /** The `ResourceUsageSummary` at the end of the edge. */
+  node?: ResourceUsageSummary | null;
+}
+/** A `ResourceUtilizationDaily` edge in the connection. */
+export interface ResourceUtilizationDailyEdge {
+  cursor?: string | null;
+  /** The `ResourceUtilizationDaily` at the end of the edge. */
+  node?: ResourceUtilizationDaily | null;
+}
+/** A `Resource` edge in the connection. */
+export interface ResourceEdge {
+  cursor?: string | null;
+  /** The `Resource` at the end of the edge. */
+  node?: Resource | null;
+}
+/** A `ResourcesHealth` edge in the connection. */
+export interface ResourcesHealthEdge {
+  cursor?: string | null;
+  /** The `ResourcesHealth` at the end of the edge. */
+  node?: ResourcesHealth | null;
+}
+/** A `ResourcesRequirementsState` edge in the connection. */
+export interface ResourcesRequirementsStateEdge {
+  cursor?: string | null;
+  /** The `ResourcesRequirementsState` at the end of the edge. */
+  node?: ResourcesRequirementsState | null;
+}
+/** A `ResourcesResolvedRequirement` edge in the connection. */
+export interface ResourcesResolvedRequirementEdge {
+  cursor?: string | null;
+  /** The `ResourcesResolvedRequirement` at the end of the edge. */
+  node?: ResourcesResolvedRequirement | null;
+}
+/** A `WebhookEndpoint` edge in the connection. */
+export interface WebhookEndpointEdge {
+  cursor?: string | null;
+  /** The `WebhookEndpoint` at the end of the edge. */
+  node?: WebhookEndpoint | null;
+}
+/** A `WebhookEvent` edge in the connection. */
+export interface WebhookEventEdge {
+  cursor?: string | null;
+  /** The `WebhookEvent` at the end of the edge. */
+  node?: WebhookEvent | null;
 }
 /** Table constraints */
 export interface MetaConstraints {
+  foreignKey: MetaForeignKeyConstraint[];
   primaryKey?: MetaPrimaryKeyConstraint | null;
   unique: MetaUniqueConstraint[];
-  foreignKey: MetaForeignKeyConstraint[];
+}
+/** Information about a table field/column */
+export interface MetaField {
+  description?: string | null;
+  /** Enum metadata if this field has an enum type */
+  enumValues?: MetaEnum | null;
+  hasDefault: boolean;
+  isForeignKey: boolean;
+  isNotNull: boolean;
+  isPrimaryKey: boolean;
+  name: string;
+  type: MetaType;
 }
 /** Information about a foreign key constraint */
 export interface MetaForeignKeyConstraint {
-  name: string;
   fields: MetaField[];
-  referencedTable: string;
-  referencedFields: string[];
+  name: string;
   refFields?: MetaField[] | null;
   refTable?: MetaRefTable | null;
+  referencedFields: string[];
+  referencedTable: string;
+}
+/** i18n metadata for a table with @i18n tag */
+export interface MetaI18n {
+  /** Fields that are translatable */
+  translatableFields: MetaI18nField[];
+  /** Name of the translation table */
+  translationTable: string;
+}
+/** Information about a database index */
+export interface MetaIndex {
+  columns: string[];
+  fields?: MetaField[] | null;
+  isPrimary: boolean;
+  isUnique: boolean;
+  name: string;
+}
+/** Table inflection names */
+export interface MetaInflection {
+  allRows: string;
+  conditionType: string;
+  connection: string;
+  createInputType: string;
+  createPayloadType: string;
+  deletePayloadType: string;
+  edge: string;
+  filterType?: string | null;
+  orderByType: string;
+  patchType?: string | null;
+  tableType: string;
+  updatePayloadType?: string | null;
 }
 /** Information about a primary key constraint */
 export interface MetaPrimaryKeyConstraint {
-  name: string;
   fields: MetaField[];
+  name: string;
 }
-/** Information about a unique constraint */
-export interface MetaUniqueConstraint {
-  name: string;
-  fields: MetaField[];
+/** Table query/mutation names */
+export interface MetaQuery {
+  all: string;
+  create?: string | null;
+  delete?: string | null;
+  one?: string | null;
+  update?: string | null;
+}
+/** Realtime metadata for a table with @realtime tag */
+export interface MetaRealtime {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
 }
 /** Table relations */
 export interface MetaRelations {
   belongsTo: MetaBelongsToRelation[];
   has: MetaHasRelation[];
-  hasOne: MetaHasRelation[];
   hasMany: MetaHasRelation[];
+  hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
-}
-/** Table inflection names */
-export interface MetaInflection {
-  tableType: string;
-  allRows: string;
-  connection: string;
-  edge: string;
-  filterType?: string | null;
-  orderByType: string;
-  conditionType: string;
-  patchType?: string | null;
-  createInputType: string;
-  createPayloadType: string;
-  updatePayloadType?: string | null;
-  deletePayloadType: string;
-}
-/** Table query/mutation names */
-export interface MetaQuery {
-  all: string;
-  one?: string | null;
-  create?: string | null;
-  update?: string | null;
-  delete?: string | null;
-}
-/** Storage metadata for a table */
-export interface MetaStorage {
-  /** Whether this table is a storage files table */
-  isFilesTable: boolean;
-  /** Whether this table is a storage buckets table */
-  isBucketsTable: boolean;
 }
 /** Search metadata for a table */
 export interface MetaSearch {
@@ -3854,31 +10492,22 @@ export interface MetaSearch {
   algorithms: string[];
   /** Searchable columns with their algorithm */
   columns: MetaSearchColumn[];
-  /** Whether unifiedSearch composite filter is available */
-  hasUnifiedSearch: boolean;
   /** Per-table search configuration */
   config?: MetaSearchConfig | null;
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
 }
-/** i18n metadata for a table with @i18n tag */
-export interface MetaI18n {
-  /** Name of the translation table */
-  translationTable: string;
-  /** Fields that are translatable */
-  translatableFields: MetaI18nField[];
+/** Storage metadata for a table */
+export interface MetaStorage {
+  /** Whether this table is a storage buckets table */
+  isBucketsTable: boolean;
+  /** Whether this table is a storage files table */
+  isFilesTable: boolean;
 }
-/** Realtime metadata for a table with @realtime tag */
-export interface MetaRealtime {
-  /** The generated subscription field name (e.g. onPostChanged) */
-  subscriptionFieldName: string;
-}
-/** Information about a PostgreSQL type */
-export interface MetaType {
-  pgType: string;
-  gqlType: string;
-  isArray: boolean;
-  isNotNull?: boolean | null;
-  hasDefault?: boolean | null;
-  subtype?: string | null;
+/** Information about a unique constraint */
+export interface MetaUniqueConstraint {
+  fields: MetaField[];
+  name: string;
 }
 /** Information about a PostgreSQL enum type */
 export interface MetaEnum {
@@ -3887,56 +10516,18 @@ export interface MetaEnum {
   /** Allowed values for this enum */
   values: string[];
 }
+/** Information about a PostgreSQL type */
+export interface MetaType {
+  gqlType: string;
+  hasDefault?: boolean | null;
+  isArray: boolean;
+  isNotNull?: boolean | null;
+  pgType: string;
+  subtype?: string | null;
+}
 /** Reference to a related table */
 export interface MetaRefTable {
   name: string;
-}
-/** A belongs-to (forward FK) relation */
-export interface MetaBelongsToRelation {
-  fieldName?: string | null;
-  isUnique: boolean;
-  type?: string | null;
-  keys: MetaField[];
-  references: MetaRefTable;
-}
-/** A has-one or has-many (reverse FK) relation */
-export interface MetaHasRelation {
-  fieldName?: string | null;
-  isUnique: boolean;
-  type?: string | null;
-  keys: MetaField[];
-  referencedBy: MetaRefTable;
-}
-/** A many-to-many relation via junction table */
-export interface MetaManyToManyRelation {
-  fieldName?: string | null;
-  type?: string | null;
-  junctionTable: MetaRefTable;
-  junctionLeftConstraint: MetaForeignKeyConstraint;
-  junctionLeftKeyAttributes: MetaField[];
-  junctionRightConstraint: MetaForeignKeyConstraint;
-  junctionRightKeyAttributes: MetaField[];
-  leftKeyAttributes: MetaField[];
-  rightKeyAttributes: MetaField[];
-  rightTable: MetaRefTable;
-}
-/** A searchable column with its algorithm */
-export interface MetaSearchColumn {
-  /** Column name (camelCase) */
-  name: string;
-  /** Search algorithm: tsvector, bm25, trgm, or vector */
-  algorithm: string;
-}
-/** Per-table search configuration from @searchConfig smart tag */
-export interface MetaSearchConfig {
-  /** JSON-encoded per-adapter score weights */
-  weights?: string | null;
-  /** Whether recency boosting is enabled */
-  boostRecent: boolean;
-  /** Field used for recency decay */
-  boostRecencyField?: string | null;
-  /** Exponential decay factor per day */
-  boostRecencyDecay?: number | null;
 }
 /** A translatable field */
 export interface MetaI18nField {
@@ -3944,4 +10535,51 @@ export interface MetaI18nField {
   name: string;
   /** PostgreSQL column type (text, citext) */
   type: string;
+}
+/** A belongs-to (forward FK) relation */
+export interface MetaBelongsToRelation {
+  fieldName?: string | null;
+  isUnique: boolean;
+  keys: MetaField[];
+  references: MetaRefTable;
+  type?: string | null;
+}
+/** A has-one or has-many (reverse FK) relation */
+export interface MetaHasRelation {
+  fieldName?: string | null;
+  isUnique: boolean;
+  keys: MetaField[];
+  referencedBy: MetaRefTable;
+  type?: string | null;
+}
+/** A many-to-many relation via junction table */
+export interface MetaManyToManyRelation {
+  fieldName?: string | null;
+  junctionLeftConstraint: MetaForeignKeyConstraint;
+  junctionLeftKeyAttributes: MetaField[];
+  junctionRightConstraint: MetaForeignKeyConstraint;
+  junctionRightKeyAttributes: MetaField[];
+  junctionTable: MetaRefTable;
+  leftKeyAttributes: MetaField[];
+  rightKeyAttributes: MetaField[];
+  rightTable: MetaRefTable;
+  type?: string | null;
+}
+/** A searchable column with its algorithm */
+export interface MetaSearchColumn {
+  /** Search algorithm: tsvector, bm25, trgm, or vector */
+  algorithm: string;
+  /** Column name (camelCase) */
+  name: string;
+}
+/** Per-table search configuration from @searchConfig smart tag */
+export interface MetaSearchConfig {
+  /** Exponential decay factor per day */
+  boostRecencyDecay?: number | null;
+  /** Field used for recency decay */
+  boostRecencyField?: string | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** JSON-encoded per-adapter score weights */
+  weights?: string | null;
 }

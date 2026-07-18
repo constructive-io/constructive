@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.15.1...@pgpmjs/server-utils@3.15.2) (2026-07-18)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
+## [3.15.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.15.0...@pgpmjs/server-utils@3.15.1) (2026-07-13)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
+# [3.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.14.5...@pgpmjs/server-utils@3.15.0) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
+## [3.14.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.14.4...@pgpmjs/server-utils@3.14.5) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
+## [3.14.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.14.3...@pgpmjs/server-utils@3.14.4) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
+## [3.14.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.14.2...@pgpmjs/server-utils@3.14.3) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
+## [3.14.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.14.1...@pgpmjs/server-utils@3.14.2) (2026-07-10)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
 ## [3.14.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.14.0...@pgpmjs/server-utils@3.14.1) (2026-07-08)
 
 **Note:** Version bump only for package @pgpmjs/server-utils

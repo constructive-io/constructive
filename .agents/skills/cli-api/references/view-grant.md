@@ -12,8 +12,8 @@ csdk view-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk view-grant list --limit 10 --after <cursor>
 csdk view-grant find-first --where.<field>.<op> <value>
 csdk view-grant get --id <UUID>
-csdk view-grant create --viewId <UUID> --granteeName <String> --privilege <String> [--databaseId <UUID>] [--withGrantOption <Boolean>] [--isGrant <Boolean>]
-csdk view-grant update --id <UUID> [--databaseId <UUID>] [--viewId <UUID>] [--granteeName <String>] [--privilege <String>] [--withGrantOption <Boolean>] [--isGrant <Boolean>]
+csdk view-grant create --granteeName <String> --privilege <String> --viewId <UUID> [--databaseId <UUID>] [--isGrant <Boolean>] [--withGrantOption <Boolean>]
+csdk view-grant update --id <UUID> [--databaseId <UUID>] [--granteeName <String>] [--isGrant <Boolean>] [--privilege <String>] [--viewId <UUID>] [--withGrantOption <Boolean>]
 csdk view-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk view-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a viewGrant
 
 ```bash
-csdk view-grant create --viewId <UUID> --granteeName <String> --privilege <String> [--databaseId <UUID>] [--withGrantOption <Boolean>] [--isGrant <Boolean>]
+csdk view-grant create --granteeName <String> --privilege <String> --viewId <UUID> [--databaseId <UUID>] [--isGrant <Boolean>] [--withGrantOption <Boolean>]
 ```
 
 ### Get a viewGrant by id

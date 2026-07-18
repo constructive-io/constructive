@@ -7,7 +7,7 @@ Creates a check constraint on a table from a $type + data blueprint definition. 
 ## Usage
 
 ```typescript
-db.mutation.provisionCheckConstraint({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute()
+db.mutation.provisionCheckConstraint({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.provisionCheckConstraint({ input: { databaseId: '<UUID>', tableId: '
 ### Run provisionCheckConstraint
 
 ```typescript
-const result = await db.mutation.provisionCheckConstraint({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+const result = await db.mutation.provisionCheckConstraint({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
 ```

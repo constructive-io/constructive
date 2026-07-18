@@ -9,8 +9,8 @@ Per-database RLS module runtime configuration; typed replacement for api_modules
 ```typescript
 db.rlsSetting.findMany({ select: { id: true } }).execute()
 db.rlsSetting.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.rlsSetting.create({ data: { databaseId: '<UUID>', authenticateSchemaId: '<UUID>', roleSchemaId: '<UUID>', authenticateFunctionId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>' }, select: { id: true } }).execute()
-db.rlsSetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.rlsSetting.create({ data: { authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', databaseId: '<UUID>', roleSchemaId: '<UUID>' }, select: { id: true } }).execute()
+db.rlsSetting.update({ where: { id: '<UUID>' }, data: { authenticateFunctionId: '<UUID>' }, select: { id: true } }).execute()
 db.rlsSetting.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.rlsSetting.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.rlsSetting.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, authenticateFunctionId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.rlsSetting.findMany({
 
 ```typescript
 const item = await db.rlsSetting.create({
-  data: { databaseId: '<UUID>', authenticateSchemaId: '<UUID>', roleSchemaId: '<UUID>', authenticateFunctionId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>' },
+  data: { authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', databaseId: '<UUID>', roleSchemaId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

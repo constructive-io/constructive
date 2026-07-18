@@ -7,7 +7,7 @@ Execute the signInCrossOrigin mutation
 ## Usage
 
 ```bash
-csdk sign-in-cross-origin --input.clientMutationId <String> --input.token <String> --input.credentialKind <String>
+csdk sign-in-cross-origin --input.clientMutationId <String> --input.credentialKind <String> --input.token <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk sign-in-cross-origin --input.clientMutationId <String> --input.token <Strin
 ### Run signInCrossOrigin
 
 ```bash
-csdk sign-in-cross-origin --input.clientMutationId <String> --input.token <String> --input.credentialKind <String>
+csdk sign-in-cross-origin --input.clientMutationId <String> --input.credentialKind <String> --input.token <String>
 ```

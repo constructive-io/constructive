@@ -21,42 +21,113 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
-| `getAllRecord` | findMany, findOne, create, update, delete |
+| `commit` | findMany, findOne, create, update, delete |
+| `getAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `object` | findMany, findOne, create, update, delete |
 | `ref` | findMany, findOne, create, update, delete |
 | `store` | findMany, findOne, create, update, delete |
-| `object` | findMany, findOne, create, update, delete |
-| `commit` | findMany, findOne, create, update, delete |
 
 ## Table Operations
 
-### `db.getAllRecord`
+### `db.commit`
 
-CRUD operations for GetAllRecord records.
+CRUD operations for Commit records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `path` | String | Yes |
-| `data` | JSON | Yes |
+| `authorId` | UUID | Yes |
+| `committerId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `date` | Datetime | Yes |
+| `id` | UUID | No |
+| `message` | String | Yes |
+| `parentIds` | UUID | Yes |
+| `storeId` | UUID | Yes |
+| `treeId` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
-// List all getAllRecord records
-const items = await db.getAllRecord.findMany({ select: { path: true, data: true } }).execute();
+// List all commit records
+const items = await db.commit.findMany({ select: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } }).execute();
 
 // Get one by id
-const item = await db.getAllRecord.findOne({ id: '<UUID>', select: { path: true, data: true } }).execute();
+const item = await db.commit.findOne({ id: '<UUID>', select: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } }).execute();
 
 // Create
-const created = await db.getAllRecord.create({ data: { path: '<String>', data: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.commit.create({ data: { authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.getAllRecord.update({ where: { id: '<UUID>' }, data: { path: '<String>' }, select: { id: true } }).execute();
+const updated = await db.commit.update({ where: { id: '<UUID>' }, data: { authorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.getAllRecord.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.commit.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.getAllTreeNodesRecord`
+
+CRUD operations for GetAllTreeNodesRecord records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `data` | JSON | Yes |
+| `path` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all getAllTreeNodesRecord records
+const items = await db.getAllTreeNodesRecord.findMany({ select: { data: true, path: true } }).execute();
+
+// Get one by id
+const item = await db.getAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
+
+// Create
+const created = await db.getAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.getAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.getAllTreeNodesRecord.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.object`
+
+CRUD operations for Object records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `kids` | UUID | Yes |
+| `ktree` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all object records
+const items = await db.object.findMany({ select: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } }).execute();
+
+// Get one by id
+const item = await db.object.findOne({ id: '<UUID>', select: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } }).execute();
+
+// Create
+const created = await db.object.create({ data: { data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.object.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.object.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.ref`
@@ -67,26 +138,26 @@ CRUD operations for Ref records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `commitId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `name` | String | Yes |
-| `databaseId` | UUID | Yes |
 | `storeId` | UUID | Yes |
-| `commitId` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all ref records
-const items = await db.ref.findMany({ select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const items = await db.ref.findMany({ select: { commitId: true, databaseId: true, id: true, name: true, storeId: true } }).execute();
 
 // Get one by id
-const item = await db.ref.findOne({ id: '<UUID>', select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const item = await db.ref.findOne({ id: '<UUID>', select: { commitId: true, databaseId: true, id: true, name: true, storeId: true } }).execute();
 
 // Create
-const created = await db.ref.create({ data: { name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.ref.create({ data: { commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.ref.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+const updated = await db.ref.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.ref.delete({ where: { id: '<UUID>' } }).execute();
@@ -100,100 +171,29 @@ CRUD operations for Store records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `hash` | UUID | Yes |
-| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `name` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all store records
-const items = await db.store.findMany({ select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const items = await db.store.findMany({ select: { createdAt: true, databaseId: true, hash: true, id: true, name: true } }).execute();
 
 // Get one by id
-const item = await db.store.findOne({ id: '<UUID>', select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const item = await db.store.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, hash: true, id: true, name: true } }).execute();
 
 // Create
-const created = await db.store.create({ data: { name: '<String>', databaseId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.store.create({ data: { databaseId: '<UUID>', hash: '<UUID>', name: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.store.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+const updated = await db.store.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.store.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.object`
-
-CRUD operations for Object records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `kids` | UUID | Yes |
-| `ktree` | String | Yes |
-| `data` | JSON | Yes |
-| `createdAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all object records
-const items = await db.object.findMany({ select: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } }).execute();
-
-// Get one by id
-const item = await db.object.findOne({ id: '<UUID>', select: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } }).execute();
-
-// Create
-const created = await db.object.create({ data: { databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.object.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.object.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.commit`
-
-CRUD operations for Commit records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `message` | String | Yes |
-| `databaseId` | UUID | Yes |
-| `storeId` | UUID | Yes |
-| `parentIds` | UUID | Yes |
-| `authorId` | UUID | Yes |
-| `committerId` | UUID | Yes |
-| `treeId` | UUID | Yes |
-| `date` | Datetime | Yes |
-
-**Operations:**
-
-```typescript
-// List all commit records
-const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
-
-// Get one by id
-const item = await db.commit.findOne({ id: '<UUID>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
-
-// Create
-const created = await db.commit.create({ data: { message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.commit.update({ where: { id: '<UUID>' }, data: { message: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.commit.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ## Custom Operations
@@ -211,21 +211,6 @@ initEmptyRepo
 
 ```typescript
 const result = await db.mutation.initEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.setDataAtPath`
-
-setDataAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetDataAtPathInput (required) |
-
-```typescript
-const result = await db.mutation.setDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.insertNodeAtPath`
@@ -259,6 +244,21 @@ and lifecycle settings.
 
 ```typescript
 const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.setDataAtPath`
+
+setDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetDataAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.setDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
 ```
 
 ---

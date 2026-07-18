@@ -67,6 +67,46 @@ describe('installModule()', () => {
   });
 });
 
+describe('workspace-level install', () => {
+  let workspace: PgpmPackage;
+
+  beforeEach(() => {
+    workspace = new PgpmPackage(fixture.getFixturePath('.'));
+  });
+
+  it('installs at the workspace root and records versions in pgpm.json', async () => {
+    await workspace.installModules('@pgpm-testing/base32@1.2.0');
+
+    const extDir = path.join(
+      workspace.getWorkspacePath()!,
+      'extensions/@pgpm-testing/base32'
+    );
+    expect(fs.existsSync(path.join(extDir, 'pgpm.plan'))).toBe(true);
+
+    const config = JSON.parse(
+      fs.readFileSync(path.join(workspace.getWorkspacePath()!, 'pgpm.json'), 'utf-8')
+    );
+    expect(config.dependencies['@pgpm-testing/base32']).toBe('1.2.0');
+    expect(workspace.getWorkspaceDependencies()['@pgpm-testing/base32']).toBe('1.2.0');
+  });
+
+  it('installWorkspaceDependencies installs pinned deps and skips installed ones', async () => {
+    const configPath = path.join(workspace.getWorkspacePath()!, 'pgpm.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    config.dependencies = { '@pgpm-testing/base32': '1.2.0' };
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+    const installed = await workspace.installWorkspaceDependencies();
+    expect(installed).toEqual(['@pgpm-testing/base32@1.2.0']);
+
+    const again = await workspace.installWorkspaceDependencies();
+    expect(again).toEqual([]);
+
+    const forced = await workspace.installWorkspaceDependencies({ force: true });
+    expect(forced).toEqual(['@pgpm-testing/base32@1.2.0']);
+  });
+});
+
 describe('modulesInstalled()', () => {
   it('returns empty arrays when no modules are installed', () => {
     const result = mod.modulesInstalled(['@pgpm-testing/base32', '@pgpm-testing/faker']);

@@ -7,7 +7,7 @@ Execute the signUpSms mutation
 ## Usage
 
 ```bash
-csdk sign-up-sms --input.clientMutationId <String> --input.phone <String> --input.code <String> --input.credentialKind <String> --input.rememberMe <Boolean> --input.deviceToken <String>
+csdk sign-up-sms --input.clientMutationId <String> --input.code <String> --input.credentialKind <String> --input.deviceToken <String> --input.phone <String> --input.rememberMe <Boolean>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk sign-up-sms --input.clientMutationId <String> --input.phone <String> --inpu
 ### Run signUpSms
 
 ```bash
-csdk sign-up-sms --input.clientMutationId <String> --input.phone <String> --input.code <String> --input.credentialKind <String> --input.rememberMe <Boolean> --input.deviceToken <String>
+csdk sign-up-sms --input.clientMutationId <String> --input.code <String> --input.credentialKind <String> --input.deviceToken <String> --input.phone <String> --input.rememberMe <Boolean>
 ```

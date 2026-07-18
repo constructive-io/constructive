@@ -8,6 +8,9 @@ import type { PgConfig } from 'pg-env';
  * @param config - PostgreSQL configuration (host, port, database, user, password)
  * @param cwd - Current working directory containing the pgpm package (defaults to process.cwd())
  * @param cache - Whether to enable caching (defaults to false)
+ * @param options.workspace - When cwd is a workspace root (not a module), deploy
+ *   every installed module in the workspace in dependency order. Off by default
+ *   so an implicit process.cwd() inside a workspace never triggers a full deploy.
  * 
  * @example
  * ```typescript
@@ -32,10 +35,12 @@ import type { PgConfig } from 'pg-env';
 export async function deployPgpm(
   config: PgConfig,
   cwd?: string,
-  cache: boolean = false
+  cache: boolean = false,
+  options: { workspace?: boolean } = {}
 ): Promise<void> {
   const proj = new PgpmPackage(cwd ?? process.cwd());
-  if (!proj.isInModule()) return;
+  const inModule = proj.isInModule();
+  if (!inModule && !(options.workspace && proj.isInWorkspace())) return;
 
   await proj.deploy(
     getEnvOptions({ 
@@ -46,7 +51,8 @@ export async function deployPgpm(
         cache
       }
     }), 
-    proj.getModuleName()
+    // At a workspace root, deploy all modules in the workspace
+    inModule ? proj.getModuleName() : undefined
   );
 }
 
@@ -60,7 +66,8 @@ export async function deployPgpm(
 export async function loadPgpm(
   config: PgConfig,
   cwd?: string,
-  cache: boolean = false
+  cache: boolean = false,
+  options: { workspace?: boolean } = {}
 ): Promise<void> {
-  return deployPgpm(config, cwd, cache);
+  return deployPgpm(config, cwd, cache, options);
 }

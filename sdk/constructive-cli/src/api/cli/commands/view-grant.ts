@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
-  viewId: 'uuid',
   granteeName: 'string',
-  privilege: 'string',
-  withGrantOption: 'boolean',
+  id: 'uuid',
   isGrant: 'boolean',
+  privilege: 'string',
+  viewId: 'uuid',
+  withGrantOption: 'boolean',
 };
 const usage =
   '\nview-grant <command>\n\nCommands:\n  list                  List viewGrant records\n  find-first            Find first matching viewGrant record\n  get                   Get a viewGrant by ID\n  create                Create a new viewGrant\n  update                Update an existing viewGrant\n  delete                Delete a viewGrant\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,13 +75,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      viewId: true,
       granteeName: true,
-      privilege: true,
-      withGrantOption: true,
+      id: true,
       isGrant: true,
+      privilege: true,
+      viewId: true,
+      withGrantOption: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy> & {
@@ -102,13 +102,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      viewId: true,
       granteeName: true,
-      privilege: true,
-      withGrantOption: true,
+      id: true,
       isGrant: true,
+      privilege: true,
+      viewId: true,
+      withGrantOption: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy> & {
@@ -141,13 +141,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
-          viewId: true,
           granteeName: true,
-          privilege: true,
-          withGrantOption: true,
+          id: true,
           isGrant: true,
+          privilege: true,
+          viewId: true,
+          withGrantOption: true,
         },
       })
       .execute();
@@ -172,15 +172,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'viewId',
-        message: 'viewId',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'granteeName',
         message: 'granteeName',
         required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -189,16 +190,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'boolean',
-        name: 'withGrantOption',
-        message: 'withGrantOption',
-        required: false,
-        skipPrompt: true,
+        type: 'text',
+        name: 'viewId',
+        message: 'viewId',
+        required: true,
       },
       {
         type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
+        name: 'withGrantOption',
+        message: 'withGrantOption',
         required: false,
         skipPrompt: true,
       },
@@ -210,20 +210,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          viewId: cleanedData.viewId,
           granteeName: cleanedData.granteeName,
-          privilege: cleanedData.privilege,
-          withGrantOption: cleanedData.withGrantOption,
           isGrant: cleanedData.isGrant,
+          privilege: cleanedData.privilege,
+          viewId: cleanedData.viewId,
+          withGrantOption: cleanedData.withGrantOption,
         },
         select: {
-          id: true,
           databaseId: true,
-          viewId: true,
           granteeName: true,
-          privilege: true,
-          withGrantOption: true,
+          id: true,
           isGrant: true,
+          privilege: true,
+          viewId: true,
+          withGrantOption: true,
         },
       })
       .execute();
@@ -254,15 +254,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'viewId',
-        message: 'viewId',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'granteeName',
         message: 'granteeName',
         required: false,
+      },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -271,16 +272,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'boolean',
-        name: 'withGrantOption',
-        message: 'withGrantOption',
+        type: 'text',
+        name: 'viewId',
+        message: 'viewId',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
+        name: 'withGrantOption',
+        message: 'withGrantOption',
         required: false,
         skipPrompt: true,
       },
@@ -295,20 +295,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          viewId: cleanedData.viewId,
           granteeName: cleanedData.granteeName,
-          privilege: cleanedData.privilege,
-          withGrantOption: cleanedData.withGrantOption,
           isGrant: cleanedData.isGrant,
+          privilege: cleanedData.privilege,
+          viewId: cleanedData.viewId,
+          withGrantOption: cleanedData.withGrantOption,
         },
         select: {
-          id: true,
           databaseId: true,
-          viewId: true,
           granteeName: true,
-          privilege: true,
-          withGrantOption: true,
+          id: true,
           isGrant: true,
+          privilege: true,
+          viewId: true,
+          withGrantOption: true,
         },
       })
       .execute();

@@ -16,14 +16,14 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  createdAt: 'string',
-  id: 'uuid',
-  event: 'string',
   actorId: 'uuid',
-  origin: 'string',
-  userAgent: 'string',
+  createdAt: 'string',
+  event: 'string',
+  id: 'uuid',
   ipAddress: 'string',
+  origin: 'string',
   success: 'boolean',
+  userAgent: 'string',
 };
 const usage =
   '\naudit-log-auth <command>\n\nCommands:\n  list                  List auditLogAuth records\n  find-first            Find first matching auditLogAuth record\n  get                   Get a auditLogAuth by ID\n  create                Create a new auditLogAuth\n  update                Update an existing auditLogAuth\n  delete                Delete a auditLogAuth\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -76,14 +76,14 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      createdAt: true,
-      id: true,
-      event: true,
       actorId: true,
-      origin: true,
-      userAgent: true,
+      createdAt: true,
+      event: true,
+      id: true,
       ipAddress: true,
+      origin: true,
       success: true,
+      userAgent: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy> & {
@@ -104,14 +104,14 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      createdAt: true,
-      id: true,
-      event: true,
       actorId: true,
-      origin: true,
-      userAgent: true,
+      createdAt: true,
+      event: true,
+      id: true,
       ipAddress: true,
+      origin: true,
       success: true,
+      userAgent: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy> & {
@@ -144,14 +144,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          createdAt: true,
-          id: true,
-          event: true,
           actorId: true,
-          origin: true,
-          userAgent: true,
+          createdAt: true,
+          event: true,
+          id: true,
           ipAddress: true,
+          origin: true,
           success: true,
+          userAgent: true,
         },
       })
       .execute();
@@ -169,14 +169,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'event',
         message: 'event',
         required: true,
       },
       {
         type: 'text',
-        name: 'actorId',
-        message: 'actorId',
+        name: 'ipAddress',
+        message: 'ipAddress',
         required: false,
         skipPrompt: true,
       },
@@ -188,24 +195,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'success',
+        message: 'success',
+        required: true,
+      },
+      {
         type: 'text',
         name: 'userAgent',
         message: 'userAgent',
         required: false,
         skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'ipAddress',
-        message: 'ipAddress',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'boolean',
-        name: 'success',
-        message: 'success',
-        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -217,22 +217,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.auditLogAuth
       .create({
         data: {
-          event: cleanedData.event,
           actorId: cleanedData.actorId,
-          origin: cleanedData.origin,
-          userAgent: cleanedData.userAgent,
+          event: cleanedData.event,
           ipAddress: cleanedData.ipAddress,
+          origin: cleanedData.origin,
           success: cleanedData.success,
+          userAgent: cleanedData.userAgent,
         },
         select: {
-          createdAt: true,
-          id: true,
-          event: true,
           actorId: true,
-          origin: true,
-          userAgent: true,
+          createdAt: true,
+          event: true,
+          id: true,
           ipAddress: true,
+          origin: true,
           success: true,
+          userAgent: true,
         },
       })
       .execute();
@@ -262,14 +262,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'event',
         message: 'event',
         required: false,
       },
       {
         type: 'text',
-        name: 'actorId',
-        message: 'actorId',
+        name: 'ipAddress',
+        message: 'ipAddress',
         required: false,
         skipPrompt: true,
       },
@@ -281,24 +288,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'success',
+        message: 'success',
+        required: false,
+      },
+      {
         type: 'text',
         name: 'userAgent',
         message: 'userAgent',
         required: false,
         skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'ipAddress',
-        message: 'ipAddress',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'boolean',
-        name: 'success',
-        message: 'success',
-        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -311,22 +311,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createdAt: answers.createdAt as string,
         },
         data: {
-          event: cleanedData.event,
           actorId: cleanedData.actorId,
-          origin: cleanedData.origin,
-          userAgent: cleanedData.userAgent,
+          event: cleanedData.event,
           ipAddress: cleanedData.ipAddress,
+          origin: cleanedData.origin,
           success: cleanedData.success,
+          userAgent: cleanedData.userAgent,
         },
         select: {
-          createdAt: true,
-          id: true,
-          event: true,
           actorId: true,
-          origin: true,
-          userAgent: true,
+          createdAt: true,
+          event: true,
+          id: true,
           ipAddress: true,
+          origin: true,
           success: true,
+          userAgent: true,
         },
       })
       .execute();

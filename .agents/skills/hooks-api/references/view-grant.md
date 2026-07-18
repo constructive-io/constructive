@@ -7,8 +7,8 @@ React Query hooks for ViewGrant data operations
 ## Usage
 
 ```typescript
-useViewGrantsQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } } })
-useViewGrantQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } } })
+useViewGrantsQuery({ selection: { fields: { databaseId: true, granteeName: true, id: true, isGrant: true, privilege: true, viewId: true, withGrantOption: true } } })
+useViewGrantQuery({ id: '<UUID>', selection: { fields: { databaseId: true, granteeName: true, id: true, isGrant: true, privilege: true, viewId: true, withGrantOption: true } } })
 useCreateViewGrantMutation({ selection: { fields: { id: true } } })
 useUpdateViewGrantMutation({ selection: { fields: { id: true } } })
 useDeleteViewGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteViewGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useViewGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } },
+  selection: { fields: { databaseId: true, granteeName: true, id: true, isGrant: true, privilege: true, viewId: true, withGrantOption: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useViewGrantsQuery({
 const { mutate } = useCreateViewGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', viewId: '<UUID>', granteeName: '<String>', privilege: '<String>', withGrantOption: '<Boolean>', isGrant: '<Boolean>' });
+mutate({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', privilege: '<String>', viewId: '<UUID>', withGrantOption: '<Boolean>' });
 ```

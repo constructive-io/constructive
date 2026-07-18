@@ -9,7 +9,7 @@ Records of successfully claimed invitations, linking senders to receivers
 ```typescript
 db.orgClaimedInvite.findMany({ select: { id: true } }).execute()
 db.orgClaimedInvite.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgClaimedInvite.create({ data: { data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>', entityId: '<UUID>' }, select: { id: true } }).execute()
+db.orgClaimedInvite.create({ data: { data: '<JSON>', entityId: '<UUID>', receiverId: '<UUID>', senderId: '<UUID>' }, select: { id: true } }).execute()
 db.orgClaimedInvite.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.orgClaimedInvite.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.orgClaimedInvite.findMany({
 
 ```typescript
 const item = await db.orgClaimedInvite.create({
-  data: { data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>', entityId: '<UUID>' },
+  data: { data: '<JSON>', entityId: '<UUID>', receiverId: '<UUID>', senderId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

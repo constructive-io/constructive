@@ -12,8 +12,8 @@ csdk users-module list --where.<field>.<op> <value> --orderBy <values>
 csdk users-module list --limit 10 --after <cursor>
 csdk users-module find-first --where.<field>.<op> <value>
 csdk users-module get --id <UUID>
-csdk users-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--typeTableId <UUID>] [--typeTableName <String>] [--apiName <String>] [--privateApiName <String>]
-csdk users-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--typeTableId <UUID>] [--typeTableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk users-module create --databaseId <UUID> [--apiName <String>] [--privateApiName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--typeTableId <UUID>] [--typeTableName <String>]
+csdk users-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--privateApiName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--typeTableId <UUID>] [--typeTableName <String>]
 csdk users-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk users-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a usersModule
 
 ```bash
-csdk users-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--typeTableId <UUID>] [--typeTableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk users-module create --databaseId <UUID> [--apiName <String>] [--privateApiName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--typeTableId <UUID>] [--typeTableName <String>]
 ```
 
 ### Get a usersModule by id

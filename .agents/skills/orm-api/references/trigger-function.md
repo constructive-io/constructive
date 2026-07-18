@@ -9,8 +9,8 @@ ORM operations for TriggerFunction records
 ```typescript
 db.triggerFunction.findMany({ select: { id: true } }).execute()
 db.triggerFunction.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.triggerFunction.create({ data: { databaseId: '<UUID>', name: '<String>', code: '<String>' }, select: { id: true } }).execute()
-db.triggerFunction.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.triggerFunction.create({ data: { code: '<String>', databaseId: '<UUID>', name: '<String>' }, select: { id: true } }).execute()
+db.triggerFunction.update({ where: { id: '<UUID>' }, data: { code: '<String>' }, select: { id: true } }).execute()
 db.triggerFunction.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.triggerFunction.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.triggerFunction.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, code: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.triggerFunction.findMany({
 
 ```typescript
 const item = await db.triggerFunction.create({
-  data: { databaseId: '<UUID>', name: '<String>', code: '<String>' },
+  data: { code: '<String>', databaseId: '<UUID>', name: '<String>' },
   select: { id: true }
 }).execute();
 ```

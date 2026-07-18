@@ -7,8 +7,8 @@ Warning configuration for soft limits. Each row defines a warning threshold and 
 ## Usage
 
 ```typescript
-useAppLimitWarningsQuery({ selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } } })
-useAppLimitWarningQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } } })
+useAppLimitWarningsQuery({ selection: { fields: { id: true, name: true, taskIdentifier: true, thresholdValue: true, warningType: true } } })
+useAppLimitWarningQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, taskIdentifier: true, thresholdValue: true, warningType: true } } })
 useCreateAppLimitWarningMutation({ selection: { fields: { id: true } } })
 useUpdateAppLimitWarningMutation({ selection: { fields: { id: true } } })
 useDeleteAppLimitWarningMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLimitWarningMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLimitWarningsQuery({
-  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+  selection: { fields: { id: true, name: true, taskIdentifier: true, thresholdValue: true, warningType: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLimitWarningsQuery({
 const { mutate } = useCreateAppLimitWarningMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' });
+mutate({ name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' });
 ```

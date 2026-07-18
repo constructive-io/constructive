@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.16.1](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.16.0...@constructive-io/knative-job-server@2.16.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+# [2.16.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.15.0...@constructive-io/knative-job-server@2.16.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+# [2.15.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.6...@constructive-io/knative-job-server@2.15.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+## [2.14.6](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.5...@constructive-io/knative-job-server@2.14.6) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+## [2.14.5](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.4...@constructive-io/knative-job-server@2.14.5) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+## [2.14.4](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.3...@constructive-io/knative-job-server@2.14.4) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+## [2.14.3](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.2...@constructive-io/knative-job-server@2.14.3) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
+## [2.14.2](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.1...@constructive-io/knative-job-server@2.14.2) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/knative-job-server
+
 ## [2.14.1](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-server@2.14.0...@constructive-io/knative-job-server@2.14.1) (2026-07-08)
 
 **Note:** Version bump only for package @constructive-io/knative-job-server

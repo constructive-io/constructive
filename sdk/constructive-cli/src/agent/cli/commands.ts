@@ -6,15 +6,15 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
-import agentPlanCmd from './commands/agent-plan';
 import agentCmd from './commands/agent';
-import agentThreadCmd from './commands/agent-thread';
 import agentMessageCmd from './commands/agent-message';
-import agentTaskCmd from './commands/agent-task';
+import agentPersonaCmd from './commands/agent-persona';
+import agentPlanCmd from './commands/agent-plan';
 import agentPromptCmd from './commands/agent-prompt';
 import agentResourceChunkCmd from './commands/agent-resource-chunk';
-import agentPersonaCmd from './commands/agent-persona';
 import agentResourceCmd from './commands/agent-resource';
+import agentTaskCmd from './commands/agent-task';
+import agentThreadCmd from './commands/agent-thread';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
@@ -26,19 +26,19 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
-  'agent-plan': agentPlanCmd,
   agent: agentCmd,
-  'agent-thread': agentThreadCmd,
   'agent-message': agentMessageCmd,
-  'agent-task': agentTaskCmd,
+  'agent-persona': agentPersonaCmd,
+  'agent-plan': agentPlanCmd,
   'agent-prompt': agentPromptCmd,
   'agent-resource-chunk': agentResourceChunkCmd,
-  'agent-persona': agentPersonaCmd,
   'agent-resource': agentResourceCmd,
+  'agent-task': agentTaskCmd,
+  'agent-thread': agentThreadCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  agent-plan           agentPlan CRUD operations\n  agent                agent CRUD operations\n  agent-thread         agentThread CRUD operations\n  agent-message        agentMessage CRUD operations\n  agent-task           agentTask CRUD operations\n  agent-prompt         agentPrompt CRUD operations\n  agent-resource-chunk agentResourceChunk CRUD operations\n  agent-persona        agentPersona CRUD operations\n  agent-resource       agentResource CRUD operations\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  agent                agent CRUD operations\n  agent-message        agentMessage CRUD operations\n  agent-persona        agentPersona CRUD operations\n  agent-plan           agentPlan CRUD operations\n  agent-prompt         agentPrompt CRUD operations\n  agent-resource-chunk agentResourceChunk CRUD operations\n  agent-resource       agentResource CRUD operations\n  agent-task           agentTask CRUD operations\n  agent-thread         agentThread CRUD operations\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

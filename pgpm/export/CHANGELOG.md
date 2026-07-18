@@ -3,6 +3,92 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.32.1...@pgpmjs/export@0.32.2) (2026-07-18)
+
+### Bug Fixes
+
+- **export:** use renamed sql action field ([08fe9b0](https://github.com/constructive-io/constructive/commit/08fe9b09d2f621415c9c2304ed2cacdbb32b2c83))
+
+## [0.32.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.32.0...@pgpmjs/export@0.32.1) (2026-07-18)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+# [0.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.31.1...@pgpmjs/export@0.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.31.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.31.0...@pgpmjs/export@0.31.1) (2026-07-17)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+# [0.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.30.1...@pgpmjs/export@0.31.0) (2026-07-17)
+
+### Features
+
+- **export:** install app-scope + function-resolution in exported databases ([84fa76f](https://github.com/constructive-io/constructive/commit/84fa76f75144b1a654d6811ff284988d1942730b))
+
+## [0.30.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.30.0...@pgpmjs/export@0.30.1) (2026-07-15)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+# [0.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.29.3...@pgpmjs/export@0.30.0) (2026-07-14)
+
+### Bug Fixes
+
+- **export:** remove field conflictDoNothing override ([de5c4c0](https://github.com/constructive-io/constructive/commit/de5c4c0829e4632f877400d28ded261ad686ddcf))
+
+## [0.29.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.29.2...@pgpmjs/export@0.29.3) (2026-07-14)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.29.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.29.1...@pgpmjs/export@0.29.2) (2026-07-13)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.29.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.29.0...@pgpmjs/export@0.29.1) (2026-07-13)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+# [0.29.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.28.2...@pgpmjs/export@0.29.0) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.28.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.28.1...@pgpmjs/export@0.28.2) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.28.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.28.0...@pgpmjs/export@0.28.1) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+# [0.28.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.27.0...@pgpmjs/export@0.28.0) (2026-07-12)
+
+### Features
+
+- **export:** drive meta export table list from generated manifest ([fcbec38](https://github.com/constructive-io/constructive/commit/fcbec38527b2d47ebdd9460f1b664acb2a49a6a8))
+
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.8...@pgpmjs/export@0.27.0) (2026-07-12)
+
+### Features
+
+- **export:** add integration_providers_module to meta export ([e497a00](https://github.com/constructive-io/constructive/commit/e497a00a7a0155c1ff57b5bfd097c018d212a979))
+
+## [0.26.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.7...@pgpmjs/export@0.26.8) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.26.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.6...@pgpmjs/export@0.26.7) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.26.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.5...@pgpmjs/export@0.26.6) (2026-07-10)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [0.26.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.4...@pgpmjs/export@0.26.5) (2026-07-10)
+
+**Note:** Version bump only for package @pgpmjs/export
+
 ## [0.26.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.3...@pgpmjs/export@0.26.4) (2026-07-10)
 
 ### Bug Fixes

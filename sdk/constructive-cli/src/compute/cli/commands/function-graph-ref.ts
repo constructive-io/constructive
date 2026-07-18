@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  commitId: 'uuid',
   id: 'uuid',
   name: 'string',
-  databaseId: 'uuid',
+  scopeId: 'uuid',
   storeId: 'uuid',
-  commitId: 'uuid',
 };
 const usage =
   '\nfunction-graph-ref <command>\n\nCommands:\n  list                  List functionGraphRef records\n  find-first            Find first matching functionGraphRef record\n  get                   Get a functionGraphRef by ID\n  create                Create a new functionGraphRef\n  update                Update an existing functionGraphRef\n  delete                Delete a functionGraphRef\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      commitId: true,
       id: true,
       name: true,
-      databaseId: true,
+      scopeId: true,
       storeId: true,
-      commitId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy> & {
@@ -98,11 +98,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      commitId: true,
       id: true,
       name: true,
-      databaseId: true,
+      scopeId: true,
       storeId: true,
-      commitId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy> & {
@@ -135,11 +135,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          commitId: true,
           id: true,
           name: true,
-          databaseId: true,
+          scopeId: true,
           storeId: true,
-          commitId: true,
         },
       })
       .execute();
@@ -157,14 +157,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'commitId',
+        message: 'commitId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
         required: true,
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: true,
       },
       {
@@ -172,13 +179,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'storeId',
         message: 'storeId',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'commitId',
-        message: 'commitId',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -190,17 +190,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.functionGraphRef
       .create({
         data: {
-          name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
-          storeId: cleanedData.storeId,
           commitId: cleanedData.commitId,
+          name: cleanedData.name,
+          scopeId: cleanedData.scopeId,
+          storeId: cleanedData.storeId,
         },
         select: {
+          commitId: true,
           id: true,
           name: true,
-          databaseId: true,
+          scopeId: true,
           storeId: true,
-          commitId: true,
         },
       })
       .execute();
@@ -224,9 +224,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'commitId',
+        message: 'commitId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -240,13 +247,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'storeId',
         required: false,
       },
-      {
-        type: 'text',
-        name: 'commitId',
-        message: 'commitId',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as FunctionGraphRefPatch;
@@ -255,19 +255,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       .update({
         where: {
           id: answers.id as string,
-          databaseId: answers.databaseId as string,
+          scopeId: answers.scopeId as string,
         },
         data: {
+          commitId: cleanedData.commitId,
           name: cleanedData.name,
           storeId: cleanedData.storeId,
-          commitId: cleanedData.commitId,
         },
         select: {
+          commitId: true,
           id: true,
           name: true,
-          databaseId: true,
+          scopeId: true,
           storeId: true,
-          commitId: true,
         },
       })
       .execute();
@@ -291,8 +291,8 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: true,
       },
     ]);
@@ -302,7 +302,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       .delete({
         where: {
           id: answers.id as string,
-          databaseId: answers.databaseId as string,
+          scopeId: answers.scopeId as string,
         },
         select: {
           id: true,

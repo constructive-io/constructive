@@ -12,8 +12,8 @@ csdk rls-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk rls-setting list --limit 10 --after <cursor>
 csdk rls-setting find-first --where.<field>.<op> <value>
 csdk rls-setting get --id <UUID>
-csdk rls-setting create --databaseId <UUID> [--authenticateSchemaId <UUID>] [--roleSchemaId <UUID>] [--authenticateFunctionId <UUID>] [--authenticateStrictFunctionId <UUID>] [--currentRoleFunctionId <UUID>] [--currentRoleIdFunctionId <UUID>] [--currentUserAgentFunctionId <UUID>] [--currentIpAddressFunctionId <UUID>]
-csdk rls-setting update --id <UUID> [--databaseId <UUID>] [--authenticateSchemaId <UUID>] [--roleSchemaId <UUID>] [--authenticateFunctionId <UUID>] [--authenticateStrictFunctionId <UUID>] [--currentRoleFunctionId <UUID>] [--currentRoleIdFunctionId <UUID>] [--currentUserAgentFunctionId <UUID>] [--currentIpAddressFunctionId <UUID>]
+csdk rls-setting create --databaseId <UUID> [--authenticateFunctionId <UUID>] [--authenticateSchemaId <UUID>] [--authenticateStrictFunctionId <UUID>] [--currentIpAddressFunctionId <UUID>] [--currentRoleFunctionId <UUID>] [--currentRoleIdFunctionId <UUID>] [--currentUserAgentFunctionId <UUID>] [--roleSchemaId <UUID>]
+csdk rls-setting update --id <UUID> [--authenticateFunctionId <UUID>] [--authenticateSchemaId <UUID>] [--authenticateStrictFunctionId <UUID>] [--currentIpAddressFunctionId <UUID>] [--currentRoleFunctionId <UUID>] [--currentRoleIdFunctionId <UUID>] [--currentUserAgentFunctionId <UUID>] [--databaseId <UUID>] [--roleSchemaId <UUID>]
 csdk rls-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk rls-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a rlsSetting
 
 ```bash
-csdk rls-setting create --databaseId <UUID> [--authenticateSchemaId <UUID>] [--roleSchemaId <UUID>] [--authenticateFunctionId <UUID>] [--authenticateStrictFunctionId <UUID>] [--currentRoleFunctionId <UUID>] [--currentRoleIdFunctionId <UUID>] [--currentUserAgentFunctionId <UUID>] [--currentIpAddressFunctionId <UUID>]
+csdk rls-setting create --databaseId <UUID> [--authenticateFunctionId <UUID>] [--authenticateSchemaId <UUID>] [--authenticateStrictFunctionId <UUID>] [--currentIpAddressFunctionId <UUID>] [--currentRoleFunctionId <UUID>] [--currentRoleIdFunctionId <UUID>] [--currentUserAgentFunctionId <UUID>] [--roleSchemaId <UUID>]
 ```
 
 ### Get a rlsSetting by id

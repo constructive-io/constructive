@@ -7,7 +7,7 @@ React Query hooks for GetAllRecord data operations
 ## Usage
 
 ```typescript
-useGetAllQuery({ selection: { fields: { path: true, data: true } } })
+useGetAllQuery({ selection: { fields: { data: true, path: true } } })
 useCreateGetAllRecordMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreateGetAllRecordMutation({ selection: { fields: { id: true } } })
 
 ```typescript
 const { data, isLoading } = useGetAllQuery({
-  selection: { fields: { path: true, data: true } },
+  selection: { fields: { data: true, path: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = useGetAllQuery({
 const { mutate } = useCreateGetAllRecordMutation({
   selection: { fields: { id: true } },
 });
-mutate({ path: '<String>', data: '<JSON>' });
+mutate({ data: '<JSON>', path: '<String>' });
 ```

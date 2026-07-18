@@ -6,53 +6,54 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
+import auditLogAuthCmd from './commands/audit-log-auth';
+import cryptoAddressCmd from './commands/crypto-address';
+import emailCmd from './commands/email';
+import identityProviderCmd from './commands/identity-provider';
+import orgApiKeyListCmd from './commands/org-api-key-list';
+import phoneNumberCmd from './commands/phone-number';
 import principalCmd from './commands/principal';
 import principalEntityCmd from './commands/principal-entity';
 import principalScopeOverrideCmd from './commands/principal-scope-override';
-import emailCmd from './commands/email';
-import phoneNumberCmd from './commands/phone-number';
-import cryptoAddressCmd from './commands/crypto-address';
-import webauthnCredentialCmd from './commands/webauthn-credential';
-import auditLogAuthCmd from './commands/audit-log-auth';
-import identityProviderCmd from './commands/identity-provider';
 import roleTypeCmd from './commands/role-type';
 import userConnectedAccountCmd from './commands/user-connected-account';
-import orgApiKeyListCmd from './commands/org-api-key-list';
 import userCmd from './commands/user';
+import webauthnCredentialCmd from './commands/webauthn-credential';
+import currentIpAddressCmd from './commands/current-ip-address';
+import currentUserCmd from './commands/current-user';
 import currentUserAgentCmd from './commands/current-user-agent';
 import currentUserIdCmd from './commands/current-user-id';
-import currentIpAddressCmd from './commands/current-ip-address';
 import requireStepUpCmd from './commands/require-step-up';
-import currentUserCmd from './commands/current-user';
-import signOutCmd from './commands/sign-out';
-import sendAccountDeletionEmailCmd from './commands/send-account-deletion-email';
 import checkPasswordCmd from './commands/check-password';
-import deleteOrgPrincipalCmd from './commands/delete-org-principal';
-import disconnectAccountCmd from './commands/disconnect-account';
-import revokeApiKeyCmd from './commands/revoke-api-key';
-import revokeSessionCmd from './commands/revoke-session';
-import verifyPasswordCmd from './commands/verify-password';
-import verifyTotpCmd from './commands/verify-totp';
 import confirmDeleteAccountCmd from './commands/confirm-delete-account';
-import revokeOrgApiKeyCmd from './commands/revoke-org-api-key';
-import setPasswordCmd from './commands/set-password';
-import verifyEmailCmd from './commands/verify-email';
+import createApiKeyCmd from './commands/create-api-key';
+import createOrgApiKeyCmd from './commands/create-org-api-key';
+import createOrgPrincipalCmd from './commands/create-org-principal';
+import deleteOrgPrincipalCmd from './commands/delete-org-principal';
+import deletePrincipalCmd from './commands/delete-principal';
+import disconnectAccountCmd from './commands/disconnect-account';
+import extendTokenExpiresCmd from './commands/extend-token-expires';
+import forgotPasswordCmd from './commands/forgot-password';
+import linkIdentityCmd from './commands/link-identity';
+import provisionBucketCmd from './commands/provision-bucket';
 import provisionNewUserCmd from './commands/provision-new-user';
+import requestCrossOriginTokenCmd from './commands/request-cross-origin-token';
 import resetPasswordCmd from './commands/reset-password';
+import revokeApiKeyCmd from './commands/revoke-api-key';
+import revokeOrgApiKeyCmd from './commands/revoke-org-api-key';
+import revokeSessionCmd from './commands/revoke-session';
+import sendAccountDeletionEmailCmd from './commands/send-account-deletion-email';
+import sendVerificationEmailCmd from './commands/send-verification-email';
+import setPasswordCmd from './commands/set-password';
+import signInCmd from './commands/sign-in';
 import signInCrossOriginCmd from './commands/sign-in-cross-origin';
 import signInSmsOtpCmd from './commands/sign-in-sms-otp';
-import signUpSmsCmd from './commands/sign-up-sms';
+import signOutCmd from './commands/sign-out';
 import signUpCmd from './commands/sign-up';
-import signInCmd from './commands/sign-in';
-import linkIdentityCmd from './commands/link-identity';
-import createOrgPrincipalCmd from './commands/create-org-principal';
-import extendTokenExpiresCmd from './commands/extend-token-expires';
-import createOrgApiKeyCmd from './commands/create-org-api-key';
-import createApiKeyCmd from './commands/create-api-key';
-import requestCrossOriginTokenCmd from './commands/request-cross-origin-token';
-import forgotPasswordCmd from './commands/forgot-password';
-import sendVerificationEmailCmd from './commands/send-verification-email';
-import provisionBucketCmd from './commands/provision-bucket';
+import signUpSmsCmd from './commands/sign-up-sms';
+import verifyEmailCmd from './commands/verify-email';
+import verifyPasswordCmd from './commands/verify-password';
+import verifyTotpCmd from './commands/verify-totp';
 const createCommandMap: () => Record<
   string,
   (
@@ -63,56 +64,57 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
+  'audit-log-auth': auditLogAuthCmd,
+  'crypto-address': cryptoAddressCmd,
+  email: emailCmd,
+  'identity-provider': identityProviderCmd,
+  'org-api-key-list': orgApiKeyListCmd,
+  'phone-number': phoneNumberCmd,
   principal: principalCmd,
   'principal-entity': principalEntityCmd,
   'principal-scope-override': principalScopeOverrideCmd,
-  email: emailCmd,
-  'phone-number': phoneNumberCmd,
-  'crypto-address': cryptoAddressCmd,
-  'webauthn-credential': webauthnCredentialCmd,
-  'audit-log-auth': auditLogAuthCmd,
-  'identity-provider': identityProviderCmd,
   'role-type': roleTypeCmd,
   'user-connected-account': userConnectedAccountCmd,
-  'org-api-key-list': orgApiKeyListCmd,
   user: userCmd,
+  'webauthn-credential': webauthnCredentialCmd,
+  'current-ip-address': currentIpAddressCmd,
+  'current-user': currentUserCmd,
   'current-user-agent': currentUserAgentCmd,
   'current-user-id': currentUserIdCmd,
-  'current-ip-address': currentIpAddressCmd,
   'require-step-up': requireStepUpCmd,
-  'current-user': currentUserCmd,
-  'sign-out': signOutCmd,
-  'send-account-deletion-email': sendAccountDeletionEmailCmd,
   'check-password': checkPasswordCmd,
-  'delete-org-principal': deleteOrgPrincipalCmd,
-  'disconnect-account': disconnectAccountCmd,
-  'revoke-api-key': revokeApiKeyCmd,
-  'revoke-session': revokeSessionCmd,
-  'verify-password': verifyPasswordCmd,
-  'verify-totp': verifyTotpCmd,
   'confirm-delete-account': confirmDeleteAccountCmd,
-  'revoke-org-api-key': revokeOrgApiKeyCmd,
-  'set-password': setPasswordCmd,
-  'verify-email': verifyEmailCmd,
+  'create-api-key': createApiKeyCmd,
+  'create-org-api-key': createOrgApiKeyCmd,
+  'create-org-principal': createOrgPrincipalCmd,
+  'delete-org-principal': deleteOrgPrincipalCmd,
+  'delete-principal': deletePrincipalCmd,
+  'disconnect-account': disconnectAccountCmd,
+  'extend-token-expires': extendTokenExpiresCmd,
+  'forgot-password': forgotPasswordCmd,
+  'link-identity': linkIdentityCmd,
+  'provision-bucket': provisionBucketCmd,
   'provision-new-user': provisionNewUserCmd,
+  'request-cross-origin-token': requestCrossOriginTokenCmd,
   'reset-password': resetPasswordCmd,
+  'revoke-api-key': revokeApiKeyCmd,
+  'revoke-org-api-key': revokeOrgApiKeyCmd,
+  'revoke-session': revokeSessionCmd,
+  'send-account-deletion-email': sendAccountDeletionEmailCmd,
+  'send-verification-email': sendVerificationEmailCmd,
+  'set-password': setPasswordCmd,
+  'sign-in': signInCmd,
   'sign-in-cross-origin': signInCrossOriginCmd,
   'sign-in-sms-otp': signInSmsOtpCmd,
-  'sign-up-sms': signUpSmsCmd,
+  'sign-out': signOutCmd,
   'sign-up': signUpCmd,
-  'sign-in': signInCmd,
-  'link-identity': linkIdentityCmd,
-  'create-org-principal': createOrgPrincipalCmd,
-  'extend-token-expires': extendTokenExpiresCmd,
-  'create-org-api-key': createOrgApiKeyCmd,
-  'create-api-key': createApiKeyCmd,
-  'request-cross-origin-token': requestCrossOriginTokenCmd,
-  'forgot-password': forgotPasswordCmd,
-  'send-verification-email': sendVerificationEmailCmd,
-  'provision-bucket': provisionBucketCmd,
+  'sign-up-sms': signUpSmsCmd,
+  'verify-email': verifyEmailCmd,
+  'verify-password': verifyPasswordCmd,
+  'verify-totp': verifyTotpCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  principal            principal CRUD operations\n  principal-entity     principalEntity CRUD operations\n  principal-scope-override principalScopeOverride CRUD operations\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  webauthn-credential  webauthnCredential CRUD operations\n  audit-log-auth       auditLogAuth CRUD operations\n  identity-provider    identityProvider CRUD operations\n  role-type            roleType CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  org-api-key-list     orgApiKeyList CRUD operations\n  user                 user CRUD operations\n  current-user-agent   currentUserAgent\n  current-user-id      currentUserId\n  current-ip-address   currentIpAddress\n  require-step-up      requireStepUp\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  delete-org-principal deleteOrgPrincipal\n  disconnect-account   disconnectAccount\n  revoke-api-key       revokeApiKey\n  revoke-session       revokeSession\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  confirm-delete-account confirmDeleteAccount\n  revoke-org-api-key   revokeOrgApiKey\n  set-password         setPassword\n  verify-email         verifyEmail\n  provision-new-user   provisionNewUser\n  reset-password       resetPassword\n  sign-in-cross-origin signInCrossOrigin\n  sign-in-sms-otp      signInSmsOtp\n  sign-up-sms          signUpSms\n  sign-up              signUp\n  sign-in              signIn\n  link-identity        linkIdentity\n  create-org-principal createOrgPrincipal\n  extend-token-expires extendTokenExpires\n  create-org-api-key   createOrgApiKey\n  create-api-key       createApiKey\n  request-cross-origin-token requestCrossOriginToken\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  audit-log-auth       auditLogAuth CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  email                email CRUD operations\n  identity-provider    identityProvider CRUD operations\n  org-api-key-list     orgApiKeyList CRUD operations\n  phone-number         phoneNumber CRUD operations\n  principal            principal CRUD operations\n  principal-entity     principalEntity CRUD operations\n  principal-scope-override principalScopeOverride CRUD operations\n  role-type            roleType CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  user                 user CRUD operations\n  webauthn-credential  webauthnCredential CRUD operations\n  current-ip-address   currentIpAddress\n  current-user         currentUser\n  current-user-agent   currentUserAgent\n  current-user-id      currentUserId\n  require-step-up      requireStepUp\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  create-api-key       createApiKey\n  create-org-api-key   createOrgApiKey\n  create-org-principal createOrgPrincipal\n  delete-org-principal deleteOrgPrincipal\n  delete-principal     deletePrincipal\n  disconnect-account   disconnectAccount\n  extend-token-expires extendTokenExpires\n  forgot-password      forgotPassword\n  link-identity        linkIdentity\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  provision-new-user   provisionNewUser\n  request-cross-origin-token requestCrossOriginToken\n  reset-password       resetPassword\n  revoke-api-key       revokeApiKey\n  revoke-org-api-key   revokeOrgApiKey\n  revoke-session       revokeSession\n  send-account-deletion-email sendAccountDeletionEmail\n  send-verification-email sendVerificationEmail\n  set-password         setPassword\n  sign-in              signIn\n  sign-in-cross-origin signInCrossOrigin\n  sign-in-sms-otp      signInSmsOtp\n  sign-out             signOut\n  sign-up              signUp\n  sign-up-sms          signUpSms\n  verify-email         verifyEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

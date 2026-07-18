@@ -29,13 +29,13 @@ export default async (
       },
       {
         type: 'text',
-        name: 'pUserId',
-        message: 'pUserId',
+        name: 'pMaxDepth',
+        message: 'pMaxDepth (number)',
       },
       {
         type: 'text',
-        name: 'pMaxDepth',
-        message: 'pMaxDepth (number)',
+        name: 'pUserId',
+        message: 'pUserId',
       },
     ]);
     const client = getClient();

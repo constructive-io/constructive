@@ -1,299 +1,131 @@
-"""The root query type which gives access points into the data universe."""
-type Query {
-  """Reads and enables pagination through a set of `MigrateFile`."""
-  migrateFiles(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MigrateFileFilter
-
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MigrateFileConnection
-
-  """Reads and enables pagination through a set of `SqlAction`."""
-  sqlActions(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: SqlActionFilter
-
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SqlActionConnection
-
-  """
-  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
-  """
-  _meta: MetaSchema
+type AstMigration {
+  actionId: UUID
+  actionName: String
+  actorId: UUID
+  createdAt: Datetime
+  databaseId: UUID
+  deploy: JSON
+  deploys: String
+  id: Int
+  name: String
+  payload: JSON
+  requires: [String]
+  revert: JSON
+  verify: JSON
 }
 
-"""A connection to a list of `MigrateFile` values."""
-type MigrateFileConnection {
-  """A list of `MigrateFile` objects."""
-  nodes: [MigrateFile]!
+"""A connection to a list of `AstMigration` values."""
+type AstMigrationConnection {
+  """
+  A list of edges which contains the `AstMigration` and cursor to aid in pagination.
+  """
+  edges: [AstMigrationEdge]!
 
-  """
-  A list of edges which contains the `MigrateFile` and cursor to aid in pagination.
-  """
-  edges: [MigrateFileEdge]!
+  """A list of `AstMigration` objects."""
+  nodes: [AstMigration]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `MigrateFile` you could get from the connection."""
+  """The count of *all* `AstMigration` you could get from the connection."""
   totalCount: Int!
 }
 
-type MigrateFile {
-  id: UUID!
-  databaseId: UUID
-  upload: ConstructiveInternalTypeUpload
-}
-
-"""
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-"""
-scalar UUID
-
-scalar ConstructiveInternalTypeUpload
-
-"""A `MigrateFile` edge in the connection."""
-type MigrateFileEdge {
+"""A `AstMigration` edge in the connection."""
+type AstMigrationEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `MigrateFile` at the end of the edge."""
-  node: MigrateFile
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
+  """The `AstMigration` at the end of the edge."""
+  node: AstMigration
 }
 
 """
-A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `AstMigration` object types. All fields are combined with a logical ‘and.’
 """
-input MigrateFileFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
+input AstMigrationFilter {
+  """Filter by the object’s `actionId` field."""
+  actionId: UUIDFilter
+
+  """Filter by the object’s `actionName` field."""
+  actionName: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [AstMigrationFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
-  """Filter by the object’s `upload` field."""
-  upload: ConstructiveInternalTypeUploadFilter
+  """Filter by the object’s `deploy` field."""
+  deploy: JSONFilter
 
-  """Checks for all expressions in this list."""
-  and: [MigrateFileFilter!]
+  """Filter by the object’s `deploys` field."""
+  deploys: StringFilter
 
-  """Checks for any expressions in this list."""
-  or: [MigrateFileFilter!]
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
 
   """Negates the expression."""
-  not: MigrateFileFilter
+  not: AstMigrationFilter
+
+  """Checks for any expressions in this list."""
+  or: [AstMigrationFilter!]
+
+  """Filter by the object’s `payload` field."""
+  payload: JSONFilter
+
+  """Filter by the object’s `requires` field."""
+  requires: StringListFilter
+
+  """Filter by the object’s `revert` field."""
+  revert: JSONFilter
+
+  """Filter by the object’s `verify` field."""
+  verify: JSONFilter
 }
 
-"""
-A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: UUID
-
-  """Not equal to the specified value."""
-  notEqualTo: UUID
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: UUID
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: UUID
-
-  """Included in the specified list."""
-  in: [UUID!]
-
-  """Not included in the specified list."""
-  notIn: [UUID!]
-
-  """Less than the specified value."""
-  lessThan: UUID
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: UUID
-
-  """Greater than the specified value."""
-  greaterThan: UUID
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: UUID
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeUploadFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeUpload
-
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeUpload
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeUpload
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeUpload
-
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeUpload!]
-
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeUpload!]
-
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeUpload
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeUpload
-
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeUpload
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeUpload
-
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeUpload
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeUpload
-}
-
-"""Methods to use when ordering `MigrateFile`."""
-enum MigrateFileOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+"""Methods to use when ordering `AstMigration`."""
+enum AstMigrationOrderBy {
+  ACTION_ID_ASC
+  ACTION_ID_DESC
+  ACTION_NAME_ASC
+  ACTION_NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  UPLOAD_ASC
-  UPLOAD_DESC
+  DEPLOYS_ASC
+  DEPLOYS_DESC
+  DEPLOY_ASC
+  DEPLOY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PAYLOAD_ASC
+  PAYLOAD_DESC
+  REQUIRES_ASC
+  REQUIRES_DESC
+  REVERT_ASC
+  REVERT_DESC
+  VERIFY_ASC
+  VERIFY_DESC
 }
 
-"""A connection to a list of `SqlAction` values."""
-type SqlActionConnection {
-  """A list of `SqlAction` objects."""
-  nodes: [SqlAction]!
-
-  """
-  A list of edges which contains the `SqlAction` and cursor to aid in pagination.
-  """
-  edges: [SqlActionEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `SqlAction` you could get from the connection."""
-  totalCount: Int!
-}
-
-type SqlAction {
-  id: Int!
-  name: String
-  databaseId: UUID
-  deploy: String
-  deps: [String]
-  payload: JSON
-  content: String
-  revert: String
-  verify: String
-  createdAt: Datetime
-  category: String
-  action: String
-  actionId: UUID
-  actorId: UUID
-}
-
-"""
-Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
 
 """
 A point in time as described by the [ISO
@@ -304,333 +136,31 @@ to unexpected results.
 """
 scalar Datetime
 
-"""A `SqlAction` edge in the connection."""
-type SqlActionEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `SqlAction` at the end of the edge."""
-  node: SqlAction
-}
-
-"""
-A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’
-"""
-input SqlActionFilter {
-  """Filter by the object’s `id` field."""
-  id: IntFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `deploy` field."""
-  deploy: StringFilter
-
-  """Filter by the object’s `deps` field."""
-  deps: StringListFilter
-
-  """Filter by the object’s `content` field."""
-  content: StringFilter
-
-  """Filter by the object’s `revert` field."""
-  revert: StringFilter
-
-  """Filter by the object’s `verify` field."""
-  verify: StringFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `category` field."""
-  category: StringFilter
-
-  """Filter by the object’s `action` field."""
-  action: StringFilter
-
-  """Filter by the object’s `actionId` field."""
-  actionId: UUIDFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [SqlActionFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [SqlActionFilter!]
-
-  """Negates the expression."""
-  not: SqlActionFilter
-}
-
-"""
-A filter to be used against Int fields. All fields are combined with a logical ‘and.’
-"""
-input IntFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Int
-
-  """Not equal to the specified value."""
-  notEqualTo: Int
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Int
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Int
-
-  """Included in the specified list."""
-  in: [Int!]
-
-  """Not included in the specified list."""
-  notIn: [Int!]
-
-  """Less than the specified value."""
-  lessThan: Int
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Int
-
-  """Greater than the specified value."""
-  greaterThan: Int
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Int
-}
-
-"""
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
-}
-
-"""
-A filter to be used against String List fields. All fields are combined with a logical ‘and.’
-"""
-input StringListFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: [String]
-
-  """Not equal to the specified value."""
-  notEqualTo: [String]
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: [String]
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: [String]
-
-  """Less than the specified value."""
-  lessThan: [String]
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: [String]
-
-  """Greater than the specified value."""
-  greaterThan: [String]
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: [String]
-
-  """Contains the specified list of values."""
-  contains: [String]
-
-  """Contained by the specified list of values."""
-  containedBy: [String]
-
-  """Overlaps the specified list of values."""
-  overlaps: [String]
-
-  """Any array item is equal to the specified value."""
-  anyEqualTo: String
-
-  """Any array item is not equal to the specified value."""
-  anyNotEqualTo: String
-
-  """Any array item is less than the specified value."""
-  anyLessThan: String
-
-  """Any array item is less than or equal to the specified value."""
-  anyLessThanOrEqualTo: String
-
-  """Any array item is greater than the specified value."""
-  anyGreaterThan: String
-
-  """Any array item is greater than or equal to the specified value."""
-  anyGreaterThanOrEqualTo: String
-}
-
 """
 A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
 """
 input DatetimeFilter {
   """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Datetime
-
-  """Not equal to the specified value."""
-  notEqualTo: Datetime
-
-  """
   Not equal to the specified value, treating null like an ordinary value.
   """
   distinctFrom: Datetime
 
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Datetime
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
 
   """Included in the specified list."""
   in: [Datetime!]
 
-  """Not included in the specified list."""
-  notIn: [Datetime!]
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
 
   """Less than the specified value."""
   lessThan: Datetime
@@ -638,102 +168,134 @@ input DatetimeFilter {
   """Less than or equal to the specified value."""
   lessThanOrEqualTo: Datetime
 
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value."""
+  equalTo: Int
+
   """Greater than the specified value."""
-  greaterThan: Datetime
+  greaterThan: Int
 
   """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Datetime
+  greaterThanOrEqualTo: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """Not included in the specified list."""
+  notIn: [Int!]
 }
 
-"""Methods to use when ordering `SqlAction`."""
-enum SqlActionOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  DEPLOY_ASC
-  DEPLOY_DESC
-  DEPS_ASC
-  DEPS_DESC
-  PAYLOAD_ASC
-  PAYLOAD_DESC
-  CONTENT_ASC
-  CONTENT_DESC
-  REVERT_ASC
-  REVERT_DESC
-  VERIFY_ASC
-  VERIFY_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  CATEGORY_ASC
-  CATEGORY_DESC
-  ACTION_ASC
-  ACTION_DESC
-  ACTION_ID_ASC
-  ACTION_ID_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """Contained by the specified JSON."""
+  containedBy: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
 }
 
-"""Root meta schema type"""
-type MetaSchema {
-  tables: [MetaTable!]!
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
 }
 
-"""Information about a database table"""
-type MetaTable {
-  name: String!
-  schemaName: String!
-  fields: [MetaField!]!
-  indexes: [MetaIndex!]!
-  constraints: MetaConstraints!
-  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
-  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
-  uniqueConstraints: [MetaUniqueConstraint!]!
-  relations: MetaRelations!
-  inflection: MetaInflection!
-  query: MetaQuery!
-
-  """Storage metadata (null if not a storage table)"""
-  storage: MetaStorage
-
-  """Search metadata (null if no search configured)"""
-  search: MetaSearch
-
-  """i18n metadata (null if no @i18n tag)"""
-  i18n: MetaI18n
-
-  """Realtime metadata (null if no @realtime tag)"""
-  realtime: MetaRealtime
-}
-
-"""Information about a table field/column"""
-type MetaField {
-  name: String!
-  type: MetaType!
-  isNotNull: Boolean!
-  hasDefault: Boolean!
-  isPrimaryKey: Boolean!
-  isForeignKey: Boolean!
-  description: String
-
-  """Enum metadata if this field has an enum type"""
-  enumValues: MetaEnum
-}
-
-"""Information about a PostgreSQL type"""
-type MetaType {
-  pgType: String!
-  gqlType: String!
-  isArray: Boolean!
-  isNotNull: Boolean
-  hasDefault: Boolean
-  subtype: String
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
 }
 
 """Information about a PostgreSQL enum type"""
@@ -745,170 +307,46 @@ type MetaEnum {
   values: [String!]!
 }
 
-"""Information about a database index"""
-type MetaIndex {
-  name: String!
-  isUnique: Boolean!
-  isPrimary: Boolean!
-  columns: [String!]!
-  fields: [MetaField!]
-}
+"""Information about a table field/column"""
+type MetaField {
+  description: String
 
-"""Table constraints"""
-type MetaConstraints {
-  primaryKey: MetaPrimaryKeyConstraint
-  unique: [MetaUniqueConstraint!]!
-  foreignKey: [MetaForeignKeyConstraint!]!
-}
-
-"""Information about a primary key constraint"""
-type MetaPrimaryKeyConstraint {
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
   name: String!
-  fields: [MetaField!]!
-}
-
-"""Information about a unique constraint"""
-type MetaUniqueConstraint {
-  name: String!
-  fields: [MetaField!]!
+  type: MetaType!
 }
 
 """Information about a foreign key constraint"""
 type MetaForeignKeyConstraint {
-  name: String!
   fields: [MetaField!]!
-  referencedTable: String!
-  referencedFields: [String!]!
+  name: String!
   refFields: [MetaField!]
   refTable: MetaRefTable
-}
-
-"""Reference to a related table"""
-type MetaRefTable {
-  name: String!
-}
-
-"""Table relations"""
-type MetaRelations {
-  belongsTo: [MetaBelongsToRelation!]!
-  has: [MetaHasRelation!]!
-  hasOne: [MetaHasRelation!]!
-  hasMany: [MetaHasRelation!]!
-  manyToMany: [MetaManyToManyRelation!]!
-}
-
-"""A belongs-to (forward FK) relation"""
-type MetaBelongsToRelation {
-  fieldName: String
-  isUnique: Boolean!
-  type: String
-  keys: [MetaField!]!
-  references: MetaRefTable!
+  referencedFields: [String!]!
+  referencedTable: String!
 }
 
 """A has-one or has-many (reverse FK) relation"""
 type MetaHasRelation {
   fieldName: String
   isUnique: Boolean!
-  type: String
   keys: [MetaField!]!
   referencedBy: MetaRefTable!
-}
-
-"""A many-to-many relation via junction table"""
-type MetaManyToManyRelation {
-  fieldName: String
   type: String
-  junctionTable: MetaRefTable!
-  junctionLeftConstraint: MetaForeignKeyConstraint!
-  junctionLeftKeyAttributes: [MetaField!]!
-  junctionRightConstraint: MetaForeignKeyConstraint!
-  junctionRightKeyAttributes: [MetaField!]!
-  leftKeyAttributes: [MetaField!]!
-  rightKeyAttributes: [MetaField!]!
-  rightTable: MetaRefTable!
-}
-
-"""Table inflection names"""
-type MetaInflection {
-  tableType: String!
-  allRows: String!
-  connection: String!
-  edge: String!
-  filterType: String
-  orderByType: String!
-  conditionType: String!
-  patchType: String
-  createInputType: String!
-  createPayloadType: String!
-  updatePayloadType: String
-  deletePayloadType: String!
-}
-
-"""Table query/mutation names"""
-type MetaQuery {
-  all: String!
-  one: String
-  create: String
-  update: String
-  delete: String
-}
-
-"""Storage metadata for a table"""
-type MetaStorage {
-  """Whether this table is a storage files table"""
-  isFilesTable: Boolean!
-
-  """Whether this table is a storage buckets table"""
-  isBucketsTable: Boolean!
-}
-
-"""Search metadata for a table"""
-type MetaSearch {
-  """Active search algorithms on this table"""
-  algorithms: [String!]!
-
-  """Searchable columns with their algorithm"""
-  columns: [MetaSearchColumn!]!
-
-  """Whether unifiedSearch composite filter is available"""
-  hasUnifiedSearch: Boolean!
-
-  """Per-table search configuration"""
-  config: MetaSearchConfig
-}
-
-"""A searchable column with its algorithm"""
-type MetaSearchColumn {
-  """Column name (camelCase)"""
-  name: String!
-
-  """Search algorithm: tsvector, bm25, trgm, or vector"""
-  algorithm: String!
-}
-
-"""Per-table search configuration from @searchConfig smart tag"""
-type MetaSearchConfig {
-  """JSON-encoded per-adapter score weights"""
-  weights: String
-
-  """Whether recency boosting is enabled"""
-  boostRecent: Boolean!
-
-  """Field used for recency decay"""
-  boostRecencyField: String
-
-  """Exponential decay factor per day"""
-  boostRecencyDecay: Float
 }
 
 """i18n metadata for a table with @i18n tag"""
 type MetaI18n {
-  """Name of the translation table"""
-  translationTable: String!
-
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
 }
 
 """A translatable field"""
@@ -920,77 +358,180 @@ type MetaI18nField {
   type: String!
 }
 
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
 """Realtime metadata for a table with @realtime tag"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
 }
 
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
 """
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  executeSql(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ExecuteSqlInput!
-  ): ExecuteSqlPayload
-  runMigration(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: RunMigrationInput!
-  ): RunMigrationPayload
-
-  """Creates a single `MigrateFile`."""
-  createMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMigrateFileInput!
-  ): CreateMigrateFilePayload
-
-  """Creates a single `SqlAction`."""
-  createSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateSqlActionInput!
-  ): CreateSqlActionPayload
-
-  """Updates a single `MigrateFile` using a unique key and a patch."""
-  updateMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMigrateFileInput!
-  ): UpdateMigrateFilePayload
-
-  """Updates a single `SqlAction` using a unique key and a patch."""
-  updateSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateSqlActionInput!
-  ): UpdateSqlActionPayload
-
-  """Deletes a single `MigrateFile` using a unique key."""
-  deleteMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMigrateFileInput!
-  ): DeleteMigrateFilePayload
-
-  """Deletes a single `SqlAction` using a unique key."""
-  deleteSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteSqlActionInput!
-  ): DeleteSqlActionPayload
-
   """
   Provision an S3 bucket for a logical bucket in the database.
   Reads the bucket config via RLS, then creates and configures
@@ -1005,326 +546,19 @@ type Mutation {
   ): ProvisionBucketPayload
 }
 
-"""The output of our `executeSql` mutation."""
-type ExecuteSqlPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
 
-"""All input for the `executeSql` mutation."""
-input ExecuteSqlInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  stmt: String
-}
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
 
-"""The output of our `runMigration` mutation."""
-type RunMigrationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `runMigration` mutation."""
-input RunMigrationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  migration: Int
-  kind: String
-}
-
-"""The output of our create `MigrateFile` mutation."""
-type CreateMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was created by this mutation."""
-  migrateFile: MigrateFile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MigrateFile`. May be used by Relay 1."""
-  migrateFileEdge(
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MigrateFileEdge
-}
-
-"""All input for the create `MigrateFile` mutation."""
-input CreateMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` to be created by this mutation."""
-  migrateFile: MigrateFileInput!
-}
-
-"""An input for mutations affecting `MigrateFile`"""
-input MigrateFileInput {
-  id: UUID
-  databaseId: UUID
-  upload: ConstructiveInternalTypeUpload
-}
-
-"""The output of our create `SqlAction` mutation."""
-type CreateSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` that was created by this mutation."""
-  sqlAction: SqlAction
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SqlAction`. May be used by Relay 1."""
-  sqlActionEdge(
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SqlActionEdge
-}
-
-"""All input for the create `SqlAction` mutation."""
-input CreateSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` to be created by this mutation."""
-  sqlAction: SqlActionInput!
-}
-
-"""An input for mutations affecting `SqlAction`"""
-input SqlActionInput {
-  id: Int
-  name: String
-  databaseId: UUID
-  deploy: String
-  deps: [String]
-  payload: JSON
-  content: String
-  revert: String
-  verify: String
-  createdAt: Datetime
-  category: String
-  action: String
-  actionId: UUID
-  actorId: UUID
-}
-
-"""The output of our update `MigrateFile` mutation."""
-type UpdateMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was updated by this mutation."""
-  migrateFile: MigrateFile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MigrateFile`. May be used by Relay 1."""
-  migrateFileEdge(
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MigrateFileEdge
-}
-
-"""All input for the `updateMigrateFile` mutation."""
-input UpdateMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `MigrateFile` being updated.
-  """
-  migrateFilePatch: MigrateFilePatch!
-}
-
-"""
-Represents an update to a `MigrateFile`. Fields that are set will be updated.
-"""
-input MigrateFilePatch {
-  id: UUID
-  databaseId: UUID
-  upload: ConstructiveInternalTypeUpload
-
-  """File upload for the `upload` field."""
-  uploadUpload: Upload
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
-"""The output of our update `SqlAction` mutation."""
-type UpdateSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` that was updated by this mutation."""
-  sqlAction: SqlAction
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SqlAction`. May be used by Relay 1."""
-  sqlActionEdge(
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SqlActionEdge
-}
-
-"""All input for the `updateSqlAction` mutation."""
-input UpdateSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `SqlAction` being updated.
-  """
-  sqlActionPatch: SqlActionPatch!
-}
-
-"""
-Represents an update to a `SqlAction`. Fields that are set will be updated.
-"""
-input SqlActionPatch {
-  id: Int
-  name: String
-  databaseId: UUID
-  deploy: String
-  deps: [String]
-  payload: JSON
-  content: String
-  revert: String
-  verify: String
-  createdAt: Datetime
-  category: String
-  action: String
-  actionId: UUID
-  actorId: UUID
-}
-
-"""The output of our delete `MigrateFile` mutation."""
-type DeleteMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was deleted by this mutation."""
-  migrateFile: MigrateFile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MigrateFile`. May be used by Relay 1."""
-  migrateFileEdge(
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MigrateFileEdge
-}
-
-"""All input for the `deleteMigrateFile` mutation."""
-input DeleteMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `SqlAction` mutation."""
-type DeleteSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` that was deleted by this mutation."""
-  sqlAction: SqlAction
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SqlAction`. May be used by Relay 1."""
-  sqlActionEdge(
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SqlActionEdge
-}
-
-"""All input for the `deleteSqlAction` mutation."""
-input DeleteSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
 }
 
 input ProvisionBucketInput {
@@ -1339,21 +573,452 @@ input ProvisionBucketInput {
 }
 
 type ProvisionBucketPayload {
-  """Whether provisioning succeeded"""
-  success: Boolean!
-
-  """The S3 bucket name that was provisioned"""
-  bucketName: String!
-
   """The access type applied"""
   accessType: String!
 
-  """The storage provider used"""
-  provider: String!
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
 
   """The S3 endpoint (null for AWS S3 default)"""
   endpoint: String
 
   """Error message if provisioning failed"""
   error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+
+  """Reads and enables pagination through a set of `AstMigration`."""
+  astMigrations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AstMigration`."""
+    orderBy: [AstMigrationOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AstMigrationFilter
+  ): AstMigrationConnection
+
+  """Reads and enables pagination through a set of `SqlAction`."""
+  sqlActions(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SqlActionFilter
+  ): SqlActionConnection
+}
+
+type SqlAction {
+  actionId: UUID
+  actionName: String
+  actorId: UUID
+  content: String
+  createdAt: Datetime
+  databaseId: UUID
+  deploy: String
+  deps: [String]
+  id: Int
+  name: String
+  payload: JSON
+  revert: String
+  verify: String
+}
+
+"""A connection to a list of `SqlAction` values."""
+type SqlActionConnection {
+  """
+  A list of edges which contains the `SqlAction` and cursor to aid in pagination.
+  """
+  edges: [SqlActionEdge]!
+
+  """A list of `SqlAction` objects."""
+  nodes: [SqlAction]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SqlAction` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SqlAction` edge in the connection."""
+type SqlActionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SqlAction` at the end of the edge."""
+  node: SqlAction
+}
+
+"""
+A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’
+"""
+input SqlActionFilter {
+  """Filter by the object’s `actionId` field."""
+  actionId: UUIDFilter
+
+  """Filter by the object’s `actionName` field."""
+  actionName: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [SqlActionFilter!]
+
+  """Filter by the object’s `content` field."""
+  content: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `deploy` field."""
+  deploy: StringFilter
+
+  """Filter by the object’s `deps` field."""
+  deps: StringListFilter
+
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: SqlActionFilter
+
+  """Checks for any expressions in this list."""
+  or: [SqlActionFilter!]
+
+  """Filter by the object’s `revert` field."""
+  revert: StringFilter
+
+  """Filter by the object’s `verify` field."""
+  verify: StringFilter
+}
+
+"""Methods to use when ordering `SqlAction`."""
+enum SqlActionOrderBy {
+  ACTION_ID_ASC
+  ACTION_ID_DESC
+  ACTION_NAME_ASC
+  ACTION_NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CONTENT_ASC
+  CONTENT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEPLOY_ASC
+  DEPLOY_DESC
+  DEPS_ASC
+  DEPS_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PAYLOAD_ASC
+  PAYLOAD_DESC
+  REVERT_ASC
+  REVERT_DESC
+  VERIFY_ASC
+  VERIFY_DESC
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
 }

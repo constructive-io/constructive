@@ -7,7 +7,7 @@ React Query mutation hook for importDefinitions
 ## Usage
 
 ```typescript
-const { mutate } = useImportDefinitionsMutation(); mutate({ input: { graphId: '<UUID>', sourceScopeId: '<UUID>', sourceCommitId: '<UUID>', contexts: '<String>' } });
+const { mutate } = useImportDefinitionsMutation(); mutate({ input: { contexts: '<String>', graphId: '<UUID>', sourceCommitId: '<UUID>', sourceScopeId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useImportDefinitionsMutation(); mutate({ input: { graphId: '<
 
 ```typescript
 const { mutate, isLoading } = useImportDefinitionsMutation();
-mutate({ input: { graphId: '<UUID>', sourceScopeId: '<UUID>', sourceCommitId: '<UUID>', contexts: '<String>' } });
+mutate({ input: { contexts: '<String>', graphId: '<UUID>', sourceCommitId: '<UUID>', sourceScopeId: '<UUID>' } });
 ```

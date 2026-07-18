@@ -9,7 +9,7 @@ ORM operations for TableGrant records
 ```typescript
 db.tableGrant.findMany({ select: { id: true } }).execute()
 db.tableGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.tableGrant.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', privilege: '<String>', granteeName: '<String>', fieldIds: '<UUID>', isGrant: '<Boolean>' }, select: { id: true } }).execute()
+db.tableGrant.create({ data: { databaseId: '<UUID>', fieldIds: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', privilege: '<String>', tableId: '<UUID>' }, select: { id: true } }).execute()
 db.tableGrant.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.tableGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.tableGrant.findMany({
 
 ```typescript
 const item = await db.tableGrant.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', privilege: '<String>', granteeName: '<String>', fieldIds: '<UUID>', isGrant: '<Boolean>' },
+  data: { databaseId: '<UUID>', fieldIds: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', privilege: '<String>', tableId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

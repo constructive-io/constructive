@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/query-builder",
-  "version": "2.20.0",
+  "version": "2.25.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Query Builder",
   "main": "index.js",
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "pg-ast": "workspace:^",
-    "pgsql-deparser": "^17.18.3"
+    "pgsql-deparser": "^17.18.3",
+    "query-spec": "workspace:^"
   }
 }

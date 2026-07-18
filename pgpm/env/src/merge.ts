@@ -1,5 +1,7 @@
+import { DeploymentOptions,pgpmDefaults, PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
-import { pgpmDefaults, PgpmOptions, PgTestConnectionOptions, DeploymentOptions } from '@pgpmjs/types';
+
+import { assertProductionEnvOptions } from './assert';
 import { loadConfigSync } from './config';
 import { getEnvVars } from './env';
 import { replaceArrays } from './utils';
@@ -25,9 +27,15 @@ export const getEnvOptions = (
   const configOptions = loadConfigSync(cwd);
   const envOptions = getEnvVars(env);
   
-  return deepmerge.all([pgpmDefaults, configOptions, envOptions, overrides], {
+  const merged = deepmerge.all([pgpmDefaults, configOptions, envOptions, overrides], {
     arrayMerge: replaceArrays
   });
+
+  // In production, surface (warn) or reject (STRICT_ENV=throw) sensitive options
+  // still left at their built-in dev defaults. No-op in dev/test/CI.
+  assertProductionEnvOptions(merged, env);
+
+  return merged;
 };
 
 export const getConnEnvOptions = (overrides: Partial<PgTestConnectionOptions> = {}, cwd: string = process.cwd()): PgTestConnectionOptions => {

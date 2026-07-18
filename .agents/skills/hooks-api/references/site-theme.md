@@ -7,8 +7,8 @@ Theme configuration for a site; stores design tokens, colors, and typography as 
 ## Usage
 
 ```typescript
-useSiteThemesQuery({ selection: { fields: { id: true, databaseId: true, siteId: true, theme: true } } })
-useSiteThemeQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, siteId: true, theme: true } } })
+useSiteThemesQuery({ selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } } })
+useSiteThemeQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } } })
 useCreateSiteThemeMutation({ selection: { fields: { id: true } } })
 useUpdateSiteThemeMutation({ selection: { fields: { id: true } } })
 useDeleteSiteThemeMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteThemeMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteThemesQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, theme: true } },
+  selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } },
 });
 ```
 

@@ -1,8 +1,8 @@
 {
   "name": "12factor-env",
-  "version": "1.14.0",
+  "version": "1.17.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Environment variable validation with secret file support for 12-factor apps",
+  "description": "Environment variable validation for 12-factor apps",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -41,9 +41,6 @@
     "env",
     "validation",
     "12factor",
-    "secrets",
-    "kubernetes",
-    "docker",
     "constructive"
   ]
 }

@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.17.0...@constructive-io/send-email-fn@1.17.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+# [1.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.16.1...@constructive-io/send-email-fn@1.17.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+## [1.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.16.0...@constructive-io/send-email-fn@1.16.1) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+# [1.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.15.5...@constructive-io/send-email-fn@1.16.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+## [1.15.5](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.15.4...@constructive-io/send-email-fn@1.15.5) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+## [1.15.4](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.15.3...@constructive-io/send-email-fn@1.15.4) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+## [1.15.3](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.15.2...@constructive-io/send-email-fn@1.15.3) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
+## [1.15.2](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.15.1...@constructive-io/send-email-fn@1.15.2) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/send-email-fn
+
 ## [1.15.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-fn@1.15.0...@constructive-io/send-email-fn@1.15.1) (2026-07-08)
 
 **Note:** Version bump only for package @constructive-io/send-email-fn

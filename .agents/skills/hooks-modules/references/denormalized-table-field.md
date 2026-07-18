@@ -7,8 +7,8 @@ React Query hooks for DenormalizedTableField data operations
 ## Usage
 
 ```typescript
-useDenormalizedTableFieldsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } } })
-useDenormalizedTableFieldQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } } })
+useDenormalizedTableFieldsQuery({ selection: { fields: { databaseId: true, fieldId: true, funcName: true, funcOrder: true, id: true, refFieldId: true, refIds: true, refTableId: true, setIds: true, tableId: true, updateDefaults: true, useUpdates: true } } })
+useDenormalizedTableFieldQuery({ id: '<UUID>', selection: { fields: { databaseId: true, fieldId: true, funcName: true, funcOrder: true, id: true, refFieldId: true, refIds: true, refTableId: true, setIds: true, tableId: true, updateDefaults: true, useUpdates: true } } })
 useCreateDenormalizedTableFieldMutation({ selection: { fields: { id: true } } })
 useUpdateDenormalizedTableFieldMutation({ selection: { fields: { id: true } } })
 useDeleteDenormalizedTableFieldMutation({})
@@ -20,7 +20,7 @@ useDeleteDenormalizedTableFieldMutation({})
 
 ```typescript
 const { data, isLoading } = useDenormalizedTableFieldsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } },
+  selection: { fields: { databaseId: true, fieldId: true, funcName: true, funcOrder: true, id: true, refFieldId: true, refIds: true, refTableId: true, setIds: true, tableId: true, updateDefaults: true, useUpdates: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDenormalizedTableFieldsQuery({
 const { mutate } = useCreateDenormalizedTableFieldMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', setIds: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', refIds: '<UUID>', useUpdates: '<Boolean>', updateDefaults: '<Boolean>', funcName: '<String>', funcOrder: '<Int>' });
+mutate({ databaseId: '<UUID>', fieldId: '<UUID>', funcName: '<String>', funcOrder: '<Int>', refFieldId: '<UUID>', refIds: '<UUID>', refTableId: '<UUID>', setIds: '<UUID>', tableId: '<UUID>', updateDefaults: '<Boolean>', useUpdates: '<Boolean>' });
 ```

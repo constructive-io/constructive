@@ -7,7 +7,7 @@ Execute the applyRegistryDefaults query
 ## Usage
 
 ```bash
-csdk apply-registry-defaults --nodeType <String> --data <JSON>
+csdk apply-registry-defaults --data <JSON> --nodeType <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk apply-registry-defaults --nodeType <String> --data <JSON>
 ### Run applyRegistryDefaults
 
 ```bash
-csdk apply-registry-defaults --nodeType <String> --data <JSON>
+csdk apply-registry-defaults --data <JSON> --nodeType <String>
 ```

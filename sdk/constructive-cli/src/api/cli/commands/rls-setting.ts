@@ -16,16 +16,16 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  authenticateSchemaId: 'uuid',
-  roleSchemaId: 'uuid',
   authenticateFunctionId: 'uuid',
+  authenticateSchemaId: 'uuid',
   authenticateStrictFunctionId: 'uuid',
+  currentIpAddressFunctionId: 'uuid',
   currentRoleFunctionId: 'uuid',
   currentRoleIdFunctionId: 'uuid',
   currentUserAgentFunctionId: 'uuid',
-  currentIpAddressFunctionId: 'uuid',
+  databaseId: 'uuid',
+  id: 'uuid',
+  roleSchemaId: 'uuid',
 };
 const usage =
   '\nrls-setting <command>\n\nCommands:\n  list                  List rlsSetting records\n  find-first            Find first matching rlsSetting record\n  get                   Get a rlsSetting by ID\n  create                Create a new rlsSetting\n  update                Update an existing rlsSetting\n  delete                Delete a rlsSetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -78,16 +78,16 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      authenticateSchemaId: true,
-      roleSchemaId: true,
       authenticateFunctionId: true,
+      authenticateSchemaId: true,
       authenticateStrictFunctionId: true,
+      currentIpAddressFunctionId: true,
       currentRoleFunctionId: true,
       currentRoleIdFunctionId: true,
       currentUserAgentFunctionId: true,
-      currentIpAddressFunctionId: true,
+      databaseId: true,
+      id: true,
+      roleSchemaId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy> & {
@@ -108,16 +108,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      authenticateSchemaId: true,
-      roleSchemaId: true,
       authenticateFunctionId: true,
+      authenticateSchemaId: true,
       authenticateStrictFunctionId: true,
+      currentIpAddressFunctionId: true,
       currentRoleFunctionId: true,
       currentRoleIdFunctionId: true,
       currentUserAgentFunctionId: true,
-      currentIpAddressFunctionId: true,
+      databaseId: true,
+      id: true,
+      roleSchemaId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy> & {
@@ -150,16 +150,16 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          authenticateSchemaId: true,
-          roleSchemaId: true,
           authenticateFunctionId: true,
+          authenticateSchemaId: true,
           authenticateStrictFunctionId: true,
+          currentIpAddressFunctionId: true,
           currentRoleFunctionId: true,
           currentRoleIdFunctionId: true,
           currentUserAgentFunctionId: true,
-          currentIpAddressFunctionId: true,
+          databaseId: true,
+          id: true,
+          roleSchemaId: true,
         },
       })
       .execute();
@@ -177,9 +177,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
+        name: 'authenticateFunctionId',
+        message: 'authenticateFunctionId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -190,22 +191,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'roleSchemaId',
-        message: 'roleSchemaId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'authenticateFunctionId',
-        message: 'authenticateFunctionId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'authenticateStrictFunctionId',
         message: 'authenticateStrictFunctionId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'currentIpAddressFunctionId',
+        message: 'currentIpAddressFunctionId',
         required: false,
         skipPrompt: true,
       },
@@ -232,8 +226,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'currentIpAddressFunctionId',
-        message: 'currentIpAddressFunctionId',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'roleSchemaId',
+        message: 'roleSchemaId',
         required: false,
         skipPrompt: true,
       },
@@ -244,27 +244,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.rlsSetting
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
-          authenticateSchemaId: cleanedData.authenticateSchemaId,
-          roleSchemaId: cleanedData.roleSchemaId,
           authenticateFunctionId: cleanedData.authenticateFunctionId,
+          authenticateSchemaId: cleanedData.authenticateSchemaId,
           authenticateStrictFunctionId: cleanedData.authenticateStrictFunctionId,
+          currentIpAddressFunctionId: cleanedData.currentIpAddressFunctionId,
           currentRoleFunctionId: cleanedData.currentRoleFunctionId,
           currentRoleIdFunctionId: cleanedData.currentRoleIdFunctionId,
           currentUserAgentFunctionId: cleanedData.currentUserAgentFunctionId,
-          currentIpAddressFunctionId: cleanedData.currentIpAddressFunctionId,
+          databaseId: cleanedData.databaseId,
+          roleSchemaId: cleanedData.roleSchemaId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          authenticateSchemaId: true,
-          roleSchemaId: true,
           authenticateFunctionId: true,
+          authenticateSchemaId: true,
           authenticateStrictFunctionId: true,
+          currentIpAddressFunctionId: true,
           currentRoleFunctionId: true,
           currentRoleIdFunctionId: true,
           currentUserAgentFunctionId: true,
-          currentIpAddressFunctionId: true,
+          databaseId: true,
+          id: true,
+          roleSchemaId: true,
         },
       })
       .execute();
@@ -288,9 +288,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'authenticateFunctionId',
+        message: 'authenticateFunctionId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -301,22 +302,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'roleSchemaId',
-        message: 'roleSchemaId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'authenticateFunctionId',
-        message: 'authenticateFunctionId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'authenticateStrictFunctionId',
         message: 'authenticateStrictFunctionId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'currentIpAddressFunctionId',
+        message: 'currentIpAddressFunctionId',
         required: false,
         skipPrompt: true,
       },
@@ -343,8 +337,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'currentIpAddressFunctionId',
-        message: 'currentIpAddressFunctionId',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'roleSchemaId',
+        message: 'roleSchemaId',
         required: false,
         skipPrompt: true,
       },
@@ -358,27 +358,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
-          authenticateSchemaId: cleanedData.authenticateSchemaId,
-          roleSchemaId: cleanedData.roleSchemaId,
           authenticateFunctionId: cleanedData.authenticateFunctionId,
+          authenticateSchemaId: cleanedData.authenticateSchemaId,
           authenticateStrictFunctionId: cleanedData.authenticateStrictFunctionId,
+          currentIpAddressFunctionId: cleanedData.currentIpAddressFunctionId,
           currentRoleFunctionId: cleanedData.currentRoleFunctionId,
           currentRoleIdFunctionId: cleanedData.currentRoleIdFunctionId,
           currentUserAgentFunctionId: cleanedData.currentUserAgentFunctionId,
-          currentIpAddressFunctionId: cleanedData.currentIpAddressFunctionId,
+          databaseId: cleanedData.databaseId,
+          roleSchemaId: cleanedData.roleSchemaId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          authenticateSchemaId: true,
-          roleSchemaId: true,
           authenticateFunctionId: true,
+          authenticateSchemaId: true,
           authenticateStrictFunctionId: true,
+          currentIpAddressFunctionId: true,
           currentRoleFunctionId: true,
           currentRoleIdFunctionId: true,
           currentUserAgentFunctionId: true,
-          currentIpAddressFunctionId: true,
+          databaseId: true,
+          id: true,
+          roleSchemaId: true,
         },
       })
       .execute();

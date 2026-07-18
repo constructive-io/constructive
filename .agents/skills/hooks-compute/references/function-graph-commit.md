@@ -7,8 +7,8 @@ Commit history — each commit snapshots a tree root for a store
 ## Usage
 
 ```typescript
-useFunctionGraphCommitsQuery({ selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
-useFunctionGraphCommitQuery({ id: '<UUID>', selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
+useFunctionGraphCommitsQuery({ selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } } })
+useFunctionGraphCommitQuery({ id: '<UUID>', selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } } })
 useCreateFunctionGraphCommitMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphCommitMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphCommitMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphCommitMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphCommitsQuery({
 const { mutate } = useCreateFunctionGraphCommitMutation({
   selection: { fields: { id: true } },
 });
-mutate({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
+mutate({ authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
 ```

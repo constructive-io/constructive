@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.20.0...pgsql-seed@2.21.0) (2026-07-18)
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
+# [2.20.0](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.19.3...pgsql-seed@2.20.0) (2026-07-18)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.19.3](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.19.2...pgsql-seed@2.19.3) (2026-07-17)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.19.2](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.19.1...pgsql-seed@2.19.2) (2026-07-13)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.19.1](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.19.0...pgsql-seed@2.19.1) (2026-07-13)
+
+**Note:** Version bump only for package pgsql-seed
+
+# [2.19.0](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.8...pgsql-seed@2.19.0) (2026-07-12)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.18.8](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.7...pgsql-seed@2.18.8) (2026-07-12)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.18.7](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.6...pgsql-seed@2.18.7) (2026-07-12)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.18.6](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.5...pgsql-seed@2.18.6) (2026-07-11)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.18.5](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.4...pgsql-seed@2.18.5) (2026-07-11)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.18.4](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.3...pgsql-seed@2.18.4) (2026-07-10)
+
+**Note:** Version bump only for package pgsql-seed
+
+## [2.18.3](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.2...pgsql-seed@2.18.3) (2026-07-10)
+
+**Note:** Version bump only for package pgsql-seed
+
 ## [2.18.2](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.18.1...pgsql-seed@2.18.2) (2026-07-08)
 
 **Note:** Version bump only for package pgsql-seed

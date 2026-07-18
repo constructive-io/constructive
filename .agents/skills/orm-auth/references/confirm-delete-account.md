@@ -7,7 +7,7 @@ Execute the confirmDeleteAccount mutation
 ## Usage
 
 ```typescript
-db.mutation.confirmDeleteAccount({ input: { userId: '<UUID>', token: '<String>' } }).execute()
+db.mutation.confirmDeleteAccount({ input: { token: '<String>', userId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.confirmDeleteAccount({ input: { userId: '<UUID>', token: '<String>' 
 ### Run confirmDeleteAccount
 
 ```typescript
-const result = await db.mutation.confirmDeleteAccount({ input: { userId: '<UUID>', token: '<String>' } }).execute();
+const result = await db.mutation.confirmDeleteAccount({ input: { token: '<String>', userId: '<UUID>' } }).execute();
 ```

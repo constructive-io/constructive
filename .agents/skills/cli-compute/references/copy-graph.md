@@ -7,7 +7,7 @@ Execute the copyGraph mutation
 ## Usage
 
 ```bash
-csdk copy-graph --input.clientMutationId <String> --input.databaseId <UUID> --input.graphId <UUID> --input.name <String>
+csdk copy-graph --input.clientMutationId <String> --input.graphId <UUID> --input.name <String> --input.scopeId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk copy-graph --input.clientMutationId <String> --input.databaseId <UUID> --in
 ### Run copyGraph
 
 ```bash
-csdk copy-graph --input.clientMutationId <String> --input.databaseId <UUID> --input.graphId <UUID> --input.name <String>
+csdk copy-graph --input.clientMutationId <String> --input.graphId <UUID> --input.name <String> --input.scopeId <UUID>
 ```

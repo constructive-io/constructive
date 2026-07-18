@@ -7,8 +7,8 @@ Records of successfully claimed invitations, linking senders to receivers
 ## Usage
 
 ```typescript
-useOrgClaimedInvitesQuery({ selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } } })
-useOrgClaimedInviteQuery({ id: '<UUID>', selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } } })
+useOrgClaimedInvitesQuery({ selection: { fields: { createdAt: true, data: true, entityId: true, id: true, receiverId: true, senderId: true, updatedAt: true } } })
+useOrgClaimedInviteQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, entityId: true, id: true, receiverId: true, senderId: true, updatedAt: true } } })
 useCreateOrgClaimedInviteMutation({ selection: { fields: { id: true } } })
 useUpdateOrgClaimedInviteMutation({ selection: { fields: { id: true } } })
 useDeleteOrgClaimedInviteMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgClaimedInviteMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgClaimedInvitesQuery({
-  selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { createdAt: true, data: true, entityId: true, id: true, receiverId: true, senderId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgClaimedInvitesQuery({
 const { mutate } = useCreateOrgClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>', entityId: '<UUID>' });
+mutate({ data: '<JSON>', entityId: '<UUID>', receiverId: '<UUID>', senderId: '<UUID>' });
 ```

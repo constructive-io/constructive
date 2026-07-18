@@ -5,7 +5,7 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { MigrateFileModel } from './models/migrateFile';
+import { AstMigrationModel } from './models/astMigration';
 import { SqlActionModel } from './models/sqlAction';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -40,7 +40,7 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    migrateFile: new MigrateFileModel(client),
+    astMigration: new AstMigrationModel(client),
     sqlAction: new SqlActionModel(client),
     mutation: createMutationOperations(client),
   };

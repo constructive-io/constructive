@@ -1,13 +1,13 @@
 ---
 name: orm-config
-description: ORM client for the config API — provides typed CRUD operations for 2 tables and 9 custom operations
+description: ORM client for the config API — provides typed CRUD operations for 5 tables and 13 custom operations
 ---
 
 # orm-config
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the config API — provides typed CRUD operations for 2 tables and 9 custom operations
+ORM client for the config API — provides typed CRUD operations for 5 tables and 13 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the config API — provides typed CRUD operations for 2 tables an
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: platformConfigDefinition, platformConfig
+// Available models: config, platformConfig, platformInternalSecret, platformSecret, secret
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.platformConfigDefinition.findMany({
+const items = await db.config.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,14 +37,21 @@ const items = await db.platformConfigDefinition.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [platform-config-definition](references/platform-config-definition.md)
+- [config](references/config.md)
 - [platform-config](references/platform-config.md)
+- [platform-internal-secret](references/platform-internal-secret.md)
+- [platform-secret](references/platform-secret.md)
+- [secret](references/secret.md)
+- [secrets-del](references/secrets-del.md)
+- [secrets-remove-array](references/secrets-remove-array.md)
+- [secrets-rotate](references/secrets-rotate.md)
+- [secrets-set](references/secrets-set.md)
+- [platform-internal-secrets-del](references/platform-internal-secrets-del.md)
+- [platform-internal-secrets-remove-array](references/platform-internal-secrets-remove-array.md)
+- [platform-internal-secrets-rotate](references/platform-internal-secrets-rotate.md)
+- [platform-internal-secrets-set](references/platform-internal-secrets-set.md)
 - [platform-secrets-del](references/platform-secrets-del.md)
-- [org-secrets-del](references/org-secrets-del.md)
 - [platform-secrets-remove-array](references/platform-secrets-remove-array.md)
-- [org-secrets-remove-array](references/org-secrets-remove-array.md)
 - [platform-secrets-rotate](references/platform-secrets-rotate.md)
 - [platform-secrets-set](references/platform-secrets-set.md)
-- [org-secrets-rotate](references/org-secrets-rotate.md)
-- [org-secrets-set](references/org-secrets-set.md)
 - [provision-bucket](references/provision-bucket.md)

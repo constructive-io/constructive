@@ -7,8 +7,8 @@ Per-scope permission overrides for principals. No row = full access; row exists 
 ## Usage
 
 ```typescript
-usePrincipalScopeOverridesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } } })
-usePrincipalScopeOverrideQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } } })
+usePrincipalScopeOverridesQuery({ selection: { fields: { allowedMask: true, createdAt: true, id: true, isActive: true, isReadOnly: true, membershipType: true, principalId: true, updatedAt: true, useAdminOwner: true } } })
+usePrincipalScopeOverrideQuery({ id: '<UUID>', selection: { fields: { allowedMask: true, createdAt: true, id: true, isActive: true, isReadOnly: true, membershipType: true, principalId: true, updatedAt: true, useAdminOwner: true } } })
 useCreatePrincipalScopeOverrideMutation({ selection: { fields: { id: true } } })
 useUpdatePrincipalScopeOverrideMutation({ selection: { fields: { id: true } } })
 useDeletePrincipalScopeOverrideMutation({})
@@ -20,7 +20,7 @@ useDeletePrincipalScopeOverrideMutation({})
 
 ```typescript
 const { data, isLoading } = usePrincipalScopeOverridesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } },
+  selection: { fields: { allowedMask: true, createdAt: true, id: true, isActive: true, isReadOnly: true, membershipType: true, principalId: true, updatedAt: true, useAdminOwner: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePrincipalScopeOverridesQuery({
 const { mutate } = useCreatePrincipalScopeOverrideMutation({
   selection: { fields: { id: true } },
 });
-mutate({ principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', isAdmin: '<Boolean>', isReadOnly: '<Boolean>' });
+mutate({ allowedMask: '<BitString>', isActive: '<Boolean>', isReadOnly: '<Boolean>', membershipType: '<Int>', principalId: '<UUID>', useAdminOwner: '<Boolean>' });
 ```

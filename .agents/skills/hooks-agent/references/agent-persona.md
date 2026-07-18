@@ -7,8 +7,8 @@ Agent persona templates (role, system prompt, default skills/knowledge)
 ## Usage
 
 ```typescript
-useAgentPersonasQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } } })
-useAgentPersonaQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } } })
+useAgentPersonasQuery({ selection: { fields: { config: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true } } })
+useAgentPersonaQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true } } })
 useCreateAgentPersonaMutation({ selection: { fields: { id: true } } })
 useUpdateAgentPersonaMutation({ selection: { fields: { id: true } } })
 useDeleteAgentPersonaMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentPersonaMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentPersonasQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } },
+  selection: { fields: { config: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isActive: true, name: true, resources: true, slug: true, systemPrompt: true, updatedAt: true, updatedBy: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentPersonasQuery({
 const { mutate } = useCreateAgentPersonaMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' });
+mutate({ config: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', name: '<String>', resources: '<String>', slug: '<String>', systemPrompt: '<String>', updatedBy: '<UUID>' });
 ```

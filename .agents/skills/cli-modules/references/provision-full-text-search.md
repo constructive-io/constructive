@@ -7,7 +7,7 @@ Creates a full-text search configuration on a table. Accepts a jsonb definition 
 ## Usage
 
 ```bash
-csdk provision-full-text-search --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-full-text-search --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-full-text-search --input.clientMutationId <String> --input.databa
 ### Run provisionFullTextSearch
 
 ```bash
-csdk provision-full-text-search --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-full-text-search --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```

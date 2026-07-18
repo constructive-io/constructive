@@ -12,8 +12,8 @@ csdk get-all-record list --where.<field>.<op> <value> --orderBy <values>
 csdk get-all-record list --limit 10 --after <cursor>
 csdk get-all-record find-first --where.<field>.<op> <value>
 csdk get-all-record get --id <UUID>
-csdk get-all-record create --path <String> --data <JSON>
-csdk get-all-record update --id <UUID> [--path <String>] [--data <JSON>]
+csdk get-all-record create --data <JSON> --path <String>
+csdk get-all-record update --id <UUID> [--data <JSON>] [--path <String>]
 csdk get-all-record delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk get-all-record list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a getAllRecord
 
 ```bash
-csdk get-all-record create --path <String> --data <JSON>
+csdk get-all-record create --data <JSON> --path <String>
 ```
 
 ### Get a getAllRecord by id

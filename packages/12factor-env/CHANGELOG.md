@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.16.0...12factor-env@1.17.0) (2026-07-18)
+
+### Features
+
+- **env:** STRICT_ENV valve + production-safety assert for baked dev defaults ([270d3bf](https://github.com/constructive-io/constructive/commit/270d3bf4c71e266125d687c0a4dbd4d36bb620d6))
+
+# [1.16.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.15.0...12factor-env@1.16.0) (2026-07-17)
+
+### Features
+
+- **12factor-env:** add fallback-class wrappers and house NODE_ENV semantics ([4bee222](https://github.com/constructive-io/constructive/commit/4bee222d11fb216959b8ffb8038e3d080d6972b8))
+
+# [1.15.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.14.1...12factor-env@1.15.0) (2026-07-12)
+
+**Note:** Version bump only for package 12factor-env
+
+## [1.14.1](https://github.com/constructive-io/constructive/compare/12factor-env@1.14.0...12factor-env@1.14.1) (2026-07-11)
+
+**Note:** Version bump only for package 12factor-env
+
 # [1.14.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.13.0...12factor-env@1.14.0) (2026-06-28)
 
 **Note:** Version bump only for package 12factor-env

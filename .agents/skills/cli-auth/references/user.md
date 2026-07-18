@@ -4,7 +4,7 @@
 
 CRUD operations for User records via csdk CLI
 
-**Unified Search API fields:** `searchTsv`, `displayNameTrgmSimilarity`, `searchScore`
+**Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`, `searchTsv`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -16,8 +16,8 @@ csdk user list --limit 10 --after <cursor>
 csdk user find-first --where.<field>.<op> <value>
 csdk user search <query>
 csdk user get --id <UUID>
-csdk user create [--username <String>] [--displayName <String>] [--profilePicture <Image>] [--type <Int>]
-csdk user update --id <UUID> [--username <String>] [--displayName <String>] [--profilePicture <Image>] [--type <Int>]
+csdk user create [--displayName <String>] [--profilePicture <Image>] [--type <Int>] [--username <String>]
+csdk user update --id <UUID> [--displayName <String>] [--profilePicture <Image>] [--type <Int>] [--username <String>]
 csdk user delete --id <UUID>
 ```
 
@@ -59,22 +59,22 @@ csdk user list --select id,id
 csdk user list --where.id.equalTo <value> --orderBy ID_ASC
 ```
 
-### Full-text search via tsvector (`searchTsv`)
-
-```bash
-csdk user list --where.searchTsv "search query" --select title,tsvRank
-```
-
 ### Fuzzy search via trigram similarity (`trgmDisplayName`)
 
 ```bash
 csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
 ```
 
+### Full-text search via tsvector (`searchTsv`)
+
+```bash
+csdk user list --where.searchTsv "search query" --select title,tsvRank
+```
+
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk user list --where.unifiedSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
+csdk user list --where.unifiedSearch "search query" --select title,displayNameTrgmSimilarity,searchScore,tsvRank
 ```
 
 ### Search with pagination and field projection
@@ -87,7 +87,7 @@ csdk user search "query" --limit 10 --select id,title,searchScore
 ### Create a user
 
 ```bash
-csdk user create [--username <String>] [--displayName <String>] [--profilePicture <Image>] [--type <Int>]
+csdk user create [--displayName <String>] [--profilePicture <Image>] [--type <Int>] [--username <String>]
 ```
 
 ### Get a user by id

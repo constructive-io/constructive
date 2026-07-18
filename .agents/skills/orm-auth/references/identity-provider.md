@@ -9,8 +9,8 @@ ORM operations for IdentityProvider records
 ```typescript
 db.identityProvider.findMany({ select: { id: true } }).execute()
 db.identityProvider.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.identityProvider.create({ data: { slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '<Boolean>', isBuiltIn: '<Boolean>' }, select: { id: true } }).execute()
-db.identityProvider.update({ where: { id: '<UUID>' }, data: { slug: '<String>' }, select: { id: true } }).execute()
+db.identityProvider.create({ data: { displayName: '<String>', enabled: '<Boolean>', kind: '<String>', slug: '<String>' }, select: { id: true } }).execute()
+db.identityProvider.update({ where: { id: '<UUID>' }, data: { displayName: '<String>' }, select: { id: true } }).execute()
 db.identityProvider.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.identityProvider.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.identityProvider.findMany({
-  select: { id: true, slug: true }
+  select: { id: true, displayName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.identityProvider.findMany({
 
 ```typescript
 const item = await db.identityProvider.create({
-  data: { slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '<Boolean>', isBuiltIn: '<Boolean>' },
+  data: { displayName: '<String>', enabled: '<Boolean>', kind: '<String>', slug: '<String>' },
   select: { id: true }
 }).execute();
 ```

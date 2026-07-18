@@ -1,122 +1,297 @@
-"""The root query type which gives access points into the data universe."""
-type Query {
-  """
-  Reads and enables pagination through a set of `PlatformConfigDefinition`.
-  """
-  platformConfigDefinitions(
-    """Only read the first `n` values of the set."""
-    first: Int
+"""
+Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
+"""
+type Config {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+  createdAt: Datetime
 
-    """Only read the last `n` values of the set."""
-    last: Int
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
+  """Human-readable note about this config entry"""
+  description: String
 
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
 
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
+  """Unique identifier for this config entry"""
+  id: UUID!
 
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformConfigDefinitionFilter
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON!
 
-    """The method to use when ordering `PlatformConfigDefinition`."""
-    orderBy: [PlatformConfigDefinitionOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PlatformConfigDefinitionConnection
+  """Key name identifying the config entry"""
+  name: String!
 
-  """Reads and enables pagination through a set of `PlatformConfig`."""
-  platformConfigs(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformConfigFilter
-
-    """The method to use when ordering `PlatformConfig`."""
-    orderBy: [PlatformConfigOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PlatformConfigConnection
+  """FK to namespaces — logical grouping for config entries"""
+  namespaceId: UUID!
 
   """
-  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
   """
-  _meta: MetaSchema
+  provider: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
 }
 
-"""A connection to a list of `PlatformConfigDefinition` values."""
-type PlatformConfigDefinitionConnection {
-  """A list of `PlatformConfigDefinition` objects."""
-  nodes: [PlatformConfigDefinition]!
+"""A connection to a list of `Config` values."""
+type ConfigConnection {
+  """
+  A list of edges which contains the `Config` and cursor to aid in pagination.
+  """
+  edges: [ConfigEdge]!
 
-  """
-  A list of edges which contains the `PlatformConfigDefinition` and cursor to aid in pagination.
-  """
-  edges: [PlatformConfigDefinitionEdge]!
+  """A list of `Config` objects."""
+  nodes: [Config]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `PlatformConfigDefinition` you could get from the connection.
-  """
+  """The count of *all* `Config` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-Registry of valid config keys — declares which config entries the platform recognizes
-"""
-type PlatformConfigDefinition {
-  """Unique identifier for this config definition"""
-  id: UUID!
-  createdAt: Datetime
-  updatedAt: Datetime
+"""A `Config` edge in the connection."""
+type ConfigEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-  """Config key name (must match config table name for resolution)"""
-  name: String!
-
-  """Human-readable description of what this config key controls"""
-  description: String
-
-  """Default value used when no config entry exists for a namespace"""
-  defaultValue: String
-
-  """Whether this row was seeded as a built-in config definition"""
-  isBuiltIn: Boolean!
-
-  """Key-value metadata for filtering and grouping config definitions"""
-  labels: JSON!
-
-  """Freeform metadata annotations for config definitions"""
-  annotations: JSON!
+  """The `Config` at the end of the edge."""
+  node: Config
 }
 
 """
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+A filter to be used against `Config` object types. All fields are combined with a logical ‘and.’
 """
-scalar UUID
+input ConfigFilter {
+  """Checks for all expressions in this list."""
+  and: [ConfigFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: ConfigFilter
+
+  """Checks for any expressions in this list."""
+  or: [ConfigFilter!]
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `value` field."""
+  value: StringFilter
+}
+
+"""An input for mutations affecting `Config`"""
+input ConfigInput {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String!
+
+  """FK to namespaces — logical grouping for config entries"""
+  namespaceId: UUID!
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""Methods to use when ordering `Config`."""
+enum ConfigOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VALUE_ASC
+  VALUE_DESC
+}
+
+"""
+Represents an update to a `Config`. Fields that are set will be updated.
+"""
+input ConfigPatch {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String
+
+  """FK to namespaces — logical grouping for config entries"""
+  namespaceId: UUID
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
+}
+
+"""All input for the create `Config` mutation."""
+input CreateConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Config` to be created by this mutation."""
+  config: ConfigInput!
+}
+
+"""The output of our create `Config` mutation."""
+type CreateConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Config` that was created by this mutation."""
+  config: Config
+
+  """An edge for our `Config`. May be used by Relay 1."""
+  configEdge(
+    """The method to use when ordering `Config`."""
+    orderBy: [ConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformConfig` mutation."""
+input CreatePlatformConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformConfig` to be created by this mutation."""
+  platformConfig: PlatformConfigInput!
+}
+
+"""The output of our create `PlatformConfig` mutation."""
+type CreatePlatformConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformConfig` that was created by this mutation."""
+  platformConfig: PlatformConfig
+
+  """An edge for our `PlatformConfig`. May be used by Relay 1."""
+  platformConfigEdge(
+    """The method to use when ordering `PlatformConfig`."""
+    orderBy: [PlatformConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
 
 """
 A point in time as described by the [ISO
@@ -128,24 +303,569 @@ to unexpected results.
 scalar Datetime
 
 """
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+}
+
+"""All input for the `deleteConfig` mutation."""
+input DeleteConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+}
+
+"""The output of our delete `Config` mutation."""
+type DeleteConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Config` that was deleted by this mutation."""
+  config: Config
+
+  """An edge for our `Config`. May be used by Relay 1."""
+  configEdge(
+    """The method to use when ordering `Config`."""
+    orderBy: [ConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformConfig` mutation."""
+input DeletePlatformConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+}
+
+"""The output of our delete `PlatformConfig` mutation."""
+type DeletePlatformConfigPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformConfig` that was deleted by this mutation."""
+  platformConfig: PlatformConfig
+
+  """An edge for our `PlatformConfig`. May be used by Relay 1."""
+  platformConfigEdge(
+    """The method to use when ordering `PlatformConfig`."""
+    orderBy: [PlatformConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
 Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
 
-"""A `PlatformConfigDefinition` edge in the connection."""
-type PlatformConfigDefinitionEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """Contained by the specified JSON."""
+  containedBy: JSON
 
-  """The `PlatformConfigDefinition` at the end of the edge."""
-  node: PlatformConfigDefinition
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
 }
 
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
+  name: String!
+  type: MetaType!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+  referencedFields: [String!]!
+  referencedTable: String!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+  type: String
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  _secretsDel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _SecretsDelInput!
+  ): _SecretsDelPayload
+  _secretsRemoveArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _SecretsRemoveArrayInput!
+  ): _SecretsRemoveArrayPayload
+  _secretsRotate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _SecretsRotateInput!
+  ): _SecretsRotatePayload
+  _secretsSet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: _SecretsSetInput!
+  ): _SecretsSetPayload
+
+  """Creates a single `Config`."""
+  createConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateConfigInput!
+  ): CreateConfigPayload
+
+  """Creates a single `PlatformConfig`."""
+  createPlatformConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformConfigInput!
+  ): CreatePlatformConfigPayload
+
+  """Deletes a single `Config` using a unique key."""
+  deleteConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConfigInput!
+  ): DeleteConfigPayload
+
+  """Deletes a single `PlatformConfig` using a unique key."""
+  deletePlatformConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformConfigInput!
+  ): DeletePlatformConfigPayload
+  platformInternalSecretsDel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInternalSecretsDelInput!
+  ): PlatformInternalSecretsDelPayload
+  platformInternalSecretsRemoveArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInternalSecretsRemoveArrayInput!
+  ): PlatformInternalSecretsRemoveArrayPayload
+  platformInternalSecretsRotate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInternalSecretsRotateInput!
+  ): PlatformInternalSecretsRotatePayload
+  platformInternalSecretsSet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInternalSecretsSetInput!
+  ): PlatformInternalSecretsSetPayload
+  platformSecretsDel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSecretsDelInput!
+  ): PlatformSecretsDelPayload
+  platformSecretsRemoveArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSecretsRemoveArrayInput!
+  ): PlatformSecretsRemoveArrayPayload
+  platformSecretsRotate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSecretsRotateInput!
+  ): PlatformSecretsRotatePayload
+  platformSecretsSet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformSecretsSetInput!
+  ): PlatformSecretsSetPayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+
+  """Updates a single `Config` using a unique key and a patch."""
+  updateConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConfigInput!
+  ): UpdateConfigPayload
+
+  """Updates a single `PlatformConfig` using a unique key and a patch."""
+  updatePlatformConfig(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformConfigInput!
+  ): UpdatePlatformConfigPayload
+}
 
 """Information about pagination in a connection."""
 type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
   """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
@@ -154,438 +874,59 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
 }
 
 """
-A filter to be used against `PlatformConfigDefinition` object types. All fields are combined with a logical ‘and.’
+Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
 """
-input PlatformConfigDefinitionFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
+type PlatformConfig {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+  createdAt: Datetime
 
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
+  """Human-readable note about this config entry"""
+  description: String
 
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
 
-  """Filter by the object’s `name` field."""
-  name: StringFilter
+  """Unique identifier for this config entry"""
+  id: UUID!
 
-  """Filter by the object’s `description` field."""
-  description: StringFilter
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON!
 
-  """Filter by the object’s `defaultValue` field."""
-  defaultValue: StringFilter
+  """Key name identifying the config entry"""
+  name: String!
 
-  """Filter by the object’s `isBuiltIn` field."""
-  isBuiltIn: BooleanFilter
-
-  """Filter by the object’s `labels` field."""
-  labels: JSONFilter
-
-  """Filter by the object’s `annotations` field."""
-  annotations: JSONFilter
-
-  """Checks for all expressions in this list."""
-  and: [PlatformConfigDefinitionFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [PlatformConfigDefinitionFilter!]
-
-  """Negates the expression."""
-  not: PlatformConfigDefinitionFilter
-}
-
-"""
-A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: UUID
-
-  """Not equal to the specified value."""
-  notEqualTo: UUID
+  """FK to namespaces — logical grouping for config entries"""
+  namespaceId: UUID!
 
   """
-  Not equal to the specified value, treating null like an ordinary value.
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
   """
-  distinctFrom: UUID
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: UUID
-
-  """Included in the specified list."""
-  in: [UUID!]
-
-  """Not included in the specified list."""
-  notIn: [UUID!]
-
-  """Less than the specified value."""
-  lessThan: UUID
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: UUID
-
-  """Greater than the specified value."""
-  greaterThan: UUID
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: UUID
-}
-
-"""
-A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
-"""
-input DatetimeFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Datetime
-
-  """Not equal to the specified value."""
-  notEqualTo: Datetime
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Datetime
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Datetime
-
-  """Included in the specified list."""
-  in: [Datetime!]
-
-  """Not included in the specified list."""
-  notIn: [Datetime!]
-
-  """Less than the specified value."""
-  lessThan: Datetime
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Datetime
-
-  """Greater than the specified value."""
-  greaterThan: Datetime
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Datetime
-}
-
-"""
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
-}
-
-"""
-A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
-"""
-input BooleanFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Boolean
-
-  """Not equal to the specified value."""
-  notEqualTo: Boolean
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Boolean
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Boolean
-
-  """Included in the specified list."""
-  in: [Boolean!]
-
-  """Not included in the specified list."""
-  notIn: [Boolean!]
-
-  """Less than the specified value."""
-  lessThan: Boolean
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Boolean
-
-  """Greater than the specified value."""
-  greaterThan: Boolean
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Boolean
-}
-
-"""
-A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
-"""
-input JSONFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: JSON
-
-  """Not equal to the specified value."""
-  notEqualTo: JSON
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: JSON
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: JSON
-
-  """Included in the specified list."""
-  in: [JSON!]
-
-  """Not included in the specified list."""
-  notIn: [JSON!]
-
-  """Less than the specified value."""
-  lessThan: JSON
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: JSON
-
-  """Greater than the specified value."""
-  greaterThan: JSON
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: JSON
-
-  """Contains the specified JSON."""
-  contains: JSON
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: JSON
-}
-
-"""Methods to use when ordering `PlatformConfigDefinition`."""
-enum PlatformConfigDefinitionOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  DEFAULT_VALUE_ASC
-  DEFAULT_VALUE_DESC
-  IS_BUILT_IN_ASC
-  IS_BUILT_IN_DESC
-  LABELS_ASC
-  LABELS_DESC
-  ANNOTATIONS_ASC
-  ANNOTATIONS_DESC
+  provider: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
 }
 
 """A connection to a list of `PlatformConfig` values."""
 type PlatformConfigConnection {
-  """A list of `PlatformConfig` objects."""
-  nodes: [PlatformConfig]!
-
   """
   A list of edges which contains the `PlatformConfig` and cursor to aid in pagination.
   """
   edges: [PlatformConfigEdge]!
+
+  """A list of `PlatformConfig` objects."""
+  nodes: [PlatformConfig]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """The count of *all* `PlatformConfig` you could get from the connection."""
   totalCount: Int!
-}
-
-"""
-App-level plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
-"""
-type PlatformConfig {
-  """Unique identifier for this config entry"""
-  id: UUID!
-
-  """FK to namespaces — logical grouping for config entries"""
-  namespaceId: UUID!
-
-  """Key name identifying the config entry"""
-  name: String!
-
-  """Plaintext config value"""
-  value: String
-
-  """Key/value pairs for selecting/filtering config entries"""
-  labels: JSON!
-
-  """Freeform metadata for tooling and operational notes"""
-  annotations: JSON!
-
-  """Human-readable note about this config entry"""
-  description: String
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Optional expiration timestamp for time-limited config entries"""
-  expiresAt: Datetime
 }
 
 """A `PlatformConfig` edge in the connection."""
@@ -601,438 +942,271 @@ type PlatformConfigEdge {
 A filter to be used against `PlatformConfig` object types. All fields are combined with a logical ‘and.’
 """
 input PlatformConfigFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `namespaceId` field."""
-  namespaceId: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `value` field."""
-  value: StringFilter
-
-  """Filter by the object’s `labels` field."""
-  labels: JSONFilter
+  """Checks for all expressions in this list."""
+  and: [PlatformConfigFilter!]
 
   """Filter by the object’s `annotations` field."""
   annotations: JSONFilter
 
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
+  """Filter by the object’s `description` field."""
+  description: StringFilter
 
   """Filter by the object’s `expiresAt` field."""
   expiresAt: DatetimeFilter
 
-  """Checks for all expressions in this list."""
-  and: [PlatformConfigFilter!]
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformConfigFilter
 
   """Checks for any expressions in this list."""
   or: [PlatformConfigFilter!]
 
-  """Negates the expression."""
-  not: PlatformConfigFilter
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `value` field."""
+  value: StringFilter
+}
+
+"""An input for mutations affecting `PlatformConfig`"""
+input PlatformConfigInput {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Human-readable note about this config entry"""
+  description: String
+
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String!
+
+  """FK to namespaces — logical grouping for config entries"""
+  namespaceId: UUID!
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
 }
 
 """Methods to use when ordering `PlatformConfig`."""
 enum PlatformConfigOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
   ID_ASC
   ID_DESC
+  LABELS_ASC
+  LABELS_DESC
   NAMESPACE_ID_ASC
   NAMESPACE_ID_DESC
   NAME_ASC
   NAME_DESC
-  VALUE_ASC
-  VALUE_DESC
-  LABELS_ASC
-  LABELS_DESC
-  ANNOTATIONS_ASC
-  ANNOTATIONS_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PROVIDER_ASC
+  PROVIDER_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-  EXPIRES_AT_ASC
-  EXPIRES_AT_DESC
+  VALUE_ASC
+  VALUE_DESC
 }
 
-"""Root meta schema type"""
-type MetaSchema {
-  tables: [MetaTable!]!
-}
+"""
+Represents an update to a `PlatformConfig`. Fields that are set will be updated.
+"""
+input PlatformConfigPatch {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
 
-"""Information about a database table"""
-type MetaTable {
-  name: String!
-  schemaName: String!
-  fields: [MetaField!]!
-  indexes: [MetaIndex!]!
-  constraints: MetaConstraints!
-  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
-  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
-  uniqueConstraints: [MetaUniqueConstraint!]!
-  relations: MetaRelations!
-  inflection: MetaInflection!
-  query: MetaQuery!
-
-  """Storage metadata (null if not a storage table)"""
-  storage: MetaStorage
-
-  """Search metadata (null if no search configured)"""
-  search: MetaSearch
-
-  """i18n metadata (null if no @i18n tag)"""
-  i18n: MetaI18n
-
-  """Realtime metadata (null if no @realtime tag)"""
-  realtime: MetaRealtime
-}
-
-"""Information about a table field/column"""
-type MetaField {
-  name: String!
-  type: MetaType!
-  isNotNull: Boolean!
-  hasDefault: Boolean!
-  isPrimaryKey: Boolean!
-  isForeignKey: Boolean!
+  """Human-readable note about this config entry"""
   description: String
 
-  """Enum metadata if this field has an enum type"""
-  enumValues: MetaEnum
+  """Optional expiration timestamp for time-limited config entries"""
+  expiresAt: Datetime
+
+  """Unique identifier for this config entry"""
+  id: UUID
+
+  """Key/value pairs for selecting/filtering config entries"""
+  labels: JSON
+
+  """Key name identifying the config entry"""
+  name: String
+
+  """FK to namespaces — logical grouping for config entries"""
+  namespaceId: UUID
+
+  """
+  Integration provider slug (e.g. mailgun, postgres). Used by the UI to group config entries by integration. No FK.
+  """
+  provider: String
+  updatedAt: Datetime
+
+  """Plaintext config value"""
+  value: String
 }
 
-"""Information about a PostgreSQL type"""
-type MetaType {
-  pgType: String!
-  gqlType: String!
-  isArray: Boolean!
-  isNotNull: Boolean
-  hasDefault: Boolean
-  subtype: String
+type PlatformInternalSecret {
+  annotations: JSON
+  createdAt: Datetime
+  description: String
+  id: UUID
+  labels: JSON
+  name: String
+  namespaceId: UUID
+  retiredAt: Datetime
+  rotatedAt: Datetime
+  updatedAt: Datetime
 }
 
-"""Information about a PostgreSQL enum type"""
-type MetaEnum {
-  """The PostgreSQL enum type name"""
-  name: String!
+"""A connection to a list of `PlatformInternalSecret` values."""
+type PlatformInternalSecretConnection {
+  """
+  A list of edges which contains the `PlatformInternalSecret` and cursor to aid in pagination.
+  """
+  edges: [PlatformInternalSecretEdge]!
 
-  """Allowed values for this enum"""
-  values: [String!]!
+  """A list of `PlatformInternalSecret` objects."""
+  nodes: [PlatformInternalSecret]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInternalSecret` you could get from the connection.
+  """
+  totalCount: Int!
 }
 
-"""Information about a database index"""
-type MetaIndex {
-  name: String!
-  isUnique: Boolean!
-  isPrimary: Boolean!
-  columns: [String!]!
-  fields: [MetaField!]
-}
+"""A `PlatformInternalSecret` edge in the connection."""
+type PlatformInternalSecretEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-"""Table constraints"""
-type MetaConstraints {
-  primaryKey: MetaPrimaryKeyConstraint
-  unique: [MetaUniqueConstraint!]!
-  foreignKey: [MetaForeignKeyConstraint!]!
-}
-
-"""Information about a primary key constraint"""
-type MetaPrimaryKeyConstraint {
-  name: String!
-  fields: [MetaField!]!
-}
-
-"""Information about a unique constraint"""
-type MetaUniqueConstraint {
-  name: String!
-  fields: [MetaField!]!
-}
-
-"""Information about a foreign key constraint"""
-type MetaForeignKeyConstraint {
-  name: String!
-  fields: [MetaField!]!
-  referencedTable: String!
-  referencedFields: [String!]!
-  refFields: [MetaField!]
-  refTable: MetaRefTable
-}
-
-"""Reference to a related table"""
-type MetaRefTable {
-  name: String!
-}
-
-"""Table relations"""
-type MetaRelations {
-  belongsTo: [MetaBelongsToRelation!]!
-  has: [MetaHasRelation!]!
-  hasOne: [MetaHasRelation!]!
-  hasMany: [MetaHasRelation!]!
-  manyToMany: [MetaManyToManyRelation!]!
-}
-
-"""A belongs-to (forward FK) relation"""
-type MetaBelongsToRelation {
-  fieldName: String
-  isUnique: Boolean!
-  type: String
-  keys: [MetaField!]!
-  references: MetaRefTable!
-}
-
-"""A has-one or has-many (reverse FK) relation"""
-type MetaHasRelation {
-  fieldName: String
-  isUnique: Boolean!
-  type: String
-  keys: [MetaField!]!
-  referencedBy: MetaRefTable!
-}
-
-"""A many-to-many relation via junction table"""
-type MetaManyToManyRelation {
-  fieldName: String
-  type: String
-  junctionTable: MetaRefTable!
-  junctionLeftConstraint: MetaForeignKeyConstraint!
-  junctionLeftKeyAttributes: [MetaField!]!
-  junctionRightConstraint: MetaForeignKeyConstraint!
-  junctionRightKeyAttributes: [MetaField!]!
-  leftKeyAttributes: [MetaField!]!
-  rightKeyAttributes: [MetaField!]!
-  rightTable: MetaRefTable!
-}
-
-"""Table inflection names"""
-type MetaInflection {
-  tableType: String!
-  allRows: String!
-  connection: String!
-  edge: String!
-  filterType: String
-  orderByType: String!
-  conditionType: String!
-  patchType: String
-  createInputType: String!
-  createPayloadType: String!
-  updatePayloadType: String
-  deletePayloadType: String!
-}
-
-"""Table query/mutation names"""
-type MetaQuery {
-  all: String!
-  one: String
-  create: String
-  update: String
-  delete: String
-}
-
-"""Storage metadata for a table"""
-type MetaStorage {
-  """Whether this table is a storage files table"""
-  isFilesTable: Boolean!
-
-  """Whether this table is a storage buckets table"""
-  isBucketsTable: Boolean!
-}
-
-"""Search metadata for a table"""
-type MetaSearch {
-  """Active search algorithms on this table"""
-  algorithms: [String!]!
-
-  """Searchable columns with their algorithm"""
-  columns: [MetaSearchColumn!]!
-
-  """Whether unifiedSearch composite filter is available"""
-  hasUnifiedSearch: Boolean!
-
-  """Per-table search configuration"""
-  config: MetaSearchConfig
-}
-
-"""A searchable column with its algorithm"""
-type MetaSearchColumn {
-  """Column name (camelCase)"""
-  name: String!
-
-  """Search algorithm: tsvector, bm25, trgm, or vector"""
-  algorithm: String!
-}
-
-"""Per-table search configuration from @searchConfig smart tag"""
-type MetaSearchConfig {
-  """JSON-encoded per-adapter score weights"""
-  weights: String
-
-  """Whether recency boosting is enabled"""
-  boostRecent: Boolean!
-
-  """Field used for recency decay"""
-  boostRecencyField: String
-
-  """Exponential decay factor per day"""
-  boostRecencyDecay: Float
-}
-
-"""i18n metadata for a table with @i18n tag"""
-type MetaI18n {
-  """Name of the translation table"""
-  translationTable: String!
-
-  """Fields that are translatable"""
-  translatableFields: [MetaI18nField!]!
-}
-
-"""A translatable field"""
-type MetaI18nField {
-  """GraphQL field name"""
-  name: String!
-
-  """PostgreSQL column type (text, citext)"""
-  type: String!
-}
-
-"""Realtime metadata for a table with @realtime tag"""
-type MetaRealtime {
-  """The generated subscription field name (e.g. onPostChanged)"""
-  subscriptionFieldName: String!
+  """The `PlatformInternalSecret` at the end of the edge."""
+  node: PlatformInternalSecret
 }
 
 """
-The root mutation type which contains root level fields which mutate data.
+A filter to be used against `PlatformInternalSecret` object types. All fields are combined with a logical ‘and.’
 """
-type Mutation {
-  platformSecretsDel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: PlatformSecretsDelInput!
-  ): PlatformSecretsDelPayload
-  orgSecretsDel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: OrgSecretsDelInput!
-  ): OrgSecretsDelPayload
-  platformSecretsRemoveArray(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: PlatformSecretsRemoveArrayInput!
-  ): PlatformSecretsRemoveArrayPayload
-  orgSecretsRemoveArray(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: OrgSecretsRemoveArrayInput!
-  ): OrgSecretsRemoveArrayPayload
-  platformSecretsRotate(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: PlatformSecretsRotateInput!
-  ): PlatformSecretsRotatePayload
-  platformSecretsSet(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: PlatformSecretsSetInput!
-  ): PlatformSecretsSetPayload
-  orgSecretsRotate(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: OrgSecretsRotateInput!
-  ): OrgSecretsRotatePayload
-  orgSecretsSet(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: OrgSecretsSetInput!
-  ): OrgSecretsSetPayload
+input PlatformInternalSecretFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformInternalSecretFilter!]
 
-  """Creates a single `PlatformConfigDefinition`."""
-  createPlatformConfigDefinition(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformConfigDefinitionInput!
-  ): CreatePlatformConfigDefinitionPayload
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
 
-  """Creates a single `PlatformConfig`."""
-  createPlatformConfig(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformConfigInput!
-  ): CreatePlatformConfigPayload
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
 
-  """
-  Updates a single `PlatformConfigDefinition` using a unique key and a patch.
-  """
-  updatePlatformConfigDefinition(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePlatformConfigDefinitionInput!
-  ): UpdatePlatformConfigDefinitionPayload
+  """Filter by the object’s `description` field."""
+  description: StringFilter
 
-  """Updates a single `PlatformConfig` using a unique key and a patch."""
-  updatePlatformConfig(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePlatformConfigInput!
-  ): UpdatePlatformConfigPayload
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
 
-  """Deletes a single `PlatformConfigDefinition` using a unique key."""
-  deletePlatformConfigDefinition(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePlatformConfigDefinitionInput!
-  ): DeletePlatformConfigDefinitionPayload
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
 
-  """Deletes a single `PlatformConfig` using a unique key."""
-  deletePlatformConfig(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePlatformConfigInput!
-  ): DeletePlatformConfigPayload
+  """Filter by the object’s `name` field."""
+  name: StringFilter
 
-  """
-  Provision an S3 bucket for a logical bucket in the database.
-  Reads the bucket config via RLS, then creates and configures
-  the S3 bucket with the appropriate privacy policies, CORS rules,
-  and lifecycle settings.
-  """
-  provisionBucket(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionBucketInput!
-  ): ProvisionBucketPayload
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformInternalSecretFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformInternalSecretFilter!]
+
+  """Filter by the object’s `retiredAt` field."""
+  retiredAt: DatetimeFilter
+
+  """Filter by the object’s `rotatedAt` field."""
+  rotatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
 }
 
-"""The output of our `platformSecretsDel` mutation."""
-type PlatformSecretsDelPayload {
+"""Methods to use when ordering `PlatformInternalSecret`."""
+enum PlatformInternalSecretOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  RETIRED_AT_ASC
+  RETIRED_AT_DESC
+  ROTATED_AT_ASC
+  ROTATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""All input for the `platformInternalSecretsDel` mutation."""
+input PlatformInternalSecretsDelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  namespaceId: UUID
+  secretName: String
+}
+
+"""The output of our `platformInternalSecretsDel` mutation."""
+type PlatformInternalSecretsDelPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -1043,6 +1217,203 @@ type PlatformSecretsDelPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the `platformInternalSecretsRemoveArray` mutation."""
+input PlatformInternalSecretsRemoveArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  namespaceId: UUID
+  secretNames: [String]
+}
+
+"""The output of our `platformInternalSecretsRemoveArray` mutation."""
+type PlatformInternalSecretsRemoveArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `platformInternalSecretsRotate` mutation."""
+input PlatformInternalSecretsRotateInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  namespaceId: UUID
+  secretName: String
+  secretValue: String
+}
+
+"""The output of our `platformInternalSecretsRotate` mutation."""
+type PlatformInternalSecretsRotatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `platformInternalSecretsSet` mutation."""
+input PlatformInternalSecretsSetInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  secretName: String
+  secretNamespaceId: UUID
+  secretValue: String
+}
+
+"""The output of our `platformInternalSecretsSet` mutation."""
+type PlatformInternalSecretsSetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+type PlatformSecret {
+  annotations: JSON
+  createdAt: Datetime
+  description: String
+  id: UUID
+  labels: JSON
+  name: String
+  namespaceId: UUID
+  provider: String
+  retiredAt: Datetime
+  rotatedAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformSecret` values."""
+type PlatformSecretConnection {
+  """
+  A list of edges which contains the `PlatformSecret` and cursor to aid in pagination.
+  """
+  edges: [PlatformSecretEdge]!
+
+  """A list of `PlatformSecret` objects."""
+  nodes: [PlatformSecret]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PlatformSecret` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PlatformSecret` edge in the connection."""
+type PlatformSecretEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformSecret` at the end of the edge."""
+  node: PlatformSecret
+}
+
+"""
+A filter to be used against `PlatformSecret` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformSecretFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformSecretFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformSecretFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformSecretFilter!]
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `retiredAt` field."""
+  retiredAt: DatetimeFilter
+
+  """Filter by the object’s `rotatedAt` field."""
+  rotatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""Methods to use when ordering `PlatformSecret`."""
+enum PlatformSecretOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PROVIDER_ASC
+  PROVIDER_DESC
+  RETIRED_AT_ASC
+  RETIRED_AT_DESC
+  ROTATED_AT_ASC
+  ROTATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """All input for the `platformSecretsDel` mutation."""
@@ -1052,38 +1423,12 @@ input PlatformSecretsDelInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  secretName: String
   namespaceId: UUID
-}
-
-"""The output of our `orgSecretsDel` mutation."""
-type OrgSecretsDelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `orgSecretsDel` mutation."""
-input OrgSecretsDelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  ownerId: UUID
   secretName: String
-  namespaceId: UUID
 }
 
-"""The output of our `platformSecretsRemoveArray` mutation."""
-type PlatformSecretsRemoveArrayPayload {
+"""The output of our `platformSecretsDel` mutation."""
+type PlatformSecretsDelPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -1103,44 +1448,17 @@ input PlatformSecretsRemoveArrayInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  secretNames: [String]
   namespaceId: UUID
+  secretNames: [String]
 }
 
-"""The output of our `orgSecretsRemoveArray` mutation."""
-type OrgSecretsRemoveArrayPayload {
+"""The output of our `platformSecretsRemoveArray` mutation."""
+type PlatformSecretsRemoveArrayPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `orgSecretsRemoveArray` mutation."""
-input OrgSecretsRemoveArrayInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  ownerId: UUID
-  secretNames: [String]
-  namespaceId: UUID
-}
-
-"""The output of our `platformSecretsRotate` mutation."""
-type PlatformSecretsRotatePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Boolean
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1150,15 +1468,46 @@ type PlatformSecretsRotatePayload {
 
 """All input for the `platformSecretsRotate` mutation."""
 input PlatformSecretsRotateInput {
+  algo: String
+
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  namespaceId: UUID
   secretName: String
   secretValue: String
-  namespaceId: UUID
+}
+
+"""The output of our `platformSecretsRotate` mutation."""
+type PlatformSecretsRotatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `platformSecretsSet` mutation."""
+input PlatformSecretsSetInput {
   algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  provider: String
+  secretName: String
+  secretNamespaceId: UUID
+  secretValue: String
 }
 
 """The output of our `platformSecretsSet` mutation."""
@@ -1168,299 +1517,537 @@ type PlatformSecretsSetPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: Boolean
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-}
-
-"""All input for the `platformSecretsSet` mutation."""
-input PlatformSecretsSetInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  secretName: String
-  secretValue: String
-  secretNamespaceId: UUID
-  algo: String
-}
-
-"""The output of our `orgSecretsRotate` mutation."""
-type OrgSecretsRotatePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
   result: Boolean
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
-"""All input for the `orgSecretsRotate` mutation."""
-input OrgSecretsRotateInput {
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
   """
-  clientMutationId: String
   ownerId: UUID
-  secretName: String
-  secretValue: String
-  namespaceId: UUID
-  algo: String
 }
 
-"""The output of our `orgSecretsSet` mutation."""
-type OrgSecretsSetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Boolean
+type ProvisionBucketPayload {
+  """The access type applied"""
+  accessType: String!
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
 }
 
-"""All input for the `orgSecretsSet` mutation."""
-input OrgSecretsSetInput {
+"""The root query type which gives access points into the data universe."""
+type Query {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
-  clientMutationId: String
-  scopeOwnerId: UUID
-  secretName: String
-  secretValue: String
-  secretNamespaceId: UUID
-  algo: String
-}
+  _meta: MetaSchema
 
-"""The output of our create `PlatformConfigDefinition` mutation."""
-type CreatePlatformConfigDefinitionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+  """Reads and enables pagination through a set of `Config`."""
+  configs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
 
-  """The `PlatformConfigDefinition` that was created by this mutation."""
-  platformConfigDefinition: PlatformConfigDefinition
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+    """Only read the first `n` values of the set."""
+    first: Int
 
-  """An edge for our `PlatformConfigDefinition`. May be used by Relay 1."""
-  platformConfigDefinitionEdge(
-    """The method to use when ordering `PlatformConfigDefinition`."""
-    orderBy: [PlatformConfigDefinitionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformConfigDefinitionEdge
-}
+    """Only read the last `n` values of the set."""
+    last: Int
 
-"""All input for the create `PlatformConfigDefinition` mutation."""
-input CreatePlatformConfigDefinitionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
 
-  """The `PlatformConfigDefinition` to be created by this mutation."""
-  platformConfigDefinition: PlatformConfigDefinitionInput!
-}
+    """The method to use when ordering `Config`."""
+    orderBy: [ConfigOrderBy!] = [PRIMARY_KEY_ASC]
 
-"""An input for mutations affecting `PlatformConfigDefinition`"""
-input PlatformConfigDefinitionInput {
-  """Unique identifier for this config definition"""
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ConfigFilter
+  ): ConfigConnection
 
-  """Config key name (must match config table name for resolution)"""
-  name: String!
+  """Reads and enables pagination through a set of `PlatformConfig`."""
+  platformConfigs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
 
-  """Human-readable description of what this config key controls"""
-  description: String
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
 
-  """Default value used when no config entry exists for a namespace"""
-  defaultValue: String
+    """Only read the first `n` values of the set."""
+    first: Int
 
-  """Whether this row was seeded as a built-in config definition"""
-  isBuiltIn: Boolean
+    """Only read the last `n` values of the set."""
+    last: Int
 
-  """Key-value metadata for filtering and grouping config definitions"""
-  labels: JSON
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
 
-  """Freeform metadata annotations for config definitions"""
-  annotations: JSON
-}
-
-"""The output of our create `PlatformConfig` mutation."""
-type CreatePlatformConfigPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformConfig` that was created by this mutation."""
-  platformConfig: PlatformConfig
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `PlatformConfig`. May be used by Relay 1."""
-  platformConfigEdge(
     """The method to use when ordering `PlatformConfig`."""
-    orderBy: [PlatformConfigOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformConfigEdge
+    orderBy: [PlatformConfigOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformConfigFilter
+  ): PlatformConfigConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformInternalSecret`.
+  """
+  platformInternalSecrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformInternalSecret`."""
+    orderBy: [PlatformInternalSecretOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformInternalSecretFilter
+  ): PlatformInternalSecretConnection
+
+  """Reads and enables pagination through a set of `PlatformSecret`."""
+  platformSecrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformSecret`."""
+    orderBy: [PlatformSecretOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformSecretFilter
+  ): PlatformSecretConnection
+
+  """Reads and enables pagination through a set of `Secret`."""
+  secrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Secret`."""
+    orderBy: [SecretOrderBy!] = [NATURAL]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SecretFilter
+  ): SecretConnection
 }
 
-"""All input for the create `PlatformConfig` mutation."""
-input CreatePlatformConfigInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformConfig` to be created by this mutation."""
-  platformConfig: PlatformConfigInput!
-}
-
-"""An input for mutations affecting `PlatformConfig`"""
-input PlatformConfigInput {
-  """Unique identifier for this config entry"""
-  id: UUID
-
-  """FK to namespaces — logical grouping for config entries"""
-  namespaceId: UUID!
-
-  """Key name identifying the config entry"""
-  name: String!
-
-  """Plaintext config value"""
-  value: String
-
-  """Key/value pairs for selecting/filtering config entries"""
-  labels: JSON
-
-  """Freeform metadata for tooling and operational notes"""
+type Secret {
   annotations: JSON
-
-  """Human-readable note about this config entry"""
+  createdAt: Datetime
+  databaseId: UUID
   description: String
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Optional expiration timestamp for time-limited config entries"""
-  expiresAt: Datetime
-}
-
-"""The output of our update `PlatformConfigDefinition` mutation."""
-type UpdatePlatformConfigDefinitionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformConfigDefinition` that was updated by this mutation."""
-  platformConfigDefinition: PlatformConfigDefinition
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `PlatformConfigDefinition`. May be used by Relay 1."""
-  platformConfigDefinitionEdge(
-    """The method to use when ordering `PlatformConfigDefinition`."""
-    orderBy: [PlatformConfigDefinitionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformConfigDefinitionEdge
-}
-
-"""All input for the `updatePlatformConfigDefinition` mutation."""
-input UpdatePlatformConfigDefinitionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this config definition"""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `PlatformConfigDefinition` being updated.
-  """
-  platformConfigDefinitionPatch: PlatformConfigDefinitionPatch!
-}
-
-"""
-Represents an update to a `PlatformConfigDefinition`. Fields that are set will be updated.
-"""
-input PlatformConfigDefinitionPatch {
-  """Unique identifier for this config definition"""
   id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Config key name (must match config table name for resolution)"""
+  labels: JSON
   name: String
-
-  """Human-readable description of what this config key controls"""
-  description: String
-
-  """Default value used when no config entry exists for a namespace"""
-  defaultValue: String
-
-  """Whether this row was seeded as a built-in config definition"""
-  isBuiltIn: Boolean
-
-  """Key-value metadata for filtering and grouping config definitions"""
-  labels: JSON
-
-  """Freeform metadata annotations for config definitions"""
-  annotations: JSON
+  namespaceId: UUID
+  provider: String
+  retiredAt: Datetime
+  rotatedAt: Datetime
+  updatedAt: Datetime
 }
 
-"""The output of our update `PlatformConfig` mutation."""
-type UpdatePlatformConfigPayload {
+"""A connection to a list of `Secret` values."""
+type SecretConnection {
+  """
+  A list of edges which contains the `Secret` and cursor to aid in pagination.
+  """
+  edges: [SecretEdge]!
+
+  """A list of `Secret` objects."""
+  nodes: [Secret]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Secret` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Secret` edge in the connection."""
+type SecretEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Secret` at the end of the edge."""
+  node: Secret
+}
+
+"""
+A filter to be used against `Secret` object types. All fields are combined with a logical ‘and.’
+"""
+input SecretFilter {
+  """Checks for all expressions in this list."""
+  and: [SecretFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: SecretFilter
+
+  """Checks for any expressions in this list."""
+  or: [SecretFilter!]
+
+  """Filter by the object’s `provider` field."""
+  provider: StringFilter
+
+  """Filter by the object’s `retiredAt` field."""
+  retiredAt: DatetimeFilter
+
+  """Filter by the object’s `rotatedAt` field."""
+  rotatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""Methods to use when ordering `Secret`."""
+enum SecretOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABELS_ASC
+  LABELS_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PROVIDER_ASC
+  PROVIDER_DESC
+  RETIRED_AT_ASC
+  RETIRED_AT_DESC
+  ROTATED_AT_ASC
+  ROTATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+}
+
+"""All input for the `updateConfig` mutation."""
+input UpdateConfigInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Config` being updated.
+  """
+  configPatch: ConfigPatch!
+
+  """Unique identifier for this config entry"""
+  id: UUID!
+}
+
+"""The output of our update `Config` mutation."""
+type UpdateConfigPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `PlatformConfig` that was updated by this mutation."""
-  platformConfig: PlatformConfig
+  """The `Config` that was updated by this mutation."""
+  config: Config
+
+  """An edge for our `Config`. May be used by Relay 1."""
+  configEdge(
+    """The method to use when ordering `Config`."""
+    orderBy: [ConfigOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConfigEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our `PlatformConfig`. May be used by Relay 1."""
-  platformConfigEdge(
-    """The method to use when ordering `PlatformConfig`."""
-    orderBy: [PlatformConfigOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformConfigEdge
 }
 
 """All input for the `updatePlatformConfig` mutation."""
@@ -1480,134 +2067,138 @@ input UpdatePlatformConfigInput {
   platformConfigPatch: PlatformConfigPatch!
 }
 
-"""
-Represents an update to a `PlatformConfig`. Fields that are set will be updated.
-"""
-input PlatformConfigPatch {
-  """Unique identifier for this config entry"""
-  id: UUID
-
-  """FK to namespaces — logical grouping for config entries"""
-  namespaceId: UUID
-
-  """Key name identifying the config entry"""
-  name: String
-
-  """Plaintext config value"""
-  value: String
-
-  """Key/value pairs for selecting/filtering config entries"""
-  labels: JSON
-
-  """Freeform metadata for tooling and operational notes"""
-  annotations: JSON
-
-  """Human-readable note about this config entry"""
-  description: String
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Optional expiration timestamp for time-limited config entries"""
-  expiresAt: Datetime
-}
-
-"""The output of our delete `PlatformConfigDefinition` mutation."""
-type DeletePlatformConfigDefinitionPayload {
+"""The output of our update `PlatformConfig` mutation."""
+type UpdatePlatformConfigPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `PlatformConfigDefinition` that was deleted by this mutation."""
-  platformConfigDefinition: PlatformConfigDefinition
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `PlatformConfigDefinition`. May be used by Relay 1."""
-  platformConfigDefinitionEdge(
-    """The method to use when ordering `PlatformConfigDefinition`."""
-    orderBy: [PlatformConfigDefinitionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformConfigDefinitionEdge
-}
-
-"""All input for the `deletePlatformConfigDefinition` mutation."""
-input DeletePlatformConfigDefinitionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this config definition"""
-  id: UUID!
-}
-
-"""The output of our delete `PlatformConfig` mutation."""
-type DeletePlatformConfigPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformConfig` that was deleted by this mutation."""
+  """The `PlatformConfig` that was updated by this mutation."""
   platformConfig: PlatformConfig
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 
   """An edge for our `PlatformConfig`. May be used by Relay 1."""
   platformConfigEdge(
     """The method to use when ordering `PlatformConfig`."""
     orderBy: [PlatformConfigOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformConfigEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
-"""All input for the `deletePlatformConfig` mutation."""
-input DeletePlatformConfigInput {
+"""All input for the `_secretsDel` mutation."""
+input _SecretsDelInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """Unique identifier for this config entry"""
-  id: UUID!
+  databaseId: UUID
+  namespaceId: UUID
+  secretName: String
 }
 
-input ProvisionBucketInput {
-  """The logical bucket key (e.g., "public", "private")"""
-  bucketKey: String!
+"""The output of our `_secretsDel` mutation."""
+type _SecretsDelPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
 
   """
-  Owner entity ID for entity-scoped bucket provisioning.
-  Omit for app-level (database-wide) storage.
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  ownerId: UUID
+  query: Query
 }
 
-type ProvisionBucketPayload {
-  """Whether provisioning succeeded"""
-  success: Boolean!
+"""All input for the `_secretsRemoveArray` mutation."""
+input _SecretsRemoveArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  namespaceId: UUID
+  secretNames: [String]
+}
 
-  """The S3 bucket name that was provisioned"""
-  bucketName: String!
+"""The output of our `_secretsRemoveArray` mutation."""
+type _SecretsRemoveArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
 
-  """The access type applied"""
-  accessType: String!
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
 
-  """The storage provider used"""
-  provider: String!
+"""All input for the `_secretsRotate` mutation."""
+input _SecretsRotateInput {
+  algo: String
 
-  """The S3 endpoint (null for AWS S3 default)"""
-  endpoint: String
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  namespaceId: UUID
+  secretName: String
+  secretValue: String
+}
 
-  """Error message if provisioning failed"""
-  error: String
+"""The output of our `_secretsRotate` mutation."""
+type _SecretsRotatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
+"""All input for the `_secretsSet` mutation."""
+input _SecretsSetInput {
+  algo: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  provider: String
+  scopeDatabaseId: UUID
+  secretName: String
+  secretNamespaceId: UUID
+  secretValue: String
+}
+
+"""The output of our `_secretsSet` mutation."""
+type _SecretsSetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
 }

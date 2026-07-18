@@ -19,7 +19,7 @@ export const applyRegistryDefaultsQueryKey = customQueryKeys.applyRegistryDefaul
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useApplyRegistryDefaultsQuery({ variables: { nodeType, data } });
+ * const { data, isLoading } = useApplyRegistryDefaultsQuery({ variables: { data, nodeType } });
  *
  * if (data?.applyRegistryDefaults) {
  *   console.log(data.applyRegistryDefaults);
@@ -76,7 +76,7 @@ export function useApplyRegistryDefaultsQuery<
  *
  * @example
  * ```ts
- * const data = await fetchApplyRegistryDefaultsQuery({ variables: { nodeType, data } });
+ * const data = await fetchApplyRegistryDefaultsQuery({ variables: { data, nodeType } });
  * ```
  */
 export async function fetchApplyRegistryDefaultsQuery(params?: {
@@ -90,7 +90,7 @@ export async function fetchApplyRegistryDefaultsQuery(params?: {
  *
  * @example
  * ```ts
- * await prefetchApplyRegistryDefaultsQuery(queryClient, { variables: { nodeType, data } });
+ * await prefetchApplyRegistryDefaultsQuery(queryClient, { variables: { data, nodeType } });
  * ```
  */
 export async function prefetchApplyRegistryDefaultsQuery(

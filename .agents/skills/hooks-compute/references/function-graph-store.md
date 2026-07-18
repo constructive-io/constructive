@@ -7,8 +7,8 @@ Named stores — one per version-controlled tree (e.g. one graph, one definition
 ## Usage
 
 ```typescript
-useFunctionGraphStoresQuery({ selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } } })
-useFunctionGraphStoreQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } } })
+useFunctionGraphStoresQuery({ selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } } })
+useFunctionGraphStoreQuery({ id: '<UUID>', selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } } })
 useCreateFunctionGraphStoreMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphStoreMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphStoreMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphStoreMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphStoresQuery({
 const { mutate } = useCreateFunctionGraphStoreMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
+mutate({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
 ```

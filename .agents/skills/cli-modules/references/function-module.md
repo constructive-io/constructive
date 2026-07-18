@@ -12,8 +12,8 @@ csdk function-module list --where.<field>.<op> <value> --orderBy <values>
 csdk function-module list --limit 10 --after <cursor>
 csdk function-module find-first --where.<field>.<op> <value>
 csdk function-module get --id <UUID>
-csdk function-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--definitionsTableId <UUID>] [--secretDefinitionsTableId <UUID>] [--definitionsTableName <String>] [--secretDefinitionsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
-csdk function-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--definitionsTableId <UUID>] [--secretDefinitionsTableId <UUID>] [--definitionsTableName <String>] [--secretDefinitionsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-module create --databaseId <UUID> [--apiName <String>] [--bindingsTableId <UUID>] [--bindingsTableName <String>] [--defaultPermissions <String>] [--definitionsTableId <UUID>] [--definitionsTableName <String>] [--entityField <String>] [--entityTableId <UUID>] [--hasCron <Boolean>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schedulesTableId <UUID>] [--schemaId <UUID>] [--scope <String>]
+csdk function-module update --id <UUID> [--apiName <String>] [--bindingsTableId <UUID>] [--bindingsTableName <String>] [--databaseId <UUID>] [--defaultPermissions <String>] [--definitionsTableId <UUID>] [--definitionsTableName <String>] [--entityField <String>] [--entityTableId <UUID>] [--hasCron <Boolean>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schedulesTableId <UUID>] [--schemaId <UUID>] [--scope <String>]
 csdk function-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionModule
 
 ```bash
-csdk function-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--definitionsTableId <UUID>] [--secretDefinitionsTableId <UUID>] [--definitionsTableName <String>] [--secretDefinitionsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-module create --databaseId <UUID> [--apiName <String>] [--bindingsTableId <UUID>] [--bindingsTableName <String>] [--defaultPermissions <String>] [--definitionsTableId <UUID>] [--definitionsTableName <String>] [--entityField <String>] [--entityTableId <UUID>] [--hasCron <Boolean>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schedulesTableId <UUID>] [--schemaId <UUID>] [--scope <String>]
 ```
 
 ### Get a functionModule by id

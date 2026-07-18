@@ -1,4 +1,19 @@
-import { QueryBuilder } from '../src/query-builder';
+import {
+  add,
+  and,
+  col,
+  eq,
+  fn,
+  gt,
+  isNotNull,
+  isNull,
+  lit,
+  lte,
+  not,
+  or,
+  param,
+  QueryBuilder,
+} from '../src/query-builder';
 
 // The deparser outputs pretty-printed SQL with newlines.
 // Use the `s` flag on regex so `.` matches newlines, or use [\s\S].
@@ -39,7 +54,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id', 'name'])
-        .where('age', '>', 18)
+        .where({ age: { greaterThan: 18 } })
         .build();
 
       expect(text).toMatch(/WHERE/);
@@ -51,8 +66,8 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('orders')
         .select(['order_id', 'total'])
-        .where('total', '>=', 100)
-        .where('status', '=', 'active')
+        .where({ total: { greaterThanOrEqualTo: 100 } })
+        .where({ status: { equalTo: 'active' } })
         .build();
 
       expect(text).toMatch(/total\s*>=\s*\$1/);
@@ -148,7 +163,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('deleted_at', 'IS', null)
+        .where({ deleted_at: { isNull: true } })
         .build();
 
       expect(text).toMatch(/deleted_at\s+IS\s+NULL/);
@@ -159,7 +174,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('email', 'IS NOT', null)
+        .where({ email: { isNull: false } })
         .build();
 
       expect(text).toMatch(/email\s+IS\s+NOT\s+NULL/);
@@ -170,7 +185,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id', 'name'])
-        .where('id', 'IN', [1, 2, 3])
+        .where({ id: { in: [1, 2, 3] } })
         .build();
 
       expect(text).toMatch(/id\s+IN\s*\(\s*\$1,\s*\$2,\s*\$3\s*\)/);
@@ -342,7 +357,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .update({ name: 'Bob' })
-        .where('id', '=', 1)
+        .where({ id: { equalTo: 1 } })
         .build();
 
       expect(text).toMatch(/UPDATE\s+users\s+SET\s+name\s*=\s*\$1/);
@@ -354,7 +369,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('inventory')
         .update({ stock: 0, price: 9.99 })
-        .where('product_id', '=', 'abc')
+        .where({ product_id: { equalTo: 'abc' } })
         .build();
 
       expect(text).toMatch(/SET\s+stock\s*=\s*\$1/);
@@ -367,8 +382,8 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('inventory')
         .update({ stock: 0 })
-        .where('product_id', '=', 'abc')
-        .where('warehouse_id', '=', 'xyz')
+        .where({ product_id: { equalTo: 'abc' } })
+        .where({ warehouse_id: { equalTo: 'xyz' } })
         .build();
 
       expect(text).toMatch(/product_id\s*=\s*\$2/);
@@ -381,7 +396,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .update({ name: 'Bob' })
-        .where('id', '=', 1)
+        .where({ id: { equalTo: 1 } })
         .returning(['id', 'name'])
         .build();
 
@@ -395,7 +410,7 @@ describe('QueryBuilder', () => {
         .schema('public')
         .table('users')
         .update({ name: 'Bob' })
-        .where('id', '=', 1)
+        .where({ id: { equalTo: 1 } })
         .build();
 
       expect(text).toMatch(/UPDATE\s+public\.users/);
@@ -411,7 +426,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .delete()
-        .where('id', '=', 1)
+        .where({ id: { equalTo: 1 } })
         .build();
 
       expect(text).toMatch(/DELETE\s+FROM\s+users/);
@@ -423,8 +438,8 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('inventory')
         .delete()
-        .where('product_id', '=', 'abc')
-        .where('warehouse_id', '=', 'xyz')
+        .where({ product_id: { equalTo: 'abc' } })
+        .where({ warehouse_id: { equalTo: 'xyz' } })
         .build();
 
       expect(text).toMatch(/product_id\s*=\s*\$1/);
@@ -437,7 +452,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .delete()
-        .where('id', '=', 1)
+        .where({ id: { equalTo: 1 } })
         .returning()
         .build();
 
@@ -450,7 +465,7 @@ describe('QueryBuilder', () => {
         .schema('my-schema')
         .table('users')
         .delete()
-        .where('id', '=', 1)
+        .where({ id: { equalTo: 1 } })
         .build();
 
       expect(text).toMatch(/"my-schema"\.users/);
@@ -544,7 +559,7 @@ describe('QueryBuilder', () => {
       const cteQuery = new QueryBuilder()
         .table('users')
         .select(['id', 'name'])
-        .where('age', '>', 18);
+        .where({ age: { greaterThan: 18 } });
 
       const { text, values } = new QueryBuilder()
         .with('active_users', cteQuery)
@@ -561,12 +576,12 @@ describe('QueryBuilder', () => {
       const cte1 = new QueryBuilder()
         .table('users')
         .select(['id', 'name'])
-        .where('active', '=', true);
+        .where({ active: { equalTo: true } });
 
       const cte2 = new QueryBuilder()
         .table('orders')
         .select(['user_id', 'total'])
-        .where('total', '>', 100);
+        .where({ total: { greaterThan: 100 } });
 
       const { text, values } = new QueryBuilder()
         .with('active_users', cte1)
@@ -584,7 +599,7 @@ describe('QueryBuilder', () => {
       const recursiveQuery = new QueryBuilder()
         .table('categories')
         .select(['id', 'parent_id', 'name'])
-        .where('parent_id', 'IS', null);
+        .where({ parent_id: { isNull: true } });
 
       const { text, values } = new QueryBuilder()
         .withRecursive('tree', recursiveQuery)
@@ -674,7 +689,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('name', '=', 'Alice')
+        .where({ name: { equalTo: 'Alice' } })
         .build();
 
       expect(text).toMatch(/\$1/);
@@ -686,7 +701,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('age', '>', 21)
+        .where({ age: { greaterThan: 21 } })
         .build();
 
       expect(text).toMatch(/\$1/);
@@ -697,7 +712,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('is_active', '=', true)
+        .where({ is_active: { equalTo: true } })
         .build();
 
       expect(text).toMatch(/\$1/);
@@ -757,7 +772,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('name', '=', "O'Brien")
+        .where({ name: { equalTo: "O'Brien" } })
         .build();
 
       expect(values).toEqual(["O'Brien"]);
@@ -816,7 +831,7 @@ describe('QueryBuilder', () => {
         .table('orders')
         .select(['customer_id'])
         .groupBy(['customer_id'])
-        .having('total', '>', 1000)
+        .having({ total: { greaterThan: 1000 } })
         .build();
 
       expect(text).toMatch(/GROUP BY\s+customer_id/);
@@ -835,9 +850,9 @@ describe('QueryBuilder', () => {
         .table('orders', 'o')
         .select(['o.customer_id', 'o.total'])
         .innerJoin('customers', 'o.customer_id', '=', 'customers.id')
-        .where('o.status', '=', 'completed')
+        .where({ 'o.status': { equalTo: 'completed' } })
         .groupBy(['o.customer_id'])
-        .having('o.total', '>', 500)
+        .having({ 'o.total': { greaterThan: 500 } })
         .orderBy('o.total', 'DESC')
         .limit(25)
         .offset(0)
@@ -857,7 +872,7 @@ describe('QueryBuilder', () => {
       const cte = new QueryBuilder()
         .table('users')
         .select(['id'])
-        .where('active', '=', true);
+        .where({ active: { equalTo: true } });
 
       const { text, values } = new QueryBuilder()
         .with('active_ids', cte)
@@ -874,7 +889,7 @@ describe('QueryBuilder', () => {
       const { text, values } = new QueryBuilder()
         .table('users')
         .update({ status: 'inactive' })
-        .where('last_login', '<', '2024-01-01')
+        .where({ last_login: { lessThan: '2024-01-01' } })
         .returning()
         .build();
 
@@ -882,6 +897,652 @@ describe('QueryBuilder', () => {
       expect(text).toMatch(/last_login\s*<\s*\$2/);
       expect(text).toMatch(/RETURNING\s+\*/);
       expect(values).toEqual(['inactive', '2024-01-01']);
+    });
+  });
+
+  // =========================================================================
+  // Expression system (col / lit / param / fn) + computed SELECT columns
+  // =========================================================================
+  describe('Expressions', () => {
+    it('should pass a column reference as a function arg (not a param)', () => {
+      const { text, values } = new QueryBuilder()
+        .schema('priv')
+        .call('secrets_get', { secret_name: col('s.name'), namespace_id: col('s.namespace_id') })
+        .build();
+
+      expect(text).toMatch(/priv\.secrets_get\(/);
+      expect(text).toMatch(/secret_name\s*=>\s*s\.name/);
+      expect(text).toMatch(/namespace_id\s*=>\s*s\.namespace_id/);
+      // Column refs are not parameterized.
+      expect(values).toEqual([]);
+    });
+
+    it('should emit a literal NULL via lit(null) (not a bound param)', () => {
+      const { text, values } = new QueryBuilder()
+        .call('f', { d: lit(null) })
+        .build();
+
+      expect(text).toMatch(/d\s*=>\s*NULL/i);
+      expect(values).toEqual([]);
+    });
+
+    it('should bind an explicit param() and auto-bind a plain value', () => {
+      const { text, values } = new QueryBuilder()
+        .call('f', { a: param('x'), b: 'y' })
+        .build();
+
+      expect(text).toMatch(/a\s*=>\s*\$1/);
+      expect(text).toMatch(/b\s*=>\s*\$2/);
+      expect(values).toEqual(['x', 'y']);
+    });
+
+    it('should mix column-ref, param, and literal args in one named call', () => {
+      const { text, values } = new QueryBuilder()
+        .call('f', {
+          owner_id: col('s.owner_id'),
+          secret_name: col('s.name'),
+          ns: param('11111111-1111-1111-1111-111111111111'),
+          d: lit(null),
+        })
+        .build();
+
+      expect(text).toMatch(/owner_id\s*=>\s*s\.owner_id/);
+      expect(text).toMatch(/secret_name\s*=>\s*s\.name/);
+      expect(text).toMatch(/ns\s*=>\s*\$1/);
+      expect(text).toMatch(/d\s*=>\s*NULL/i);
+      expect(values).toEqual(['11111111-1111-1111-1111-111111111111']);
+    });
+
+    it('should support fn() with schema-qualified name', () => {
+      const { text } = new QueryBuilder()
+        .selectExpr('v', fn('priv.secrets_get', { secret_name: col('s.name') }))
+        .table('secrets', 's')
+        .schema('priv')
+        .build();
+
+      expect(text).toMatch(/priv\.secrets_get\(\s*secret_name\s*=>\s*s\.name\s*\)\s+AS\s+v/);
+    });
+
+    it('should build a computed function-call column over a base table (scope-switch shape)', () => {
+      // Mirrors decryptScopeSecrets for an entity scope.
+      const nsId = '22222222-2222-2222-2222-222222222222';
+      const { text, values } = new QueryBuilder()
+        .schema('priv')
+        .table('secrets', 's')
+        .select(['s.name'])
+        .selectCall('decrypted_value', 'secrets_get', {
+          owner_id: col('s.owner_id'),
+          secret_name: col('s.name'),
+          namespace_id: col('s.namespace_id'),
+          default_value: lit(null),
+        }, { schema: 'priv' })
+        .where({ 's.namespace_id': { equalTo: nsId } })
+        .where({ 's.owner_id': { equalTo: 'owner-1' } })
+        .where({ 's.retired_at': { isNull: true } })
+        .orderBy('s.created_at', 'ASC')
+        .build();
+
+      expect(text).toMatch(/SELECT/);
+      expect(text).toMatch(/s\.name/);
+      expect(text).toMatch(/priv\.secrets_get\(/);
+      expect(text).toMatch(/owner_id\s*=>\s*s\.owner_id/);
+      expect(text).toMatch(/default_value\s*=>\s*NULL/i);
+      expect(text).toMatch(/AS\s+decrypted_value/);
+      expect(text).toMatch(/FROM\s+priv\.secrets\s+(AS\s+)?s/);
+      expect(text).toMatch(/s\.namespace_id\s*=\s*\$1/);
+      expect(text).toMatch(/s\.owner_id\s*=\s*\$2/);
+      expect(text).toMatch(/s\.retired_at\s+IS\s+NULL/);
+      expect(text).toMatch(/ORDER\s+BY\s+s\.created_at/);
+      // Column-ref getter args bind nothing; only WHERE values are params.
+      expect(values).toEqual([nsId, 'owner-1']);
+    });
+
+    it('should keep param numbering correct when a computed column also binds a param', () => {
+      const { text, values } = new QueryBuilder()
+        .table('t', 's')
+        .select(['s.id'])
+        .selectExpr('v', fn('f', { a: param('A'), b: col('s.b') }))
+        .where({ 's.active': { equalTo: true } })
+        .build();
+
+      // Target-list param comes before WHERE param.
+      expect(text).toMatch(/a\s*=>\s*\$1/);
+      expect(text).toMatch(/s\.active\s*=\s*\$2/);
+      expect(values).toEqual(['A', true]);
+    });
+  });
+
+  // =========================================================================
+  // JSON filters (SDK style)
+  // =========================================================================
+  describe('JSON Filters', () => {
+    it('should combine multiple operators on one field', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({ attempts: { greaterThanOrEqualTo: 1, lessThan: 5 } })
+        .build();
+
+      expect(text).toMatch(/attempts\s*>=\s*\$1/);
+      expect(text).toMatch(/attempts\s*<\s*\$2/);
+      expect(text).toMatch(/AND/);
+      expect(values).toEqual([1, 5]);
+    });
+
+    it('should build notEqualTo and notIn', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({ status: { notEqualTo: 'failed' } })
+        .where({ kind: { notIn: ['a', 'b'] } })
+        .build();
+
+      expect(text).toMatch(/status\s*<>\s*\$1/);
+      expect(text).toMatch(/kind\s+NOT\s+IN\s*\(\s*\$2,\s*\$3\s*\)/);
+      expect(values).toEqual(['failed', 'a', 'b']);
+    });
+
+    it('should build or/and/not combinators', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({
+          or: [
+            { priority: { greaterThan: 0 } },
+            { escalated: { equalTo: true } },
+          ],
+          not: { status: { equalTo: 'done' } },
+          and: [{ attempts: { lessThan: 3 } }],
+        })
+        .build();
+
+      expect(text).toMatch(/priority\s*>\s*\$1\s+OR\s+escalated\s*=\s*\$2/);
+      expect(text).toMatch(/NOT\s*\(?\s*status\s*=\s*\$3/);
+      expect(text).toMatch(/attempts\s*<\s*\$4/);
+      expect(values).toEqual([0, true, 'done', 3]);
+    });
+
+    it('should build nested or inside and', () => {
+      const { text, values } = new QueryBuilder()
+        .table('t')
+        .select(['id'])
+        .where({
+          a: { equalTo: 1 },
+          or: [{ b: { isNull: true } }, { b: { equalTo: 2 } }],
+        })
+        .build();
+
+      expect(text).toMatch(/a\s*=\s*\$1/);
+      expect(text).toMatch(/b\s+IS\s+NULL\s+OR\s+b\s*=\s*\$2/);
+      expect(values).toEqual([1, 2]);
+    });
+
+    it('should build LIKE / ILIKE operators', () => {
+      const { text, values } = new QueryBuilder()
+        .table('users')
+        .select(['id'])
+        .where({ name: { like: 'Al%' } })
+        .where({ email: { likeInsensitive: '%@example.com' } })
+        .build();
+
+      expect(text).toMatch(/name\s+LIKE\s+\$1/);
+      expect(text).toMatch(/email\s+ILIKE\s+\$2/);
+      expect(values).toEqual(['Al%', '%@example.com']);
+    });
+
+    it('should build includes / startsWith / endsWith pattern sugar', () => {
+      const { text, values } = new QueryBuilder()
+        .table('users')
+        .select(['id'])
+        .where({ name: { includes: 'li' } })
+        .where({ email: { startsWithInsensitive: 'alice' } })
+        .where({ host: { endsWith: '.io' } })
+        .build();
+
+      expect(text).toMatch(/name\s+LIKE\s+\$1/);
+      expect(text).toMatch(/email\s+ILIKE\s+\$2/);
+      expect(text).toMatch(/host\s+LIKE\s+\$3/);
+      expect(values).toEqual(['%li%', 'alice%', '%.io']);
+    });
+
+    it('should build IS DISTINCT FROM / IS NOT DISTINCT FROM', () => {
+      const { text, values } = new QueryBuilder()
+        .table('t')
+        .select(['id'])
+        .where({ a: { distinctFrom: 1 } })
+        .where({ b: { notDistinctFrom: 2 } })
+        .build();
+
+      expect(text).toMatch(/a\s+IS\s+DISTINCT\s+FROM\s+\$1/);
+      expect(text).toMatch(/b\s+IS\s+NOT\s+DISTINCT\s+FROM\s+\$2/);
+      expect(values).toEqual([1, 2]);
+    });
+
+    it('should accept Expr operands (column-to-column and function comparisons)', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({ updated_at: { lessThan: fn('now') } })
+        .where({ a: { equalTo: col('b') } })
+        .build();
+
+      expect(text).toMatch(/updated_at\s*<\s*now\(\)/);
+      expect(text).toMatch(/a\s*=\s*b/);
+      expect(values).toEqual([]);
+    });
+
+    it('should support a subquery as a comparison operand', () => {
+      const sub = new QueryBuilder()
+        .table('teams')
+        .select(['id'])
+        .where({ name: { equalTo: 'core' } });
+
+      const { text, values } = new QueryBuilder()
+        .table('users')
+        .select(['id'])
+        .where({ team_id: { equalTo: sub } })
+        .build();
+
+      expect(text).toMatch(/team_id\s*=\s*\(+\s*SELECT/s);
+      expect(text).toMatch(/name\s*=\s*\$1/);
+      expect(values).toEqual(['core']);
+    });
+
+    it('should support a subquery for in / notIn', () => {
+      const sub = new QueryBuilder()
+        .table('teams')
+        .select(['id'])
+        .where({ active: { equalTo: true } });
+
+      const { text, values } = new QueryBuilder()
+        .table('users')
+        .select(['id'])
+        .where({ team_id: { in: sub } })
+        .build();
+
+      expect(text).toMatch(/team_id\s+IN\s*\(\s*SELECT/s);
+      expect(values).toEqual([true]);
+    });
+
+    it('should apply filters to HAVING', () => {
+      const { text, values } = new QueryBuilder()
+        .table('orders')
+        .select(['customer_id'])
+        .groupBy(['customer_id'])
+        .having({ total: { greaterThan: 1000 } })
+        .build();
+
+      expect(text).toMatch(/HAVING\s+total\s*>\s*\$1/);
+      expect(values).toEqual([1000]);
+    });
+
+    it('should apply a filter to ON CONFLICT DO UPDATE WHERE', () => {
+      const { text, values } = new QueryBuilder()
+        .table('users')
+        .insert({ name: 'Alice', email: 'a@b.com' })
+        .onConflict({
+          columns: ['email'],
+          action: 'update',
+          updateColumns: { name: 'Alice Updated' },
+          where: { locked: { equalTo: false } },
+        })
+        .build();
+
+      expect(text).toMatch(/DO UPDATE/);
+      expect(text).toMatch(/locked\s*=\s*\$4/);
+      expect(values).toEqual(['Alice', 'a@b.com', 'Alice Updated', false]);
+    });
+
+    it('should throw on an empty filter object', () => {
+      expect(() =>
+        new QueryBuilder().table('t').select(['id']).where({}).build()
+      ).toThrow('Empty filter object.');
+    });
+
+    it('should throw on an empty in array', () => {
+      expect(() =>
+        new QueryBuilder()
+          .table('t')
+          .select(['id'])
+          .where({ id: { in: [] } })
+          .build()
+      ).toThrow('Empty array for "in" filter on "id".');
+    });
+
+    it('should throw on an unsupported operator', () => {
+      expect(() =>
+        new QueryBuilder()
+          .table('t')
+          .select(['id'])
+          .where({ id: { bogus: 1 } as any })
+          .build()
+      ).toThrow('Unsupported filter operator "bogus" on "id".');
+    });
+  });
+
+  // =========================================================================
+  // Expression predicates and helpers
+  // =========================================================================
+  describe('Expression Predicates', () => {
+    it('should build where() expression with eq / isNull / and', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where(and(eq(col('a'), col('b')), isNull(col('completed_at'))))
+        .build();
+
+      expect(text).toMatch(/a\s*=\s*b/);
+      expect(text).toMatch(/completed_at\s+IS\s+NULL/);
+      expect(values).toEqual([]);
+    });
+
+    it('should build where() expression with or / not / isNotNull and bound values', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where(or(gt(col('priority'), 5), not(isNotNull(col('locked_at')))))
+        .build();
+
+      expect(text).toMatch(/priority\s*>\s*\$1/);
+      expect(text).toMatch(/NOT\s*\(?\s*locked_at\s+IS\s+NOT\s+NULL/);
+      expect(values).toEqual([5]);
+    });
+
+    it('should mix where filters and expression predicates', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({ status: { equalTo: 'queued' } })
+        .where(lte(col('attempts'), col('max_attempts')))
+        .build();
+
+      expect(text).toMatch(/status\s*=\s*\$1/);
+      expect(text).toMatch(/attempts\s*<=\s*max_attempts/);
+      expect(values).toEqual(['queued']);
+    });
+
+    it('should build having() expression', () => {
+      const { text, values } = new QueryBuilder()
+        .table('orders')
+        .select(['customer_id'])
+        .groupBy(['customer_id'])
+        .having(gt(fn('sum', [col('total')]), 1000))
+        .build();
+
+      expect(text).toMatch(/HAVING\s+sum\(\s*total\s*\)\s*>\s*\$1/);
+      expect(values).toEqual([1000]);
+    });
+  });
+
+  // =========================================================================
+  // Expressions in UPDATE / ON CONFLICT / RETURNING
+  // =========================================================================
+  describe('UPDATE Expressions', () => {
+    it('should build SET with arithmetic and function expressions', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .update({
+          attempts: add(col('attempts'), 1),
+          updated_at: fn('now'),
+          status: 'running',
+        })
+        .where({ completed_at: { isNull: true } })
+        .returning(['id'])
+        .build();
+
+      expect(text).toMatch(/attempts\s*=\s*attempts\s*\+\s*\$1/);
+      expect(text).toMatch(/updated_at\s*=\s*now\(\)/);
+      expect(text).toMatch(/status\s*=\s*\$2/);
+      expect(text).toMatch(/completed_at\s+IS\s+NULL/);
+      expect(text).toMatch(/RETURNING/);
+      expect(values).toEqual([1, 'running']);
+    });
+
+    it('should build ON CONFLICT DO UPDATE with excluded expressions', () => {
+      const { text, values } = new QueryBuilder()
+        .table('counters')
+        .insert({ key: 'k', count: 1 })
+        .onConflict({
+          columns: ['key'],
+          action: 'update',
+          updateColumns: { count: add(col('counters.count'), col('excluded.count')) },
+        })
+        .build();
+
+      expect(text).toMatch(/DO UPDATE/);
+      expect(text).toMatch(/count\s*=\s*counters\.count\s*\+\s*excluded\.count/);
+      expect(values).toEqual(['k', 1]);
+    });
+
+    it('should build RETURNING with expressions and aliases', () => {
+      const { text, values } = new QueryBuilder()
+        .table('users')
+        .insert({ name: 'Alice' })
+        .returning(['id', { expr: fn('lower', [col('name')]), as: 'name_lower' }])
+        .build();
+
+      expect(text).toMatch(/RETURNING/);
+      expect(text).toMatch(/lower\(\s*name\s*\)\s+AS\s+name_lower/);
+      expect(values).toEqual(['Alice']);
+    });
+  });
+
+  // =========================================================================
+  // Function call aliases
+  // =========================================================================
+  describe('Function Call Aliases', () => {
+    it('should alias a scalar function call result', () => {
+      const { text, values } = new QueryBuilder()
+        .call('rollup_compute_daily', { day: '2026-01-01' }, { schema: 'private', as: 'result' })
+        .build();
+
+      expect(text).toMatch(/private\.rollup_compute_daily\(/);
+      expect(text).toMatch(/AS\s+result/);
+      expect(values).toEqual(['2026-01-01']);
+    });
+  });
+
+  // =========================================================================
+  // Expressions in INSERT values
+  // =========================================================================
+  describe('INSERT Expression Values', () => {
+    it('should accept expressions in insert values', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .insert({
+          name: 'job-1',
+          created_at: fn('now'),
+          priority: add(lit(1), 2)
+        })
+        .returning(['id'])
+        .build();
+
+      expect(text).toMatch(/INSERT INTO jobs/);
+      expect(text).toMatch(/now\(\)/);
+      expect(text).toMatch(/1\s*\+\s*\$2/);
+      expect(values).toEqual(['job-1', 2]);
+    });
+
+    it('should accept expressions in multi-row inserts', () => {
+      const { text, values } = new QueryBuilder()
+        .table('events')
+        .insert([
+          { kind: 'a', at: fn('now') },
+          { kind: 'b', at: fn('now') }
+        ])
+        .build();
+
+      expect(text).toMatch(/now\(\)/);
+      expect(values).toEqual(['a', 'b']);
+    });
+  });
+
+  // =========================================================================
+  // JOIN ON with filters and expressions
+  // =========================================================================
+  describe('JOIN ON Filters and Expressions', () => {
+    it('should keep the classic 4-arg column form working', () => {
+      const { text } = new QueryBuilder()
+        .table('orders', 'o')
+        .select(['o.id'])
+        .innerJoin('customers', 'o.customer_id', '=', 'customers.id')
+        .build();
+
+      expect(text).toMatch(/JOIN customers ON o\.customer_id = customers\.id/);
+    });
+
+    it('should accept an expression ON condition', () => {
+      const { text, values } = new QueryBuilder()
+        .table('orders', 'o')
+        .select(['o.id'])
+        .innerJoin('customers', and(
+          eq(col('o.customer_id'), col('customers.id')),
+          eq(col('customers.region'), 'us')
+        ))
+        .build();
+
+      expect(text).toMatch(/JOIN customers ON\s+o\.customer_id = customers\.id\s+AND customers\.region = \$1/s);
+      expect(values).toEqual(['us']);
+    });
+
+    it('should accept a JSON filter ON condition', () => {
+      const { text, values } = new QueryBuilder()
+        .table('orders', 'o')
+        .select(['o.id'])
+        .leftJoin('c_alias', {
+          'c.active': { equalTo: true },
+          'c.tier': { in: ['gold', 'silver'] }
+        }, { schema: 'crm', alias: 'c' })
+        .build();
+
+      expect(text).toMatch(/LEFT JOIN crm\.c_alias AS c ON/s);
+      expect(text).toMatch(/c\.active = \$1/);
+      expect(text).toMatch(/c\.tier IN \(\$2, \$3\)/);
+      expect(values).toEqual([true, 'gold', 'silver']);
+    });
+  });
+
+  // =========================================================================
+  // fromFunction (set-returning function source)
+  // =========================================================================
+  describe('fromFunction', () => {
+    it('should build SELECT ... FROM fn(...) with a range alias', () => {
+      const { text, values } = new QueryBuilder()
+        .select(['r.id', 'r.name'])
+        .fromFunction('get_rows', [7], { as: 'r' })
+        .build();
+
+      expect(text).toMatch(/SELECT/);
+      expect(text).toMatch(/FROM get_rows\(\$1\) AS r/);
+      expect(values).toEqual([7]);
+    });
+
+    it('should support schema qualification and named args', () => {
+      const { text, values } = new QueryBuilder()
+        .fromFunction('get_users', { active: true }, { schema: 'app', as: 'u' })
+        .build();
+
+      expect(text).toMatch(/FROM app\.get_users\(active => \$1\) AS u/);
+      expect(text).toMatch(/SELECT\s+\*/s);
+      expect(values).toEqual([true]);
+    });
+
+    it('should support joining against a function source', () => {
+      const { text } = new QueryBuilder()
+        .select(['r.id', 't.name'])
+        .fromFunction('get_rows', [], { as: 'r' })
+        .innerJoin('teams', 'r.team_id', '=', 't.id', { alias: 't' })
+        .build();
+
+      expect(text).toMatch(/FROM get_rows\(\) AS r/);
+      expect(text).toMatch(/JOIN teams AS t ON r\.team_id = t\.id/);
+    });
+
+    it('should support where filters over function sources', () => {
+      const { text, values } = new QueryBuilder()
+        .select(['r.id'])
+        .fromFunction('get_rows', [], { as: 'r' })
+        .where({ 'r.status': { equalTo: 'ok' } })
+        .build();
+
+      expect(text).toMatch(/WHERE\s+r\.status = \$1/s);
+      expect(values).toEqual(['ok']);
+    });
+  });
+
+  // =========================================================================
+  // Expressions in ORDER BY / GROUP BY
+  // =========================================================================
+  describe('ORDER BY / GROUP BY Expressions', () => {
+    it('should order by an expression', () => {
+      const { text } = new QueryBuilder()
+        .table('users')
+        .select(['id'])
+        .orderBy(fn('lower', [col('name')]), 'DESC')
+        .build();
+
+      expect(text).toMatch(/ORDER BY\s+lower\(\s*name\s*\) DESC/s);
+    });
+
+    it('should group by an expression', () => {
+      const { text } = new QueryBuilder()
+        .table('events')
+        .select([{ expr: fn('date_trunc', [lit('day'), col('created_at')]), as: 'day' }])
+        .groupBy([fn('date_trunc', [lit('day'), col('created_at')])])
+        .build();
+
+      expect(text).toMatch(/GROUP BY\s+date_trunc\(/s);
+    });
+
+    it('should still group and order by column names', () => {
+      const { text } = new QueryBuilder()
+        .table('orders')
+        .select(['customer_id'])
+        .groupBy(['customer_id'])
+        .orderBy('customer_id', 'ASC', 'LAST')
+        .build();
+
+      expect(text).toMatch(/GROUP BY\s+customer_id/s);
+      expect(text).toMatch(/ORDER BY\s+customer_id ASC NULLS LAST/s);
+    });
+  });
+
+  // =========================================================================
+  // clone()
+  // =========================================================================
+  describe('clone', () => {
+    it('should not mutate the original when chaining on a clone', () => {
+      const base = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({ status: { equalTo: 'queued' } });
+
+      const escalated = base.clone().where({ priority: { greaterThan: 5 } }).limit(1);
+
+      const baseOut = base.build();
+      const escalatedOut = escalated.build();
+
+      expect(baseOut.text).not.toMatch(/priority/);
+      expect(baseOut.text).not.toMatch(/LIMIT/);
+      expect(baseOut.values).toEqual(['queued']);
+
+      expect(escalatedOut.text).toMatch(/priority > \$2/);
+      expect(escalatedOut.text).toMatch(/LIMIT 1/);
+      expect(escalatedOut.values).toEqual(['queued', 5]);
+    });
+
+    it('should clone inserts, updates, joins and order specs independently', () => {
+      const base = new QueryBuilder()
+        .table('users')
+        .update({ name: 'a' })
+        .where({ id: { equalTo: 1 } })
+        .returning(['id']);
+
+      const other = base.clone().update({ name: 'b', updated_at: fn('now') });
+
+      expect(base.build().values).toEqual(['a', 1]);
+      expect(other.build().values).toEqual(['b', 1]);
+      expect(other.build().text).toMatch(/now\(\)/);
     });
   });
 });

@@ -9,8 +9,8 @@ Stores the default permission bitmask assigned to new members upon joining
 ```typescript
 db.orgPermissionDefault.findMany({ select: { id: true } }).execute()
 db.orgPermissionDefault.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgPermissionDefault.create({ data: { permissions: '<BitString>', entityId: '<UUID>' }, select: { id: true } }).execute()
-db.orgPermissionDefault.update({ where: { id: '<UUID>' }, data: { permissions: '<BitString>' }, select: { id: true } }).execute()
+db.orgPermissionDefault.create({ data: { entityId: '<UUID>', permissions: '<BitString>' }, select: { id: true } }).execute()
+db.orgPermissionDefault.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgPermissionDefault.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgPermissionDefault.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgPermissionDefault.findMany({
-  select: { id: true, permissions: true }
+  select: { id: true, entityId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgPermissionDefault.findMany({
 
 ```typescript
 const item = await db.orgPermissionDefault.create({
-  data: { permissions: '<BitString>', entityId: '<UUID>' },
+  data: { entityId: '<UUID>', permissions: '<BitString>' },
   select: { id: true }
 }).execute();
 ```

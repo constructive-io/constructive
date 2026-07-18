@@ -12,8 +12,8 @@ csdk app-invite list --where.<field>.<op> <value> --orderBy <values>
 csdk app-invite list --limit 10 --after <cursor>
 csdk app-invite find-first --where.<field>.<op> <value>
 csdk app-invite get --id <UUID>
-csdk app-invite create [--channel <String>] [--email <Email>] [--phone <String>] [--senderId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--expiresAt <Datetime>]
-csdk app-invite update --id <UUID> [--channel <String>] [--email <Email>] [--phone <String>] [--senderId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--expiresAt <Datetime>]
+csdk app-invite create [--channel <String>] [--data <JSON>] [--email <Email>] [--expiresAt <Datetime>] [--inviteCount <Int>] [--inviteLimit <Int>] [--inviteToken <String>] [--inviteValid <Boolean>] [--multiple <Boolean>] [--phone <String>] [--profileId <UUID>] [--senderId <UUID>]
+csdk app-invite update --id <UUID> [--channel <String>] [--data <JSON>] [--email <Email>] [--expiresAt <Datetime>] [--inviteCount <Int>] [--inviteLimit <Int>] [--inviteToken <String>] [--inviteValid <Boolean>] [--multiple <Boolean>] [--phone <String>] [--profileId <UUID>] [--senderId <UUID>]
 csdk app-invite delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-invite list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appInvite
 
 ```bash
-csdk app-invite create [--channel <String>] [--email <Email>] [--phone <String>] [--senderId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--expiresAt <Datetime>]
+csdk app-invite create [--channel <String>] [--data <JSON>] [--email <Email>] [--expiresAt <Datetime>] [--inviteCount <Int>] [--inviteLimit <Int>] [--inviteToken <String>] [--inviteValid <Boolean>] [--multiple <Boolean>] [--phone <String>] [--profileId <UUID>] [--senderId <UUID>]
 ```
 
 ### Get a appInvite by id

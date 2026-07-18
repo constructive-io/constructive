@@ -16,14 +16,14 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  createdAt: 'string',
-  updatedAt: 'string',
-  entityId: 'uuid',
   childId: 'uuid',
+  createdAt: 'string',
+  entityId: 'uuid',
+  id: 'uuid',
   parentId: 'uuid',
-  positionTitle: 'string',
   positionLevel: 'int',
+  positionTitle: 'string',
+  updatedAt: 'string',
 };
 const usage =
   '\norg-chart-edge <command>\n\nCommands:\n  list                  List orgChartEdge records\n  find-first            Find first matching orgChartEdge record\n  get                   Get a orgChartEdge by ID\n  create                Create a new orgChartEdge\n  update                Update an existing orgChartEdge\n  delete                Delete a orgChartEdge\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -76,14 +76,14 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      entityId: true,
       childId: true,
+      createdAt: true,
+      entityId: true,
+      id: true,
       parentId: true,
-      positionTitle: true,
       positionLevel: true,
+      positionTitle: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, OrgChartEdgeOrderBy> & {
@@ -104,14 +104,14 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      entityId: true,
       childId: true,
+      createdAt: true,
+      entityId: true,
+      id: true,
       parentId: true,
-      positionTitle: true,
       positionLevel: true,
+      positionTitle: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, OrgChartEdgeOrderBy> & {
@@ -144,14 +144,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          entityId: true,
           childId: true,
+          createdAt: true,
+          entityId: true,
+          id: true,
           parentId: true,
-          positionTitle: true,
           positionLevel: true,
+          positionTitle: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -169,14 +169,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
+        name: 'childId',
+        message: 'childId',
         required: true,
       },
       {
         type: 'text',
-        name: 'childId',
-        message: 'childId',
+        name: 'entityId',
+        message: 'entityId',
         required: true,
       },
       {
@@ -188,15 +188,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'positionTitle',
-        message: 'positionTitle',
+        name: 'positionLevel',
+        message: 'positionLevel',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'positionLevel',
-        message: 'positionLevel',
+        name: 'positionTitle',
+        message: 'positionTitle',
         required: false,
         skipPrompt: true,
       },
@@ -210,21 +210,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgChartEdge
       .create({
         data: {
-          entityId: cleanedData.entityId,
           childId: cleanedData.childId,
+          entityId: cleanedData.entityId,
           parentId: cleanedData.parentId,
-          positionTitle: cleanedData.positionTitle,
           positionLevel: cleanedData.positionLevel,
+          positionTitle: cleanedData.positionTitle,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          entityId: true,
           childId: true,
+          createdAt: true,
+          entityId: true,
+          id: true,
           parentId: true,
-          positionTitle: true,
           positionLevel: true,
+          positionTitle: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -248,14 +248,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
+        name: 'childId',
+        message: 'childId',
         required: false,
       },
       {
         type: 'text',
-        name: 'childId',
-        message: 'childId',
+        name: 'entityId',
+        message: 'entityId',
         required: false,
       },
       {
@@ -267,15 +267,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'positionTitle',
-        message: 'positionTitle',
+        name: 'positionLevel',
+        message: 'positionLevel',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'positionLevel',
-        message: 'positionLevel',
+        name: 'positionTitle',
+        message: 'positionTitle',
         required: false,
         skipPrompt: true,
       },
@@ -289,21 +289,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          entityId: cleanedData.entityId,
           childId: cleanedData.childId,
+          entityId: cleanedData.entityId,
           parentId: cleanedData.parentId,
-          positionTitle: cleanedData.positionTitle,
           positionLevel: cleanedData.positionLevel,
+          positionTitle: cleanedData.positionTitle,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          entityId: true,
           childId: true,
+          createdAt: true,
+          entityId: true,
+          id: true,
           parentId: true,
-          positionTitle: true,
           positionLevel: true,
+          positionTitle: true,
+          updatedAt: true,
         },
       })
       .execute();

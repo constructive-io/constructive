@@ -230,221 +230,237 @@ export interface UUIDListFilter {
   anyGreaterThan?: string;
   anyGreaterThanOrEqualTo?: string;
 }
-/** Workflow plan attached to an agent thread with ordered tasks and optional approval gates */
-// ============ Entity Types ============
-export interface AgentPlan {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** User who owns this plan */
-  ownerId?: string | null;
-  /** Foreign key to agent_thread */
-  threadId?: string | null;
-  /** Human-readable plan name */
-  title?: string | null;
-  /** Overall goal or context for this plan */
-  description?: string | null;
-  /** Plan lifecycle: draft, active, completed, failed, cancelled */
-  status?: string | null;
-}
 /** Agent instance registry (human-managed or ephemeral sub-agents) */
+// ============ Entity Types ============
 export interface Agent {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** Human who owns/manages this agent */
-  ownerId?: string | null;
-  /** Persona template this agent was created from */
-  personaId?: string | null;
-  /** Parent agent (for sub-agent delegation hierarchy) */
-  parentId?: string | null;
-  /** Display name for this agent instance */
-  name?: string | null;
-  /** System prompt override (NULL = inherit from persona) */
-  systemPrompt?: string | null;
   /** Per-instance config overrides (model, temperature, tools) */
   config?: Record<string, unknown> | null;
-  /** Agent lifecycle status: active, paused, terminated */
-  status?: string | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  id: string;
   /** If true, agent is deleted when its spawning thread is deleted */
   isEphemeral?: boolean | null;
-}
-/** Top-level AI/LLM conversation thread */
-export interface AgentThread {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** User who owns this thread */
+  /** Display name for this agent instance */
+  name?: string | null;
+  /** Human who owns/manages this agent */
   ownerId?: string | null;
-  /** Current status of this thread */
+  /** Parent agent (for sub-agent delegation hierarchy) */
+  parentId?: string | null;
+  /** Persona template this agent was created from */
+  personaId?: string | null;
+  /** Agent lifecycle status: active, paused, terminated */
   status?: string | null;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean | null;
-  /** Timestamp when this record was archived, NULL if active */
-  archivedAt?: string | null;
-  /** Human-readable conversation title */
-  title?: string | null;
-  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
-  mode?: string | null;
-  /** LLM model id this thread is bound to */
-  model?: string | null;
-  /** System prompt active for this thread */
+  /** System prompt override (NULL = inherit from persona) */
   systemPrompt?: string | null;
-  /** User-defined labels for organizing and filtering threads */
-  tags?: string[] | null;
-  /** Optional FK to a shared prompt template */
-  promptTemplateId?: string | null;
-  /** Agent instance assigned to this thread */
-  agentId?: string | null;
-  /** Parent thread that spawned this sub-conversation */
-  parentThreadId?: string | null;
+  updatedAt?: string | null;
 }
 /** Message within an agent thread with TextPart/ToolPart jsonb parts */
 export interface AgentMessage {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
   /** User who authored this message */
   actorId?: string | null;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string | null;
+  /** Who authored this message: user or assistant */
+  authorRole?: string | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  id: string;
+  /** LLM model that generated this response */
+  model?: string | null;
   /** Message content: TextPart and ToolPart array */
   parts?: Record<string, unknown> | null;
   /** Foreign key to agent_thread */
   threadId?: string | null;
-  /** Who authored this message: user or assistant */
-  authorRole?: string | null;
-  /** LLM model that generated this response */
-  model?: string | null;
-  /** Agent that authored this message (NULL for human messages) */
-  agentId?: string | null;
-}
-/** Task within a plan, with ordering and optional approval gates */
-export interface AgentTask {
-  id: string;
-  createdAt?: string | null;
   updatedAt?: string | null;
-  /** User who authored this task */
-  actorId?: string | null;
-  /** Current status of this task */
-  status?: string | null;
-  /** Foreign key to agent_plan */
-  planId?: string | null;
-  /** Natural-language description of the work to do */
+}
+/** Agent persona templates (role, system prompt, default skills/knowledge) */
+export interface AgentPersona {
+  /** Model preferences, temperature, tool access, constraints */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  createdBy?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Brief description of this persona role */
   description?: string | null;
-  /** Who created the task: agent or user */
-  source?: string | null;
-  /** Error message captured when the task failed */
-  error?: string | null;
-  /** Position within the plan (for ordered task lists) */
-  orderIndex?: number | null;
-  /** Whether this task is an approval gate requiring human decision */
-  requiresApproval?: boolean | null;
-  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
-  approvalStatus?: string | null;
-  /** User who approved or rejected this task */
-  approvedBy?: string | null;
-  /** Timestamp of the approval or rejection decision */
-  approvedAt?: string | null;
-  /** Reviewer feedback or reason for the decision */
-  approvalFeedback?: string | null;
+  id: string;
+  /** Whether this persona is available for use */
+  isActive?: boolean | null;
+  /** Display name for this persona */
+  name?: string | null;
+  /** Slugs of agent_resource entries to link when spawning */
+  resources?: string[] | null;
+  /** Unique human-readable identifier for this persona */
+  slug?: string | null;
+  /** Default system prompt for agents using this persona */
+  systemPrompt?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+}
+/** Workflow plan attached to an agent thread with ordered tasks and optional approval gates */
+export interface AgentPlan {
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Overall goal or context for this plan */
+  description?: string | null;
+  id: string;
+  /** User who owns this plan */
+  ownerId?: string | null;
+  /** Plan lifecycle: draft, active, completed, failed, cancelled */
+  status?: string | null;
+  /** Foreign key to agent_thread */
+  threadId?: string | null;
+  /** Human-readable plan name */
+  title?: string | null;
+  updatedAt?: string | null;
 }
 /** Shared system prompt templates for agent conversations */
 export interface AgentPrompt {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
-  name?: string | null;
   /** The system prompt template content */
   content?: string | null;
+  createdAt?: string | null;
+  createdBy?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** What this prompt template is for */
   description?: string | null;
+  id: string;
   /** Whether this is the default prompt for the entity/app */
   isDefault?: boolean | null;
   /** Variables, tags, category metadata */
   metadata?: Record<string, unknown> | null;
+  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
+  name?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
 }
 export interface AgentResourceChunk {
-  id: string;
   agentResourceId?: string | null;
   body?: string | null;
   chunkIndex?: number | null;
-  embedding?: number[] | null;
-  metadata?: Record<string, unknown> | null;
   createdAt?: string | null;
-  updatedAt?: string | null;
+  embedding?: number[] | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
+  id: string;
+  metadata?: Record<string, unknown> | null;
   /** Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active. */
   searchScore?: number | null;
-}
-/** Agent persona templates (role, system prompt, default skills/knowledge) */
-export interface AgentPersona {
-  id: string;
-  createdAt?: string | null;
   updatedAt?: string | null;
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  /** Unique human-readable identifier for this persona */
-  slug?: string | null;
-  /** Display name for this persona */
-  name?: string | null;
-  /** Brief description of this persona role */
-  description?: string | null;
-  /** Default system prompt for agents using this persona */
-  systemPrompt?: string | null;
-  /** Slugs of agent_resource entries to link when spawning */
-  resources?: string[] | null;
-  /** Model preferences, temperature, tool access, constraints */
-  config?: Record<string, unknown> | null;
-  /** Whether this persona is available for use */
-  isActive?: boolean | null;
 }
 /** Unified skills and knowledge resources for agent retrieval */
 export interface AgentResource {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  /** Unique human-readable identifier for portable references */
-  slug?: string | null;
-  /** Resource type: skill, knowledge, or convention */
-  kind?: string | null;
-  /** Resource name or title */
-  title?: string | null;
-  /** Brief description of this resource */
-  description?: string | null;
-  /** Full content (instructions for skills, reference text for knowledge) */
-  body?: string | null;
-  /** Keywords for deterministic retrieval routing */
-  keywords?: string[] | null;
-  /** Whether this resource is active and retrievable */
-  isActive?: boolean | null;
-  /** Structured metadata: category, version, author, custom attributes */
-  metadata?: Record<string, unknown> | null;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean | null;
   /** Timestamp when this record was archived, NULL if active */
   archivedAt?: string | null;
-  search?: string | null;
-  embedding?: number[] | null;
-  embeddingUpdatedAt?: string | null;
-  /** TSV rank when searching `search`. Returns null when no tsv search filter is active. */
-  searchTsvRank?: number | null;
-  /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
-  embeddingVectorDistance?: number | null;
-  /** TRGM similarity when searching `kind`. Returns null when no trgm search filter is active. */
-  kindTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `title`. Returns null when no trgm search filter is active. */
-  titleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
+  /** Full content (instructions for skills, reference text for knowledge) */
+  body?: string | null;
   /** TRGM similarity when searching `body`. Returns null when no trgm search filter is active. */
   bodyTrgmSimilarity?: number | null;
+  createdAt?: string | null;
+  createdBy?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Brief description of this resource */
+  description?: string | null;
+  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
+  descriptionTrgmSimilarity?: number | null;
+  embedding?: number[] | null;
+  embeddingUpdatedAt?: string | null;
+  /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
+  embeddingVectorDistance?: number | null;
+  id: string;
+  /** Whether this resource is active and retrievable */
+  isActive?: boolean | null;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean | null;
+  /** Keywords for deterministic retrieval routing */
+  keywords?: string[] | null;
+  /** Resource type: skill, knowledge, or convention */
+  kind?: string | null;
+  /** TRGM similarity when searching `kind`. Returns null when no trgm search filter is active. */
+  kindTrgmSimilarity?: number | null;
+  /** Structured metadata: category, version, author, custom attributes */
+  metadata?: Record<string, unknown> | null;
+  search?: string | null;
   /** Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active. */
   searchScore?: number | null;
+  /** TSV rank when searching `search`. Returns null when no tsv search filter is active. */
+  searchTsvRank?: number | null;
+  /** Unique human-readable identifier for portable references */
+  slug?: string | null;
+  /** Resource name or title */
+  title?: string | null;
+  /** TRGM similarity when searching `title`. Returns null when no trgm search filter is active. */
+  titleTrgmSimilarity?: number | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+}
+/** Task within a plan, with ordering and optional approval gates */
+export interface AgentTask {
+  /** User who authored this task */
+  actorId?: string | null;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string | null;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string | null;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string | null;
+  /** User who approved or rejected this task */
+  approvedBy?: string | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Natural-language description of the work to do */
+  description?: string | null;
+  /** Error message captured when the task failed */
+  error?: string | null;
+  id: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number | null;
+  /** Foreign key to agent_plan */
+  planId?: string | null;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean | null;
+  /** Who created the task: agent or user */
+  source?: string | null;
+  /** Current status of this task */
+  status?: string | null;
+  updatedAt?: string | null;
+}
+/** Top-level AI/LLM conversation thread */
+export interface AgentThread {
+  /** Agent instance assigned to this thread */
+  agentId?: string | null;
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  id: string;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean | null;
+  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
+  mode?: string | null;
+  /** LLM model id this thread is bound to */
+  model?: string | null;
+  /** User who owns this thread */
+  ownerId?: string | null;
+  /** Parent thread that spawned this sub-conversation */
+  parentThreadId?: string | null;
+  /** Optional FK to a shared prompt template */
+  promptTemplateId?: string | null;
+  /** Current status of this thread */
+  status?: string | null;
+  /** System prompt active for this thread */
+  systemPrompt?: string | null;
+  /** User-defined labels for organizing and filtering threads */
+  tags?: string[] | null;
+  /** Human-readable conversation title */
+  title?: string | null;
+  updatedAt?: string | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -459,62 +475,142 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
-export interface AgentPlanRelations {
-  thread?: AgentThread | null;
-  agentTasksByPlanId?: ConnectionResult<AgentTask>;
-}
 export interface AgentRelations {
   parent?: Agent | null;
   persona?: AgentPersona | null;
-  agentThreads?: ConnectionResult<AgentThread>;
   agentMessages?: ConnectionResult<AgentMessage>;
+  agentThreads?: ConnectionResult<AgentThread>;
   childAgents?: ConnectionResult<Agent>;
-}
-export interface AgentThreadRelations {
-  agent?: Agent | null;
-  parentThread?: AgentThread | null;
-  promptTemplate?: AgentPrompt | null;
-  agentThreadsByParentThreadId?: ConnectionResult<AgentThread>;
-  agentMessagesByThreadId?: ConnectionResult<AgentMessage>;
-  agentPlansByThreadId?: ConnectionResult<AgentPlan>;
 }
 export interface AgentMessageRelations {
   agent?: Agent | null;
   thread?: AgentThread | null;
 }
-export interface AgentTaskRelations {
-  plan?: AgentPlan | null;
-}
-export interface AgentPromptRelations {}
-export interface AgentResourceChunkRelations {
-  agentResource?: AgentResource | null;
-}
 export interface AgentPersonaRelations {
   agentsByPersonaId?: ConnectionResult<Agent>;
+}
+export interface AgentPlanRelations {
+  thread?: AgentThread | null;
+  agentTasksByPlanId?: ConnectionResult<AgentTask>;
+}
+export interface AgentPromptRelations {
+  agentThreadsByPromptTemplateId?: ConnectionResult<AgentThread>;
+}
+export interface AgentResourceChunkRelations {
+  agentResource?: AgentResource | null;
 }
 export interface AgentResourceRelations {
   agentResourceChunks?: ConnectionResult<AgentResourceChunk>;
 }
+export interface AgentTaskRelations {
+  plan?: AgentPlan | null;
+}
+export interface AgentThreadRelations {
+  agent?: Agent | null;
+  parentThread?: AgentThread | null;
+  promptTemplate?: AgentPrompt | null;
+  agentMessagesByThreadId?: ConnectionResult<AgentMessage>;
+  agentPlansByThreadId?: ConnectionResult<AgentPlan>;
+  agentThreadsByParentThreadId?: ConnectionResult<AgentThread>;
+}
 // ============ Entity Types With Relations ============
-export type AgentPlanWithRelations = AgentPlan & AgentPlanRelations;
 export type AgentWithRelations = Agent & AgentRelations;
-export type AgentThreadWithRelations = AgentThread & AgentThreadRelations;
 export type AgentMessageWithRelations = AgentMessage & AgentMessageRelations;
-export type AgentTaskWithRelations = AgentTask & AgentTaskRelations;
+export type AgentPersonaWithRelations = AgentPersona & AgentPersonaRelations;
+export type AgentPlanWithRelations = AgentPlan & AgentPlanRelations;
 export type AgentPromptWithRelations = AgentPrompt & AgentPromptRelations;
 export type AgentResourceChunkWithRelations = AgentResourceChunk & AgentResourceChunkRelations;
-export type AgentPersonaWithRelations = AgentPersona & AgentPersonaRelations;
 export type AgentResourceWithRelations = AgentResource & AgentResourceRelations;
+export type AgentTaskWithRelations = AgentTask & AgentTaskRelations;
+export type AgentThreadWithRelations = AgentThread & AgentThreadRelations;
 // ============ Entity Select Types ============
-export type AgentPlanSelect = {
-  id?: boolean;
+export type AgentSelect = {
+  config?: boolean;
   createdAt?: boolean;
-  updatedAt?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  isEphemeral?: boolean;
+  name?: boolean;
   ownerId?: boolean;
+  parentId?: boolean;
+  personaId?: boolean;
+  status?: boolean;
+  systemPrompt?: boolean;
+  updatedAt?: boolean;
+  parent?: {
+    select: AgentSelect;
+  };
+  persona?: {
+    select: AgentPersonaSelect;
+  };
+  agentMessages?: {
+    select: AgentMessageSelect;
+    first?: number;
+    filter?: AgentMessageFilter;
+    orderBy?: AgentMessageOrderBy[];
+  };
+  agentThreads?: {
+    select: AgentThreadSelect;
+    first?: number;
+    filter?: AgentThreadFilter;
+    orderBy?: AgentThreadOrderBy[];
+  };
+  childAgents?: {
+    select: AgentSelect;
+    first?: number;
+    filter?: AgentFilter;
+    orderBy?: AgentOrderBy[];
+  };
+};
+export type AgentMessageSelect = {
+  actorId?: boolean;
+  agentId?: boolean;
+  authorRole?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  model?: boolean;
+  parts?: boolean;
+  threadId?: boolean;
+  updatedAt?: boolean;
+  agent?: {
+    select: AgentSelect;
+  };
+  thread?: {
+    select: AgentThreadSelect;
+  };
+};
+export type AgentPersonaSelect = {
+  config?: boolean;
+  createdAt?: boolean;
+  createdBy?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  name?: boolean;
+  resources?: boolean;
+  slug?: boolean;
+  systemPrompt?: boolean;
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  agentsByPersonaId?: {
+    select: AgentSelect;
+    first?: number;
+    filter?: AgentFilter;
+    orderBy?: AgentOrderBy[];
+  };
+};
+export type AgentPlanSelect = {
+  createdAt?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  id?: boolean;
+  ownerId?: boolean;
+  status?: boolean;
   threadId?: boolean;
   title?: boolean;
-  description?: boolean;
-  status?: boolean;
+  updatedAt?: boolean;
   thread?: {
     select: AgentThreadSelect;
   };
@@ -525,59 +621,112 @@ export type AgentPlanSelect = {
     orderBy?: AgentTaskOrderBy[];
   };
 };
-export type AgentSelect = {
-  id?: boolean;
+export type AgentPromptSelect = {
+  content?: boolean;
   createdAt?: boolean;
-  updatedAt?: boolean;
-  ownerId?: boolean;
-  personaId?: boolean;
-  parentId?: boolean;
+  createdBy?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  id?: boolean;
+  isDefault?: boolean;
+  metadata?: boolean;
   name?: boolean;
-  systemPrompt?: boolean;
-  config?: boolean;
-  status?: boolean;
-  isEphemeral?: boolean;
-  parent?: {
-    select: AgentSelect;
-  };
-  persona?: {
-    select: AgentPersonaSelect;
-  };
-  agentThreads?: {
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  agentThreadsByPromptTemplateId?: {
     select: AgentThreadSelect;
     first?: number;
     filter?: AgentThreadFilter;
     orderBy?: AgentThreadOrderBy[];
   };
-  agentMessages?: {
-    select: AgentMessageSelect;
-    first?: number;
-    filter?: AgentMessageFilter;
-    orderBy?: AgentMessageOrderBy[];
+};
+export type AgentResourceChunkSelect = {
+  agentResourceId?: boolean;
+  body?: boolean;
+  chunkIndex?: boolean;
+  createdAt?: boolean;
+  embedding?: boolean;
+  embeddingVectorDistance?: boolean;
+  id?: boolean;
+  metadata?: boolean;
+  searchScore?: boolean;
+  updatedAt?: boolean;
+  agentResource?: {
+    select: AgentResourceSelect;
   };
-  childAgents?: {
-    select: AgentSelect;
+};
+export type AgentResourceSelect = {
+  archivedAt?: boolean;
+  body?: boolean;
+  bodyTrgmSimilarity?: boolean;
+  createdAt?: boolean;
+  createdBy?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  descriptionTrgmSimilarity?: boolean;
+  embedding?: boolean;
+  embeddingUpdatedAt?: boolean;
+  embeddingVectorDistance?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  isArchived?: boolean;
+  keywords?: boolean;
+  kind?: boolean;
+  kindTrgmSimilarity?: boolean;
+  metadata?: boolean;
+  search?: boolean;
+  searchScore?: boolean;
+  searchTsvRank?: boolean;
+  slug?: boolean;
+  title?: boolean;
+  titleTrgmSimilarity?: boolean;
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  agentResourceChunks?: {
+    select: AgentResourceChunkSelect;
     first?: number;
-    filter?: AgentFilter;
-    orderBy?: AgentOrderBy[];
+    filter?: AgentResourceChunkFilter;
+    orderBy?: AgentResourceChunkOrderBy[];
+  };
+};
+export type AgentTaskSelect = {
+  actorId?: boolean;
+  approvalFeedback?: boolean;
+  approvalStatus?: boolean;
+  approvedAt?: boolean;
+  approvedBy?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  description?: boolean;
+  error?: boolean;
+  id?: boolean;
+  orderIndex?: boolean;
+  planId?: boolean;
+  requiresApproval?: boolean;
+  source?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  plan?: {
+    select: AgentPlanSelect;
   };
 };
 export type AgentThreadSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  ownerId?: boolean;
-  status?: boolean;
-  isArchived?: boolean;
+  agentId?: boolean;
   archivedAt?: boolean;
-  title?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  isArchived?: boolean;
   mode?: boolean;
   model?: boolean;
+  ownerId?: boolean;
+  parentThreadId?: boolean;
+  promptTemplateId?: boolean;
+  status?: boolean;
   systemPrompt?: boolean;
   tags?: boolean;
-  promptTemplateId?: boolean;
-  agentId?: boolean;
-  parentThreadId?: boolean;
+  title?: boolean;
+  updatedAt?: boolean;
   agent?: {
     select: AgentSelect;
   };
@@ -586,12 +735,6 @@ export type AgentThreadSelect = {
   };
   promptTemplate?: {
     select: AgentPromptSelect;
-  };
-  agentThreadsByParentThreadId?: {
-    select: AgentThreadSelect;
-    first?: number;
-    filter?: AgentThreadFilter;
-    orderBy?: AgentThreadOrderBy[];
   };
   agentMessagesByThreadId?: {
     select: AgentMessageSelect;
@@ -605,490 +748,287 @@ export type AgentThreadSelect = {
     filter?: AgentPlanFilter;
     orderBy?: AgentPlanOrderBy[];
   };
-};
-export type AgentMessageSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  actorId?: boolean;
-  parts?: boolean;
-  threadId?: boolean;
-  authorRole?: boolean;
-  model?: boolean;
-  agentId?: boolean;
-  agent?: {
-    select: AgentSelect;
-  };
-  thread?: {
+  agentThreadsByParentThreadId?: {
     select: AgentThreadSelect;
-  };
-};
-export type AgentTaskSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  actorId?: boolean;
-  status?: boolean;
-  planId?: boolean;
-  description?: boolean;
-  source?: boolean;
-  error?: boolean;
-  orderIndex?: boolean;
-  requiresApproval?: boolean;
-  approvalStatus?: boolean;
-  approvedBy?: boolean;
-  approvedAt?: boolean;
-  approvalFeedback?: boolean;
-  plan?: {
-    select: AgentPlanSelect;
-  };
-};
-export type AgentPromptSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  createdBy?: boolean;
-  updatedBy?: boolean;
-  name?: boolean;
-  content?: boolean;
-  description?: boolean;
-  isDefault?: boolean;
-  metadata?: boolean;
-};
-export type AgentResourceChunkSelect = {
-  id?: boolean;
-  agentResourceId?: boolean;
-  body?: boolean;
-  chunkIndex?: boolean;
-  embedding?: boolean;
-  metadata?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  embeddingVectorDistance?: boolean;
-  searchScore?: boolean;
-  agentResource?: {
-    select: AgentResourceSelect;
-  };
-};
-export type AgentPersonaSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  createdBy?: boolean;
-  updatedBy?: boolean;
-  slug?: boolean;
-  name?: boolean;
-  description?: boolean;
-  systemPrompt?: boolean;
-  resources?: boolean;
-  config?: boolean;
-  isActive?: boolean;
-  agentsByPersonaId?: {
-    select: AgentSelect;
     first?: number;
-    filter?: AgentFilter;
-    orderBy?: AgentOrderBy[];
-  };
-};
-export type AgentResourceSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  createdBy?: boolean;
-  updatedBy?: boolean;
-  slug?: boolean;
-  kind?: boolean;
-  title?: boolean;
-  description?: boolean;
-  body?: boolean;
-  keywords?: boolean;
-  isActive?: boolean;
-  metadata?: boolean;
-  isArchived?: boolean;
-  archivedAt?: boolean;
-  search?: boolean;
-  embedding?: boolean;
-  embeddingUpdatedAt?: boolean;
-  searchTsvRank?: boolean;
-  embeddingVectorDistance?: boolean;
-  kindTrgmSimilarity?: boolean;
-  titleTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  bodyTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  agentResourceChunks?: {
-    select: AgentResourceChunkSelect;
-    first?: number;
-    filter?: AgentResourceChunkFilter;
-    orderBy?: AgentResourceChunkOrderBy[];
+    filter?: AgentThreadFilter;
+    orderBy?: AgentThreadOrderBy[];
   };
 };
 // ============ Table Filter Types ============
-export interface AgentPlanFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPlanFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPlanFilter[];
-  /** Negates the expression. */
-  not?: AgentPlanFilter;
-  /** Filter by the object’s `thread` relation. */
-  thread?: AgentThreadFilter;
-  /** Filter by the object’s `agentTasksByPlanId` relation. */
-  agentTasksByPlanId?: AgentPlanToManyAgentTaskFilter;
-  /** `agentTasksByPlanId` exist. */
-  agentTasksByPlanIdExist?: boolean;
-}
 export interface AgentFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `personaId` field. */
-  personaId?: UUIDFilter;
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `isEphemeral` field. */
-  isEphemeral?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentFilter[];
-  /** Negates the expression. */
-  not?: AgentFilter;
-  /** Filter by the object’s `parent` relation. */
-  parent?: AgentFilter;
-  /** A related `parent` exists. */
-  parentExists?: boolean;
-  /** Filter by the object’s `persona` relation. */
-  persona?: AgentPersonaFilter;
-  /** A related `persona` exists. */
-  personaExists?: boolean;
-  /** Filter by the object’s `agentThreads` relation. */
-  agentThreads?: AgentToManyAgentThreadFilter;
-  /** `agentThreads` exist. */
-  agentThreadsExist?: boolean;
   /** Filter by the object’s `agentMessages` relation. */
   agentMessages?: AgentToManyAgentMessageFilter;
   /** `agentMessages` exist. */
   agentMessagesExist?: boolean;
+  /** Filter by the object’s `agentThreads` relation. */
+  agentThreads?: AgentToManyAgentThreadFilter;
+  /** `agentThreads` exist. */
+  agentThreadsExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentFilter[];
   /** Filter by the object’s `childAgents` relation. */
   childAgents?: AgentToManyAgentFilter;
   /** `childAgents` exist. */
   childAgentsExist?: boolean;
-}
-export interface AgentThreadFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isEphemeral` field. */
+  isEphemeral?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentFilter[];
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: AgentFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `persona` relation. */
+  persona?: AgentPersonaFilter;
+  /** A related `persona` exists. */
+  personaExists?: boolean;
+  /** Filter by the object’s `personaId` field. */
+  personaId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
-  /** Filter by the object’s `isArchived` field. */
-  isArchived?: BooleanFilter;
-  /** Filter by the object’s `archivedAt` field. */
-  archivedAt?: DatetimeFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `mode` field. */
-  mode?: StringFilter;
-  /** Filter by the object’s `model` field. */
-  model?: StringFilter;
   /** Filter by the object’s `systemPrompt` field. */
   systemPrompt?: StringFilter;
-  /** Filter by the object’s `tags` field. */
-  tags?: StringListFilter;
-  /** Filter by the object’s `promptTemplateId` field. */
-  promptTemplateId?: UUIDFilter;
-  /** Filter by the object’s `agentId` field. */
-  agentId?: UUIDFilter;
-  /** Filter by the object’s `parentThreadId` field. */
-  parentThreadId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentThreadFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentThreadFilter[];
-  /** Negates the expression. */
-  not?: AgentThreadFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface AgentMessageFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
   /** Filter by the object’s `agent` relation. */
   agent?: AgentFilter;
   /** A related `agent` exists. */
   agentExists?: boolean;
-  /** Filter by the object’s `parentThread` relation. */
-  parentThread?: AgentThreadFilter;
-  /** A related `parentThread` exists. */
-  parentThreadExists?: boolean;
-  /** Filter by the object’s `promptTemplate` relation. */
-  promptTemplate?: AgentPromptFilter;
-  /** A related `promptTemplate` exists. */
-  promptTemplateExists?: boolean;
-  /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
-  agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
-  /** `agentThreadsByParentThreadId` exist. */
-  agentThreadsByParentThreadIdExist?: boolean;
-  /** Filter by the object’s `agentMessagesByThreadId` relation. */
-  agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
-  /** `agentMessagesByThreadId` exist. */
-  agentMessagesByThreadIdExist?: boolean;
-  /** Filter by the object’s `agentPlansByThreadId` relation. */
-  agentPlansByThreadId?: AgentThreadToManyAgentPlanFilter;
-  /** `agentPlansByThreadId` exist. */
-  agentPlansByThreadIdExist?: boolean;
-}
-export interface AgentMessageFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `parts` field. */
-  parts?: JSONFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `authorRole` field. */
-  authorRole?: StringFilter;
-  /** Filter by the object’s `model` field. */
-  model?: StringFilter;
   /** Filter by the object’s `agentId` field. */
   agentId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: AgentMessageFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentMessageFilter[];
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
   /** Negates the expression. */
   not?: AgentMessageFilter;
-  /** Filter by the object’s `agent` relation. */
-  agent?: AgentFilter;
-  /** A related `agent` exists. */
-  agentExists?: boolean;
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
   /** Filter by the object’s `thread` relation. */
   thread?: AgentThreadFilter;
-}
-export interface AgentTaskFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `planId` field. */
-  planId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `source` field. */
-  source?: StringFilter;
-  /** Filter by the object’s `error` field. */
-  error?: StringFilter;
-  /** Filter by the object’s `orderIndex` field. */
-  orderIndex?: IntFilter;
-  /** Filter by the object’s `requiresApproval` field. */
-  requiresApproval?: BooleanFilter;
-  /** Filter by the object’s `approvalStatus` field. */
-  approvalStatus?: StringFilter;
-  /** Filter by the object’s `approvedBy` field. */
-  approvedBy?: UUIDFilter;
-  /** Filter by the object’s `approvedAt` field. */
-  approvedAt?: DatetimeFilter;
-  /** Filter by the object’s `approvalFeedback` field. */
-  approvalFeedback?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentTaskFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentTaskFilter[];
-  /** Negates the expression. */
-  not?: AgentTaskFilter;
-  /** Filter by the object’s `plan` relation. */
-  plan?: AgentPlanFilter;
-}
-export interface AgentPromptFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `content` field. */
-  content?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `isDefault` field. */
-  isDefault?: BooleanFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPromptFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPromptFilter[];
-  /** Negates the expression. */
-  not?: AgentPromptFilter;
-}
-export interface AgentResourceChunkFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `agentResourceId` field. */
-  agentResourceId?: UUIDFilter;
-  /** Filter by the object’s `body` field. */
-  body?: StringFilter;
-  /** Filter by the object’s `chunkIndex` field. */
-  chunkIndex?: IntFilter;
-  /** Filter by the object’s `embedding` field. */
-  embedding?: VectorFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentResourceChunkFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentResourceChunkFilter[];
-  /** Negates the expression. */
-  not?: AgentResourceChunkFilter;
-  /** Filter by the object’s `agentResource` relation. */
-  agentResource?: AgentResourceFilter;
-  /** VECTOR search on the `embedding` column. */
-  vectorEmbedding?: VectorNearbyInput;
 }
 export interface AgentPersonaFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `resources` field. */
-  resources?: StringListFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPersonaFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPersonaFilter[];
-  /** Negates the expression. */
-  not?: AgentPersonaFilter;
   /** Filter by the object’s `agentsByPersonaId` relation. */
   agentsByPersonaId?: AgentPersonaToManyAgentFilter;
   /** `agentsByPersonaId` exist. */
   agentsByPersonaIdExist?: boolean;
-}
-export interface AgentResourceFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentPersonaFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringTrgmFilter;
-  /** Filter by the object’s `kind` field. */
-  kind?: StringTrgmFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringTrgmFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
-  description?: StringTrgmFilter;
-  /** Filter by the object’s `body` field. */
-  body?: StringTrgmFilter;
-  /** Filter by the object’s `keywords` field. */
-  keywords?: StringListFilter;
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentPersonaFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPersonaFilter[];
+  /** Filter by the object’s `resources` field. */
+  resources?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+export interface AgentPlanFilter {
+  /** Filter by the object’s `agentTasksByPlanId` relation. */
+  agentTasksByPlanId?: AgentPlanToManyAgentTaskFilter;
+  /** `agentTasksByPlanId` exist. */
+  agentTasksByPlanIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPlanFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentPlanFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPlanFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface AgentPromptFilter {
+  /** Filter by the object’s `agentThreadsByPromptTemplateId` relation. */
+  agentThreadsByPromptTemplateId?: AgentPromptToManyAgentThreadFilter;
+  /** `agentThreadsByPromptTemplateId` exist. */
+  agentThreadsByPromptTemplateIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPromptFilter[];
+  /** Filter by the object’s `content` field. */
+  content?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
   /** Filter by the object’s `metadata` field. */
   metadata?: JSONFilter;
-  /** Filter by the object’s `isArchived` field. */
-  isArchived?: BooleanFilter;
-  /** Filter by the object’s `archivedAt` field. */
-  archivedAt?: DatetimeFilter;
-  /** Filter by the object’s `search` field. */
-  search?: FullTextFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentPromptFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPromptFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+export interface AgentResourceChunkFilter {
+  /** Filter by the object’s `agentResource` relation. */
+  agentResource?: AgentResourceFilter;
+  /** Filter by the object’s `agentResourceId` field. */
+  agentResourceId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentResourceChunkFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringFilter;
+  /** Filter by the object’s `chunkIndex` field. */
+  chunkIndex?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
-  /** Filter by the object’s `embeddingUpdatedAt` field. */
-  embeddingUpdatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentResourceFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentResourceFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
   /** Negates the expression. */
-  not?: AgentResourceFilter;
+  not?: AgentResourceChunkFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentResourceChunkFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+export interface AgentResourceFilter {
   /** Filter by the object’s `agentResourceChunks` relation. */
   agentResourceChunks?: AgentResourceToManyAgentResourceChunkFilter;
   /** `agentResourceChunks` exist. */
   agentResourceChunksExist?: boolean;
-  /** TSV search on the `search` column. */
-  tsvSearch?: string;
-  /** VECTOR search on the `embedding` column. */
-  vectorEmbedding?: VectorNearbyInput;
+  /** Checks for all expressions in this list. */
+  and?: AgentResourceFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringTrgmFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `keywords` field. */
+  keywords?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringTrgmFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: AgentResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentResourceFilter[];
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringTrgmFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringTrgmFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
   trgmTitle?: TrgmSearchInput;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /** TRGM search on the `body` column. */
-  trgmBody?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
   /**
    * Composite unified search. Provide a search string and it will be dispatched to
    * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
@@ -1097,323 +1037,427 @@ export interface AgentResourceFilter {
    * fields are populated.
    */
   unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+export interface AgentTaskFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Filter by the object’s `approvalFeedback` field. */
+  approvalFeedback?: StringFilter;
+  /** Filter by the object’s `approvalStatus` field. */
+  approvalStatus?: StringFilter;
+  /** Filter by the object’s `approvedAt` field. */
+  approvedAt?: DatetimeFilter;
+  /** Filter by the object’s `approvedBy` field. */
+  approvedBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Filter by the object’s `orderIndex` field. */
+  orderIndex?: IntFilter;
+  /** Filter by the object’s `plan` relation. */
+  plan?: AgentPlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `requiresApproval` field. */
+  requiresApproval?: BooleanFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface AgentThreadFilter {
+  /** Filter by the object’s `agent` relation. */
+  agent?: AgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
+  /** Filter by the object’s `agentMessagesByThreadId` relation. */
+  agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
+  /** `agentMessagesByThreadId` exist. */
+  agentMessagesByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentPlansByThreadId` relation. */
+  agentPlansByThreadId?: AgentThreadToManyAgentPlanFilter;
+  /** `agentPlansByThreadId` exist. */
+  agentPlansByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
+  agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
+  /** `agentThreadsByParentThreadId` exist. */
+  agentThreadsByParentThreadIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentThreadFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parentThread` relation. */
+  parentThread?: AgentThreadFilter;
+  /** A related `parentThread` exists. */
+  parentThreadExists?: boolean;
+  /** Filter by the object’s `parentThreadId` field. */
+  parentThreadId?: UUIDFilter;
+  /** Filter by the object’s `promptTemplate` relation. */
+  promptTemplate?: AgentPromptFilter;
+  /** A related `promptTemplate` exists. */
+  promptTemplateExists?: boolean;
+  /** Filter by the object’s `promptTemplateId` field. */
+  promptTemplateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
-export type AgentPlanOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'THREAD_ID_ASC'
-  | 'THREAD_ID_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC';
 export type AgentOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PERSONA_ID_ASC'
-  | 'PERSONA_ID_DESC'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
   | 'CONFIG_ASC'
   | 'CONFIG_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'IS_EPHEMERAL_ASC'
-  | 'IS_EPHEMERAL_DESC';
-export type AgentThreadOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'IS_ARCHIVED_ASC'
-  | 'IS_ARCHIVED_DESC'
-  | 'ARCHIVED_AT_ASC'
-  | 'ARCHIVED_AT_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'MODE_ASC'
-  | 'MODE_DESC'
-  | 'MODEL_ASC'
-  | 'MODEL_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'PROMPT_TEMPLATE_ID_ASC'
-  | 'PROMPT_TEMPLATE_ID_DESC'
-  | 'AGENT_ID_ASC'
-  | 'AGENT_ID_DESC'
-  | 'PARENT_THREAD_ID_ASC'
-  | 'PARENT_THREAD_ID_DESC';
-export type AgentMessageOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'PARTS_ASC'
-  | 'PARTS_DESC'
-  | 'THREAD_ID_ASC'
-  | 'THREAD_ID_DESC'
-  | 'AUTHOR_ROLE_ASC'
-  | 'AUTHOR_ROLE_DESC'
-  | 'MODEL_ASC'
-  | 'MODEL_DESC'
-  | 'AGENT_ID_ASC'
-  | 'AGENT_ID_DESC';
-export type AgentTaskOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'PLAN_ID_ASC'
-  | 'PLAN_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'ORDER_INDEX_ASC'
-  | 'ORDER_INDEX_DESC'
-  | 'REQUIRES_APPROVAL_ASC'
-  | 'REQUIRES_APPROVAL_DESC'
-  | 'APPROVAL_STATUS_ASC'
-  | 'APPROVAL_STATUS_DESC'
-  | 'APPROVED_BY_ASC'
-  | 'APPROVED_BY_DESC'
-  | 'APPROVED_AT_ASC'
-  | 'APPROVED_AT_DESC'
-  | 'APPROVAL_FEEDBACK_ASC'
-  | 'APPROVAL_FEEDBACK_DESC';
-export type AgentPromptOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
+  | 'IS_EPHEMERAL_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'CONTENT_ASC'
-  | 'CONTENT_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'PERSONA_ID_ASC'
+  | 'PERSONA_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AgentMessageOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC'
+  | 'AUTHOR_ROLE_ASC'
+  | 'AUTHOR_ROLE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'NATURAL'
+  | 'PARTS_ASC'
+  | 'PARTS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AgentPersonaOrderBy =
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type AgentPlanOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AgentPromptOrderBy =
+  | 'CONTENT_ASC'
+  | 'CONTENT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'IS_DEFAULT_ASC'
   | 'IS_DEFAULT_DESC'
   | 'METADATA_ASC'
-  | 'METADATA_DESC';
-export type AgentResourceChunkOrderBy =
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type AgentResourceChunkOrderBy =
   | 'AGENT_RESOURCE_ID_ASC'
   | 'AGENT_RESOURCE_ID_DESC'
   | 'BODY_ASC'
   | 'BODY_DESC'
   | 'CHUNK_INDEX_ASC'
   | 'CHUNK_INDEX_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
   | 'EMBEDDING_VECTOR_DISTANCE_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AgentPersonaOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC';
-export type AgentResourceOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'BODY_ASC'
-  | 'BODY_DESC'
-  | 'KEYWORDS_ASC'
-  | 'KEYWORDS_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
   | 'METADATA_ASC'
   | 'METADATA_DESC'
-  | 'IS_ARCHIVED_ASC'
-  | 'IS_ARCHIVED_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AgentResourceOrderBy =
   | 'ARCHIVED_AT_ASC'
   | 'ARCHIVED_AT_DESC'
-  | 'SEARCH_ASC'
-  | 'SEARCH_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
-  | 'SEARCH_TSV_RANK_ASC'
-  | 'SEARCH_TSV_RANK_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
   | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'KEYWORDS_ASC'
+  | 'KEYWORDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
   | 'KIND_TRGM_SIMILARITY_ASC'
   | 'KIND_TRGM_SIMILARITY_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
   | 'TITLE_TRGM_SIMILARITY_ASC'
   | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'BODY_TRGM_SIMILARITY_ASC'
-  | 'BODY_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type AgentTaskOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'APPROVAL_FEEDBACK_ASC'
+  | 'APPROVAL_FEEDBACK_DESC'
+  | 'APPROVAL_STATUS_ASC'
+  | 'APPROVAL_STATUS_DESC'
+  | 'APPROVED_AT_ASC'
+  | 'APPROVED_AT_DESC'
+  | 'APPROVED_BY_ASC'
+  | 'APPROVED_BY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'ORDER_INDEX_ASC'
+  | 'ORDER_INDEX_DESC'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRES_APPROVAL_ASC'
+  | 'REQUIRES_APPROVAL_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AgentThreadOrderBy =
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC'
+  | 'ARCHIVED_AT_ASC'
+  | 'ARCHIVED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARENT_THREAD_ID_ASC'
+  | 'PARENT_THREAD_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROMPT_TEMPLATE_ID_ASC'
+  | 'PROMPT_TEMPLATE_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 // ============ CRUD Input Types ============
-export interface CreateAgentPlanInput {
-  clientMutationId?: string;
-  agentPlan: {
-    ownerId?: string;
-    threadId: string;
-    title: string;
-    description?: string;
-    status?: string;
-  };
-}
-export interface AgentPlanPatch {
-  ownerId?: string | null;
-  threadId?: string | null;
-  title?: string | null;
-  description?: string | null;
-  status?: string | null;
-}
-export interface UpdateAgentPlanInput {
-  clientMutationId?: string;
-  id: string;
-  agentPlanPatch: AgentPlanPatch;
-}
-export interface DeleteAgentPlanInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAgentInput {
   clientMutationId?: string;
   agent: {
-    ownerId?: string;
-    personaId?: string;
-    parentId?: string;
-    name: string;
-    systemPrompt?: string;
     config?: Record<string, unknown>;
-    status?: string;
+    databaseId: string;
     isEphemeral?: boolean;
+    name: string;
+    ownerId?: string;
+    parentId?: string;
+    personaId?: string;
+    status?: string;
+    systemPrompt?: string;
   };
 }
 export interface AgentPatch {
-  ownerId?: string | null;
-  personaId?: string | null;
-  parentId?: string | null;
-  name?: string | null;
-  systemPrompt?: string | null;
   config?: Record<string, unknown> | null;
-  status?: string | null;
+  databaseId?: string | null;
   isEphemeral?: boolean | null;
+  name?: string | null;
+  ownerId?: string | null;
+  parentId?: string | null;
+  personaId?: string | null;
+  status?: string | null;
+  systemPrompt?: string | null;
 }
 export interface UpdateAgentInput {
   clientMutationId?: string;
@@ -1424,64 +1468,26 @@ export interface DeleteAgentInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAgentThreadInput {
-  clientMutationId?: string;
-  agentThread: {
-    ownerId?: string;
-    status?: string;
-    isArchived?: boolean;
-    archivedAt?: string;
-    title?: string;
-    mode?: string;
-    model?: string;
-    systemPrompt?: string;
-    tags?: string[];
-    promptTemplateId?: string;
-    agentId?: string;
-    parentThreadId?: string;
-  };
-}
-export interface AgentThreadPatch {
-  ownerId?: string | null;
-  status?: string | null;
-  isArchived?: boolean | null;
-  archivedAt?: string | null;
-  title?: string | null;
-  mode?: string | null;
-  model?: string | null;
-  systemPrompt?: string | null;
-  tags?: string[] | null;
-  promptTemplateId?: string | null;
-  agentId?: string | null;
-  parentThreadId?: string | null;
-}
-export interface UpdateAgentThreadInput {
-  clientMutationId?: string;
-  id: string;
-  agentThreadPatch: AgentThreadPatch;
-}
-export interface DeleteAgentThreadInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAgentMessageInput {
   clientMutationId?: string;
   agentMessage: {
     actorId?: string;
+    agentId?: string;
+    authorRole: string;
+    databaseId: string;
+    model?: string;
     parts?: Record<string, unknown>;
     threadId: string;
-    authorRole: string;
-    model?: string;
-    agentId?: string;
   };
 }
 export interface AgentMessagePatch {
   actorId?: string | null;
+  agentId?: string | null;
+  authorRole?: string | null;
+  databaseId?: string | null;
+  model?: string | null;
   parts?: Record<string, unknown> | null;
   threadId?: string | null;
-  authorRole?: string | null;
-  model?: string | null;
-  agentId?: string | null;
 }
 export interface UpdateAgentMessageInput {
   clientMutationId?: string;
@@ -1492,66 +1498,92 @@ export interface DeleteAgentMessageInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAgentTaskInput {
+export interface CreateAgentPersonaInput {
   clientMutationId?: string;
-  agentTask: {
-    actorId?: string;
-    status?: string;
-    planId: string;
-    description: string;
-    source?: string;
-    error?: string;
-    orderIndex?: number;
-    requiresApproval?: boolean;
-    approvalStatus?: string;
-    approvedBy?: string;
-    approvedAt?: string;
-    approvalFeedback?: string;
+  agentPersona: {
+    config?: Record<string, unknown>;
+    createdBy?: string;
+    databaseId: string;
+    description?: string;
+    isActive?: boolean;
+    name: string;
+    resources?: string[];
+    slug: string;
+    systemPrompt?: string;
+    updatedBy?: string;
   };
 }
-export interface AgentTaskPatch {
-  actorId?: string | null;
-  status?: string | null;
-  planId?: string | null;
+export interface AgentPersonaPatch {
+  config?: Record<string, unknown> | null;
+  createdBy?: string | null;
+  databaseId?: string | null;
   description?: string | null;
-  source?: string | null;
-  error?: string | null;
-  orderIndex?: number | null;
-  requiresApproval?: boolean | null;
-  approvalStatus?: string | null;
-  approvedBy?: string | null;
-  approvedAt?: string | null;
-  approvalFeedback?: string | null;
+  isActive?: boolean | null;
+  name?: string | null;
+  resources?: string[] | null;
+  slug?: string | null;
+  systemPrompt?: string | null;
+  updatedBy?: string | null;
 }
-export interface UpdateAgentTaskInput {
+export interface UpdateAgentPersonaInput {
   clientMutationId?: string;
   id: string;
-  agentTaskPatch: AgentTaskPatch;
+  agentPersonaPatch: AgentPersonaPatch;
 }
-export interface DeleteAgentTaskInput {
+export interface DeleteAgentPersonaInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAgentPlanInput {
+  clientMutationId?: string;
+  agentPlan: {
+    databaseId: string;
+    description?: string;
+    ownerId?: string;
+    status?: string;
+    threadId: string;
+    title: string;
+  };
+}
+export interface AgentPlanPatch {
+  databaseId?: string | null;
+  description?: string | null;
+  ownerId?: string | null;
+  status?: string | null;
+  threadId?: string | null;
+  title?: string | null;
+}
+export interface UpdateAgentPlanInput {
+  clientMutationId?: string;
+  id: string;
+  agentPlanPatch: AgentPlanPatch;
+}
+export interface DeleteAgentPlanInput {
   clientMutationId?: string;
   id: string;
 }
 export interface CreateAgentPromptInput {
   clientMutationId?: string;
   agentPrompt: {
-    createdBy?: string;
-    updatedBy?: string;
-    name: string;
     content: string;
+    createdBy?: string;
+    databaseId: string;
     description?: string;
     isDefault?: boolean;
     metadata?: Record<string, unknown>;
+    name: string;
+    updatedBy?: string;
   };
 }
 export interface AgentPromptPatch {
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  name?: string | null;
   content?: string | null;
+  createdBy?: string | null;
+  databaseId?: string | null;
   description?: string | null;
   isDefault?: boolean | null;
   metadata?: Record<string, unknown> | null;
+  name?: string | null;
+  updatedBy?: string | null;
 }
 export interface UpdateAgentPromptInput {
   clientMutationId?: string;
@@ -1569,8 +1601,8 @@ export interface CreateAgentResourceChunkInput {
     body: string;
     chunkIndex?: number;
     embedding?: number[];
-    metadata?: Record<string, unknown>;
     embeddingText?: string;
+    metadata?: Record<string, unknown>;
   };
 }
 export interface AgentResourceChunkPatch {
@@ -1578,8 +1610,8 @@ export interface AgentResourceChunkPatch {
   body?: string | null;
   chunkIndex?: number | null;
   embedding?: number[] | null;
-  metadata?: Record<string, unknown> | null;
   embeddingText?: string | null;
+  metadata?: Record<string, unknown> | null;
 }
 export interface UpdateAgentResourceChunkInput {
   clientMutationId?: string;
@@ -1590,76 +1622,44 @@ export interface DeleteAgentResourceChunkInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAgentPersonaInput {
-  clientMutationId?: string;
-  agentPersona: {
-    createdBy?: string;
-    updatedBy?: string;
-    slug: string;
-    name: string;
-    description?: string;
-    systemPrompt?: string;
-    resources?: string[];
-    config?: Record<string, unknown>;
-    isActive?: boolean;
-  };
-}
-export interface AgentPersonaPatch {
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  slug?: string | null;
-  name?: string | null;
-  description?: string | null;
-  systemPrompt?: string | null;
-  resources?: string[] | null;
-  config?: Record<string, unknown> | null;
-  isActive?: boolean | null;
-}
-export interface UpdateAgentPersonaInput {
-  clientMutationId?: string;
-  id: string;
-  agentPersonaPatch: AgentPersonaPatch;
-}
-export interface DeleteAgentPersonaInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAgentResourceInput {
   clientMutationId?: string;
   agentResource: {
-    createdBy?: string;
-    updatedBy?: string;
-    slug: string;
-    kind?: string;
-    title: string;
-    description?: string;
-    body: string;
-    keywords?: string[];
-    isActive?: boolean;
-    metadata?: Record<string, unknown>;
-    isArchived?: boolean;
     archivedAt?: string;
+    body: string;
+    createdBy?: string;
+    databaseId: string;
+    description?: string;
     embedding?: number[];
-    embeddingUpdatedAt?: string;
     embeddingText?: string;
+    embeddingUpdatedAt?: string;
+    isActive?: boolean;
+    isArchived?: boolean;
+    keywords?: string[];
+    kind?: string;
+    metadata?: Record<string, unknown>;
+    slug: string;
+    title: string;
+    updatedBy?: string;
   };
 }
 export interface AgentResourcePatch {
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  slug?: string | null;
-  kind?: string | null;
-  title?: string | null;
-  description?: string | null;
-  body?: string | null;
-  keywords?: string[] | null;
-  isActive?: boolean | null;
-  metadata?: Record<string, unknown> | null;
-  isArchived?: boolean | null;
   archivedAt?: string | null;
+  body?: string | null;
+  createdBy?: string | null;
+  databaseId?: string | null;
+  description?: string | null;
   embedding?: number[] | null;
-  embeddingUpdatedAt?: string | null;
   embeddingText?: string | null;
+  embeddingUpdatedAt?: string | null;
+  isActive?: boolean | null;
+  isArchived?: boolean | null;
+  keywords?: string[] | null;
+  kind?: string | null;
+  metadata?: Record<string, unknown> | null;
+  slug?: string | null;
+  title?: string | null;
+  updatedBy?: string | null;
 }
 export interface UpdateAgentResourceInput {
   clientMutationId?: string;
@@ -1670,26 +1670,113 @@ export interface DeleteAgentResourceInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAgentTaskInput {
+  clientMutationId?: string;
+  agentTask: {
+    actorId?: string;
+    approvalFeedback?: string;
+    approvalStatus?: string;
+    approvedAt?: string;
+    approvedBy?: string;
+    databaseId: string;
+    description: string;
+    error?: string;
+    orderIndex?: number;
+    planId: string;
+    requiresApproval?: boolean;
+    source?: string;
+    status?: string;
+  };
+}
+export interface AgentTaskPatch {
+  actorId?: string | null;
+  approvalFeedback?: string | null;
+  approvalStatus?: string | null;
+  approvedAt?: string | null;
+  approvedBy?: string | null;
+  databaseId?: string | null;
+  description?: string | null;
+  error?: string | null;
+  orderIndex?: number | null;
+  planId?: string | null;
+  requiresApproval?: boolean | null;
+  source?: string | null;
+  status?: string | null;
+}
+export interface UpdateAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+  agentTaskPatch: AgentTaskPatch;
+}
+export interface DeleteAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAgentThreadInput {
+  clientMutationId?: string;
+  agentThread: {
+    agentId?: string;
+    archivedAt?: string;
+    databaseId: string;
+    isArchived?: boolean;
+    mode?: string;
+    model?: string;
+    ownerId?: string;
+    parentThreadId?: string;
+    promptTemplateId?: string;
+    status?: string;
+    systemPrompt?: string;
+    tags?: string[];
+    title?: string;
+  };
+}
+export interface AgentThreadPatch {
+  agentId?: string | null;
+  archivedAt?: string | null;
+  databaseId?: string | null;
+  isArchived?: boolean | null;
+  mode?: string | null;
+  model?: string | null;
+  ownerId?: string | null;
+  parentThreadId?: string | null;
+  promptTemplateId?: string | null;
+  status?: string | null;
+  systemPrompt?: string | null;
+  tags?: string[] | null;
+  title?: string | null;
+}
+export interface UpdateAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+  agentThreadPatch: AgentThreadPatch;
+}
+export interface DeleteAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+}
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  AgentPlan: {
-    agentTasksByPlanId: 'AgentTask',
-  },
   Agent: {
-    agentThreads: 'AgentThread',
     agentMessages: 'AgentMessage',
+    agentThreads: 'AgentThread',
     childAgents: 'Agent',
-  },
-  AgentThread: {
-    agentThreadsByParentThreadId: 'AgentThread',
-    agentMessagesByThreadId: 'AgentMessage',
-    agentPlansByThreadId: 'AgentPlan',
   },
   AgentPersona: {
     agentsByPersonaId: 'Agent',
   },
+  AgentPlan: {
+    agentTasksByPlanId: 'AgentTask',
+  },
+  AgentPrompt: {
+    agentThreadsByPromptTemplateId: 'AgentThread',
+  },
   AgentResource: {
     agentResourceChunks: 'AgentResourceChunk',
+  },
+  AgentThread: {
+    agentMessagesByThreadId: 'AgentMessage',
+    agentPlansByThreadId: 'AgentPlan',
+    agentThreadsByParentThreadId: 'AgentThread',
   },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
@@ -1702,484 +1789,457 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentToManyAgentMessageFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentToManyAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
+}
+/** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentToManyAgentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentFilter;
+}
+/** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPersonaToManyAgentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentFilter;
+}
 /** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPlanToManyAgentTaskFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentTaskFilter;
   /** Filters to entities where every related entity matches. */
   every?: AgentTaskFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentTaskFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
 }
 /** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentToManyAgentThreadFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentThreadFilter;
+export interface AgentPromptToManyAgentThreadFilter {
   /** Filters to entities where every related entity matches. */
   every?: AgentThreadFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentThreadFilter;
-}
-/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentToManyAgentMessageFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentMessageFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentMessageFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentMessageFilter;
-}
-/** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentToManyAgentFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentFilter;
-}
-/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentThreadToManyAgentThreadFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: AgentThreadFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentThreadFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentThreadFilter;
-}
-/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentThreadToManyAgentMessageFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentMessageFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentMessageFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentMessageFilter;
-}
-/** A filter to be used against many `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentThreadToManyAgentPlanFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentPlanFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentPlanFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentPlanFilter;
 }
 /** Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold. */
 export interface VectorNearbyInput {
-  /** Query vector for similarity search. */
-  vector: number[];
-  /** Similarity metric to use (default: COSINE). */
-  metric?: VectorMetric;
   /** Maximum distance threshold. Only rows within this distance are returned. */
   distance?: number;
   /** When true (default for tables with @hasChunks), transparently queries the chunks table and returns the minimum distance across parent + all chunks. Set to false to only search the parent embedding. */
   includeChunks?: boolean;
+  /** Similarity metric to use (default: COSINE). */
+  metric?: VectorMetric;
   /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   text?: string;
-}
-/** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPersonaToManyAgentFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentFilter;
-}
-/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
-export interface StringTrgmFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Contains the specified string (case-sensitive). */
-  includes?: string;
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: string;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: string;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: string;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: string;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: string;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: string;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: string;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: string;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: string;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: string;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: string;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: string;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
-  similarTo?: TrgmSearchInput;
-  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
-  wordSimilarTo?: TrgmSearchInput;
+  /** Query vector for similarity search. */
+  vector: number[];
 }
 /** A filter to be used against many `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentResourceToManyAgentResourceChunkFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentResourceChunkFilter;
   /** Filters to entities where every related entity matches. */
   every?: AgentResourceChunkFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentResourceChunkFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentResourceChunkFilter;
+}
+/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
+export interface StringTrgmFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
+  similarTo?: TrgmSearchInput;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
+  wordSimilarTo?: TrgmSearchInput;
 }
 /** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
 export interface TrgmSearchInput {
-  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
-  value: string;
   /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
   threshold?: number;
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
 }
-/** An input for mutations affecting `AgentPlan` */
-export interface AgentPlanInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who owns this plan */
-  ownerId?: string;
-  /** Foreign key to agent_thread */
-  threadId: string;
-  /** Human-readable plan name */
-  title: string;
-  /** Overall goal or context for this plan */
-  description?: string;
-  /** Plan lifecycle: draft, active, completed, failed, cancelled */
-  status?: string;
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentMessageFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentPlanFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentPlanFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentPlanFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentPlanFilter;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
 }
 /** An input for mutations affecting `Agent` */
 export interface AgentInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Human who owns/manages this agent */
-  ownerId?: string;
-  /** Persona template this agent was created from */
-  personaId?: string;
-  /** Parent agent (for sub-agent delegation hierarchy) */
-  parentId?: string;
-  /** Display name for this agent instance */
-  name: string;
-  /** System prompt override (NULL = inherit from persona) */
-  systemPrompt?: string;
   /** Per-instance config overrides (model, temperature, tools) */
   config?: Record<string, unknown>;
-  /** Agent lifecycle status: active, paused, terminated */
-  status?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
   /** If true, agent is deleted when its spawning thread is deleted */
   isEphemeral?: boolean;
-}
-/** An input for mutations affecting `AgentThread` */
-export interface AgentThreadInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who owns this thread */
+  /** Display name for this agent instance */
+  name: string;
+  /** Human who owns/manages this agent */
   ownerId?: string;
-  /** Current status of this thread */
+  /** Parent agent (for sub-agent delegation hierarchy) */
+  parentId?: string;
+  /** Persona template this agent was created from */
+  personaId?: string;
+  /** Agent lifecycle status: active, paused, terminated */
   status?: string;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean;
-  /** Timestamp when this record was archived, NULL if active */
-  archivedAt?: string;
-  /** Human-readable conversation title */
-  title?: string;
-  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
-  mode?: string;
-  /** LLM model id this thread is bound to */
-  model?: string;
-  /** System prompt active for this thread */
+  /** System prompt override (NULL = inherit from persona) */
   systemPrompt?: string;
-  /** User-defined labels for organizing and filtering threads */
-  tags?: string[];
-  /** Optional FK to a shared prompt template */
-  promptTemplateId?: string;
-  /** Agent instance assigned to this thread */
-  agentId?: string;
-  /** Parent thread that spawned this sub-conversation */
-  parentThreadId?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `AgentMessage` */
 export interface AgentMessageInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
   /** User who authored this message */
   actorId?: string;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string;
+  /** Who authored this message: user or assistant */
+  authorRole: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** LLM model that generated this response */
+  model?: string;
   /** Message content: TextPart and ToolPart array */
   parts?: Record<string, unknown>;
   /** Foreign key to agent_thread */
   threadId: string;
-  /** Who authored this message: user or assistant */
-  authorRole: string;
-  /** LLM model that generated this response */
-  model?: string;
-  /** Agent that authored this message (NULL for human messages) */
-  agentId?: string;
-}
-/** An input for mutations affecting `AgentTask` */
-export interface AgentTaskInput {
-  id?: string;
-  createdAt?: string;
   updatedAt?: string;
-  /** User who authored this task */
-  actorId?: string;
-  /** Current status of this task */
+}
+/** An input for mutations affecting `AgentPersona` */
+export interface AgentPersonaInput {
+  /** Model preferences, temperature, tool access, constraints */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Brief description of this persona role */
+  description?: string;
+  id?: string;
+  /** Whether this persona is available for use */
+  isActive?: boolean;
+  /** Display name for this persona */
+  name: string;
+  /** Slugs of agent_resource entries to link when spawning */
+  resources?: string[];
+  /** Unique human-readable identifier for this persona */
+  slug: string;
+  /** Default system prompt for agents using this persona */
+  systemPrompt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** An input for mutations affecting `AgentPlan` */
+export interface AgentPlanInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Overall goal or context for this plan */
+  description?: string;
+  id?: string;
+  /** User who owns this plan */
+  ownerId?: string;
+  /** Plan lifecycle: draft, active, completed, failed, cancelled */
   status?: string;
-  /** Foreign key to agent_plan */
-  planId: string;
-  /** Natural-language description of the work to do */
-  description: string;
-  /** Who created the task: agent or user */
-  source?: string;
-  /** Error message captured when the task failed */
-  error?: string;
-  /** Position within the plan (for ordered task lists) */
-  orderIndex?: number;
-  /** Whether this task is an approval gate requiring human decision */
-  requiresApproval?: boolean;
-  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
-  approvalStatus?: string;
-  /** User who approved or rejected this task */
-  approvedBy?: string;
-  /** Timestamp of the approval or rejection decision */
-  approvedAt?: string;
-  /** Reviewer feedback or reason for the decision */
-  approvalFeedback?: string;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  /** Human-readable plan name */
+  title: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `AgentPrompt` */
 export interface AgentPromptInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
-  name: string;
   /** The system prompt template content */
   content: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** What this prompt template is for */
   description?: string;
+  id?: string;
   /** Whether this is the default prompt for the entity/app */
   isDefault?: boolean;
   /** Variables, tags, category metadata */
   metadata?: Record<string, unknown>;
+  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
+  name: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 /** An input for mutations affecting `AgentResourceChunk` */
 export interface AgentResourceChunkInput {
-  id?: string;
   agentResourceId: string;
   body: string;
   chunkIndex?: number;
-  embedding?: number[];
-  metadata?: Record<string, unknown>;
   createdAt?: string;
-  updatedAt?: string;
+  embedding?: number[];
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
-}
-/** An input for mutations affecting `AgentPersona` */
-export interface AgentPersonaInput {
   id?: string;
-  createdAt?: string;
+  metadata?: Record<string, unknown>;
   updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique human-readable identifier for this persona */
-  slug: string;
-  /** Display name for this persona */
-  name: string;
-  /** Brief description of this persona role */
-  description?: string;
-  /** Default system prompt for agents using this persona */
-  systemPrompt?: string;
-  /** Slugs of agent_resource entries to link when spawning */
-  resources?: string[];
-  /** Model preferences, temperature, tool access, constraints */
-  config?: Record<string, unknown>;
-  /** Whether this persona is available for use */
-  isActive?: boolean;
 }
 /** An input for mutations affecting `AgentResource` */
 export interface AgentResourceInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique human-readable identifier for portable references */
-  slug: string;
-  /** Resource type: skill, knowledge, or convention */
-  kind?: string;
-  /** Resource name or title */
-  title: string;
-  /** Brief description of this resource */
-  description?: string;
-  /** Full content (instructions for skills, reference text for knowledge) */
-  body: string;
-  /** Keywords for deterministic retrieval routing */
-  keywords?: string[];
-  /** Whether this resource is active and retrievable */
-  isActive?: boolean;
-  /** Structured metadata: category, version, author, custom attributes */
-  metadata?: Record<string, unknown>;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean;
   /** Timestamp when this record was archived, NULL if active */
   archivedAt?: string;
+  /** Full content (instructions for skills, reference text for knowledge) */
+  body: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Brief description of this resource */
+  description?: string;
   embedding?: number[];
-  embeddingUpdatedAt?: string;
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
+  embeddingUpdatedAt?: string;
+  id?: string;
+  /** Whether this resource is active and retrievable */
+  isActive?: boolean;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Keywords for deterministic retrieval routing */
+  keywords?: string[];
+  /** Resource type: skill, knowledge, or convention */
+  kind?: string;
+  /** Structured metadata: category, version, author, custom attributes */
+  metadata?: Record<string, unknown>;
+  /** Unique human-readable identifier for portable references */
+  slug: string;
+  /** Resource name or title */
+  title: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
-/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentTaskFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
+/** An input for mutations affecting `AgentTask` */
+export interface AgentTaskInput {
+  /** User who authored this task */
+  actorId?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Natural-language description of the work to do */
+  description: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  id?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Foreign key to agent_plan */
+  planId: string;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Current status of this task */
+  status?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `AgentThread` */
+export interface AgentThreadInput {
+  /** Agent instance assigned to this thread */
+  agentId?: string;
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
+  mode?: string;
+  /** LLM model id this thread is bound to */
+  model?: string;
+  /** User who owns this thread */
+  ownerId?: string;
+  /** Parent thread that spawned this sub-conversation */
+  parentThreadId?: string;
+  /** Optional FK to a shared prompt template */
+  promptTemplateId?: string;
+  /** Current status of this thread */
+  status?: string;
+  /** System prompt active for this thread */
+  systemPrompt?: string;
+  /** User-defined labels for organizing and filtering threads */
+  tags?: string[];
+  /** Human-readable conversation title */
+  title?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentMessageFilter {
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `planId` field. */
-  planId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `source` field. */
-  source?: StringFilter;
-  /** Filter by the object’s `error` field. */
-  error?: StringFilter;
-  /** Filter by the object’s `orderIndex` field. */
-  orderIndex?: IntFilter;
-  /** Filter by the object’s `requiresApproval` field. */
-  requiresApproval?: BooleanFilter;
-  /** Filter by the object’s `approvalStatus` field. */
-  approvalStatus?: StringFilter;
-  /** Filter by the object’s `approvedBy` field. */
-  approvedBy?: UUIDFilter;
-  /** Filter by the object’s `approvedAt` field. */
-  approvedAt?: DatetimeFilter;
-  /** Filter by the object’s `approvalFeedback` field. */
-  approvalFeedback?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentTaskFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentTaskFilter[];
-  /** Negates the expression. */
-  not?: AgentTaskFilter;
-  /** Filter by the object’s `plan` relation. */
-  plan?: AgentPlanFilter;
-}
-/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentThreadFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `isArchived` field. */
-  isArchived?: BooleanFilter;
-  /** Filter by the object’s `archivedAt` field. */
-  archivedAt?: DatetimeFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `mode` field. */
-  mode?: StringFilter;
-  /** Filter by the object’s `model` field. */
-  model?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `tags` field. */
-  tags?: StringListFilter;
-  /** Filter by the object’s `promptTemplateId` field. */
-  promptTemplateId?: UUIDFilter;
-  /** Filter by the object’s `agentId` field. */
-  agentId?: UUIDFilter;
-  /** Filter by the object’s `parentThreadId` field. */
-  parentThreadId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentThreadFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentThreadFilter[];
-  /** Negates the expression. */
-  not?: AgentThreadFilter;
   /** Filter by the object’s `agent` relation. */
   agent?: AgentFilter;
   /** A related `agent` exists. */
   agentExists?: boolean;
-  /** Filter by the object’s `parentThread` relation. */
-  parentThread?: AgentThreadFilter;
-  /** A related `parentThread` exists. */
-  parentThreadExists?: boolean;
-  /** Filter by the object’s `promptTemplate` relation. */
-  promptTemplate?: AgentPromptFilter;
-  /** A related `promptTemplate` exists. */
-  promptTemplateExists?: boolean;
-  /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
-  agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
-  /** `agentThreadsByParentThreadId` exist. */
-  agentThreadsByParentThreadIdExist?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadFilter {
+  /** Filter by the object’s `agent` relation. */
+  agent?: AgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
   /** Filter by the object’s `agentMessagesByThreadId` relation. */
   agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
   /** `agentMessagesByThreadId` exist. */
@@ -2188,547 +2248,596 @@ export interface AgentThreadFilter {
   agentPlansByThreadId?: AgentThreadToManyAgentPlanFilter;
   /** `agentPlansByThreadId` exist. */
   agentPlansByThreadIdExist?: boolean;
-}
-/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentMessageFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
+  /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
+  agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
+  /** `agentThreadsByParentThreadId` exist. */
+  agentThreadsByParentThreadIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `parts` field. */
-  parts?: JSONFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `authorRole` field. */
-  authorRole?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
   /** Filter by the object’s `model` field. */
   model?: StringFilter;
-  /** Filter by the object’s `agentId` field. */
-  agentId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentMessageFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentMessageFilter[];
   /** Negates the expression. */
-  not?: AgentMessageFilter;
-  /** Filter by the object’s `agent` relation. */
-  agent?: AgentFilter;
-  /** A related `agent` exists. */
-  agentExists?: boolean;
-  /** Filter by the object’s `thread` relation. */
-  thread?: AgentThreadFilter;
+  not?: AgentThreadFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parentThread` relation. */
+  parentThread?: AgentThreadFilter;
+  /** A related `parentThread` exists. */
+  parentThreadExists?: boolean;
+  /** Filter by the object’s `parentThreadId` field. */
+  parentThreadId?: UUIDFilter;
+  /** Filter by the object’s `promptTemplate` relation. */
+  promptTemplate?: AgentPromptFilter;
+  /** A related `promptTemplate` exists. */
+  promptTemplateExists?: boolean;
+  /** Filter by the object’s `promptTemplateId` field. */
+  promptTemplateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `personaId` field. */
-  personaId?: UUIDFilter;
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `isEphemeral` field. */
-  isEphemeral?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentFilter[];
-  /** Negates the expression. */
-  not?: AgentFilter;
-  /** Filter by the object’s `parent` relation. */
-  parent?: AgentFilter;
-  /** A related `parent` exists. */
-  parentExists?: boolean;
-  /** Filter by the object’s `persona` relation. */
-  persona?: AgentPersonaFilter;
-  /** A related `persona` exists. */
-  personaExists?: boolean;
-  /** Filter by the object’s `agentThreads` relation. */
-  agentThreads?: AgentToManyAgentThreadFilter;
-  /** `agentThreads` exist. */
-  agentThreadsExist?: boolean;
   /** Filter by the object’s `agentMessages` relation. */
   agentMessages?: AgentToManyAgentMessageFilter;
   /** `agentMessages` exist. */
   agentMessagesExist?: boolean;
+  /** Filter by the object’s `agentThreads` relation. */
+  agentThreads?: AgentToManyAgentThreadFilter;
+  /** `agentThreads` exist. */
+  agentThreadsExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentFilter[];
   /** Filter by the object’s `childAgents` relation. */
   childAgents?: AgentToManyAgentFilter;
   /** `childAgents` exist. */
   childAgentsExist?: boolean;
-}
-/** A filter to be used against `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPlanFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPlanFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPlanFilter[];
-  /** Negates the expression. */
-  not?: AgentPlanFilter;
-  /** Filter by the object’s `thread` relation. */
-  thread?: AgentThreadFilter;
-  /** Filter by the object’s `agentTasksByPlanId` relation. */
-  agentTasksByPlanId?: AgentPlanToManyAgentTaskFilter;
-  /** `agentTasksByPlanId` exist. */
-  agentTasksByPlanIdExist?: boolean;
-}
-/** Similarity metric for vector search */
-export type VectorMetric = 'COSINE' | 'L2' | 'IP';
-/** A filter to be used against `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentResourceChunkFilter {
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isEphemeral` field. */
+  isEphemeral?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: AgentFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `persona` relation. */
+  persona?: AgentPersonaFilter;
+  /** A related `persona` exists. */
+  personaExists?: boolean;
+  /** Filter by the object’s `personaId` field. */
+  personaId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentTaskFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Filter by the object’s `approvalFeedback` field. */
+  approvalFeedback?: StringFilter;
+  /** Filter by the object’s `approvalStatus` field. */
+  approvalStatus?: StringFilter;
+  /** Filter by the object’s `approvedAt` field. */
+  approvedAt?: DatetimeFilter;
+  /** Filter by the object’s `approvedBy` field. */
+  approvedBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Filter by the object’s `orderIndex` field. */
+  orderIndex?: IntFilter;
+  /** Filter by the object’s `plan` relation. */
+  plan?: AgentPlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `requiresApproval` field. */
+  requiresApproval?: BooleanFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** Similarity metric for vector search */
+export type VectorMetric = 'COSINE' | 'IP' | 'L2';
+/** A filter to be used against `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentResourceChunkFilter {
+  /** Filter by the object’s `agentResource` relation. */
+  agentResource?: AgentResourceFilter;
   /** Filter by the object’s `agentResourceId` field. */
   agentResourceId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentResourceChunkFilter[];
   /** Filter by the object’s `body` field. */
   body?: StringFilter;
   /** Filter by the object’s `chunkIndex` field. */
   chunkIndex?: IntFilter;
-  /** Filter by the object’s `embedding` field. */
-  embedding?: VectorFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentResourceChunkFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentResourceChunkFilter[];
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
   /** Negates the expression. */
   not?: AgentResourceChunkFilter;
-  /** Filter by the object’s `agentResource` relation. */
-  agentResource?: AgentResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentResourceChunkFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
   /** VECTOR search on the `embedding` column. */
   vectorEmbedding?: VectorNearbyInput;
 }
+/** A filter to be used against `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPlanFilter {
+  /** Filter by the object’s `agentTasksByPlanId` relation. */
+  agentTasksByPlanId?: AgentPlanToManyAgentTaskFilter;
+  /** `agentTasksByPlanId` exist. */
+  agentTasksByPlanIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPlanFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentPlanFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPlanFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
   /** Not equal to the specified value, treating null like an ordinary value. */
   distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
   /** Greater than the specified value. */
   greaterThan?: string;
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: string;
-}
-/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
-export interface DatetimeFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
   /** Included in the specified list. */
   in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
   /** Less than the specified value. */
   lessThan?: string;
   /** Less than or equal to the specified value. */
   lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
 }
 /** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
 export interface StringFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
   /** Not equal to the specified value, treating null like an ordinary value. */
   distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
   /** Included in the specified list. */
   in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
   /** Less than the specified value. */
   lessThan?: string;
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
   /** Less than or equal to the specified value. */
   lessThanOrEqualTo?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+}
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
   /** Greater than the specified value. */
   greaterThan?: string;
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: string;
-  /** Contains the specified string (case-sensitive). */
-  includes?: string;
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: string;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: string;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: string;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: string;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: string;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: string;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: string;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: string;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: string;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: string;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: string;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: string;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-}
-/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
-export interface IntFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: number;
-  /** Not equal to the specified value. */
-  notEqualTo?: number;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: number;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: number;
   /** Included in the specified list. */
-  in?: number[];
-  /** Not included in the specified list. */
-  notIn?: number[];
-  /** Less than the specified value. */
-  lessThan?: number;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: number;
-  /** Greater than the specified value. */
-  greaterThan?: number;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: number;
-}
-/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
-export interface BooleanFilter {
+  in?: string[];
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
   isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: boolean;
-  /** Not equal to the specified value. */
-  notEqualTo?: boolean;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
   /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: boolean;
-  /** Included in the specified list. */
-  in?: boolean[];
+  notDistinctFrom?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
   /** Not included in the specified list. */
-  notIn?: boolean[];
-  /** Less than the specified value. */
-  lessThan?: boolean;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: boolean;
-  /** Greater than the specified value. */
-  greaterThan?: boolean;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: boolean;
-}
-/** A filter to be used against String List fields. All fields are combined with a logical ‘and.’ */
-export interface StringListFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string[];
-  /** Not equal to the specified value. */
-  notEqualTo?: string[];
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string[];
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string[];
-  /** Less than the specified value. */
-  lessThan?: string[];
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string[];
-  /** Greater than the specified value. */
-  greaterThan?: string[];
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string[];
-  /** Contains the specified list of values. */
-  contains?: string[];
-  /** Contained by the specified list of values. */
-  containedBy?: string[];
-  /** Overlaps the specified list of values. */
-  overlaps?: string[];
-  /** Any array item is equal to the specified value. */
-  anyEqualTo?: string;
-  /** Any array item is not equal to the specified value. */
-  anyNotEqualTo?: string;
-  /** Any array item is less than the specified value. */
-  anyLessThan?: string;
-  /** Any array item is less than or equal to the specified value. */
-  anyLessThanOrEqualTo?: string;
-  /** Any array item is greater than the specified value. */
-  anyGreaterThan?: string;
-  /** Any array item is greater than or equal to the specified value. */
-  anyGreaterThanOrEqualTo?: string;
-}
-/** A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPromptFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `content` field. */
-  content?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `isDefault` field. */
-  isDefault?: BooleanFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPromptFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPromptFilter[];
-  /** Negates the expression. */
-  not?: AgentPromptFilter;
+  notIn?: string[];
 }
 /** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
 export interface JSONFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: Record<string, unknown>;
-  /** Not equal to the specified value. */
-  notEqualTo?: Record<string, unknown>;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: Record<string, unknown>;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: Record<string, unknown>;
-  /** Included in the specified list. */
-  in?: Record<string, unknown>[];
-  /** Not included in the specified list. */
-  notIn?: Record<string, unknown>[];
-  /** Less than the specified value. */
-  lessThan?: Record<string, unknown>;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: Record<string, unknown>;
-  /** Greater than the specified value. */
-  greaterThan?: Record<string, unknown>;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: Record<string, unknown>;
+  /** Contained by the specified JSON. */
+  containedBy?: Record<string, unknown>;
   /** Contains the specified JSON. */
   contains?: Record<string, unknown>;
-  /** Contains the specified key. */
-  containsKey?: string;
   /** Contains all of the specified keys. */
   containsAllKeys?: string[];
   /** Contains any of the specified keys. */
   containsAnyKeys?: string[];
-  /** Contained by the specified JSON. */
-  containedBy?: Record<string, unknown>;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Record<string, unknown>;
+  /** Equal to the specified value. */
+  equalTo?: Record<string, unknown>;
+  /** Greater than the specified value. */
+  greaterThan?: Record<string, unknown>;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: Record<string, unknown>;
+  /** Included in the specified list. */
+  in?: Record<string, unknown>[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: Record<string, unknown>;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: Record<string, unknown>;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Record<string, unknown>;
+  /** Not equal to the specified value. */
+  notEqualTo?: Record<string, unknown>;
+  /** Not included in the specified list. */
+  notIn?: Record<string, unknown>[];
+}
+/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
+export interface BooleanFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: boolean;
+  /** Greater than the specified value. */
+  greaterThan?: boolean;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: boolean;
+  /** Included in the specified list. */
+  in?: boolean[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: boolean;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: boolean;
+  /** Not equal to the specified value. */
+  notEqualTo?: boolean;
+  /** Not included in the specified list. */
+  notIn?: boolean[];
+}
+/** A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPromptFilter {
+  /** Filter by the object’s `agentThreadsByPromptTemplateId` relation. */
+  agentThreadsByPromptTemplateId?: AgentPromptToManyAgentThreadFilter;
+  /** `agentThreadsByPromptTemplateId` exist. */
+  agentThreadsByPromptTemplateIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPromptFilter[];
+  /** Filter by the object’s `content` field. */
+  content?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentPromptFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPromptFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** A filter to be used against String List fields. All fields are combined with a logical ‘and.’ */
+export interface StringListFilter {
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: string;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: string;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: string;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: string;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: string;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: string;
+  /** Contained by the specified list of values. */
+  containedBy?: string[];
+  /** Contains the specified list of values. */
+  contains?: string[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string[];
+  /** Equal to the specified value. */
+  equalTo?: string[];
+  /** Greater than the specified value. */
+  greaterThan?: string[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string[];
+  /** Not equal to the specified value. */
+  notEqualTo?: string[];
+  /** Overlaps the specified list of values. */
+  overlaps?: string[];
 }
 /** A filter to be used against `AgentPersona` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPersonaFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `resources` field. */
-  resources?: StringListFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPersonaFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPersonaFilter[];
-  /** Negates the expression. */
-  not?: AgentPersonaFilter;
   /** Filter by the object’s `agentsByPersonaId` relation. */
   agentsByPersonaId?: AgentPersonaToManyAgentFilter;
   /** `agentsByPersonaId` exist. */
   agentsByPersonaIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPersonaFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentPersonaFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPersonaFilter[];
+  /** Filter by the object’s `resources` field. */
+  resources?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
 }
-/** A filter to be used against Vector fields. All fields are combined with a logical ‘and.’ */
-export interface VectorFilter {
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+  /** Included in the specified list. */
+  in?: number[];
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
   isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: number[];
-  /** Not equal to the specified value. */
-  notEqualTo?: number[];
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
   /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: number[];
-  /** Included in the specified list. */
-  in?: number[][];
+  notDistinctFrom?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
   /** Not included in the specified list. */
-  notIn?: number[][];
+  notIn?: number[];
 }
 /** A filter to be used against `AgentResource` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentResourceFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringTrgmFilter;
-  /** Filter by the object’s `kind` field. */
-  kind?: StringTrgmFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringTrgmFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringTrgmFilter;
-  /** Filter by the object’s `body` field. */
-  body?: StringTrgmFilter;
-  /** Filter by the object’s `keywords` field. */
-  keywords?: StringListFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `isArchived` field. */
-  isArchived?: BooleanFilter;
-  /** Filter by the object’s `archivedAt` field. */
-  archivedAt?: DatetimeFilter;
-  /** Filter by the object’s `search` field. */
-  search?: FullTextFilter;
-  /** Filter by the object’s `embedding` field. */
-  embedding?: VectorFilter;
-  /** Filter by the object’s `embeddingUpdatedAt` field. */
-  embeddingUpdatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentResourceFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentResourceFilter[];
-  /** Negates the expression. */
-  not?: AgentResourceFilter;
   /** Filter by the object’s `agentResourceChunks` relation. */
   agentResourceChunks?: AgentResourceToManyAgentResourceChunkFilter;
   /** `agentResourceChunks` exist. */
   agentResourceChunksExist?: boolean;
-  /** TSV search on the `search` column. */
-  tsvSearch?: string;
-  /** VECTOR search on the `embedding` column. */
-  vectorEmbedding?: VectorNearbyInput;
+  /** Checks for all expressions in this list. */
+  and?: AgentResourceFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringTrgmFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `keywords` field. */
+  keywords?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringTrgmFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: AgentResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentResourceFilter[];
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringTrgmFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringTrgmFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
   trgmTitle?: TrgmSearchInput;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /** TRGM search on the `body` column. */
-  trgmBody?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
   /**
    * Composite unified search. Provide a search string and it will be dispatched to
    * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
@@ -2737,465 +2846,476 @@ export interface AgentResourceFilter {
    * fields are populated.
    */
   unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** A filter to be used against Vector fields. All fields are combined with a logical ‘and.’ */
+export interface VectorFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number[];
+  /** Equal to the specified value. */
+  equalTo?: number[];
+  /** Included in the specified list. */
+  in?: number[][];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number[];
+  /** Not equal to the specified value. */
+  notEqualTo?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[][];
 }
 /** A filter to be used against FullText fields. All fields are combined with a logical ‘and.’ */
 export interface FullTextFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
   /** Not equal to the specified value, treating null like an ordinary value. */
   distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
   /** Included in the specified list. */
   in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
   /** Performs a full text search on the field. */
   matches?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
   /** The access type applied */
   accessType: string;
-  /** The storage provider used */
-  provider: string;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
   /** The S3 endpoint (null for AWS S3 default) */
   endpoint?: string | null;
   /** Error message if provisioning failed */
   error?: string | null;
+  /** The storage provider used */
+  provider: string;
+  /** Whether provisioning succeeded */
+  success: boolean;
 }
 export type ProvisionBucketPayloadSelect = {
-  success?: boolean;
-  bucketName?: boolean;
   accessType?: boolean;
-  provider?: boolean;
+  bucketName?: boolean;
   endpoint?: boolean;
   error?: boolean;
-};
-export interface CreateAgentPlanPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPlan` that was created by this mutation. */
-  agentPlan?: AgentPlan | null;
-  agentPlanEdge?: AgentPlanEdge | null;
-}
-export type CreateAgentPlanPayloadSelect = {
-  clientMutationId?: boolean;
-  agentPlan?: {
-    select: AgentPlanSelect;
-  };
-  agentPlanEdge?: {
-    select: AgentPlanEdgeSelect;
-  };
-};
-export interface UpdateAgentPlanPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPlan` that was updated by this mutation. */
-  agentPlan?: AgentPlan | null;
-  agentPlanEdge?: AgentPlanEdge | null;
-}
-export type UpdateAgentPlanPayloadSelect = {
-  clientMutationId?: boolean;
-  agentPlan?: {
-    select: AgentPlanSelect;
-  };
-  agentPlanEdge?: {
-    select: AgentPlanEdgeSelect;
-  };
-};
-export interface DeleteAgentPlanPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPlan` that was deleted by this mutation. */
-  agentPlan?: AgentPlan | null;
-  agentPlanEdge?: AgentPlanEdge | null;
-}
-export type DeleteAgentPlanPayloadSelect = {
-  clientMutationId?: boolean;
-  agentPlan?: {
-    select: AgentPlanSelect;
-  };
-  agentPlanEdge?: {
-    select: AgentPlanEdgeSelect;
-  };
+  provider?: boolean;
+  success?: boolean;
 };
 export interface CreateAgentPayload {
-  clientMutationId?: string | null;
   /** The `Agent` that was created by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
 }
 export type CreateAgentPayloadSelect = {
-  clientMutationId?: boolean;
   agent?: {
     select: AgentSelect;
   };
   agentEdge?: {
     select: AgentEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface UpdateAgentPayload {
-  clientMutationId?: string | null;
   /** The `Agent` that was updated by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
 }
 export type UpdateAgentPayloadSelect = {
-  clientMutationId?: boolean;
   agent?: {
     select: AgentSelect;
   };
   agentEdge?: {
     select: AgentEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface DeleteAgentPayload {
-  clientMutationId?: string | null;
   /** The `Agent` that was deleted by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
 }
 export type DeleteAgentPayloadSelect = {
-  clientMutationId?: boolean;
   agent?: {
     select: AgentSelect;
   };
   agentEdge?: {
     select: AgentEdgeSelect;
   };
-};
-export interface CreateAgentThreadPayload {
-  clientMutationId?: string | null;
-  /** The `AgentThread` that was created by this mutation. */
-  agentThread?: AgentThread | null;
-  agentThreadEdge?: AgentThreadEdge | null;
-}
-export type CreateAgentThreadPayloadSelect = {
   clientMutationId?: boolean;
-  agentThread?: {
-    select: AgentThreadSelect;
-  };
-  agentThreadEdge?: {
-    select: AgentThreadEdgeSelect;
-  };
-};
-export interface UpdateAgentThreadPayload {
-  clientMutationId?: string | null;
-  /** The `AgentThread` that was updated by this mutation. */
-  agentThread?: AgentThread | null;
-  agentThreadEdge?: AgentThreadEdge | null;
-}
-export type UpdateAgentThreadPayloadSelect = {
-  clientMutationId?: boolean;
-  agentThread?: {
-    select: AgentThreadSelect;
-  };
-  agentThreadEdge?: {
-    select: AgentThreadEdgeSelect;
-  };
-};
-export interface DeleteAgentThreadPayload {
-  clientMutationId?: string | null;
-  /** The `AgentThread` that was deleted by this mutation. */
-  agentThread?: AgentThread | null;
-  agentThreadEdge?: AgentThreadEdge | null;
-}
-export type DeleteAgentThreadPayloadSelect = {
-  clientMutationId?: boolean;
-  agentThread?: {
-    select: AgentThreadSelect;
-  };
-  agentThreadEdge?: {
-    select: AgentThreadEdgeSelect;
-  };
 };
 export interface CreateAgentMessagePayload {
-  clientMutationId?: string | null;
   /** The `AgentMessage` that was created by this mutation. */
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
+  clientMutationId?: string | null;
 }
 export type CreateAgentMessagePayloadSelect = {
-  clientMutationId?: boolean;
   agentMessage?: {
     select: AgentMessageSelect;
   };
   agentMessageEdge?: {
     select: AgentMessageEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface UpdateAgentMessagePayload {
-  clientMutationId?: string | null;
   /** The `AgentMessage` that was updated by this mutation. */
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
+  clientMutationId?: string | null;
 }
 export type UpdateAgentMessagePayloadSelect = {
-  clientMutationId?: boolean;
   agentMessage?: {
     select: AgentMessageSelect;
   };
   agentMessageEdge?: {
     select: AgentMessageEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface DeleteAgentMessagePayload {
-  clientMutationId?: string | null;
   /** The `AgentMessage` that was deleted by this mutation. */
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
+  clientMutationId?: string | null;
 }
 export type DeleteAgentMessagePayloadSelect = {
-  clientMutationId?: boolean;
   agentMessage?: {
     select: AgentMessageSelect;
   };
   agentMessageEdge?: {
     select: AgentMessageEdgeSelect;
   };
-};
-export interface CreateAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was created by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
-export type CreateAgentTaskPayloadSelect = {
   clientMutationId?: boolean;
-  agentTask?: {
-    select: AgentTaskSelect;
-  };
-  agentTaskEdge?: {
-    select: AgentTaskEdgeSelect;
-  };
-};
-export interface UpdateAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was updated by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
-export type UpdateAgentTaskPayloadSelect = {
-  clientMutationId?: boolean;
-  agentTask?: {
-    select: AgentTaskSelect;
-  };
-  agentTaskEdge?: {
-    select: AgentTaskEdgeSelect;
-  };
-};
-export interface DeleteAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was deleted by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
-export type DeleteAgentTaskPayloadSelect = {
-  clientMutationId?: boolean;
-  agentTask?: {
-    select: AgentTaskSelect;
-  };
-  agentTaskEdge?: {
-    select: AgentTaskEdgeSelect;
-  };
-};
-export interface CreateAgentPromptPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPrompt` that was created by this mutation. */
-  agentPrompt?: AgentPrompt | null;
-  agentPromptEdge?: AgentPromptEdge | null;
-}
-export type CreateAgentPromptPayloadSelect = {
-  clientMutationId?: boolean;
-  agentPrompt?: {
-    select: AgentPromptSelect;
-  };
-  agentPromptEdge?: {
-    select: AgentPromptEdgeSelect;
-  };
-};
-export interface UpdateAgentPromptPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPrompt` that was updated by this mutation. */
-  agentPrompt?: AgentPrompt | null;
-  agentPromptEdge?: AgentPromptEdge | null;
-}
-export type UpdateAgentPromptPayloadSelect = {
-  clientMutationId?: boolean;
-  agentPrompt?: {
-    select: AgentPromptSelect;
-  };
-  agentPromptEdge?: {
-    select: AgentPromptEdgeSelect;
-  };
-};
-export interface DeleteAgentPromptPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPrompt` that was deleted by this mutation. */
-  agentPrompt?: AgentPrompt | null;
-  agentPromptEdge?: AgentPromptEdge | null;
-}
-export type DeleteAgentPromptPayloadSelect = {
-  clientMutationId?: boolean;
-  agentPrompt?: {
-    select: AgentPromptSelect;
-  };
-  agentPromptEdge?: {
-    select: AgentPromptEdgeSelect;
-  };
-};
-export interface CreateAgentResourceChunkPayload {
-  clientMutationId?: string | null;
-  /** The `AgentResourceChunk` that was created by this mutation. */
-  agentResourceChunk?: AgentResourceChunk | null;
-  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
-}
-export type CreateAgentResourceChunkPayloadSelect = {
-  clientMutationId?: boolean;
-  agentResourceChunk?: {
-    select: AgentResourceChunkSelect;
-  };
-  agentResourceChunkEdge?: {
-    select: AgentResourceChunkEdgeSelect;
-  };
-};
-export interface UpdateAgentResourceChunkPayload {
-  clientMutationId?: string | null;
-  /** The `AgentResourceChunk` that was updated by this mutation. */
-  agentResourceChunk?: AgentResourceChunk | null;
-  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
-}
-export type UpdateAgentResourceChunkPayloadSelect = {
-  clientMutationId?: boolean;
-  agentResourceChunk?: {
-    select: AgentResourceChunkSelect;
-  };
-  agentResourceChunkEdge?: {
-    select: AgentResourceChunkEdgeSelect;
-  };
-};
-export interface DeleteAgentResourceChunkPayload {
-  clientMutationId?: string | null;
-  /** The `AgentResourceChunk` that was deleted by this mutation. */
-  agentResourceChunk?: AgentResourceChunk | null;
-  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
-}
-export type DeleteAgentResourceChunkPayloadSelect = {
-  clientMutationId?: boolean;
-  agentResourceChunk?: {
-    select: AgentResourceChunkSelect;
-  };
-  agentResourceChunkEdge?: {
-    select: AgentResourceChunkEdgeSelect;
-  };
 };
 export interface CreateAgentPersonaPayload {
-  clientMutationId?: string | null;
   /** The `AgentPersona` that was created by this mutation. */
   agentPersona?: AgentPersona | null;
   agentPersonaEdge?: AgentPersonaEdge | null;
+  clientMutationId?: string | null;
 }
 export type CreateAgentPersonaPayloadSelect = {
-  clientMutationId?: boolean;
   agentPersona?: {
     select: AgentPersonaSelect;
   };
   agentPersonaEdge?: {
     select: AgentPersonaEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface UpdateAgentPersonaPayload {
-  clientMutationId?: string | null;
   /** The `AgentPersona` that was updated by this mutation. */
   agentPersona?: AgentPersona | null;
   agentPersonaEdge?: AgentPersonaEdge | null;
+  clientMutationId?: string | null;
 }
 export type UpdateAgentPersonaPayloadSelect = {
-  clientMutationId?: boolean;
   agentPersona?: {
     select: AgentPersonaSelect;
   };
   agentPersonaEdge?: {
     select: AgentPersonaEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface DeleteAgentPersonaPayload {
-  clientMutationId?: string | null;
   /** The `AgentPersona` that was deleted by this mutation. */
   agentPersona?: AgentPersona | null;
   agentPersonaEdge?: AgentPersonaEdge | null;
+  clientMutationId?: string | null;
 }
 export type DeleteAgentPersonaPayloadSelect = {
-  clientMutationId?: boolean;
   agentPersona?: {
     select: AgentPersonaSelect;
   };
   agentPersonaEdge?: {
     select: AgentPersonaEdgeSelect;
   };
+  clientMutationId?: boolean;
+};
+export interface CreateAgentPlanPayload {
+  /** The `AgentPlan` that was created by this mutation. */
+  agentPlan?: AgentPlan | null;
+  agentPlanEdge?: AgentPlanEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateAgentPlanPayloadSelect = {
+  agentPlan?: {
+    select: AgentPlanSelect;
+  };
+  agentPlanEdge?: {
+    select: AgentPlanEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateAgentPlanPayload {
+  /** The `AgentPlan` that was updated by this mutation. */
+  agentPlan?: AgentPlan | null;
+  agentPlanEdge?: AgentPlanEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateAgentPlanPayloadSelect = {
+  agentPlan?: {
+    select: AgentPlanSelect;
+  };
+  agentPlanEdge?: {
+    select: AgentPlanEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteAgentPlanPayload {
+  /** The `AgentPlan` that was deleted by this mutation. */
+  agentPlan?: AgentPlan | null;
+  agentPlanEdge?: AgentPlanEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteAgentPlanPayloadSelect = {
+  agentPlan?: {
+    select: AgentPlanSelect;
+  };
+  agentPlanEdge?: {
+    select: AgentPlanEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface CreateAgentPromptPayload {
+  /** The `AgentPrompt` that was created by this mutation. */
+  agentPrompt?: AgentPrompt | null;
+  agentPromptEdge?: AgentPromptEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateAgentPromptPayloadSelect = {
+  agentPrompt?: {
+    select: AgentPromptSelect;
+  };
+  agentPromptEdge?: {
+    select: AgentPromptEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateAgentPromptPayload {
+  /** The `AgentPrompt` that was updated by this mutation. */
+  agentPrompt?: AgentPrompt | null;
+  agentPromptEdge?: AgentPromptEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateAgentPromptPayloadSelect = {
+  agentPrompt?: {
+    select: AgentPromptSelect;
+  };
+  agentPromptEdge?: {
+    select: AgentPromptEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteAgentPromptPayload {
+  /** The `AgentPrompt` that was deleted by this mutation. */
+  agentPrompt?: AgentPrompt | null;
+  agentPromptEdge?: AgentPromptEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteAgentPromptPayloadSelect = {
+  agentPrompt?: {
+    select: AgentPromptSelect;
+  };
+  agentPromptEdge?: {
+    select: AgentPromptEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface CreateAgentResourceChunkPayload {
+  /** The `AgentResourceChunk` that was created by this mutation. */
+  agentResourceChunk?: AgentResourceChunk | null;
+  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateAgentResourceChunkPayloadSelect = {
+  agentResourceChunk?: {
+    select: AgentResourceChunkSelect;
+  };
+  agentResourceChunkEdge?: {
+    select: AgentResourceChunkEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateAgentResourceChunkPayload {
+  /** The `AgentResourceChunk` that was updated by this mutation. */
+  agentResourceChunk?: AgentResourceChunk | null;
+  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateAgentResourceChunkPayloadSelect = {
+  agentResourceChunk?: {
+    select: AgentResourceChunkSelect;
+  };
+  agentResourceChunkEdge?: {
+    select: AgentResourceChunkEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteAgentResourceChunkPayload {
+  /** The `AgentResourceChunk` that was deleted by this mutation. */
+  agentResourceChunk?: AgentResourceChunk | null;
+  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteAgentResourceChunkPayloadSelect = {
+  agentResourceChunk?: {
+    select: AgentResourceChunkSelect;
+  };
+  agentResourceChunkEdge?: {
+    select: AgentResourceChunkEdgeSelect;
+  };
+  clientMutationId?: boolean;
 };
 export interface CreateAgentResourcePayload {
-  clientMutationId?: string | null;
   /** The `AgentResource` that was created by this mutation. */
   agentResource?: AgentResource | null;
   agentResourceEdge?: AgentResourceEdge | null;
+  clientMutationId?: string | null;
 }
 export type CreateAgentResourcePayloadSelect = {
-  clientMutationId?: boolean;
   agentResource?: {
     select: AgentResourceSelect;
   };
   agentResourceEdge?: {
     select: AgentResourceEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface UpdateAgentResourcePayload {
-  clientMutationId?: string | null;
   /** The `AgentResource` that was updated by this mutation. */
   agentResource?: AgentResource | null;
   agentResourceEdge?: AgentResourceEdge | null;
+  clientMutationId?: string | null;
 }
 export type UpdateAgentResourcePayloadSelect = {
-  clientMutationId?: boolean;
   agentResource?: {
     select: AgentResourceSelect;
   };
   agentResourceEdge?: {
     select: AgentResourceEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
 export interface DeleteAgentResourcePayload {
-  clientMutationId?: string | null;
   /** The `AgentResource` that was deleted by this mutation. */
   agentResource?: AgentResource | null;
   agentResourceEdge?: AgentResourceEdge | null;
+  clientMutationId?: string | null;
 }
 export type DeleteAgentResourcePayloadSelect = {
-  clientMutationId?: boolean;
   agentResource?: {
     select: AgentResourceSelect;
   };
   agentResourceEdge?: {
     select: AgentResourceEdgeSelect;
   };
+  clientMutationId?: boolean;
 };
-/** A `AgentPlan` edge in the connection. */
-export interface AgentPlanEdge {
-  cursor?: string | null;
-  /** The `AgentPlan` at the end of the edge. */
-  node?: AgentPlan | null;
+export interface CreateAgentTaskPayload {
+  /** The `AgentTask` that was created by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+  clientMutationId?: string | null;
 }
-export type AgentPlanEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AgentPlanSelect;
+export type CreateAgentTaskPayloadSelect = {
+  agentTask?: {
+    select: AgentTaskSelect;
   };
+  agentTaskEdge?: {
+    select: AgentTaskEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateAgentTaskPayload {
+  /** The `AgentTask` that was updated by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateAgentTaskPayloadSelect = {
+  agentTask?: {
+    select: AgentTaskSelect;
+  };
+  agentTaskEdge?: {
+    select: AgentTaskEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteAgentTaskPayload {
+  /** The `AgentTask` that was deleted by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteAgentTaskPayloadSelect = {
+  agentTask?: {
+    select: AgentTaskSelect;
+  };
+  agentTaskEdge?: {
+    select: AgentTaskEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface CreateAgentThreadPayload {
+  /** The `AgentThread` that was created by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateAgentThreadPayloadSelect = {
+  agentThread?: {
+    select: AgentThreadSelect;
+  };
+  agentThreadEdge?: {
+    select: AgentThreadEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateAgentThreadPayload {
+  /** The `AgentThread` that was updated by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateAgentThreadPayloadSelect = {
+  agentThread?: {
+    select: AgentThreadSelect;
+  };
+  agentThreadEdge?: {
+    select: AgentThreadEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteAgentThreadPayload {
+  /** The `AgentThread` that was deleted by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteAgentThreadPayloadSelect = {
+  agentThread?: {
+    select: AgentThreadSelect;
+  };
+  agentThreadEdge?: {
+    select: AgentThreadEdgeSelect;
+  };
+  clientMutationId?: boolean;
 };
 /** A `Agent` edge in the connection. */
 export interface AgentEdge {
@@ -3207,18 +3327,6 @@ export type AgentEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: AgentSelect;
-  };
-};
-/** A `AgentThread` edge in the connection. */
-export interface AgentThreadEdge {
-  cursor?: string | null;
-  /** The `AgentThread` at the end of the edge. */
-  node?: AgentThread | null;
-}
-export type AgentThreadEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AgentThreadSelect;
   };
 };
 /** A `AgentMessage` edge in the connection. */
@@ -3233,16 +3341,28 @@ export type AgentMessageEdgeSelect = {
     select: AgentMessageSelect;
   };
 };
-/** A `AgentTask` edge in the connection. */
-export interface AgentTaskEdge {
+/** A `AgentPersona` edge in the connection. */
+export interface AgentPersonaEdge {
   cursor?: string | null;
-  /** The `AgentTask` at the end of the edge. */
-  node?: AgentTask | null;
+  /** The `AgentPersona` at the end of the edge. */
+  node?: AgentPersona | null;
 }
-export type AgentTaskEdgeSelect = {
+export type AgentPersonaEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: AgentTaskSelect;
+    select: AgentPersonaSelect;
+  };
+};
+/** A `AgentPlan` edge in the connection. */
+export interface AgentPlanEdge {
+  cursor?: string | null;
+  /** The `AgentPlan` at the end of the edge. */
+  node?: AgentPlan | null;
+}
+export type AgentPlanEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AgentPlanSelect;
   };
 };
 /** A `AgentPrompt` edge in the connection. */
@@ -3269,18 +3389,6 @@ export type AgentResourceChunkEdgeSelect = {
     select: AgentResourceChunkSelect;
   };
 };
-/** A `AgentPersona` edge in the connection. */
-export interface AgentPersonaEdge {
-  cursor?: string | null;
-  /** The `AgentPersona` at the end of the edge. */
-  node?: AgentPersona | null;
-}
-export type AgentPersonaEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AgentPersonaSelect;
-  };
-};
 /** A `AgentResource` edge in the connection. */
 export interface AgentResourceEdge {
   cursor?: string | null;
@@ -3291,5 +3399,29 @@ export type AgentResourceEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: AgentResourceSelect;
+  };
+};
+/** A `AgentTask` edge in the connection. */
+export interface AgentTaskEdge {
+  cursor?: string | null;
+  /** The `AgentTask` at the end of the edge. */
+  node?: AgentTask | null;
+}
+export type AgentTaskEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AgentTaskSelect;
+  };
+};
+/** A `AgentThread` edge in the connection. */
+export interface AgentThreadEdge {
+  cursor?: string | null;
+  /** The `AgentThread` at the end of the edge. */
+  node?: AgentThread | null;
+}
+export type AgentThreadEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AgentThreadSelect;
   };
 };

@@ -16,17 +16,17 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  username: 'string',
-  displayName: 'string',
-  profilePicture: 'string',
-  searchTsv: 'string',
-  type: 'int',
   createdAt: 'string',
-  updatedAt: 'string',
-  searchTsvRank: 'float',
+  displayName: 'string',
   displayNameTrgmSimilarity: 'float',
+  id: 'uuid',
+  profilePicture: 'string',
   searchScore: 'float',
+  searchTsv: 'string',
+  searchTsvRank: 'float',
+  type: 'int',
+  updatedAt: 'string',
+  username: 'string',
 };
 const usage =
   '\nuser <command>\n\nCommands:\n  list                  List user records\n  find-first            Find first matching user record\n  search <query>        Search user records\n  get                   Get a user by ID\n  create                Create a new user\n  update                Update an existing user\n  delete                Delete a user\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nSearch Options:\n  <query>               Search query string (required)\n  --limit <n>           Max number of records to return\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --orderBy <values>    Comma-separated list of ordering values\n\n  --help, -h            Show this help message\n';
@@ -81,13 +81,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      username: true,
+      createdAt: true,
       displayName: true,
+      id: true,
       profilePicture: true,
       type: true,
-      createdAt: true,
       updatedAt: true,
+      username: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<UserSelect, UserFilter, UserOrderBy> & {
@@ -108,13 +108,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      username: true,
+      createdAt: true,
       displayName: true,
+      id: true,
       profilePicture: true,
       type: true,
-      createdAt: true,
       updatedAt: true,
+      username: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<UserSelect, UserFilter, UserOrderBy> & {
@@ -140,22 +140,22 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
       process.exit(1);
     }
     const searchWhere = {
-      searchTsv: {
-        query,
-      },
       trgmDisplayName: {
         value: query,
         threshold: 0.3,
       },
+      searchTsv: {
+        query,
+      },
     };
     const defaultSelect = {
-      id: true,
-      username: true,
+      createdAt: true,
       displayName: true,
+      id: true,
       profilePicture: true,
       type: true,
-      createdAt: true,
       updatedAt: true,
+      username: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<UserSelect, UserFilter, UserOrderBy> & {
@@ -188,13 +188,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          username: true,
+          createdAt: true,
           displayName: true,
+          id: true,
           profilePicture: true,
           type: true,
-          createdAt: true,
           updatedAt: true,
+          username: true,
         },
       })
       .execute();
@@ -210,13 +210,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'username',
-        message: 'username',
-        required: false,
-        skipPrompt: true,
-      },
       {
         type: 'text',
         name: 'displayName',
@@ -238,6 +231,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'username',
+        message: 'username',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateUserInput['user'];
@@ -245,19 +245,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.user
       .create({
         data: {
-          username: cleanedData.username,
           displayName: cleanedData.displayName,
           profilePicture: cleanedData.profilePicture,
           type: cleanedData.type,
+          username: cleanedData.username,
         },
         select: {
-          id: true,
-          username: true,
+          createdAt: true,
           displayName: true,
+          id: true,
           profilePicture: true,
           type: true,
-          createdAt: true,
           updatedAt: true,
+          username: true,
         },
       })
       .execute();
@@ -281,13 +281,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'username',
-        message: 'username',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'displayName',
         message: 'displayName',
         required: false,
@@ -307,6 +300,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'username',
+        message: 'username',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as UserPatch;
@@ -317,19 +317,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          username: cleanedData.username,
           displayName: cleanedData.displayName,
           profilePicture: cleanedData.profilePicture,
           type: cleanedData.type,
+          username: cleanedData.username,
         },
         select: {
-          id: true,
-          username: true,
+          createdAt: true,
           displayName: true,
+          id: true,
           profilePicture: true,
           type: true,
-          createdAt: true,
           updatedAt: true,
+          username: true,
         },
       })
       .execute();

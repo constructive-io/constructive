@@ -7,8 +7,8 @@ Default membership settings per entity, controlling initial approval and verific
 ## Usage
 
 ```typescript
-useAppMembershipDefaultsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } } })
-useAppMembershipDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } } })
+useAppMembershipDefaultsQuery({ selection: { fields: { createdAt: true, createdBy: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true } } })
+useAppMembershipDefaultQuery({ id: '<UUID>', selection: { fields: { createdAt: true, createdBy: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true } } })
 useCreateAppMembershipDefaultMutation({ selection: { fields: { id: true } } })
 useUpdateAppMembershipDefaultMutation({ selection: { fields: { id: true } } })
 useDeleteAppMembershipDefaultMutation({})
@@ -20,7 +20,7 @@ useDeleteAppMembershipDefaultMutation({})
 
 ```typescript
 const { data, isLoading } = useAppMembershipDefaultsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+  selection: { fields: { createdAt: true, createdBy: true, id: true, isApproved: true, isVerified: true, updatedAt: true, updatedBy: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppMembershipDefaultsQuery({
 const { mutate } = useCreateAppMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' });
+mutate({ createdBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>', updatedBy: '<UUID>' });
 ```

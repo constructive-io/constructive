@@ -12,8 +12,8 @@ csdk schema-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk schema-grant list --limit 10 --after <cursor>
 csdk schema-grant find-first --where.<field>.<op> <value>
 csdk schema-grant get --id <UUID>
-csdk schema-grant create --schemaId <UUID> --granteeName <String> [--databaseId <UUID>]
-csdk schema-grant update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--granteeName <String>]
+csdk schema-grant create --granteeName <String> --schemaId <UUID> [--databaseId <UUID>]
+csdk schema-grant update --id <UUID> [--databaseId <UUID>] [--granteeName <String>] [--schemaId <UUID>]
 csdk schema-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk schema-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a schemaGrant
 
 ```bash
-csdk schema-grant create --schemaId <UUID> --granteeName <String> [--databaseId <UUID>]
+csdk schema-grant create --granteeName <String> --schemaId <UUID> [--databaseId <UUID>]
 ```
 
 ### Get a schemaGrant by id

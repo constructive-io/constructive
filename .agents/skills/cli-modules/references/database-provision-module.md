@@ -12,8 +12,8 @@ csdk database-provision-module list --where.<field>.<op> <value> --orderBy <valu
 csdk database-provision-module list --limit 10 --after <cursor>
 csdk database-provision-module find-first --where.<field>.<op> <value>
 csdk database-provision-module get --id <UUID>
-csdk database-provision-module create --databaseName <String> --ownerId <UUID> --domain <String> [--subdomain <String>] [--modules <JSON>] [--options <JSON>] [--bootstrapUser <Boolean>] [--status <String>] [--errorMessage <String>] [--databaseId <UUID>] [--completedAt <Datetime>]
-csdk database-provision-module update --id <UUID> [--databaseName <String>] [--ownerId <UUID>] [--subdomain <String>] [--domain <String>] [--modules <JSON>] [--options <JSON>] [--bootstrapUser <Boolean>] [--status <String>] [--errorMessage <String>] [--databaseId <UUID>] [--completedAt <Datetime>]
+csdk database-provision-module create --databaseName <String> --domain <String> --ownerId <UUID> [--bootstrapError <String>] [--bootstrapStatus <String>] [--bootstrapUser <Boolean>] [--completedAt <Datetime>] [--databaseId <UUID>] [--errorMessage <String>] [--fulfilledAt <Datetime>] [--modules <JSON>] [--options <JSON>] [--sourceDatabaseId <UUID>] [--status <String>] [--subdomain <String>]
+csdk database-provision-module update --id <UUID> [--bootstrapError <String>] [--bootstrapStatus <String>] [--bootstrapUser <Boolean>] [--completedAt <Datetime>] [--databaseId <UUID>] [--databaseName <String>] [--domain <String>] [--errorMessage <String>] [--fulfilledAt <Datetime>] [--modules <JSON>] [--options <JSON>] [--ownerId <UUID>] [--sourceDatabaseId <UUID>] [--status <String>] [--subdomain <String>]
 csdk database-provision-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk database-provision-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a databaseProvisionModule
 
 ```bash
-csdk database-provision-module create --databaseName <String> --ownerId <UUID> --domain <String> [--subdomain <String>] [--modules <JSON>] [--options <JSON>] [--bootstrapUser <Boolean>] [--status <String>] [--errorMessage <String>] [--databaseId <UUID>] [--completedAt <Datetime>]
+csdk database-provision-module create --databaseName <String> --domain <String> --ownerId <UUID> [--bootstrapError <String>] [--bootstrapStatus <String>] [--bootstrapUser <Boolean>] [--completedAt <Datetime>] [--databaseId <UUID>] [--errorMessage <String>] [--fulfilledAt <Datetime>] [--modules <JSON>] [--options <JSON>] [--sourceDatabaseId <UUID>] [--status <String>] [--subdomain <String>]
 ```
 
 ### Get a databaseProvisionModule by id

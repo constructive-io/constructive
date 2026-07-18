@@ -13,7 +13,7 @@ csdk org-permission-default list --limit 10 --after <cursor>
 csdk org-permission-default find-first --where.<field>.<op> <value>
 csdk org-permission-default get --id <UUID>
 csdk org-permission-default create --entityId <UUID> [--permissions <BitString>]
-csdk org-permission-default update --id <UUID> [--permissions <BitString>] [--entityId <UUID>]
+csdk org-permission-default update --id <UUID> [--entityId <UUID>] [--permissions <BitString>]
 csdk org-permission-default delete --id <UUID>
 ```
 

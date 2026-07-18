@@ -16,6 +16,7 @@
 | auth | - | ORM | [./src/auth/README.md](./src/auth/README.md) |
 | compute | - | ORM | [./src/compute/README.md](./src/compute/README.md) |
 | config | - | ORM | [./src/config/README.md](./src/config/README.md) |
+| infra | - | ORM | [./src/infra/README.md](./src/infra/README.md) |
 | modules | - | ORM | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | ORM | [./src/objects/README.md](./src/objects/README.md) |
 | usage | - | ORM | [./src/usage/README.md](./src/usage/README.md) |

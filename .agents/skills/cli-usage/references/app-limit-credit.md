@@ -12,8 +12,8 @@ csdk app-limit-credit list --where.<field>.<op> <value> --orderBy <values>
 csdk app-limit-credit list --limit 10 --after <cursor>
 csdk app-limit-credit find-first --where.<field>.<op> <value>
 csdk app-limit-credit get --id <UUID>
-csdk app-limit-credit create --defaultLimitId <UUID> --amount <BigInt> [--actorId <UUID>] [--creditType <String>] [--reason <String>]
-csdk app-limit-credit update --id <UUID> [--defaultLimitId <UUID>] [--actorId <UUID>] [--amount <BigInt>] [--creditType <String>] [--reason <String>]
+csdk app-limit-credit create --amount <BigInt> --defaultLimitId <UUID> [--actorId <UUID>] [--creditType <String>] [--reason <String>]
+csdk app-limit-credit update --id <UUID> [--actorId <UUID>] [--amount <BigInt>] [--creditType <String>] [--defaultLimitId <UUID>] [--reason <String>]
 csdk app-limit-credit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit-credit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appLimitCredit
 
 ```bash
-csdk app-limit-credit create --defaultLimitId <UUID> --amount <BigInt> [--actorId <UUID>] [--creditType <String>] [--reason <String>]
+csdk app-limit-credit create --amount <BigInt> --defaultLimitId <UUID> [--actorId <UUID>] [--creditType <String>] [--reason <String>]
 ```
 
 ### Get a appLimitCredit by id

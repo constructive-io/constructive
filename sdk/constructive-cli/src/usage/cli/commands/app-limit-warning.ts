@@ -18,9 +18,9 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
-  warningType: 'string',
-  thresholdValue: 'int',
   taskIdentifier: 'string',
+  thresholdValue: 'int',
+  warningType: 'string',
 };
 const usage =
   '\napp-limit-warning <command>\n\nCommands:\n  list                  List appLimitWarning records\n  find-first            Find first matching appLimitWarning record\n  get                   Get a appLimitWarning by ID\n  create                Create a new appLimitWarning\n  update                Update an existing appLimitWarning\n  delete                Delete a appLimitWarning\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,9 +75,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       id: true,
       name: true,
-      warningType: true,
-      thresholdValue: true,
       taskIdentifier: true,
+      thresholdValue: true,
+      warningType: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy> & {
@@ -100,9 +100,9 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       id: true,
       name: true,
-      warningType: true,
-      thresholdValue: true,
       taskIdentifier: true,
+      thresholdValue: true,
+      warningType: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy> & {
@@ -137,9 +137,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           name: true,
-          warningType: true,
-          thresholdValue: true,
           taskIdentifier: true,
+          thresholdValue: true,
+          warningType: true,
         },
       })
       .execute();
@@ -163,8 +163,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'warningType',
-        message: 'warningType',
+        name: 'taskIdentifier',
+        message: 'taskIdentifier',
         required: true,
       },
       {
@@ -175,8 +175,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'taskIdentifier',
-        message: 'taskIdentifier',
+        name: 'warningType',
+        message: 'warningType',
         required: true,
       },
     ]);
@@ -190,16 +190,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           name: cleanedData.name,
-          warningType: cleanedData.warningType,
-          thresholdValue: cleanedData.thresholdValue,
           taskIdentifier: cleanedData.taskIdentifier,
+          thresholdValue: cleanedData.thresholdValue,
+          warningType: cleanedData.warningType,
         },
         select: {
           id: true,
           name: true,
-          warningType: true,
-          thresholdValue: true,
           taskIdentifier: true,
+          thresholdValue: true,
+          warningType: true,
         },
       })
       .execute();
@@ -229,8 +229,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'warningType',
-        message: 'warningType',
+        name: 'taskIdentifier',
+        message: 'taskIdentifier',
         required: false,
       },
       {
@@ -241,8 +241,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'taskIdentifier',
-        message: 'taskIdentifier',
+        name: 'warningType',
+        message: 'warningType',
         required: false,
       },
     ]);
@@ -256,16 +256,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           name: cleanedData.name,
-          warningType: cleanedData.warningType,
-          thresholdValue: cleanedData.thresholdValue,
           taskIdentifier: cleanedData.taskIdentifier,
+          thresholdValue: cleanedData.thresholdValue,
+          warningType: cleanedData.warningType,
         },
         select: {
           id: true,
           name: true,
-          warningType: true,
-          thresholdValue: true,
           taskIdentifier: true,
+          thresholdValue: true,
+          warningType: true,
         },
       })
       .execute();

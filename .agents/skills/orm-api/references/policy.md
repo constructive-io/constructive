@@ -9,8 +9,8 @@ ORM operations for Policy records
 ```typescript
 db.policy.findMany({ select: { id: true } }).execute()
 db.policy.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.policy.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute()
-db.policy.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.policy.create({ data: { category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' }, select: { id: true } }).execute()
+db.policy.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute()
 db.policy.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.policy.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.policy.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, category: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.policy.findMany({
 
 ```typescript
 const item = await db.policy.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' },
+  data: { category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

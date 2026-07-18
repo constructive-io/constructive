@@ -3,6 +3,90 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.40.1](https://github.com/constructive-io/constructive/compare/pgpm@4.40.0...pgpm@4.40.1) (2026-07-18)
+
+**Note:** Version bump only for package pgpm
+
+# [4.40.0](https://github.com/constructive-io/constructive/compare/pgpm@4.39.0...pgpm@4.40.0) (2026-07-18)
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
+# [4.39.0](https://github.com/constructive-io/constructive/compare/pgpm@4.38.3...pgpm@4.39.0) (2026-07-18)
+
+**Note:** Version bump only for package pgpm
+
+## [4.38.3](https://github.com/constructive-io/constructive/compare/pgpm@4.38.2...pgpm@4.38.3) (2026-07-17)
+
+**Note:** Version bump only for package pgpm
+
+## [4.38.2](https://github.com/constructive-io/constructive/compare/pgpm@4.38.1...pgpm@4.38.2) (2026-07-17)
+
+**Note:** Version bump only for package pgpm
+
+## [4.38.1](https://github.com/constructive-io/constructive/compare/pgpm@4.38.0...pgpm@4.38.1) (2026-07-15)
+
+**Note:** Version bump only for package pgpm
+
+# [4.38.0](https://github.com/constructive-io/constructive/compare/pgpm@4.37.3...pgpm@4.38.0) (2026-07-14)
+
+**Note:** Version bump only for package pgpm
+
+## [4.37.3](https://github.com/constructive-io/constructive/compare/pgpm@4.37.2...pgpm@4.37.3) (2026-07-14)
+
+**Note:** Version bump only for package pgpm
+
+## [4.37.2](https://github.com/constructive-io/constructive/compare/pgpm@4.37.1...pgpm@4.37.2) (2026-07-13)
+
+**Note:** Version bump only for package pgpm
+
+## [4.37.1](https://github.com/constructive-io/constructive/compare/pgpm@4.37.0...pgpm@4.37.1) (2026-07-13)
+
+**Note:** Version bump only for package pgpm
+
+# [4.37.0](https://github.com/constructive-io/constructive/compare/pgpm@4.36.5...pgpm@4.37.0) (2026-07-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.36.5](https://github.com/constructive-io/constructive/compare/pgpm@4.36.4...pgpm@4.36.5) (2026-07-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.36.4](https://github.com/constructive-io/constructive/compare/pgpm@4.36.3...pgpm@4.36.4) (2026-07-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.36.3](https://github.com/constructive-io/constructive/compare/pgpm@4.36.2...pgpm@4.36.3) (2026-07-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.36.2](https://github.com/constructive-io/constructive/compare/pgpm@4.36.1...pgpm@4.36.2) (2026-07-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.36.1](https://github.com/constructive-io/constructive/compare/pgpm@4.36.0...pgpm@4.36.1) (2026-07-11)
+
+**Note:** Version bump only for package pgpm
+
+# [4.36.0](https://github.com/constructive-io/constructive/compare/pgpm@4.35.0...pgpm@4.36.0) (2026-07-11)
+
+### Features
+
+- **pgpm:** add --pglite flag to init with workspace inheritance ([1cbe2e4](https://github.com/constructive-io/constructive/commit/1cbe2e447638d970016a0920a3feba5a84b5e12e))
+- **pgpm:** default pgpm init to no extensions (opt-in via --extensions/--with-extensions) ([fb0eb70](https://github.com/constructive-io/constructive/commit/fb0eb7036128a2413d89cb2e09d78648543b4bda))
+- **pgpm:** harden `pgpm extension` as the canonical enable-later path ([41c60dc](https://github.com/constructive-io/constructive/commit/41c60dc9fd42ccff03443a61f698fd12c669e835))
+
+# [4.35.0](https://github.com/constructive-io/constructive/compare/pgpm@4.34.2...pgpm@4.35.0) (2026-07-10)
+
+### Features
+
+- **pgpm:** pluggable migration-driver contract + generic plugin loader ([eef726f](https://github.com/constructive-io/constructive/commit/eef726fcf2d31a084641b42487e4991bd8d5992a))
+
+## [4.34.2](https://github.com/constructive-io/constructive/compare/pgpm@4.34.1...pgpm@4.34.2) (2026-07-10)
+
+**Note:** Version bump only for package pgpm
+
 ## [4.34.1](https://github.com/constructive-io/constructive/compare/pgpm@4.34.0...pgpm@4.34.1) (2026-07-10)
 
 **Note:** Version bump only for package pgpm

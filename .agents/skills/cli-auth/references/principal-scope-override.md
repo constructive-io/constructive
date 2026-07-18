@@ -12,8 +12,8 @@ csdk principal-scope-override list --where.<field>.<op> <value> --orderBy <value
 csdk principal-scope-override list --limit 10 --after <cursor>
 csdk principal-scope-override find-first --where.<field>.<op> <value>
 csdk principal-scope-override get --id <UUID>
-csdk principal-scope-override create --principalId <UUID> --membershipType <Int> --allowedMask <BitString> --isAdmin <Boolean> --isReadOnly <Boolean>
-csdk principal-scope-override update --id <UUID> [--principalId <UUID>] [--membershipType <Int>] [--allowedMask <BitString>] [--isAdmin <Boolean>] [--isReadOnly <Boolean>]
+csdk principal-scope-override create --allowedMask <BitString> --isActive <Boolean> --isReadOnly <Boolean> --membershipType <Int> --principalId <UUID> --useAdminOwner <Boolean>
+csdk principal-scope-override update --id <UUID> [--allowedMask <BitString>] [--isActive <Boolean>] [--isReadOnly <Boolean>] [--membershipType <Int>] [--principalId <UUID>] [--useAdminOwner <Boolean>]
 csdk principal-scope-override delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk principal-scope-override list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a principalScopeOverride
 
 ```bash
-csdk principal-scope-override create --principalId <UUID> --membershipType <Int> --allowedMask <BitString> --isAdmin <Boolean> --isReadOnly <Boolean>
+csdk principal-scope-override create --allowedMask <BitString> --isActive <Boolean> --isReadOnly <Boolean> --membershipType <Int> --principalId <UUID> --useAdminOwner <Boolean>
 ```
 
 ### Get a principalScopeOverride by id

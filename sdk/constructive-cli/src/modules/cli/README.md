@@ -26,82 +26,89 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
-| `default-ids-module` | defaultIdsModule CRUD operations |
-| `membership-types-module` | membershipTypesModule CRUD operations |
-| `user-state-module` | userStateModule CRUD operations |
-| `session-secrets-module` | sessionSecretsModule CRUD operations |
-| `config-secrets-org-module` | configSecretsOrgModule CRUD operations |
-| `devices-module` | devicesModule CRUD operations |
-| `i-18-n-module` | i18NModule CRUD operations |
-| `user-credentials-module` | userCredentialsModule CRUD operations |
-| `user-settings-module` | userSettingsModule CRUD operations |
+| `agent-module` | agentModule CRUD operations |
+| `billing-module` | billingModule CRUD operations |
+| `billing-provider-module` | billingProviderModule CRUD operations |
+| `blueprint` | blueprint CRUD operations |
+| `blueprint-construction` | blueprintConstruction CRUD operations |
+| `blueprint-template` | blueprintTemplate CRUD operations |
+| `compute-log-module` | computeLogModule CRUD operations |
 | `config-secrets-user-module` | configSecretsUserModule CRUD operations |
 | `connected-accounts-module` | connectedAccountsModule CRUD operations |
-| `emails-module` | emailsModule CRUD operations |
-| `phone-numbers-module` | phoneNumbersModule CRUD operations |
-| `rate-limits-module` | rateLimitsModule CRUD operations |
-| `users-module` | usersModule CRUD operations |
-| `webauthn-credentials-module` | webauthnCredentialsModule CRUD operations |
 | `crypto-addresses-module` | cryptoAddressesModule CRUD operations |
-| `denormalized-table-field` | denormalizedTableField CRUD operations |
-| `identity-providers-module` | identityProvidersModule CRUD operations |
-| `rls-module` | rlsModule CRUD operations |
-| `blueprint` | blueprint CRUD operations |
-| `blueprint-template` | blueprintTemplate CRUD operations |
-| `blueprint-construction` | blueprintConstruction CRUD operations |
 | `crypto-auth-module` | cryptoAuthModule CRUD operations |
-| `sessions-module` | sessionsModule CRUD operations |
-| `secure-table-provision` | secureTableProvision CRUD operations |
 | `database-provision-module` | databaseProvisionModule CRUD operations |
-| `config-secrets-module` | configSecretsModule CRUD operations |
-| `graph-module` | graphModule CRUD operations |
-| `merkle-store-module` | merkleStoreModule CRUD operations |
-| `rate-limit-meters-module` | rateLimitMetersModule CRUD operations |
-| `realtime-module` | realtimeModule CRUD operations |
-| `webauthn-auth-module` | webauthnAuthModule CRUD operations |
+| `db-pool-config` | dbPoolConfig CRUD operations |
+| `db-pool` | dbPool CRUD operations |
+| `db-preset-module` | dbPresetModule CRUD operations |
+| `db-usage-module` | dbUsageModule CRUD operations |
+| `default-ids-module` | defaultIdsModule CRUD operations |
+| `denormalized-table-field` | denormalizedTableField CRUD operations |
+| `devices-module` | devicesModule CRUD operations |
+| `emails-module` | emailsModule CRUD operations |
+| `entity-type-provision` | entityTypeProvision CRUD operations |
+| `events-module` | eventsModule CRUD operations |
+| `function-deployment-module` | functionDeploymentModule CRUD operations |
 | `function-invocation-module` | functionInvocationModule CRUD operations |
 | `function-module` | functionModule CRUD operations |
-| `invites-module` | invitesModule CRUD operations |
-| `principal-auth-module` | principalAuthModule CRUD operations |
-| `compute-log-module` | computeLogModule CRUD operations |
-| `inference-log-module` | inferenceLogModule CRUD operations |
-| `namespace-module` | namespaceModule CRUD operations |
-| `resource-module` | resourceModule CRUD operations |
-| `storage-log-module` | storageLogModule CRUD operations |
-| `transfer-log-module` | transferLogModule CRUD operations |
-| `function-deployment-module` | functionDeploymentModule CRUD operations |
-| `plans-module` | plansModule CRUD operations |
-| `billing-provider-module` | billingProviderModule CRUD operations |
-| `db-usage-module` | dbUsageModule CRUD operations |
 | `graph-execution-module` | graphExecutionModule CRUD operations |
+| `graph-module` | graphModule CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
-| `permissions-module` | permissionsModule CRUD operations |
-| `notifications-module` | notificationsModule CRUD operations |
-| `profiles-module` | profilesModule CRUD operations |
-| `billing-module` | billingModule CRUD operations |
-| `relation-provision` | relationProvision CRUD operations |
-| `user-auth-module` | userAuthModule CRUD operations |
-| `agent-module` | agentModule CRUD operations |
+| `http-route-module` | httpRouteModule CRUD operations |
+| `i-18-n-module` | i18NModule CRUD operations |
+| `identity-providers-module` | identityProvidersModule CRUD operations |
+| `inference-log-module` | inferenceLogModule CRUD operations |
+| `infra-config-module` | infraConfigModule CRUD operations |
+| `infra-secrets-module` | infraSecretsModule CRUD operations |
+| `integration-providers-module` | integrationProvidersModule CRUD operations |
+| `internal-secrets-module` | internalSecretsModule CRUD operations |
+| `invites-module` | invitesModule CRUD operations |
 | `limits-module` | limitsModule CRUD operations |
+| `membership-types-module` | membershipTypesModule CRUD operations |
 | `memberships-module` | membershipsModule CRUD operations |
-| `entity-type-provision` | entityTypeProvision CRUD operations |
+| `merkle-store-module` | merkleStoreModule CRUD operations |
+| `namespace-module` | namespaceModule CRUD operations |
+| `notifications-module` | notificationsModule CRUD operations |
+| `permissions-module` | permissionsModule CRUD operations |
+| `phone-numbers-module` | phoneNumbersModule CRUD operations |
+| `plans-module` | plansModule CRUD operations |
+| `principal-auth-module` | principalAuthModule CRUD operations |
+| `profiles-module` | profilesModule CRUD operations |
+| `rate-limit-meters-module` | rateLimitMetersModule CRUD operations |
+| `rate-limits-module` | rateLimitsModule CRUD operations |
+| `realtime-module` | realtimeModule CRUD operations |
+| `relation-provision` | relationProvision CRUD operations |
+| `resource-module` | resourceModule CRUD operations |
+| `rls-module` | rlsModule CRUD operations |
+| `secure-table-provision` | secureTableProvision CRUD operations |
+| `session-secrets-module` | sessionSecretsModule CRUD operations |
+| `sessions-module` | sessionsModule CRUD operations |
+| `storage-log-module` | storageLogModule CRUD operations |
 | `storage-module` | storageModule CRUD operations |
-| `events-module` | eventsModule CRUD operations |
+| `transfer-log-module` | transferLogModule CRUD operations |
+| `user-auth-module` | userAuthModule CRUD operations |
+| `user-credentials-module` | userCredentialsModule CRUD operations |
+| `user-settings-module` | userSettingsModule CRUD operations |
+| `user-state-module` | userStateModule CRUD operations |
+| `users-module` | usersModule CRUD operations |
+| `webauthn-auth-module` | webauthnAuthModule CRUD operations |
+| `webauthn-credentials-module` | webauthnCredentialsModule CRUD operations |
+| `webhook-module` | webhookModule CRUD operations |
 | `resolve-blueprint-field` | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
 | `resolve-blueprint-table` | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
-| `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
-| `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
-| `provision-check-constraint` | Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists. |
-| `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 | `copy-template-to-blueprint` | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
-| `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
-| `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
-| `provision-relation` | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `provision-check-constraint` | Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists. |
+| `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
+| `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
+| `provision-relation` | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
+| `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
+| `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
+| `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 
 ## Infrastructure Commands
 
@@ -144,1833 +151,62 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
-### `default-ids-module`
+### `agent-module`
 
-CRUD operations for DefaultIdsModule records.
+CRUD operations for AgentModule records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all defaultIdsModule records |
-| `find-first` | Find first matching defaultIdsModule record |
-| `get` | Get a defaultIdsModule by id |
-| `create` | Create a new defaultIdsModule |
-| `update` | Update an existing defaultIdsModule |
-| `delete` | Delete a defaultIdsModule |
+| `list` | List all agentModule records |
+| `find-first` | Find first matching agentModule record |
+| `get` | Get a agentModule by id |
+| `create` | Create a new agentModule |
+| `update` | Update an existing agentModule |
+| `delete` | Delete a agentModule |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-
-**Required create fields:** `databaseId`
-
-### `membership-types-module`
-
-CRUD operations for MembershipTypesModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all membershipTypesModule records |
-| `find-first` | Find first matching membershipTypesModule record |
-| `get` | Get a membershipTypesModule by id |
-| `create` | Create a new membershipTypesModule |
-| `update` | Update an existing membershipTypesModule |
-| `delete` | Delete a membershipTypesModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
-
-### `user-state-module`
-
-CRUD operations for UserStateModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all userStateModule records |
-| `find-first` | Find first matching userStateModule record |
-| `get` | Get a userStateModule by id |
-| `create` | Create a new userStateModule |
-| `update` | Update an existing userStateModule |
-| `delete` | Delete a userStateModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
-
-### `session-secrets-module`
-
-CRUD operations for SessionSecretsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all sessionSecretsModule records |
-| `find-first` | Find first matching sessionSecretsModule record |
-| `get` | Get a sessionSecretsModule by id |
-| `create` | Create a new sessionSecretsModule |
-| `update` | Update an existing sessionSecretsModule |
-| `delete` | Delete a sessionSecretsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-| `sessionsTableId` | UUID |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `sessionsTableId`
-
-### `config-secrets-org-module`
-
-CRUD operations for ConfigSecretsOrgModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all configSecretsOrgModule records |
-| `find-first` | Find first matching configSecretsOrgModule record |
-| `get` | Get a configSecretsOrgModule by id |
-| `create` | Create a new configSecretsOrgModule |
-| `update` | Update an existing configSecretsOrgModule |
-| `delete` | Delete a configSecretsOrgModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
+| `agentTableId` | UUID |
+| `agentTableName` | String |
 | `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `apiName`, `privateApiName`
-
-### `devices-module`
-
-CRUD operations for DevicesModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all devicesModule records |
-| `find-first` | Find first matching devicesModule record |
-| `get` | Get a devicesModule by id |
-| `create` | Create a new devicesModule |
-| `update` | Update an existing devicesModule |
-| `delete` | Delete a devicesModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
 | `databaseId` | UUID |
-| `schemaId` | UUID |
-| `userDevicesTableId` | UUID |
-| `deviceSettingsTableId` | UUID |
-| `userDevicesTable` | String |
-| `deviceSettingsTable` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `userDevicesTableId`, `deviceSettingsTableId`, `userDevicesTable`, `deviceSettingsTable`
-
-### `i-18-n-module`
-
-CRUD operations for I18NModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all i18NModule records |
-| `find-first` | Find first matching i18NModule record |
-| `get` | Get a i18NModule by id |
-| `create` | Create a new i18NModule |
-| `update` | Update an existing i18NModule |
-| `delete` | Delete a i18NModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `settingsTableId` | UUID |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `settingsTableId`, `apiName`, `privateApiName`
-
-### `user-credentials-module`
-
-CRUD operations for UserCredentialsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all userCredentialsModule records |
-| `find-first` | Find first matching userCredentialsModule record |
-| `get` | Get a userCredentialsModule by id |
-| `create` | Create a new userCredentialsModule |
-| `update` | Update an existing userCredentialsModule |
-| `delete` | Delete a userCredentialsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `apiName`, `privateApiName`
-
-### `user-settings-module`
-
-CRUD operations for UserSettingsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all userSettingsModule records |
-| `find-first` | Find first matching userSettingsModule record |
-| `get` | Get a userSettingsModule by id |
-| `create` | Create a new userSettingsModule |
-| `update` | Update an existing userSettingsModule |
-| `delete` | Delete a userSettingsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `ownerTableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `ownerTableId`, `tableName`, `apiName`
-
-### `config-secrets-user-module`
-
-CRUD operations for ConfigSecretsUserModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all configSecretsUserModule records |
-| `find-first` | Find first matching configSecretsUserModule record |
-| `get` | Get a configSecretsUserModule by id |
-| `create` | Create a new configSecretsUserModule |
-| `update` | Update an existing configSecretsUserModule |
-| `delete` | Delete a configSecretsUserModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-| `configDefinitionsTableId` | UUID |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `configDefinitionsTableId`, `apiName`, `privateApiName`
-
-### `connected-accounts-module`
-
-CRUD operations for ConnectedAccountsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all connectedAccountsModule records |
-| `find-first` | Find first matching connectedAccountsModule record |
-| `get` | Get a connectedAccountsModule by id |
-| `create` | Create a new connectedAccountsModule |
-| `update` | Update an existing connectedAccountsModule |
-| `delete` | Delete a connectedAccountsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `tableId` | UUID |
-| `ownerTableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`, `tableName`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `apiName`, `privateApiName`
-
-### `emails-module`
-
-CRUD operations for EmailsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all emailsModule records |
-| `find-first` | Find first matching emailsModule record |
-| `get` | Get a emailsModule by id |
-| `create` | Create a new emailsModule |
-| `update` | Update an existing emailsModule |
-| `delete` | Delete a emailsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `tableId` | UUID |
-| `ownerTableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`, `tableName`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `apiName`, `privateApiName`
-
-### `phone-numbers-module`
-
-CRUD operations for PhoneNumbersModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all phoneNumbersModule records |
-| `find-first` | Find first matching phoneNumbersModule record |
-| `get` | Get a phoneNumbersModule by id |
-| `create` | Create a new phoneNumbersModule |
-| `update` | Update an existing phoneNumbersModule |
-| `delete` | Delete a phoneNumbersModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `tableId` | UUID |
-| `ownerTableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`, `tableName`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `apiName`, `privateApiName`
-
-### `rate-limits-module`
-
-CRUD operations for RateLimitsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all rateLimitsModule records |
-| `find-first` | Find first matching rateLimitsModule record |
-| `get` | Get a rateLimitsModule by id |
-| `create` | Create a new rateLimitsModule |
-| `update` | Update an existing rateLimitsModule |
-| `delete` | Delete a rateLimitsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `rateLimitSettingsTableId` | UUID |
-| `ipRateLimitsTableId` | UUID |
-| `rateLimitsTableId` | UUID |
-| `rateLimitSettingsTable` | String |
-| `ipRateLimitsTable` | String |
-| `rateLimitsTable` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `rateLimitSettingsTableId`, `ipRateLimitsTableId`, `rateLimitsTableId`, `rateLimitSettingsTable`, `ipRateLimitsTable`, `rateLimitsTable`
-
-### `users-module`
-
-CRUD operations for UsersModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all usersModule records |
-| `find-first` | Find first matching usersModule record |
-| `get` | Get a usersModule by id |
-| `create` | Create a new usersModule |
-| `update` | Update an existing usersModule |
-| `delete` | Delete a usersModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-| `typeTableId` | UUID |
-| `typeTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `typeTableId`, `typeTableName`, `apiName`, `privateApiName`
-
-### `webauthn-credentials-module`
-
-CRUD operations for WebauthnCredentialsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all webauthnCredentialsModule records |
-| `find-first` | Find first matching webauthnCredentialsModule record |
-| `get` | Get a webauthnCredentialsModule by id |
-| `create` | Create a new webauthnCredentialsModule |
-| `update` | Update an existing webauthnCredentialsModule |
-| `delete` | Delete a webauthnCredentialsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `tableId` | UUID |
-| `ownerTableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`, `apiName`, `privateApiName`
-
-### `crypto-addresses-module`
-
-CRUD operations for CryptoAddressesModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all cryptoAddressesModule records |
-| `find-first` | Find first matching cryptoAddressesModule record |
-| `get` | Get a cryptoAddressesModule by id |
-| `create` | Create a new cryptoAddressesModule |
-| `update` | Update an existing cryptoAddressesModule |
-| `delete` | Delete a cryptoAddressesModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `tableId` | UUID |
-| `ownerTableId` | UUID |
-| `tableName` | String |
-| `cryptoNetwork` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`, `tableName`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `cryptoNetwork`, `apiName`, `privateApiName`
-
-### `denormalized-table-field`
-
-CRUD operations for DenormalizedTableField records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all denormalizedTableField records |
-| `find-first` | Find first matching denormalizedTableField record |
-| `get` | Get a denormalizedTableField by id |
-| `create` | Create a new denormalizedTableField |
-| `update` | Update an existing denormalizedTableField |
-| `delete` | Delete a denormalizedTableField |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `tableId` | UUID |
-| `fieldId` | UUID |
-| `setIds` | UUID |
-| `refTableId` | UUID |
-| `refFieldId` | UUID |
-| `refIds` | UUID |
-| `useUpdates` | Boolean |
-| `updateDefaults` | Boolean |
-| `funcName` | String |
-| `funcOrder` | Int |
-
-**Required create fields:** `databaseId`, `tableId`, `fieldId`, `refTableId`, `refFieldId`
-**Optional create fields (backend defaults):** `setIds`, `refIds`, `useUpdates`, `updateDefaults`, `funcName`, `funcOrder`
-
-### `identity-providers-module`
-
-CRUD operations for IdentityProvidersModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all identityProvidersModule records |
-| `find-first` | Find first matching identityProvidersModule record |
-| `get` | Get a identityProvidersModule by id |
-| `create` | Create a new identityProvidersModule |
-| `update` | Update an existing identityProvidersModule |
-| `delete` | Delete a identityProvidersModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `tableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
+| `defaultPermissions` | String |
+| `entityField` | String |
 | `entityTableId` | UUID |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableId`, `tableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`
-
-### `rls-module`
-
-CRUD operations for RlsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all rlsModule records |
-| `find-first` | Find first matching rlsModule record |
-| `get` | Get a rlsModule by id |
-| `create` | Create a new rlsModule |
-| `update` | Update an existing rlsModule |
-| `delete` | Delete a rlsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
+| `hasAgents` | Boolean |
+| `hasPlans` | Boolean |
+| `hasResources` | Boolean |
 | `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `sessionsTableId` | UUID |
-| `usersTableId` | UUID |
-| `authenticate` | String |
-| `authenticateStrict` | String |
-| `currentRole` | String |
-| `currentRoleId` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`, `apiName`, `privateApiName`
-
-### `blueprint`
-
-CRUD operations for Blueprint records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all blueprint records |
-| `find-first` | Find first matching blueprint record |
-| `get` | Get a blueprint by id |
-| `create` | Create a new blueprint |
-| `update` | Update an existing blueprint |
-| `delete` | Delete a blueprint |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `databaseId` | UUID |
-| `name` | String |
-| `displayName` | String |
-| `description` | String |
-| `definition` | JSON |
-| `templateId` | UUID |
-| `definitionHash` | UUID |
-| `tableHashes` | JSON |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `ownerId`, `databaseId`, `name`, `displayName`, `definition`
-**Optional create fields (backend defaults):** `description`, `templateId`, `definitionHash`, `tableHashes`
-
-### `blueprint-template`
-
-CRUD operations for BlueprintTemplate records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all blueprintTemplate records |
-| `find-first` | Find first matching blueprintTemplate record |
-| `get` | Get a blueprintTemplate by id |
-| `create` | Create a new blueprintTemplate |
-| `update` | Update an existing blueprintTemplate |
-| `delete` | Delete a blueprintTemplate |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `version` | String |
-| `displayName` | String |
-| `description` | String |
-| `ownerId` | UUID |
-| `visibility` | String |
-| `categories` | String |
-| `tags` | String |
-| `definition` | JSON |
-| `definitionSchemaVersion` | String |
-| `source` | String |
-| `complexity` | String |
-| `copyCount` | Int |
-| `forkCount` | Int |
-| `forkedFromId` | UUID |
-| `definitionHash` | UUID |
-| `tableHashes` | JSON |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`, `displayName`, `ownerId`, `definition`
-**Optional create fields (backend defaults):** `version`, `description`, `visibility`, `categories`, `tags`, `definitionSchemaVersion`, `source`, `complexity`, `copyCount`, `forkCount`, `forkedFromId`, `definitionHash`, `tableHashes`
-
-### `blueprint-construction`
-
-CRUD operations for BlueprintConstruction records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all blueprintConstruction records |
-| `find-first` | Find first matching blueprintConstruction record |
-| `get` | Get a blueprintConstruction by id |
-| `create` | Create a new blueprintConstruction |
-| `update` | Update an existing blueprintConstruction |
-| `delete` | Delete a blueprintConstruction |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `blueprintId` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `status` | String |
-| `errorDetails` | String |
-| `tableMap` | JSON |
-| `constructedDefinition` | JSON |
-| `constructedAt` | Datetime |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `blueprintId`, `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `status`, `errorDetails`, `tableMap`, `constructedDefinition`, `constructedAt`
-
-### `crypto-auth-module`
-
-CRUD operations for CryptoAuthModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all cryptoAuthModule records |
-| `find-first` | Find first matching cryptoAuthModule record |
-| `get` | Get a cryptoAuthModule by id |
-| `create` | Create a new cryptoAuthModule |
-| `update` | Update an existing cryptoAuthModule |
-| `delete` | Delete a cryptoAuthModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `usersTableId` | UUID |
-| `secretsTableId` | UUID |
-| `sessionsTableId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `addressesTableId` | UUID |
-| `userField` | String |
-| `cryptoNetwork` | String |
-| `signInRequestChallenge` | String |
-| `signInRecordFailure` | String |
-| `signUpWithKey` | String |
-| `signInWithChallenge` | String |
-
-**Required create fields:** `databaseId`, `userField`
-**Optional create fields (backend defaults):** `schemaId`, `usersTableId`, `secretsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `addressesTableId`, `cryptoNetwork`, `signInRequestChallenge`, `signInRecordFailure`, `signUpWithKey`, `signInWithChallenge`
-
-### `sessions-module`
-
-CRUD operations for SessionsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all sessionsModule records |
-| `find-first` | Find first matching sessionsModule record |
-| `get` | Get a sessionsModule by id |
-| `create` | Create a new sessionsModule |
-| `update` | Update an existing sessionsModule |
-| `delete` | Delete a sessionsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `sessionsTableId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `authSettingsTableId` | UUID |
-| `usersTableId` | UUID |
-| `sessionsDefaultExpiration` | Interval |
-| `sessionsTable` | String |
-| `sessionCredentialsTable` | String |
-| `authSettingsTable` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `sessionsTableId`, `sessionCredentialsTableId`, `authSettingsTableId`, `usersTableId`, `sessionsDefaultExpiration`, `sessionsTable`, `sessionCredentialsTable`, `authSettingsTable`
-
-### `secure-table-provision`
-
-CRUD operations for SecureTableProvision records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all secureTableProvision records |
-| `find-first` | Find first matching secureTableProvision record |
-| `get` | Get a secureTableProvision by id |
-| `create` | Create a new secureTableProvision |
-| `update` | Update an existing secureTableProvision |
-| `delete` | Delete a secureTableProvision |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-| `nodes` | JSON |
-| `useRls` | Boolean |
-| `fields` | JSON |
-| `grants` | JSON |
+| `messageTableId` | UUID |
+| `messageTableName` | String |
+| `personaTableId` | UUID |
+| `personaTableName` | String |
+| `planTableId` | UUID |
+| `planTableName` | String |
 | `policies` | JSON |
-| `outFields` | UUID |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `nodes`, `useRls`, `fields`, `grants`, `policies`, `outFields`
-
-### `database-provision-module`
-
-CRUD operations for DatabaseProvisionModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all databaseProvisionModule records |
-| `find-first` | Find first matching databaseProvisionModule record |
-| `get` | Get a databaseProvisionModule by id |
-| `create` | Create a new databaseProvisionModule |
-| `update` | Update an existing databaseProvisionModule |
-| `delete` | Delete a databaseProvisionModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseName` | String |
-| `ownerId` | UUID |
-| `subdomain` | String |
-| `domain` | String |
-| `modules` | JSON |
-| `options` | JSON |
-| `bootstrapUser` | Boolean |
-| `status` | String |
-| `errorMessage` | String |
-| `databaseId` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `completedAt` | Datetime |
-
-**Required create fields:** `databaseName`, `ownerId`, `domain`
-**Optional create fields (backend defaults):** `subdomain`, `modules`, `options`, `bootstrapUser`, `status`, `errorMessage`, `databaseId`, `completedAt`
-
-### `config-secrets-module`
-
-CRUD operations for ConfigSecretsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all configSecretsModule records |
-| `find-first` | Find first matching configSecretsModule record |
-| `get` | Get a configSecretsModule by id |
-| `create` | Create a new configSecretsModule |
-| `update` | Update an existing configSecretsModule |
-| `delete` | Delete a configSecretsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `tableId` | UUID |
-| `configDefinitionsTableId` | UUID |
-| `tableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
 | `prefix` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `promptsTableId` | UUID |
+| `promptsTableName` | String |
 | `provisions` | JSON |
-| `hasConfig` | Boolean |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableId`, `configDefinitionsTableId`, `tableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `policies`, `provisions`, `hasConfig`
-
-### `graph-module`
-
-CRUD operations for GraphModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all graphModule records |
-| `find-first` | Find first matching graphModule record |
-| `get` | Get a graphModule by id |
-| `create` | Create a new graphModule |
-| `update` | Update an existing graphModule |
-| `delete` | Delete a graphModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `publicSchemaId` | UUID |
-| `privateSchemaId` | UUID |
 | `publicSchemaName` | String |
-| `privateSchemaName` | String |
+| `resourceTableId` | UUID |
+| `resourceTableName` | String |
+| `resources` | JSON |
+| `schemaId` | UUID |
 | `scope` | String |
-| `prefix` | String |
-| `merkleStoreModuleId` | UUID |
-| `graphsTableId` | UUID |
-| `apiName` | String |
-| `privateApiName` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-| `createdAt` | Datetime |
-
-**Required create fields:** `databaseId`, `merkleStoreModuleId`
-**Optional create fields (backend defaults):** `publicSchemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `scope`, `prefix`, `graphsTableId`, `apiName`, `privateApiName`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
-
-### `merkle-store-module`
-
-CRUD operations for MerkleStoreModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all merkleStoreModule records |
-| `find-first` | Find first matching merkleStoreModule record |
-| `get` | Get a merkleStoreModule by id |
-| `create` | Create a new merkleStoreModule |
-| `update` | Update an existing merkleStoreModule |
-| `delete` | Delete a merkleStoreModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `objectTableId` | UUID |
-| `storeTableId` | UUID |
-| `commitTableId` | UUID |
-| `refTableId` | UUID |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `functionPrefix` | String |
-| `permissionKey` | String |
-| `createdAt` | Datetime |
+| `shared` | Boolean |
+| `taskTableId` | UUID |
+| `taskTableName` | String |
+| `threadTableId` | UUID |
+| `threadTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `objectTableId`, `storeTableId`, `commitTableId`, `refTableId`, `prefix`, `apiName`, `privateApiName`, `scope`, `functionPrefix`, `permissionKey`
-
-### `rate-limit-meters-module`
-
-CRUD operations for RateLimitMetersModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all rateLimitMetersModule records |
-| `find-first` | Find first matching rateLimitMetersModule record |
-| `get` | Get a rateLimitMetersModule by id |
-| `create` | Create a new rateLimitMetersModule |
-| `update` | Update an existing rateLimitMetersModule |
-| `delete` | Delete a rateLimitMetersModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `rateLimitStateTableId` | UUID |
-| `rateLimitStateTableName` | String |
-| `rateLimitOverridesTableId` | UUID |
-| `rateLimitOverridesTableName` | String |
-| `rateWindowLimitsTableId` | UUID |
-| `rateWindowLimitsTableName` | String |
-| `checkRateLimitFunction` | String |
-| `prefix` | String |
-| `defaultPermissions` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `rateLimitStateTableId`, `rateLimitStateTableName`, `rateLimitOverridesTableId`, `rateLimitOverridesTableName`, `rateWindowLimitsTableId`, `rateWindowLimitsTableName`, `checkRateLimitFunction`, `prefix`, `defaultPermissions`, `apiName`, `privateApiName`
-
-### `realtime-module`
-
-CRUD operations for RealtimeModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all realtimeModule records |
-| `find-first` | Find first matching realtimeModule record |
-| `get` | Get a realtimeModule by id |
-| `create` | Create a new realtimeModule |
-| `update` | Update an existing realtimeModule |
-| `delete` | Delete a realtimeModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `subscriptionsSchemaId` | UUID |
-| `changeLogTableId` | UUID |
-| `listenerNodeTableId` | UUID |
-| `sourceRegistryTableId` | UUID |
-| `retentionHours` | Int |
-| `premake` | Int |
-| `interval` | String |
-| `notifyChannel` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `subscriptionsSchemaId`, `changeLogTableId`, `listenerNodeTableId`, `sourceRegistryTableId`, `retentionHours`, `premake`, `interval`, `notifyChannel`, `apiName`, `privateApiName`
-
-### `webauthn-auth-module`
-
-CRUD operations for WebauthnAuthModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all webauthnAuthModule records |
-| `find-first` | Find first matching webauthnAuthModule record |
-| `get` | Get a webauthnAuthModule by id |
-| `create` | Create a new webauthnAuthModule |
-| `update` | Update an existing webauthnAuthModule |
-| `delete` | Delete a webauthnAuthModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `usersTableId` | UUID |
-| `credentialsTableId` | UUID |
-| `sessionsTableId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `sessionSecretsTableId` | UUID |
-| `authSettingsTableId` | UUID |
-| `rpId` | String |
-| `rpName` | String |
-| `originAllowlist` | String |
-| `attestationType` | String |
-| `requireUserVerification` | Boolean |
-| `residentKey` | String |
-| `challengeExpiry` | Interval |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `usersTableId`, `credentialsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `sessionSecretsTableId`, `authSettingsTableId`, `rpId`, `rpName`, `originAllowlist`, `attestationType`, `requireUserVerification`, `residentKey`, `challengeExpiry`
-
-### `function-invocation-module`
-
-CRUD operations for FunctionInvocationModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all functionInvocationModule records |
-| `find-first` | Find first matching functionInvocationModule record |
-| `get` | Get a functionInvocationModule by id |
-| `create` | Create a new functionInvocationModule |
-| `update` | Update an existing functionInvocationModule |
-| `delete` | Delete a functionInvocationModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `invocationsTableId` | UUID |
-| `executionLogsTableId` | UUID |
-| `invocationsTableName` | String |
-| `executionLogsTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `invocationsTableId`, `executionLogsTableId`, `invocationsTableName`, `executionLogsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
-
-### `function-module`
-
-CRUD operations for FunctionModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all functionModule records |
-| `find-first` | Find first matching functionModule record |
-| `get` | Get a functionModule by id |
-| `create` | Create a new functionModule |
-| `update` | Update an existing functionModule |
-| `delete` | Delete a functionModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `definitionsTableId` | UUID |
-| `secretDefinitionsTableId` | UUID |
-| `definitionsTableName` | String |
-| `secretDefinitionsTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `definitionsTableId`, `secretDefinitionsTableId`, `definitionsTableName`, `secretDefinitionsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
-
-### `invites-module`
-
-CRUD operations for InvitesModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all invitesModule records |
-| `find-first` | Find first matching invitesModule record |
-| `get` | Get a invitesModule by id |
-| `create` | Create a new invitesModule |
-| `update` | Update an existing invitesModule |
-| `delete` | Delete a invitesModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `emailsTableId` | UUID |
-| `usersTableId` | UUID |
-| `invitesTableId` | UUID |
-| `claimedInvitesTableId` | UUID |
-| `invitesTableName` | String |
-| `claimedInvitesTableName` | String |
-| `submitInviteCodeFunction` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `scope`, `prefix`, `entityTableId`, `apiName`, `privateApiName`
-
-### `principal-auth-module`
-
-CRUD operations for PrincipalAuthModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all principalAuthModule records |
-| `find-first` | Find first matching principalAuthModule record |
-| `get` | Get a principalAuthModule by id |
-| `create` | Create a new principalAuthModule |
-| `update` | Update an existing principalAuthModule |
-| `delete` | Delete a principalAuthModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `principalsTableId` | UUID |
-| `principalEntitiesTableId` | UUID |
-| `principalScopeOverridesTableId` | UUID |
-| `usersTableId` | UUID |
-| `sessionsTableId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `auditsTableId` | UUID |
-| `principalsTableName` | String |
-| `createPrincipalFunction` | String |
-| `deletePrincipalFunction` | String |
-| `createOrgPrincipalFunction` | String |
-| `deleteOrgPrincipalFunction` | String |
-| `createOrgApiKeyFunction` | String |
-| `revokeOrgApiKeyFunction` | String |
-| `apiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `principalsTableId`, `principalEntitiesTableId`, `principalScopeOverridesTableId`, `usersTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `auditsTableId`, `principalsTableName`, `createPrincipalFunction`, `deletePrincipalFunction`, `createOrgPrincipalFunction`, `deleteOrgPrincipalFunction`, `createOrgApiKeyFunction`, `revokeOrgApiKeyFunction`, `apiName`
-
-### `compute-log-module`
-
-CRUD operations for ComputeLogModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all computeLogModule records |
-| `find-first` | Find first matching computeLogModule record |
-| `get` | Get a computeLogModule by id |
-| `create` | Create a new computeLogModule |
-| `update` | Update an existing computeLogModule |
-| `delete` | Delete a computeLogModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `computeLogTableId` | UUID |
-| `computeLogTableName` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
-| `interval` | String |
-| `retention` | String |
-| `premake` | Int |
-| `scope` | String |
-| `actorFkTableId` | UUID |
-| `entityFkTableId` | UUID |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `computeLogTableId`, `computeLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `scope`, `actorFkTableId`, `entityFkTableId`, `prefix`, `apiName`, `privateApiName`
-
-### `inference-log-module`
-
-CRUD operations for InferenceLogModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all inferenceLogModule records |
-| `find-first` | Find first matching inferenceLogModule record |
-| `get` | Get a inferenceLogModule by id |
-| `create` | Create a new inferenceLogModule |
-| `update` | Update an existing inferenceLogModule |
-| `delete` | Delete a inferenceLogModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `inferenceLogTableId` | UUID |
-| `inferenceLogTableName` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
-| `interval` | String |
-| `retention` | String |
-| `premake` | Int |
-| `scope` | String |
-| `actorFkTableId` | UUID |
-| `entityFkTableId` | UUID |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `inferenceLogTableId`, `inferenceLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `scope`, `actorFkTableId`, `entityFkTableId`, `prefix`, `apiName`, `privateApiName`
-
-### `namespace-module`
-
-CRUD operations for NamespaceModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all namespaceModule records |
-| `find-first` | Find first matching namespaceModule record |
-| `get` | Get a namespaceModule by id |
-| `create` | Create a new namespaceModule |
-| `update` | Update an existing namespaceModule |
-| `delete` | Delete a namespaceModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `namespacesTableId` | UUID |
-| `namespaceEventsTableId` | UUID |
-| `namespacesTableName` | String |
-| `namespaceEventsTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `platformNamespacesTableId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `namespacesTableId`, `namespaceEventsTableId`, `namespacesTableName`, `namespaceEventsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `platformNamespacesTableId`, `policies`, `provisions`, `defaultPermissions`
-
-### `resource-module`
-
-CRUD operations for ResourceModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all resourceModule records |
-| `find-first` | Find first matching resourceModule record |
-| `get` | Get a resourceModule by id |
-| `create` | Create a new resourceModule |
-| `update` | Update an existing resourceModule |
-| `delete` | Delete a resourceModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `resourcesTableId` | UUID |
-| `resourceEventsTableId` | UUID |
-| `resourcesTableName` | String |
-| `resourceEventsTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `namespaceModuleId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `resourcesTableId`, `resourceEventsTableId`, `resourcesTableName`, `resourceEventsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `namespaceModuleId`, `policies`, `provisions`, `defaultPermissions`
-
-### `storage-log-module`
-
-CRUD operations for StorageLogModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all storageLogModule records |
-| `find-first` | Find first matching storageLogModule record |
-| `get` | Get a storageLogModule by id |
-| `create` | Create a new storageLogModule |
-| `update` | Update an existing storageLogModule |
-| `delete` | Delete a storageLogModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `storageLogTableId` | UUID |
-| `storageLogTableName` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
-| `interval` | String |
-| `retention` | String |
-| `premake` | Int |
-| `scope` | String |
-| `actorFkTableId` | UUID |
-| `entityFkTableId` | UUID |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `storageLogTableId`, `storageLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `scope`, `actorFkTableId`, `entityFkTableId`, `prefix`, `apiName`, `privateApiName`
-
-### `transfer-log-module`
-
-CRUD operations for TransferLogModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all transferLogModule records |
-| `find-first` | Find first matching transferLogModule record |
-| `get` | Get a transferLogModule by id |
-| `create` | Create a new transferLogModule |
-| `update` | Update an existing transferLogModule |
-| `delete` | Delete a transferLogModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `transferLogTableId` | UUID |
-| `transferLogTableName` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
-| `interval` | String |
-| `retention` | String |
-| `premake` | Int |
-| `scope` | String |
-| `actorFkTableId` | UUID |
-| `entityFkTableId` | UUID |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `transferLogTableId`, `transferLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `scope`, `actorFkTableId`, `entityFkTableId`, `prefix`, `apiName`, `privateApiName`
-
-### `function-deployment-module`
-
-CRUD operations for FunctionDeploymentModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all functionDeploymentModule records |
-| `find-first` | Find first matching functionDeploymentModule record |
-| `get` | Get a functionDeploymentModule by id |
-| `create` | Create a new functionDeploymentModule |
-| `update` | Update an existing functionDeploymentModule |
-| `delete` | Delete a functionDeploymentModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `deploymentsTableId` | UUID |
-| `deploymentEventsTableId` | UUID |
-| `deploymentsTableName` | String |
-| `deploymentEventsTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `functionModuleId` | UUID |
-| `namespaceModuleId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `deploymentsTableId`, `deploymentEventsTableId`, `deploymentsTableName`, `deploymentEventsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `functionModuleId`, `namespaceModuleId`, `policies`, `provisions`, `defaultPermissions`
-
-### `plans-module`
-
-CRUD operations for PlansModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all plansModule records |
-| `find-first` | Find first matching plansModule record |
-| `get` | Get a plansModule by id |
-| `create` | Create a new plansModule |
-| `update` | Update an existing plansModule |
-| `delete` | Delete a plansModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `plansTableId` | UUID |
-| `plansTableName` | String |
-| `planLimitsTableId` | UUID |
-| `planLimitsTableName` | String |
-| `planPricingTableId` | UUID |
-| `planOverridesTableId` | UUID |
-| `planMeterLimitsTableId` | UUID |
-| `planCapsTableId` | UUID |
-| `applyPlanFunction` | String |
-| `applyPlanAggregateFunction` | String |
-| `applyBillingPlanFunction` | String |
-| `applyPlanCapsFunction` | String |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `plansTableId`, `plansTableName`, `planLimitsTableId`, `planLimitsTableName`, `planPricingTableId`, `planOverridesTableId`, `planMeterLimitsTableId`, `planCapsTableId`, `applyPlanFunction`, `applyPlanAggregateFunction`, `applyBillingPlanFunction`, `applyPlanCapsFunction`, `prefix`, `apiName`, `privateApiName`
-
-### `billing-provider-module`
-
-CRUD operations for BillingProviderModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all billingProviderModule records |
-| `find-first` | Find first matching billingProviderModule record |
-| `get` | Get a billingProviderModule by id |
-| `create` | Create a new billingProviderModule |
-| `update` | Update an existing billingProviderModule |
-| `delete` | Delete a billingProviderModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `provider` | String |
-| `productsTableId` | UUID |
-| `pricesTableId` | UUID |
-| `subscriptionsTableId` | UUID |
-| `billingCustomersTableId` | UUID |
-| `billingCustomersTableName` | String |
-| `billingProductsTableId` | UUID |
-| `billingProductsTableName` | String |
-| `billingPricesTableId` | UUID |
-| `billingPricesTableName` | String |
-| `billingSubscriptionsTableId` | UUID |
-| `billingSubscriptionsTableName` | String |
-| `billingWebhookEventsTableId` | UUID |
-| `billingWebhookEventsTableName` | String |
-| `processBillingEventFunction` | String |
-| `prefix` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `provider`, `productsTableId`, `pricesTableId`, `subscriptionsTableId`, `billingCustomersTableId`, `billingCustomersTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `processBillingEventFunction`, `prefix`, `apiName`, `privateApiName`
-
-### `db-usage-module`
-
-CRUD operations for DbUsageModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all dbUsageModule records |
-| `find-first` | Find first matching dbUsageModule record |
-| `get` | Get a dbUsageModule by id |
-| `create` | Create a new dbUsageModule |
-| `update` | Update an existing dbUsageModule |
-| `delete` | Delete a dbUsageModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `tableStatsLogTableId` | UUID |
-| `tableStatsLogTableName` | String |
-| `tableStatsDailyTableId` | UUID |
-| `tableStatsDailyTableName` | String |
-| `queryStatsLogTableId` | UUID |
-| `queryStatsLogTableName` | String |
-| `queryStatsDailyTableId` | UUID |
-| `queryStatsDailyTableName` | String |
-| `interval` | String |
-| `retention` | String |
-| `premake` | Int |
-| `scope` | String |
-| `prefix` | String |
-| `defaultPermissions` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableStatsLogTableId`, `tableStatsLogTableName`, `tableStatsDailyTableId`, `tableStatsDailyTableName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `queryStatsDailyTableId`, `queryStatsDailyTableName`, `interval`, `retention`, `premake`, `scope`, `prefix`, `defaultPermissions`, `apiName`, `privateApiName`
-
-### `graph-execution-module`
-
-CRUD operations for GraphExecutionModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all graphExecutionModule records |
-| `find-first` | Find first matching graphExecutionModule record |
-| `get` | Get a graphExecutionModule by id |
-| `create` | Create a new graphExecutionModule |
-| `update` | Update an existing graphExecutionModule |
-| `delete` | Delete a graphExecutionModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `graphModuleId` | UUID |
-| `scope` | String |
-| `prefix` | String |
-| `executionsTableId` | UUID |
-| `outputsTableId` | UUID |
-| `nodeStatesTableId` | UUID |
-| `executionsTableName` | String |
-| `outputsTableName` | String |
-| `nodeStatesTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-| `createdAt` | Datetime |
-
-**Required create fields:** `databaseId`, `graphModuleId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `scope`, `prefix`, `executionsTableId`, `outputsTableId`, `nodeStatesTableId`, `executionsTableName`, `outputsTableName`, `nodeStatesTableName`, `apiName`, `privateApiName`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
-
-### `hierarchy-module`
-
-CRUD operations for HierarchyModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all hierarchyModule records |
-| `find-first` | Find first matching hierarchyModule record |
-| `get` | Get a hierarchyModule by id |
-| `create` | Create a new hierarchyModule |
-| `update` | Update an existing hierarchyModule |
-| `delete` | Delete a hierarchyModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `chartEdgesTableId` | UUID |
-| `chartEdgesTableName` | String |
-| `hierarchySprtTableId` | UUID |
-| `hierarchySprtTableName` | String |
-| `chartEdgeGrantsTableId` | UUID |
-| `chartEdgeGrantsTableName` | String |
-| `entityTableId` | UUID |
-| `usersTableId` | UUID |
-| `scope` | String |
-| `prefix` | String |
-| `privateSchemaName` | String |
-| `sprtTableName` | String |
-| `rebuildHierarchyFunction` | String |
-| `getSubordinatesFunction` | String |
-| `getManagersFunction` | String |
-| `isManagerOfFunction` | String |
-| `defaultPermissions` | String |
-| `createdAt` | Datetime |
-
-**Required create fields:** `databaseId`, `entityTableId`, `usersTableId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `chartEdgesTableId`, `chartEdgesTableName`, `hierarchySprtTableId`, `hierarchySprtTableName`, `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `scope`, `prefix`, `privateSchemaName`, `sprtTableName`, `rebuildHierarchyFunction`, `getSubordinatesFunction`, `getManagersFunction`, `isManagerOfFunction`, `defaultPermissions`
-
-### `permissions-module`
-
-CRUD operations for PermissionsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all permissionsModule records |
-| `find-first` | Find first matching permissionsModule record |
-| `get` | Get a permissionsModule by id |
-| `create` | Create a new permissionsModule |
-| `update` | Update an existing permissionsModule |
-| `delete` | Delete a permissionsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `tableId` | UUID |
-| `tableName` | String |
-| `defaultTableId` | UUID |
-| `defaultTableName` | String |
-| `bitlen` | Int |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `actorTableId` | UUID |
-| `getPaddedMask` | String |
-| `getMask` | String |
-| `getByMask` | String |
-| `getMaskByName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `bitlen`, `scope`, `prefix`, `entityTableId`, `actorTableId`, `getPaddedMask`, `getMask`, `getByMask`, `getMaskByName`, `apiName`, `privateApiName`
-
-### `notifications-module`
-
-CRUD operations for NotificationsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all notificationsModule records |
-| `find-first` | Find first matching notificationsModule record |
-| `get` | Get a notificationsModule by id |
-| `create` | Create a new notificationsModule |
-| `update` | Update an existing notificationsModule |
-| `delete` | Delete a notificationsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `notificationsTableId` | UUID |
-| `readStateTableId` | UUID |
-| `preferencesTableId` | UUID |
-| `channelsTableId` | UUID |
-| `deliveryLogTableId` | UUID |
-| `suppressionsTableId` | UUID |
-| `ownerTableId` | UUID |
-| `userSettingsTableId` | UUID |
-| `organizationSettingsTableId` | UUID |
-| `hasChannels` | Boolean |
-| `hasPreferences` | Boolean |
-| `hasSettingsExtension` | Boolean |
-| `hasDigestMetadata` | Boolean |
-| `hasSubscriptions` | Boolean |
-| `defaultPermissions` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `notificationsTableId`, `readStateTableId`, `preferencesTableId`, `channelsTableId`, `deliveryLogTableId`, `suppressionsTableId`, `ownerTableId`, `userSettingsTableId`, `organizationSettingsTableId`, `hasChannels`, `hasPreferences`, `hasSettingsExtension`, `hasDigestMetadata`, `hasSubscriptions`, `defaultPermissions`, `apiName`, `privateApiName`
-
-### `profiles-module`
-
-CRUD operations for ProfilesModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all profilesModule records |
-| `find-first` | Find first matching profilesModule record |
-| `get` | Get a profilesModule by id |
-| `create` | Create a new profilesModule |
-| `update` | Update an existing profilesModule |
-| `delete` | Delete a profilesModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `tableId` | UUID |
-| `tableName` | String |
-| `profilePermissionsTableId` | UUID |
-| `profilePermissionsTableName` | String |
-| `profileGrantsTableId` | UUID |
-| `profileGrantsTableName` | String |
-| `profileDefinitionGrantsTableId` | UUID |
-| `profileDefinitionGrantsTableName` | String |
-| `profileTemplatesTableId` | UUID |
-| `profileTemplatesTableName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `actorTableId` | UUID |
-| `permissionsTableId` | UUID |
-| `membershipsTableId` | UUID |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableId`, `tableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `profileTemplatesTableId`, `profileTemplatesTableName`, `scope`, `prefix`, `entityTableId`, `actorTableId`, `permissionsTableId`, `membershipsTableId`, `apiName`, `privateApiName`
+**Optional create fields (backend defaults):** `agentTableId`, `agentTableName`, `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `hasAgents`, `hasPlans`, `hasResources`, `messageTableId`, `messageTableName`, `personaTableId`, `personaTableName`, `planTableId`, `planTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `promptsTableId`, `promptsTableName`, `provisions`, `publicSchemaName`, `resourceTableId`, `resourceTableName`, `resources`, `schemaId`, `scope`, `shared`, `taskTableId`, `taskTableName`, `threadTableId`, `threadTableName`
 
 ### `billing-module`
 
@@ -1989,303 +225,654 @@ CRUD operations for BillingModule records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `apiName` | String |
+| `balancesTableId` | UUID |
+| `balancesTableName` | String |
 | `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
+| `defaultPermissions` | String |
+| `id` | UUID |
+| `ledgerTableId` | UUID |
+| `ledgerTableName` | String |
+| `meterCreditsTableId` | UUID |
+| `meterCreditsTableName` | String |
+| `meterDefaultsTableId` | UUID |
+| `meterDefaultsTableName` | String |
+| `meterSourcesTableId` | UUID |
+| `meterSourcesTableName` | String |
 | `metersTableId` | UUID |
 | `metersTableName` | String |
 | `planSubscriptionsTableId` | UUID |
 | `planSubscriptionsTableName` | String |
-| `ledgerTableId` | UUID |
-| `ledgerTableName` | String |
-| `balancesTableId` | UUID |
-| `balancesTableName` | String |
-| `meterCreditsTableId` | UUID |
-| `meterCreditsTableName` | String |
-| `meterSourcesTableId` | UUID |
-| `meterSourcesTableName` | String |
-| `meterDefaultsTableId` | UUID |
-| `meterDefaultsTableName` | String |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
 | `recordUsageFunction` | String |
+| `rollupUsageSummaryFunction` | String |
+| `schemaId` | UUID |
+| `sweepExpiredSubscriptionsFunction` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `balancesTableId`, `balancesTableName`, `defaultPermissions`, `ledgerTableId`, `ledgerTableName`, `meterCreditsTableId`, `meterCreditsTableName`, `meterDefaultsTableId`, `meterDefaultsTableName`, `meterSourcesTableId`, `meterSourcesTableName`, `metersTableId`, `metersTableName`, `planSubscriptionsTableId`, `planSubscriptionsTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `recordUsageFunction`, `rollupUsageSummaryFunction`, `schemaId`, `sweepExpiredSubscriptionsFunction`
+
+### `billing-provider-module`
+
+CRUD operations for BillingProviderModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all billingProviderModule records |
+| `find-first` | Find first matching billingProviderModule record |
+| `get` | Get a billingProviderModule by id |
+| `create` | Create a new billingProviderModule |
+| `update` | Update an existing billingProviderModule |
+| `delete` | Delete a billingProviderModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `billingCustomersTableId` | UUID |
+| `billingCustomersTableName` | String |
+| `billingPricesTableId` | UUID |
+| `billingPricesTableName` | String |
+| `billingProductsTableId` | UUID |
+| `billingProductsTableName` | String |
+| `billingSubscriptionsTableId` | UUID |
+| `billingSubscriptionsTableName` | String |
+| `billingWebhookEventsTableId` | UUID |
+| `billingWebhookEventsTableName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
 | `prefix` | String |
-| `defaultPermissions` | String |
-| `apiName` | String |
+| `pricesTableId` | UUID |
 | `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `metersTableId`, `metersTableName`, `planSubscriptionsTableId`, `planSubscriptionsTableName`, `ledgerTableId`, `ledgerTableName`, `balancesTableId`, `balancesTableName`, `meterCreditsTableId`, `meterCreditsTableName`, `meterSourcesTableId`, `meterSourcesTableName`, `meterDefaultsTableId`, `meterDefaultsTableName`, `recordUsageFunction`, `prefix`, `defaultPermissions`, `apiName`, `privateApiName`
-
-### `relation-provision`
-
-CRUD operations for RelationProvision records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all relationProvision records |
-| `find-first` | Find first matching relationProvision record |
-| `get` | Get a relationProvision by id |
-| `create` | Create a new relationProvision |
-| `update` | Update an existing relationProvision |
-| `delete` | Delete a relationProvision |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `relationType` | String |
-| `sourceTableId` | UUID |
-| `targetTableId` | UUID |
-| `fieldName` | String |
-| `deleteAction` | String |
-| `isRequired` | Boolean |
-| `apiRequired` | Boolean |
-| `junctionTableId` | UUID |
-| `junctionTableName` | String |
-| `junctionSchemaId` | UUID |
-| `sourceFieldName` | String |
-| `targetFieldName` | String |
-| `useCompositeKey` | Boolean |
-| `createIndex` | Boolean |
-| `exposeInApi` | Boolean |
-| `nodes` | JSON |
-| `grants` | JSON |
-| `policies` | JSON |
-| `outFieldId` | UUID |
-| `outJunctionTableId` | UUID |
-| `outSourceFieldId` | UUID |
-| `outTargetFieldId` | UUID |
-
-**Required create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`
-**Optional create fields (backend defaults):** `fieldName`, `deleteAction`, `isRequired`, `apiRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `createIndex`, `exposeInApi`, `nodes`, `grants`, `policies`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
-
-### `user-auth-module`
-
-CRUD operations for UserAuthModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all userAuthModule records |
-| `find-first` | Find first matching userAuthModule record |
-| `get` | Get a userAuthModule by id |
-| `create` | Create a new userAuthModule |
-| `update` | Update an existing userAuthModule |
-| `delete` | Delete a userAuthModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `emailsTableId` | UUID |
-| `usersTableId` | UUID |
-| `secretsTableId` | UUID |
-| `encryptedTableId` | UUID |
-| `sessionsTableId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `auditsTableId` | UUID |
-| `auditsTableName` | String |
-| `signInFunction` | String |
-| `signUpFunction` | String |
-| `signOutFunction` | String |
-| `setPasswordFunction` | String |
-| `resetPasswordFunction` | String |
-| `forgotPasswordFunction` | String |
-| `sendVerificationEmailFunction` | String |
-| `verifyEmailFunction` | String |
-| `verifyPasswordFunction` | String |
-| `checkPasswordFunction` | String |
-| `sendAccountDeletionEmailFunction` | String |
-| `deleteAccountFunction` | String |
-| `signInCrossOriginFunction` | String |
-| `requestCrossOriginTokenFunction` | String |
-| `extendTokenExpires` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `emailsTableId`, `usersTableId`, `secretsTableId`, `encryptedTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `auditsTableId`, `auditsTableName`, `signInFunction`, `signUpFunction`, `signOutFunction`, `setPasswordFunction`, `resetPasswordFunction`, `forgotPasswordFunction`, `sendVerificationEmailFunction`, `verifyEmailFunction`, `verifyPasswordFunction`, `checkPasswordFunction`, `sendAccountDeletionEmailFunction`, `deleteAccountFunction`, `signInCrossOriginFunction`, `requestCrossOriginTokenFunction`, `extendTokenExpires`, `apiName`, `privateApiName`
-
-### `agent-module`
-
-CRUD operations for AgentModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all agentModule records |
-| `find-first` | Find first matching agentModule record |
-| `get` | Get a agentModule by id |
-| `create` | Create a new agentModule |
-| `update` | Update an existing agentModule |
-| `delete` | Delete a agentModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
 | `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `threadTableId` | UUID |
-| `messageTableId` | UUID |
-| `taskTableId` | UUID |
-| `promptsTableId` | UUID |
-| `planTableId` | UUID |
-| `agentTableId` | UUID |
-| `personaTableId` | UUID |
-| `resourceTableId` | UUID |
-| `threadTableName` | String |
-| `messageTableName` | String |
-| `taskTableName` | String |
-| `promptsTableName` | String |
-| `planTableName` | String |
-| `agentTableName` | String |
-| `personaTableName` | String |
-| `resourceTableName` | String |
-| `hasPlans` | Boolean |
-| `hasResources` | Boolean |
-| `hasAgents` | Boolean |
-| `shared` | Boolean |
+| `processBillingEventFunction` | String |
+| `productsTableId` | UUID |
+| `provider` | String |
+| `schemaId` | UUID |
+| `subscriptionsTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `billingCustomersTableId`, `billingCustomersTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `prefix`, `pricesTableId`, `privateApiName`, `privateSchemaId`, `processBillingEventFunction`, `productsTableId`, `provider`, `schemaId`, `subscriptionsTableId`
+
+### `blueprint`
+
+CRUD operations for Blueprint records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all blueprint records |
+| `find-first` | Find first matching blueprint record |
+| `get` | Get a blueprint by id |
+| `create` | Create a new blueprint |
+| `update` | Update an existing blueprint |
+| `delete` | Delete a blueprint |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `definition` | JSON |
+| `definitionHash` | UUID |
+| `description` | String |
+| `displayName` | String |
+| `id` | UUID |
+| `name` | String |
+| `ownerId` | UUID |
+| `tableHashes` | JSON |
+| `templateId` | UUID |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `definition`, `displayName`, `name`, `ownerId`
+**Optional create fields (backend defaults):** `definitionHash`, `description`, `tableHashes`, `templateId`
+
+### `blueprint-construction`
+
+CRUD operations for BlueprintConstruction records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all blueprintConstruction records |
+| `find-first` | Find first matching blueprintConstruction record |
+| `get` | Get a blueprintConstruction by id |
+| `create` | Create a new blueprintConstruction |
+| `update` | Update an existing blueprintConstruction |
+| `delete` | Delete a blueprintConstruction |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `blueprintId` | UUID |
+| `constructedAt` | Datetime |
+| `constructedDefinition` | JSON |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `errorDetails` | String |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `status` | String |
+| `tableMap` | JSON |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `blueprintId`, `databaseId`
+**Optional create fields (backend defaults):** `constructedAt`, `constructedDefinition`, `errorDetails`, `schemaId`, `status`, `tableMap`
+
+### `blueprint-template`
+
+CRUD operations for BlueprintTemplate records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all blueprintTemplate records |
+| `find-first` | Find first matching blueprintTemplate record |
+| `get` | Get a blueprintTemplate by id |
+| `create` | Create a new blueprintTemplate |
+| `update` | Update an existing blueprintTemplate |
+| `delete` | Delete a blueprintTemplate |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `categories` | String |
+| `complexity` | String |
+| `copyCount` | Int |
+| `createdAt` | Datetime |
+| `definition` | JSON |
+| `definitionHash` | UUID |
+| `definitionSchemaVersion` | String |
+| `description` | String |
+| `displayName` | String |
+| `forkCount` | Int |
+| `forkedFromId` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `ownerId` | UUID |
+| `source` | String |
+| `tableHashes` | JSON |
+| `tags` | String |
+| `updatedAt` | Datetime |
+| `version` | String |
+| `visibility` | String |
+
+**Required create fields:** `definition`, `displayName`, `name`, `ownerId`
+**Optional create fields (backend defaults):** `categories`, `complexity`, `copyCount`, `definitionHash`, `definitionSchemaVersion`, `description`, `forkCount`, `forkedFromId`, `source`, `tableHashes`, `tags`, `version`, `visibility`
+
+### `compute-log-module`
+
+CRUD operations for ComputeLogModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all computeLogModule records |
+| `find-first` | Find first matching computeLogModule record |
+| `get` | Get a computeLogModule by id |
+| `create` | Create a new computeLogModule |
+| `update` | Update an existing computeLogModule |
+| `delete` | Delete a computeLogModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorFkTableId` | UUID |
 | `apiName` | String |
+| `computeLogTableId` | UUID |
+| `computeLogTableName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityFkTableId` | UUID |
+| `id` | UUID |
+| `interval` | String |
+| `prefix` | String |
+| `premake` | Int |
 | `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `retention` | String |
+| `schemaId` | UUID |
 | `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
-| `resources` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `threadTableId`, `messageTableId`, `taskTableId`, `promptsTableId`, `planTableId`, `agentTableId`, `personaTableId`, `resourceTableId`, `threadTableName`, `messageTableName`, `taskTableName`, `promptsTableName`, `planTableName`, `agentTableName`, `personaTableName`, `resourceTableName`, `hasPlans`, `hasResources`, `hasAgents`, `shared`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `policies`, `resources`, `provisions`, `defaultPermissions`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `computeLogTableId`, `computeLogTableName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `usageSummaryTableId`, `usageSummaryTableName`
 
-### `limits-module`
+### `config-secrets-user-module`
 
-CRUD operations for LimitsModule records.
+CRUD operations for ConfigSecretsUserModule records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all limitsModule records |
-| `find-first` | Find first matching limitsModule record |
-| `get` | Get a limitsModule by id |
-| `create` | Create a new limitsModule |
-| `update` | Update an existing limitsModule |
-| `delete` | Delete a limitsModule |
+| `list` | List all configSecretsUserModule records |
+| `find-first` | Find first matching configSecretsUserModule record |
+| `get` | Get a configSecretsUserModule by id |
+| `create` | Create a new configSecretsUserModule |
+| `update` | Update an existing configSecretsUserModule |
+| `delete` | Delete a configSecretsUserModule |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `apiName` | String |
 | `databaseId` | UUID |
+| `entityField` | String |
+| `id` | UUID |
+| `privateApiName` | String |
 | `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
 | `tableId` | UUID |
 | `tableName` | String |
-| `defaultTableId` | UUID |
-| `defaultTableName` | String |
-| `limitIncrementFunction` | String |
-| `limitDecrementFunction` | String |
-| `limitIncrementTrigger` | String |
-| `limitDecrementTrigger` | String |
-| `limitUpdateTrigger` | String |
-| `limitCheckFunction` | String |
-| `limitCreditsTableId` | UUID |
-| `eventsTableId` | UUID |
-| `creditCodesTableId` | UUID |
-| `creditCodeItemsTableId` | UUID |
-| `creditRedemptionsTableId` | UUID |
-| `aggregateTableId` | UUID |
-| `limitCapsTableId` | UUID |
-| `limitCapsDefaultsTableId` | UUID |
-| `capCheckTrigger` | String |
-| `resolveCapFunction` | String |
-| `limitWarningsTableId` | UUID |
-| `limitWarningStateTableId` | UUID |
-| `limitCheckSoftFunction` | String |
-| `limitAggregateCheckSoftFunction` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `actorTableId` | UUID |
-| `apiName` | String |
-| `privateApiName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `limitCreditsTableId`, `eventsTableId`, `creditCodesTableId`, `creditCodeItemsTableId`, `creditRedemptionsTableId`, `aggregateTableId`, `limitCapsTableId`, `limitCapsDefaultsTableId`, `capCheckTrigger`, `resolveCapFunction`, `limitWarningsTableId`, `limitWarningStateTableId`, `limitCheckSoftFunction`, `limitAggregateCheckSoftFunction`, `scope`, `prefix`, `entityTableId`, `actorTableId`, `apiName`, `privateApiName`
+**Optional create fields (backend defaults):** `apiName`, `entityField`, `privateApiName`, `schemaId`, `tableId`, `tableName`
 
-### `memberships-module`
+### `connected-accounts-module`
 
-CRUD operations for MembershipsModule records.
+CRUD operations for ConnectedAccountsModule records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all membershipsModule records |
-| `find-first` | Find first matching membershipsModule record |
-| `get` | Get a membershipsModule by id |
-| `create` | Create a new membershipsModule |
-| `update` | Update an existing membershipsModule |
-| `delete` | Delete a membershipsModule |
+| `list` | List all connectedAccountsModule records |
+| `find-first` | Find first matching connectedAccountsModule record |
+| `get` | Get a connectedAccountsModule by id |
+| `create` | Create a new connectedAccountsModule |
+| `update` | Update an existing connectedAccountsModule |
+| `delete` | Delete a connectedAccountsModule |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `membershipsTableId` | UUID |
-| `membershipsTableName` | String |
-| `membersTableId` | UUID |
-| `membersTableName` | String |
-| `membershipDefaultsTableId` | UUID |
-| `membershipDefaultsTableName` | String |
-| `membershipSettingsTableId` | UUID |
-| `membershipSettingsTableName` | String |
-| `grantsTableId` | UUID |
-| `grantsTableName` | String |
-| `actorTableId` | UUID |
-| `limitsTableId` | UUID |
-| `defaultLimitsTableId` | UUID |
-| `permissionsTableId` | UUID |
-| `defaultPermissionsTableId` | UUID |
-| `sprtTableId` | UUID |
-| `adminGrantsTableId` | UUID |
-| `adminGrantsTableName` | String |
-| `ownerGrantsTableId` | UUID |
-| `ownerGrantsTableName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `entityTableOwnerId` | UUID |
-| `getOrgFn` | String |
-| `actorMaskCheck` | String |
-| `actorPermCheck` | String |
-| `entityIdsByMask` | String |
-| `entityIdsByPerm` | String |
-| `entityIdsFunction` | String |
-| `memberProfilesTableId` | UUID |
-| `permissionDefaultPermissionsTableId` | UUID |
-| `permissionDefaultGrantsTableId` | UUID |
 | `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
 | `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `privateApiName`, `privateSchemaId`, `schemaId`, `tableId`
+
+### `crypto-addresses-module`
+
+CRUD operations for CryptoAddressesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all cryptoAddressesModule records |
+| `find-first` | Find first matching cryptoAddressesModule record |
+| `get` | Get a cryptoAddressesModule by id |
+| `create` | Create a new cryptoAddressesModule |
+| `update` | Update an existing cryptoAddressesModule |
+| `delete` | Delete a cryptoAddressesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `cryptoNetwork` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `apiName`, `cryptoNetwork`, `ownerTableId`, `privateApiName`, `privateSchemaId`, `schemaId`, `tableId`
+
+### `crypto-auth-module`
+
+CRUD operations for CryptoAuthModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all cryptoAuthModule records |
+| `find-first` | Find first matching cryptoAuthModule record |
+| `get` | Get a cryptoAuthModule by id |
+| `create` | Create a new cryptoAuthModule |
+| `update` | Update an existing cryptoAuthModule |
+| `delete` | Delete a cryptoAuthModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `addressesTableId` | UUID |
+| `cryptoNetwork` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `secretsTableId` | UUID |
+| `sessionCredentialsTableId` | UUID |
+| `sessionsTableId` | UUID |
+| `signInRecordFailure` | String |
+| `signInRequestChallenge` | String |
+| `signInWithChallenge` | String |
+| `signUpWithKey` | String |
+| `userField` | String |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`, `userField`
+**Optional create fields (backend defaults):** `addressesTableId`, `cryptoNetwork`, `schemaId`, `secretsTableId`, `sessionCredentialsTableId`, `sessionsTableId`, `signInRecordFailure`, `signInRequestChallenge`, `signInWithChallenge`, `signUpWithKey`, `usersTableId`
+
+### `database-provision-module`
+
+CRUD operations for DatabaseProvisionModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseProvisionModule records |
+| `find-first` | Find first matching databaseProvisionModule record |
+| `get` | Get a databaseProvisionModule by id |
+| `create` | Create a new databaseProvisionModule |
+| `update` | Update an existing databaseProvisionModule |
+| `delete` | Delete a databaseProvisionModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `bootstrapError` | String |
+| `bootstrapStatus` | String |
+| `bootstrapUser` | Boolean |
+| `completedAt` | Datetime |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `databaseName` | String |
+| `domain` | String |
+| `errorMessage` | String |
+| `fulfilledAt` | Datetime |
+| `id` | UUID |
+| `modules` | JSON |
+| `options` | JSON |
+| `ownerId` | UUID |
+| `sourceDatabaseId` | UUID |
+| `status` | String |
+| `subdomain` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseName`, `domain`, `ownerId`
+**Optional create fields (backend defaults):** `bootstrapError`, `bootstrapStatus`, `bootstrapUser`, `completedAt`, `databaseId`, `errorMessage`, `fulfilledAt`, `modules`, `options`, `sourceDatabaseId`, `status`, `subdomain`
+
+### `db-pool-config`
+
+CRUD operations for DbPoolConfig records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all dbPoolConfig records |
+| `find-first` | Find first matching dbPoolConfig record |
+| `get` | Get a dbPoolConfig by id |
+| `create` | Create a new dbPoolConfig |
+| `update` | Update an existing dbPoolConfig |
+| `delete` | Delete a dbPoolConfig |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `domain` | String |
+| `enabled` | Boolean |
+| `id` | UUID |
+| `max` | Int |
+| `min` | Int |
+| `poolOwnerId` | UUID |
+| `presetSlug` | String |
+| `updatedAt` | Datetime |
+| `warmTtl` | Interval |
+
+**Required create fields:** `domain`, `poolOwnerId`, `presetSlug`
+**Optional create fields (backend defaults):** `enabled`, `max`, `min`, `warmTtl`
+
+### `db-pool`
+
+CRUD operations for DbPool records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all dbPool records |
+| `find-first` | Find first matching dbPool record |
+| `get` | Get a dbPool by id |
+| `create` | Create a new dbPool |
+| `update` | Update an existing dbPool |
+| `delete` | Delete a dbPool |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `bootstrapError` | String |
+| `bootstrapStatus` | String |
+| `claimedAt` | Datetime |
+| `claimedBy` | UUID |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `errorMessage` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `presetCommitId` | UUID |
+| `presetSlug` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `presetSlug`
+**Optional create fields (backend defaults):** `bootstrapError`, `bootstrapStatus`, `claimedAt`, `claimedBy`, `databaseId`, `errorMessage`, `expiresAt`, `presetCommitId`, `status`
+
+### `db-preset-module`
+
+CRUD operations for DbPresetModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all dbPresetModule records |
+| `find-first` | Find first matching dbPresetModule record |
+| `get` | Get a dbPresetModule by id |
+| `create` | Create a new dbPresetModule |
+| `update` | Update an existing dbPresetModule |
+| `delete` | Delete a dbPresetModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `dbPresetsTableId` | UUID |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `merkleStoreModuleId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaId` | UUID |
+| `publicSchemaName` | String |
+| `scope` | String |
+| `storeName` | String |
+
+**Required create fields:** `databaseId`, `merkleStoreModuleId`, `prefix`, `scope`, `storeName`
+**Optional create fields (backend defaults):** `apiName`, `dbPresetsTableId`, `entityTableId`, `policies`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaId`, `publicSchemaName`
+
+### `db-usage-module`
+
+CRUD operations for DbUsageModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all dbUsageModule records |
+| `find-first` | Find first matching dbUsageModule record |
+| `get` | Get a dbUsageModule by id |
+| `create` | Create a new dbUsageModule |
+| `update` | Update an existing dbUsageModule |
+| `delete` | Delete a dbUsageModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `collectDbQueryStatsFunction` | String |
+| `collectDbTableStatsFunction` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `id` | UUID |
+| `interval` | String |
+| `prefix` | String |
+| `premake` | Int |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `queryStatsLogTableId` | UUID |
+| `queryStatsLogTableName` | String |
+| `queryStatsSummaryTableId` | UUID |
+| `queryStatsSummaryTableName` | String |
+| `retention` | String |
+| `rollupDbQueryStatsUsageSummaryFunction` | String |
+| `rollupDbTableStatsUsageSummaryFunction` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `tableStatsLogTableId` | UUID |
+| `tableStatsLogTableName` | String |
+| `tableStatsSummaryTableId` | UUID |
+| `tableStatsSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `membershipsTableId`, `membershipsTableName`, `membersTableId`, `membersTableName`, `membershipDefaultsTableId`, `membershipDefaultsTableName`, `membershipSettingsTableId`, `membershipSettingsTableName`, `grantsTableId`, `grantsTableName`, `actorTableId`, `limitsTableId`, `defaultLimitsTableId`, `permissionsTableId`, `defaultPermissionsTableId`, `sprtTableId`, `adminGrantsTableId`, `adminGrantsTableName`, `ownerGrantsTableId`, `ownerGrantsTableName`, `scope`, `prefix`, `entityTableId`, `entityTableOwnerId`, `getOrgFn`, `actorMaskCheck`, `actorPermCheck`, `entityIdsByMask`, `entityIdsByPerm`, `entityIdsFunction`, `memberProfilesTableId`, `permissionDefaultPermissionsTableId`, `permissionDefaultGrantsTableId`, `apiName`, `privateApiName`
+**Optional create fields (backend defaults):** `apiName`, `collectDbQueryStatsFunction`, `collectDbTableStatsFunction`, `defaultPermissions`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `queryStatsSummaryTableId`, `queryStatsSummaryTableName`, `retention`, `rollupDbQueryStatsUsageSummaryFunction`, `rollupDbTableStatsUsageSummaryFunction`, `schemaId`, `scope`, `tableStatsLogTableId`, `tableStatsLogTableName`, `tableStatsSummaryTableId`, `tableStatsSummaryTableName`
+
+### `default-ids-module`
+
+CRUD operations for DefaultIdsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all defaultIdsModule records |
+| `find-first` | Find first matching defaultIdsModule record |
+| `get` | Get a defaultIdsModule by id |
+| `create` | Create a new defaultIdsModule |
+| `update` | Update an existing defaultIdsModule |
+| `delete` | Delete a defaultIdsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `id` | UUID |
+
+**Required create fields:** `databaseId`
+
+### `denormalized-table-field`
+
+CRUD operations for DenormalizedTableField records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all denormalizedTableField records |
+| `find-first` | Find first matching denormalizedTableField record |
+| `get` | Get a denormalizedTableField by id |
+| `create` | Create a new denormalizedTableField |
+| `update` | Update an existing denormalizedTableField |
+| `delete` | Delete a denormalizedTableField |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `fieldId` | UUID |
+| `funcName` | String |
+| `funcOrder` | Int |
+| `id` | UUID |
+| `refFieldId` | UUID |
+| `refIds` | UUID |
+| `refTableId` | UUID |
+| `setIds` | UUID |
+| `tableId` | UUID |
+| `updateDefaults` | Boolean |
+| `useUpdates` | Boolean |
+
+**Required create fields:** `databaseId`, `fieldId`, `refFieldId`, `refTableId`, `tableId`
+**Optional create fields (backend defaults):** `funcName`, `funcOrder`, `refIds`, `setIds`, `updateDefaults`, `useUpdates`
+
+### `devices-module`
+
+CRUD operations for DevicesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all devicesModule records |
+| `find-first` | Find first matching devicesModule record |
+| `get` | Get a devicesModule by id |
+| `create` | Create a new devicesModule |
+| `update` | Update an existing devicesModule |
+| `delete` | Delete a devicesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `deviceSettingsTableId` | UUID |
+| `deviceSettingsTableName` | String |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `userDevicesTableId` | UUID |
+| `userDevicesTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `deviceSettingsTableId`, `deviceSettingsTableName`, `schemaId`, `userDevicesTableId`, `userDevicesTableName`
+
+### `emails-module`
+
+CRUD operations for EmailsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all emailsModule records |
+| `find-first` | Find first matching emailsModule record |
+| `get` | Get a emailsModule by id |
+| `create` | Create a new emailsModule |
+| `update` | Update an existing emailsModule |
+| `delete` | Delete a emailsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `privateApiName`, `privateSchemaId`, `schemaId`, `tableId`
 
 ### `entity-type-provision`
 
@@ -2304,109 +891,48 @@ CRUD operations for EntityTypeProvision records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `agents` | JSON |
 | `databaseId` | UUID |
-| `name` | String |
-| `prefix` | String |
 | `description` | String |
-| `parentEntity` | String |
-| `tableName` | String |
-| `isVisible` | Boolean |
-| `hasLimits` | Boolean |
-| `hasProfiles` | Boolean |
-| `hasLevels` | Boolean |
-| `hasInvites` | Boolean |
-| `hasInviteAchievements` | Boolean |
-| `storage` | JSON |
-| `namespaces` | JSON |
 | `functions` | JSON |
 | `graphs` | JSON |
-| `agents` | JSON |
-| `skipEntityPolicies` | Boolean |
-| `tableProvision` | JSON |
-| `outMembershipType` | Int |
+| `hasInviteAchievements` | Boolean |
+| `hasInvites` | Boolean |
+| `hasLevels` | Boolean |
+| `hasLimits` | Boolean |
+| `hasProfiles` | Boolean |
+| `id` | UUID |
+| `isVisible` | Boolean |
+| `name` | String |
+| `namespaces` | JSON |
+| `outAgentModuleId` | UUID |
+| `outBucketsTableId` | UUID |
+| `outDefinitionsTableId` | UUID |
 | `outEntityTableId` | UUID |
 | `outEntityTableName` | String |
-| `outInstalledModules` | String |
-| `outStorageModuleId` | UUID |
-| `outBucketsTableId` | UUID |
-| `outFilesTableId` | UUID |
-| `outPathSharesTableId` | UUID |
-| `outInvitesModuleId` | UUID |
-| `outNamespaceModuleId` | UUID |
-| `outNamespacesTableId` | UUID |
-| `outNamespaceEventsTableId` | UUID |
-| `outFunctionModuleId` | UUID |
-| `outDefinitionsTableId` | UUID |
-| `outInvocationsTableId` | UUID |
 | `outExecutionLogsTableId` | UUID |
-| `outSecretDefinitionsTableId` | UUID |
+| `outFilesTableId` | UUID |
+| `outFunctionModuleId` | UUID |
 | `outGraphModuleId` | UUID |
 | `outGraphsTableId` | UUID |
-| `outAgentModuleId` | UUID |
+| `outInstalledModules` | String |
+| `outInvitesModuleId` | UUID |
+| `outInvocationsTableId` | UUID |
+| `outMembershipType` | Int |
+| `outNamespaceEventsTableId` | UUID |
+| `outNamespaceModuleId` | UUID |
+| `outNamespacesTableId` | UUID |
+| `outPathSharesTableId` | UUID |
+| `outStorageModuleId` | UUID |
+| `parentEntity` | String |
+| `prefix` | String |
+| `skipEntityPolicies` | Boolean |
+| `storage` | JSON |
+| `tableName` | String |
+| `tableProvision` | JSON |
 
 **Required create fields:** `databaseId`, `name`, `prefix`
-**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasInvites`, `hasInviteAchievements`, `storage`, `namespaces`, `functions`, `graphs`, `agents`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`, `outPathSharesTableId`, `outInvitesModuleId`, `outNamespaceModuleId`, `outNamespacesTableId`, `outNamespaceEventsTableId`, `outFunctionModuleId`, `outDefinitionsTableId`, `outInvocationsTableId`, `outExecutionLogsTableId`, `outSecretDefinitionsTableId`, `outGraphModuleId`, `outGraphsTableId`, `outAgentModuleId`
-
-### `storage-module`
-
-CRUD operations for StorageModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all storageModule records |
-| `find-first` | Find first matching storageModule record |
-| `get` | Get a storageModule by id |
-| `create` | Create a new storageModule |
-| `update` | Update an existing storageModule |
-| `delete` | Delete a storageModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `bucketsTableId` | UUID |
-| `filesTableId` | UUID |
-| `bucketsTableName` | String |
-| `filesTableName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `entityTableId` | UUID |
-| `endpoint` | String |
-| `publicUrlPrefix` | String |
-| `provider` | String |
-| `allowedOrigins` | String |
-| `restrictReads` | Boolean |
-| `hasPathShares` | Boolean |
-| `pathSharesTableId` | UUID |
-| `uploadUrlExpirySeconds` | Int |
-| `downloadUrlExpirySeconds` | Int |
-| `defaultMaxFileSize` | BigInt |
-| `maxFilenameLength` | Int |
-| `cacheTtlSeconds` | Int |
-| `maxBulkFiles` | Int |
-| `maxBulkTotalSize` | BigInt |
-| `hasVersioning` | Boolean |
-| `hasContentHash` | Boolean |
-| `hasCustomKeys` | Boolean |
-| `hasAuditLog` | Boolean |
-| `hasConfirmUpload` | Boolean |
-| `confirmUploadDelay` | Interval |
-| `fileEventsTableId` | UUID |
-| `defaultPermissions` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `bucketsTableId`, `filesTableId`, `bucketsTableName`, `filesTableName`, `scope`, `prefix`, `policies`, `provisions`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `restrictReads`, `hasPathShares`, `pathSharesTableId`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`, `maxBulkFiles`, `maxBulkTotalSize`, `hasVersioning`, `hasContentHash`, `hasCustomKeys`, `hasAuditLog`, `hasConfirmUpload`, `confirmUploadDelay`, `fileEventsTableId`, `defaultPermissions`, `apiName`, `privateApiName`
+**Optional create fields (backend defaults):** `agents`, `description`, `functions`, `graphs`, `hasInviteAchievements`, `hasInvites`, `hasLevels`, `hasLimits`, `hasProfiles`, `isVisible`, `namespaces`, `outAgentModuleId`, `outBucketsTableId`, `outDefinitionsTableId`, `outEntityTableId`, `outEntityTableName`, `outExecutionLogsTableId`, `outFilesTableId`, `outFunctionModuleId`, `outGraphModuleId`, `outGraphsTableId`, `outInstalledModules`, `outInvitesModuleId`, `outInvocationsTableId`, `outMembershipType`, `outNamespaceEventsTableId`, `outNamespaceModuleId`, `outNamespacesTableId`, `outPathSharesTableId`, `outStorageModuleId`, `parentEntity`, `skipEntityPolicies`, `storage`, `tableName`, `tableProvision`
 
 ### `events-module`
 
@@ -2425,53 +951,1853 @@ CRUD operations for EventsModule records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `achievementRewardsTableId` | UUID |
+| `achievementRewardsTableName` | String |
+| `actorTableId` | UUID |
+| `apiName` | String |
 | `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `eventsTableId` | UUID |
-| `eventsTableName` | String |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
 | `eventAggregatesTableId` | UUID |
 | `eventAggregatesTableName` | String |
 | `eventTypesTableId` | UUID |
 | `eventTypesTableName` | String |
-| `levelsTableId` | UUID |
-| `levelsTableName` | String |
-| `levelRequirementsTableId` | UUID |
-| `levelRequirementsTableName` | String |
+| `eventsTableId` | UUID |
+| `eventsTableName` | String |
+| `grantAchievement` | String |
+| `id` | UUID |
+| `interval` | String |
+| `levelAchieved` | String |
 | `levelGrantsTableId` | UUID |
 | `levelGrantsTableName` | String |
-| `achievementRewardsTableId` | UUID |
-| `achievementRewardsTableName` | String |
+| `levelRequirementsTableId` | UUID |
+| `levelRequirementsTableName` | String |
+| `levelsTableId` | UUID |
+| `levelsTableName` | String |
+| `prefix` | String |
+| `premake` | Int |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
 | `recordEvent` | String |
 | `removeEvent` | String |
+| `retention` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `stepsRequired` | String |
+| `tgAchievementReward` | String |
+| `tgCheckAchievements` | String |
 | `tgEvent` | String |
+| `tgEventBool` | String |
 | `tgEventToggle` | String |
 | `tgEventToggleBool` | String |
-| `tgEventBool` | String |
-| `upsertAggregate` | String |
 | `tgUpdateAggregates` | String |
-| `pruneEvents` | String |
-| `stepsRequired` | String |
-| `levelAchieved` | String |
-| `tgCheckAchievements` | String |
-| `grantAchievement` | String |
-| `tgAchievementReward` | String |
-| `interval` | String |
-| `retention` | String |
-| `premake` | Int |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `actorTableId` | UUID |
-| `defaultPermissions` | String |
-| `apiName` | String |
-| `privateApiName` | String |
+| `upsertAggregate` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `eventsTableId`, `eventsTableName`, `eventAggregatesTableId`, `eventAggregatesTableName`, `eventTypesTableId`, `eventTypesTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `levelGrantsTableId`, `levelGrantsTableName`, `achievementRewardsTableId`, `achievementRewardsTableName`, `recordEvent`, `removeEvent`, `tgEvent`, `tgEventToggle`, `tgEventToggleBool`, `tgEventBool`, `upsertAggregate`, `tgUpdateAggregates`, `pruneEvents`, `stepsRequired`, `levelAchieved`, `tgCheckAchievements`, `grantAchievement`, `tgAchievementReward`, `interval`, `retention`, `premake`, `scope`, `prefix`, `entityTableId`, `actorTableId`, `defaultPermissions`, `apiName`, `privateApiName`
+**Optional create fields (backend defaults):** `achievementRewardsTableId`, `achievementRewardsTableName`, `actorTableId`, `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `eventAggregatesTableId`, `eventAggregatesTableName`, `eventTypesTableId`, `eventTypesTableName`, `eventsTableId`, `eventsTableName`, `grantAchievement`, `interval`, `levelAchieved`, `levelGrantsTableId`, `levelGrantsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `levelsTableId`, `levelsTableName`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `recordEvent`, `removeEvent`, `retention`, `schemaId`, `scope`, `stepsRequired`, `tgAchievementReward`, `tgCheckAchievements`, `tgEvent`, `tgEventBool`, `tgEventToggle`, `tgEventToggleBool`, `tgUpdateAggregates`, `upsertAggregate`
+
+### `function-deployment-module`
+
+CRUD operations for FunctionDeploymentModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionDeploymentModule records |
+| `find-first` | Find first matching functionDeploymentModule record |
+| `get` | Get a functionDeploymentModule by id |
+| `create` | Create a new functionDeploymentModule |
+| `update` | Update an existing functionDeploymentModule |
+| `delete` | Delete a functionDeploymentModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `deploymentEventsTableId` | UUID |
+| `deploymentEventsTableName` | String |
+| `deploymentsTableId` | UUID |
+| `deploymentsTableName` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `functionModuleId` | UUID |
+| `id` | UUID |
+| `namespaceModuleId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `deploymentEventsTableId`, `deploymentEventsTableName`, `deploymentsTableId`, `deploymentsTableName`, `entityField`, `entityTableId`, `functionModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+
+### `function-invocation-module`
+
+CRUD operations for FunctionInvocationModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionInvocationModule records |
+| `find-first` | Find first matching functionInvocationModule record |
+| `get` | Get a functionInvocationModule by id |
+| `create` | Create a new functionInvocationModule |
+| `update` | Update an existing functionInvocationModule |
+| `delete` | Delete a functionInvocationModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `executionLogsTableId` | UUID |
+| `executionLogsTableName` | String |
+| `id` | UUID |
+| `invocationsTableId` | UUID |
+| `invocationsTableName` | String |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `executionLogsTableId`, `executionLogsTableName`, `invocationsTableId`, `invocationsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+
+### `function-module`
+
+CRUD operations for FunctionModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionModule records |
+| `find-first` | Find first matching functionModule record |
+| `get` | Get a functionModule by id |
+| `create` | Create a new functionModule |
+| `update` | Update an existing functionModule |
+| `delete` | Delete a functionModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `bindingsTableId` | UUID |
+| `bindingsTableName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `definitionsTableId` | UUID |
+| `definitionsTableName` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `hasCron` | Boolean |
+| `id` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schedulesTableId` | UUID |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `bindingsTableId`, `bindingsTableName`, `defaultPermissions`, `definitionsTableId`, `definitionsTableName`, `entityField`, `entityTableId`, `hasCron`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schedulesTableId`, `schemaId`, `scope`
+
+### `graph-execution-module`
+
+CRUD operations for GraphExecutionModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all graphExecutionModule records |
+| `find-first` | Find first matching graphExecutionModule record |
+| `get` | Get a graphExecutionModule by id |
+| `create` | Create a new graphExecutionModule |
+| `update` | Update an existing graphExecutionModule |
+| `delete` | Delete a graphExecutionModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `executionsTableId` | UUID |
+| `executionsTableName` | String |
+| `graphModuleId` | UUID |
+| `id` | UUID |
+| `nodeStatesTableId` | UUID |
+| `nodeStatesTableName` | String |
+| `outputsTableId` | UUID |
+| `outputsTableName` | String |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`, `graphModuleId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `executionsTableId`, `executionsTableName`, `nodeStatesTableId`, `nodeStatesTableName`, `outputsTableId`, `outputsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+
+### `graph-module`
+
+CRUD operations for GraphModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all graphModule records |
+| `find-first` | Find first matching graphModule record |
+| `get` | Get a graphModule by id |
+| `create` | Create a new graphModule |
+| `update` | Update an existing graphModule |
+| `delete` | Delete a graphModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `graphsTableId` | UUID |
+| `id` | UUID |
+| `merkleStoreModuleId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaId` | UUID |
+| `publicSchemaName` | String |
+| `scope` | String |
+
+**Required create fields:** `databaseId`, `merkleStoreModuleId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `graphsTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaId`, `publicSchemaName`, `scope`
+
+### `hierarchy-module`
+
+CRUD operations for HierarchyModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all hierarchyModule records |
+| `find-first` | Find first matching hierarchyModule record |
+| `get` | Get a hierarchyModule by id |
+| `create` | Create a new hierarchyModule |
+| `update` | Update an existing hierarchyModule |
+| `delete` | Delete a hierarchyModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `chartEdgeGrantsTableId` | UUID |
+| `chartEdgeGrantsTableName` | String |
+| `chartEdgesTableId` | UUID |
+| `chartEdgesTableName` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `getManagersFunction` | String |
+| `getSubordinatesFunction` | String |
+| `hierarchySprtTableId` | UUID |
+| `hierarchySprtTableName` | String |
+| `id` | UUID |
+| `isManagerOfFunction` | String |
+| `prefix` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `rebuildHierarchyFunction` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `sprtTableName` | String |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`, `entityTableId`, `usersTableId`
+**Optional create fields (backend defaults):** `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `chartEdgesTableId`, `chartEdgesTableName`, `defaultPermissions`, `entityField`, `getManagersFunction`, `getSubordinatesFunction`, `hierarchySprtTableId`, `hierarchySprtTableName`, `isManagerOfFunction`, `prefix`, `privateSchemaId`, `privateSchemaName`, `rebuildHierarchyFunction`, `schemaId`, `scope`, `sprtTableName`
+
+### `http-route-module`
+
+CRUD operations for HttpRouteModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all httpRouteModule records |
+| `find-first` | Find first matching httpRouteModule record |
+| `get` | Get a httpRouteModule by id |
+| `create` | Create a new httpRouteModule |
+| `update` | Update an existing httpRouteModule |
+| `delete` | Delete a httpRouteModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `functionModuleId` | UUID |
+| `httpRoutesTableId` | UUID |
+| `httpRoutesTableName` | String |
+| `id` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `resolverFunctionName` | String |
+| `resourceModuleId` | UUID |
+| `schemaId` | UUID |
+| `scope` | String |
+| `storageModuleId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `functionModuleId`, `httpRoutesTableId`, `httpRoutesTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `resolverFunctionName`, `resourceModuleId`, `schemaId`, `scope`, `storageModuleId`
+
+### `i-18-n-module`
+
+CRUD operations for I18NModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all i18NModule records |
+| `find-first` | Find first matching i18NModule record |
+| `get` | Get a i18NModule by id |
+| `create` | Create a new i18NModule |
+| `update` | Update an existing i18NModule |
+| `delete` | Delete a i18NModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `settingsTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `privateApiName`, `privateSchemaId`, `schemaId`, `settingsTableId`
+
+### `identity-providers-module`
+
+CRUD operations for IdentityProvidersModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all identityProvidersModule records |
+| `find-first` | Find first matching identityProvidersModule record |
+| `get` | Get a identityProvidersModule by id |
+| `create` | Create a new identityProvidersModule |
+| `update` | Update an existing identityProvidersModule |
+| `delete` | Delete a identityProvidersModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `entityField`, `entityTableId`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`, `scope`, `tableId`, `tableName`
+
+### `inference-log-module`
+
+CRUD operations for InferenceLogModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all inferenceLogModule records |
+| `find-first` | Find first matching inferenceLogModule record |
+| `get` | Get a inferenceLogModule by id |
+| `create` | Create a new inferenceLogModule |
+| `update` | Update an existing inferenceLogModule |
+| `delete` | Delete a inferenceLogModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorFkTableId` | UUID |
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityFkTableId` | UUID |
+| `id` | UUID |
+| `inferenceLogTableId` | UUID |
+| `inferenceLogTableName` | String |
+| `interval` | String |
+| `prefix` | String |
+| `premake` | Int |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `retention` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `inferenceLogTableId`, `inferenceLogTableName`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `usageSummaryTableId`, `usageSummaryTableName`
+
+### `infra-config-module`
+
+CRUD operations for InfraConfigModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraConfigModule records |
+| `find-first` | Find first matching infraConfigModule record |
+| `get` | Get a infraConfigModule by id |
+| `create` | Create a new infraConfigModule |
+| `update` | Update an existing infraConfigModule |
+| `delete` | Delete a infraConfigModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `configTableId` | UUID |
+| `configTableName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `configTableId`, `configTableName`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+
+### `infra-secrets-module`
+
+CRUD operations for InfraSecretsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraSecretsModule records |
+| `find-first` | Find first matching infraSecretsModule record |
+| `get` | Get a infraSecretsModule by id |
+| `create` | Create a new infraSecretsModule |
+| `update` | Update an existing infraSecretsModule |
+| `delete` | Delete a infraSecretsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `secretsTableId` | UUID |
+| `secretsTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`, `secretsTableId`, `secretsTableName`
+
+### `integration-providers-module`
+
+CRUD operations for IntegrationProvidersModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all integrationProvidersModule records |
+| `find-first` | Find first matching integrationProvidersModule record |
+| `get` | Get a integrationProvidersModule by id |
+| `create` | Create a new integrationProvidersModule |
+| `update` | Update an existing integrationProvidersModule |
+| `delete` | Delete a integrationProvidersModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `entityField`, `entityTableId`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`, `scope`, `tableId`, `tableName`
+
+### `internal-secrets-module`
+
+CRUD operations for InternalSecretsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all internalSecretsModule records |
+| `find-first` | Find first matching internalSecretsModule record |
+| `get` | Get a internalSecretsModule by id |
+| `create` | Create a new internalSecretsModule |
+| `update` | Update an existing internalSecretsModule |
+| `delete` | Delete a internalSecretsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `internalSecretsTableId` | UUID |
+| `internalSecretsTableName` | String |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `entityField`, `entityTableId`, `internalSecretsTableId`, `internalSecretsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+
+### `invites-module`
+
+CRUD operations for InvitesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all invitesModule records |
+| `find-first` | Find first matching invitesModule record |
+| `get` | Get a invitesModule by id |
+| `create` | Create a new invitesModule |
+| `update` | Update an existing invitesModule |
+| `delete` | Delete a invitesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `claimedInvitesTableId` | UUID |
+| `claimedInvitesTableName` | String |
+| `databaseId` | UUID |
+| `emailsTableId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `invitesTableId` | UUID |
+| `invitesTableName` | String |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `submitInviteCodeFunction` | String |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `claimedInvitesTableId`, `claimedInvitesTableName`, `emailsTableId`, `entityField`, `entityTableId`, `invitesTableId`, `invitesTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`, `scope`, `submitInviteCodeFunction`, `usersTableId`
+
+### `limits-module`
+
+CRUD operations for LimitsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all limitsModule records |
+| `find-first` | Find first matching limitsModule record |
+| `get` | Get a limitsModule by id |
+| `create` | Create a new limitsModule |
+| `update` | Update an existing limitsModule |
+| `delete` | Delete a limitsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorTableId` | UUID |
+| `aggregateTableId` | UUID |
+| `apiName` | String |
+| `capCheckTrigger` | String |
+| `creditCodeItemsTableId` | UUID |
+| `creditCodesTableId` | UUID |
+| `creditRedemptionsTableId` | UUID |
+| `databaseId` | UUID |
+| `defaultTableId` | UUID |
+| `defaultTableName` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `eventsTableId` | UUID |
+| `id` | UUID |
+| `limitAggregateCheckSoftFunction` | String |
+| `limitCapsDefaultsTableId` | UUID |
+| `limitCapsTableId` | UUID |
+| `limitCheckFunction` | String |
+| `limitCheckSoftFunction` | String |
+| `limitCreditsTableId` | UUID |
+| `limitDecrementFunction` | String |
+| `limitDecrementTrigger` | String |
+| `limitIncrementFunction` | String |
+| `limitIncrementTrigger` | String |
+| `limitUpdateTrigger` | String |
+| `limitWarningStateTableId` | UUID |
+| `limitWarningsTableId` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `resolveCapFunction` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorTableId`, `aggregateTableId`, `apiName`, `capCheckTrigger`, `creditCodeItemsTableId`, `creditCodesTableId`, `creditRedemptionsTableId`, `defaultTableId`, `defaultTableName`, `entityField`, `entityTableId`, `eventsTableId`, `limitAggregateCheckSoftFunction`, `limitCapsDefaultsTableId`, `limitCapsTableId`, `limitCheckFunction`, `limitCheckSoftFunction`, `limitCreditsTableId`, `limitDecrementFunction`, `limitDecrementTrigger`, `limitIncrementFunction`, `limitIncrementTrigger`, `limitUpdateTrigger`, `limitWarningStateTableId`, `limitWarningsTableId`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `resolveCapFunction`, `schemaId`, `scope`, `tableId`, `tableName`
+
+### `membership-types-module`
+
+CRUD operations for MembershipTypesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all membershipTypesModule records |
+| `find-first` | Find first matching membershipTypesModule record |
+| `get` | Get a membershipTypesModule by id |
+| `create` | Create a new membershipTypesModule |
+| `update` | Update an existing membershipTypesModule |
+| `delete` | Delete a membershipTypesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
+
+### `memberships-module`
+
+CRUD operations for MembershipsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all membershipsModule records |
+| `find-first` | Find first matching membershipsModule record |
+| `get` | Get a membershipsModule by id |
+| `create` | Create a new membershipsModule |
+| `update` | Update an existing membershipsModule |
+| `delete` | Delete a membershipsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorMaskCheck` | String |
+| `actorPermCheck` | String |
+| `actorTableId` | UUID |
+| `adminGrantsTableId` | UUID |
+| `adminGrantsTableName` | String |
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultLimitsTableId` | UUID |
+| `defaultPermissionsTableId` | UUID |
+| `entityField` | String |
+| `entityIdsByMask` | String |
+| `entityIdsByPerm` | String |
+| `entityIdsFunction` | String |
+| `entityTableId` | UUID |
+| `entityTableOwnerId` | UUID |
+| `getOrgFn` | String |
+| `grantsTableId` | UUID |
+| `grantsTableName` | String |
+| `id` | UUID |
+| `limitsTableId` | UUID |
+| `memberProfilesTableId` | UUID |
+| `membersTableId` | UUID |
+| `membersTableName` | String |
+| `membershipDefaultsTableId` | UUID |
+| `membershipDefaultsTableName` | String |
+| `membershipSettingsTableId` | UUID |
+| `membershipSettingsTableName` | String |
+| `membershipsTableId` | UUID |
+| `membershipsTableName` | String |
+| `ownerGrantsTableId` | UUID |
+| `ownerGrantsTableName` | String |
+| `permissionDefaultGrantsTableId` | UUID |
+| `permissionDefaultPermissionsTableId` | UUID |
+| `permissionsTableId` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `sprtTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorMaskCheck`, `actorPermCheck`, `actorTableId`, `adminGrantsTableId`, `adminGrantsTableName`, `apiName`, `defaultLimitsTableId`, `defaultPermissionsTableId`, `entityField`, `entityIdsByMask`, `entityIdsByPerm`, `entityIdsFunction`, `entityTableId`, `entityTableOwnerId`, `getOrgFn`, `grantsTableId`, `grantsTableName`, `limitsTableId`, `memberProfilesTableId`, `membersTableId`, `membersTableName`, `membershipDefaultsTableId`, `membershipDefaultsTableName`, `membershipSettingsTableId`, `membershipSettingsTableName`, `membershipsTableId`, `membershipsTableName`, `ownerGrantsTableId`, `ownerGrantsTableName`, `permissionDefaultGrantsTableId`, `permissionDefaultPermissionsTableId`, `permissionsTableId`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`, `scope`, `sprtTableId`
+
+### `merkle-store-module`
+
+CRUD operations for MerkleStoreModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all merkleStoreModule records |
+| `find-first` | Find first matching merkleStoreModule record |
+| `get` | Get a merkleStoreModule by id |
+| `create` | Create a new merkleStoreModule |
+| `update` | Update an existing merkleStoreModule |
+| `delete` | Delete a merkleStoreModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `commitTableId` | UUID |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `functionPrefix` | String |
+| `id` | UUID |
+| `objectTableId` | UUID |
+| `permissionKey` | String |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `refTableId` | UUID |
+| `schemaId` | UUID |
+| `scope` | String |
+| `storeTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `commitTableId`, `entityField`, `functionPrefix`, `objectTableId`, `permissionKey`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `refTableId`, `schemaId`, `scope`, `storeTableId`
+
+### `namespace-module`
+
+CRUD operations for NamespaceModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all namespaceModule records |
+| `find-first` | Find first matching namespaceModule record |
+| `get` | Get a namespaceModule by id |
+| `create` | Create a new namespaceModule |
+| `update` | Update an existing namespaceModule |
+| `delete` | Delete a namespaceModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `namespaceEventsTableId` | UUID |
+| `namespaceEventsTableName` | String |
+| `namespacesTableId` | UUID |
+| `namespacesTableName` | String |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `namespaceEventsTableId`, `namespaceEventsTableName`, `namespacesTableId`, `namespacesTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+
+### `notifications-module`
+
+CRUD operations for NotificationsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all notificationsModule records |
+| `find-first` | Find first matching notificationsModule record |
+| `get` | Get a notificationsModule by id |
+| `create` | Create a new notificationsModule |
+| `update` | Update an existing notificationsModule |
+| `delete` | Delete a notificationsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `channelsTableId` | UUID |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `deliveryLogTableId` | UUID |
+| `entityField` | String |
+| `hasChannels` | Boolean |
+| `hasDigestMetadata` | Boolean |
+| `hasPreferences` | Boolean |
+| `hasSettingsExtension` | Boolean |
+| `hasSubscriptions` | Boolean |
+| `id` | UUID |
+| `notificationsTableId` | UUID |
+| `organizationSettingsTableId` | UUID |
+| `ownerTableId` | UUID |
+| `preferencesTableId` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `readStateTableId` | UUID |
+| `schemaId` | UUID |
+| `suppressionsTableId` | UUID |
+| `userSettingsTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `channelsTableId`, `defaultPermissions`, `deliveryLogTableId`, `entityField`, `hasChannels`, `hasDigestMetadata`, `hasPreferences`, `hasSettingsExtension`, `hasSubscriptions`, `notificationsTableId`, `organizationSettingsTableId`, `ownerTableId`, `preferencesTableId`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `readStateTableId`, `schemaId`, `suppressionsTableId`, `userSettingsTableId`
+
+### `permissions-module`
+
+CRUD operations for PermissionsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all permissionsModule records |
+| `find-first` | Find first matching permissionsModule record |
+| `get` | Get a permissionsModule by id |
+| `create` | Create a new permissionsModule |
+| `update` | Update an existing permissionsModule |
+| `delete` | Delete a permissionsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorTableId` | UUID |
+| `apiName` | String |
+| `bitlen` | Int |
+| `databaseId` | UUID |
+| `defaultTableId` | UUID |
+| `defaultTableName` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `getByMask` | String |
+| `getMask` | String |
+| `getMaskByName` | String |
+| `getPaddedMask` | String |
+| `id` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorTableId`, `apiName`, `bitlen`, `defaultTableId`, `defaultTableName`, `entityField`, `entityTableId`, `getByMask`, `getMask`, `getMaskByName`, `getPaddedMask`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`, `scope`, `tableId`, `tableName`
+
+### `phone-numbers-module`
+
+CRUD operations for PhoneNumbersModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all phoneNumbersModule records |
+| `find-first` | Find first matching phoneNumbersModule record |
+| `get` | Get a phoneNumbersModule by id |
+| `create` | Create a new phoneNumbersModule |
+| `update` | Update an existing phoneNumbersModule |
+| `delete` | Delete a phoneNumbersModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `privateApiName`, `privateSchemaId`, `schemaId`, `tableId`
+
+### `plans-module`
+
+CRUD operations for PlansModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all plansModule records |
+| `find-first` | Find first matching plansModule record |
+| `get` | Get a plansModule by id |
+| `create` | Create a new plansModule |
+| `update` | Update an existing plansModule |
+| `delete` | Delete a plansModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `applyBillingPlanFunction` | String |
+| `applyPlanAggregateFunction` | String |
+| `applyPlanCapsFunction` | String |
+| `applyPlanFunction` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `planCapsTableId` | UUID |
+| `planLimitsTableId` | UUID |
+| `planLimitsTableName` | String |
+| `planMeterLimitsTableId` | UUID |
+| `planOverridesTableId` | UUID |
+| `planPricingTableId` | UUID |
+| `plansTableId` | UUID |
+| `plansTableName` | String |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `applyBillingPlanFunction`, `applyPlanAggregateFunction`, `applyPlanCapsFunction`, `applyPlanFunction`, `planCapsTableId`, `planLimitsTableId`, `planLimitsTableName`, `planMeterLimitsTableId`, `planOverridesTableId`, `planPricingTableId`, `plansTableId`, `plansTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`
+
+### `principal-auth-module`
+
+CRUD operations for PrincipalAuthModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all principalAuthModule records |
+| `find-first` | Find first matching principalAuthModule record |
+| `get` | Get a principalAuthModule by id |
+| `create` | Create a new principalAuthModule |
+| `update` | Update an existing principalAuthModule |
+| `delete` | Delete a principalAuthModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `auditsTableId` | UUID |
+| `createOrgApiKeyFunction` | String |
+| `createOrgPrincipalFunction` | String |
+| `createPrincipalFunction` | String |
+| `databaseId` | UUID |
+| `deleteOrgPrincipalFunction` | String |
+| `deletePrincipalFunction` | String |
+| `id` | UUID |
+| `principalEntitiesTableId` | UUID |
+| `principalScopeOverridesTableId` | UUID |
+| `principalsTableId` | UUID |
+| `principalsTableName` | String |
+| `revokeOrgApiKeyFunction` | String |
+| `schemaId` | UUID |
+| `sessionCredentialsTableId` | UUID |
+| `sessionsTableId` | UUID |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `auditsTableId`, `createOrgApiKeyFunction`, `createOrgPrincipalFunction`, `createPrincipalFunction`, `deleteOrgPrincipalFunction`, `deletePrincipalFunction`, `principalEntitiesTableId`, `principalScopeOverridesTableId`, `principalsTableId`, `principalsTableName`, `revokeOrgApiKeyFunction`, `schemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`
+
+### `profiles-module`
+
+CRUD operations for ProfilesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all profilesModule records |
+| `find-first` | Find first matching profilesModule record |
+| `get` | Get a profilesModule by id |
+| `create` | Create a new profilesModule |
+| `update` | Update an existing profilesModule |
+| `delete` | Delete a profilesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorTableId` | UUID |
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `membershipsTableId` | UUID |
+| `permissionsTableId` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `profileDefinitionGrantsTableId` | UUID |
+| `profileDefinitionGrantsTableName` | String |
+| `profileGrantsTableId` | UUID |
+| `profileGrantsTableName` | String |
+| `profilePermissionsTableId` | UUID |
+| `profilePermissionsTableName` | String |
+| `profileTemplatesTableId` | UUID |
+| `profileTemplatesTableName` | String |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorTableId`, `apiName`, `entityField`, `entityTableId`, `membershipsTableId`, `permissionsTableId`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileTemplatesTableId`, `profileTemplatesTableName`, `publicSchemaName`, `schemaId`, `scope`, `tableId`, `tableName`
+
+### `rate-limit-meters-module`
+
+CRUD operations for RateLimitMetersModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all rateLimitMetersModule records |
+| `find-first` | Find first matching rateLimitMetersModule record |
+| `get` | Get a rateLimitMetersModule by id |
+| `create` | Create a new rateLimitMetersModule |
+| `update` | Update an existing rateLimitMetersModule |
+| `delete` | Delete a rateLimitMetersModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `checkRateLimitFunction` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `id` | UUID |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `rateLimitOverridesTableId` | UUID |
+| `rateLimitOverridesTableName` | String |
+| `rateLimitStateTableId` | UUID |
+| `rateLimitStateTableName` | String |
+| `rateWindowLimitsTableId` | UUID |
+| `rateWindowLimitsTableName` | String |
+| `schemaId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `checkRateLimitFunction`, `defaultPermissions`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `rateLimitOverridesTableId`, `rateLimitOverridesTableName`, `rateLimitStateTableId`, `rateLimitStateTableName`, `rateWindowLimitsTableId`, `rateWindowLimitsTableName`, `schemaId`
+
+### `rate-limits-module`
+
+CRUD operations for RateLimitsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all rateLimitsModule records |
+| `find-first` | Find first matching rateLimitsModule record |
+| `get` | Get a rateLimitsModule by id |
+| `create` | Create a new rateLimitsModule |
+| `update` | Update an existing rateLimitsModule |
+| `delete` | Delete a rateLimitsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ipRateLimitsTableId` | UUID |
+| `ipRateLimitsTableName` | String |
+| `rateLimitSettingsTableId` | UUID |
+| `rateLimitSettingsTableName` | String |
+| `rateLimitsTableId` | UUID |
+| `rateLimitsTableName` | String |
+| `schemaId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `ipRateLimitsTableId`, `ipRateLimitsTableName`, `rateLimitSettingsTableId`, `rateLimitSettingsTableName`, `rateLimitsTableId`, `rateLimitsTableName`, `schemaId`
+
+### `realtime-module`
+
+CRUD operations for RealtimeModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all realtimeModule records |
+| `find-first` | Find first matching realtimeModule record |
+| `get` | Get a realtimeModule by id |
+| `create` | Create a new realtimeModule |
+| `update` | Update an existing realtimeModule |
+| `delete` | Delete a realtimeModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `changeLogTableId` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `interval` | String |
+| `listenerNodeTableId` | UUID |
+| `notifyChannel` | String |
+| `premake` | Int |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `retentionHours` | Int |
+| `schemaId` | UUID |
+| `sourceRegistryTableId` | UUID |
+| `subscriptionsSchemaId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `changeLogTableId`, `interval`, `listenerNodeTableId`, `notifyChannel`, `premake`, `privateApiName`, `privateSchemaId`, `retentionHours`, `schemaId`, `sourceRegistryTableId`, `subscriptionsSchemaId`
+
+### `relation-provision`
+
+CRUD operations for RelationProvision records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all relationProvision records |
+| `find-first` | Find first matching relationProvision record |
+| `get` | Get a relationProvision by id |
+| `create` | Create a new relationProvision |
+| `update` | Update an existing relationProvision |
+| `delete` | Delete a relationProvision |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiRequired` | Boolean |
+| `createIndex` | Boolean |
+| `databaseId` | UUID |
+| `deleteAction` | String |
+| `exposeInApi` | Boolean |
+| `fieldName` | String |
+| `grants` | JSON |
+| `id` | UUID |
+| `isRequired` | Boolean |
+| `junctionSchemaId` | UUID |
+| `junctionTableId` | UUID |
+| `junctionTableName` | String |
+| `nodes` | JSON |
+| `outFieldId` | UUID |
+| `outJunctionTableId` | UUID |
+| `outSourceFieldId` | UUID |
+| `outTargetFieldId` | UUID |
+| `policies` | JSON |
+| `relationType` | String |
+| `sourceFieldName` | String |
+| `sourceTableId` | UUID |
+| `targetFieldName` | String |
+| `targetTableId` | UUID |
+| `useCompositeKey` | Boolean |
+
+**Required create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`
+**Optional create fields (backend defaults):** `apiRequired`, `createIndex`, `deleteAction`, `exposeInApi`, `fieldName`, `grants`, `isRequired`, `junctionSchemaId`, `junctionTableId`, `junctionTableName`, `nodes`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`, `policies`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`
+
+### `resource-module`
+
+CRUD operations for ResourceModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceModule records |
+| `find-first` | Find first matching resourceModule record |
+| `get` | Get a resourceModule by id |
+| `create` | Create a new resourceModule |
+| `update` | Update an existing resourceModule |
+| `delete` | Delete a resourceModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `id` | UUID |
+| `installationStoreName` | String |
+| `merkleStoreModuleId` | UUID |
+| `namespaceModuleId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `requirementsStateViewName` | String |
+| `resolvedRequirementsViewName` | String |
+| `resourceBillingRollupFunction` | String |
+| `resourceDefinitionsTableId` | UUID |
+| `resourceDefinitionsTableName` | String |
+| `resourceEventsTableId` | UUID |
+| `resourceEventsTableName` | String |
+| `resourceInstallationsTableId` | UUID |
+| `resourceInstallationsTableName` | String |
+| `resourceStatusChecksTableId` | UUID |
+| `resourceStatusChecksTableName` | String |
+| `resourceUsageLogTableId` | UUID |
+| `resourceUsageLogTableName` | String |
+| `resourceUsageSummaryTableId` | UUID |
+| `resourceUsageSummaryTableName` | String |
+| `resourcesTableId` | UUID |
+| `resourcesTableName` | String |
+| `rollupResourceUsageSummaryFunction` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `installationStoreName`, `merkleStoreModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `requirementsStateViewName`, `resolvedRequirementsViewName`, `resourceBillingRollupFunction`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceEventsTableId`, `resourceEventsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourceStatusChecksTableId`, `resourceStatusChecksTableName`, `resourceUsageLogTableId`, `resourceUsageLogTableName`, `resourceUsageSummaryTableId`, `resourceUsageSummaryTableName`, `resourcesTableId`, `resourcesTableName`, `rollupResourceUsageSummaryFunction`, `schemaId`, `scope`
+
+### `rls-module`
+
+CRUD operations for RlsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all rlsModule records |
+| `find-first` | Find first matching rlsModule record |
+| `get` | Get a rlsModule by id |
+| `create` | Create a new rlsModule |
+| `update` | Update an existing rlsModule |
+| `delete` | Delete a rlsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `authenticate` | String |
+| `authenticateStrict` | String |
+| `currentRole` | String |
+| `currentRoleId` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `sessionCredentialsTableId` | UUID |
+| `sessionsTableId` | UUID |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`, `privateApiName`, `privateSchemaId`, `schemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`
+
+### `secure-table-provision`
+
+CRUD operations for SecureTableProvision records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all secureTableProvision records |
+| `find-first` | Find first matching secureTableProvision record |
+| `get` | Get a secureTableProvision by id |
+| `create` | Create a new secureTableProvision |
+| `update` | Update an existing secureTableProvision |
+| `delete` | Delete a secureTableProvision |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `fields` | JSON |
+| `grants` | JSON |
+| `id` | UUID |
+| `nodes` | JSON |
+| `outFields` | UUID |
+| `policies` | JSON |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+| `useRls` | Boolean |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `fields`, `grants`, `nodes`, `outFields`, `policies`, `schemaId`, `tableId`, `tableName`, `useRls`
+
+### `session-secrets-module`
+
+CRUD operations for SessionSecretsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all sessionSecretsModule records |
+| `find-first` | Find first matching sessionSecretsModule record |
+| `get` | Get a sessionSecretsModule by id |
+| `create` | Create a new sessionSecretsModule |
+| `update` | Update an existing sessionSecretsModule |
+| `delete` | Delete a sessionSecretsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `sessionsTableId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `sessionsTableId`, `tableId`, `tableName`
+
+### `sessions-module`
+
+CRUD operations for SessionsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all sessionsModule records |
+| `find-first` | Find first matching sessionsModule record |
+| `get` | Get a sessionsModule by id |
+| `create` | Create a new sessionsModule |
+| `update` | Update an existing sessionsModule |
+| `delete` | Delete a sessionsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authSettingsTableId` | UUID |
+| `authSettingsTableName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `sessionCredentialsTableId` | UUID |
+| `sessionCredentialsTableName` | String |
+| `sessionsDefaultExpiration` | Interval |
+| `sessionsTableId` | UUID |
+| `sessionsTableName` | String |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `authSettingsTableId`, `authSettingsTableName`, `schemaId`, `sessionCredentialsTableId`, `sessionCredentialsTableName`, `sessionsDefaultExpiration`, `sessionsTableId`, `sessionsTableName`, `usersTableId`
+
+### `storage-log-module`
+
+CRUD operations for StorageLogModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all storageLogModule records |
+| `find-first` | Find first matching storageLogModule record |
+| `get` | Get a storageLogModule by id |
+| `create` | Create a new storageLogModule |
+| `update` | Update an existing storageLogModule |
+| `delete` | Delete a storageLogModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorFkTableId` | UUID |
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityFkTableId` | UUID |
+| `id` | UUID |
+| `interval` | String |
+| `prefix` | String |
+| `premake` | Int |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `retention` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `storageLogTableId` | UUID |
+| `storageLogTableName` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `storageLogTableId`, `storageLogTableName`, `usageSummaryTableId`, `usageSummaryTableName`
+
+### `storage-module`
+
+CRUD operations for StorageModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all storageModule records |
+| `find-first` | Find first matching storageModule record |
+| `get` | Get a storageModule by id |
+| `create` | Create a new storageModule |
+| `update` | Update an existing storageModule |
+| `delete` | Delete a storageModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `allowedOrigins` | String |
+| `apiName` | String |
+| `bucketsTableId` | UUID |
+| `bucketsTableName` | String |
+| `cacheTtlSeconds` | Int |
+| `confirmUploadDelay` | Interval |
+| `databaseId` | UUID |
+| `defaultMaxFileSize` | BigInt |
+| `defaultPermissions` | String |
+| `downloadUrlExpirySeconds` | Int |
+| `endpoint` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `fileEventsTableId` | UUID |
+| `filesTableId` | UUID |
+| `filesTableName` | String |
+| `hasAuditLog` | Boolean |
+| `hasConfirmUpload` | Boolean |
+| `hasContentHash` | Boolean |
+| `hasCustomKeys` | Boolean |
+| `hasPathShares` | Boolean |
+| `hasVersioning` | Boolean |
+| `id` | UUID |
+| `maxBulkFiles` | Int |
+| `maxBulkTotalSize` | BigInt |
+| `maxFilenameLength` | Int |
+| `pathSharesTableId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provider` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `publicUrlPrefix` | String |
+| `restrictReads` | Boolean |
+| `schemaId` | UUID |
+| `scope` | String |
+| `uploadUrlExpirySeconds` | Int |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `allowedOrigins`, `apiName`, `bucketsTableId`, `bucketsTableName`, `cacheTtlSeconds`, `confirmUploadDelay`, `defaultMaxFileSize`, `defaultPermissions`, `downloadUrlExpirySeconds`, `endpoint`, `entityField`, `entityTableId`, `fileEventsTableId`, `filesTableId`, `filesTableName`, `hasAuditLog`, `hasConfirmUpload`, `hasContentHash`, `hasCustomKeys`, `hasPathShares`, `hasVersioning`, `maxBulkFiles`, `maxBulkTotalSize`, `maxFilenameLength`, `pathSharesTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provider`, `provisions`, `publicSchemaName`, `publicUrlPrefix`, `restrictReads`, `schemaId`, `scope`, `uploadUrlExpirySeconds`
+
+### `transfer-log-module`
+
+CRUD operations for TransferLogModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all transferLogModule records |
+| `find-first` | Find first matching transferLogModule record |
+| `get` | Get a transferLogModule by id |
+| `create` | Create a new transferLogModule |
+| `update` | Update an existing transferLogModule |
+| `delete` | Delete a transferLogModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorFkTableId` | UUID |
+| `apiName` | String |
+| `databaseId` | UUID |
+| `entityField` | String |
+| `entityFkTableId` | UUID |
+| `id` | UUID |
+| `interval` | String |
+| `prefix` | String |
+| `premake` | Int |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `publicSchemaName` | String |
+| `retention` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `transferLogTableId` | UUID |
+| `transferLogTableName` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `transferLogTableId`, `transferLogTableName`, `usageSummaryTableId`, `usageSummaryTableName`
+
+### `user-auth-module`
+
+CRUD operations for UserAuthModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userAuthModule records |
+| `find-first` | Find first matching userAuthModule record |
+| `get` | Get a userAuthModule by id |
+| `create` | Create a new userAuthModule |
+| `update` | Update an existing userAuthModule |
+| `delete` | Delete a userAuthModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `auditsTableId` | UUID |
+| `auditsTableName` | String |
+| `checkPasswordFunction` | String |
+| `databaseId` | UUID |
+| `deleteAccountFunction` | String |
+| `emailsTableId` | UUID |
+| `encryptedTableId` | UUID |
+| `extendTokenExpires` | String |
+| `forgotPasswordFunction` | String |
+| `id` | UUID |
+| `privateApiName` | String |
+| `requestCrossOriginTokenFunction` | String |
+| `resetPasswordFunction` | String |
+| `schemaId` | UUID |
+| `secretsTableId` | UUID |
+| `sendAccountDeletionEmailFunction` | String |
+| `sendVerificationEmailFunction` | String |
+| `sessionCredentialsTableId` | UUID |
+| `sessionsTableId` | UUID |
+| `setPasswordFunction` | String |
+| `signInCrossOriginFunction` | String |
+| `signInFunction` | String |
+| `signOutFunction` | String |
+| `signUpFunction` | String |
+| `usersTableId` | UUID |
+| `verifyEmailFunction` | String |
+| `verifyPasswordFunction` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `auditsTableId`, `auditsTableName`, `checkPasswordFunction`, `deleteAccountFunction`, `emailsTableId`, `encryptedTableId`, `extendTokenExpires`, `forgotPasswordFunction`, `privateApiName`, `requestCrossOriginTokenFunction`, `resetPasswordFunction`, `schemaId`, `secretsTableId`, `sendAccountDeletionEmailFunction`, `sendVerificationEmailFunction`, `sessionCredentialsTableId`, `sessionsTableId`, `setPasswordFunction`, `signInCrossOriginFunction`, `signInFunction`, `signOutFunction`, `signUpFunction`, `usersTableId`, `verifyEmailFunction`, `verifyPasswordFunction`
+
+### `user-credentials-module`
+
+CRUD operations for UserCredentialsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userCredentialsModule records |
+| `find-first` | Find first matching userCredentialsModule record |
+| `get` | Get a userCredentialsModule by id |
+| `create` | Create a new userCredentialsModule |
+| `update` | Update an existing userCredentialsModule |
+| `delete` | Delete a userCredentialsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `entityField` | String |
+| `id` | UUID |
+| `privateApiName` | String |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `entityField`, `privateApiName`, `schemaId`, `tableId`, `tableName`
+
+### `user-settings-module`
+
+CRUD operations for UserSettingsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userSettingsModule records |
+| `find-first` | Find first matching userSettingsModule record |
+| `get` | Get a userSettingsModule by id |
+| `create` | Create a new userSettingsModule |
+| `update` | Update an existing userSettingsModule |
+| `delete` | Delete a userSettingsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `schemaId`, `tableId`, `tableName`
+
+### `user-state-module`
+
+CRUD operations for UserStateModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userStateModule records |
+| `find-first` | Find first matching userStateModule record |
+| `get` | Get a userStateModule by id |
+| `create` | Create a new userStateModule |
+| `update` | Update an existing userStateModule |
+| `delete` | Delete a userStateModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `entityField` | String |
+| `id` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `entityField`, `schemaId`, `tableId`, `tableName`
+
+### `users-module`
+
+CRUD operations for UsersModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all usersModule records |
+| `find-first` | Find first matching usersModule record |
+| `get` | Get a usersModule by id |
+| `create` | Create a new usersModule |
+| `update` | Update an existing usersModule |
+| `delete` | Delete a usersModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `privateApiName` | String |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+| `typeTableId` | UUID |
+| `typeTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `privateApiName`, `schemaId`, `tableId`, `tableName`, `typeTableId`, `typeTableName`
+
+### `webauthn-auth-module`
+
+CRUD operations for WebauthnAuthModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all webauthnAuthModule records |
+| `find-first` | Find first matching webauthnAuthModule record |
+| `get` | Get a webauthnAuthModule by id |
+| `create` | Create a new webauthnAuthModule |
+| `update` | Update an existing webauthnAuthModule |
+| `delete` | Delete a webauthnAuthModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `attestationType` | String |
+| `authSettingsTableId` | UUID |
+| `challengeExpiry` | Interval |
+| `credentialsTableId` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `originAllowlist` | String |
+| `requireUserVerification` | Boolean |
+| `residentKey` | String |
+| `rpId` | String |
+| `rpName` | String |
+| `schemaId` | UUID |
+| `sessionCredentialsTableId` | UUID |
+| `sessionSecretsTableId` | UUID |
+| `sessionsTableId` | UUID |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `attestationType`, `authSettingsTableId`, `challengeExpiry`, `credentialsTableId`, `originAllowlist`, `requireUserVerification`, `residentKey`, `rpId`, `rpName`, `schemaId`, `sessionCredentialsTableId`, `sessionSecretsTableId`, `sessionsTableId`, `usersTableId`
+
+### `webauthn-credentials-module`
+
+CRUD operations for WebauthnCredentialsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all webauthnCredentialsModule records |
+| `find-first` | Find first matching webauthnCredentialsModule record |
+| `get` | Get a webauthnCredentialsModule by id |
+| `create` | Create a new webauthnCredentialsModule |
+| `update` | Update an existing webauthnCredentialsModule |
+| `delete` | Delete a webauthnCredentialsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `ownerTableId` | UUID |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `privateApiName`, `privateSchemaId`, `schemaId`, `tableId`, `tableName`
+
+### `webhook-module`
+
+CRUD operations for WebhookModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all webhookModule records |
+| `find-first` | Find first matching webhookModule record |
+| `get` | Get a webhookModule by id |
+| `create` | Create a new webhookModule |
+| `update` | Update an existing webhookModule |
+| `delete` | Delete a webhookModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `functionInvocationModuleId` | UUID |
+| `functionModuleId` | UUID |
+| `id` | UUID |
+| `infraSecretsModuleId` | UUID |
+| `namespaceModuleId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `webhookEndpointsTableId` | UUID |
+| `webhookEndpointsTableName` | String |
+| `webhookEventsTableId` | UUID |
+| `webhookEventsTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `functionInvocationModuleId`, `functionModuleId`, `infraSecretsModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`, `webhookEndpointsTableId`, `webhookEndpointsTableName`, `webhookEventsTableId`, `webhookEventsTableName`
 
 ## Custom Operations
 
@@ -2485,8 +2811,8 @@ Resolves a field_name within a given table_id to a field_id. Throws if no match 
   | Argument | Type |
   |----------|------|
   | `--databaseId` | UUID |
-  | `--tableId` | UUID |
   | `--fieldName` | String |
+  | `--tableId` | UUID |
 
 ### `resolve-blueprint-table`
 
@@ -2498,10 +2824,10 @@ Resolves a table_name (with optional schema_name) to a table_id. Resolution orde
   | Argument | Type |
   |----------|------|
   | `--databaseId` | UUID |
-  | `--tableName` | String |
+  | `--defaultSchemaId` | UUID |
   | `--schemaName` | String |
   | `--tableMap` | JSON |
-  | `--defaultSchemaId` | UUID |
+  | `--tableName` | String |
 
 ### `construct-blueprint`
 
@@ -2512,65 +2838,9 @@ Executes a blueprint definition by delegating to provision_* procedures. Creates
 
   | Argument | Type |
   |----------|------|
-  | `--input.clientMutationId` | String |
   | `--input.blueprintId` | UUID |
+  | `--input.clientMutationId` | String |
   | `--input.schemaId` | UUID |
-
-### `provision-full-text-search`
-
-Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.tableId` | UUID |
-  | `--input.definition` | JSON |
-
-### `provision-index`
-
-Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.tableId` | UUID |
-  | `--input.definition` | JSON |
-
-### `provision-check-constraint`
-
-Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.tableId` | UUID |
-  | `--input.definition` | JSON |
-
-### `provision-unique-constraint`
-
-Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.tableId` | UUID |
-  | `--input.definition` | JSON |
 
 ### `copy-template-to-blueprint`
 
@@ -2582,84 +2852,11 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.templateId` | UUID |
   | `--input.databaseId` | UUID |
-  | `--input.ownerId` | UUID |
-  | `--input.nameOverride` | String |
   | `--input.displayNameOverride` | String |
-
-### `provision-spatial-relation`
-
-Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.pDatabaseId` | UUID |
-  | `--input.pSourceTableId` | UUID |
-  | `--input.pSourceFieldId` | UUID |
-  | `--input.pTargetTableId` | UUID |
-  | `--input.pTargetFieldId` | UUID |
-  | `--input.pName` | String |
-  | `--input.pOperator` | String |
-  | `--input.pParamName` | String |
-
-### `provision-table`
-
-Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.schemaId` | UUID |
-  | `--input.tableName` | String |
-  | `--input.tableId` | UUID |
-  | `--input.nodes` | JSON |
-  | `--input.fields` | JSON |
-  | `--input.policies` | JSON |
-  | `--input.grants` | JSON |
-  | `--input.useRls` | Boolean |
-  | `--input.indexes` | JSON |
-  | `--input.fullTextSearches` | JSON |
-  | `--input.uniqueConstraints` | JSON |
-  | `--input.description` | String |
-
-### `provision-relation`
-
-Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.relationType` | String |
-  | `--input.sourceTableId` | UUID |
-  | `--input.targetTableId` | UUID |
-  | `--input.fieldName` | String |
-  | `--input.deleteAction` | String |
-  | `--input.isRequired` | Boolean |
-  | `--input.apiRequired` | Boolean |
-  | `--input.createIndex` | Boolean |
-  | `--input.junctionTableId` | UUID |
-  | `--input.junctionTableName` | String |
-  | `--input.junctionSchemaId` | UUID |
-  | `--input.sourceFieldName` | String |
-  | `--input.targetFieldName` | String |
-  | `--input.useCompositeKey` | Boolean |
-  | `--input.exposeInApi` | Boolean |
-  | `--input.nodes` | JSON |
-  | `--input.grants` | JSON |
-  | `--input.policies` | JSON |
+  | `--input.nameOverride` | String |
+  | `--input.ownerId` | UUID |
+  | `--input.templateId` | UUID |
 
 ### `provision-bucket`
 
@@ -2675,6 +2872,135 @@ and lifecycle settings.
   |----------|------|
   | `--input.bucketKey` | String (required) |
   | `--input.ownerId` | UUID |
+
+### `provision-check-constraint`
+
+Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.definition` | JSON |
+  | `--input.tableId` | UUID |
+
+### `provision-full-text-search`
+
+Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.definition` | JSON |
+  | `--input.tableId` | UUID |
+
+### `provision-index`
+
+Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.definition` | JSON |
+  | `--input.tableId` | UUID |
+
+### `provision-relation`
+
+Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.apiRequired` | Boolean |
+  | `--input.clientMutationId` | String |
+  | `--input.createIndex` | Boolean |
+  | `--input.databaseId` | UUID |
+  | `--input.deleteAction` | String |
+  | `--input.exposeInApi` | Boolean |
+  | `--input.fieldName` | String |
+  | `--input.grants` | JSON |
+  | `--input.isRequired` | Boolean |
+  | `--input.junctionSchemaId` | UUID |
+  | `--input.junctionTableId` | UUID |
+  | `--input.junctionTableName` | String |
+  | `--input.nodes` | JSON |
+  | `--input.policies` | JSON |
+  | `--input.relationType` | String |
+  | `--input.sourceFieldName` | String |
+  | `--input.sourceTableId` | UUID |
+  | `--input.targetFieldName` | String |
+  | `--input.targetTableId` | UUID |
+  | `--input.useCompositeKey` | Boolean |
+
+### `provision-spatial-relation`
+
+Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pDatabaseId` | UUID |
+  | `--input.pName` | String |
+  | `--input.pOperator` | String |
+  | `--input.pParamName` | String |
+  | `--input.pSourceFieldId` | UUID |
+  | `--input.pSourceTableId` | UUID |
+  | `--input.pTargetFieldId` | UUID |
+  | `--input.pTargetTableId` | UUID |
+
+### `provision-table`
+
+Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.description` | String |
+  | `--input.fields` | JSON |
+  | `--input.fullTextSearches` | JSON |
+  | `--input.grants` | JSON |
+  | `--input.indexes` | JSON |
+  | `--input.nodes` | JSON |
+  | `--input.policies` | JSON |
+  | `--input.schemaId` | UUID |
+  | `--input.tableId` | UUID |
+  | `--input.tableName` | String |
+  | `--input.uniqueConstraints` | JSON |
+  | `--input.useRls` | Boolean |
+
+### `provision-unique-constraint`
+
+Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.definition` | JSON |
+  | `--input.tableId` | UUID |
 
 ## Output
 

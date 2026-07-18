@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  schemaId: 'uuid',
   cryptoNetwork: 'string',
-  userField: 'string',
-  signUpWithKeyFunctionId: 'uuid',
-  signInRequestChallengeFunctionId: 'uuid',
+  databaseId: 'uuid',
+  id: 'uuid',
+  schemaId: 'uuid',
   signInRecordFailureFunctionId: 'uuid',
+  signInRequestChallengeFunctionId: 'uuid',
   signInWithChallengeFunctionId: 'uuid',
+  signUpWithKeyFunctionId: 'uuid',
+  userField: 'string',
 };
 const usage =
   '\npubkey-setting <command>\n\nCommands:\n  list                  List pubkeySetting records\n  find-first            Find first matching pubkeySetting record\n  get                   Get a pubkeySetting by ID\n  create                Create a new pubkeySetting\n  update                Update an existing pubkeySetting\n  delete                Delete a pubkeySetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      schemaId: true,
       cryptoNetwork: true,
-      userField: true,
-      signUpWithKeyFunctionId: true,
-      signInRequestChallengeFunctionId: true,
+      databaseId: true,
+      id: true,
+      schemaId: true,
       signInRecordFailureFunctionId: true,
+      signInRequestChallengeFunctionId: true,
       signInWithChallengeFunctionId: true,
+      signUpWithKeyFunctionId: true,
+      userField: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy> & {
@@ -106,15 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      schemaId: true,
       cryptoNetwork: true,
-      userField: true,
-      signUpWithKeyFunctionId: true,
-      signInRequestChallengeFunctionId: true,
+      databaseId: true,
+      id: true,
+      schemaId: true,
       signInRecordFailureFunctionId: true,
+      signInRequestChallengeFunctionId: true,
       signInWithChallengeFunctionId: true,
+      signUpWithKeyFunctionId: true,
+      userField: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy> & {
@@ -147,15 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
           cryptoNetwork: true,
-          userField: true,
-          signUpWithKeyFunctionId: true,
-          signInRequestChallengeFunctionId: true,
+          databaseId: true,
+          id: true,
+          schemaId: true,
           signInRecordFailureFunctionId: true,
+          signInRequestChallengeFunctionId: true,
           signInWithChallengeFunctionId: true,
+          signUpWithKeyFunctionId: true,
+          userField: true,
         },
       })
       .execute();
@@ -173,6 +173,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'cryptoNetwork',
+        message: 'cryptoNetwork',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
@@ -186,22 +193,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'cryptoNetwork',
-        message: 'cryptoNetwork',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'userField',
-        message: 'userField',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'signUpWithKeyFunctionId',
-        message: 'signUpWithKeyFunctionId',
+        name: 'signInRecordFailureFunctionId',
+        message: 'signInRecordFailureFunctionId',
         required: false,
         skipPrompt: true,
       },
@@ -214,15 +207,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'signInRecordFailureFunctionId',
-        message: 'signInRecordFailureFunctionId',
+        name: 'signInWithChallengeFunctionId',
+        message: 'signInWithChallengeFunctionId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'signInWithChallengeFunctionId',
-        message: 'signInWithChallengeFunctionId',
+        name: 'signUpWithKeyFunctionId',
+        message: 'signUpWithKeyFunctionId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'userField',
+        message: 'userField',
         required: false,
         skipPrompt: true,
       },
@@ -236,25 +236,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.pubkeySetting
       .create({
         data: {
+          cryptoNetwork: cleanedData.cryptoNetwork,
           databaseId: cleanedData.databaseId,
           schemaId: cleanedData.schemaId,
-          cryptoNetwork: cleanedData.cryptoNetwork,
-          userField: cleanedData.userField,
-          signUpWithKeyFunctionId: cleanedData.signUpWithKeyFunctionId,
-          signInRequestChallengeFunctionId: cleanedData.signInRequestChallengeFunctionId,
           signInRecordFailureFunctionId: cleanedData.signInRecordFailureFunctionId,
+          signInRequestChallengeFunctionId: cleanedData.signInRequestChallengeFunctionId,
           signInWithChallengeFunctionId: cleanedData.signInWithChallengeFunctionId,
+          signUpWithKeyFunctionId: cleanedData.signUpWithKeyFunctionId,
+          userField: cleanedData.userField,
         },
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
           cryptoNetwork: true,
-          userField: true,
-          signUpWithKeyFunctionId: true,
-          signInRequestChallengeFunctionId: true,
+          databaseId: true,
+          id: true,
+          schemaId: true,
           signInRecordFailureFunctionId: true,
+          signInRequestChallengeFunctionId: true,
           signInWithChallengeFunctionId: true,
+          signUpWithKeyFunctionId: true,
+          userField: true,
         },
       })
       .execute();
@@ -278,6 +278,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'cryptoNetwork',
+        message: 'cryptoNetwork',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -291,22 +298,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'cryptoNetwork',
-        message: 'cryptoNetwork',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'userField',
-        message: 'userField',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'signUpWithKeyFunctionId',
-        message: 'signUpWithKeyFunctionId',
+        name: 'signInRecordFailureFunctionId',
+        message: 'signInRecordFailureFunctionId',
         required: false,
         skipPrompt: true,
       },
@@ -319,15 +312,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'signInRecordFailureFunctionId',
-        message: 'signInRecordFailureFunctionId',
+        name: 'signInWithChallengeFunctionId',
+        message: 'signInWithChallengeFunctionId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'signInWithChallengeFunctionId',
-        message: 'signInWithChallengeFunctionId',
+        name: 'signUpWithKeyFunctionId',
+        message: 'signUpWithKeyFunctionId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'userField',
+        message: 'userField',
         required: false,
         skipPrompt: true,
       },
@@ -341,25 +341,25 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          cryptoNetwork: cleanedData.cryptoNetwork,
           databaseId: cleanedData.databaseId,
           schemaId: cleanedData.schemaId,
-          cryptoNetwork: cleanedData.cryptoNetwork,
-          userField: cleanedData.userField,
-          signUpWithKeyFunctionId: cleanedData.signUpWithKeyFunctionId,
-          signInRequestChallengeFunctionId: cleanedData.signInRequestChallengeFunctionId,
           signInRecordFailureFunctionId: cleanedData.signInRecordFailureFunctionId,
+          signInRequestChallengeFunctionId: cleanedData.signInRequestChallengeFunctionId,
           signInWithChallengeFunctionId: cleanedData.signInWithChallengeFunctionId,
+          signUpWithKeyFunctionId: cleanedData.signUpWithKeyFunctionId,
+          userField: cleanedData.userField,
         },
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
           cryptoNetwork: true,
-          userField: true,
-          signUpWithKeyFunctionId: true,
-          signInRequestChallengeFunctionId: true,
+          databaseId: true,
+          id: true,
+          schemaId: true,
           signInRecordFailureFunctionId: true,
+          signInRequestChallengeFunctionId: true,
           signInWithChallengeFunctionId: true,
+          signUpWithKeyFunctionId: true,
+          userField: true,
         },
       })
       .execute();

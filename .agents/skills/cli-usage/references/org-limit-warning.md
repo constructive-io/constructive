@@ -12,8 +12,8 @@ csdk org-limit-warning list --where.<field>.<op> <value> --orderBy <values>
 csdk org-limit-warning list --limit 10 --after <cursor>
 csdk org-limit-warning find-first --where.<field>.<op> <value>
 csdk org-limit-warning get --id <UUID>
-csdk org-limit-warning create --name <String> --warningType <String> --thresholdValue <BigInt> --taskIdentifier <String> [--entityId <UUID>]
-csdk org-limit-warning update --id <UUID> [--name <String>] [--warningType <String>] [--thresholdValue <BigInt>] [--taskIdentifier <String>] [--entityId <UUID>]
+csdk org-limit-warning create --name <String> --taskIdentifier <String> --thresholdValue <BigInt> --warningType <String> [--entityId <UUID>]
+csdk org-limit-warning update --id <UUID> [--entityId <UUID>] [--name <String>] [--taskIdentifier <String>] [--thresholdValue <BigInt>] [--warningType <String>]
 csdk org-limit-warning delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-limit-warning list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgLimitWarning
 
 ```bash
-csdk org-limit-warning create --name <String> --warningType <String> --thresholdValue <BigInt> --taskIdentifier <String> [--entityId <UUID>]
+csdk org-limit-warning create --name <String> --taskIdentifier <String> --thresholdValue <BigInt> --warningType <String> [--entityId <UUID>]
 ```
 
 ### Get a orgLimitWarning by id

@@ -12,8 +12,8 @@ csdk function-graph-store list --where.<field>.<op> <value> --orderBy <values>
 csdk function-graph-store list --limit 10 --after <cursor>
 csdk function-graph-store find-first --where.<field>.<op> <value>
 csdk function-graph-store get --id <UUID>
-csdk function-graph-store create --name <String> --databaseId <UUID> [--hash <UUID>]
-csdk function-graph-store update --id <UUID> [--name <String>] [--databaseId <UUID>] [--hash <UUID>]
+csdk function-graph-store create --name <String> --scopeId <UUID> [--hash <UUID>]
+csdk function-graph-store update --id <UUID> [--hash <UUID>] [--name <String>] [--scopeId <UUID>]
 csdk function-graph-store delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-graph-store list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionGraphStore
 
 ```bash
-csdk function-graph-store create --name <String> --databaseId <UUID> [--hash <UUID>]
+csdk function-graph-store create --name <String> --scopeId <UUID> [--hash <UUID>]
 ```
 
 ### Get a functionGraphStore by id

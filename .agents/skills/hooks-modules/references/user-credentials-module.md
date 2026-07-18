@@ -9,8 +9,8 @@ Per-user bcrypt credential store (password hashes, API key hashes).
 ## Usage
 
 ```typescript
-useUserCredentialsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, apiName: true, privateApiName: true } } })
-useUserCredentialsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, apiName: true, privateApiName: true } } })
+useUserCredentialsModulesQuery({ selection: { fields: { databaseId: true, entityField: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true } } })
+useUserCredentialsModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, entityField: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateUserCredentialsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateUserCredentialsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteUserCredentialsModuleMutation({})
@@ -22,7 +22,7 @@ useDeleteUserCredentialsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useUserCredentialsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, apiName: true, privateApiName: true } },
+  selection: { fields: { databaseId: true, entityField: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -32,5 +32,5 @@ const { data, isLoading } = useUserCredentialsModulesQuery({
 const { mutate } = useCreateUserCredentialsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ databaseId: '<UUID>', entityField: '<String>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

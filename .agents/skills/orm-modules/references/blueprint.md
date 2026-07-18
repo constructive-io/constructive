@@ -9,8 +9,8 @@ An owned, editable blueprint scoped to a specific database. Created by copying f
 ```typescript
 db.blueprint.findMany({ select: { id: true } }).execute()
 db.blueprint.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.blueprint.create({ data: { ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' }, select: { id: true } }).execute()
-db.blueprint.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.blueprint.create({ data: { databaseId: '<UUID>', definition: '<JSON>', definitionHash: '<UUID>', description: '<String>', displayName: '<String>', name: '<String>', ownerId: '<UUID>', tableHashes: '<JSON>', templateId: '<UUID>' }, select: { id: true } }).execute()
+db.blueprint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.blueprint.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.blueprint.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.blueprint.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, databaseId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.blueprint.findMany({
 
 ```typescript
 const item = await db.blueprint.create({
-  data: { ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' },
+  data: { databaseId: '<UUID>', definition: '<JSON>', definitionHash: '<UUID>', description: '<String>', displayName: '<String>', name: '<String>', ownerId: '<UUID>', tableHashes: '<JSON>', templateId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

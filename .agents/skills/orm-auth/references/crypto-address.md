@@ -9,8 +9,8 @@ Cryptocurrency wallet addresses owned by users, with network-specific validation
 ```typescript
 db.cryptoAddress.findMany({ select: { id: true } }).execute()
 db.cryptoAddress.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.cryptoAddress.create({ data: { ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute()
-db.cryptoAddress.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.cryptoAddress.create({ data: { address: '<String>', isPrimary: '<Boolean>', isVerified: '<Boolean>', name: '<String>', ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.cryptoAddress.update({ where: { id: '<UUID>' }, data: { address: '<String>' }, select: { id: true } }).execute()
 db.cryptoAddress.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.cryptoAddress.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.cryptoAddress.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, address: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.cryptoAddress.findMany({
 
 ```typescript
 const item = await db.cryptoAddress.create({
-  data: { ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' },
+  data: { address: '<String>', isPrimary: '<Boolean>', isVerified: '<Boolean>', name: '<String>', ownerId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

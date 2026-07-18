@@ -12,8 +12,8 @@ csdk invites-module list --where.<field>.<op> <value> --orderBy <values>
 csdk invites-module list --limit 10 --after <cursor>
 csdk invites-module find-first --where.<field>.<op> <value>
 csdk invites-module get --id <UUID>
-csdk invites-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--emailsTableId <UUID>] [--usersTableId <UUID>] [--invitesTableId <UUID>] [--claimedInvitesTableId <UUID>] [--invitesTableName <String>] [--claimedInvitesTableName <String>] [--submitInviteCodeFunction <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
-csdk invites-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--emailsTableId <UUID>] [--usersTableId <UUID>] [--invitesTableId <UUID>] [--claimedInvitesTableId <UUID>] [--invitesTableName <String>] [--claimedInvitesTableName <String>] [--submitInviteCodeFunction <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk invites-module create --databaseId <UUID> [--apiName <String>] [--claimedInvitesTableId <UUID>] [--claimedInvitesTableName <String>] [--emailsTableId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--invitesTableId <UUID>] [--invitesTableName <String>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--submitInviteCodeFunction <String>] [--usersTableId <UUID>]
+csdk invites-module update --id <UUID> [--apiName <String>] [--claimedInvitesTableId <UUID>] [--claimedInvitesTableName <String>] [--databaseId <UUID>] [--emailsTableId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--invitesTableId <UUID>] [--invitesTableName <String>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--submitInviteCodeFunction <String>] [--usersTableId <UUID>]
 csdk invites-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk invites-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a invitesModule
 
 ```bash
-csdk invites-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--emailsTableId <UUID>] [--usersTableId <UUID>] [--invitesTableId <UUID>] [--claimedInvitesTableId <UUID>] [--invitesTableName <String>] [--claimedInvitesTableName <String>] [--submitInviteCodeFunction <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk invites-module create --databaseId <UUID> [--apiName <String>] [--claimedInvitesTableId <UUID>] [--claimedInvitesTableName <String>] [--emailsTableId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--invitesTableId <UUID>] [--invitesTableName <String>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--submitInviteCodeFunction <String>] [--usersTableId <UUID>]
 ```
 
 ### Get a invitesModule by id

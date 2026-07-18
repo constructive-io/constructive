@@ -12,8 +12,8 @@ csdk database-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk database-setting list --limit 10 --after <cursor>
 csdk database-setting find-first --where.<field>.<op> <value>
 csdk database-setting get --id <UUID>
-csdk database-setting create --databaseId <UUID> [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--enableRealtime <Boolean>] [--enableBulk <Boolean>] [--enableI18N <Boolean>] [--options <JSON>] [--labels <JSON>] [--annotations <JSON>]
-csdk database-setting update --id <UUID> [--databaseId <UUID>] [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--enableRealtime <Boolean>] [--enableBulk <Boolean>] [--enableI18N <Boolean>] [--options <JSON>] [--labels <JSON>] [--annotations <JSON>]
+csdk database-setting create --databaseId <UUID> [--annotations <JSON>] [--enableAggregates <Boolean>] [--enableBulk <Boolean>] [--enableConnectionFilter <Boolean>] [--enableDirectUploads <Boolean>] [--enableI18N <Boolean>] [--enableLlm <Boolean>] [--enableLtree <Boolean>] [--enableManyToMany <Boolean>] [--enablePostgis <Boolean>] [--enablePresignedUploads <Boolean>] [--enableRealtime <Boolean>] [--enableSearch <Boolean>] [--labels <JSON>] [--options <JSON>]
+csdk database-setting update --id <UUID> [--annotations <JSON>] [--databaseId <UUID>] [--enableAggregates <Boolean>] [--enableBulk <Boolean>] [--enableConnectionFilter <Boolean>] [--enableDirectUploads <Boolean>] [--enableI18N <Boolean>] [--enableLlm <Boolean>] [--enableLtree <Boolean>] [--enableManyToMany <Boolean>] [--enablePostgis <Boolean>] [--enablePresignedUploads <Boolean>] [--enableRealtime <Boolean>] [--enableSearch <Boolean>] [--labels <JSON>] [--options <JSON>]
 csdk database-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk database-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a databaseSetting
 
 ```bash
-csdk database-setting create --databaseId <UUID> [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--enableRealtime <Boolean>] [--enableBulk <Boolean>] [--enableI18N <Boolean>] [--options <JSON>] [--labels <JSON>] [--annotations <JSON>]
+csdk database-setting create --databaseId <UUID> [--annotations <JSON>] [--enableAggregates <Boolean>] [--enableBulk <Boolean>] [--enableConnectionFilter <Boolean>] [--enableDirectUploads <Boolean>] [--enableI18N <Boolean>] [--enableLlm <Boolean>] [--enableLtree <Boolean>] [--enableManyToMany <Boolean>] [--enablePostgis <Boolean>] [--enablePresignedUploads <Boolean>] [--enableRealtime <Boolean>] [--enableSearch <Boolean>] [--labels <JSON>] [--options <JSON>]
 ```
 
 ### Get a databaseSetting by id

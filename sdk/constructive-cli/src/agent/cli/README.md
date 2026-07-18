@@ -26,15 +26,15 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
-| `agent-plan` | agentPlan CRUD operations |
 | `agent` | agent CRUD operations |
-| `agent-thread` | agentThread CRUD operations |
 | `agent-message` | agentMessage CRUD operations |
-| `agent-task` | agentTask CRUD operations |
+| `agent-persona` | agentPersona CRUD operations |
+| `agent-plan` | agentPlan CRUD operations |
 | `agent-prompt` | agentPrompt CRUD operations |
 | `agent-resource-chunk` | agentResourceChunk CRUD operations |
-| `agent-persona` | agentPersona CRUD operations |
 | `agent-resource` | agentResource CRUD operations |
+| `agent-task` | agentTask CRUD operations |
+| `agent-thread` | agentThread CRUD operations |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -81,35 +81,6 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
-### `agent-plan`
-
-CRUD operations for AgentPlan records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all agentPlan records |
-| `find-first` | Find first matching agentPlan record |
-| `get` | Get a agentPlan by id |
-| `create` | Create a new agentPlan |
-| `update` | Update an existing agentPlan |
-| `delete` | Delete a agentPlan |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `ownerId` | UUID |
-| `threadId` | UUID |
-| `title` | String |
-| `description` | String |
-| `status` | String |
-
-**Required create fields:** `threadId`, `title`
-**Optional create fields (backend defaults):** `ownerId`, `description`, `status`
-
 ### `agent`
 
 CRUD operations for Agent records.
@@ -127,55 +98,21 @@ CRUD operations for Agent records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `ownerId` | UUID |
-| `personaId` | UUID |
-| `parentId` | UUID |
-| `name` | String |
-| `systemPrompt` | String |
 | `config` | JSON |
-| `status` | String |
-| `isEphemeral` | Boolean |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `ownerId`, `personaId`, `parentId`, `systemPrompt`, `config`, `status`, `isEphemeral`
-
-### `agent-thread`
-
-CRUD operations for AgentThread records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all agentThread records |
-| `find-first` | Find first matching agentThread record |
-| `get` | Get a agentThread by id |
-| `create` | Create a new agentThread |
-| `update` | Update an existing agentThread |
-| `delete` | Delete a agentThread |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `isEphemeral` | Boolean |
+| `name` | String |
 | `ownerId` | UUID |
+| `parentId` | UUID |
+| `personaId` | UUID |
 | `status` | String |
-| `isArchived` | Boolean |
-| `archivedAt` | Datetime |
-| `title` | String |
-| `mode` | String |
-| `model` | String |
 | `systemPrompt` | String |
-| `tags` | String |
-| `promptTemplateId` | UUID |
-| `agentId` | UUID |
-| `parentThreadId` | UUID |
+| `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `ownerId`, `status`, `isArchived`, `archivedAt`, `title`, `mode`, `model`, `systemPrompt`, `tags`, `promptTemplateId`, `agentId`, `parentThreadId`
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `config`, `isEphemeral`, `ownerId`, `parentId`, `personaId`, `status`, `systemPrompt`
 
 ### `agent-message`
 
@@ -194,54 +131,83 @@ CRUD operations for AgentMessage records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
 | `actorId` | UUID |
+| `agentId` | UUID |
+| `authorRole` | String |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `model` | String |
 | `parts` | JSON |
 | `threadId` | UUID |
-| `authorRole` | String |
-| `model` | String |
-| `agentId` | UUID |
+| `updatedAt` | Datetime |
 
-**Required create fields:** `threadId`, `authorRole`
-**Optional create fields (backend defaults):** `actorId`, `parts`, `model`, `agentId`
+**Required create fields:** `authorRole`, `databaseId`, `threadId`
+**Optional create fields (backend defaults):** `actorId`, `agentId`, `model`, `parts`
 
-### `agent-task`
+### `agent-persona`
 
-CRUD operations for AgentTask records.
+CRUD operations for AgentPersona records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all agentTask records |
-| `find-first` | Find first matching agentTask record |
-| `get` | Get a agentTask by id |
-| `create` | Create a new agentTask |
-| `update` | Update an existing agentTask |
-| `delete` | Delete a agentTask |
+| `list` | List all agentPersona records |
+| `find-first` | Find first matching agentPersona record |
+| `get` | Get a agentPersona by id |
+| `create` | Create a new agentPersona |
+| `update` | Update an existing agentPersona |
+| `delete` | Delete a agentPersona |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `config` | JSON |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `actorId` | UUID |
-| `status` | String |
-| `planId` | UUID |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
 | `description` | String |
-| `source` | String |
-| `error` | String |
-| `orderIndex` | Int |
-| `requiresApproval` | Boolean |
-| `approvalStatus` | String |
-| `approvedBy` | UUID |
-| `approvedAt` | Datetime |
-| `approvalFeedback` | String |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `resources` | String |
+| `slug` | String |
+| `systemPrompt` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
 
-**Required create fields:** `planId`, `description`
-**Optional create fields (backend defaults):** `actorId`, `status`, `source`, `error`, `orderIndex`, `requiresApproval`, `approvalStatus`, `approvedBy`, `approvedAt`, `approvalFeedback`
+**Required create fields:** `databaseId`, `name`, `slug`
+**Optional create fields (backend defaults):** `config`, `createdBy`, `description`, `isActive`, `resources`, `systemPrompt`, `updatedBy`
+
+### `agent-plan`
+
+CRUD operations for AgentPlan records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentPlan records |
+| `find-first` | Find first matching agentPlan record |
+| `get` | Get a agentPlan by id |
+| `create` | Create a new agentPlan |
+| `update` | Update an existing agentPlan |
+| `delete` | Delete a agentPlan |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
+| `id` | UUID |
+| `ownerId` | UUID |
+| `status` | String |
+| `threadId` | UUID |
+| `title` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `threadId`, `title`
+**Optional create fields (backend defaults):** `description`, `ownerId`, `status`
 
 ### `agent-prompt`
 
@@ -260,19 +226,20 @@ CRUD operations for AgentPrompt records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `name` | String |
 | `content` | String |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
 | `description` | String |
+| `id` | UUID |
 | `isDefault` | Boolean |
 | `metadata` | JSON |
+| `name` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
 
-**Required create fields:** `name`, `content`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `description`, `isDefault`, `metadata`
+**Required create fields:** `content`, `databaseId`, `name`
+**Optional create fields (backend defaults):** `createdBy`, `description`, `isDefault`, `metadata`, `updatedBy`
 
 ### `agent-resource-chunk`
 
@@ -292,16 +259,16 @@ CRUD operations for AgentResourceChunk records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
 | `agentResourceId` | UUID |
 | `body` | String |
 | `chunkIndex` | Int |
-| `embedding` | Vector |
-| `metadata` | JSON |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
+| `embedding` | Vector |
 | `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `metadata` | JSON |
 | `searchScore` | Float |
+| `updatedAt` | Datetime |
 
 **Required create fields:** `agentResourceId`, `body`
 **Optional create fields (backend defaults):** `chunkIndex`, `embedding`, `metadata`
@@ -340,39 +307,6 @@ csdk agent-resource-chunk search "query" --limit 10 --select id,title,searchScor
 ```
 
 
-### `agent-persona`
-
-CRUD operations for AgentPersona records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all agentPersona records |
-| `find-first` | Find first matching agentPersona record |
-| `get` | Get a agentPersona by id |
-| `create` | Create a new agentPersona |
-| `update` | Update an existing agentPersona |
-| `delete` | Delete a agentPersona |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `slug` | String |
-| `name` | String |
-| `description` | String |
-| `systemPrompt` | String |
-| `resources` | String |
-| `config` | JSON |
-| `isActive` | Boolean |
-
-**Required create fields:** `slug`, `name`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `description`, `systemPrompt`, `resources`, `config`, `isActive`
-
 ### `agent-resource`
 
 CRUD operations for AgentResource records.
@@ -391,38 +325,39 @@ CRUD operations for AgentResource records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `slug` | String |
-| `kind` | String |
-| `title` | String |
-| `description` | String |
-| `body` | String |
-| `keywords` | String |
-| `isActive` | Boolean |
-| `metadata` | JSON |
-| `isArchived` | Boolean |
 | `archivedAt` | Datetime |
-| `search` | FullText |
+| `body` | String |
+| `bodyTrgmSimilarity` | Float |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
+| `description` | String |
+| `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
 | `embeddingUpdatedAt` | Datetime |
-| `searchTsvRank` | Float |
 | `embeddingVectorDistance` | Float |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `isArchived` | Boolean |
+| `keywords` | String |
+| `kind` | String |
 | `kindTrgmSimilarity` | Float |
-| `titleTrgmSimilarity` | Float |
-| `descriptionTrgmSimilarity` | Float |
-| `bodyTrgmSimilarity` | Float |
+| `metadata` | JSON |
+| `search` | FullText |
 | `searchScore` | Float |
+| `searchTsvRank` | Float |
+| `slug` | String |
+| `title` | String |
+| `titleTrgmSimilarity` | Float |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
 
-**Required create fields:** `slug`, `title`, `body`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `kind`, `description`, `keywords`, `isActive`, `metadata`, `isArchived`, `archivedAt`, `embedding`, `embeddingUpdatedAt`
+**Required create fields:** `body`, `databaseId`, `slug`, `title`
+**Optional create fields (backend defaults):** `archivedAt`, `createdBy`, `description`, `embedding`, `embeddingUpdatedAt`, `isActive`, `isArchived`, `keywords`, `kind`, `metadata`, `updatedBy`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `search`, `kindTrgmSimilarity`, `titleTrgmSimilarity`, `descriptionTrgmSimilarity`, `bodyTrgmSimilarity`, `searchScore`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -447,19 +382,9 @@ EMBEDDER_PROVIDER=ollama csdk agent-resource create --embedding "text to embed" 
 EMBEDDER_PROVIDER=ollama csdk agent-resource update --embedding "new text to embed" --auto-embed
 ```
 
-*Full-text search via tsvector (`search`):*
+*Fuzzy search via trigram similarity (`trgmBody`):*
 ```bash
-csdk agent-resource list --where.search "search query" --select title,tsvRank
-```
-
-*Fuzzy search via trigram similarity (`trgmKind`):*
-```bash
-csdk agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
-```
-
-*Fuzzy search via trigram similarity (`trgmTitle`):*
-```bash
-csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
+csdk agent-resource list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmDescription`):*
@@ -467,14 +392,24 @@ csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trg
 csdk agent-resource list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
-*Fuzzy search via trigram similarity (`trgmBody`):*
+*Fuzzy search via trigram similarity (`trgmKind`):*
 ```bash
-csdk agent-resource list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
+```
+
+*Full-text search via tsvector (`search`):*
+```bash
+csdk agent-resource list --where.search "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmTitle`):*
+```bash
+csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk agent-resource list --where.unifiedSearch "search query" --select title,tsvRank,kindTrgmSimilarity,titleTrgmSimilarity,descriptionTrgmSimilarity,bodyTrgmSimilarity,searchScore
+csdk agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,kindTrgmSimilarity,tsvRank,searchScore,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -483,6 +418,80 @@ csdk agent-resource list --where.unifiedSearch "query" --limit 10 --select id,ti
 csdk agent-resource search "query" --limit 10 --select id,title,searchScore
 ```
 
+
+### `agent-task`
+
+CRUD operations for AgentTask records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentTask records |
+| `find-first` | Find first matching agentTask record |
+| `get` | Get a agentTask by id |
+| `create` | Create a new agentTask |
+| `update` | Update an existing agentTask |
+| `delete` | Delete a agentTask |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `approvalFeedback` | String |
+| `approvalStatus` | String |
+| `approvedAt` | Datetime |
+| `approvedBy` | UUID |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
+| `error` | String |
+| `id` | UUID |
+| `orderIndex` | Int |
+| `planId` | UUID |
+| `requiresApproval` | Boolean |
+| `source` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `description`, `planId`
+**Optional create fields (backend defaults):** `actorId`, `approvalFeedback`, `approvalStatus`, `approvedAt`, `approvedBy`, `error`, `orderIndex`, `requiresApproval`, `source`, `status`
+
+### `agent-thread`
+
+CRUD operations for AgentThread records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentThread records |
+| `find-first` | Find first matching agentThread record |
+| `get` | Get a agentThread by id |
+| `create` | Create a new agentThread |
+| `update` | Update an existing agentThread |
+| `delete` | Delete a agentThread |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `agentId` | UUID |
+| `archivedAt` | Datetime |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `isArchived` | Boolean |
+| `mode` | String |
+| `model` | String |
+| `ownerId` | UUID |
+| `parentThreadId` | UUID |
+| `promptTemplateId` | UUID |
+| `status` | String |
+| `systemPrompt` | String |
+| `tags` | String |
+| `title` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `agentId`, `archivedAt`, `isArchived`, `mode`, `model`, `ownerId`, `parentThreadId`, `promptTemplateId`, `status`, `systemPrompt`, `tags`, `title`
 
 ## Custom Operations
 

@@ -9,8 +9,8 @@ Per-node execution state — tracks individual node lifecycle for debugging
 ```typescript
 db.functionGraphExecutionNodeState.findMany({ select: { id: true } }).execute()
 db.functionGraphExecutionNodeState.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionGraphExecutionNodeState.create({ data: { executionId: '<UUID>', databaseId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' }, select: { id: true } }).execute()
-db.functionGraphExecutionNodeState.update({ where: { id: '<UUID>' }, data: { executionId: '<UUID>' }, select: { id: true } }).execute()
+db.functionGraphExecutionNodeState.create({ data: { callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>' }, select: { id: true } }).execute()
+db.functionGraphExecutionNodeState.update({ where: { id: '<UUID>' }, data: { callbackInputs: '<JSON>' }, select: { id: true } }).execute()
 db.functionGraphExecutionNodeState.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.functionGraphExecutionNodeState.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.functionGraphExecutionNodeState.findMany({
-  select: { id: true, executionId: true }
+  select: { id: true, callbackInputs: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.functionGraphExecutionNodeState.findMany({
 
 ```typescript
 const item = await db.functionGraphExecutionNodeState.create({
-  data: { executionId: '<UUID>', databaseId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' },
+  data: { callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -7,8 +7,8 @@ React Query hooks for DefaultIdsModule data operations
 ## Usage
 
 ```typescript
-useDefaultIdsModulesQuery({ selection: { fields: { id: true, databaseId: true } } })
-useDefaultIdsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true } } })
+useDefaultIdsModulesQuery({ selection: { fields: { databaseId: true, id: true } } })
+useDefaultIdsModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true } } })
 useCreateDefaultIdsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateDefaultIdsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteDefaultIdsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteDefaultIdsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useDefaultIdsModulesQuery({
-  selection: { fields: { id: true, databaseId: true } },
+  selection: { fields: { databaseId: true, id: true } },
 });
 ```
 

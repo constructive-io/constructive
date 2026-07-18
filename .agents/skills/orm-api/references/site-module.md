@@ -9,8 +9,8 @@ Site-level module configuration; stores module name and JSON settings used by th
 ```typescript
 db.siteModule.findMany({ select: { id: true } }).execute()
 db.siteModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.siteModule.create({ data: { databaseId: '<UUID>', siteId: '<UUID>', name: '<String>', data: '<JSON>' }, select: { id: true } }).execute()
-db.siteModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.siteModule.create({ data: { data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' }, select: { id: true } }).execute()
+db.siteModule.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.siteModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.siteModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.siteModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, data: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.siteModule.findMany({
 
 ```typescript
 const item = await db.siteModule.create({
-  data: { databaseId: '<UUID>', siteId: '<UUID>', name: '<String>', data: '<JSON>' },
+  data: { data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

@@ -12,8 +12,8 @@ csdk denormalized-table-field list --where.<field>.<op> <value> --orderBy <value
 csdk denormalized-table-field list --limit 10 --after <cursor>
 csdk denormalized-table-field find-first --where.<field>.<op> <value>
 csdk denormalized-table-field get --id <UUID>
-csdk denormalized-table-field create --databaseId <UUID> --tableId <UUID> --fieldId <UUID> --refTableId <UUID> --refFieldId <UUID> [--setIds <UUID>] [--refIds <UUID>] [--useUpdates <Boolean>] [--updateDefaults <Boolean>] [--funcName <String>] [--funcOrder <Int>]
-csdk denormalized-table-field update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--fieldId <UUID>] [--setIds <UUID>] [--refTableId <UUID>] [--refFieldId <UUID>] [--refIds <UUID>] [--useUpdates <Boolean>] [--updateDefaults <Boolean>] [--funcName <String>] [--funcOrder <Int>]
+csdk denormalized-table-field create --databaseId <UUID> --fieldId <UUID> --refFieldId <UUID> --refTableId <UUID> --tableId <UUID> [--funcName <String>] [--funcOrder <Int>] [--refIds <UUID>] [--setIds <UUID>] [--updateDefaults <Boolean>] [--useUpdates <Boolean>]
+csdk denormalized-table-field update --id <UUID> [--databaseId <UUID>] [--fieldId <UUID>] [--funcName <String>] [--funcOrder <Int>] [--refFieldId <UUID>] [--refIds <UUID>] [--refTableId <UUID>] [--setIds <UUID>] [--tableId <UUID>] [--updateDefaults <Boolean>] [--useUpdates <Boolean>]
 csdk denormalized-table-field delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk denormalized-table-field list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a denormalizedTableField
 
 ```bash
-csdk denormalized-table-field create --databaseId <UUID> --tableId <UUID> --fieldId <UUID> --refTableId <UUID> --refFieldId <UUID> [--setIds <UUID>] [--refIds <UUID>] [--useUpdates <Boolean>] [--updateDefaults <Boolean>] [--funcName <String>] [--funcOrder <Int>]
+csdk denormalized-table-field create --databaseId <UUID> --fieldId <UUID> --refFieldId <UUID> --refTableId <UUID> --tableId <UUID> [--funcName <String>] [--funcOrder <Int>] [--refIds <UUID>] [--setIds <UUID>] [--updateDefaults <Boolean>] [--useUpdates <Boolean>]
 ```
 
 ### Get a denormalizedTableField by id

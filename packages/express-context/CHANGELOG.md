@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.12.0...@constructive-io/express-context@0.12.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+# [0.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.11.1...@constructive-io/express-context@0.12.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.11.0...@constructive-io/express-context@0.11.1) (2026-07-15)
+
+### Bug Fixes
+
+- **express-context:** read auth_settings_table_name directly ([560530d](https://github.com/constructive-io/constructive/commit/560530d688a3b2fa3bf6dc9854be51867d2ed5a7)), closes [constructive-db#2194](https://github.com/constructive-db/issues/2194)
+
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.10.0...@constructive-io/express-context@0.11.0) (2026-07-14)
+
+### Bug Fixes
+
+- **express-context:** read renamed auth_settings_table_name column ([ee8f4de](https://github.com/constructive-io/constructive/commit/ee8f4defaf406dc9bf77e110d2a73127f9e4a46e))
+
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.9.0...@constructive-io/express-context@0.10.0) (2026-07-13)
+
+### Features
+
+- consume finalized DB invocation model (loader-resolved tables, provenance inserts) ([60a9b6e](https://github.com/constructive-io/constructive/commit/60a9b6e2347e286a68207f940a3384ede098734c))
+- inject jwt.claims.api_id provenance claim and add REST /fn routes ([0aa60ee](https://github.com/constructive-io/constructive/commit/0aa60ee7ccf2066a419301e1ec553119cde61bfb)), closes [constructive-io/constructive-planning#1149](https://github.com/constructive-io/constructive-planning/issues/1149)
+
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.6...@constructive-io/express-context@0.9.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.8.6](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.5...@constructive-io/express-context@0.8.6) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.8.5](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.4...@constructive-io/express-context@0.8.5) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.8.4](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.3...@constructive-io/express-context@0.8.4) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.8.3](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.2...@constructive-io/express-context@0.8.3) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.8.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.1...@constructive-io/express-context@0.8.2) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
 ## [0.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.0...@constructive-io/express-context@0.8.1) (2026-07-08)
 
 **Note:** Version bump only for package @constructive-io/express-context

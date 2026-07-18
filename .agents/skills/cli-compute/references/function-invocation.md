@@ -12,8 +12,8 @@ csdk function-invocation list --where.<field>.<op> <value> --orderBy <values>
 csdk function-invocation list --limit 10 --after <cursor>
 csdk function-invocation find-first --where.<field>.<op> <value>
 csdk function-invocation get --id <UUID>
-csdk function-invocation create --databaseId <UUID> --taskIdentifier <String> [--actorId <UUID>] [--payload <JSON>] [--status <String>] [--result <JSON>] [--error <String>] [--durationMs <Int>] [--jobId <BigInt>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--parentInvocationId <UUID>] [--graphExecutionId <UUID>]
-csdk function-invocation update --id <UUID> [--actorId <UUID>] [--databaseId <UUID>] [--taskIdentifier <String>] [--payload <JSON>] [--status <String>] [--result <JSON>] [--error <String>] [--durationMs <Int>] [--jobId <BigInt>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--parentInvocationId <UUID>] [--graphExecutionId <UUID>]
+csdk function-invocation create --databaseId <UUID> --taskIdentifier <String> [--actorId <UUID>] [--apiBindingId <UUID>] [--channel <String>] [--completedAt <Datetime>] [--definitionScope <String>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--provenance <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>]
+csdk function-invocation update --id <UUID> [--actorId <UUID>] [--apiBindingId <UUID>] [--channel <String>] [--completedAt <Datetime>] [--databaseId <UUID>] [--definitionScope <String>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--provenance <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>] [--taskIdentifier <String>]
 csdk function-invocation delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-invocation list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionInvocation
 
 ```bash
-csdk function-invocation create --databaseId <UUID> --taskIdentifier <String> [--actorId <UUID>] [--payload <JSON>] [--status <String>] [--result <JSON>] [--error <String>] [--durationMs <Int>] [--jobId <BigInt>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--parentInvocationId <UUID>] [--graphExecutionId <UUID>]
+csdk function-invocation create --databaseId <UUID> --taskIdentifier <String> [--actorId <UUID>] [--apiBindingId <UUID>] [--channel <String>] [--completedAt <Datetime>] [--definitionScope <String>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--provenance <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>]
 ```
 
 ### Get a functionInvocation by id

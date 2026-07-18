@@ -12,8 +12,8 @@ csdk compute-log-module list --where.<field>.<op> <value> --orderBy <values>
 csdk compute-log-module list --limit 10 --after <cursor>
 csdk compute-log-module find-first --where.<field>.<op> <value>
 csdk compute-log-module get --id <UUID>
-csdk compute-log-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--computeLogTableId <UUID>] [--computeLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
-csdk compute-log-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--computeLogTableId <UUID>] [--computeLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk compute-log-module create --databaseId <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--computeLogTableId <UUID>] [--computeLogTableName <String>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--usageSummaryTableId <UUID>] [--usageSummaryTableName <String>]
+csdk compute-log-module update --id <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--computeLogTableId <UUID>] [--computeLogTableName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--usageSummaryTableId <UUID>] [--usageSummaryTableName <String>]
 csdk compute-log-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk compute-log-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a computeLogModule
 
 ```bash
-csdk compute-log-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--computeLogTableId <UUID>] [--computeLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk compute-log-module create --databaseId <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--computeLogTableId <UUID>] [--computeLogTableName <String>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--usageSummaryTableId <UUID>] [--usageSummaryTableName <String>]
 ```
 
 ### Get a computeLogModule by id

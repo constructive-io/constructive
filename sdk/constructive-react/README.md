@@ -16,6 +16,7 @@
 | auth | - | React Query, ORM | [./src/auth/README.md](./src/auth/README.md) |
 | compute | - | React Query, ORM | [./src/compute/README.md](./src/compute/README.md) |
 | config | - | React Query, ORM | [./src/config/README.md](./src/config/README.md) |
+| infra | - | React Query, ORM | [./src/infra/README.md](./src/infra/README.md) |
 | modules | - | React Query, ORM | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | React Query, ORM | [./src/objects/README.md](./src/objects/README.md) |
 | usage | - | React Query, ORM | [./src/usage/README.md](./src/usage/README.md) |

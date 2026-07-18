@@ -7,8 +7,8 @@ Records of individual permission grants and revocations for members via bitmask
 ## Usage
 
 ```typescript
-useAppGrantsQuery({ selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } } })
-useAppGrantQuery({ id: '<UUID>', selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } } })
+useAppGrantsQuery({ selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } } })
+useAppGrantQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } } })
 useCreateAppGrantMutation({ selection: { fields: { id: true } } })
 useUpdateAppGrantMutation({ selection: { fields: { id: true } } })
 useDeleteAppGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteAppGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useAppGrantsQuery({
-  selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppGrantsQuery({
 const { mutate } = useCreateAppGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', grantorId: '<UUID>' });
+mutate({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' });
 ```

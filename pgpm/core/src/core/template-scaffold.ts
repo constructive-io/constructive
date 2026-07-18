@@ -99,8 +99,19 @@ export interface ScaffoldTemplateResult {
   questions?: Question[];
 }
 
-export const DEFAULT_TEMPLATE_REPO =
-  'https://github.com/constructive-io/pgpm-boilerplates.git';
+/**
+ * Registry of known boilerplate template repos, keyed by flavor. Add new
+ * backends (e.g. `turso`) here rather than sprinkling flavor-specific
+ * constants across the codebase.
+ */
+export const TEMPLATE_REPOS = {
+  default: 'https://github.com/constructive-io/pgpm-boilerplates.git',
+  pglite: 'https://github.com/constructive-io/pglite-boilerplates.git'
+} as const;
+
+export type TemplateRepoFlavor = keyof typeof TEMPLATE_REPOS;
+
+export const DEFAULT_TEMPLATE_REPO = TEMPLATE_REPOS.default;
 export const DEFAULT_TEMPLATE_TTL_MS = 1 * 24 * 60 * 60 * 1000; // 1 day
 export const DEFAULT_TEMPLATE_TOOL_NAME = 'pgpm';
 

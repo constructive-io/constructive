@@ -9,8 +9,8 @@ Audit log of permission additions and removals from the defaults bitmask
 ```typescript
 db.orgPermissionDefaultGrant.findMany({ select: { id: true } }).execute()
 db.orgPermissionDefaultGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgPermissionDefaultGrant.create({ data: { permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>', entityId: '<UUID>' }, select: { id: true } }).execute()
-db.orgPermissionDefaultGrant.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute()
+db.orgPermissionDefaultGrant.create({ data: { entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' }, select: { id: true } }).execute()
+db.orgPermissionDefaultGrant.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgPermissionDefaultGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgPermissionDefaultGrant.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgPermissionDefaultGrant.findMany({
-  select: { id: true, permissionId: true }
+  select: { id: true, entityId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgPermissionDefaultGrant.findMany({
 
 ```typescript
 const item = await db.orgPermissionDefaultGrant.create({
-  data: { permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>', entityId: '<UUID>' },
+  data: { entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

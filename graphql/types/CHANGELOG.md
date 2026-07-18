@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.14.0...@constructive-io/graphql-types@3.14.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
+# [3.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.13.5...@constructive-io/graphql-types@3.14.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
+## [3.13.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.13.4...@constructive-io/graphql-types@3.13.5) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
+## [3.13.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.13.3...@constructive-io/graphql-types@3.13.4) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
+## [3.13.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.13.2...@constructive-io/graphql-types@3.13.3) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
+## [3.13.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.13.1...@constructive-io/graphql-types@3.13.2) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
 ## [3.13.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.13.0...@constructive-io/graphql-types@3.13.1) (2026-07-08)
 
 **Note:** Version bump only for package @constructive-io/graphql-types

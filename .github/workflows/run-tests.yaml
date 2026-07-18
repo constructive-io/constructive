@@ -5,6 +5,7 @@ on:
       - main
       - v1
     paths-ignore:
+      - '**.md'
       - '**/*.md'
       - '.agents/skills/**'
       - 'docs/**'
@@ -13,6 +14,7 @@ on:
       - main
       - v1
     paths-ignore:
+      - '**.md'
       - '**/*.md'
       - '.agents/skills/**'
       - 'docs/**'
@@ -102,6 +104,8 @@ jobs:
             packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
+          - batch: pglite
+            packages: 'postgres/pglite-adapter postgres/pglite-test examples/pglite-socket'
 
     steps:
       - name: Download workspace
@@ -174,6 +178,8 @@ jobs:
             env: {}
           - package: graphile/graphile-bulk-mutations
             env: {}
+          - package: graphile/graphile-function-bindings
+            env: {}
           - package: graphql/orm-test
             env: {}
           - package: graphql/test
@@ -240,6 +246,9 @@ jobs:
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Install pgpm fixture modules
+        run: pnpm fixtures:install
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test
@@ -353,6 +362,9 @@ jobs:
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Install pgpm fixture modules
+        run: pnpm fixtures:install
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test

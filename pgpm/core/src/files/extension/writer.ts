@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 import { getExtensionInfo } from './reader';
 
@@ -73,7 +73,45 @@ superuser = ${superuser}\n`;
 }
 
 /**
+ * Update (or insert/remove) the `requires =` line of an existing .control file
+ * in place, preserving every other field and the file's formatting. Used when
+ * changing a module's dependencies after init (e.g. via `pgpm extension`) so
+ * hand-tuned fields (comment, schema, relocatable, module_pathname) survive.
+ */
+export function upsertRequiresLine(
+  content: string,
+  requires: string[]
+): string {
+  const lines = content.split('\n');
+  const idx = lines.findIndex((line) => /^\s*requires\s*=/.test(line));
+
+  if (requires.length === 0) {
+    if (idx !== -1) lines.splice(idx, 1);
+    return lines.join('\n');
+  }
+
+  const requiresLine = `requires = '${requires.join(',')}'`;
+  if (idx !== -1) {
+    lines[idx] = requiresLine;
+    return lines.join('\n');
+  }
+
+  // Insert to match generated ordering (before relocatable/superuser/schema).
+  const insertAt = lines.findIndex((line) =>
+    /^\s*(relocatable|superuser|schema)\s*=/.test(line)
+  );
+  if (insertAt !== -1) {
+    lines.splice(insertAt, 0, requiresLine);
+  } else {
+    lines.push(requiresLine);
+  }
+  return lines.join('\n');
+}
+
+/**
  * Write the control file for the extension.
+ * If the file already exists, only its `requires` line is updated so that any
+ * custom fields are preserved; otherwise a fresh file is generated.
  */
 export const writeExtensionControlFile = (
   outputPath: string,
@@ -81,6 +119,11 @@ export const writeExtensionControlFile = (
   extensions: string[],
   version: string
 ): void => {
+  if (existsSync(outputPath)) {
+    const existing = readFileSync(outputPath, 'utf-8');
+    writeFileSync(outputPath, upsertRequiresLine(existing, extensions));
+    return;
+  }
   const content = generateControlFileContent({
     name: extname,
     version,

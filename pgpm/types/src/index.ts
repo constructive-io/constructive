@@ -1,3 +1,4 @@
+export * from './driver';
 export * from './error';
 export * from './error-factory';
 export * from './pg-error-format';

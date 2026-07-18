@@ -5,8 +5,11 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { PlatformConfigDefinitionModel } from './models/platformConfigDefinition';
+import { ConfigModel } from './models/config';
 import { PlatformConfigModel } from './models/platformConfig';
+import { PlatformInternalSecretModel } from './models/platformInternalSecret';
+import { PlatformSecretModel } from './models/platformSecret';
+import { SecretModel } from './models/secret';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
@@ -40,8 +43,11 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    platformConfigDefinition: new PlatformConfigDefinitionModel(client),
+    config: new ConfigModel(client),
     platformConfig: new PlatformConfigModel(client),
+    platformInternalSecret: new PlatformInternalSecretModel(client),
+    platformSecret: new PlatformSecretModel(client),
+    secret: new SecretModel(client),
     mutation: createMutationOperations(client),
   };
 }

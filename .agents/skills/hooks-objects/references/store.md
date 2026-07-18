@@ -7,8 +7,8 @@ Named stores — one per version-controlled tree (e.g. one graph, one definition
 ## Usage
 
 ```typescript
-useStoresQuery({ selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } } })
-useStoreQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } } })
+useStoresQuery({ selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } } })
+useStoreQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } } })
 useCreateStoreMutation({ selection: { fields: { id: true } } })
 useUpdateStoreMutation({ selection: { fields: { id: true } } })
 useDeleteStoreMutation({})
@@ -20,7 +20,7 @@ useDeleteStoreMutation({})
 
 ```typescript
 const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useStoresQuery({
 const { mutate } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
+mutate({ databaseId: '<UUID>', hash: '<UUID>', name: '<String>' });
 ```

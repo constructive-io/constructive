@@ -28,7 +28,7 @@ exports[`installModule() installs a package and updates package.json dependencie
 
 exports[`installModule() installs a package and updates package.json dependencies 2`] = `
 "# totp extension
-comment = 'totp extension'
+comment = 'skitch project'
 default_version = '0.0.1'
 module_pathname = '$libdir/totp'
 requires = 'pgcrypto,pgpm-base32,pgpm-verify,plpgsql,uuid-ossp'

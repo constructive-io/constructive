@@ -9,8 +9,8 @@ ORM operations for Trigger records
 ```typescript
 db.trigger.findMany({ select: { id: true } }).execute()
 db.trigger.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.trigger.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<String>', functionName: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute()
-db.trigger.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.trigger.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>' }, select: { id: true } }).execute()
+db.trigger.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute()
 db.trigger.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.trigger.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.trigger.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, category: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.trigger.findMany({
 
 ```typescript
 const item = await db.trigger.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<String>', functionName: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' },
+  data: { category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>' },
   select: { id: true }
 }).execute();
 ```

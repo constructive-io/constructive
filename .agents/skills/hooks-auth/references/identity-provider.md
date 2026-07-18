@@ -7,7 +7,7 @@ React Query hooks for IdentityProvider data operations
 ## Usage
 
 ```typescript
-useIdentityProvidersQuery({ selection: { fields: { slug: true, kind: true, displayName: true, enabled: true, isBuiltIn: true } } })
+useIdentityProvidersQuery({ selection: { fields: { displayName: true, enabled: true, kind: true, slug: true } } })
 useCreateIdentityProviderMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreateIdentityProviderMutation({ selection: { fields: { id: true } } })
 
 ```typescript
 const { data, isLoading } = useIdentityProvidersQuery({
-  selection: { fields: { slug: true, kind: true, displayName: true, enabled: true, isBuiltIn: true } },
+  selection: { fields: { displayName: true, enabled: true, kind: true, slug: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = useIdentityProvidersQuery({
 const { mutate } = useCreateIdentityProviderMutation({
   selection: { fields: { id: true } },
 });
-mutate({ slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '<Boolean>', isBuiltIn: '<Boolean>' });
+mutate({ displayName: '<String>', enabled: '<Boolean>', kind: '<String>', slug: '<String>' });
 ```

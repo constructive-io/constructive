@@ -16,14 +16,14 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  createdAt: 'string',
-  id: 'uuid',
-  resourceId: 'uuid',
-  eventType: 'string',
   actorId: 'uuid',
+  createdAt: 'string',
+  databaseId: 'uuid',
+  eventType: 'string',
+  id: 'uuid',
   message: 'string',
   metadata: 'json',
-  databaseId: 'uuid',
+  resourceId: 'uuid',
 };
 const usage =
   '\nresource-event <command>\n\nCommands:\n  list                  List resourceEvent records\n  find-first            Find first matching resourceEvent record\n  get                   Get a resourceEvent by ID\n  create                Create a new resourceEvent\n  update                Update an existing resourceEvent\n  delete                Delete a resourceEvent\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -76,14 +76,14 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      createdAt: true,
-      id: true,
-      resourceId: true,
-      eventType: true,
       actorId: true,
+      createdAt: true,
+      databaseId: true,
+      eventType: true,
+      id: true,
       message: true,
       metadata: true,
-      databaseId: true,
+      resourceId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ResourceEventSelect, ResourceEventFilter, ResourceEventOrderBy> & {
@@ -104,14 +104,14 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      createdAt: true,
-      id: true,
-      resourceId: true,
-      eventType: true,
       actorId: true,
+      createdAt: true,
+      databaseId: true,
+      eventType: true,
+      id: true,
       message: true,
       metadata: true,
-      databaseId: true,
+      resourceId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ResourceEventSelect, ResourceEventFilter, ResourceEventOrderBy> & {
@@ -144,14 +144,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          createdAt: true,
-          id: true,
-          resourceId: true,
-          eventType: true,
           actorId: true,
+          createdAt: true,
+          databaseId: true,
+          eventType: true,
+          id: true,
           message: true,
           metadata: true,
-          databaseId: true,
+          resourceId: true,
         },
       })
       .execute();
@@ -169,8 +169,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
         required: true,
       },
       {
@@ -178,13 +185,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'eventType',
         message: 'eventType',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -202,8 +202,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'resourceId',
+        message: 'resourceId',
         required: true,
       },
     ]);
@@ -216,22 +216,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.resourceEvent
       .create({
         data: {
-          resourceId: cleanedData.resourceId,
-          eventType: cleanedData.eventType,
           actorId: cleanedData.actorId,
+          databaseId: cleanedData.databaseId,
+          eventType: cleanedData.eventType,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
-          databaseId: cleanedData.databaseId,
+          resourceId: cleanedData.resourceId,
         },
         select: {
-          createdAt: true,
-          id: true,
-          resourceId: true,
-          eventType: true,
           actorId: true,
+          createdAt: true,
+          databaseId: true,
+          eventType: true,
+          id: true,
           message: true,
           metadata: true,
-          databaseId: true,
+          resourceId: true,
         },
       })
       .execute();
@@ -261,8 +261,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
         required: false,
       },
       {
@@ -270,13 +277,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'eventType',
         message: 'eventType',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -294,8 +294,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'resourceId',
+        message: 'resourceId',
         required: false,
       },
     ]);
@@ -309,22 +309,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createdAt: answers.createdAt as string,
         },
         data: {
-          resourceId: cleanedData.resourceId,
-          eventType: cleanedData.eventType,
           actorId: cleanedData.actorId,
+          databaseId: cleanedData.databaseId,
+          eventType: cleanedData.eventType,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
-          databaseId: cleanedData.databaseId,
+          resourceId: cleanedData.resourceId,
         },
         select: {
-          createdAt: true,
-          id: true,
-          resourceId: true,
-          eventType: true,
           actorId: true,
+          createdAt: true,
+          databaseId: true,
+          eventType: true,
+          id: true,
           message: true,
           metadata: true,
-          databaseId: true,
+          resourceId: true,
         },
       })
       .execute();

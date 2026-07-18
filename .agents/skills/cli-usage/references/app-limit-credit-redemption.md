@@ -12,8 +12,8 @@ csdk app-limit-credit-redemption list --where.<field>.<op> <value> --orderBy <va
 csdk app-limit-credit-redemption list --limit 10 --after <cursor>
 csdk app-limit-credit-redemption find-first --where.<field>.<op> <value>
 csdk app-limit-credit-redemption get --id <UUID>
-csdk app-limit-credit-redemption create --creditCodeId <UUID> --entityId <UUID> [--organizationId <UUID>] [--entityType <String>]
-csdk app-limit-credit-redemption update --id <UUID> [--creditCodeId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>]
+csdk app-limit-credit-redemption create --creditCodeId <UUID> --entityId <UUID> [--entityType <String>] [--organizationId <UUID>]
+csdk app-limit-credit-redemption update --id <UUID> [--creditCodeId <UUID>] [--entityId <UUID>] [--entityType <String>] [--organizationId <UUID>]
 csdk app-limit-credit-redemption delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit-credit-redemption list --where.id.equalTo <value> --orderBy ID_AS
 ### Create a appLimitCreditRedemption
 
 ```bash
-csdk app-limit-credit-redemption create --creditCodeId <UUID> --entityId <UUID> [--organizationId <UUID>] [--entityType <String>]
+csdk app-limit-credit-redemption create --creditCodeId <UUID> --entityId <UUID> [--entityType <String>] [--organizationId <UUID>]
 ```
 
 ### Get a appLimitCreditRedemption by id

@@ -49,7 +49,7 @@ export function useUpdateFunctionGraphObjectMutation<S extends FunctionGraphObje
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
         functionGraphObjectPatch: FunctionGraphObjectPatch;
       }
     >,
@@ -64,7 +64,7 @@ export function useUpdateFunctionGraphObjectMutation<S extends FunctionGraphObje
   Error,
   {
     id: string;
-    databaseId: string;
+    scopeId: string;
     functionGraphObjectPatch: FunctionGraphObjectPatch;
   }
 >;
@@ -77,7 +77,7 @@ export function useUpdateFunctionGraphObjectMutation(
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
         functionGraphObjectPatch: FunctionGraphObjectPatch;
       }
     >,
@@ -92,18 +92,18 @@ export function useUpdateFunctionGraphObjectMutation(
     mutationKey: functionGraphObjectMutationKeys.all,
     mutationFn: ({
       id,
-      databaseId,
+      scopeId,
       functionGraphObjectPatch,
     }: {
       id: string;
-      databaseId: string;
+      scopeId: string;
       functionGraphObjectPatch: FunctionGraphObjectPatch;
     }) =>
       getClient()
         .functionGraphObject.update({
           where: {
             id,
-            databaseId,
+            scopeId,
           },
           data: functionGraphObjectPatch,
           select: args.select,

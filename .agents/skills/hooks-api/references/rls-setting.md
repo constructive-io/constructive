@@ -7,8 +7,8 @@ Per-database RLS module runtime configuration; typed replacement for api_modules
 ## Usage
 
 ```typescript
-useRlsSettingsQuery({ selection: { fields: { id: true, databaseId: true, authenticateSchemaId: true, roleSchemaId: true, authenticateFunctionId: true, authenticateStrictFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, currentIpAddressFunctionId: true } } })
-useRlsSettingQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, authenticateSchemaId: true, roleSchemaId: true, authenticateFunctionId: true, authenticateStrictFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, currentIpAddressFunctionId: true } } })
+useRlsSettingsQuery({ selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } } })
+useRlsSettingQuery({ id: '<UUID>', selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } } })
 useCreateRlsSettingMutation({ selection: { fields: { id: true } } })
 useUpdateRlsSettingMutation({ selection: { fields: { id: true } } })
 useDeleteRlsSettingMutation({})
@@ -20,7 +20,7 @@ useDeleteRlsSettingMutation({})
 
 ```typescript
 const { data, isLoading } = useRlsSettingsQuery({
-  selection: { fields: { id: true, databaseId: true, authenticateSchemaId: true, roleSchemaId: true, authenticateFunctionId: true, authenticateStrictFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, currentIpAddressFunctionId: true } },
+  selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRlsSettingsQuery({
 const { mutate } = useCreateRlsSettingMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', authenticateSchemaId: '<UUID>', roleSchemaId: '<UUID>', authenticateFunctionId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>' });
+mutate({ authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', databaseId: '<UUID>', roleSchemaId: '<UUID>' });
 ```

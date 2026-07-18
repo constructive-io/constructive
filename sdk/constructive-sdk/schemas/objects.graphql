@@ -1,227 +1,329 @@
-"""The root query type which gives access points into the data universe."""
-type Query {
-  """Reads and enables pagination through a set of `GetAllRecord`."""
-  getAll(
-    sId: UUID
-    id: UUID
+"""Commit history — each commit snapshots a tree root for a store"""
+type Commit {
+  """User who authored the changes"""
+  authorId: UUID
 
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): GetAllConnection
-  getNodeAtPath(sId: UUID, id: UUID, path: [String]): Object
-
-  """Reads and enables pagination through a set of `Ref`."""
-  refs(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: RefFilter
-
-    """The method to use when ordering `Ref`."""
-    orderBy: [RefOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RefConnection
-
-  """Reads and enables pagination through a set of `Store`."""
-  stores(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: StoreFilter
-
-    """The method to use when ordering `Store`."""
-    orderBy: [StoreOrderBy!] = [PRIMARY_KEY_ASC]
-  ): StoreConnection
-
-  """Reads and enables pagination through a set of `Object`."""
-  objects(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ObjectFilter
-
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ObjectConnection
-
-  """Reads and enables pagination through a set of `Commit`."""
-  commits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CommitFilter
-
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CommitConnection
-
-  """
-  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
-  """
-  _meta: MetaSchema
-}
-
-"""A connection to a list of `GetAllRecord` values."""
-type GetAllConnection {
-  """A list of `GetAllRecord` objects."""
-  nodes: [GetAllRecord]!
-
-  """
-  A list of edges which contains the `GetAllRecord` and cursor to aid in pagination.
-  """
-  edges: [GetAllEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `GetAllRecord` you could get from the connection."""
-  totalCount: Int!
-}
-
-type GetAllRecord {
-  path: [String]
-  data: JSON
-}
-
-"""
-Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-"""A `GetAllRecord` edge in the connection."""
-type GetAllEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `GetAllRecord` at the end of the edge."""
-  node: GetAllRecord
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
-"""
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-"""
-scalar UUID
-
-"""
-Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
-"""
-type Object {
-  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
-  id: UUID!
+  """User who committed (may differ from author)"""
+  committerId: UUID
 
   """Database scope for multi-tenant isolation"""
   databaseId: UUID!
 
-  """Ordered array of child object IDs"""
-  kids: [UUID]
+  """Commit timestamp"""
+  date: Datetime!
 
-  """Ordered array of child path names (parallel to kids)"""
-  ktree: [String]
+  """Unique commit identifier"""
+  id: UUID!
 
-  """Payload data for this object node"""
-  data: JSON
+  """Optional commit message"""
+  message: String
 
-  """Timestamp of object creation"""
-  createdAt: Datetime
+  """Parent commit IDs (supports merge commits)"""
+  parentIds: [UUID]
+
+  """Store this commit belongs to"""
+  storeId: UUID!
+
+  """Root object ID of the tree snapshot at this commit"""
+  treeId: UUID
 }
+
+"""A connection to a list of `Commit` values."""
+type CommitConnection {
+  """
+  A list of edges which contains the `Commit` and cursor to aid in pagination.
+  """
+  edges: [CommitEdge]!
+
+  """A list of `Commit` objects."""
+  nodes: [Commit]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Commit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Commit` edge in the connection."""
+type CommitEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Commit` at the end of the edge."""
+  node: Commit
+}
+
+"""
+A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’
+"""
+input CommitFilter {
+  """Checks for all expressions in this list."""
+  and: [CommitFilter!]
+
+  """Filter by the object’s `authorId` field."""
+  authorId: UUIDFilter
+
+  """Filter by the object’s `committerId` field."""
+  committerId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `date` field."""
+  date: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Negates the expression."""
+  not: CommitFilter
+
+  """Checks for any expressions in this list."""
+  or: [CommitFilter!]
+
+  """Filter by the object’s `parentIds` field."""
+  parentIds: UUIDListFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `treeId` field."""
+  treeId: UUIDFilter
+}
+
+"""An input for mutations affecting `Commit`"""
+input CommitInput {
+  """User who authored the changes"""
+  authorId: UUID
+
+  """User who committed (may differ from author)"""
+  committerId: UUID
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Commit timestamp"""
+  date: Datetime
+
+  """Unique commit identifier"""
+  id: UUID
+
+  """Optional commit message"""
+  message: String
+
+  """Parent commit IDs (supports merge commits)"""
+  parentIds: [UUID]
+
+  """Store this commit belongs to"""
+  storeId: UUID!
+
+  """Root object ID of the tree snapshot at this commit"""
+  treeId: UUID
+}
+
+"""Methods to use when ordering `Commit`."""
+enum CommitOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  COMMITTER_ID_ASC
+  COMMITTER_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DATE_ASC
+  DATE_DESC
+  ID_ASC
+  ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  NATURAL
+  PARENT_IDS_ASC
+  PARENT_IDS_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  TREE_ID_ASC
+  TREE_ID_DESC
+}
+
+"""
+Represents an update to a `Commit`. Fields that are set will be updated.
+"""
+input CommitPatch {
+  """User who authored the changes"""
+  authorId: UUID
+
+  """User who committed (may differ from author)"""
+  committerId: UUID
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID
+
+  """Commit timestamp"""
+  date: Datetime
+
+  """Unique commit identifier"""
+  id: UUID
+
+  """Optional commit message"""
+  message: String
+
+  """Parent commit IDs (supports merge commits)"""
+  parentIds: [UUID]
+
+  """Store this commit belongs to"""
+  storeId: UUID
+
+  """Root object ID of the tree snapshot at this commit"""
+  treeId: UUID
+}
+
+"""All input for the create `Commit` mutation."""
+input CreateCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Commit` to be created by this mutation."""
+  commit: CommitInput!
+}
+
+"""The output of our create `Commit` mutation."""
+type CreateCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Commit` that was created by this mutation."""
+  commit: Commit
+
+  """An edge for our `Commit`. May be used by Relay 1."""
+  commitEdge(
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Object` mutation."""
+input CreateObjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Object` to be created by this mutation."""
+  object: ObjectInput!
+}
+
+"""The output of our create `Object` mutation."""
+type CreateObjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Object` that was created by this mutation."""
+  object: Object
+
+  """An edge for our `Object`. May be used by Relay 1."""
+  objectEdge(
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ObjectEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Ref` mutation."""
+input CreateRefInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Ref` to be created by this mutation."""
+  ref: RefInput!
+}
+
+"""The output of our create `Ref` mutation."""
+type CreateRefPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Ref` that was created by this mutation."""
+  ref: Ref
+
+  """An edge for our `Ref`. May be used by Relay 1."""
+  refEdge(
+    """The method to use when ordering `Ref`."""
+    orderBy: [RefOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RefEdge
+}
+
+"""All input for the create `Store` mutation."""
+input CreateStoreInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Store` to be created by this mutation."""
+  store: StoreInput!
+}
+
+"""The output of our create `Store` mutation."""
+type CreateStorePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Store` that was created by this mutation."""
+  store: Store
+
+  """An edge for our `Store`. May be used by Relay 1."""
+  storeEdge(
+    """The method to use when ordering `Store`."""
+    orderBy: [StoreOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StoreEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
 
 """
 A point in time as described by the [ISO
@@ -232,373 +334,31 @@ to unexpected results.
 """
 scalar Datetime
 
-"""A connection to a list of `Ref` values."""
-type RefConnection {
-  """A list of `Ref` objects."""
-  nodes: [Ref]!
-
-  """
-  A list of edges which contains the `Ref` and cursor to aid in pagination.
-  """
-  edges: [RefEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Ref` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Branch heads — mutable pointers into the commit chain"""
-type Ref {
-  """Unique ref identifier"""
-  id: UUID!
-
-  """Ref name (e.g. HEAD, main)"""
-  name: String!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """Store this ref belongs to"""
-  storeId: UUID!
-
-  """Commit this ref points to"""
-  commitId: UUID
-}
-
-"""A `Ref` edge in the connection."""
-type RefEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Ref` at the end of the edge."""
-  node: Ref
-}
-
-"""
-A filter to be used against `Ref` object types. All fields are combined with a logical ‘and.’
-"""
-input RefFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `storeId` field."""
-  storeId: UUIDFilter
-
-  """Filter by the object’s `commitId` field."""
-  commitId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [RefFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [RefFilter!]
-
-  """Negates the expression."""
-  not: RefFilter
-}
-
-"""
-A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: UUID
-
-  """Not equal to the specified value."""
-  notEqualTo: UUID
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: UUID
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: UUID
-
-  """Included in the specified list."""
-  in: [UUID!]
-
-  """Not included in the specified list."""
-  notIn: [UUID!]
-
-  """Less than the specified value."""
-  lessThan: UUID
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: UUID
-
-  """Greater than the specified value."""
-  greaterThan: UUID
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: UUID
-}
-
-"""
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
-}
-
-"""Methods to use when ordering `Ref`."""
-enum RefOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  STORE_ID_ASC
-  STORE_ID_DESC
-  COMMIT_ID_ASC
-  COMMIT_ID_DESC
-}
-
-"""A connection to a list of `Store` values."""
-type StoreConnection {
-  """A list of `Store` objects."""
-  nodes: [Store]!
-
-  """
-  A list of edges which contains the `Store` and cursor to aid in pagination.
-  """
-  edges: [StoreEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Store` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Named stores — one per version-controlled tree (e.g. one graph, one definition set)
-"""
-type Store {
-  """Unique store identifier"""
-  id: UUID!
-
-  """Human-readable store name"""
-  name: String!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """Current root object hash of this store"""
-  hash: UUID
-
-  """Timestamp of store creation"""
-  createdAt: Datetime
-}
-
-"""A `Store` edge in the connection."""
-type StoreEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Store` at the end of the edge."""
-  node: Store
-}
-
-"""
-A filter to be used against `Store` object types. All fields are combined with a logical ‘and.’
-"""
-input StoreFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `hash` field."""
-  hash: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [StoreFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [StoreFilter!]
-
-  """Negates the expression."""
-  not: StoreFilter
-}
-
 """
 A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
 """
 input DatetimeFilter {
   """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Datetime
-
-  """Not equal to the specified value."""
-  notEqualTo: Datetime
-
-  """
   Not equal to the specified value, treating null like an ordinary value.
   """
   distinctFrom: Datetime
 
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Datetime
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
 
   """Included in the specified list."""
   in: [Datetime!]
 
-  """Not included in the specified list."""
-  notIn: [Datetime!]
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
 
   """Less than the specified value."""
   lessThan: Datetime
@@ -606,39 +366,725 @@ input DatetimeFilter {
   """Less than or equal to the specified value."""
   lessThanOrEqualTo: Datetime
 
-  """Greater than the specified value."""
-  greaterThan: Datetime
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
 
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Datetime
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
 }
 
-"""Methods to use when ordering `Store`."""
-enum StoreOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  HASH_ASC
-  HASH_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
+"""All input for the `deleteCommit` mutation."""
+input DeleteCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Unique commit identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `Commit` mutation."""
+type DeleteCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Commit` that was deleted by this mutation."""
+  commit: Commit
+
+  """An edge for our `Commit`. May be used by Relay 1."""
+  commitEdge(
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteObject` mutation."""
+input DeleteObjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
+}
+
+"""The output of our delete `Object` mutation."""
+type DeleteObjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Object` that was deleted by this mutation."""
+  object: Object
+
+  """An edge for our `Object`. May be used by Relay 1."""
+  objectEdge(
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ObjectEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteRef` mutation."""
+input DeleteRefInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Unique ref identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `Ref` mutation."""
+type DeleteRefPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Ref` that was deleted by this mutation."""
+  ref: Ref
+
+  """An edge for our `Ref`. May be used by Relay 1."""
+  refEdge(
+    """The method to use when ordering `Ref`."""
+    orderBy: [RefOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RefEdge
+}
+
+"""All input for the `deleteStore` mutation."""
+input DeleteStoreInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique store identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `Store` mutation."""
+type DeleteStorePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Store` that was deleted by this mutation."""
+  store: Store
+
+  """An edge for our `Store`. May be used by Relay 1."""
+  storeEdge(
+    """The method to use when ordering `Store`."""
+    orderBy: [StoreOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StoreEdge
+}
+
+"""A connection to a list of `GetAllTreeNodesRecord` values."""
+type GetAllTreeNodesConnection {
+  """
+  A list of edges which contains the `GetAllTreeNodesRecord` and cursor to aid in pagination.
+  """
+  edges: [GetAllTreeNodesEdge]!
+
+  """A list of `GetAllTreeNodesRecord` objects."""
+  nodes: [GetAllTreeNodesRecord]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `GetAllTreeNodesRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `GetAllTreeNodesRecord` edge in the connection."""
+type GetAllTreeNodesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GetAllTreeNodesRecord` at the end of the edge."""
+  node: GetAllTreeNodesRecord
+}
+
+type GetAllTreeNodesRecord {
+  data: JSON
+  path: [String]
+}
+
+"""All input for the `initEmptyRepo` mutation."""
+input InitEmptyRepoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `initEmptyRepo` mutation."""
+type InitEmptyRepoPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `insertNodeAtPath` mutation."""
+input InsertNodeAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+  path: [String]
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `insertNodeAtPath` mutation."""
+type InsertNodeAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """Contained by the specified JSON."""
+  containedBy: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
+  name: String!
+  type: MetaType!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+  referencedFields: [String!]!
+  referencedTable: String!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+  type: String
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Commit`."""
+  createCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCommitInput!
+  ): CreateCommitPayload
+
+  """Creates a single `Object`."""
+  createObject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateObjectInput!
+  ): CreateObjectPayload
+
+  """Creates a single `Ref`."""
+  createRef(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRefInput!
+  ): CreateRefPayload
+
+  """Creates a single `Store`."""
+  createStore(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateStoreInput!
+  ): CreateStorePayload
+
+  """Deletes a single `Commit` using a unique key."""
+  deleteCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCommitInput!
+  ): DeleteCommitPayload
+
+  """Deletes a single `Object` using a unique key."""
+  deleteObject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteObjectInput!
+  ): DeleteObjectPayload
+
+  """Deletes a single `Ref` using a unique key."""
+  deleteRef(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRefInput!
+  ): DeleteRefPayload
+
+  """Deletes a single `Store` using a unique key."""
+  deleteStore(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStoreInput!
+  ): DeleteStorePayload
+  initEmptyRepo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InitEmptyRepoInput!
+  ): InitEmptyRepoPayload
+  insertNodeAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InsertNodeAtPathInput!
+  ): InsertNodeAtPathPayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+  setDataAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetDataAtPathInput!
+  ): SetDataAtPathPayload
+
+  """Updates a single `Commit` using a unique key and a patch."""
+  updateCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCommitInput!
+  ): UpdateCommitPayload
+
+  """Updates a single `Object` using a unique key and a patch."""
+  updateObject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateObjectInput!
+  ): UpdateObjectPayload
+
+  """Updates a single `Ref` using a unique key and a patch."""
+  updateRef(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRefInput!
+  ): UpdateRefPayload
+
+  """Updates a single `Store` using a unique key and a patch."""
+  updateStore(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateStoreInput!
+  ): UpdateStorePayload
+}
+
+"""
+Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
+"""
+type Object {
+  """Timestamp of object creation"""
+  createdAt: Datetime
+
+  """Payload data for this object node"""
+  data: JSON
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
+
+  """Ordered array of child object IDs"""
+  kids: [UUID]
+
+  """Ordered array of child path names (parallel to kids)"""
+  ktree: [String]
 }
 
 """A connection to a list of `Object` values."""
 type ObjectConnection {
-  """A list of `Object` objects."""
-  nodes: [Object]!
-
   """
   A list of edges which contains the `Object` and cursor to aid in pagination.
   """
   edges: [ObjectEdge]!
+
+  """A list of `Object` objects."""
+  nodes: [Object]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -660,11 +1106,20 @@ type ObjectEdge {
 A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’
 """
 input ObjectFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
+  """Checks for all expressions in this list."""
+  and: [ObjectFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `data` field."""
+  data: JSONFilter
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
 
   """Filter by the object’s `kids` field."""
   kids: UUIDListFilter
@@ -672,763 +1127,388 @@ input ObjectFilter {
   """Filter by the object’s `ktree` field."""
   ktree: StringListFilter
 
-  """Filter by the object’s `data` field."""
-  data: JSONFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [ObjectFilter!]
+  """Negates the expression."""
+  not: ObjectFilter
 
   """Checks for any expressions in this list."""
   or: [ObjectFilter!]
-
-  """Negates the expression."""
-  not: ObjectFilter
 }
 
-"""
-A filter to be used against UUID List fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDListFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
+"""An input for mutations affecting `Object`"""
+input ObjectInput {
+  """Timestamp of object creation"""
+  createdAt: Datetime
 
-  """Equal to the specified value."""
-  equalTo: [UUID]
-
-  """Not equal to the specified value."""
-  notEqualTo: [UUID]
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: [UUID]
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: [UUID]
-
-  """Less than the specified value."""
-  lessThan: [UUID]
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: [UUID]
-
-  """Greater than the specified value."""
-  greaterThan: [UUID]
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: [UUID]
-
-  """Contains the specified list of values."""
-  contains: [UUID]
-
-  """Contained by the specified list of values."""
-  containedBy: [UUID]
-
-  """Overlaps the specified list of values."""
-  overlaps: [UUID]
-
-  """Any array item is equal to the specified value."""
-  anyEqualTo: UUID
-
-  """Any array item is not equal to the specified value."""
-  anyNotEqualTo: UUID
-
-  """Any array item is less than the specified value."""
-  anyLessThan: UUID
-
-  """Any array item is less than or equal to the specified value."""
-  anyLessThanOrEqualTo: UUID
-
-  """Any array item is greater than the specified value."""
-  anyGreaterThan: UUID
-
-  """Any array item is greater than or equal to the specified value."""
-  anyGreaterThanOrEqualTo: UUID
-}
-
-"""
-A filter to be used against String List fields. All fields are combined with a logical ‘and.’
-"""
-input StringListFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: [String]
-
-  """Not equal to the specified value."""
-  notEqualTo: [String]
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: [String]
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: [String]
-
-  """Less than the specified value."""
-  lessThan: [String]
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: [String]
-
-  """Greater than the specified value."""
-  greaterThan: [String]
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: [String]
-
-  """Contains the specified list of values."""
-  contains: [String]
-
-  """Contained by the specified list of values."""
-  containedBy: [String]
-
-  """Overlaps the specified list of values."""
-  overlaps: [String]
-
-  """Any array item is equal to the specified value."""
-  anyEqualTo: String
-
-  """Any array item is not equal to the specified value."""
-  anyNotEqualTo: String
-
-  """Any array item is less than the specified value."""
-  anyLessThan: String
-
-  """Any array item is less than or equal to the specified value."""
-  anyLessThanOrEqualTo: String
-
-  """Any array item is greater than the specified value."""
-  anyGreaterThan: String
-
-  """Any array item is greater than or equal to the specified value."""
-  anyGreaterThanOrEqualTo: String
-}
-
-"""
-A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
-"""
-input JSONFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: JSON
-
-  """Not equal to the specified value."""
-  notEqualTo: JSON
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: JSON
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: JSON
-
-  """Included in the specified list."""
-  in: [JSON!]
-
-  """Not included in the specified list."""
-  notIn: [JSON!]
-
-  """Less than the specified value."""
-  lessThan: JSON
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: JSON
-
-  """Greater than the specified value."""
-  greaterThan: JSON
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: JSON
-
-  """Contains the specified JSON."""
-  contains: JSON
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: JSON
-}
-
-"""Methods to use when ordering `Object`."""
-enum ObjectOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  KIDS_ASC
-  KIDS_DESC
-  KTREE_ASC
-  KTREE_DESC
-  DATA_ASC
-  DATA_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-}
-
-"""A connection to a list of `Commit` values."""
-type CommitConnection {
-  """A list of `Commit` objects."""
-  nodes: [Commit]!
-
-  """
-  A list of edges which contains the `Commit` and cursor to aid in pagination.
-  """
-  edges: [CommitEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Commit` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Commit history — each commit snapshots a tree root for a store"""
-type Commit {
-  """Unique commit identifier"""
-  id: UUID!
-
-  """Optional commit message"""
-  message: String
+  """Payload data for this object node"""
+  data: JSON
 
   """Database scope for multi-tenant isolation"""
   databaseId: UUID!
 
-  """Store this commit belongs to"""
-  storeId: UUID!
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
 
-  """Parent commit IDs (supports merge commits)"""
-  parentIds: [UUID]
+  """Ordered array of child object IDs"""
+  kids: [UUID]
 
-  """User who authored the changes"""
-  authorId: UUID
-
-  """User who committed (may differ from author)"""
-  committerId: UUID
-
-  """Root object ID of the tree snapshot at this commit"""
-  treeId: UUID
-
-  """Commit timestamp"""
-  date: Datetime!
+  """Ordered array of child path names (parallel to kids)"""
+  ktree: [String]
 }
 
-"""A `Commit` edge in the connection."""
-type CommitEdge {
+"""Methods to use when ordering `Object`."""
+enum ObjectOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DATA_ASC
+  DATA_DESC
+  ID_ASC
+  ID_DESC
+  KIDS_ASC
+  KIDS_DESC
+  KTREE_ASC
+  KTREE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `Object`. Fields that are set will be updated.
+"""
+input ObjectPatch {
+  """Timestamp of object creation"""
+  createdAt: Datetime
+
+  """Payload data for this object node"""
+  data: JSON
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID
+
+  """Ordered array of child object IDs"""
+  kids: [UUID]
+
+  """Ordered array of child path names (parallel to kids)"""
+  ktree: [String]
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
+  """
+  ownerId: UUID
+}
+
+type ProvisionBucketPayload {
+  """The access type applied"""
+  accessType: String!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+
+  """Reads and enables pagination through a set of `Commit`."""
+  commits(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CommitFilter
+  ): CommitConnection
+
+  """Reads and enables pagination through a set of `GetAllTreeNodesRecord`."""
+  getAllTreeNodes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+    id: UUID
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+    sId: UUID
+  ): GetAllTreeNodesConnection
+  getNodeAtPath(id: UUID, path: [String], sId: UUID): Object
+
+  """Reads and enables pagination through a set of `Object`."""
+  objects(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ObjectFilter
+  ): ObjectConnection
+
+  """Reads and enables pagination through a set of `Ref`."""
+  refs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Ref`."""
+    orderBy: [RefOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RefFilter
+  ): RefConnection
+
+  """Reads and enables pagination through a set of `Store`."""
+  stores(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Store`."""
+    orderBy: [StoreOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: StoreFilter
+  ): StoreConnection
+}
+
+"""Branch heads — mutable pointers into the commit chain"""
+type Ref {
+  """Commit this ref points to"""
+  commitId: UUID
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Unique ref identifier"""
+  id: UUID!
+
+  """Ref name (e.g. HEAD, main)"""
+  name: String!
+
+  """Store this ref belongs to"""
+  storeId: UUID!
+}
+
+"""A connection to a list of `Ref` values."""
+type RefConnection {
+  """
+  A list of edges which contains the `Ref` and cursor to aid in pagination.
+  """
+  edges: [RefEdge]!
+
+  """A list of `Ref` objects."""
+  nodes: [Ref]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Ref` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Ref` edge in the connection."""
+type RefEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `Commit` at the end of the edge."""
-  node: Commit
+  """The `Ref` at the end of the edge."""
+  node: Ref
 }
 
 """
-A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `Ref` object types. All fields are combined with a logical ‘and.’
 """
-input CommitFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
+input RefFilter {
+  """Checks for all expressions in this list."""
+  and: [RefFilter!]
 
-  """Filter by the object’s `message` field."""
-  message: StringFilter
+  """Filter by the object’s `commitId` field."""
+  commitId: UUIDFilter
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
-  """Filter by the object’s `storeId` field."""
-  storeId: UUIDFilter
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
 
-  """Filter by the object’s `parentIds` field."""
-  parentIds: UUIDListFilter
-
-  """Filter by the object’s `authorId` field."""
-  authorId: UUIDFilter
-
-  """Filter by the object’s `committerId` field."""
-  committerId: UUIDFilter
-
-  """Filter by the object’s `treeId` field."""
-  treeId: UUIDFilter
-
-  """Filter by the object’s `date` field."""
-  date: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [CommitFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [CommitFilter!]
+  """Filter by the object’s `name` field."""
+  name: StringFilter
 
   """Negates the expression."""
-  not: CommitFilter
+  not: RefFilter
+
+  """Checks for any expressions in this list."""
+  or: [RefFilter!]
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
 }
 
-"""Methods to use when ordering `Commit`."""
-enum CommitOrderBy {
+"""An input for mutations affecting `Ref`"""
+input RefInput {
+  """Commit this ref points to"""
+  commitId: UUID
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Unique ref identifier"""
+  id: UUID
+
+  """Ref name (e.g. HEAD, main)"""
+  name: String!
+
+  """Store this ref belongs to"""
+  storeId: UUID!
+}
+
+"""Methods to use when ordering `Ref`."""
+enum RefOrderBy {
+  COMMIT_ID_ASC
+  COMMIT_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  MESSAGE_ASC
-  MESSAGE_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
   STORE_ID_ASC
   STORE_ID_DESC
-  PARENT_IDS_ASC
-  PARENT_IDS_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  COMMITTER_ID_ASC
-  COMMITTER_ID_DESC
-  TREE_ID_ASC
-  TREE_ID_DESC
-  DATE_ASC
-  DATE_DESC
 }
 
-"""Root meta schema type"""
-type MetaSchema {
-  tables: [MetaTable!]!
-}
+"""Represents an update to a `Ref`. Fields that are set will be updated."""
+input RefPatch {
+  """Commit this ref points to"""
+  commitId: UUID
 
-"""Information about a database table"""
-type MetaTable {
-  name: String!
-  schemaName: String!
-  fields: [MetaField!]!
-  indexes: [MetaIndex!]!
-  constraints: MetaConstraints!
-  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
-  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
-  uniqueConstraints: [MetaUniqueConstraint!]!
-  relations: MetaRelations!
-  inflection: MetaInflection!
-  query: MetaQuery!
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID
 
-  """Storage metadata (null if not a storage table)"""
-  storage: MetaStorage
+  """Unique ref identifier"""
+  id: UUID
 
-  """Search metadata (null if no search configured)"""
-  search: MetaSearch
+  """Ref name (e.g. HEAD, main)"""
+  name: String
 
-  """i18n metadata (null if no @i18n tag)"""
-  i18n: MetaI18n
-
-  """Realtime metadata (null if no @realtime tag)"""
-  realtime: MetaRealtime
-}
-
-"""Information about a table field/column"""
-type MetaField {
-  name: String!
-  type: MetaType!
-  isNotNull: Boolean!
-  hasDefault: Boolean!
-  isPrimaryKey: Boolean!
-  isForeignKey: Boolean!
-  description: String
-
-  """Enum metadata if this field has an enum type"""
-  enumValues: MetaEnum
-}
-
-"""Information about a PostgreSQL type"""
-type MetaType {
-  pgType: String!
-  gqlType: String!
-  isArray: Boolean!
-  isNotNull: Boolean
-  hasDefault: Boolean
-  subtype: String
-}
-
-"""Information about a PostgreSQL enum type"""
-type MetaEnum {
-  """The PostgreSQL enum type name"""
-  name: String!
-
-  """Allowed values for this enum"""
-  values: [String!]!
-}
-
-"""Information about a database index"""
-type MetaIndex {
-  name: String!
-  isUnique: Boolean!
-  isPrimary: Boolean!
-  columns: [String!]!
-  fields: [MetaField!]
-}
-
-"""Table constraints"""
-type MetaConstraints {
-  primaryKey: MetaPrimaryKeyConstraint
-  unique: [MetaUniqueConstraint!]!
-  foreignKey: [MetaForeignKeyConstraint!]!
-}
-
-"""Information about a primary key constraint"""
-type MetaPrimaryKeyConstraint {
-  name: String!
-  fields: [MetaField!]!
-}
-
-"""Information about a unique constraint"""
-type MetaUniqueConstraint {
-  name: String!
-  fields: [MetaField!]!
-}
-
-"""Information about a foreign key constraint"""
-type MetaForeignKeyConstraint {
-  name: String!
-  fields: [MetaField!]!
-  referencedTable: String!
-  referencedFields: [String!]!
-  refFields: [MetaField!]
-  refTable: MetaRefTable
-}
-
-"""Reference to a related table"""
-type MetaRefTable {
-  name: String!
-}
-
-"""Table relations"""
-type MetaRelations {
-  belongsTo: [MetaBelongsToRelation!]!
-  has: [MetaHasRelation!]!
-  hasOne: [MetaHasRelation!]!
-  hasMany: [MetaHasRelation!]!
-  manyToMany: [MetaManyToManyRelation!]!
-}
-
-"""A belongs-to (forward FK) relation"""
-type MetaBelongsToRelation {
-  fieldName: String
-  isUnique: Boolean!
-  type: String
-  keys: [MetaField!]!
-  references: MetaRefTable!
-}
-
-"""A has-one or has-many (reverse FK) relation"""
-type MetaHasRelation {
-  fieldName: String
-  isUnique: Boolean!
-  type: String
-  keys: [MetaField!]!
-  referencedBy: MetaRefTable!
-}
-
-"""A many-to-many relation via junction table"""
-type MetaManyToManyRelation {
-  fieldName: String
-  type: String
-  junctionTable: MetaRefTable!
-  junctionLeftConstraint: MetaForeignKeyConstraint!
-  junctionLeftKeyAttributes: [MetaField!]!
-  junctionRightConstraint: MetaForeignKeyConstraint!
-  junctionRightKeyAttributes: [MetaField!]!
-  leftKeyAttributes: [MetaField!]!
-  rightKeyAttributes: [MetaField!]!
-  rightTable: MetaRefTable!
-}
-
-"""Table inflection names"""
-type MetaInflection {
-  tableType: String!
-  allRows: String!
-  connection: String!
-  edge: String!
-  filterType: String
-  orderByType: String!
-  conditionType: String!
-  patchType: String
-  createInputType: String!
-  createPayloadType: String!
-  updatePayloadType: String
-  deletePayloadType: String!
-}
-
-"""Table query/mutation names"""
-type MetaQuery {
-  all: String!
-  one: String
-  create: String
-  update: String
-  delete: String
-}
-
-"""Storage metadata for a table"""
-type MetaStorage {
-  """Whether this table is a storage files table"""
-  isFilesTable: Boolean!
-
-  """Whether this table is a storage buckets table"""
-  isBucketsTable: Boolean!
-}
-
-"""Search metadata for a table"""
-type MetaSearch {
-  """Active search algorithms on this table"""
-  algorithms: [String!]!
-
-  """Searchable columns with their algorithm"""
-  columns: [MetaSearchColumn!]!
-
-  """Whether unifiedSearch composite filter is available"""
-  hasUnifiedSearch: Boolean!
-
-  """Per-table search configuration"""
-  config: MetaSearchConfig
-}
-
-"""A searchable column with its algorithm"""
-type MetaSearchColumn {
-  """Column name (camelCase)"""
-  name: String!
-
-  """Search algorithm: tsvector, bm25, trgm, or vector"""
-  algorithm: String!
-}
-
-"""Per-table search configuration from @searchConfig smart tag"""
-type MetaSearchConfig {
-  """JSON-encoded per-adapter score weights"""
-  weights: String
-
-  """Whether recency boosting is enabled"""
-  boostRecent: Boolean!
-
-  """Field used for recency decay"""
-  boostRecencyField: String
-
-  """Exponential decay factor per day"""
-  boostRecencyDecay: Float
-}
-
-"""i18n metadata for a table with @i18n tag"""
-type MetaI18n {
-  """Name of the translation table"""
-  translationTable: String!
-
-  """Fields that are translatable"""
-  translatableFields: [MetaI18nField!]!
-}
-
-"""A translatable field"""
-type MetaI18nField {
-  """GraphQL field name"""
-  name: String!
-
-  """PostgreSQL column type (text, citext)"""
-  type: String!
-}
-
-"""Realtime metadata for a table with @realtime tag"""
-type MetaRealtime {
-  """The generated subscription field name (e.g. onPostChanged)"""
-  subscriptionFieldName: String!
-}
-
-"""
-The root mutation type which contains root level fields which mutate data.
-"""
-type Mutation {
-  initEmptyRepo(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: InitEmptyRepoInput!
-  ): InitEmptyRepoPayload
-  setDataAtPath(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SetDataAtPathInput!
-  ): SetDataAtPathPayload
-  insertNodeAtPath(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: InsertNodeAtPathInput!
-  ): InsertNodeAtPathPayload
-
-  """Creates a single `Ref`."""
-  createRef(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateRefInput!
-  ): CreateRefPayload
-
-  """Creates a single `Store`."""
-  createStore(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateStoreInput!
-  ): CreateStorePayload
-
-  """Creates a single `Object`."""
-  createObject(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateObjectInput!
-  ): CreateObjectPayload
-
-  """Creates a single `Commit`."""
-  createCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateCommitInput!
-  ): CreateCommitPayload
-
-  """Updates a single `Ref` using a unique key and a patch."""
-  updateRef(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRefInput!
-  ): UpdateRefPayload
-
-  """Updates a single `Store` using a unique key and a patch."""
-  updateStore(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateStoreInput!
-  ): UpdateStorePayload
-
-  """Updates a single `Object` using a unique key and a patch."""
-  updateObject(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateObjectInput!
-  ): UpdateObjectPayload
-
-  """Updates a single `Commit` using a unique key and a patch."""
-  updateCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateCommitInput!
-  ): UpdateCommitPayload
-
-  """Deletes a single `Ref` using a unique key."""
-  deleteRef(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRefInput!
-  ): DeleteRefPayload
-
-  """Deletes a single `Store` using a unique key."""
-  deleteStore(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteStoreInput!
-  ): DeleteStorePayload
-
-  """Deletes a single `Object` using a unique key."""
-  deleteObject(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteObjectInput!
-  ): DeleteObjectPayload
-
-  """Deletes a single `Commit` using a unique key."""
-  deleteCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteCommitInput!
-  ): DeleteCommitPayload
-
-  """
-  Provision an S3 bucket for a logical bucket in the database.
-  Reads the bucket config via RLS, then creates and configures
-  the S3 bucket with the appropriate privacy policies, CORS rules,
-  and lifecycle settings.
-  """
-  provisionBucket(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionBucketInput!
-  ): ProvisionBucketPayload
-}
-
-"""The output of our `initEmptyRepo` mutation."""
-type InitEmptyRepoPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `initEmptyRepo` mutation."""
-input InitEmptyRepoInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  sId: UUID
+  """Store this ref belongs to"""
   storeId: UUID
-}
-
-"""The output of our `setDataAtPath` mutation."""
-type SetDataAtPathPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
 """All input for the `setDataAtPath` mutation."""
@@ -1438,137 +1518,33 @@ input SetDataAtPathInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  sId: UUID
-  root: UUID
-  path: [String]
   data: JSON
+  path: [String]
+  root: UUID
+  sId: UUID
 }
 
-"""The output of our `insertNodeAtPath` mutation."""
-type InsertNodeAtPathPayload {
+"""The output of our `setDataAtPath` mutation."""
+type SetDataAtPathPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
   result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
-"""All input for the `insertNodeAtPath` mutation."""
-input InsertNodeAtPathInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  sId: UUID
-  root: UUID
-  path: [String]
-  data: JSON
-  kids: [UUID]
-  ktree: [String]
-}
-
-"""The output of our create `Ref` mutation."""
-type CreateRefPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Ref` that was created by this mutation."""
-  ref: Ref
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Ref`. May be used by Relay 1."""
-  refEdge(
-    """The method to use when ordering `Ref`."""
-    orderBy: [RefOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RefEdge
-}
-
-"""All input for the create `Ref` mutation."""
-input CreateRefInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Ref` to be created by this mutation."""
-  ref: RefInput!
-}
-
-"""An input for mutations affecting `Ref`"""
-input RefInput {
-  """Unique ref identifier"""
-  id: UUID
-
-  """Ref name (e.g. HEAD, main)"""
-  name: String!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """Store this ref belongs to"""
-  storeId: UUID!
-
-  """Commit this ref points to"""
-  commitId: UUID
-}
-
-"""The output of our create `Store` mutation."""
-type CreateStorePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Store` that was created by this mutation."""
-  store: Store
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Store`. May be used by Relay 1."""
-  storeEdge(
-    """The method to use when ordering `Store`."""
-    orderBy: [StoreOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StoreEdge
-}
-
-"""All input for the create `Store` mutation."""
-input CreateStoreInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Store` to be created by this mutation."""
-  store: StoreInput!
-}
-
-"""An input for mutations affecting `Store`"""
-input StoreInput {
-  """Unique store identifier"""
-  id: UUID
-
-  """Human-readable store name"""
-  name: String!
+"""
+Named stores — one per version-controlled tree (e.g. one graph, one definition set)
+"""
+type Store {
+  """Timestamp of store creation"""
+  createdAt: Datetime
 
   """Database scope for multi-tenant isolation"""
   databaseId: UUID!
@@ -1576,152 +1552,512 @@ input StoreInput {
   """Current root object hash of this store"""
   hash: UUID
 
+  """Unique store identifier"""
+  id: UUID!
+
+  """Human-readable store name"""
+  name: String!
+}
+
+"""A connection to a list of `Store` values."""
+type StoreConnection {
+  """
+  A list of edges which contains the `Store` and cursor to aid in pagination.
+  """
+  edges: [StoreEdge]!
+
+  """A list of `Store` objects."""
+  nodes: [Store]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Store` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Store` edge in the connection."""
+type StoreEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Store` at the end of the edge."""
+  node: Store
+}
+
+"""
+A filter to be used against `Store` object types. All fields are combined with a logical ‘and.’
+"""
+input StoreFilter {
+  """Checks for all expressions in this list."""
+  and: [StoreFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `hash` field."""
+  hash: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: StoreFilter
+
+  """Checks for any expressions in this list."""
+  or: [StoreFilter!]
+}
+
+"""An input for mutations affecting `Store`"""
+input StoreInput {
   """Timestamp of store creation"""
   createdAt: Datetime
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Current root object hash of this store"""
+  hash: UUID
+
+  """Unique store identifier"""
+  id: UUID
+
+  """Human-readable store name"""
+  name: String!
 }
 
-"""The output of our create `Object` mutation."""
-type CreateObjectPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Object` that was created by this mutation."""
-  object: Object
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Object`. May be used by Relay 1."""
-  objectEdge(
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ObjectEdge
+"""Methods to use when ordering `Store`."""
+enum StoreOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  HASH_ASC
+  HASH_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
-"""All input for the create `Object` mutation."""
-input CreateObjectInput {
+"""
+Represents an update to a `Store`. Fields that are set will be updated.
+"""
+input StorePatch {
+  """Timestamp of store creation"""
+  createdAt: Datetime
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID
+
+  """Current root object hash of this store"""
+  hash: UUID
+
+  """Unique store identifier"""
+  id: UUID
+
+  """Human-readable store name"""
+  name: String
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+}
+
+"""
+A filter to be used against UUID List fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: UUID
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: UUID
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: UUID
+
+  """Any array item is less than the specified value."""
+  anyLessThan: UUID
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: UUID
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: UUID
+
+  """Contained by the specified list of values."""
+  containedBy: [UUID]
+
+  """Contains the specified list of values."""
+  contains: [UUID]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [UUID]
+
+  """Equal to the specified value."""
+  equalTo: [UUID]
+
+  """Greater than the specified value."""
+  greaterThan: [UUID]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [UUID]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [UUID]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [UUID]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [UUID]
+
+  """Not equal to the specified value."""
+  notEqualTo: [UUID]
+
+  """Overlaps the specified list of values."""
+  overlaps: [UUID]
+}
+
+"""All input for the `updateCommit` mutation."""
+input UpdateCommitInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `Object` to be created by this mutation."""
-  object: ObjectInput!
-}
-
-"""An input for mutations affecting `Object`"""
-input ObjectInput {
-  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
-  id: UUID!
+  """
+  An object where the defined keys will be set on the `Commit` being updated.
+  """
+  commitPatch: CommitPatch!
 
   """Database scope for multi-tenant isolation"""
   databaseId: UUID!
 
-  """Ordered array of child object IDs"""
-  kids: [UUID]
-
-  """Ordered array of child path names (parallel to kids)"""
-  ktree: [String]
-
-  """Payload data for this object node"""
-  data: JSON
-
-  """Timestamp of object creation"""
-  createdAt: Datetime
+  """Unique commit identifier"""
+  id: UUID!
 }
 
-"""The output of our create `Commit` mutation."""
-type CreateCommitPayload {
+"""The output of our update `Commit` mutation."""
+type UpdateCommitPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Commit` that was created by this mutation."""
+  """The `Commit` that was updated by this mutation."""
   commit: Commit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 
   """An edge for our `Commit`. May be used by Relay 1."""
   commitEdge(
     """The method to use when ordering `Commit`."""
     orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
-"""All input for the create `Commit` mutation."""
-input CreateCommitInput {
+"""All input for the `updateObject` mutation."""
+input UpdateObjectInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `Commit` to be created by this mutation."""
-  commit: CommitInput!
-}
-
-"""An input for mutations affecting `Commit`"""
-input CommitInput {
-  """Unique commit identifier"""
-  id: UUID
-
-  """Optional commit message"""
-  message: String
-
   """Database scope for multi-tenant isolation"""
   databaseId: UUID!
 
-  """Store this commit belongs to"""
-  storeId: UUID!
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
 
-  """Parent commit IDs (supports merge commits)"""
-  parentIds: [UUID]
-
-  """User who authored the changes"""
-  authorId: UUID
-
-  """User who committed (may differ from author)"""
-  committerId: UUID
-
-  """Root object ID of the tree snapshot at this commit"""
-  treeId: UUID
-
-  """Commit timestamp"""
-  date: Datetime
+  """
+  An object where the defined keys will be set on the `Object` being updated.
+  """
+  objectPatch: ObjectPatch!
 }
 
-"""The output of our update `Ref` mutation."""
-type UpdateRefPayload {
+"""The output of our update `Object` mutation."""
+type UpdateObjectPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Ref` that was updated by this mutation."""
-  ref: Ref
+  """The `Object` that was updated by this mutation."""
+  object: Object
+
+  """An edge for our `Object`. May be used by Relay 1."""
+  objectEdge(
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ObjectEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our `Ref`. May be used by Relay 1."""
-  refEdge(
-    """The method to use when ordering `Ref`."""
-    orderBy: [RefOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RefEdge
 }
 
 """All input for the `updateRef` mutation."""
@@ -1732,11 +2068,11 @@ input UpdateRefInput {
   """
   clientMutationId: String
 
-  """Unique ref identifier"""
-  id: UUID!
-
   """Database scope for multi-tenant isolation"""
   databaseId: UUID!
+
+  """Unique ref identifier"""
+  id: UUID!
 
   """
   An object where the defined keys will be set on the `Ref` being updated.
@@ -1744,45 +2080,27 @@ input UpdateRefInput {
   refPatch: RefPatch!
 }
 
-"""Represents an update to a `Ref`. Fields that are set will be updated."""
-input RefPatch {
-  """Unique ref identifier"""
-  id: UUID
-
-  """Ref name (e.g. HEAD, main)"""
-  name: String
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID
-
-  """Store this ref belongs to"""
-  storeId: UUID
-
-  """Commit this ref points to"""
-  commitId: UUID
-}
-
-"""The output of our update `Store` mutation."""
-type UpdateStorePayload {
+"""The output of our update `Ref` mutation."""
+type UpdateRefPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Store` that was updated by this mutation."""
-  store: Store
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Store`. May be used by Relay 1."""
-  storeEdge(
-    """The method to use when ordering `Store`."""
-    orderBy: [StoreOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StoreEdge
+  """The `Ref` that was updated by this mutation."""
+  ref: Ref
+
+  """An edge for our `Ref`. May be used by Relay 1."""
+  refEdge(
+    """The method to use when ordering `Ref`."""
+    orderBy: [RefOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RefEdge
 }
 
 """All input for the `updateStore` mutation."""
@@ -1802,343 +2120,25 @@ input UpdateStoreInput {
   storePatch: StorePatch!
 }
 
-"""
-Represents an update to a `Store`. Fields that are set will be updated.
-"""
-input StorePatch {
-  """Unique store identifier"""
-  id: UUID
-
-  """Human-readable store name"""
-  name: String
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID
-
-  """Current root object hash of this store"""
-  hash: UUID
-
-  """Timestamp of store creation"""
-  createdAt: Datetime
-}
-
-"""The output of our update `Object` mutation."""
-type UpdateObjectPayload {
+"""The output of our update `Store` mutation."""
+type UpdateStorePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-
-  """The `Object` that was updated by this mutation."""
-  object: Object
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Object`. May be used by Relay 1."""
-  objectEdge(
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ObjectEdge
-}
-
-"""All input for the `updateObject` mutation."""
-input UpdateObjectInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """
-  An object where the defined keys will be set on the `Object` being updated.
-  """
-  objectPatch: ObjectPatch!
-}
-
-"""
-Represents an update to a `Object`. Fields that are set will be updated.
-"""
-input ObjectPatch {
-  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
-  id: UUID
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID
-
-  """Ordered array of child object IDs"""
-  kids: [UUID]
-
-  """Ordered array of child path names (parallel to kids)"""
-  ktree: [String]
-
-  """Payload data for this object node"""
-  data: JSON
-
-  """Timestamp of object creation"""
-  createdAt: Datetime
-}
-
-"""The output of our update `Commit` mutation."""
-type UpdateCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Commit` that was updated by this mutation."""
-  commit: Commit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Commit`. May be used by Relay 1."""
-  commitEdge(
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommitEdge
-}
-
-"""All input for the `updateCommit` mutation."""
-input UpdateCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique commit identifier"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """
-  An object where the defined keys will be set on the `Commit` being updated.
-  """
-  commitPatch: CommitPatch!
-}
-
-"""
-Represents an update to a `Commit`. Fields that are set will be updated.
-"""
-input CommitPatch {
-  """Unique commit identifier"""
-  id: UUID
-
-  """Optional commit message"""
-  message: String
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID
-
-  """Store this commit belongs to"""
-  storeId: UUID
-
-  """Parent commit IDs (supports merge commits)"""
-  parentIds: [UUID]
-
-  """User who authored the changes"""
-  authorId: UUID
-
-  """User who committed (may differ from author)"""
-  committerId: UUID
-
-  """Root object ID of the tree snapshot at this commit"""
-  treeId: UUID
-
-  """Commit timestamp"""
-  date: Datetime
-}
-
-"""The output of our delete `Ref` mutation."""
-type DeleteRefPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Ref` that was deleted by this mutation."""
-  ref: Ref
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Ref`. May be used by Relay 1."""
-  refEdge(
-    """The method to use when ordering `Ref`."""
-    orderBy: [RefOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RefEdge
-}
-
-"""All input for the `deleteRef` mutation."""
-input DeleteRefInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique ref identifier"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-}
-
-"""The output of our delete `Store` mutation."""
-type DeleteStorePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Store` that was deleted by this mutation."""
+  """The `Store` that was updated by this mutation."""
   store: Store
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 
   """An edge for our `Store`. May be used by Relay 1."""
   storeEdge(
     """The method to use when ordering `Store`."""
     orderBy: [StoreOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StoreEdge
-}
-
-"""All input for the `deleteStore` mutation."""
-input DeleteStoreInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique store identifier"""
-  id: UUID!
-}
-
-"""The output of our delete `Object` mutation."""
-type DeleteObjectPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Object` that was deleted by this mutation."""
-  object: Object
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Object`. May be used by Relay 1."""
-  objectEdge(
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ObjectEdge
-}
-
-"""All input for the `deleteObject` mutation."""
-input DeleteObjectInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-}
-
-"""The output of our delete `Commit` mutation."""
-type DeleteCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Commit` that was deleted by this mutation."""
-  commit: Commit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Commit`. May be used by Relay 1."""
-  commitEdge(
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommitEdge
-}
-
-"""All input for the `deleteCommit` mutation."""
-input DeleteCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique commit identifier"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-}
-
-input ProvisionBucketInput {
-  """The logical bucket key (e.g., "public", "private")"""
-  bucketKey: String!
-
-  """
-  Owner entity ID for entity-scoped bucket provisioning.
-  Omit for app-level (database-wide) storage.
-  """
-  ownerId: UUID
-}
-
-type ProvisionBucketPayload {
-  """Whether provisioning succeeded"""
-  success: Boolean!
-
-  """The S3 bucket name that was provisioned"""
-  bucketName: String!
-
-  """The access type applied"""
-  accessType: String!
-
-  """The storage provider used"""
-  provider: String!
-
-  """The S3 endpoint (null for AWS S3 default)"""
-  endpoint: String
-
-  """Error message if provisioning failed"""
-  error: String
 }

@@ -5,52 +5,53 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { FunctionModel } from './models/function';
-import { SchemaModel } from './models/schema';
-import { TableModel } from './models/table';
+import { ApiModel } from './models/api';
+import { ApiModuleModel } from './models/apiModule';
+import { ApiSchemaModel } from './models/apiSchema';
+import { ApiSettingModel } from './models/apiSetting';
+import { AppModel } from './models/app';
+import { AstMigrationModel } from './models/astMigration';
 import { CheckConstraintModel } from './models/checkConstraint';
+import { CompositeTypeModel } from './models/compositeType';
+import { CorsSettingModel } from './models/corsSetting';
+import { DatabaseModel } from './models/database';
+import { DatabaseSettingModel } from './models/databaseSetting';
+import { DatabaseTransferModel } from './models/databaseTransfer';
+import { DefaultPrivilegeModel } from './models/defaultPrivilege';
+import { DomainModel } from './models/domain';
+import { EmbeddingChunkModel } from './models/embeddingChunk';
+import { EnumModel } from './models/enum';
 import { FieldModel } from './models/field';
-import { SpatialRelationModel } from './models/spatialRelation';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
+import { FunctionModel } from './models/function';
+import { HttpRouteModel } from './models/httpRoute';
 import { IndexModel } from './models/index';
+import { ManagedDomainModel } from './models/managedDomain';
+import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
+import { PartitionModel } from './models/partition';
 import { PolicyModel } from './models/policy';
 import { PrimaryKeyConstraintModel } from './models/primaryKeyConstraint';
-import { TableGrantModel } from './models/tableGrant';
-import { TriggerModel } from './models/trigger';
-import { UniqueConstraintModel } from './models/uniqueConstraint';
-import { ViewModel } from './models/view';
-import { ViewTableModel } from './models/viewTable';
-import { ViewGrantModel } from './models/viewGrant';
-import { ViewRuleModel } from './models/viewRule';
-import { EmbeddingChunkModel } from './models/embeddingChunk';
+import { PubkeySettingModel } from './models/pubkeySetting';
+import { RlsSettingModel } from './models/rlsSetting';
+import { SchemaModel } from './models/schema';
 import { SchemaGrantModel } from './models/schemaGrant';
-import { DefaultPrivilegeModel } from './models/defaultPrivilege';
-import { EnumModel } from './models/enum';
-import { CompositeTypeModel } from './models/compositeType';
-import { ApiSchemaModel } from './models/apiSchema';
-import { ApiModuleModel } from './models/apiModule';
-import { DomainModel } from './models/domain';
+import { SiteModel } from './models/site';
 import { SiteMetadatumModel } from './models/siteMetadatum';
 import { SiteModuleModel } from './models/siteModule';
 import { SiteThemeModel } from './models/siteTheme';
-import { CorsSettingModel } from './models/corsSetting';
-import { TriggerFunctionModel } from './models/triggerFunction';
-import { PartitionModel } from './models/partition';
-import { DatabaseTransferModel } from './models/databaseTransfer';
-import { ApiModel } from './models/api';
-import { SiteModel } from './models/site';
-import { AppModel } from './models/app';
-import { ApiSettingModel } from './models/apiSetting';
-import { MigrateFileModel } from './models/migrateFile';
-import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
-import { PubkeySettingModel } from './models/pubkeySetting';
-import { DatabaseModel } from './models/database';
-import { RlsSettingModel } from './models/rlsSetting';
+import { SpatialRelationModel } from './models/spatialRelation';
 import { SqlActionModel } from './models/sqlAction';
-import { DatabaseSettingModel } from './models/databaseSetting';
+import { TableModel } from './models/table';
+import { TableGrantModel } from './models/tableGrant';
+import { TriggerModel } from './models/trigger';
+import { TriggerFunctionModel } from './models/triggerFunction';
+import { UniqueConstraintModel } from './models/uniqueConstraint';
+import { ViewModel } from './models/view';
+import { ViewGrantModel } from './models/viewGrant';
+import { ViewRuleModel } from './models/viewRule';
+import { ViewTableModel } from './models/viewTable';
 import { WebauthnSettingModel } from './models/webauthnSetting';
-import { AstMigrationModel } from './models/astMigration';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -86,52 +87,53 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    function: new FunctionModel(client),
-    schema: new SchemaModel(client),
-    table: new TableModel(client),
+    api: new ApiModel(client),
+    apiModule: new ApiModuleModel(client),
+    apiSchema: new ApiSchemaModel(client),
+    apiSetting: new ApiSettingModel(client),
+    app: new AppModel(client),
+    astMigration: new AstMigrationModel(client),
     checkConstraint: new CheckConstraintModel(client),
+    compositeType: new CompositeTypeModel(client),
+    corsSetting: new CorsSettingModel(client),
+    database: new DatabaseModel(client),
+    databaseSetting: new DatabaseSettingModel(client),
+    databaseTransfer: new DatabaseTransferModel(client),
+    defaultPrivilege: new DefaultPrivilegeModel(client),
+    domain: new DomainModel(client),
+    embeddingChunk: new EmbeddingChunkModel(client),
+    enum: new EnumModel(client),
     field: new FieldModel(client),
-    spatialRelation: new SpatialRelationModel(client),
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
+    function: new FunctionModel(client),
+    httpRoute: new HttpRouteModel(client),
     index: new IndexModel(client),
+    managedDomain: new ManagedDomainModel(client),
+    nodeTypeRegistry: new NodeTypeRegistryModel(client),
+    partition: new PartitionModel(client),
     policy: new PolicyModel(client),
     primaryKeyConstraint: new PrimaryKeyConstraintModel(client),
-    tableGrant: new TableGrantModel(client),
-    trigger: new TriggerModel(client),
-    uniqueConstraint: new UniqueConstraintModel(client),
-    view: new ViewModel(client),
-    viewTable: new ViewTableModel(client),
-    viewGrant: new ViewGrantModel(client),
-    viewRule: new ViewRuleModel(client),
-    embeddingChunk: new EmbeddingChunkModel(client),
+    pubkeySetting: new PubkeySettingModel(client),
+    rlsSetting: new RlsSettingModel(client),
+    schema: new SchemaModel(client),
     schemaGrant: new SchemaGrantModel(client),
-    defaultPrivilege: new DefaultPrivilegeModel(client),
-    enum: new EnumModel(client),
-    compositeType: new CompositeTypeModel(client),
-    apiSchema: new ApiSchemaModel(client),
-    apiModule: new ApiModuleModel(client),
-    domain: new DomainModel(client),
+    site: new SiteModel(client),
     siteMetadatum: new SiteMetadatumModel(client),
     siteModule: new SiteModuleModel(client),
     siteTheme: new SiteThemeModel(client),
-    corsSetting: new CorsSettingModel(client),
-    triggerFunction: new TriggerFunctionModel(client),
-    partition: new PartitionModel(client),
-    databaseTransfer: new DatabaseTransferModel(client),
-    api: new ApiModel(client),
-    site: new SiteModel(client),
-    app: new AppModel(client),
-    apiSetting: new ApiSettingModel(client),
-    migrateFile: new MigrateFileModel(client),
-    nodeTypeRegistry: new NodeTypeRegistryModel(client),
-    pubkeySetting: new PubkeySettingModel(client),
-    database: new DatabaseModel(client),
-    rlsSetting: new RlsSettingModel(client),
+    spatialRelation: new SpatialRelationModel(client),
     sqlAction: new SqlActionModel(client),
-    databaseSetting: new DatabaseSettingModel(client),
+    table: new TableModel(client),
+    tableGrant: new TableGrantModel(client),
+    trigger: new TriggerModel(client),
+    triggerFunction: new TriggerFunctionModel(client),
+    uniqueConstraint: new UniqueConstraintModel(client),
+    view: new ViewModel(client),
+    viewGrant: new ViewGrantModel(client),
+    viewRule: new ViewRuleModel(client),
+    viewTable: new ViewTableModel(client),
     webauthnSetting: new WebauthnSettingModel(client),
-    astMigration: new AstMigrationModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

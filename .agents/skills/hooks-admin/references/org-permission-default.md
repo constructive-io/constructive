@@ -7,8 +7,8 @@ Stores the default permission bitmask assigned to new members upon joining
 ## Usage
 
 ```typescript
-useOrgPermissionDefaultsQuery({ selection: { fields: { id: true, permissions: true, entityId: true } } })
-useOrgPermissionDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, permissions: true, entityId: true } } })
+useOrgPermissionDefaultsQuery({ selection: { fields: { entityId: true, id: true, permissions: true } } })
+useOrgPermissionDefaultQuery({ id: '<UUID>', selection: { fields: { entityId: true, id: true, permissions: true } } })
 useCreateOrgPermissionDefaultMutation({ selection: { fields: { id: true } } })
 useUpdateOrgPermissionDefaultMutation({ selection: { fields: { id: true } } })
 useDeleteOrgPermissionDefaultMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgPermissionDefaultMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgPermissionDefaultsQuery({
-  selection: { fields: { id: true, permissions: true, entityId: true } },
+  selection: { fields: { entityId: true, id: true, permissions: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgPermissionDefaultsQuery({
 const { mutate } = useCreateOrgPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
-mutate({ permissions: '<BitString>', entityId: '<UUID>' });
+mutate({ entityId: '<UUID>', permissions: '<BitString>' });
 ```

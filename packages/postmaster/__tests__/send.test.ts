@@ -1,8 +1,4 @@
-import { writeFileSync, unlinkSync, mkdirSync, rmSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-
-import { send, resetClient } from '../src';
+import { resetClient,send } from '../src';
 
 // Enhanced mock to capture actual arguments passed to messages.create
 const mockCreate = jest.fn().mockResolvedValue({ id: 'mock-message-id' });
@@ -17,19 +13,6 @@ jest.mock('mailgun.js', () => {
 
 describe('send', () => {
   const ORIGINAL_ENV = { ...process.env };
-  const testDir = join(tmpdir(), 'postmaster-test-' + process.pid);
-
-  beforeAll(() => {
-    mkdirSync(testDir, { recursive: true });
-  });
-
-  afterAll(() => {
-    try {
-      rmSync(testDir, { recursive: true });
-    } catch {
-      // ignore cleanup errors
-    }
-  });
 
   beforeEach(() => {
     mockCreate.mockClear();
@@ -53,8 +36,7 @@ describe('send', () => {
     process.env.MAILGUN_FROM = 'sender@example.com';
     process.env.MAILGUN_REPLY = 'reply@example.com';
 
-    // This should not throw ReferenceError when accessing vars
-    // The bug was that secretEnv used varEnv instead of inputEnv
+    // This should not throw ReferenceError when accessing vars.
     await expect(
       send({
         to: 'recipient@example.com',
@@ -124,25 +106,6 @@ describe('send', () => {
     ).resolves.not.toThrow();
   });
 
-  describe('file-based secrets', () => {
-    it('C1: MAILGUN_KEY_FILE only (no MAILGUN_KEY) → send succeeds', async () => {
-      const keyPath = join(testDir, 'mailgun-key');
-      writeFileSync(keyPath, 'file-api-key');
-
-      process.env.MAILGUN_KEY_FILE = keyPath;
-      process.env.MAILGUN_DOMAIN = 'mg.example.com';
-      process.env.MAILGUN_FROM = 'sender@example.com';
-      process.env.MAILGUN_REPLY = 'reply@example.com';
-      // No MAILGUN_KEY set directly
-
-      await expect(
-        send({ to: 'test@example.com', subject: 'Test', text: 'Body' })
-      ).resolves.not.toThrow();
-
-      unlinkSync(keyPath);
-    });
-  });
-
   describe('resetClient behavior', () => {
     it('C2: resetClient() forces env re-read', async () => {
       process.env.MAILGUN_KEY = 'key1';
@@ -179,7 +142,6 @@ describe('send', () => {
 
     it('D2: Missing MAILGUN_KEY → throw', async () => {
       delete process.env.MAILGUN_KEY;
-      delete process.env.MAILGUN_KEY_FILE;
       process.env.MAILGUN_DOMAIN = 'mg.example.com';
       process.env.MAILGUN_FROM = 'sender@example.com';
       process.env.MAILGUN_REPLY = 'reply@example.com';

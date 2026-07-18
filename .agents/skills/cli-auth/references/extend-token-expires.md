@@ -7,7 +7,7 @@ Execute the extendTokenExpires mutation
 ## Usage
 
 ```bash
-csdk extend-token-expires --input.clientMutationId <String> --input.amount <IntervalInput>
+csdk extend-token-expires --input.amount <IntervalInput> --input.clientMutationId <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk extend-token-expires --input.clientMutationId <String> --input.amount <Inte
 ### Run extendTokenExpires
 
 ```bash
-csdk extend-token-expires --input.clientMutationId <String> --input.amount <IntervalInput>
+csdk extend-token-expires --input.amount <IntervalInput> --input.clientMutationId <String>
 ```

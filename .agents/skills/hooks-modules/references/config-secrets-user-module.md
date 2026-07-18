@@ -7,8 +7,8 @@ React Query hooks for ConfigSecretsUserModule data operations
 ## Usage
 
 ```typescript
-useConfigSecretsUserModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, configDefinitionsTableId: true, apiName: true, privateApiName: true } } })
-useConfigSecretsUserModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, configDefinitionsTableId: true, apiName: true, privateApiName: true } } })
+useConfigSecretsUserModulesQuery({ selection: { fields: { apiName: true, databaseId: true, entityField: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true } } })
+useConfigSecretsUserModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, databaseId: true, entityField: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateConfigSecretsUserModuleMutation({ selection: { fields: { id: true } } })
 useUpdateConfigSecretsUserModuleMutation({ selection: { fields: { id: true } } })
 useDeleteConfigSecretsUserModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteConfigSecretsUserModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useConfigSecretsUserModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, configDefinitionsTableId: true, apiName: true, privateApiName: true } },
+  selection: { fields: { apiName: true, databaseId: true, entityField: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useConfigSecretsUserModulesQuery({
 const { mutate } = useCreateConfigSecretsUserModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', configDefinitionsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

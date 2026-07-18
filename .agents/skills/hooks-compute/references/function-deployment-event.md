@@ -7,8 +7,8 @@ Deployment lifecycle events — audit log of provisioning, scaling, and failure 
 ## Usage
 
 ```typescript
-useFunctionDeploymentEventsQuery({ selection: { fields: { createdAt: true, id: true, deploymentId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } } })
-useFunctionDeploymentEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, deploymentId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } } })
+useFunctionDeploymentEventsQuery({ selection: { fields: { actorId: true, createdAt: true, databaseId: true, deploymentId: true, eventType: true, id: true, message: true, metadata: true } } })
+useFunctionDeploymentEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, databaseId: true, deploymentId: true, eventType: true, id: true, message: true, metadata: true } } })
 useCreateFunctionDeploymentEventMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionDeploymentEventMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionDeploymentEventMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionDeploymentEventMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionDeploymentEventsQuery({
-  selection: { fields: { createdAt: true, id: true, deploymentId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } },
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, deploymentId: true, eventType: true, id: true, message: true, metadata: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionDeploymentEventsQuery({
 const { mutate } = useCreateFunctionDeploymentEventMutation({
   selection: { fields: { id: true } },
 });
-mutate({ deploymentId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', databaseId: '<UUID>' });
+mutate({ actorId: '<UUID>', databaseId: '<UUID>', deploymentId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>' });
 ```

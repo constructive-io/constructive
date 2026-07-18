@@ -5,11 +5,11 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { GetAllRecordModel } from './models/getAllRecord';
+import { CommitModel } from './models/commit';
+import { GetAllTreeNodesRecordModel } from './models/getAllTreeNodesRecord';
+import { ObjectModel } from './models/object';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
-import { ObjectModel } from './models/object';
-import { CommitModel } from './models/commit';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
@@ -43,11 +43,11 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    getAllRecord: new GetAllRecordModel(client),
+    commit: new CommitModel(client),
+    getAllTreeNodesRecord: new GetAllTreeNodesRecordModel(client),
+    object: new ObjectModel(client),
     ref: new RefModel(client),
     store: new StoreModel(client),
-    object: new ObjectModel(client),
-    commit: new CommitModel(client),
     mutation: createMutationOperations(client),
   };
 }

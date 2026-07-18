@@ -12,8 +12,8 @@ csdk app-limit-warning list --where.<field>.<op> <value> --orderBy <values>
 csdk app-limit-warning list --limit 10 --after <cursor>
 csdk app-limit-warning find-first --where.<field>.<op> <value>
 csdk app-limit-warning get --id <UUID>
-csdk app-limit-warning create --name <String> --warningType <String> --thresholdValue <BigInt> --taskIdentifier <String>
-csdk app-limit-warning update --id <UUID> [--name <String>] [--warningType <String>] [--thresholdValue <BigInt>] [--taskIdentifier <String>]
+csdk app-limit-warning create --name <String> --taskIdentifier <String> --thresholdValue <BigInt> --warningType <String>
+csdk app-limit-warning update --id <UUID> [--name <String>] [--taskIdentifier <String>] [--thresholdValue <BigInt>] [--warningType <String>]
 csdk app-limit-warning delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit-warning list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appLimitWarning
 
 ```bash
-csdk app-limit-warning create --name <String> --warningType <String> --thresholdValue <BigInt> --taskIdentifier <String>
+csdk app-limit-warning create --name <String> --taskIdentifier <String> --thresholdValue <BigInt> --warningType <String>
 ```
 
 ### Get a appLimitWarning by id

@@ -9,8 +9,8 @@ Agent persona templates (role, system prompt, default skills/knowledge)
 ```typescript
 db.agentPersona.findMany({ select: { id: true } }).execute()
 db.agentPersona.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.agentPersona.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' }, select: { id: true } }).execute()
-db.agentPersona.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute()
+db.agentPersona.create({ data: { config: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', name: '<String>', resources: '<String>', slug: '<String>', systemPrompt: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.agentPersona.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute()
 db.agentPersona.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.agentPersona.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.agentPersona.findMany({
-  select: { id: true, createdBy: true }
+  select: { id: true, config: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.agentPersona.findMany({
 
 ```typescript
 const item = await db.agentPersona.create({
-  data: { createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' },
+  data: { config: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', name: '<String>', resources: '<String>', slug: '<String>', systemPrompt: '<String>', updatedBy: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

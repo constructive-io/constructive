@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.27.1](https://github.com/constructive-io/constructive/compare/graphile-query@4.27.0...graphile-query@4.27.1) (2026-07-18)
+
+**Note:** Version bump only for package graphile-query
+
+# [4.27.0](https://github.com/constructive-io/constructive/compare/graphile-query@4.26.3...graphile-query@4.27.0) (2026-07-18)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.26.3](https://github.com/constructive-io/constructive/compare/graphile-query@4.26.2...graphile-query@4.26.3) (2026-07-17)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.26.2](https://github.com/constructive-io/constructive/compare/graphile-query@4.26.1...graphile-query@4.26.2) (2026-07-17)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.26.1](https://github.com/constructive-io/constructive/compare/graphile-query@4.26.0...graphile-query@4.26.1) (2026-07-15)
+
+**Note:** Version bump only for package graphile-query
+
+# [4.26.0](https://github.com/constructive-io/constructive/compare/graphile-query@4.25.3...graphile-query@4.26.0) (2026-07-14)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.25.3](https://github.com/constructive-io/constructive/compare/graphile-query@4.25.2...graphile-query@4.25.3) (2026-07-14)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.25.2](https://github.com/constructive-io/constructive/compare/graphile-query@4.25.1...graphile-query@4.25.2) (2026-07-13)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.25.1](https://github.com/constructive-io/constructive/compare/graphile-query@4.25.0...graphile-query@4.25.1) (2026-07-13)
+
+**Note:** Version bump only for package graphile-query
+
+# [4.25.0](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.8...graphile-query@4.25.0) (2026-07-12)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.24.8](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.7...graphile-query@4.24.8) (2026-07-12)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.24.7](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.6...graphile-query@4.24.7) (2026-07-12)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.24.6](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.5...graphile-query@4.24.6) (2026-07-11)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.24.5](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.4...graphile-query@4.24.5) (2026-07-11)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.24.4](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.3...graphile-query@4.24.4) (2026-07-10)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.24.3](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.2...graphile-query@4.24.3) (2026-07-10)
+
+**Note:** Version bump only for package graphile-query
+
 ## [4.24.2](https://github.com/constructive-io/constructive/compare/graphile-query@4.24.1...graphile-query@4.24.2) (2026-07-08)
 
 **Note:** Version bump only for package graphile-query

@@ -9,7 +9,7 @@ Warning configuration for soft limits. Each row defines a warning threshold and 
 ```typescript
 db.appLimitWarning.findMany({ select: { id: true } }).execute()
 db.appLimitWarning.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appLimitWarning.create({ data: { name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' }, select: { id: true } }).execute()
+db.appLimitWarning.create({ data: { name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' }, select: { id: true } }).execute()
 db.appLimitWarning.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
 db.appLimitWarning.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.appLimitWarning.findMany({
 
 ```typescript
 const item = await db.appLimitWarning.create({
-  data: { name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' },
+  data: { name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' },
   select: { id: true }
 }).execute();
 ```

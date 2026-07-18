@@ -23,7 +23,7 @@ import 'graphile-connection-filter';
 import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
-import { getQueryBuilder } from 'graphile-connection-filter';
+import { getQueryBuilder } from 'graphile-plugin-utils';
 import type { SearchAdapter, SearchableColumn, UnifiedSearchOptions } from './types';
 
 // ─── TypeScript Namespace Augmentations ──────────────────────────────────────

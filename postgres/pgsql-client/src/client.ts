@@ -1,8 +1,10 @@
+import { AuthOptions, PgTestClientContext,PgTestConnectionOptions } from '@pgpmjs/types';
 import { Client, QueryResult } from 'pg';
 import { PgConfig } from 'pg-env';
-import { AuthOptions, PgTestConnectionOptions, PgTestClientContext } from '@pgpmjs/types';
-import { getRoleName } from './roles';
+
 import { generateContextStatements } from './context-utils';
+import { defaultPgClientFactory, getActivePgClientFactory } from './driver';
+import { getRoleName } from './roles';
 
 export type PgClientOpts = {
   deferConnect?: boolean;
@@ -21,13 +23,8 @@ export class PgClient {
   constructor(config: PgConfig, opts: PgClientOpts = {}) {
     this.opts = opts;
     this.config = config;
-    this.client = new Client({
-      host: this.config.host,
-      port: this.config.port,
-      database: this.config.database,
-      user: this.config.user,
-      password: this.config.password
-    });
+    const factory = getActivePgClientFactory() ?? defaultPgClientFactory;
+    this.client = factory(this.config) as Client;
     if (!opts.deferConnect) {
       this.connectPromise = this.client.connect();
       if (opts.trackConnect) opts.trackConnect(this.connectPromise);

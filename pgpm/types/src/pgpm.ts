@@ -1,5 +1,7 @@
 import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
+
+import { PgpmDriverConfig } from './driver';
 import { JobsConfig } from './jobs';
 
 /**
@@ -208,6 +210,26 @@ export interface PgpmWorkspaceConfig {
   };
   /** Deployment configuration for the workspace */
   deployment?: Omit<DeploymentOptions, 'toChange'>;
+  /**
+   * Workspace-level pgpm module dependencies (npm package name -> exact version).
+   * Recorded by `pgpm install` when run at the workspace root; `pgpm install`
+   * with no arguments at the workspace root installs these into extensions/.
+   */
+  dependencies?: Record<string, string>;
+  /**
+   * Template source recorded at scaffold time when the workspace is created
+   * from a non-default boilerplate repo (e.g. via `pgpm init workspace --pglite`
+   * or `--repo`). `pgpm init` reads this so modules created inside the workspace
+   * inherit the same boilerplate source without re-specifying the flag.
+   */
+  boilerplates?: {
+    /** Template repository URL */
+    repo: string;
+    /** Branch/tag to clone */
+    branch?: string;
+    /** Template variant directory */
+    dir?: string;
+  };
 }
 
 /**
@@ -257,6 +279,12 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
+    /**
+     * Pluggable migration backend. Undefined = built-in `pg` (server) path.
+     * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved
+     * from the consumer's `node_modules`.
+     */
+    driver?: PgpmDriverConfig;
 }
 
 /**
@@ -282,7 +310,6 @@ export const pgpmDefaults: PgpmOptions = {
       anonymous: 'anonymous',
       authenticated: 'authenticated',
       administrator: 'administrator',
-      authenticatedClient: 'authenticated_client',
       default: 'anonymous'
     },
     useLocksForRoles: false
@@ -292,13 +319,13 @@ export const pgpmDefaults: PgpmOptions = {
     port: 5432,
     user: 'postgres',
     password: 'password',
-    database: 'postgres',
+    database: 'postgres'
   },
   server: {
     host: 'localhost',
     port: 3000,
     trustProxy: false,
-    strictAuth: false,
+    strictAuth: false
   },
   cdn: {
     provider: 'minio',

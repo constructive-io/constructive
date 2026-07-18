@@ -171,38 +171,4 @@ export class PrincipalModel {
       variables,
     });
   }
-  delete<S extends PrincipalSelect>(
-    args: DeleteArgs<
-      {
-        principalId: string;
-      },
-      S
-    > & {
-      select: S;
-    } & StrictSelect<S, PrincipalSelect>
-  ): QueryBuilder<{
-    deletePrincipal: {
-      principal: InferSelectResult<PrincipalWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildDeleteByPkDocument(
-      'Principal',
-      'deletePrincipal',
-      'principal',
-      {
-        principalId: args.where.principalId,
-      },
-      'DeletePrincipalInput',
-      args.select,
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'Principal',
-      fieldName: 'deletePrincipal',
-      document,
-      variables,
-    });
-  }
 }

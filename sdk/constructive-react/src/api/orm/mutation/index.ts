@@ -8,76 +8,36 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   AcceptDatabaseTransferInput,
-  CancelDatabaseTransferInput,
-  RejectDatabaseTransferInput,
-  ProvisionDatabaseWithUserInput,
-  BootstrapUserInput,
-  SetFieldOrderInput,
   ApplyRlsInput,
-  CreateUserDatabaseInput,
+  CancelDatabaseTransferInput,
   ProvisionBucketInput,
+  RejectDatabaseTransferInput,
+  RequestDatabaseInput,
+  SetFieldOrderInput,
   AcceptDatabaseTransferPayload,
-  CancelDatabaseTransferPayload,
-  RejectDatabaseTransferPayload,
-  ProvisionDatabaseWithUserPayload,
-  BootstrapUserPayload,
-  SetFieldOrderPayload,
   ApplyRlsPayload,
-  CreateUserDatabasePayload,
+  CancelDatabaseTransferPayload,
   ProvisionBucketPayload,
+  RejectDatabaseTransferPayload,
+  RequestDatabasePayload,
+  SetFieldOrderPayload,
   AcceptDatabaseTransferPayloadSelect,
-  CancelDatabaseTransferPayloadSelect,
-  RejectDatabaseTransferPayloadSelect,
-  ProvisionDatabaseWithUserPayloadSelect,
-  BootstrapUserPayloadSelect,
-  SetFieldOrderPayloadSelect,
   ApplyRlsPayloadSelect,
-  CreateUserDatabasePayloadSelect,
+  CancelDatabaseTransferPayloadSelect,
   ProvisionBucketPayloadSelect,
+  RejectDatabaseTransferPayloadSelect,
+  RequestDatabasePayloadSelect,
+  SetFieldOrderPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface AcceptDatabaseTransferVariables {
   input: AcceptDatabaseTransferInput;
 }
-export interface CancelDatabaseTransferVariables {
-  input: CancelDatabaseTransferInput;
-}
-export interface RejectDatabaseTransferVariables {
-  input: RejectDatabaseTransferInput;
-}
-export interface ProvisionDatabaseWithUserVariables {
-  input: ProvisionDatabaseWithUserInput;
-}
-export interface BootstrapUserVariables {
-  input: BootstrapUserInput;
-}
-export interface SetFieldOrderVariables {
-  input: SetFieldOrderInput;
-}
 export interface ApplyRlsVariables {
   input: ApplyRlsInput;
 }
-/**
- * Variables for createUserDatabase
- * Creates a new user database with all required modules, permissions, and RLS policies.
-
-Parameters:
-  - database_name: Name for the new database (required)
-  - owner_id: UUID of the owner user (required)
-  - include_invites: Include invite system (default: true)
-  - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include events/analytics (default: false)
-  - bitlen: Bit length for permission masks (default: 64)
-  - tokens_expiration: Token expiration interval (default: 30 days)
-
-Returns the database_id UUID of the newly created database.
-
-Example usage:
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
- */
-export interface CreateUserDatabaseVariables {
-  input: CreateUserDatabaseInput;
+export interface CancelDatabaseTransferVariables {
+  input: CancelDatabaseTransferInput;
 }
 /**
  * Variables for provisionBucket
@@ -88,6 +48,25 @@ and lifecycle settings.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
+}
+export interface RejectDatabaseTransferVariables {
+  input: RejectDatabaseTransferInput;
+}
+/**
+ * Variables for requestDatabase
+ * Requests a database and returns a ticket (database_provision_module row) to poll.
+
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+
+Example usage:
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+ */
+export interface RequestDatabaseVariables {
+  input: RequestDatabaseInput;
+}
+export interface SetFieldOrderVariables {
+  input: SetFieldOrderInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -120,6 +99,35 @@ export function createMutationOperations(client: OrmClient) {
           'AcceptDatabaseTransferPayload'
         ),
       }),
+    applyRls: <S extends ApplyRlsPayloadSelect>(
+      args: ApplyRlsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ApplyRlsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        applyRls: InferSelectResult<ApplyRlsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ApplyRls',
+        fieldName: 'applyRls',
+        ...buildCustomDocument(
+          'mutation',
+          'ApplyRls',
+          'applyRls',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ApplyRlsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ApplyRlsPayload'
+        ),
+      }),
     cancelDatabaseTransfer: <S extends CancelDatabaseTransferPayloadSelect>(
       args: CancelDatabaseTransferVariables,
       options: {
@@ -147,6 +155,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CancelDatabaseTransferPayload'
+        ),
+      }),
+    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
+      args: ProvisionBucketVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionBucket',
+        fieldName: 'provisionBucket',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionBucket',
+          'provisionBucket',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionBucketInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionBucketPayload'
         ),
       }),
     rejectDatabaseTransfer: <S extends RejectDatabaseTransferPayloadSelect>(
@@ -178,62 +215,33 @@ export function createMutationOperations(client: OrmClient) {
           'RejectDatabaseTransferPayload'
         ),
       }),
-    provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
-      args: ProvisionDatabaseWithUserVariables,
+    requestDatabase: <S extends RequestDatabasePayloadSelect>(
+      args: RequestDatabaseVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ProvisionDatabaseWithUserPayloadSelect>
+      } & StrictSelect<S, RequestDatabasePayloadSelect>
     ) =>
       new QueryBuilder<{
-        provisionDatabaseWithUser: InferSelectResult<ProvisionDatabaseWithUserPayload, S> | null;
+        requestDatabase: InferSelectResult<RequestDatabasePayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ProvisionDatabaseWithUser',
-        fieldName: 'provisionDatabaseWithUser',
+        operationName: 'RequestDatabase',
+        fieldName: 'requestDatabase',
         ...buildCustomDocument(
           'mutation',
-          'ProvisionDatabaseWithUser',
-          'provisionDatabaseWithUser',
+          'RequestDatabase',
+          'requestDatabase',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ProvisionDatabaseWithUserInput!',
+              type: 'RequestDatabaseInput!',
             },
           ],
           connectionFieldsMap,
-          'ProvisionDatabaseWithUserPayload'
-        ),
-      }),
-    bootstrapUser: <S extends BootstrapUserPayloadSelect>(
-      args: BootstrapUserVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, BootstrapUserPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        bootstrapUser: InferSelectResult<BootstrapUserPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'BootstrapUser',
-        fieldName: 'bootstrapUser',
-        ...buildCustomDocument(
-          'mutation',
-          'BootstrapUser',
-          'bootstrapUser',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'BootstrapUserInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'BootstrapUserPayload'
+          'RequestDatabasePayload'
         ),
       }),
     setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
@@ -263,93 +271,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetFieldOrderPayload'
-        ),
-      }),
-    applyRls: <S extends ApplyRlsPayloadSelect>(
-      args: ApplyRlsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ApplyRlsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        applyRls: InferSelectResult<ApplyRlsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ApplyRls',
-        fieldName: 'applyRls',
-        ...buildCustomDocument(
-          'mutation',
-          'ApplyRls',
-          'applyRls',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ApplyRlsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ApplyRlsPayload'
-        ),
-      }),
-    createUserDatabase: <S extends CreateUserDatabasePayloadSelect>(
-      args: CreateUserDatabaseVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CreateUserDatabasePayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        createUserDatabase: InferSelectResult<CreateUserDatabasePayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CreateUserDatabase',
-        fieldName: 'createUserDatabase',
-        ...buildCustomDocument(
-          'mutation',
-          'CreateUserDatabase',
-          'createUserDatabase',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CreateUserDatabaseInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CreateUserDatabasePayload'
-        ),
-      }),
-    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
-      args: ProvisionBucketVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionBucketPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionBucket',
-        fieldName: 'provisionBucket',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionBucket',
-          'provisionBucket',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionBucketInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionBucketPayload'
         ),
       }),
   };

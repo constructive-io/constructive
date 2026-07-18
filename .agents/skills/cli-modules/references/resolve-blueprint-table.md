@@ -7,7 +7,7 @@ Resolves a table_name (with optional schema_name) to a table_id. Resolution orde
 ## Usage
 
 ```bash
-csdk resolve-blueprint-table --databaseId <UUID> --tableName <String> --schemaName <String> --tableMap <JSON> --defaultSchemaId <UUID>
+csdk resolve-blueprint-table --databaseId <UUID> --defaultSchemaId <UUID> --schemaName <String> --tableMap <JSON> --tableName <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resolve-blueprint-table --databaseId <UUID> --tableName <String> --schemaNa
 ### Run resolveBlueprintTable
 
 ```bash
-csdk resolve-blueprint-table --databaseId <UUID> --tableName <String> --schemaName <String> --tableMap <JSON> --defaultSchemaId <UUID>
+csdk resolve-blueprint-table --databaseId <UUID> --defaultSchemaId <UUID> --schemaName <String> --tableMap <JSON> --tableName <String>
 ```

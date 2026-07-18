@@ -7,8 +7,8 @@ Scoped sub-identities (API keys and agents) with precomputed SPRT
 ## Usage
 
 ```typescript
-usePrincipalsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } } })
-usePrincipalQuery({ principalId: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } } })
+usePrincipalsQuery({ selection: { fields: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } } })
+usePrincipalQuery({ principalId: '<UUID>', selection: { fields: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } } })
 useCreatePrincipalMutation({ selection: { fields: { principalId: true } } })
 useUpdatePrincipalMutation({ selection: { fields: { principalId: true } } })
 useDeletePrincipalMutation({})
@@ -20,7 +20,7 @@ useDeletePrincipalMutation({})
 
 ```typescript
 const { data, isLoading } = usePrincipalsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } },
+  selection: { fields: { bypassStepUp: true, createdAt: true, id: true, isReadOnly: true, name: true, ownerId: true, updatedAt: true, useAdminOwner: true, userId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePrincipalsQuery({
 const { mutate } = useCreatePrincipalMutation({
   selection: { fields: { principalId: true } },
 });
-mutate({ id: '<UUID>', ownerId: '<UUID>', userId: '<UUID>', name: '<String>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' });
+mutate({ bypassStepUp: '<Boolean>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' });
 ```

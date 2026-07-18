@@ -16,10 +16,10 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
+  entityId: 'uuid',
   id: 'uuid',
   permissionId: 'uuid',
-  entityId: 'uuid',
-  createdAt: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -73,10 +73,10 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      entityId: true,
       id: true,
       permissionId: true,
-      entityId: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -102,10 +102,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      entityId: true,
       id: true,
       permissionId: true,
-      entityId: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -143,10 +143,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
+          entityId: true,
           id: true,
           permissionId: true,
-          entityId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -165,14 +165,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'permissionId',
-        message: 'permissionId',
+        name: 'entityId',
+        message: 'entityId',
         required: true,
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
+        name: 'permissionId',
+        message: 'permissionId',
         required: true,
       },
     ]);
@@ -185,14 +185,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgPermissionDefaultPermission
       .create({
         data: {
-          permissionId: cleanedData.permissionId,
           entityId: cleanedData.entityId,
+          permissionId: cleanedData.permissionId,
         },
         select: {
+          createdAt: true,
+          entityId: true,
           id: true,
           permissionId: true,
-          entityId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -217,14 +217,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'permissionId',
-        message: 'permissionId',
+        name: 'entityId',
+        message: 'entityId',
         required: false,
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
+        name: 'permissionId',
+        message: 'permissionId',
         required: false,
       },
     ]);
@@ -237,14 +237,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          permissionId: cleanedData.permissionId,
           entityId: cleanedData.entityId,
+          permissionId: cleanedData.permissionId,
         },
         select: {
+          createdAt: true,
+          entityId: true,
           id: true,
           permissionId: true,
-          entityId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })

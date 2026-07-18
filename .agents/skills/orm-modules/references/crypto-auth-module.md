@@ -9,8 +9,8 @@ ORM operations for CryptoAuthModule records
 ```typescript
 db.cryptoAuthModule.findMany({ select: { id: true } }).execute()
 db.cryptoAuthModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.cryptoAuthModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', usersTableId: '<UUID>', secretsTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', addressesTableId: '<UUID>', userField: '<String>', cryptoNetwork: '<String>', signInRequestChallenge: '<String>', signInRecordFailure: '<String>', signUpWithKey: '<String>', signInWithChallenge: '<String>' }, select: { id: true } }).execute()
-db.cryptoAuthModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.cryptoAuthModule.create({ data: { addressesTableId: '<UUID>', cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', secretsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', signInRecordFailure: '<String>', signInRequestChallenge: '<String>', signInWithChallenge: '<String>', signUpWithKey: '<String>', userField: '<String>', usersTableId: '<UUID>' }, select: { id: true } }).execute()
+db.cryptoAuthModule.update({ where: { id: '<UUID>' }, data: { addressesTableId: '<UUID>' }, select: { id: true } }).execute()
 db.cryptoAuthModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.cryptoAuthModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.cryptoAuthModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, addressesTableId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.cryptoAuthModule.findMany({
 
 ```typescript
 const item = await db.cryptoAuthModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', usersTableId: '<UUID>', secretsTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', addressesTableId: '<UUID>', userField: '<String>', cryptoNetwork: '<String>', signInRequestChallenge: '<String>', signInRecordFailure: '<String>', signUpWithKey: '<String>', signInWithChallenge: '<String>' },
+  data: { addressesTableId: '<UUID>', cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', secretsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', signInRecordFailure: '<String>', signInRequestChallenge: '<String>', signInWithChallenge: '<String>', signUpWithKey: '<String>', userField: '<String>', usersTableId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```
