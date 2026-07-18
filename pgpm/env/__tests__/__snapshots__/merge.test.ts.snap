@@ -48,6 +48,11 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "verbose": false,
   },
   "jobs": {
+    "gateway": {
+      "callbackPort": 12345,
+      "callbackUrl": "http://callback:12345",
+      "gatewayUrl": "http://gateway:8080",
+    },
     "scheduler": {
       "gracefulShutdown": true,
       "hostname": "scheduler-0",

@@ -35,6 +35,9 @@
     "config",
     "constructive"
   ],
+  "dependencies": {
+    "12factor-env": "workspace:^"
+  },
   "devDependencies": {
     "makage": "^0.3.0"
   }

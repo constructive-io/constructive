@@ -168,6 +168,18 @@ const parseEnvNumber = (val?: string): number | undefined => {
 };
 
 /**
+ * Parse a comma-separated env value into a trimmed, non-empty string list;
+ * unset/blank => undefined.
+ */
+const parseEnvList = (val?: string): string[] | undefined => {
+  if (!val) return undefined;
+  return val
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+};
+
+/**
  * Lenient boolean validator. Unlike envalid's built-in `bool` (which rejects
  * e.g. `TRUE`/`yes`), this accepts `true`/`1`/`yes` case-insensitively. Safe to
  * combine with a boolean `default`/`devDefault` (envalid also runs the validator
@@ -233,6 +245,7 @@ export {
   num,
   // Lenient coercion
   parseEnvBoolean,
+  parseEnvList,
   parseEnvNumber,
   port,
   required,

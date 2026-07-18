@@ -10,6 +10,7 @@ import {
   isProduction,
   isTest,
   parseEnvBoolean,
+  parseEnvList,
   parseEnvNumber,
   port,
   required,
@@ -246,6 +247,15 @@ describe('env', () => {
       expect(parseEnvNumber('nan')).toBeUndefined();
       expect(parseEnvNumber('')).toBeUndefined();
       expect(parseEnvNumber(undefined)).toBeUndefined();
+    });
+
+    it('parseEnvList splits, trims and drops empty entries', () => {
+      expect(parseEnvList('a,b,c')).toEqual(['a', 'b', 'c']);
+      expect(parseEnvList(' a , b ,, c ')).toEqual(['a', 'b', 'c']);
+      expect(parseEnvList('solo')).toEqual(['solo']);
+      expect(parseEnvList(',')).toEqual([]);
+      expect(parseEnvList('')).toBeUndefined();
+      expect(parseEnvList(undefined)).toBeUndefined();
     });
 
     it('boolish validator accepts TRUE/yes that envalid bool rejects', () => {

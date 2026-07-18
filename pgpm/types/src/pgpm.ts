@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
 
 import { PgpmDriverConfig } from './driver';
-import { JobsConfig } from './jobs';
+import { JobsConfig, jobsDefaults } from './jobs';
 
 /**
  * Authentication options for test client sessions
@@ -349,27 +349,7 @@ export const pgpmDefaults: PgpmOptions = {
       useTx: false
     }
   },
-  jobs: {
-    schema: {
-      schema: 'app_jobs'
-    },
-    worker: {
-      schema: 'app_jobs',
-      hostname: 'worker-0',
-      supportAny: true,
-      supported: [],
-      pollInterval: 1000,
-      gracefulShutdown: true
-    },
-    scheduler: {
-      schema: 'app_jobs',
-      hostname: 'scheduler-0',
-      supportAny: true,
-      supported: [],
-      pollInterval: 1000,
-      gracefulShutdown: true
-    }
-  },
+  jobs: jobsDefaults,
   errorOutput: {
     queryHistoryLimit: 30,
     maxLength: 10000,

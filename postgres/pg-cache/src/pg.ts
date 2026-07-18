@@ -1,3 +1,4 @@
+import { parseEnvNumber } from '12factor-env';
 import pg from 'pg';
 import { getPgEnvOptions, PgConfig, PgPoolConfig } from 'pg-env';
 import { Logger } from '@pgpmjs/logger';
@@ -16,12 +17,6 @@ export const buildConnectionString = (
 ): string =>
   `postgres://${user}:${password}@${host}:${port}/${database}`;
 
-const parseEnvInt = (val: string | undefined, fallback: number): number => {
-  if (!val) return fallback;
-  const n = parseInt(val, 10);
-  return isNaN(n) ? fallback : n;
-};
-
 /**
  * Read per-pool configuration from environment variables.
  *
@@ -32,9 +27,9 @@ const parseEnvInt = (val: string | undefined, fallback: number): number => {
  */
 export function getPgPoolConfig(overrides?: PgPoolConfig): pg.PoolConfig {
   return {
-    max: overrides?.max ?? parseEnvInt(process.env.PG_POOL_MAX, 5),
-    idleTimeoutMillis: overrides?.idleTimeoutMillis ?? parseEnvInt(process.env.PG_POOL_IDLE_TIMEOUT_MS, 30000),
-    connectionTimeoutMillis: overrides?.connectionTimeoutMillis ?? parseEnvInt(process.env.PG_POOL_CONNECTION_TIMEOUT_MS, 5000),
+    max: overrides?.max ?? parseEnvNumber(process.env.PG_POOL_MAX) ?? 5,
+    idleTimeoutMillis: overrides?.idleTimeoutMillis ?? parseEnvNumber(process.env.PG_POOL_IDLE_TIMEOUT_MS) ?? 30000,
+    connectionTimeoutMillis: overrides?.connectionTimeoutMillis ?? parseEnvNumber(process.env.PG_POOL_CONNECTION_TIMEOUT_MS) ?? 5000,
     ...(overrides?.allowExitOnIdle !== undefined && { allowExitOnIdle: overrides.allowExitOnIdle }),
   };
 }

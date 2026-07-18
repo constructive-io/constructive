@@ -43,6 +43,8 @@ describe('findUnsafeProductionDefaults', () => {
     expect(joined).toContain('cdn.awsSecretKey');
     expect(joined).toContain('db.connections.app.password');
     expect(joined).toContain('pg.host');
+    expect(joined).toContain('jobs.gateway.gatewayUrl');
+    expect(joined).toContain('jobs.gateway.callbackUrl');
     // Never leak the value itself (paths mention ".password", but never the
     // actual secret/host strings baked into pgpmDefaults).
     expect(joined).not.toContain('app_password');
@@ -50,6 +52,8 @@ describe('findUnsafeProductionDefaults', () => {
     expect(joined).not.toContain('minioadmin');
     expect(joined).not.toContain('localhost');
     expect(joined).not.toContain('test-bucket');
+    expect(joined).not.toContain('http://gateway');
+    expect(joined).not.toContain('http://callback');
   });
 
   it('reports no issues when every sensitive field is overridden', () => {

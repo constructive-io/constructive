@@ -75,6 +75,11 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     ],
   },
   "jobs": {
+    "gateway": {
+      "callbackPort": 12345,
+      "callbackUrl": "http://callback:12345",
+      "gatewayUrl": "http://gateway:8080",
+    },
     "scheduler": {
       "gracefulShutdown": true,
       "hostname": "scheduler-0",

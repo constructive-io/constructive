@@ -10,7 +10,7 @@ import {
   getSchedulerHostname,
   getWorkerHostname
 } from '@constructive-io/job-utils';
-import { parseEnvBoolean } from '@pgpmjs/env';
+import { parseEnvBoolean, parseEnvList } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import retry from 'async-retry';
 import { Client } from 'pg';
@@ -289,14 +289,6 @@ export class KnativeJobsSvc {
   }
 }
 
-const parseList = (value?: string): string[] => {
-  if (!value) return [];
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
-};
-
 const parsePortMap = (value?: string): Record<string, number> => {
   if (!value) return {};
 
@@ -339,7 +331,7 @@ const buildFunctionsOptionsFromEnv = (): KnativeJobsSvcOptions['functions'] => {
     return { enabled: true };
   }
 
-  const names = parseList(rawFunctions) as FunctionName[];
+  const names = (parseEnvList(rawFunctions) ?? []) as FunctionName[];
   if (!names.length) return undefined;
 
   const services: FunctionServiceConfig[] = names.map((name) => ({
