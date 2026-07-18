@@ -8,7 +8,7 @@ Composable SQL seed layers for integration testing. Each layer builds on the pre
 |-------|-------|-----------------|
 | **base** | `base/setup.sql` | `uuid-ossp` extension, `stamps` schema + `timestamps()` trigger |
 | **services (real modules)** | `seed.pgpm(repoRoot)` | Real `@pgpm/metaschema-modules` (+ deps: `@pgpm/services`, `@pgpm/metaschema-schema`, ...) installed into the gitignored root `extensions/` — see `.agents/skills/ephemeral-pgpm-fixtures/SKILL.md`; run `pnpm fixtures:install` first |
-| **services grants** | `services/grants.sql` | Widens grants on the installed metaschema/services schemas to the test roles |
+| **services grants** | `services/grants.sql` | Grants the `anonymous` test role read access on the installed metaschema/services schemas (modules already grant to `administrator`/`authenticated`) |
 | **services data** | `services/test-data.sql` | Example database (`simple-pets`), 3 schemas, 5 APIs, 2 domains, API→schema linkage, animals metaschema entries |
 | **app-schemas** | `app-schemas/simple-pets/schema.sql` | `simple-pets-*` schemas, animals table with constraints/indexes/triggers |
 | **app data** | `app-schemas/simple-pets/test-data.sql` | 5 test animals (Buddy, Max, Whiskers, Mittens, Tweety) |

@@ -284,25 +284,19 @@ export class PgpmPackage {
   listModules(): ModuleMap {
     if (!this.workspacePath) return {};
 
-    // Modules that live inside a nested workspace (a directory below this
-    // workspace root with its own pgpm.json / pgpm.config.js) belong to that
-    // workspace, not this one.
-    const inNestedWorkspace = (file: string): boolean => {
-      let dir = path.dirname(file);
-      while (dir !== this.workspacePath && dir !== path.dirname(dir)) {
-        if (
-          fs.existsSync(path.join(dir, 'pgpm.json')) ||
-          fs.existsSync(path.join(dir, 'pgpm.config.js'))
-        ) {
-          return true;
-        }
-        dir = path.dirname(dir);
-      }
-      return false;
-    };
+    // Workspace membership is first-class: modules are discovered from the
+    // workspace's declared `packages` globs plus the installed extensions/
+    // directory — never from an unscoped workspace-wide scan. This keeps
+    // nested workspaces (e.g. test fixtures) out of the module map.
+    const packageDirs = [
+      ...this.allowedDirs,
+      ...glob.sync(path.join(this.workspacePath, EXTENSIONS_DIR, '{*,@*/*}'))
+    ];
 
-    const moduleFiles = glob.sync(`${this.workspacePath}/**/*.control`).filter(
-      (file: string) => !/node_modules/.test(file) && !inNestedWorkspace(file)
+    const moduleFiles = [...new Set(
+      packageDirs.flatMap(dir => glob.sync(`${dir}/**/*.control`))
+    )].filter(
+      (file: string) => !/node_modules/.test(file)
     ).sort((a, b) => a.localeCompare(b));
 
     // Group files by module name to handle collisions

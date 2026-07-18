@@ -27,7 +27,7 @@ and installed into the gitignored root `extensions/` directory.
 ```bash
 pnpm install
 pnpm build                    # builds the pgpm CLI used by fixtures:install
-pnpm fixtures:install         # pgpm install at the repo root -> gitignored extensions/
+pnpm fixtures:install         # pgpm install -W at the repo root -> gitignored extensions/
 ```
 
 `fixtures:install` is idempotent — it skips modules already present. Use
@@ -51,22 +51,26 @@ await getConnections(options, [
 
 Key facts:
 - `seed.pgpm(dir)` deploys a pgpm module (and its dependencies) into the isolated test database; pass a workspace root (e.g. the repo root) to deploy every installed module once, in dependency order. Workspace-wide deploys require an explicit `cwd` — `seed.pgpm()` with no args stays module-only. Don't chain multiple `seed.pgpm(module)` calls that share dependencies — fast deploys are not idempotent across calls.
-- The real modules only grant to production roles — include `__fixtures__/seed/services/grants.sql` so `administrator`/`authenticated`/`anonymous` test roles can read/write.
+- The real modules already grant to `administrator`/`authenticated`; include `__fixtures__/seed/services/grants.sql` only for the `anonymous` test role (read access), which production modules never grant to.
 - Per-app *generated* tables (compute `function_definitions`, storage tables) are NOT published modules — they stay as hand-written fixtures (`__fixtures__/seed/compute/setup.sql`, `simple-seed-storage/`).
 - The deterministic pgpm engine fixtures under `__fixtures__/sqitch/` are intentionally frozen — never replace them with installed modules.
 
 ## Upgrading module versions
 
 ```bash
-node pgpm/cli/dist/index.js install @pgpm/metaschema-modules@latest
+node pgpm/cli/dist/index.js install -W @pgpm/metaschema-modules@latest
 ```
 
 This installs the latest published version and records it in the root
 `pgpm.json` — commit the 1-line version bump.
 
-## Workspace-level `pgpm install`
+## Workspace-level `pgpm install -W`
 
-`pgpm install` works at a workspace root (no module/.control file needed):
+`pgpm install -W` (`--workspace-root`) installs at a workspace root (no module/.control file needed):
 - with no args, it installs everything pinned in the workspace `pgpm.json` `dependencies`
 - with explicit packages, it installs them and records resolved versions back into `pgpm.json`
 - `--force` reinstalls even if the extension directories already exist
+
+Workspace module discovery is scoped to the workspace's declared `packages`
+globs plus `extensions/` — nested workspaces (like `__fixtures__/sqitch/*`)
+are never part of the parent workspace's module map.
