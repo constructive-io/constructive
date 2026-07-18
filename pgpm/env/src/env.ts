@@ -1,15 +1,7 @@
-import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
+import { parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
 import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
 
-export { parseEnvBoolean, parseEnvNumber };
-
-const parseEnvStringArray = (val?: string): string[] | undefined => {
-  if (!val) return undefined;
-  return val
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-};
+export { parseEnvBoolean, parseEnvList, parseEnvNumber };
 
 /**
  * Parse core PGPM environment variables.
@@ -174,7 +166,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
             supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
           }),
           ...(JOBS_SUPPORTED && {
-            supported: parseEnvStringArray(JOBS_SUPPORTED)
+            supported: parseEnvList(JOBS_SUPPORTED)
           })
         },
         scheduler: {
@@ -182,7 +174,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
             supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
           }),
           ...(JOBS_SUPPORTED && {
-            supported: parseEnvStringArray(JOBS_SUPPORTED)
+            supported: parseEnvList(JOBS_SUPPORTED)
           })
         }
       }),

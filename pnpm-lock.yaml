@@ -402,6 +402,9 @@ importers:
 
   graphile/graphile-cache:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -3159,6 +3162,9 @@ importers:
 
   postgres/pg-cache:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -3228,6 +3234,10 @@ importers:
     publishDirectory: dist
 
   postgres/pg-env:
+    dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
     devDependencies:
       makage:
         specifier: ^0.3.0

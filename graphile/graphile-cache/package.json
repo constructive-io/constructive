@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "express": "^5.2.1",
     "grafserv": "1.0.0",

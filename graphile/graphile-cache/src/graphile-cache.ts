@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { parseEnvNumber } from '12factor-env';
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
@@ -58,15 +59,11 @@ export interface CacheConfig {
 export function getCacheConfig(): CacheConfig {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
-  const max = process.env.GRAPHILE_CACHE_MAX
-    ? parseInt(process.env.GRAPHILE_CACHE_MAX, 10)
-    : 50;
+  const max = parseEnvNumber(process.env.GRAPHILE_CACHE_MAX) ?? 50;
 
-  const ttl = process.env.GRAPHILE_CACHE_TTL_MS
-    ? parseInt(process.env.GRAPHILE_CACHE_TTL_MS, 10)
-    : isDevelopment
-      ? FIVE_MINUTES_MS
-      : ONE_YEAR;
+  const ttl =
+    parseEnvNumber(process.env.GRAPHILE_CACHE_TTL_MS) ??
+    (isDevelopment ? FIVE_MINUTES_MS : ONE_YEAR);
 
   return { max, ttl };
 }

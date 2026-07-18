@@ -96,22 +96,12 @@ export const getSchedulerHostname = (): string => {
 export const getJobGatewayConfig = () => {
   const opts: PgpmOptions = getEnvOptions();
   const gateway = opts.jobs?.gateway ?? {};
-  const defaults = jobsDefaults.gateway ?? {
-    gatewayUrl: 'http://gateway:8080',
-    callbackUrl: 'http://callback:12345',
-    callbackPort: 12345
-  };
+  const defaults = jobsDefaults.gateway ?? {};
 
   return {
-    gatewayUrl:
-      gateway.gatewayUrl ||
-      defaults.gatewayUrl,
-    callbackUrl:
-      gateway.callbackUrl ||
-      defaults.callbackUrl,
-    callbackPort:
-      gateway.callbackPort ??
-      defaults.callbackPort
+    gatewayUrl: gateway.gatewayUrl || defaults.gatewayUrl,
+    callbackUrl: gateway.callbackUrl || defaults.callbackUrl,
+    callbackPort: gateway.callbackPort ?? defaults.callbackPort
   };
 };
 

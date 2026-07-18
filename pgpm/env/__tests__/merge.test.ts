@@ -271,7 +271,9 @@ describe('getEnvOptions', () => {
         AWS_SECRET_KEY: 'realsecret',
         CDN_ENDPOINT: 'https://s3.example.com',
         CDN_PUBLIC_URL_PREFIX: 'https://cdn.example.com',
-        BUCKET_NAME: 'prod-bucket'
+        BUCKET_NAME: 'prod-bucket',
+        INTERNAL_GATEWAY_URL: 'http://gateway.internal:8080',
+        INTERNAL_JOBS_CALLBACK_URL: 'http://callback.internal:12345'
       };
       expect(() => getEnvOptions({}, emptyCwd(), safeEnv)).not.toThrow();
     });

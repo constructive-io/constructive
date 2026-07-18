@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "lru-cache": "^11.2.7",
