@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.16.0...12factor-env@1.17.0) (2026-07-18)
+
+### Features
+
+- **env:** STRICT_ENV valve + production-safety assert for baked dev defaults ([270d3bf](https://github.com/constructive-io/constructive/commit/270d3bf4c71e266125d687c0a4dbd4d36bb620d6))
+
 # [1.16.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.15.0...12factor-env@1.16.0) (2026-07-17)
 
 ### Features

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/react@0.29.3...@constructive-io/react@0.30.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/react
+
 ## [0.29.3](https://github.com/constructive-io/constructive/compare/@constructive-io/react@0.29.2...@constructive-io/react@0.29.3) (2026-07-17)
 
 **Note:** Version bump only for package @constructive-io/react

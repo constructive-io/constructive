@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.28.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.27.0...@pgpmjs/env@2.28.0) (2026-07-18)
+
+### Features
+
+- **env:** enforce production-safe env options at the getEnvOptions chokepoint ([ac696fb](https://github.com/constructive-io/constructive/commit/ac696fbfe27fa0cb5a2da9a8bff1d5d3b57e1d39))
+- **env:** STRICT_ENV valve + production-safety assert for baked dev defaults ([270d3bf](https://github.com/constructive-io/constructive/commit/270d3bf4c71e266125d687c0a4dbd4d36bb620d6))
+
 # [2.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.5...@pgpmjs/env@2.27.0) (2026-07-12)
 
 **Note:** Version bump only for package @pgpmjs/env
