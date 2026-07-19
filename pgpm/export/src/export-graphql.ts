@@ -70,6 +70,12 @@ export interface ExportGraphQLOptions {
   username?: string;
   serviceOutdir?: string;
   skipSchemaRenaming?: boolean;
+  /**
+   * sql_actions categories to exclude from the export (e.g. ['security',
+   * 'permissions']). Rows whose category matches are omitted; rows with a
+   * null category are always kept.
+   */
+  excludeCategories?: string[];
 }
 
 export const exportGraphQL = async ({
@@ -94,7 +100,8 @@ export const exportGraphQL = async ({
   repoName,
   username,
   serviceOutdir,
-  skipSchemaRenaming = false
+  skipSchemaRenaming = false,
+  excludeCategories
 }: ExportGraphQLOptions): Promise<void> => {
   const normalizedOutdir = normalizeOutdir(outdir);
   const svcOutdir = normalizeOutdir(serviceOutdir || outdir);
@@ -147,10 +154,19 @@ export const exportGraphQL = async ({
             actionName: true,
             actionId: true,
             actorId: true,
-            payload: true
+            payload: true,
+            category: true
           },
           where: {
-            databaseId: { equalTo: databaseId }
+            databaseId: { equalTo: databaseId },
+            ...(excludeCategories && excludeCategories.length > 0
+              ? {
+                  or: [
+                    { category: { isNull: true } },
+                    { category: { notIn: excludeCategories } }
+                  ]
+                }
+              : {})
           },
           orderBy: ['ID_ASC'],
           first: PAGE_SIZE,

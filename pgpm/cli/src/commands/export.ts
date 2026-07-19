@@ -24,7 +24,7 @@ Options:
   --extensionName <name>  Extension name
   --metaExtensionName <name>  Meta extension name (default: svc)
   --exclude-categories <list>  Comma-separated sql_actions categories to omit
-                          (e.g. security,permissions,auth,memberships). SQL mode only.
+                          (e.g. security,permissions,auth,memberships). Works in SQL and GraphQL modes.
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
@@ -179,7 +179,8 @@ export default async (
       metaExtensionName,
       prompter,
       argv,
-      username
+      username,
+      excludeCategories
     });
   } else {
     // =========================================================================
