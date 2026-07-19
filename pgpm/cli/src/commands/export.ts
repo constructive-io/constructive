@@ -23,10 +23,13 @@ Options:
   --author <name>         Project author (default: from git config)
   --extensionName <name>  Extension name
   --metaExtensionName <name>  Meta extension name (default: svc)
+  --exclude-categories <list>  Comma-separated sql_actions categories to omit
+                          (e.g. security,permissions,auth,memberships). SQL mode only.
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
   pgpm export              Export migrations from selected database (SQL mode)
+  pgpm export --exclude-categories security,permissions,auth,memberships
   pgpm export --graphql-endpoint 'http://[::1]:3002/graphql' --migrate-endpoint 'http://[::1]:3000/graphql' --migrate-host db_migrate.localhost:3000
 `;
 
@@ -52,6 +55,14 @@ export default async (
   const migrateHost = argv['migrate-host'] || argv.migrateHost;
   const migrateHeadersRaw = argv['migrate-headers'] || argv.migrateHeaders;
   const token = argv.token;
+
+  const excludeCategoriesRaw = argv['exclude-categories'] || argv.excludeCategories;
+  const excludeCategories: string[] | undefined =
+    typeof excludeCategoriesRaw === 'string'
+      ? excludeCategoriesRaw.split(',').map((s: string) => s.trim()).filter(Boolean)
+      : Array.isArray(excludeCategoriesRaw)
+        ? excludeCategoriesRaw
+        : undefined;
 
   if (graphqlEndpoint) {
     // =========================================================================
@@ -305,7 +316,8 @@ export default async (
       metaExtensionName,
       prompter,
       argv,
-      username
+      username,
+      excludeCategories
     });
   }
 

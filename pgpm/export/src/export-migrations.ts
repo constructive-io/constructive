@@ -44,6 +44,12 @@ interface ExportMigrationsToDiskOptions {
    * Useful for self-referential introspection where you want to apply policies to real schemas.
    */
   skipSchemaRenaming?: boolean;
+  /**
+   * Action categories to exclude from the export (e.g. ['security', 'permissions']).
+   * Rows in db_migrate.sql_actions whose category matches are omitted from the
+   * generated pgpm plan and SQL files. Rows with a NULL category are always kept.
+   */
+  excludeCategories?: string[];
 }
 
 interface ExportOptions {
@@ -75,6 +81,12 @@ interface ExportOptions {
    * Useful for self-referential introspection where you want to apply policies to real schemas.
    */
   skipSchemaRenaming?: boolean;
+  /**
+   * Action categories to exclude from the export (e.g. ['security', 'permissions']).
+   * Rows in db_migrate.sql_actions whose category matches are omitted from the
+   * generated pgpm plan and SQL files. Rows with a NULL category are always kept.
+   */
+  excludeCategories?: string[];
 }
 
 const exportMigrationsToDisk = async ({
@@ -95,7 +107,8 @@ const exportMigrationsToDisk = async ({
   repoName,
   username,
   serviceOutdir,
-  skipSchemaRenaming = false
+  skipSchemaRenaming = false,
+  excludeCategories
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   const normalizedOutdir = normalizeOutdir(outdir);
   // Use serviceOutdir for service module, defaulting to outdir if not provided
@@ -140,13 +153,22 @@ const exportMigrationsToDisk = async ({
     name
   });
 
-  // Filter sql_actions by database_id to avoid cross-database pollution
-  // Previously this query had no WHERE clause, which could export actions
-  // from unrelated databases in a persistent database environment
-  const results = await pgPool.query(
-    `select * from db_migrate.sql_actions where database_id = $1 order by id`,
-    [databaseId]
-  );
+  // Filter sql_actions by database_id to avoid cross-database pollution.
+  // Category exclusion is applied here explicitly rather than via the
+  // export.exclude_categories session GUC, which only affects the session
+  // it was set on and therefore cannot be relied upon across connections.
+  const results = excludeCategories && excludeCategories.length > 0
+    ? await pgPool.query(
+        `select * from db_migrate.sql_actions
+         where database_id = $1
+           and (category is null or category != ALL($2::text[]))
+         order by id`,
+        [databaseId, excludeCategories]
+      )
+    : await pgPool.query(
+        `select * from db_migrate.sql_actions where database_id = $1 order by id`,
+        [databaseId]
+      );
 
   const opts: SqlWriteOptions = {
     name,
@@ -276,8 +298,6 @@ ${META_COMMON_FOOTER}
 
   writePgpmPlan(metaPackage, opts);
   writePgpmFiles(metaPackage, opts);
-
-  pgPool.end();
 };
 
 export const exportMigrations = async ({
@@ -296,7 +316,8 @@ export const exportMigrations = async ({
   repoName,
   username,
   serviceOutdir,
-  skipSchemaRenaming
+  skipSchemaRenaming,
+  excludeCategories
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -318,7 +339,8 @@ export const exportMigrations = async ({
       repoName,
       username,
       serviceOutdir,
-      skipSchemaRenaming
+      skipSchemaRenaming,
+      excludeCategories
     });
   }
 };
