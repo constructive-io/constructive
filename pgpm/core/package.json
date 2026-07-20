@@ -60,8 +60,8 @@
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.18.3",
-    "pgsql-parser": "^17.9.15",
+    "pgsql-deparser": "^17.18.5",
+    "pgsql-parser": "^17.9.17",
     "yanse": "^0.2.1"
   }
 }
