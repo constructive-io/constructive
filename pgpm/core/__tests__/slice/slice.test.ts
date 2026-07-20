@@ -342,6 +342,43 @@ schemas/public/functions/get_user [schemas/auth/tables/users] 2024-01-02T00:00:0
       expect(publicPkg!.planContent).toContain('auth:schemas/auth/tables/users');
     });
 
+    it('should drop per-change cross-package refs in control-only mode', () => {
+      const planContent = `%syntax-version=1.0.0
+%project=test-project
+
+schemas/auth/tables/users 2024-01-01T00:00:00Z Developer <dev@example.com>
+schemas/public/functions/get_user [schemas/auth/tables/users] 2024-01-02T00:00:00Z Developer <dev@example.com>
+schemas/public/functions/get_user_v2 [schemas/public/functions/get_user] 2024-01-03T00:00:00Z Developer <dev@example.com>
+`;
+      const planPath = join(testDir, 'control-only.plan');
+      writeFileSync(planPath, planContent);
+
+      const result = slicePlan({
+        sourcePlan: planPath,
+        outputDir: join(testDir, 'output-control-only'),
+        strategy: { type: 'folder' },
+        crossPackageDepMode: 'control-only'
+      });
+
+      const publicPkg = result.packages.find(p => p.name === 'public');
+      expect(publicPkg).toBeDefined();
+
+      // Package-level dependency is preserved in the control file
+      expect(publicPkg!.packageDependencies).toContain('auth');
+      expect(publicPkg!.controlContent).toContain(`requires = 'auth'`);
+
+      // But no per-change cross-package ref remains in the plan
+      expect(publicPkg!.planContent).not.toContain('auth:');
+
+      // Internal dependencies are untouched
+      const getUserV2 = publicPkg!.changes.find(c => c.name === 'schemas/public/functions/get_user_v2');
+      expect(getUserV2!.dependencies).toEqual(['schemas/public/functions/get_user']);
+
+      // The dependent change loses only the cross-package ref
+      const getUser = publicPkg!.changes.find(c => c.name === 'schemas/public/functions/get_user');
+      expect(getUser!.dependencies).toEqual([]);
+    });
+
     it('should slice using pattern strategy', () => {
       const planContent = `%syntax-version=1.0.0
 %project=test-project

@@ -4,6 +4,7 @@ import { join,relative } from 'path';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { parsePlanFile } from '../files/plan/parser';
+import { scanDeployScript } from '../files/sql/header';
 import { ExtendedPlanFile } from '../files/types';
 import { errors } from '@pgpmjs/types';
 
@@ -476,94 +477,46 @@ export const resolveDependencies = (
 
   for (const file of files) {
     const data = readFileSync(file, 'utf-8');
-    const lines = data.split('\n');
     const key = '/' + relative(packageDir, file);
     deps[key] = [];
 
-    for (const line of lines) {
-      // Handle requires statements
-      const requiresMatch = line.match(/^-- requires: (.*)/);
-      if (requiresMatch) {
-        const dep = requiresMatch[1].trim();
-        
-        // For 'preserve' mode, just add the dependency as-is (like original getDeps)
-        if (tagResolution === 'preserve') {
-          deps[key].push(dep);
-          continue;
-        }
-        
-        // For other modes, handle tag resolution
-        if (dep.includes('@')) {
-          const match = dep.match(/^([^:]+):@(.+)$/);
-          if (match) {
-            const [, projectName, tagName] = match;
-            const taggedChange = resolveTagToChange(projectName, tagName);
-            
-            if (taggedChange) {
-              if (tagResolution === 'resolve') {
-                // Full resolution: replace tag with actual change
-                const resolvedDep = `${projectName}:${taggedChange}`;
-                deps[key].push(resolvedDep);
-              } else if (tagResolution === 'internal') {
-                // Internal resolution: keep tag in deps but track mapping
-                tagMappings[dep] = `${projectName}:${taggedChange}`;
-                deps[key].push(dep);
-              }
-            } else {
-              // Could not resolve tag, keep it as is
-              deps[key].push(dep);
-            }
-          } else {
-            // Invalid tag format, keep as is
-            deps[key].push(dep);
-          }
-        } else {
-          // Not a tag, keep as is
-          deps[key].push(dep);
-        }
+    const { requires } = scanDeployScript(data, { key, extname, makeKey });
+
+    for (const dep of requires) {
+      // For 'preserve' mode, just add the dependency as-is (like original getDeps)
+      if (tagResolution === 'preserve') {
+        deps[key].push(dep);
         continue;
       }
 
-      // Handle deploy statements - exactly as in original
-      let m2;
-      let keyToTest;
+      // For other modes, handle tag resolution
+      if (dep.includes('@')) {
+        const match = dep.match(/^([^:]+):@(.+)$/);
+        if (match) {
+          const [, projectName, tagName] = match;
+          const taggedChange = resolveTagToChange(projectName, tagName);
 
-      if (/:/.test(line)) {
-        m2 = line.match(/^-- Deploy ([^:]*):([\w\/]+)(?:\s+to\s+pg)?/);
-        if (m2) {
-          const actualProject = m2[1];
-          keyToTest = m2[2];
-        
-          if (extname !== actualProject) {
-            throw new Error(
-              `Mismatched project name in deploy file:
-          Expected project: ${extname}
-          Found in line   : ${actualProject}
-          Line            : ${line}`
-            );
+          if (taggedChange) {
+            if (tagResolution === 'resolve') {
+              // Full resolution: replace tag with actual change
+              const resolvedDep = `${projectName}:${taggedChange}`;
+              deps[key].push(resolvedDep);
+            } else if (tagResolution === 'internal') {
+              // Internal resolution: keep tag in deps but track mapping
+              tagMappings[dep] = `${projectName}:${taggedChange}`;
+              deps[key].push(dep);
+            }
+          } else {
+            // Could not resolve tag, keep it as is
+            deps[key].push(dep);
           }
-        
-          const expectedKey = makeKey(keyToTest);
-          if (key !== expectedKey) {
-            throw new Error(
-              `Deployment script path or internal name mismatch:
-          Expected key    : ${key}
-          Found in line   : ${expectedKey}
-          Line            : ${line}`
-            );
-          }
+        } else {
+          // Invalid tag format, keep as is
+          deps[key].push(dep);
         }
-
       } else {
-        m2 = line.match(/^-- Deploy (.*?)(?:\s+to\s+pg)?\s*$/);
-        if (m2) {
-          keyToTest = m2[1].trim();
-          if (key !== makeKey(keyToTest)) {
-            throw new Error(
-              'deployment script in wrong place or is named wrong internally\n' + line
-            );
-          }
-        }
+        // Not a tag, keep as is
+        deps[key].push(dep);
       }
     }
   }
