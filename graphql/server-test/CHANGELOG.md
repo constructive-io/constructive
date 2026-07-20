@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.36.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.35.2...graphql-server-test@2.36.0) (2026-07-20)
+
+### Features
+
+- **meta:** add scalar encoding contracts to \_meta field types ([987aa87](https://github.com/constructive-io/constructive/commit/987aa8783166e8e8bf6afa61ae6f2164321e13b7))
+
 ## [2.35.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.35.1...graphql-server-test@2.35.2) (2026-07-18)
 
 **Note:** Version bump only for package graphql-server-test

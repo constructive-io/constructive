@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.17.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.16.0...graphile-settings@5.17.0) (2026-07-20)
+
+### Features
+
+- **meta:** add scalar encoding contracts to \_meta field types ([987aa87](https://github.com/constructive-io/constructive/commit/987aa8783166e8e8bf6afa61ae6f2164321e13b7))
+
 # [5.16.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.15.1...graphile-settings@5.16.0) (2026-07-18)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.14.2...@constructive-io/graphql-types@3.15.0) (2026-07-20)
+
+### Features
+
+- scoped-routing resolution via resolve_route() in api middleware ([334ba21](https://github.com/constructive-io/constructive/commit/334ba213422e76297d211d9524e4926392930e30))
+
 ## [3.14.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.14.1...@constructive-io/graphql-types@3.14.2) (2026-07-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-types

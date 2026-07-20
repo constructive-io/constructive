@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.30.3...@constructive-io/graphql-test@4.31.0) (2026-07-20)
+
+### Features
+
+- **meta:** add scalar encoding contracts to \_meta field types ([987aa87](https://github.com/constructive-io/constructive/commit/987aa8783166e8e8bf6afa61ae6f2164321e13b7))
+
 ## [4.30.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.30.2...@constructive-io/graphql-test@4.30.3) (2026-07-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

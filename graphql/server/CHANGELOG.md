@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.45.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.44.3...@constructive-io/graphql-server@4.45.0) (2026-07-20)
+
+### Features
+
+- narrow scoped-route resolution to host-only (path/method routing stays in Traefik) ([bc904fc](https://github.com/constructive-io/constructive/commit/bc904fcce11341798255c4ee501f11b673ac352d))
+- scoped-routing resolution via resolve_route() in api middleware ([334ba21](https://github.com/constructive-io/constructive/commit/334ba213422e76297d211d9524e4926392930e30))
+
 ## [4.44.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.44.2...@constructive-io/graphql-server@4.44.3) (2026-07-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
