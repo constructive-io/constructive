@@ -9,14 +9,15 @@ const log = new Logger('routing');
 // Scoped routing plane (resolve_route contract)
 // =============================================================================
 //
-// One indexed call resolves an incoming request across scopes:
+// One indexed call resolves an incoming request across scopes. The server's
+// projection is HOST-ONLY: Traefik/Ingress owns L7 path/method routing, so
+// the server always calls the frozen contract with the root path and no
+// method:
 //
-//   SELECT * FROM <schema>.resolve_route(request_host, request_path, request_method)
+//   SELECT * FROM <schema>.resolve_route(request_host, '/', NULL)
 //
 // Contract (constructive-db docs/architecture/scoped-domain-routing.md):
 // a single row is always returned; no match → route_binding_id IS NULL.
-// resolved_config is a jsonb snapshot the server consumes without further
-// lookups.
 
 /** Row shape returned by <schema>.resolve_route() — frozen DB↔server contract. */
 export interface ResolvedRoute {
@@ -44,7 +45,8 @@ const isValidSchemaName = (name: string): boolean =>
   /^[a-z_][a-z0-9_]*$/.test(name);
 
 /**
- * Resolve host/path/method through the compiled scoped-routing plane.
+ * Resolve a hostname through the compiled scoped-routing plane (host-only:
+ * path/method routing belongs to Traefik/Ingress, not the server).
  * Returns null when there is no match (route_binding_id IS NULL) or when the
  * resolver is not installed in the target database — callers fall back to the
  * legacy services_public lookup in both cases.
@@ -52,9 +54,7 @@ const isValidSchemaName = (name: string): boolean =>
 export const resolveRoute = async (
   pool: Pool,
   schema: string,
-  host: string,
-  path: string,
-  method: string
+  host: string
 ): Promise<ResolvedRoute | null> => {
   if (!isValidSchemaName(schema)) {
     log.warn(`[resolve-route] invalid routing schema name: ${schema}`);
@@ -63,12 +63,12 @@ export const resolveRoute = async (
 
   try {
     const result = await pool.query<ResolvedRoute>(
-      `SELECT * FROM "${schema}".${RESOLVER_FUNCTION}($1, $2, $3)`,
-      [host, path, method]
+      `SELECT * FROM "${schema}".${RESOLVER_FUNCTION}($1, '/', NULL)`,
+      [host]
     );
     const row = result.rows[0];
     if (!row || row.route_binding_id === null) {
-      log.debug(`[resolve-route] no match for host=${host} path=${path} method=${method}`);
+      log.debug(`[resolve-route] no match for host=${host}`);
       return null;
     }
     return row;

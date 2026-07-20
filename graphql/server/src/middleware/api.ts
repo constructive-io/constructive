@@ -123,8 +123,6 @@ interface ResolveContext {
   cacheKey: string;
   headers: RoutingHeaders;
   host: string;
-  path: string;
-  method: string;
 }
 
 type ResolutionMode = 
@@ -404,23 +402,25 @@ const resolveMetaSchemaHeader = (
 };
 
 /**
- * Scoped routing plane resolution (additive): one indexed resolve_route()
- * call against the compiled hostname/route bindings. Returns null (fall back
- * to the legacy services_public lookup) when disabled, unmatched, resolver
- * not installed, or the target is not an api surface.
+ * Scoped routing plane resolution (additive, host-only): one indexed
+ * resolve_route() call against the compiled hostname/route bindings.
+ * Path/method routing belongs to Traefik/Ingress — the server only maps
+ * host → tenant/api/db/role. Returns null (fall back to the legacy
+ * services_public lookup) when disabled, unmatched, resolver not installed,
+ * or the target is not an api surface.
  */
 const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
-  const { opts, pool, host, path, method } = ctx;
+  const { opts, pool, host } = ctx;
   if (!opts.api?.enableScopedRouting) return null;
 
   const schema = opts.api?.scopedRoutingSchema || 'constructive_routing_public';
-  const route = await resolveRoute(pool, schema, host, path, method);
+  const route = await resolveRoute(pool, schema, host);
   if (!route) return null;
 
   const structure = routeToApiStructure(route, opts);
   if (!structure) return null;
 
-  log.debug(`[scoped-routing] resolved host=${host} path=${path} → api=${structure.apiId} db=${structure.dbname}`);
+  log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} db=${structure.dbname}`);
 
   if (!structure.databaseId || !structure.apiId) return structure;
 
@@ -545,8 +545,6 @@ export const getApiConfig = async (
     cacheKey,
     headers: getRoutingHeaders(req),
     host: req.get('host') || '',
-    path: req.path || req.originalUrl || '/',
-    method: req.method || 'GET',
   };
 
   // Validate schemas upfront for modes that need them
@@ -626,8 +624,6 @@ export const createApiMiddleware = (opts: ApiOptions) => {
         cacheKey: 'meta-api-off',
         headers: {},
         host: '',
-        path: '/',
-        method: req.method || 'GET',
       });
       req.databaseId = req.api.databaseId;
       req.svc_key = 'meta-api-off';

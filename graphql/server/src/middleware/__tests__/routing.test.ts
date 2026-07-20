@@ -55,42 +55,42 @@ const createPool = (query: jest.Mock): Pool => ({ query } as unknown as Pool);
 describe('resolveRoute', () => {
   it('returns the row when a route matches', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [matchedRoute()] });
-    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com', '/', 'GET');
+    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com');
     expect(row?.route_binding_id).toBe('rb-1');
     expect(query).toHaveBeenCalledWith(
-      expect.stringContaining('"constructive_routing_public".resolve_route($1, $2, $3)'),
-      ['api.example.com', '/', 'GET']
+      expect.stringContaining(`"constructive_routing_public".resolve_route($1, '/', NULL)`),
+      ['api.example.com']
     );
   });
 
   it('returns null on the contract no-match row (route_binding_id IS NULL)', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [noMatchRoute()] });
-    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'nope.example.com', '/', 'GET');
+    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'nope.example.com');
     expect(row).toBeNull();
   });
 
   it('returns null when the resolver function is not installed', async () => {
     const query = jest.fn().mockRejectedValue(Object.assign(new Error('undefined function'), { code: '42883' }));
-    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com', '/', 'GET');
+    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com');
     expect(row).toBeNull();
   });
 
   it('returns null when the routing schema does not exist', async () => {
     const query = jest.fn().mockRejectedValue(Object.assign(new Error('invalid schema'), { code: '3F000' }));
-    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com', '/', 'GET');
+    const row = await resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com');
     expect(row).toBeNull();
   });
 
   it('rethrows unexpected database errors', async () => {
     const query = jest.fn().mockRejectedValue(Object.assign(new Error('boom'), { code: '57P01' }));
     await expect(
-      resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com', '/', 'GET')
+      resolveRoute(createPool(query), 'constructive_routing_public', 'api.example.com')
     ).rejects.toThrow('boom');
   });
 
   it('rejects unsafe schema names without querying', async () => {
     const query = jest.fn();
-    const row = await resolveRoute(createPool(query), 'bad"; DROP TABLE x;--', 'api.example.com', '/', 'GET');
+    const row = await resolveRoute(createPool(query), 'bad"; DROP TABLE x;--', 'api.example.com');
     expect(row).toBeNull();
     expect(query).not.toHaveBeenCalled();
   });
@@ -159,7 +159,7 @@ describe('getApiConfig with scoped routing enabled', () => {
     rows: (params[0] as string[]).map((schemaName) => ({ schema_name: schemaName })),
   });
 
-  it('resolves via resolve_route before the legacy domain lookup', async () => {
+  it('resolves via resolve_route (host only) before the legacy domain lookup', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('resolve_route')) return { rows: [matchedRoute()] };
@@ -172,7 +172,7 @@ describe('getApiConfig with scoped routing enabled', () => {
     expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'tenant_db' }));
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining('resolve_route'),
-      ['api.example.com', '/graphql', 'POST']
+      ['api.example.com']
     );
   });
 
