@@ -42,6 +42,14 @@ export interface ApiOptions {
   isPublic?: boolean;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
+  /**
+   * Enable scoped-routing resolution via <schema>.resolve_route() before the
+   * legacy services_public domain lookup. Additive: when the resolver returns
+   * no match (or is not installed), resolution falls back to the legacy path.
+   */
+  enableScopedRouting?: boolean;
+  /** Schema containing the compiled resolve_route() resolver */
+  scopedRoutingSchema?: string;
 }
 
 /**
@@ -77,4 +85,6 @@ export const apiDefaults: ApiOptions = {
     'metaschema_public',
     'metaschema_modules_public',
   ],
+  enableScopedRouting: false,
+  scopedRoutingSchema: 'constructive_routing_public',
 };

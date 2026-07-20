@@ -5,6 +5,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
   "api": {
     "anonRole": "env_anon",
     "defaultDatabaseId": "override_db",
+    "enableScopedRouting": false,
     "enableServicesApi": false,
     "exposedSchemas": [
       "public",
@@ -16,6 +17,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "env_meta2",
     ],
     "roleName": "env_role",
+    "scopedRoutingSchema": "constructive_routing_public",
   },
   "cdn": {
     "awsAccessKey": "minioadmin",
