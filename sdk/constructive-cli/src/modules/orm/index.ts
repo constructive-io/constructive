@@ -6,11 +6,14 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { AgentModuleModel } from './models/agentModule';
+import { ApiSurfaceModuleModel } from './models/apiSurfaceModule';
+import { AppModuleModel } from './models/appModule';
 import { BillingModuleModel } from './models/billingModule';
 import { BillingProviderModuleModel } from './models/billingProviderModule';
 import { BlueprintModel } from './models/blueprint';
 import { BlueprintConstructionModel } from './models/blueprintConstruction';
 import { BlueprintTemplateModel } from './models/blueprintTemplate';
+import { CatalogModuleModel } from './models/catalogModule';
 import { ComputeLogModuleModel } from './models/computeLogModule';
 import { ConfigSecretsUserModuleModel } from './models/configSecretsUserModule';
 import { ConnectedAccountsModuleModel } from './models/connectedAccountsModule';
@@ -24,6 +27,7 @@ import { DbUsageModuleModel } from './models/dbUsageModule';
 import { DefaultIdsModuleModel } from './models/defaultIdsModule';
 import { DenormalizedTableFieldModel } from './models/denormalizedTableField';
 import { DevicesModuleModel } from './models/devicesModule';
+import { DomainModuleModel } from './models/domainModule';
 import { EmailsModuleModel } from './models/emailsModule';
 import { EntityTypeProvisionModel } from './models/entityTypeProvision';
 import { EventsModuleModel } from './models/eventsModule';
@@ -59,9 +63,11 @@ import { RealtimeModuleModel } from './models/realtimeModule';
 import { RelationProvisionModel } from './models/relationProvision';
 import { ResourceModuleModel } from './models/resourceModule';
 import { RlsModuleModel } from './models/rlsModule';
+import { RouteModuleModel } from './models/routeModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { SessionSecretsModuleModel } from './models/sessionSecretsModule';
 import { SessionsModuleModel } from './models/sessionsModule';
+import { SiteSurfaceModuleModel } from './models/siteSurfaceModule';
 import { StorageLogModuleModel } from './models/storageLogModule';
 import { StorageModuleModel } from './models/storageModule';
 import { TransferLogModuleModel } from './models/transferLogModule';
@@ -109,11 +115,14 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     agentModule: new AgentModuleModel(client),
+    apiSurfaceModule: new ApiSurfaceModuleModel(client),
+    appModule: new AppModuleModel(client),
     billingModule: new BillingModuleModel(client),
     billingProviderModule: new BillingProviderModuleModel(client),
     blueprint: new BlueprintModel(client),
     blueprintConstruction: new BlueprintConstructionModel(client),
     blueprintTemplate: new BlueprintTemplateModel(client),
+    catalogModule: new CatalogModuleModel(client),
     computeLogModule: new ComputeLogModuleModel(client),
     configSecretsUserModule: new ConfigSecretsUserModuleModel(client),
     connectedAccountsModule: new ConnectedAccountsModuleModel(client),
@@ -127,6 +136,7 @@ export function createClient(config: OrmClientConfig) {
     defaultIdsModule: new DefaultIdsModuleModel(client),
     denormalizedTableField: new DenormalizedTableFieldModel(client),
     devicesModule: new DevicesModuleModel(client),
+    domainModule: new DomainModuleModel(client),
     emailsModule: new EmailsModuleModel(client),
     entityTypeProvision: new EntityTypeProvisionModel(client),
     eventsModule: new EventsModuleModel(client),
@@ -162,9 +172,11 @@ export function createClient(config: OrmClientConfig) {
     relationProvision: new RelationProvisionModel(client),
     resourceModule: new ResourceModuleModel(client),
     rlsModule: new RlsModuleModel(client),
+    routeModule: new RouteModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
     sessionSecretsModule: new SessionSecretsModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
+    siteSurfaceModule: new SiteSurfaceModuleModel(client),
     storageLogModule: new StorageLogModuleModel(client),
     storageModule: new StorageModuleModel(client),
     transferLogModule: new TransferLogModuleModel(client),

@@ -207,6 +207,11 @@
       "table": "billing_provider_module"
     },
     {
+      "key": "catalog_module",
+      "schema": "metaschema_modules_public",
+      "table": "catalog_module"
+    },
+    {
       "key": "compute_log_module",
       "schema": "metaschema_modules_public",
       "table": "compute_log_module"
@@ -477,6 +482,16 @@
       "table": "webauthn_settings"
     },
     {
+      "key": "api_surface_module",
+      "schema": "metaschema_modules_public",
+      "table": "api_surface_module"
+    },
+    {
+      "key": "app_module",
+      "schema": "metaschema_modules_public",
+      "table": "app_module"
+    },
+    {
       "key": "db_preset_module",
       "schema": "metaschema_modules_public",
       "table": "db_preset_module"
@@ -485,6 +500,11 @@
       "key": "denormalized_table_field",
       "schema": "metaschema_modules_public",
       "table": "denormalized_table_field"
+    },
+    {
+      "key": "domain_module",
+      "schema": "metaschema_modules_public",
+      "table": "domain_module"
     },
     {
       "key": "function_deployment_module",
@@ -507,6 +527,11 @@
       "table": "resource_module"
     },
     {
+      "key": "site_surface_module",
+      "schema": "metaschema_modules_public",
+      "table": "site_surface_module"
+    },
+    {
       "key": "webhook_module",
       "schema": "metaschema_modules_public",
       "table": "webhook_module"
@@ -520,6 +545,11 @@
       "key": "http_route_module",
       "schema": "metaschema_modules_public",
       "table": "http_route_module"
+    },
+    {
+      "key": "route_module",
+      "schema": "metaschema_modules_public",
+      "table": "route_module"
     }
   ],
   "timestampDefaultColumns": {

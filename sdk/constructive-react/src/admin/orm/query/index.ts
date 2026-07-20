@@ -30,10 +30,10 @@ export interface AppPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
 export interface OrgIsManagerOfVariables {
-  pEntityId?: string;
-  pManagerId?: string;
-  pMaxDepth?: number;
-  pUserId?: string;
+  managerId?: string;
+  maxDepth?: number;
+  targetEntityId?: string;
+  userId?: string;
 }
 export interface OrgPermissionsGetByMaskVariables {
   /** Read all values in the set after (below) this cursor. */
@@ -207,19 +207,19 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'pEntityId',
+              name: 'managerId',
               type: 'UUID',
             },
             {
-              name: 'pManagerId',
-              type: 'UUID',
-            },
-            {
-              name: 'pMaxDepth',
+              name: 'maxDepth',
               type: 'Int',
             },
             {
-              name: 'pUserId',
+              name: 'targetEntityId',
+              type: 'UUID',
+            },
+            {
+              name: 'userId',
               type: 'UUID',
             },
           ],

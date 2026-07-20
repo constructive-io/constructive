@@ -16,11 +16,14 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   agentModuleKeys,
+  apiSurfaceModuleKeys,
+  appModuleKeys,
   billingModuleKeys,
   billingProviderModuleKeys,
   blueprintKeys,
   blueprintConstructionKeys,
   blueprintTemplateKeys,
+  catalogModuleKeys,
   computeLogModuleKeys,
   configSecretsUserModuleKeys,
   connectedAccountsModuleKeys,
@@ -34,6 +37,7 @@ import {
   defaultIdsModuleKeys,
   denormalizedTableFieldKeys,
   devicesModuleKeys,
+  domainModuleKeys,
   emailsModuleKeys,
   entityTypeProvisionKeys,
   eventsModuleKeys,
@@ -69,9 +73,11 @@ import {
   relationProvisionKeys,
   resourceModuleKeys,
   rlsModuleKeys,
+  routeModuleKeys,
   secureTableProvisionKeys,
   sessionSecretsModuleKeys,
   sessionsModuleKeys,
+  siteSurfaceModuleKeys,
   storageLogModuleKeys,
   storageModuleKeys,
   transferLogModuleKeys,
@@ -119,6 +125,40 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: agentModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate apiSurfaceModule queries */ apiSurfaceModule: {
+    /** Invalidate all apiSurfaceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: apiSurfaceModuleKeys.all,
+      }),
+    /** Invalidate apiSurfaceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: apiSurfaceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific apiSurfaceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: apiSurfaceModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate appModule queries */ appModule: {
+    /** Invalidate all appModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: appModuleKeys.all,
+      }),
+    /** Invalidate appModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: appModuleKeys.lists(),
+      }),
+    /** Invalidate a specific appModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: appModuleKeys.detail(id),
       }),
   },
   /** Invalidate billingModule queries */ billingModule: {
@@ -204,6 +244,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: blueprintTemplateKeys.detail(id),
+      }),
+  },
+  /** Invalidate catalogModule queries */ catalogModule: {
+    /** Invalidate all catalogModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: catalogModuleKeys.all,
+      }),
+    /** Invalidate catalogModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: catalogModuleKeys.lists(),
+      }),
+    /** Invalidate a specific catalogModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: catalogModuleKeys.detail(id),
       }),
   },
   /** Invalidate computeLogModule queries */ computeLogModule: {
@@ -422,6 +479,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: devicesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate domainModule queries */ domainModule: {
+    /** Invalidate all domainModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainModuleKeys.all,
+      }),
+    /** Invalidate domainModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainModuleKeys.lists(),
+      }),
+    /** Invalidate a specific domainModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: domainModuleKeys.detail(id),
       }),
   },
   /** Invalidate emailsModule queries */ emailsModule: {
@@ -1019,6 +1093,23 @@ export const invalidate = {
         queryKey: rlsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate routeModule queries */ routeModule: {
+    /** Invalidate all routeModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: routeModuleKeys.all,
+      }),
+    /** Invalidate routeModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: routeModuleKeys.lists(),
+      }),
+    /** Invalidate a specific routeModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: routeModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate secureTableProvision queries */ secureTableProvision: {
     /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1068,6 +1159,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: sessionsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate siteSurfaceModule queries */ siteSurfaceModule: {
+    /** Invalidate all siteSurfaceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: siteSurfaceModuleKeys.all,
+      }),
+    /** Invalidate siteSurfaceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: siteSurfaceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific siteSurfaceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: siteSurfaceModuleKeys.detail(id),
       }),
   },
   /** Invalidate storageLogModule queries */ storageLogModule: {
@@ -1278,6 +1386,19 @@ export const remove = {
       queryKey: agentModuleKeys.detail(id),
     });
   },
+  /** Remove apiSurfaceModule from cache */ apiSurfaceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: apiSurfaceModuleKeys.detail(id),
+    });
+  },
+  /** Remove appModule from cache */ appModule: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: appModuleKeys.detail(id),
+    });
+  },
   /** Remove billingModule from cache */ billingModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1313,6 +1434,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: blueprintTemplateKeys.detail(id),
+    });
+  },
+  /** Remove catalogModule from cache */ catalogModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: catalogModuleKeys.detail(id),
     });
   },
   /** Remove computeLogModule from cache */ computeLogModule: (
@@ -1414,6 +1543,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: devicesModuleKeys.detail(id),
+    });
+  },
+  /** Remove domainModule from cache */ domainModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: domainModuleKeys.detail(id),
     });
   },
   /** Remove emailsModule from cache */ emailsModule: (
@@ -1693,6 +1830,14 @@ export const remove = {
       queryKey: rlsModuleKeys.detail(id),
     });
   },
+  /** Remove routeModule from cache */ routeModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: routeModuleKeys.detail(id),
+    });
+  },
   /** Remove secureTableProvision from cache */ secureTableProvision: (
     queryClient: QueryClient,
     id: string | number
@@ -1715,6 +1860,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: sessionsModuleKeys.detail(id),
+    });
+  },
+  /** Remove siteSurfaceModule from cache */ siteSurfaceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: siteSurfaceModuleKeys.detail(id),
     });
   },
   /** Remove storageLogModule from cache */ storageLogModule: (
