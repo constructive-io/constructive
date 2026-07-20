@@ -4,11 +4,14 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { AgentModuleModel } from './agentModule';
+export { ApiSurfaceModuleModel } from './apiSurfaceModule';
+export { AppModuleModel } from './appModule';
 export { BillingModuleModel } from './billingModule';
 export { BillingProviderModuleModel } from './billingProviderModule';
 export { BlueprintModel } from './blueprint';
 export { BlueprintConstructionModel } from './blueprintConstruction';
 export { BlueprintTemplateModel } from './blueprintTemplate';
+export { CatalogModuleModel } from './catalogModule';
 export { ComputeLogModuleModel } from './computeLogModule';
 export { ConfigSecretsUserModuleModel } from './configSecretsUserModule';
 export { ConnectedAccountsModuleModel } from './connectedAccountsModule';
@@ -22,6 +25,7 @@ export { DbUsageModuleModel } from './dbUsageModule';
 export { DefaultIdsModuleModel } from './defaultIdsModule';
 export { DenormalizedTableFieldModel } from './denormalizedTableField';
 export { DevicesModuleModel } from './devicesModule';
+export { DomainModuleModel } from './domainModule';
 export { EmailsModuleModel } from './emailsModule';
 export { EntityTypeProvisionModel } from './entityTypeProvision';
 export { EventsModuleModel } from './eventsModule';
@@ -57,9 +61,11 @@ export { RealtimeModuleModel } from './realtimeModule';
 export { RelationProvisionModel } from './relationProvision';
 export { ResourceModuleModel } from './resourceModule';
 export { RlsModuleModel } from './rlsModule';
+export { RouteModuleModel } from './routeModule';
 export { SecureTableProvisionModel } from './secureTableProvision';
 export { SessionSecretsModuleModel } from './sessionSecretsModule';
 export { SessionsModuleModel } from './sessionsModule';
+export { SiteSurfaceModuleModel } from './siteSurfaceModule';
 export { StorageLogModuleModel } from './storageLogModule';
 export { StorageModuleModel } from './storageModule';
 export { TransferLogModuleModel } from './transferLogModule';

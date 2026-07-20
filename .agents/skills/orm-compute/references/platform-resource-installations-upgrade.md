@@ -7,7 +7,7 @@ Execute the platformResourceInstallationsUpgrade mutation
 ## Usage
 
 ```typescript
-db.mutation.platformResourceInstallationsUpgrade({ input: { pInstallationId: '<UUID>', pParams: '<JSON>' } }).execute()
+db.mutation.platformResourceInstallationsUpgrade({ input: { newParams: '<JSON>', targetInstallationId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformResourceInstallationsUpgrade({ input: { pInstallationId: '<U
 ### Run platformResourceInstallationsUpgrade
 
 ```typescript
-const result = await db.mutation.platformResourceInstallationsUpgrade({ input: { pInstallationId: '<UUID>', pParams: '<JSON>' } }).execute();
+const result = await db.mutation.platformResourceInstallationsUpgrade({ input: { newParams: '<JSON>', targetInstallationId: '<UUID>' } }).execute();
 ```

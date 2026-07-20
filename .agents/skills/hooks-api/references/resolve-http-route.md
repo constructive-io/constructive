@@ -7,7 +7,7 @@ React Query query hook for resolveHttpRoute
 ## Usage
 
 ```typescript
-useResolveHttpRouteQuery({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' })
+useResolveHttpRouteQuery({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useResolveHttpRouteQuery({ pHost: '<String>', pMethod: '<String>', pPath: '<Stri
 ### Use useResolveHttpRouteQuery
 
 ```typescript
-const { data, isLoading } = useResolveHttpRouteQuery({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' });
+const { data, isLoading } = useResolveHttpRouteQuery({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' });
 ```

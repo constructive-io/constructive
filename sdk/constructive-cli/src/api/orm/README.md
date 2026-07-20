@@ -35,6 +35,8 @@ const db = createClient({
 | `databaseTransfer` | findMany, findOne, create, update, delete |
 | `defaultPrivilege` | findMany, findOne, create, update, delete |
 | `domain` | findMany, findOne, create, update, delete |
+| `domainEvent` | findMany, findOne, create, update, delete |
+| `domainVerification` | findMany, findOne, create, update, delete |
 | `embeddingChunk` | findMany, findOne, create, update, delete |
 | `enum` | findMany, findOne, create, update, delete |
 | `field` | findMany, findOne, create, update, delete |
@@ -601,6 +603,86 @@ const updated = await db.domain.update({ where: { id: '<UUID>' }, data: { annota
 const deleted = await db.domain.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.domainEvent`
+
+CRUD operations for DomainEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `domainVerificationId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `id` | UUID | No |
+| `managedDomainId` | UUID | Yes |
+| `message` | String | Yes |
+| `metadata` | JSON | Yes |
+| `ownerId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all domainEvent records
+const items = await db.domainEvent.findMany({ select: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } }).execute();
+
+// Get one by id
+const item = await db.domainEvent.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } }).execute();
+
+// Create
+const created = await db.domainEvent.create({ data: { actorId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>', ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.domainVerification`
+
+CRUD operations for DomainVerification records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `attempts` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `error` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `lastCheckedAt` | Datetime | Yes |
+| `managedDomainId` | UUID | Yes |
+| `method` | String | Yes |
+| `ownerId` | UUID | Yes |
+| `recordName` | String | Yes |
+| `recordType` | String | Yes |
+| `recordValue` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verifiedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all domainVerification records
+const items = await db.domainVerification.findMany({ select: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Get one by id
+const item = await db.domainVerification.findOne({ id: '<UUID>', select: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Create
+const created = await db.domainVerification.create({ data: { attempts: '<Int>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', ownerId: '<UUID>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainVerification.update({ where: { id: '<UUID>' }, data: { attempts: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainVerification.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.embeddingChunk`
 
 CRUD operations for EmbeddingChunk records.
@@ -947,7 +1029,9 @@ CRUD operations for ManagedDomain records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `allowPublicUsage` | Boolean | Yes |
 | `annotations` | JSON | Yes |
+| `certStatus` | String | Yes |
 | `databaseId` | UUID | Yes |
 | `domain` | ConstructiveInternalTypeHostname | Yes |
 | `id` | UUID | No |
@@ -961,16 +1045,16 @@ CRUD operations for ManagedDomain records.
 
 ```typescript
 // List all managedDomain records
-const items = await db.managedDomain.findMany({ select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
+const items = await db.managedDomain.findMany({ select: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Get one by id
-const item = await db.managedDomain.findOne({ id: '<UUID>', select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
+const item = await db.managedDomain.findOne({ id: '<UUID>', select: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Create
-const created = await db.managedDomain.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.managedDomain.create({ data: { allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { allowPublicUsage: '<Boolean>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.managedDomain.delete({ where: { id: '<UUID>' } }).execute();
@@ -1922,12 +2006,12 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `pHost` | String |
-  | `pMethod` | String |
-  | `pPath` | String |
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
 
 ```typescript
-const result = await db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' }).execute();
+const result = await db.query.resolveHttpRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
 ```
 
 ### `db.mutation.acceptDatabaseTransfer`
@@ -2012,7 +2096,7 @@ const result = await db.mutation.rejectDatabaseTransfer({ input: { transferId: '
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

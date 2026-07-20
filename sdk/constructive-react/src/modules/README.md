@@ -8,7 +8,7 @@
 
 ## Overview
 
-- **Tables:** 68
+- **Tables:** 74
 - **Custom queries:** 2
 - **Custom mutations:** 10
 
