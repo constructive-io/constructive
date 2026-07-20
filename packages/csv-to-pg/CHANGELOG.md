@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.21.1](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.21.0...csv-to-pg@3.21.1) (2026-07-20)
+
+**Note:** Version bump only for package csv-to-pg
+
 # [3.21.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.20.2...csv-to-pg@3.21.0) (2026-07-12)
 
 **Note:** Version bump only for package csv-to-pg
