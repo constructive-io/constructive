@@ -9,7 +9,8 @@ import {
   SliceWarning,
   SliceStats,
   GroupingStrategy,
-  PatternStrategy
+  PatternStrategy,
+  CrossPackageDepMode
 } from './types';
 import { minimatch } from 'minimatch';
 
@@ -439,8 +440,11 @@ export function generateSinglePackage(
   graph: DependencyGraph,
   changeToPackage: Map<string, string>,
   pkgDeps: Set<string>,
-  useTagsForCrossPackageDeps: boolean = false
+  crossPackageDeps: boolean | CrossPackageDepMode = 'change'
 ): PackageOutput {
+  // Back-compat: earlier signature took useTagsForCrossPackageDeps: boolean
+  const crossPackageDepMode: CrossPackageDepMode =
+    crossPackageDeps === true ? 'tag' : crossPackageDeps === false ? 'change' : crossPackageDeps;
   // Sort changes in topological order within package
   const sortedChanges = topologicalSortWithinPackage(changes, graph);
 
@@ -464,7 +468,13 @@ export function generateSinglePackage(
         newDeps.push(dep);
       } else {
         // Cross-package dependency
-        if (useTagsForCrossPackageDeps) {
+        if (crossPackageDepMode === 'control-only') {
+          // Dropped from the plan line; carried by the control file's
+          // `requires` (extension install ordering deploys the whole
+          // dependency package first)
+          continue;
+        }
+        if (crossPackageDepMode === 'tag') {
           // Find latest tag in the dependency package
           const depPkgChanges = [...graph.nodes.keys()]
             .filter(c => changeToPackage.get(c) === depPkg);
@@ -593,7 +603,7 @@ export function slicePlan(config: SliceConfig): SliceResult {
       graph,
       changeToPackage,
       packageDeps.get(pkgName) || new Set(),
-      config.useTagsForCrossPackageDeps || false
+      config.crossPackageDepMode ?? (config.useTagsForCrossPackageDeps ? 'tag' : 'change')
     );
 
     packages.push(pkgOutput);

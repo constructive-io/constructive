@@ -19,12 +19,29 @@ export interface SliceConfig {
   /** Whether to use tags for cross-package deps */
   useTagsForCrossPackageDeps?: boolean;
 
+  /**
+   * How cross-package dependencies are recorded in sliced plans:
+   * - 'change' (default): per-change refs (`{package}:{change}`)
+   * - 'tag': per-change tag refs (`{package}:@tag`) when available
+   *   (equivalent to `useTagsForCrossPackageDeps: true`)
+   * - 'control-only': drop per-change cross-package refs from plan lines
+   *   entirely; the dependency is carried only by the control file's
+   *   `requires` (extension install ordering deploys the whole dependency
+   *   package first, which subsumes any per-change ordering constraint)
+   */
+  crossPackageDepMode?: CrossPackageDepMode;
+
   /** Minimum changes per package (merge smaller groups) */
   minChangesPerPackage?: number;
 
   /** Author for generated plan files */
   author?: string;
 }
+
+/**
+ * How cross-package dependencies are represented in sliced plan files
+ */
+export type CrossPackageDepMode = 'change' | 'tag' | 'control-only';
 
 /**
  * Grouping strategy for slicing
