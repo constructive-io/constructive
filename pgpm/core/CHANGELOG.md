@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.33.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.32.2...@pgpmjs/core@6.33.0) (2026-07-20)
+
+### Features
+
+- **pgpm-core:** shared SQL header model, plan-vs-header drift check, control-only cross-package dep mode ([c7fd535](https://github.com/constructive-io/constructive/commit/c7fd535a9e826ed44083aa99d0e05eca08c32cbb))
+
 ## [6.32.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.32.1...@pgpmjs/core@6.32.2) (2026-07-20)
 
 **Note:** Version bump only for package @pgpmjs/core

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.27.5](https://github.com/constructive-io/constructive/compare/graphile-query@4.27.4...graphile-query@4.27.5) (2026-07-20)
+
+**Note:** Version bump only for package graphile-query
+
 ## [4.27.4](https://github.com/constructive-io/constructive/compare/graphile-query@4.27.3...graphile-query@4.27.4) (2026-07-20)
 
 **Note:** Version bump only for package graphile-query
