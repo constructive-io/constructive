@@ -1,18 +1,5 @@
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { parseEnvBoolean } from '12factor-env';
-
-const parseEnvInteger = (name: string, val?: string): number | undefined => {
-  if (val === undefined) return undefined;
-  const trimmed = val.trim();
-  if (!/^\d+$/.test(trimmed)) {
-    throw new Error(`${name} must be an integer`);
-  }
-  const parsed = Number.parseInt(trimmed, 10);
-  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
-    throw new Error(`${name} must be a positive safe integer`);
-  }
-  return parsed;
-};
+import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
@@ -92,7 +79,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
         ...(SMS_PROVIDER && { provider: SMS_PROVIDER }),
         ...(SMS_SENDER_ID && { senderId: SMS_SENDER_ID }),
         ...(SMS_REQUEST_TIMEOUT_MS && {
-          requestTimeoutMs: parseEnvInteger('SMS_REQUEST_TIMEOUT_MS', SMS_REQUEST_TIMEOUT_MS)
+          requestTimeoutMs: parseEnvNumber(SMS_REQUEST_TIMEOUT_MS)
         }),
         ...(SEND_SMS_DRY_RUN && { dryRun: parseEnvBoolean(SEND_SMS_DRY_RUN) }),
         ...(DEVSMS_BASE_URL && {

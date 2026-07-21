@@ -236,9 +236,11 @@ describe('getEnvOptions', () => {
     });
   });
 
-  it('throws on invalid SMS_REQUEST_TIMEOUT_MS values', () => {
-    expect(() => getGraphQLEnvVars({
+  it('uses shared number parsing behavior for invalid SMS_REQUEST_TIMEOUT_MS values', () => {
+    const result = getGraphQLEnvVars({
       SMS_REQUEST_TIMEOUT_MS: '5s'
-    })).toThrow('SMS_REQUEST_TIMEOUT_MS must be an integer');
+    });
+
+    expect(result.sms?.requestTimeoutMs).toBeUndefined();
   });
 });
