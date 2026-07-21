@@ -1196,13 +1196,13 @@ orgIsManagerOf
 
   | Argument | Type |
   |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pMaxDepth` | Int |
-  | `pUserId` | UUID |
+  | `managerId` | UUID |
+  | `maxDepth` | Int |
+  | `targetEntityId` | UUID |
+  | `userId` | UUID |
 
 ```typescript
-const result = await db.query.orgIsManagerOf({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: '<Int>', pUserId: '<UUID>' }).execute();
+const result = await db.query.orgIsManagerOf({ managerId: '<UUID>', maxDepth: '<Int>', targetEntityId: '<UUID>', userId: '<UUID>' }).execute();
 ```
 
 ### `db.query.orgPermissionsGetByMask`

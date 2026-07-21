@@ -7,7 +7,7 @@ Execute the platformResourceInstallationsInstall mutation
 ## Usage
 
 ```typescript
-db.mutation.platformResourceInstallationsInstall({ input: { pName: '<String>', pNamespaceId: '<UUID>', pParams: '<JSON>', pSlug: '<String>' } }).execute()
+db.mutation.platformResourceInstallationsInstall({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformResourceInstallationsInstall({ input: { pName: '<String>', p
 ### Run platformResourceInstallationsInstall
 
 ```typescript
-const result = await db.mutation.platformResourceInstallationsInstall({ input: { pName: '<String>', pNamespaceId: '<UUID>', pParams: '<JSON>', pSlug: '<String>' } }).execute();
+const result = await db.mutation.platformResourceInstallationsInstall({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } }).execute();
 ```

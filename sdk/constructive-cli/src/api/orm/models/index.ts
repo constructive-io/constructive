@@ -17,6 +17,8 @@ export { DatabaseSettingModel } from './databaseSetting';
 export { DatabaseTransferModel } from './databaseTransfer';
 export { DefaultPrivilegeModel } from './defaultPrivilege';
 export { DomainModel } from './domain';
+export { DomainEventModel } from './domainEvent';
+export { DomainVerificationModel } from './domainVerification';
 export { EmbeddingChunkModel } from './embeddingChunk';
 export { EnumModel } from './enum';
 export { FieldModel } from './field';

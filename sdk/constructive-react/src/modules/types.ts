@@ -41,6 +41,54 @@ export interface AgentModule {
   threadTableId: string | null;
   threadTableName: string | null;
 }
+export interface ApiSurfaceModule {
+  apiModulesTableId: string | null;
+  apiModulesTableName: string | null;
+  apiName: string | null;
+  apiSchemasTableId: string | null;
+  apiSchemasTableName: string | null;
+  apiSettingsTableId: string | null;
+  apiSettingsTableName: string | null;
+  apisTableId: string | null;
+  apisTableName: string | null;
+  catalogModuleId: string | null;
+  corsSettingsTableId: string | null;
+  corsSettingsTableName: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+}
+export interface AppModule {
+  apiName: string | null;
+  appMembersTableId: string | null;
+  appMembersTableName: string | null;
+  appsTableId: string | null;
+  appsTableName: string | null;
+  catalogModuleId: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+}
 export interface BillingModule {
   apiName: string | null;
   balancesTableId: string | null;
@@ -143,6 +191,37 @@ export interface BlueprintTemplate {
   version: string | null;
   visibility: string | null;
 }
+export interface CatalogModule {
+  apiName: string | null;
+  apisTableId: string | null;
+  apisTableName: string | null;
+  appsTableId: string | null;
+  appsTableName: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  domainsTableId: string | null;
+  domainsTableName: string | null;
+  entityTableId: string | null;
+  functionsTableId: string | null;
+  functionsTableName: string | null;
+  id: string | null;
+  namespacesTableId: string | null;
+  namespacesTableName: string | null;
+  policies: unknown | null;
+  privateApiName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  resourceDefinitionsTableId: string | null;
+  resourceDefinitionsTableName: string | null;
+  resourceInstallationsTableId: string | null;
+  resourceInstallationsTableName: string | null;
+  resourcesTableId: string | null;
+  resourcesTableName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  sitesTableId: string | null;
+  sitesTableName: string | null;
+}
 export interface ComputeLogModule {
   actorFkTableId: string | null;
   apiName: string | null;
@@ -215,6 +294,7 @@ export interface CryptoAuthModule {
   usersTableId: string | null;
 }
 export interface DatabaseProvisionModule {
+  async: boolean | null;
   bootstrapError: string | null;
   bootstrapStatus: string | null;
   bootstrapUser: boolean | null;
@@ -233,6 +313,29 @@ export interface DatabaseProvisionModule {
   status: string | null;
   subdomain: string | null;
   updatedAt: string | null;
+}
+export interface DatabaseSettingsModule {
+  apiName: string | null;
+  databaseId: string | null;
+  databaseSettingsTableId: string | null;
+  databaseSettingsTableName: string | null;
+  defaultPermissions: string[] | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  provisions: unknown | null;
+  pubkeySettingsTableId: string | null;
+  pubkeySettingsTableName: string | null;
+  publicSchemaName: string | null;
+  rlsSettingsTableId: string | null;
+  rlsSettingsTableName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  webauthnSettingsTableId: string | null;
+  webauthnSettingsTableName: string | null;
 }
 export interface DbPoolConfig {
   createdAt: string | null;
@@ -335,6 +438,30 @@ export interface DevicesModule {
   schemaId: string | null;
   userDevicesTableId: string | null;
   userDevicesTableName: string | null;
+}
+export interface DomainModule {
+  apiName: string | null;
+  catalogModuleId: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  domainEventsTableId: string | null;
+  domainEventsTableName: string | null;
+  domainVerificationsTableId: string | null;
+  domainVerificationsTableName: string | null;
+  domainsTableId: string | null;
+  domainsTableName: string | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  managedDomainsTableId: string | null;
+  managedDomainsTableName: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
 }
 export interface EmailsModule {
   apiName: string | null;
@@ -459,6 +586,8 @@ export interface FunctionDeploymentModule {
 }
 export interface FunctionInvocationModule {
   apiName: string | null;
+  attemptsTableId: string | null;
+  attemptsTableName: string | null;
   databaseId: string | null;
   defaultPermissions: string[] | null;
   entityField: string | null;
@@ -1119,6 +1248,32 @@ export interface RlsModule {
   sessionsTableId: string | null;
   usersTableId: string | null;
 }
+export interface RouteModule {
+  apiName: string | null;
+  catalogModuleId: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  domainModuleId: string | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  hostnameBindingsTableId: string | null;
+  hostnameBindingsTableName: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  resolverFunctionName: string | null;
+  routeBindingsTableId: string | null;
+  routeBindingsTableName: string | null;
+  routesTableId: string | null;
+  routesTableName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+}
 export interface SecureTableProvision {
   databaseId: string | null;
   fields: unknown[] | null;
@@ -1152,6 +1307,30 @@ export interface SessionsModule {
   sessionsTableId: string | null;
   sessionsTableName: string | null;
   usersTableId: string | null;
+}
+export interface SiteSurfaceModule {
+  apiName: string | null;
+  catalogModuleId: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  siteMetadataTableId: string | null;
+  siteMetadataTableName: string | null;
+  siteModulesTableId: string | null;
+  siteModulesTableName: string | null;
+  siteThemesTableId: string | null;
+  siteThemesTableName: string | null;
+  sitesTableId: string | null;
+  sitesTableName: string | null;
 }
 export interface StorageLogModule {
   actorFkTableId: string | null;

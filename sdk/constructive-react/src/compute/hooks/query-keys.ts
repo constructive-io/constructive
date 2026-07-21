@@ -28,15 +28,6 @@ export const dbPresetKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...dbPresetKeys.details(), id] as const,
 } as const;
-export const declaredCapacityKeys = {
-  /** All declaredCapacity queries */ all: ['declaredcapacity'] as const,
-  /** List query keys */ lists: () => [...declaredCapacityKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...declaredCapacityKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...declaredCapacityKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...declaredCapacityKeys.details(), id] as const,
-} as const;
 export const functionApiBindingKeys = {
   /** All functionApiBinding queries */ all: ['functionapibinding'] as const,
   /** List query keys */ lists: () => [...functionApiBindingKeys.all, 'list'] as const,
@@ -158,6 +149,15 @@ export const functionGraphStoreKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphStoreKeys.details(), id] as const,
 } as const;
+export const functionInvocationAttemptKeys = {
+  /** All functionInvocationAttempt queries */ all: ['functioninvocationattempt'] as const,
+  /** List query keys */ lists: () => [...functionInvocationAttemptKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionInvocationAttemptKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionInvocationAttemptKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionInvocationAttemptKeys.details(), id] as const,
+} as const;
 export const functionInvocationKeys = {
   /** All functionInvocation queries */ all: ['functioninvocation'] as const,
   /** List query keys */ lists: () => [...functionInvocationKeys.all, 'list'] as const,
@@ -249,15 +249,6 @@ export const namespaceEventKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...namespaceEventKeys.details(), id] as const,
 } as const;
-export const platformDeclaredCapacityKeys = {
-  /** All platformDeclaredCapacity queries */ all: ['platformdeclaredcapacity'] as const,
-  /** List query keys */ lists: () => [...platformDeclaredCapacityKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformDeclaredCapacityKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformDeclaredCapacityKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformDeclaredCapacityKeys.details(), id] as const,
-} as const;
 export const platformFunctionApiBindingKeys = {
   /** All platformFunctionApiBinding queries */ all: ['platformfunctionapibinding'] as const,
   /** List query keys */ lists: () => [...platformFunctionApiBindingKeys.all, 'list'] as const,
@@ -309,6 +300,19 @@ export const platformFunctionExecutionLogKeys = {
     [...platformFunctionExecutionLogKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformFunctionExecutionLogKeys.details(), id] as const,
+} as const;
+export const platformFunctionInvocationAttemptKeys = {
+  /** All platformFunctionInvocationAttempt queries */ all: [
+    'platformfunctioninvocationattempt',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformFunctionInvocationAttemptKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformFunctionInvocationAttemptKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionInvocationAttemptKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformFunctionInvocationAttemptKeys.details(), id] as const,
 } as const;
 export const platformFunctionInvocationKeys = {
   /** All platformFunctionInvocation queries */ all: ['platformfunctioninvocation'] as const,
@@ -396,6 +400,19 @@ export const platformResourceKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformResourceKeys.details(), id] as const,
 } as const;
+export const platformResourceDeclaredCapacityKeys = {
+  /** All platformResourceDeclaredCapacity queries */ all: [
+    'platformresourcedeclaredcapacity',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformResourceDeclaredCapacityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceDeclaredCapacityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourceDeclaredCapacityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceDeclaredCapacityKeys.details(), id] as const,
+} as const;
 export const platformResourceDefinitionKeys = {
   /** All platformResourceDefinition queries */ all: ['platformresourcedefinition'] as const,
   /** List query keys */ lists: () => [...platformResourceDefinitionKeys.all, 'list'] as const,
@@ -454,18 +471,15 @@ export const platformResourceUsageSummaryKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformResourceUsageSummaryKeys.details(), id] as const,
 } as const;
-export const platformResourceUtilizationDailyKeys = {
-  /** All platformResourceUtilizationDaily queries */ all: [
-    'platformresourceutilizationdaily',
-  ] as const,
-  /** List query keys */ lists: () =>
-    [...platformResourceUtilizationDailyKeys.all, 'list'] as const,
+export const platformResourceUtilizationKeys = {
+  /** All platformResourceUtilization queries */ all: ['platformresourceutilization'] as const,
+  /** List query keys */ lists: () => [...platformResourceUtilizationKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...platformResourceUtilizationDailyKeys.lists(), variables] as const,
+    [...platformResourceUtilizationKeys.lists(), variables] as const,
   /** Detail query keys */ details: () =>
-    [...platformResourceUtilizationDailyKeys.all, 'detail'] as const,
+    [...platformResourceUtilizationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformResourceUtilizationDailyKeys.details(), id] as const,
+    [...platformResourceUtilizationKeys.details(), id] as const,
 } as const;
 export const platformResourcesHealthKeys = {
   /** All platformResourcesHealth queries */ all: ['platformresourceshealth'] as const,
@@ -529,6 +543,15 @@ export const resourceKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...resourceKeys.details(), id] as const,
 } as const;
+export const resourceDeclaredCapacityKeys = {
+  /** All resourceDeclaredCapacity queries */ all: ['resourcedeclaredcapacity'] as const,
+  /** List query keys */ lists: () => [...resourceDeclaredCapacityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceDeclaredCapacityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceDeclaredCapacityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceDeclaredCapacityKeys.details(), id] as const,
+} as const;
 export const resourceDefinitionKeys = {
   /** All resourceDefinition queries */ all: ['resourcedefinition'] as const,
   /** List query keys */ lists: () => [...resourceDefinitionKeys.all, 'list'] as const,
@@ -583,14 +606,14 @@ export const resourceUsageSummaryKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...resourceUsageSummaryKeys.details(), id] as const,
 } as const;
-export const resourceUtilizationDailyKeys = {
-  /** All resourceUtilizationDaily queries */ all: ['resourceutilizationdaily'] as const,
-  /** List query keys */ lists: () => [...resourceUtilizationDailyKeys.all, 'list'] as const,
+export const resourceUtilizationKeys = {
+  /** All resourceUtilization queries */ all: ['resourceutilization'] as const,
+  /** List query keys */ lists: () => [...resourceUtilizationKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...resourceUtilizationDailyKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...resourceUtilizationDailyKeys.all, 'detail'] as const,
+    [...resourceUtilizationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceUtilizationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...resourceUtilizationDailyKeys.details(), id] as const,
+    [...resourceUtilizationKeys.details(), id] as const,
 } as const;
 export const resourcesHealthKeys = {
   /** All resourcesHealth queries */ all: ['resourceshealth'] as const,
@@ -672,7 +695,6 @@ export const customQueryKeys = {
  */
 export const queryKeys = {
   dbPreset: dbPresetKeys,
-  declaredCapacity: declaredCapacityKeys,
   functionApiBinding: functionApiBindingKeys,
   functionDefinition: functionDefinitionKeys,
   functionDeployment: functionDeploymentKeys,
@@ -686,6 +708,7 @@ export const queryKeys = {
   functionGraphObject: functionGraphObjectKeys,
   functionGraphRef: functionGraphRefKeys,
   functionGraphStore: functionGraphStoreKeys,
+  functionInvocationAttempt: functionInvocationAttemptKeys,
   functionInvocation: functionInvocationKeys,
   getAllTreeNodesRecord: getAllTreeNodesRecordKeys,
   infraCommit: infraCommitKeys,
@@ -696,12 +719,12 @@ export const queryKeys = {
   integrationProvider: integrationProviderKeys,
   namespace: namespaceKeys,
   namespaceEvent: namespaceEventKeys,
-  platformDeclaredCapacity: platformDeclaredCapacityKeys,
   platformFunctionApiBinding: platformFunctionApiBindingKeys,
   platformFunctionDefinition: platformFunctionDefinitionKeys,
   platformFunctionDeployment: platformFunctionDeploymentKeys,
   platformFunctionDeploymentEvent: platformFunctionDeploymentEventKeys,
   platformFunctionExecutionLog: platformFunctionExecutionLogKeys,
+  platformFunctionInvocationAttempt: platformFunctionInvocationAttemptKeys,
   platformFunctionInvocation: platformFunctionInvocationKeys,
   platformInfraCommit: platformInfraCommitKeys,
   platformInfraGetAllTreeNodesRecord: platformInfraGetAllTreeNodesRecordKeys,
@@ -711,26 +734,28 @@ export const queryKeys = {
   platformNamespace: platformNamespaceKeys,
   platformNamespaceEvent: platformNamespaceEventKeys,
   platformResource: platformResourceKeys,
+  platformResourceDeclaredCapacity: platformResourceDeclaredCapacityKeys,
   platformResourceDefinition: platformResourceDefinitionKeys,
   platformResourceEvent: platformResourceEventKeys,
   platformResourceInstallation: platformResourceInstallationKeys,
   platformResourceStatusCheck: platformResourceStatusCheckKeys,
   platformResourceUsageLog: platformResourceUsageLogKeys,
   platformResourceUsageSummary: platformResourceUsageSummaryKeys,
-  platformResourceUtilizationDaily: platformResourceUtilizationDailyKeys,
+  platformResourceUtilization: platformResourceUtilizationKeys,
   platformResourcesHealth: platformResourcesHealthKeys,
   platformResourcesRequirementsState: platformResourcesRequirementsStateKeys,
   platformResourcesResolvedRequirement: platformResourcesResolvedRequirementKeys,
   platformWebhookEndpoint: platformWebhookEndpointKeys,
   platformWebhookEvent: platformWebhookEventKeys,
   resource: resourceKeys,
+  resourceDeclaredCapacity: resourceDeclaredCapacityKeys,
   resourceDefinition: resourceDefinitionKeys,
   resourceEvent: resourceEventKeys,
   resourceInstallation: resourceInstallationKeys,
   resourceStatusCheck: resourceStatusCheckKeys,
   resourceUsageLog: resourceUsageLogKeys,
   resourceUsageSummary: resourceUsageSummaryKeys,
-  resourceUtilizationDaily: resourceUtilizationDailyKeys,
+  resourceUtilization: resourceUtilizationKeys,
   resourcesHealth: resourcesHealthKeys,
   resourcesRequirementsState: resourcesRequirementsStateKeys,
   resourcesResolvedRequirement: resourcesResolvedRequirementKeys,
