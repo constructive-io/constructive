@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { isAbsolute } from 'node:path';
 import { Type } from '@sinclair/typebox';
 
 import {
@@ -9,7 +8,6 @@ import {
   ExecutionOutcome,
   ExecutionOutcomeSchema,
   NextAction,
-  OperationContext,
   OperationResult,
   OperationWarning,
   PROTOCOL_VERSION,
@@ -38,6 +36,12 @@ import {
 } from './redaction';
 import { assertOperationResultMetadata, CommandRegistry } from './registry';
 import { assertJsonValue, compileSchema } from './schema';
+import { createOperationContext } from './operation-context';
+
+export {
+  createOperationContext,
+  type CreateOperationContextOptions,
+} from './operation-context';
 
 const RESERVED_EVENTS = new Set([
   'operation.started',
@@ -121,64 +125,6 @@ class ProtocolSinkError extends Error {
     this.name = 'ProtocolSinkError';
     this.cause = cause;
   }
-}
-
-export interface CreateOperationContextOptions<TEvent = unknown> {
-  cwd: string;
-  mode: ExecutionMode;
-  env: Readonly<Record<string, string | undefined>>;
-  signal: AbortSignal;
-  operationId?: string;
-  now?: () => Date;
-  events?: { emit(event: TEvent): Promise<void> };
-  capabilities?: Partial<ApprovedCapabilities>;
-  registerSensitiveValue?: (value: string) => void;
-}
-
-export function createOperationContext<TEvent = unknown>(
-  options: CreateOperationContextOptions<TEvent>
-): OperationContext<TEvent> {
-  if (!isAbsolute(options.cwd)) {
-    throw new ContractError(
-      'CLI_CWD_NOT_ABSOLUTE',
-      'OperationContext.cwd must be an absolute path.',
-      {
-        cwd: options.cwd,
-      }
-    );
-  }
-  const env = Object.freeze({ ...options.env });
-  const capabilities: ApprovedCapabilities = Object.freeze({
-    yes: options.capabilities?.yes ?? false,
-    ...(options.capabilities?.dryRun === undefined
-      ? {}
-      : { dryRun: options.capabilities.dryRun }),
-    ...(options.capabilities?.idempotencyKey === undefined
-      ? {}
-      : { idempotencyKey: options.capabilities.idempotencyKey }),
-    acknowledgedRisks: Object.freeze([
-      ...(options.capabilities?.acknowledgedRisks ?? []),
-    ]),
-  });
-  return Object.freeze({
-    cwd: options.cwd,
-    mode: options.mode,
-    env,
-    signal: options.signal,
-    operationId: options.operationId ?? randomUUID(),
-    now: options.now ?? (() => new Date()),
-    events: options.events ?? { emit: async () => undefined },
-    capabilities,
-    registerSensitiveValue(value: string): void {
-      if (typeof value !== 'string') {
-        throw new ContractError(
-          'CLI_SENSITIVE_VALUE_INVALID',
-          'Sensitive values registered by an operation must be strings.'
-        );
-      }
-      if (value.length > 0) options.registerSensitiveValue?.(value);
-    },
-  });
 }
 
 export interface ExecuteCommandOptions {

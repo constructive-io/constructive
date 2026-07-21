@@ -209,6 +209,7 @@ jobs:
           npm_config_ignore_scripts=true pnpm --filter graphile-presigned-url-plugin pack --pack-destination /tmp/cnc-package-artifacts
           npm_config_ignore_scripts=true pnpm --filter @constructive-io/cli pack --pack-destination /tmp/cnc-package-artifacts
           cp packages/cli/scripts/verify-packed-artifacts.mjs /tmp/cnc-package-artifacts/
+          cp packages/cli/scripts/packed-acceptance-support.mjs /tmp/cnc-package-artifacts/
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
