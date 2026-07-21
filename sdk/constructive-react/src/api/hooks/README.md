@@ -102,6 +102,16 @@ function App() {
 | `useCreateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
 | `useUpdateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
 | `useDeleteDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useDomainEventsQuery` | Query | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useDomainEventQuery` | Query | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useCreateDomainEventMutation` | Mutation | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useUpdateDomainEventMutation` | Mutation | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useDeleteDomainEventMutation` | Mutation | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useDomainVerificationsQuery` | Query | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useDomainVerificationQuery` | Query | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useCreateDomainVerificationMutation` | Mutation | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useUpdateDomainVerificationMutation` | Mutation | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useDeleteDomainVerificationMutation` | Mutation | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
 | `useEmbeddingChunksQuery` | Query | List all embeddingChunks |
 | `useEmbeddingChunkQuery` | Query | Get one embeddingChunk |
 | `useCreateEmbeddingChunkMutation` | Mutation | Create a embeddingChunk |
@@ -279,7 +289,7 @@ and lifecycle settings. |
 | `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
 | `useRequestDatabaseMutation` | Mutation | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
@@ -582,6 +592,48 @@ const { mutate: create } = useCreateDomainMutation({
 create({ annotations: '<JSON>', apiId: '<UUID>', databaseId: '<UUID>', domain: '<Hostname>', labels: '<JSON>', serviceId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>' });
 ```
 
+### DomainEvent
+
+```typescript
+// List all domainEvents
+const { data, isLoading } = useDomainEventsQuery({
+  selection: { fields: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } },
+});
+
+// Get one domainEvent
+const { data: item } = useDomainEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } },
+});
+
+// Create a domainEvent
+const { mutate: create } = useCreateDomainEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>', ownerId: '<UUID>' });
+```
+
+### DomainVerification
+
+```typescript
+// List all domainVerifications
+const { data, isLoading } = useDomainVerificationsQuery({
+  selection: { fields: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Get one domainVerification
+const { data: item } = useDomainVerificationQuery({
+  id: '<UUID>',
+  selection: { fields: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Create a domainVerification
+const { mutate: create } = useCreateDomainVerificationMutation({
+  selection: { fields: { id: true } },
+});
+create({ attempts: '<Int>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', ownerId: '<UUID>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' });
+```
+
 ### EmbeddingChunk
 
 ```typescript
@@ -755,20 +807,20 @@ create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<U
 ```typescript
 // List all managedDomains
 const { data, isLoading } = useManagedDomainsQuery({
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one managedDomain
 const { data: item } = useManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a managedDomain
 const { mutate: create } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### NodeTypeRegistry
@@ -1298,9 +1350,9 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `pHost` | String |
-  | `pMethod` | String |
-  | `pPath` | String |
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
 
 ### `useAcceptDatabaseTransferMutation`
 
@@ -1364,7 +1416,7 @@ rejectDatabaseTransfer
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

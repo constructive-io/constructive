@@ -7,7 +7,7 @@ Execute the orgIsManagerOf query
 ## Usage
 
 ```typescript
-db.query.orgIsManagerOf({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: '<Int>', pUserId: '<UUID>' }).execute()
+db.query.orgIsManagerOf({ managerId: '<UUID>', maxDepth: '<Int>', targetEntityId: '<UUID>', userId: '<UUID>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.orgIsManagerOf({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: 
 ### Run orgIsManagerOf
 
 ```typescript
-const result = await db.query.orgIsManagerOf({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: '<Int>', pUserId: '<UUID>' }).execute();
+const result = await db.query.orgIsManagerOf({ managerId: '<UUID>', maxDepth: '<Int>', targetEntityId: '<UUID>', userId: '<UUID>' }).execute();
 ```

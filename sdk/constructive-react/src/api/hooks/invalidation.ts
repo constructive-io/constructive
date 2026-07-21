@@ -29,6 +29,8 @@ import {
   databaseTransferKeys,
   defaultPrivilegeKeys,
   domainKeys,
+  domainEventKeys,
+  domainVerificationKeys,
   embeddingChunkKeys,
   enumKeys,
   fieldKeys,
@@ -307,6 +309,40 @@ export const invalidate = {
     /** Invalidate a specific domain */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: domainKeys.detail(id),
+      }),
+  },
+  /** Invalidate domainEvent queries */ domainEvent: {
+    /** Invalidate all domainEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainEventKeys.all,
+      }),
+    /** Invalidate domainEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainEventKeys.lists(),
+      }),
+    /** Invalidate a specific domainEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: domainEventKeys.detail(id),
+      }),
+  },
+  /** Invalidate domainVerification queries */ domainVerification: {
+    /** Invalidate all domainVerification queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainVerificationKeys.all,
+      }),
+    /** Invalidate domainVerification list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainVerificationKeys.lists(),
+      }),
+    /** Invalidate a specific domainVerification */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: domainVerificationKeys.detail(id),
       }),
   },
   /** Invalidate embeddingChunk queries */ embeddingChunk: {
@@ -942,6 +978,22 @@ export const remove = {
   /** Remove domain from cache */ domain: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: domainKeys.detail(id),
+    });
+  },
+  /** Remove domainEvent from cache */ domainEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: domainEventKeys.detail(id),
+    });
+  },
+  /** Remove domainVerification from cache */ domainVerification: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: domainVerificationKeys.detail(id),
     });
   },
   /** Remove embeddingChunk from cache */ embeddingChunk: (
