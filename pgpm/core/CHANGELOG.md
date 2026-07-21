@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.34.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.33.0...@pgpmjs/core@6.34.0) (2026-07-21)
+
+### Features
+
+- **pgpm-core:** renameChanges — atomic change rename/move across files, headers, and plan ([6bebb4a](https://github.com/constructive-io/constructive/commit/6bebb4aed49a5668dc6a7762a21c38768c20fbd3))
+
 # [6.33.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.32.2...@pgpmjs/core@6.33.0) (2026-07-20)
 
 ### Features
