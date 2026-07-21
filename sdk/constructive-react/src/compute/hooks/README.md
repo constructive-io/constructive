@@ -37,8 +37,6 @@ function App() {
 | `useCreateDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useUpdateDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useDeleteDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
-| `useDeclaredCapacitiesQuery` | Query | List all declaredCapacities |
-| `useCreateDeclaredCapacityMutation` | Mutation | Create a declaredCapacity |
 | `useFunctionApiBindingsQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `useFunctionApiBindingQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `useCreateFunctionApiBindingMutation` | Mutation | Join table binding function definitions to API endpoints with per-binding alias and config |
@@ -104,6 +102,11 @@ function App() {
 | `useCreateFunctionGraphStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useUpdateFunctionGraphStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useDeleteFunctionGraphStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useFunctionInvocationAttemptsQuery` | Query | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useFunctionInvocationAttemptQuery` | Query | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useCreateFunctionInvocationAttemptMutation` | Mutation | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useUpdateFunctionInvocationAttemptMutation` | Mutation | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useDeleteFunctionInvocationAttemptMutation` | Mutation | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
 | `useFunctionInvocationsQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `useFunctionInvocationQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `useCreateFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
@@ -148,8 +151,6 @@ function App() {
 | `useCreateNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useUpdateNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useDeleteNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
-| `usePlatformDeclaredCapacitiesQuery` | Query | List all platformDeclaredCapacities |
-| `useCreatePlatformDeclaredCapacityMutation` | Mutation | Create a platformDeclaredCapacity |
 | `usePlatformFunctionApiBindingsQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `usePlatformFunctionApiBindingQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `useCreatePlatformFunctionApiBindingMutation` | Mutation | Join table binding function definitions to API endpoints with per-binding alias and config |
@@ -175,6 +176,11 @@ function App() {
 | `useCreatePlatformFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useUpdatePlatformFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useDeletePlatformFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
+| `usePlatformFunctionInvocationAttemptsQuery` | Query | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `usePlatformFunctionInvocationAttemptQuery` | Query | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useCreatePlatformFunctionInvocationAttemptMutation` | Mutation | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useUpdatePlatformFunctionInvocationAttemptMutation` | Mutation | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
+| `useDeletePlatformFunctionInvocationAttemptMutation` | Mutation | Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail |
 | `usePlatformFunctionInvocationsQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `usePlatformFunctionInvocationQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
 | `useCreatePlatformFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. |
@@ -217,6 +223,8 @@ function App() {
 | `useCreatePlatformResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useUpdatePlatformResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useDeletePlatformResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
+| `usePlatformResourceDeclaredCapacitiesQuery` | Query | List all platformResourceDeclaredCapacities |
+| `useCreatePlatformResourceDeclaredCapacityMutation` | Mutation | Create a platformResourceDeclaredCapacity |
 | `usePlatformResourceDefinitionsQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `usePlatformResourceDefinitionQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `useCreatePlatformResourceDefinitionMutation` | Mutation | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
@@ -237,18 +245,18 @@ function App() {
 | `useCreatePlatformResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useUpdatePlatformResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useDeletePlatformResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
-| `usePlatformResourceUsageLogsQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `usePlatformResourceUsageLogQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useCreatePlatformResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useUpdatePlatformResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useDeletePlatformResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
+| `usePlatformResourceUsageLogsQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `usePlatformResourceUsageLogQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useCreatePlatformResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useUpdatePlatformResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useDeletePlatformResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
 | `usePlatformResourceUsageSummariesQuery` | Query | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `usePlatformResourceUsageSummaryQuery` | Query | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useCreatePlatformResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useUpdatePlatformResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useDeletePlatformResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
-| `usePlatformResourceUtilizationDailiesQuery` | Query | List all platformResourceUtilizationDailies |
-| `useCreatePlatformResourceUtilizationDailyMutation` | Mutation | Create a platformResourceUtilizationDaily |
+| `usePlatformResourceUtilizationsQuery` | Query | List all platformResourceUtilizations |
+| `useCreatePlatformResourceUtilizationMutation` | Mutation | Create a platformResourceUtilization |
 | `usePlatformResourcesHealthsQuery` | Query | List all platformResourcesHealths |
 | `usePlatformResourcesHealthQuery` | Query | Get one platformResourcesHealth |
 | `useCreatePlatformResourcesHealthMutation` | Mutation | Create a platformResourcesHealth |
@@ -273,6 +281,8 @@ function App() {
 | `useCreateResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useUpdateResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useDeleteResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
+| `useResourceDeclaredCapacitiesQuery` | Query | List all resourceDeclaredCapacities |
+| `useCreateResourceDeclaredCapacityMutation` | Mutation | Create a resourceDeclaredCapacity |
 | `useResourceDefinitionsQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `useResourceDefinitionQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `useCreateResourceDefinitionMutation` | Mutation | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
@@ -293,18 +303,18 @@ function App() {
 | `useCreateResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useUpdateResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useDeleteResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
-| `useResourceUsageLogsQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useResourceUsageLogQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useCreateResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useUpdateResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
-| `useDeleteResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) |
+| `useResourceUsageLogsQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useResourceUsageLogQuery` | Query | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useCreateResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useUpdateResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
+| `useDeleteResourceUsageLogMutation` | Mutation | Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) |
 | `useResourceUsageSummariesQuery` | Query | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useResourceUsageSummaryQuery` | Query | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useCreateResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useUpdateResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useDeleteResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
-| `useResourceUtilizationDailiesQuery` | Query | List all resourceUtilizationDailies |
-| `useCreateResourceUtilizationDailyMutation` | Mutation | Create a resourceUtilizationDaily |
+| `useResourceUtilizationsQuery` | Query | List all resourceUtilizations |
+| `useCreateResourceUtilizationMutation` | Mutation | Create a resourceUtilization |
 | `useResourcesHealthsQuery` | Query | List all resourcesHealths |
 | `useResourcesHealthQuery` | Query | Get one resourcesHealth |
 | `useCreateResourcesHealthMutation` | Mutation | Create a resourcesHealth |
@@ -378,21 +388,6 @@ const { mutate: create } = useCreateDbPresetMutation({
   selection: { fields: { id: true } },
 });
 create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', modulesHash: '<UUID>', slug: '<String>', storeId: '<UUID>' });
-```
-
-### DeclaredCapacity
-
-```typescript
-// List all declaredCapacities
-const { data, isLoading } = useDeclaredCapacitiesQuery({
-  selection: { fields: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } },
-});
-
-// Create a declaredCapacity
-const { mutate: create } = useCreateDeclaredCapacityMutation({
-  selection: { fields: { id: true } },
-});
-create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>' });
 ```
 
 ### FunctionApiBinding
@@ -668,6 +663,27 @@ const { mutate: create } = useCreateFunctionGraphStoreMutation({
 create({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
 ```
 
+### FunctionInvocationAttempt
+
+```typescript
+// List all functionInvocationAttempts
+const { data, isLoading } = useFunctionInvocationAttemptsQuery({
+  selection: { fields: { actorId: true, attempt: true, createdAt: true, databaseId: true, durationMs: true, error: true, errorDetail: true, id: true, invocationCreatedAt: true, invocationId: true, startedAt: true, success: true, taskIdentifier: true } },
+});
+
+// Get one functionInvocationAttempt
+const { data: item } = useFunctionInvocationAttemptQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, attempt: true, createdAt: true, databaseId: true, durationMs: true, error: true, errorDetail: true, id: true, invocationCreatedAt: true, invocationId: true, startedAt: true, success: true, taskIdentifier: true } },
+});
+
+// Create a functionInvocationAttempt
+const { mutate: create } = useCreateFunctionInvocationAttemptMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', attempt: '<Int>', databaseId: '<UUID>', durationMs: '<Int>', error: '<String>', errorDetail: '<JSON>', invocationCreatedAt: '<Datetime>', invocationId: '<UUID>', startedAt: '<Datetime>', success: '<Boolean>', taskIdentifier: '<String>' });
+```
+
 ### FunctionInvocation
 
 ```typescript
@@ -866,21 +882,6 @@ const { mutate: create } = useCreateNamespaceEventMutation({
 create({ actorId: '<UUID>', databaseId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' });
 ```
 
-### PlatformDeclaredCapacity
-
-```typescript
-// List all platformDeclaredCapacities
-const { data, isLoading } = usePlatformDeclaredCapacitiesQuery({
-  selection: { fields: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } },
-});
-
-// Create a platformDeclaredCapacity
-const { mutate: create } = useCreatePlatformDeclaredCapacityMutation({
-  selection: { fields: { id: true } },
-});
-create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>' });
-```
-
 ### PlatformFunctionApiBinding
 
 ```typescript
@@ -907,20 +908,20 @@ create({ alias: '<String>', apiId: '<UUID>', config: '<JSON>', functionDefinitio
 ```typescript
 // List all platformFunctionDefinitions
 const { data, isLoading } = usePlatformFunctionDefinitionsQuery({
-  selection: { fields: { accessChannels: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
+  selection: { fields: { accessChannels: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
 });
 
 // Get one platformFunctionDefinition
 const { data: item } = usePlatformFunctionDefinitionQuery({
   id: '<UUID>',
-  selection: { fields: { accessChannels: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
+  selection: { fields: { accessChannels: true, billable: true, category: true, concurrency: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, description: true, fnCategory: true, functionColumns: true, graphId: true, icon: true, id: true, image: true, inputs: true, integrations: true, isPublished: true, maxAttempts: true, memoryLimitBytes: true, memoryRequestBytes: true, moduleTable: true, name: true, outputs: true, payloadArgs: true, priority: true, props: true, protected: true, publishedAt: true, queueName: true, requiredBuckets: true, requiredConfigs: true, requiredModels: true, requiredSecrets: true, resources: true, runtime: true, scaleMax: true, scaleMin: true, system: true, targetFunction: true, targetSchema: true, taskIdentifier: true, timeoutSeconds: true, updatedAt: true, volatile: true } },
 });
 
 // Create a platformFunctionDefinition
 const { mutate: create } = useCreatePlatformFunctionDefinitionMutation({
   selection: { fields: { id: true } },
 });
-create({ accessChannels: '<String>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', volatile: '<Boolean>' });
+create({ accessChannels: '<String>', billable: '<Boolean>', category: '<String>', concurrency: '<Int>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', description: '<String>', fnCategory: '<String>', functionColumns: '<JSON>', graphId: '<UUID>', icon: '<String>', image: '<String>', inputs: '<JSON>', integrations: '<String>', isPublished: '<Boolean>', maxAttempts: '<Int>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', moduleTable: '<String>', name: '<String>', outputs: '<JSON>', payloadArgs: '<JSON>', priority: '<Int>', props: '<JSON>', protected: '<Boolean>', publishedAt: '<Datetime>', queueName: '<String>', requiredBuckets: '<String>', requiredConfigs: '<ResourceRequirement>', requiredModels: '<String>', requiredSecrets: '<ResourceRequirement>', resources: '<JSON>', runtime: '<String>', scaleMax: '<Int>', scaleMin: '<Int>', system: '<Boolean>', targetFunction: '<String>', targetSchema: '<String>', taskIdentifier: '<String>', timeoutSeconds: '<Int>', volatile: '<Boolean>' });
 ```
 
 ### PlatformFunctionDeployment
@@ -984,6 +985,27 @@ const { mutate: create } = useCreatePlatformFunctionExecutionLogMutation({
   selection: { fields: { id: true } },
 });
 create({ actorId: '<UUID>', invocationId: '<UUID>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', taskIdentifier: '<String>' });
+```
+
+### PlatformFunctionInvocationAttempt
+
+```typescript
+// List all platformFunctionInvocationAttempts
+const { data, isLoading } = usePlatformFunctionInvocationAttemptsQuery({
+  selection: { fields: { actorId: true, attempt: true, createdAt: true, durationMs: true, error: true, errorDetail: true, id: true, invocationCreatedAt: true, invocationId: true, startedAt: true, success: true, taskIdentifier: true } },
+});
+
+// Get one platformFunctionInvocationAttempt
+const { data: item } = usePlatformFunctionInvocationAttemptQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, attempt: true, createdAt: true, durationMs: true, error: true, errorDetail: true, id: true, invocationCreatedAt: true, invocationId: true, startedAt: true, success: true, taskIdentifier: true } },
+});
+
+// Create a platformFunctionInvocationAttempt
+const { mutate: create } = useCreatePlatformFunctionInvocationAttemptMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', attempt: '<Int>', durationMs: '<Int>', error: '<String>', errorDetail: '<JSON>', invocationCreatedAt: '<Datetime>', invocationId: '<UUID>', startedAt: '<Datetime>', success: '<Boolean>', taskIdentifier: '<String>' });
 ```
 
 ### PlatformFunctionInvocation
@@ -1169,6 +1191,21 @@ const { mutate: create } = useCreatePlatformResourceMutation({
 create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' });
 ```
 
+### PlatformResourceDeclaredCapacity
+
+```typescript
+// List all platformResourceDeclaredCapacities
+const { data, isLoading } = usePlatformResourceDeclaredCapacitiesQuery({
+  selection: { fields: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } },
+});
+
+// Create a platformResourceDeclaredCapacity
+const { mutate: create } = useCreatePlatformResourceDeclaredCapacityMutation({
+  selection: { fields: { id: true } },
+});
+create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>' });
+```
+
 ### PlatformResourceDefinition
 
 ```typescript
@@ -1295,16 +1332,16 @@ const { mutate: create } = useCreatePlatformResourceUsageSummaryMutation({
 create({ date: '<Date>', gbSeconds: '<BigFloat>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', namespaceId: '<UUID>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' });
 ```
 
-### PlatformResourceUtilizationDaily
+### PlatformResourceUtilization
 
 ```typescript
-// List all platformResourceUtilizationDailies
-const { data, isLoading } = usePlatformResourceUtilizationDailiesQuery({
+// List all platformResourceUtilizations
+const { data, isLoading } = usePlatformResourceUtilizationsQuery({
   selection: { fields: { avgMemoryBytes: true, cpuLimitMillicores: true, cpuPeakUtilization: true, cpuRequestHeadroomMillicores: true, cpuRequestMillicores: true, date: true, gbSeconds: true, kind: true, maxCpuMillicores: true, maxMemoryBytes: true, memoryLimitBytes: true, memoryPeakUtilization: true, memoryRequestBytes: true, memoryRequestHeadroomBytes: true, namespaceId: true, replicas: true, resourceId: true, runtimeSeconds: true, sampleCount: true } },
 });
 
-// Create a platformResourceUtilizationDaily
-const { mutate: create } = useCreatePlatformResourceUtilizationDailyMutation({
+// Create a platformResourceUtilization
+const { mutate: create } = useCreatePlatformResourceUtilizationMutation({
   selection: { fields: { id: true } },
 });
 create({ avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtilization: '<BigFloat>', cpuRequestHeadroomMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', date: '<Date>', gbSeconds: '<BigFloat>', kind: '<String>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', memoryLimitBytes: '<BigInt>', memoryPeakUtilization: '<BigFloat>', memoryRequestBytes: '<BigInt>', memoryRequestHeadroomBytes: '<BigInt>', namespaceId: '<UUID>', replicas: '<Int>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' });
@@ -1422,6 +1459,21 @@ const { mutate: create } = useCreateResourceMutation({
   selection: { fields: { id: true } },
 });
 create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', updatedBy: '<UUID>' });
+```
+
+### ResourceDeclaredCapacity
+
+```typescript
+// List all resourceDeclaredCapacities
+const { data, isLoading } = useResourceDeclaredCapacitiesQuery({
+  selection: { fields: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true } },
+});
+
+// Create a resourceDeclaredCapacity
+const { mutate: create } = useCreateResourceDeclaredCapacityMutation({
+  selection: { fields: { id: true } },
+});
+create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>' });
 ```
 
 ### ResourceDefinition
@@ -1550,16 +1602,16 @@ const { mutate: create } = useCreateResourceUsageSummaryMutation({
 create({ databaseId: '<UUID>', date: '<Date>', gbSeconds: '<BigFloat>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', namespaceId: '<UUID>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' });
 ```
 
-### ResourceUtilizationDaily
+### ResourceUtilization
 
 ```typescript
-// List all resourceUtilizationDailies
-const { data, isLoading } = useResourceUtilizationDailiesQuery({
+// List all resourceUtilizations
+const { data, isLoading } = useResourceUtilizationsQuery({
   selection: { fields: { avgMemoryBytes: true, cpuLimitMillicores: true, cpuPeakUtilization: true, cpuRequestHeadroomMillicores: true, cpuRequestMillicores: true, date: true, gbSeconds: true, kind: true, maxCpuMillicores: true, maxMemoryBytes: true, memoryLimitBytes: true, memoryPeakUtilization: true, memoryRequestBytes: true, memoryRequestHeadroomBytes: true, namespaceId: true, replicas: true, resourceId: true, runtimeSeconds: true, sampleCount: true } },
 });
 
-// Create a resourceUtilizationDaily
-const { mutate: create } = useCreateResourceUtilizationDailyMutation({
+// Create a resourceUtilization
+const { mutate: create } = useCreateResourceUtilizationMutation({
   selection: { fields: { id: true } },
 });
 create({ avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtilization: '<BigFloat>', cpuRequestHeadroomMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', date: '<Date>', gbSeconds: '<BigFloat>', kind: '<String>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', memoryLimitBytes: '<BigInt>', memoryPeakUtilization: '<BigFloat>', memoryRequestBytes: '<BigInt>', memoryRequestHeadroomBytes: '<BigInt>', namespaceId: '<UUID>', replicas: '<Int>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' });

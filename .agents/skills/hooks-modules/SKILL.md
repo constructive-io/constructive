@@ -1,13 +1,13 @@
 ---
 name: hooks-modules
-description: React Query hooks for the modules API — provides typed query and mutation hooks for 68 tables and 12 custom operations
+description: React Query hooks for the modules API — provides typed query and mutation hooks for 75 tables and 12 custom operations
 ---
 
 # hooks-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the modules API — provides typed query and mutation hooks for 68 tables and 12 custom operations
+React Query hooks for the modules API — provides typed query and mutation hooks for 75 tables and 12 custom operations
 
 ## Usage
 
@@ -39,17 +39,21 @@ const { data, isLoading } = useAgentModulesQuery({
 See the `references/` directory for detailed per-entity API documentation:
 
 - [agent-module](references/agent-module.md)
+- [api-surface-module](references/api-surface-module.md)
+- [app-module](references/app-module.md)
 - [billing-module](references/billing-module.md)
 - [billing-provider-module](references/billing-provider-module.md)
 - [blueprint](references/blueprint.md)
 - [blueprint-construction](references/blueprint-construction.md)
 - [blueprint-template](references/blueprint-template.md)
+- [catalog-module](references/catalog-module.md)
 - [compute-log-module](references/compute-log-module.md)
 - [config-secrets-user-module](references/config-secrets-user-module.md)
 - [connected-accounts-module](references/connected-accounts-module.md)
 - [crypto-addresses-module](references/crypto-addresses-module.md)
 - [crypto-auth-module](references/crypto-auth-module.md)
 - [database-provision-module](references/database-provision-module.md)
+- [database-settings-module](references/database-settings-module.md)
 - [db-pool-config](references/db-pool-config.md)
 - [db-pool](references/db-pool.md)
 - [db-preset-module](references/db-preset-module.md)
@@ -57,6 +61,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [default-ids-module](references/default-ids-module.md)
 - [denormalized-table-field](references/denormalized-table-field.md)
 - [devices-module](references/devices-module.md)
+- [domain-module](references/domain-module.md)
 - [emails-module](references/emails-module.md)
 - [entity-type-provision](references/entity-type-provision.md)
 - [events-module](references/events-module.md)
@@ -92,9 +97,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [relation-provision](references/relation-provision.md)
 - [resource-module](references/resource-module.md)
 - [rls-module](references/rls-module.md)
+- [route-module](references/route-module.md)
 - [secure-table-provision](references/secure-table-provision.md)
 - [session-secrets-module](references/session-secrets-module.md)
 - [sessions-module](references/sessions-module.md)
+- [site-surface-module](references/site-surface-module.md)
 - [storage-log-module](references/storage-log-module.md)
 - [storage-module](references/storage-module.md)
 - [transfer-log-module](references/transfer-log-module.md)

@@ -27,7 +27,6 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `db-preset` | dbPreset CRUD operations |
-| `declared-capacity` | declaredCapacity CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
 | `function-definition` | functionDefinition CRUD operations |
 | `function-deployment` | functionDeployment CRUD operations |
@@ -41,6 +40,7 @@ csdk auth set-token <your-token>
 | `function-graph-object` | functionGraphObject CRUD operations |
 | `function-graph-ref` | functionGraphRef CRUD operations |
 | `function-graph-store` | functionGraphStore CRUD operations |
+| `function-invocation-attempt` | functionInvocationAttempt CRUD operations |
 | `function-invocation` | functionInvocation CRUD operations |
 | `get-all-tree-nodes-record` | getAllTreeNodesRecord CRUD operations |
 | `infra-commit` | infraCommit CRUD operations |
@@ -51,12 +51,12 @@ csdk auth set-token <your-token>
 | `integration-provider` | integrationProvider CRUD operations |
 | `namespace` | namespace CRUD operations |
 | `namespace-event` | namespaceEvent CRUD operations |
-| `platform-declared-capacity` | platformDeclaredCapacity CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
 | `platform-function-deployment` | platformFunctionDeployment CRUD operations |
 | `platform-function-deployment-event` | platformFunctionDeploymentEvent CRUD operations |
 | `platform-function-execution-log` | platformFunctionExecutionLog CRUD operations |
+| `platform-function-invocation-attempt` | platformFunctionInvocationAttempt CRUD operations |
 | `platform-function-invocation` | platformFunctionInvocation CRUD operations |
 | `platform-infra-commit` | platformInfraCommit CRUD operations |
 | `platform-infra-get-all-tree-nodes-record` | platformInfraGetAllTreeNodesRecord CRUD operations |
@@ -66,26 +66,28 @@ csdk auth set-token <your-token>
 | `platform-namespace` | platformNamespace CRUD operations |
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
 | `platform-resource` | platformResource CRUD operations |
+| `platform-resource-declared-capacity` | platformResourceDeclaredCapacity CRUD operations |
 | `platform-resource-definition` | platformResourceDefinition CRUD operations |
 | `platform-resource-event` | platformResourceEvent CRUD operations |
 | `platform-resource-installation` | platformResourceInstallation CRUD operations |
 | `platform-resource-status-check` | platformResourceStatusCheck CRUD operations |
 | `platform-resource-usage-log` | platformResourceUsageLog CRUD operations |
 | `platform-resource-usage-summary` | platformResourceUsageSummary CRUD operations |
-| `platform-resource-utilization-daily` | platformResourceUtilizationDaily CRUD operations |
+| `platform-resource-utilization` | platformResourceUtilization CRUD operations |
 | `platform-resources-health` | platformResourcesHealth CRUD operations |
 | `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
 | `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
 | `platform-webhook-event` | platformWebhookEvent CRUD operations |
 | `resource` | resource CRUD operations |
+| `resource-declared-capacity` | resourceDeclaredCapacity CRUD operations |
 | `resource-definition` | resourceDefinition CRUD operations |
 | `resource-event` | resourceEvent CRUD operations |
 | `resource-installation` | resourceInstallation CRUD operations |
 | `resource-status-check` | resourceStatusCheck CRUD operations |
 | `resource-usage-log` | resourceUsageLog CRUD operations |
 | `resource-usage-summary` | resourceUsageSummary CRUD operations |
-| `resource-utilization-daily` | resourceUtilizationDaily CRUD operations |
+| `resource-utilization` | resourceUtilization CRUD operations |
 | `resources-health` | resourcesHealth CRUD operations |
 | `resources-requirements-state` | resourcesRequirementsState CRUD operations |
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
@@ -197,39 +199,6 @@ CRUD operations for DbPreset records.
 **Required create fields:** `definition`, `slug`
 **Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `modulesHash`, `storeId`
 
-### `declared-capacity`
-
-CRUD operations for DeclaredCapacity records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all declaredCapacity records |
-| `find-first` | Find first matching declaredCapacity record |
-| `get` | Get a declaredCapacity by id |
-| `create` | Create a new declaredCapacity |
-| `update` | Update an existing declaredCapacity |
-| `delete` | Delete a declaredCapacity |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `cpuLimitMillicores` | BigInt |
-| `cpuRequestMillicores` | BigInt |
-| `installationId` | UUID |
-| `isTransient` | Boolean |
-| `kind` | String |
-| `memoryLimitBytes` | BigInt |
-| `memoryRequestBytes` | BigInt |
-| `namespaceId` | UUID |
-| `podCountMax` | Int |
-| `podCountMin` | Int |
-| `source` | String |
-| `sourceId` | UUID |
-| `storageSizeBytes` | BigInt |
-
-**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
-
 ### `function-api-binding`
 
 CRUD operations for FunctionApiBinding records.
@@ -317,7 +286,7 @@ CRUD operations for FunctionDefinition records.
 | `updatedAt` | Datetime |
 | `volatile` | Boolean |
 
-**Required create fields:** `category`, `databaseId`, `name`, `taskIdentifier`
+**Required create fields:** `category`, `databaseId`, `name`
 **Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
 
 ### `function-deployment`
@@ -677,6 +646,40 @@ CRUD operations for FunctionGraphStore records.
 **Required create fields:** `name`, `scopeId`
 **Optional create fields (backend defaults):** `hash`
 
+### `function-invocation-attempt`
+
+CRUD operations for FunctionInvocationAttempt records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionInvocationAttempt records |
+| `find-first` | Find first matching functionInvocationAttempt record |
+| `get` | Get a functionInvocationAttempt by id |
+| `create` | Create a new functionInvocationAttempt |
+| `update` | Update an existing functionInvocationAttempt |
+| `delete` | Delete a functionInvocationAttempt |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `attempt` | Int |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `durationMs` | Int |
+| `error` | String |
+| `errorDetail` | JSON |
+| `id` | UUID |
+| `invocationCreatedAt` | Datetime |
+| `invocationId` | UUID |
+| `startedAt` | Datetime |
+| `success` | Boolean |
+| `taskIdentifier` | String |
+
+**Required create fields:** `attempt`, `databaseId`, `invocationCreatedAt`, `invocationId`, `success`, `taskIdentifier`
+**Optional create fields (backend defaults):** `actorId`, `durationMs`, `error`, `errorDetail`, `startedAt`
+
 ### `function-invocation`
 
 CRUD operations for FunctionInvocation records.
@@ -967,39 +970,6 @@ CRUD operations for NamespaceEvent records.
 **Required create fields:** `databaseId`, `eventType`, `namespaceId`
 **Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
-### `platform-declared-capacity`
-
-CRUD operations for PlatformDeclaredCapacity records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformDeclaredCapacity records |
-| `find-first` | Find first matching platformDeclaredCapacity record |
-| `get` | Get a platformDeclaredCapacity by id |
-| `create` | Create a new platformDeclaredCapacity |
-| `update` | Update an existing platformDeclaredCapacity |
-| `delete` | Delete a platformDeclaredCapacity |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `cpuLimitMillicores` | BigInt |
-| `cpuRequestMillicores` | BigInt |
-| `installationId` | UUID |
-| `isTransient` | Boolean |
-| `kind` | String |
-| `memoryLimitBytes` | BigInt |
-| `memoryRequestBytes` | BigInt |
-| `namespaceId` | UUID |
-| `podCountMax` | Int |
-| `podCountMin` | Int |
-| `source` | String |
-| `sourceId` | UUID |
-| `storageSizeBytes` | BigInt |
-
-**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
-
 ### `platform-function-api-binding`
 
 CRUD operations for PlatformFunctionApiBinding records.
@@ -1044,6 +1014,7 @@ CRUD operations for PlatformFunctionDefinition records.
 | Field | Type |
 |-------|------|
 | `accessChannels` | String |
+| `billable` | Boolean |
 | `category` | String |
 | `concurrency` | Int |
 | `cpuLimitMillicores` | BigInt |
@@ -1079,6 +1050,7 @@ CRUD operations for PlatformFunctionDefinition records.
 | `runtime` | String |
 | `scaleMax` | Int |
 | `scaleMin` | Int |
+| `system` | Boolean |
 | `targetFunction` | String |
 | `targetSchema` | String |
 | `taskIdentifier` | String |
@@ -1086,8 +1058,8 @@ CRUD operations for PlatformFunctionDefinition records.
 | `updatedAt` | Datetime |
 | `volatile` | Boolean |
 
-**Required create fields:** `category`, `name`, `taskIdentifier`
-**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Required create fields:** `category`, `name`
+**Optional create fields (backend defaults):** `accessChannels`, `billable`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `system`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
 
 ### `platform-function-deployment`
 
@@ -1187,6 +1159,39 @@ CRUD operations for PlatformFunctionExecutionLog records.
 
 **Required create fields:** `message`
 **Optional create fields (backend defaults):** `actorId`, `invocationId`, `logLevel`, `metadata`, `taskIdentifier`
+
+### `platform-function-invocation-attempt`
+
+CRUD operations for PlatformFunctionInvocationAttempt records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionInvocationAttempt records |
+| `find-first` | Find first matching platformFunctionInvocationAttempt record |
+| `get` | Get a platformFunctionInvocationAttempt by id |
+| `create` | Create a new platformFunctionInvocationAttempt |
+| `update` | Update an existing platformFunctionInvocationAttempt |
+| `delete` | Delete a platformFunctionInvocationAttempt |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `attempt` | Int |
+| `createdAt` | Datetime |
+| `durationMs` | Int |
+| `error` | String |
+| `errorDetail` | JSON |
+| `id` | UUID |
+| `invocationCreatedAt` | Datetime |
+| `invocationId` | UUID |
+| `startedAt` | Datetime |
+| `success` | Boolean |
+| `taskIdentifier` | String |
+
+**Required create fields:** `attempt`, `invocationCreatedAt`, `invocationId`, `success`, `taskIdentifier`
+**Optional create fields (backend defaults):** `actorId`, `durationMs`, `error`, `errorDetail`, `startedAt`
 
 ### `platform-function-invocation`
 
@@ -1470,6 +1475,39 @@ CRUD operations for PlatformResource records.
 **Required create fields:** `kind`, `name`, `namespaceId`, `slug`
 **Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
 
+### `platform-resource-declared-capacity`
+
+CRUD operations for PlatformResourceDeclaredCapacity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceDeclaredCapacity records |
+| `find-first` | Find first matching platformResourceDeclaredCapacity record |
+| `get` | Get a platformResourceDeclaredCapacity by id |
+| `create` | Create a new platformResourceDeclaredCapacity |
+| `update` | Update an existing platformResourceDeclaredCapacity |
+| `delete` | Delete a platformResourceDeclaredCapacity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `installationId` | UUID |
+| `isTransient` | Boolean |
+| `kind` | String |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
+| `namespaceId` | UUID |
+| `podCountMax` | Int |
+| `podCountMin` | Int |
+| `source` | String |
+| `sourceId` | UUID |
+| `storageSizeBytes` | BigInt |
+
+**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
+
 ### `platform-resource-definition`
 
 CRUD operations for PlatformResourceDefinition records.
@@ -1658,18 +1696,18 @@ CRUD operations for PlatformResourceUsageSummary records.
 **Required create fields:** `date`, `namespaceId`
 **Optional create fields (backend defaults):** `gbSeconds`, `maxCpuMillicores`, `maxMemoryBytes`, `resourceId`, `runtimeSeconds`, `sampleCount`
 
-### `platform-resource-utilization-daily`
+### `platform-resource-utilization`
 
-CRUD operations for PlatformResourceUtilizationDaily records.
+CRUD operations for PlatformResourceUtilization records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all platformResourceUtilizationDaily records |
-| `find-first` | Find first matching platformResourceUtilizationDaily record |
-| `get` | Get a platformResourceUtilizationDaily by id |
-| `create` | Create a new platformResourceUtilizationDaily |
-| `update` | Update an existing platformResourceUtilizationDaily |
-| `delete` | Delete a platformResourceUtilizationDaily |
+| `list` | List all platformResourceUtilization records |
+| `find-first` | Find first matching platformResourceUtilization record |
+| `get` | Get a platformResourceUtilization by id |
+| `create` | Create a new platformResourceUtilization |
+| `update` | Update an existing platformResourceUtilization |
+| `delete` | Delete a platformResourceUtilization |
 
 **Fields:**
 
@@ -1922,6 +1960,39 @@ CRUD operations for Resource records.
 **Required create fields:** `databaseId`, `kind`, `name`, `namespaceId`, `slug`
 **Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
 
+### `resource-declared-capacity`
+
+CRUD operations for ResourceDeclaredCapacity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceDeclaredCapacity records |
+| `find-first` | Find first matching resourceDeclaredCapacity record |
+| `get` | Get a resourceDeclaredCapacity by id |
+| `create` | Create a new resourceDeclaredCapacity |
+| `update` | Update an existing resourceDeclaredCapacity |
+| `delete` | Delete a resourceDeclaredCapacity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `installationId` | UUID |
+| `isTransient` | Boolean |
+| `kind` | String |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
+| `namespaceId` | UUID |
+| `podCountMax` | Int |
+| `podCountMin` | Int |
+| `source` | String |
+| `sourceId` | UUID |
+| `storageSizeBytes` | BigInt |
+
+**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
+
 ### `resource-definition`
 
 CRUD operations for ResourceDefinition records.
@@ -2116,18 +2187,18 @@ CRUD operations for ResourceUsageSummary records.
 **Required create fields:** `databaseId`, `date`, `namespaceId`
 **Optional create fields (backend defaults):** `gbSeconds`, `maxCpuMillicores`, `maxMemoryBytes`, `resourceId`, `runtimeSeconds`, `sampleCount`
 
-### `resource-utilization-daily`
+### `resource-utilization`
 
-CRUD operations for ResourceUtilizationDaily records.
+CRUD operations for ResourceUtilization records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all resourceUtilizationDaily records |
-| `find-first` | Find first matching resourceUtilizationDaily record |
-| `get` | Get a resourceUtilizationDaily by id |
-| `create` | Create a new resourceUtilizationDaily |
-| `update` | Update an existing resourceUtilizationDaily |
-| `delete` | Delete a resourceUtilizationDaily |
+| `list` | List all resourceUtilization records |
+| `find-first` | Find first matching resourceUtilization record |
+| `get` | Get a resourceUtilization by id |
+| `create` | Create a new resourceUtilization |
+| `update` | Update an existing resourceUtilization |
+| `delete` | Delete a resourceUtilization |
 
 **Fields:**
 
@@ -2594,10 +2665,10 @@ platformResourceInstallationsInstall
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pName` | String |
-  | `--input.pNamespaceId` | UUID |
-  | `--input.pParams` | JSON |
-  | `--input.pSlug` | String |
+  | `--input.name` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.newParams` | JSON |
+  | `--input.slug` | String |
 
 ### `platform-resource-installations-rollback`
 
@@ -2609,8 +2680,8 @@ platformResourceInstallationsRollback
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pCommitId` | UUID |
-  | `--input.pInstallationId` | UUID |
+  | `--input.commitId` | UUID |
+  | `--input.targetInstallationId` | UUID |
 
 ### `platform-resource-installations-uninstall`
 
@@ -2622,7 +2693,7 @@ platformResourceInstallationsUninstall
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pInstallationId` | UUID |
+  | `--input.targetInstallationId` | UUID |
 
 ### `platform-resource-installations-upgrade`
 
@@ -2634,8 +2705,8 @@ platformResourceInstallationsUpgrade
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pInstallationId` | UUID |
-  | `--input.pParams` | JSON |
+  | `--input.newParams` | JSON |
+  | `--input.targetInstallationId` | UUID |
 
 ### `provision-bucket`
 
@@ -2662,10 +2733,10 @@ resourceInstallationsInstall
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pName` | String |
-  | `--input.pNamespaceId` | UUID |
-  | `--input.pParams` | JSON |
-  | `--input.pSlug` | String |
+  | `--input.name` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.newParams` | JSON |
+  | `--input.slug` | String |
 
 ### `resource-installations-rollback`
 
@@ -2677,8 +2748,8 @@ resourceInstallationsRollback
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pCommitId` | UUID |
-  | `--input.pInstallationId` | UUID |
+  | `--input.commitId` | UUID |
+  | `--input.targetInstallationId` | UUID |
 
 ### `resource-installations-uninstall`
 
@@ -2690,7 +2761,7 @@ resourceInstallationsUninstall
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pInstallationId` | UUID |
+  | `--input.targetInstallationId` | UUID |
 
 ### `resource-installations-upgrade`
 
@@ -2702,8 +2773,8 @@ resourceInstallationsUpgrade
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.pInstallationId` | UUID |
-  | `--input.pParams` | JSON |
+  | `--input.newParams` | JSON |
+  | `--input.targetInstallationId` | UUID |
 
 ### `save-graph`
 

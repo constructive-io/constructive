@@ -346,6 +346,500 @@ input AgentModulePatch {
   threadTableName: String
 }
 
+type ApiSurfaceModule {
+  apiModulesTableId: UUID!
+  apiModulesTableName: String!
+  apiName: String
+  apiSchemasTableId: UUID!
+  apiSchemasTableName: String!
+  apiSettingsTableId: UUID!
+  apiSettingsTableName: String!
+  apisTableId: UUID!
+  apisTableName: String!
+
+  """
+  Reads a single `CatalogModule` that is related to this `ApiSurfaceModule`.
+  """
+  catalogModule: CatalogModule
+  catalogModuleId: UUID
+  corsSettingsTableId: UUID!
+  corsSettingsTableName: String!
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID!
+  scope: String!
+}
+
+"""A connection to a list of `ApiSurfaceModule` values."""
+type ApiSurfaceModuleConnection {
+  """
+  A list of edges which contains the `ApiSurfaceModule` and cursor to aid in pagination.
+  """
+  edges: [ApiSurfaceModuleEdge]!
+
+  """A list of `ApiSurfaceModule` objects."""
+  nodes: [ApiSurfaceModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ApiSurfaceModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ApiSurfaceModule` edge in the connection."""
+type ApiSurfaceModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ApiSurfaceModule` at the end of the edge."""
+  node: ApiSurfaceModule
+}
+
+"""
+A filter to be used against `ApiSurfaceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input ApiSurfaceModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [ApiSurfaceModuleFilter!]
+
+  """Filter by the object’s `apiModulesTableId` field."""
+  apiModulesTableId: UUIDFilter
+
+  """Filter by the object’s `apiModulesTableName` field."""
+  apiModulesTableName: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `apiSchemasTableId` field."""
+  apiSchemasTableId: UUIDFilter
+
+  """Filter by the object’s `apiSchemasTableName` field."""
+  apiSchemasTableName: StringFilter
+
+  """Filter by the object’s `apiSettingsTableId` field."""
+  apiSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `apiSettingsTableName` field."""
+  apiSettingsTableName: StringFilter
+
+  """Filter by the object’s `apisTableId` field."""
+  apisTableId: UUIDFilter
+
+  """Filter by the object’s `apisTableName` field."""
+  apisTableName: StringFilter
+
+  """Filter by the object’s `catalogModule` relation."""
+  catalogModule: CatalogModuleFilter
+
+  """A related `catalogModule` exists."""
+  catalogModuleExists: Boolean
+
+  """Filter by the object’s `catalogModuleId` field."""
+  catalogModuleId: UUIDFilter
+
+  """Filter by the object’s `corsSettingsTableId` field."""
+  corsSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `corsSettingsTableName` field."""
+  corsSettingsTableName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: ApiSurfaceModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [ApiSurfaceModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+}
+
+"""An input for mutations affecting `ApiSurfaceModule`"""
+input ApiSurfaceModuleInput {
+  apiModulesTableId: UUID
+  apiModulesTableName: String
+  apiName: String
+  apiSchemasTableId: UUID
+  apiSchemasTableName: String
+  apiSettingsTableId: UUID
+  apiSettingsTableName: String
+  apisTableId: UUID
+  apisTableName: String
+  catalogModuleId: UUID
+  corsSettingsTableId: UUID
+  corsSettingsTableName: String
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+}
+
+"""Methods to use when ordering `ApiSurfaceModule`."""
+enum ApiSurfaceModuleOrderBy {
+  APIS_TABLE_ID_ASC
+  APIS_TABLE_ID_DESC
+  APIS_TABLE_NAME_ASC
+  APIS_TABLE_NAME_DESC
+  API_MODULES_TABLE_ID_ASC
+  API_MODULES_TABLE_ID_DESC
+  API_MODULES_TABLE_NAME_ASC
+  API_MODULES_TABLE_NAME_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  API_SCHEMAS_TABLE_ID_ASC
+  API_SCHEMAS_TABLE_ID_DESC
+  API_SCHEMAS_TABLE_NAME_ASC
+  API_SCHEMAS_TABLE_NAME_DESC
+  API_SETTINGS_TABLE_ID_ASC
+  API_SETTINGS_TABLE_ID_DESC
+  API_SETTINGS_TABLE_NAME_ASC
+  API_SETTINGS_TABLE_NAME_DESC
+  CATALOG_MODULE_ID_ASC
+  CATALOG_MODULE_ID_DESC
+  CORS_SETTINGS_TABLE_ID_ASC
+  CORS_SETTINGS_TABLE_ID_DESC
+  CORS_SETTINGS_TABLE_NAME_ASC
+  CORS_SETTINGS_TABLE_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+}
+
+"""
+Represents an update to a `ApiSurfaceModule`. Fields that are set will be updated.
+"""
+input ApiSurfaceModulePatch {
+  apiModulesTableId: UUID
+  apiModulesTableName: String
+  apiName: String
+  apiSchemasTableId: UUID
+  apiSchemasTableName: String
+  apiSettingsTableId: UUID
+  apiSettingsTableName: String
+  apisTableId: UUID
+  apisTableName: String
+  catalogModuleId: UUID
+  corsSettingsTableId: UUID
+  corsSettingsTableName: String
+  databaseId: UUID
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+}
+
+type AppModule {
+  apiName: String
+  appMembersTableId: UUID!
+  appMembersTableName: String!
+  appsTableId: UUID!
+  appsTableName: String!
+
+  """Reads a single `CatalogModule` that is related to this `AppModule`."""
+  catalogModule: CatalogModule
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  privateSchemaId: UUID!
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID!
+  scope: String!
+}
+
+"""A connection to a list of `AppModule` values."""
+type AppModuleConnection {
+  """
+  A list of edges which contains the `AppModule` and cursor to aid in pagination.
+  """
+  edges: [AppModuleEdge]!
+
+  """A list of `AppModule` objects."""
+  nodes: [AppModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `AppModule` edge in the connection."""
+type AppModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppModule` at the end of the edge."""
+  node: AppModule
+}
+
+"""
+A filter to be used against `AppModule` object types. All fields are combined with a logical ‘and.’
+"""
+input AppModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [AppModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `appMembersTableId` field."""
+  appMembersTableId: UUIDFilter
+
+  """Filter by the object’s `appMembersTableName` field."""
+  appMembersTableName: StringFilter
+
+  """Filter by the object’s `appsTableId` field."""
+  appsTableId: UUIDFilter
+
+  """Filter by the object’s `appsTableName` field."""
+  appsTableName: StringFilter
+
+  """Filter by the object’s `catalogModule` relation."""
+  catalogModule: CatalogModuleFilter
+
+  """A related `catalogModule` exists."""
+  catalogModuleExists: Boolean
+
+  """Filter by the object’s `catalogModuleId` field."""
+  catalogModuleId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: AppModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [AppModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+}
+
+"""An input for mutations affecting `AppModule`"""
+input AppModuleInput {
+  apiName: String
+  appMembersTableId: UUID
+  appMembersTableName: String
+  appsTableId: UUID
+  appsTableName: String
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+}
+
+"""Methods to use when ordering `AppModule`."""
+enum AppModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  APPS_TABLE_ID_ASC
+  APPS_TABLE_ID_DESC
+  APPS_TABLE_NAME_ASC
+  APPS_TABLE_NAME_DESC
+  APP_MEMBERS_TABLE_ID_ASC
+  APP_MEMBERS_TABLE_ID_DESC
+  APP_MEMBERS_TABLE_NAME_ASC
+  APP_MEMBERS_TABLE_NAME_DESC
+  CATALOG_MODULE_ID_ASC
+  CATALOG_MODULE_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+}
+
+"""
+Represents an update to a `AppModule`. Fields that are set will be updated.
+"""
+input AppModulePatch {
+  apiName: String
+  appMembersTableId: UUID
+  appMembersTableName: String
+  appsTableId: UUID
+  appsTableName: String
+  catalogModuleId: UUID
+  databaseId: UUID
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+}
+
 """
 A signed eight-byte integer. The upper big integer values are greater than the
 max value for a JavaScript number. Therefore all big integers will be output as
@@ -2058,6 +2552,298 @@ input BooleanFilter {
   notIn: [Boolean!]
 }
 
+type CatalogModule {
+  apiName: String
+  apisTableId: UUID!
+  apisTableName: String!
+  appsTableId: UUID!
+  appsTableName: String!
+  databaseId: UUID!
+  defaultPermissions: [String]
+  domainsTableId: UUID!
+  domainsTableName: String!
+  entityTableId: UUID
+  functionsTableId: UUID!
+  functionsTableName: String!
+  id: UUID!
+  namespacesTableId: UUID!
+  namespacesTableName: String!
+  policies: JSON
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  resourceDefinitionsTableId: UUID!
+  resourceDefinitionsTableName: String!
+  resourceInstallationsTableId: UUID!
+  resourceInstallationsTableName: String!
+  resourcesTableId: UUID!
+  resourcesTableName: String!
+  schemaId: UUID!
+  scope: String!
+  sitesTableId: UUID!
+  sitesTableName: String!
+}
+
+"""A connection to a list of `CatalogModule` values."""
+type CatalogModuleConnection {
+  """
+  A list of edges which contains the `CatalogModule` and cursor to aid in pagination.
+  """
+  edges: [CatalogModuleEdge]!
+
+  """A list of `CatalogModule` objects."""
+  nodes: [CatalogModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `CatalogModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `CatalogModule` edge in the connection."""
+type CatalogModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `CatalogModule` at the end of the edge."""
+  node: CatalogModule
+}
+
+"""
+A filter to be used against `CatalogModule` object types. All fields are combined with a logical ‘and.’
+"""
+input CatalogModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [CatalogModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `apisTableId` field."""
+  apisTableId: UUIDFilter
+
+  """Filter by the object’s `apisTableName` field."""
+  apisTableName: StringFilter
+
+  """Filter by the object’s `appsTableId` field."""
+  appsTableId: UUIDFilter
+
+  """Filter by the object’s `appsTableName` field."""
+  appsTableName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `domainsTableId` field."""
+  domainsTableId: UUIDFilter
+
+  """Filter by the object’s `domainsTableName` field."""
+  domainsTableName: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `functionsTableId` field."""
+  functionsTableId: UUIDFilter
+
+  """Filter by the object’s `functionsTableName` field."""
+  functionsTableName: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `namespacesTableId` field."""
+  namespacesTableId: UUIDFilter
+
+  """Filter by the object’s `namespacesTableName` field."""
+  namespacesTableName: StringFilter
+
+  """Negates the expression."""
+  not: CatalogModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [CatalogModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `resourceDefinitionsTableId` field."""
+  resourceDefinitionsTableId: UUIDFilter
+
+  """Filter by the object’s `resourceDefinitionsTableName` field."""
+  resourceDefinitionsTableName: StringFilter
+
+  """Filter by the object’s `resourceInstallationsTableId` field."""
+  resourceInstallationsTableId: UUIDFilter
+
+  """Filter by the object’s `resourceInstallationsTableName` field."""
+  resourceInstallationsTableName: StringFilter
+
+  """Filter by the object’s `resourcesTableId` field."""
+  resourcesTableId: UUIDFilter
+
+  """Filter by the object’s `resourcesTableName` field."""
+  resourcesTableName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `sitesTableId` field."""
+  sitesTableId: UUIDFilter
+
+  """Filter by the object’s `sitesTableName` field."""
+  sitesTableName: StringFilter
+}
+
+"""An input for mutations affecting `CatalogModule`"""
+input CatalogModuleInput {
+  apiName: String
+  apisTableId: UUID
+  apisTableName: String
+  appsTableId: UUID
+  appsTableName: String
+  databaseId: UUID!
+  defaultPermissions: [String]
+  domainsTableId: UUID
+  domainsTableName: String
+  entityTableId: UUID
+  functionsTableId: UUID
+  functionsTableName: String
+  id: UUID
+  namespacesTableId: UUID
+  namespacesTableName: String
+  policies: JSON
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  resourceDefinitionsTableId: UUID
+  resourceDefinitionsTableName: String
+  resourceInstallationsTableId: UUID
+  resourceInstallationsTableName: String
+  resourcesTableId: UUID
+  resourcesTableName: String
+  schemaId: UUID
+  scope: String
+  sitesTableId: UUID
+  sitesTableName: String
+}
+
+"""Methods to use when ordering `CatalogModule`."""
+enum CatalogModuleOrderBy {
+  APIS_TABLE_ID_ASC
+  APIS_TABLE_ID_DESC
+  APIS_TABLE_NAME_ASC
+  APIS_TABLE_NAME_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  APPS_TABLE_ID_ASC
+  APPS_TABLE_ID_DESC
+  APPS_TABLE_NAME_ASC
+  APPS_TABLE_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  DOMAINS_TABLE_ID_ASC
+  DOMAINS_TABLE_ID_DESC
+  DOMAINS_TABLE_NAME_ASC
+  DOMAINS_TABLE_NAME_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  FUNCTIONS_TABLE_ID_ASC
+  FUNCTIONS_TABLE_ID_DESC
+  FUNCTIONS_TABLE_NAME_ASC
+  FUNCTIONS_TABLE_NAME_DESC
+  ID_ASC
+  ID_DESC
+  NAMESPACES_TABLE_ID_ASC
+  NAMESPACES_TABLE_ID_DESC
+  NAMESPACES_TABLE_NAME_ASC
+  NAMESPACES_TABLE_NAME_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  RESOURCES_TABLE_ID_ASC
+  RESOURCES_TABLE_ID_DESC
+  RESOURCES_TABLE_NAME_ASC
+  RESOURCES_TABLE_NAME_DESC
+  RESOURCE_DEFINITIONS_TABLE_ID_ASC
+  RESOURCE_DEFINITIONS_TABLE_ID_DESC
+  RESOURCE_DEFINITIONS_TABLE_NAME_ASC
+  RESOURCE_DEFINITIONS_TABLE_NAME_DESC
+  RESOURCE_INSTALLATIONS_TABLE_ID_ASC
+  RESOURCE_INSTALLATIONS_TABLE_ID_DESC
+  RESOURCE_INSTALLATIONS_TABLE_NAME_ASC
+  RESOURCE_INSTALLATIONS_TABLE_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  SITES_TABLE_ID_ASC
+  SITES_TABLE_ID_DESC
+  SITES_TABLE_NAME_ASC
+  SITES_TABLE_NAME_DESC
+}
+
+"""
+Represents an update to a `CatalogModule`. Fields that are set will be updated.
+"""
+input CatalogModulePatch {
+  apiName: String
+  apisTableId: UUID
+  apisTableName: String
+  appsTableId: UUID
+  appsTableName: String
+  databaseId: UUID
+  defaultPermissions: [String]
+  domainsTableId: UUID
+  domainsTableName: String
+  entityTableId: UUID
+  functionsTableId: UUID
+  functionsTableName: String
+  id: UUID
+  namespacesTableId: UUID
+  namespacesTableName: String
+  policies: JSON
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  resourceDefinitionsTableId: UUID
+  resourceDefinitionsTableName: String
+  resourceInstallationsTableId: UUID
+  resourceInstallationsTableName: String
+  resourcesTableId: UUID
+  resourcesTableName: String
+  schemaId: UUID
+  scope: String
+  sitesTableId: UUID
+  sitesTableName: String
+}
+
 type ComputeLogModule {
   actorFkTableId: UUID
   apiName: String
@@ -2631,6 +3417,76 @@ type CreateAgentModulePayload {
   query: Query
 }
 
+"""All input for the create `ApiSurfaceModule` mutation."""
+input CreateApiSurfaceModuleInput {
+  """The `ApiSurfaceModule` to be created by this mutation."""
+  apiSurfaceModule: ApiSurfaceModuleInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `ApiSurfaceModule` mutation."""
+type CreateApiSurfaceModulePayload {
+  """The `ApiSurfaceModule` that was created by this mutation."""
+  apiSurfaceModule: ApiSurfaceModule
+
+  """An edge for our `ApiSurfaceModule`. May be used by Relay 1."""
+  apiSurfaceModuleEdge(
+    """The method to use when ordering `ApiSurfaceModule`."""
+    orderBy: [ApiSurfaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiSurfaceModuleEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `AppModule` mutation."""
+input CreateAppModuleInput {
+  """The `AppModule` to be created by this mutation."""
+  appModule: AppModuleInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `AppModule` mutation."""
+type CreateAppModulePayload {
+  """The `AppModule` that was created by this mutation."""
+  appModule: AppModule
+
+  """An edge for our `AppModule`. May be used by Relay 1."""
+  appModuleEdge(
+    """The method to use when ordering `AppModule`."""
+    orderBy: [AppModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppModuleEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `BillingModule` mutation."""
 input CreateBillingModuleInput {
   """The `BillingModule` to be created by this mutation."""
@@ -2793,6 +3649,41 @@ type CreateBlueprintTemplatePayload {
     """The method to use when ordering `BlueprintTemplate`."""
     orderBy: [BlueprintTemplateOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BlueprintTemplateEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `CatalogModule` mutation."""
+input CreateCatalogModuleInput {
+  """The `CatalogModule` to be created by this mutation."""
+  catalogModule: CatalogModuleInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `CatalogModule` mutation."""
+type CreateCatalogModulePayload {
+  """The `CatalogModule` that was created by this mutation."""
+  catalogModule: CatalogModule
+
+  """An edge for our `CatalogModule`. May be used by Relay 1."""
+  catalogModuleEdge(
+    """The method to use when ordering `CatalogModule`."""
+    orderBy: [CatalogModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CatalogModuleEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -3009,6 +3900,41 @@ type CreateDatabaseProvisionModulePayload {
     """The method to use when ordering `DatabaseProvisionModule`."""
     orderBy: [DatabaseProvisionModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DatabaseProvisionModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `DatabaseSettingsModule` mutation."""
+input CreateDatabaseSettingsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSettingsModule` to be created by this mutation."""
+  databaseSettingsModule: DatabaseSettingsModuleInput!
+}
+
+"""The output of our create `DatabaseSettingsModule` mutation."""
+type CreateDatabaseSettingsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSettingsModule` that was created by this mutation."""
+  databaseSettingsModule: DatabaseSettingsModule
+
+  """An edge for our `DatabaseSettingsModule`. May be used by Relay 1."""
+  databaseSettingsModuleEdge(
+    """The method to use when ordering `DatabaseSettingsModule`."""
+    orderBy: [DatabaseSettingsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingsModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3254,6 +4180,41 @@ type CreateDevicesModulePayload {
     """The method to use when ordering `DevicesModule`."""
     orderBy: [DevicesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DevicesModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `DomainModule` mutation."""
+input CreateDomainModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DomainModule` to be created by this mutation."""
+  domainModule: DomainModuleInput!
+}
+
+"""The output of our create `DomainModule` mutation."""
+type CreateDomainModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainModule` that was created by this mutation."""
+  domainModule: DomainModule
+
+  """An edge for our `DomainModule`. May be used by Relay 1."""
+  domainModuleEdge(
+    """The method to use when ordering `DomainModule`."""
+    orderBy: [DomainModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4486,6 +5447,41 @@ type CreateRlsModulePayload {
   ): RlsModuleEdge
 }
 
+"""All input for the create `RouteModule` mutation."""
+input CreateRouteModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RouteModule` to be created by this mutation."""
+  routeModule: RouteModuleInput!
+}
+
+"""The output of our create `RouteModule` mutation."""
+type CreateRouteModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RouteModule` that was created by this mutation."""
+  routeModule: RouteModule
+
+  """An edge for our `RouteModule`. May be used by Relay 1."""
+  routeModuleEdge(
+    """The method to use when ordering `RouteModule`."""
+    orderBy: [RouteModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RouteModuleEdge
+}
+
 """All input for the create `SecureTableProvision` mutation."""
 input CreateSecureTableProvisionInput {
   """
@@ -4589,6 +5585,41 @@ type CreateSessionsModulePayload {
     """The method to use when ordering `SessionsModule`."""
     orderBy: [SessionsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SessionsModuleEdge
+}
+
+"""All input for the create `SiteSurfaceModule` mutation."""
+input CreateSiteSurfaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SiteSurfaceModule` to be created by this mutation."""
+  siteSurfaceModule: SiteSurfaceModuleInput!
+}
+
+"""The output of our create `SiteSurfaceModule` mutation."""
+type CreateSiteSurfaceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SiteSurfaceModule` that was created by this mutation."""
+  siteSurfaceModule: SiteSurfaceModule
+
+  """An edge for our `SiteSurfaceModule`. May be used by Relay 1."""
+  siteSurfaceModuleEdge(
+    """The method to use when ordering `SiteSurfaceModule`."""
+    orderBy: [SiteSurfaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteSurfaceModuleEdge
 }
 
 """All input for the create `StorageLogModule` mutation."""
@@ -5299,6 +6330,11 @@ scalar Cursor
 Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
 """
 type DatabaseProvisionModule {
+  """
+  When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger
+  """
+  async: Boolean!
+
   """Error message from the most recent failed bootstrap attempt"""
   bootstrapError: String
 
@@ -5391,6 +6427,9 @@ input DatabaseProvisionModuleFilter {
   """Checks for all expressions in this list."""
   and: [DatabaseProvisionModuleFilter!]
 
+  """Filter by the object’s `async` field."""
+  async: BooleanFilter
+
   """Filter by the object’s `bootstrapError` field."""
   bootstrapError: StringFilter
 
@@ -5454,6 +6493,11 @@ input DatabaseProvisionModuleFilter {
 
 """An input for mutations affecting `DatabaseProvisionModule`"""
 input DatabaseProvisionModuleInput {
+  """
+  When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger
+  """
+  async: Boolean
+
   """Error message from the most recent failed bootstrap attempt"""
   bootstrapError: String
 
@@ -5513,6 +6557,8 @@ input DatabaseProvisionModuleInput {
 
 """Methods to use when ordering `DatabaseProvisionModule`."""
 enum DatabaseProvisionModuleOrderBy {
+  ASYNC_ASC
+  ASYNC_DESC
   BOOTSTRAP_ERROR_ASC
   BOOTSTRAP_ERROR_DESC
   BOOTSTRAP_STATUS_ASC
@@ -5558,6 +6604,11 @@ enum DatabaseProvisionModuleOrderBy {
 Represents an update to a `DatabaseProvisionModule`. Fields that are set will be updated.
 """
 input DatabaseProvisionModulePatch {
+  """
+  When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger
+  """
+  async: Boolean
+
   """Error message from the most recent failed bootstrap attempt"""
   bootstrapError: String
 
@@ -5613,6 +6664,236 @@ input DatabaseProvisionModulePatch {
   """
   subdomain: String
   updatedAt: Datetime
+}
+
+type DatabaseSettingsModule {
+  apiName: String
+  databaseId: UUID!
+  databaseSettingsTableId: UUID!
+  databaseSettingsTableName: String!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  provisions: JSON
+  pubkeySettingsTableId: UUID!
+  pubkeySettingsTableName: String!
+  publicSchemaName: String
+  rlsSettingsTableId: UUID!
+  rlsSettingsTableName: String!
+  schemaId: UUID!
+  scope: String!
+  webauthnSettingsTableId: UUID!
+  webauthnSettingsTableName: String!
+}
+
+"""A connection to a list of `DatabaseSettingsModule` values."""
+type DatabaseSettingsModuleConnection {
+  """
+  A list of edges which contains the `DatabaseSettingsModule` and cursor to aid in pagination.
+  """
+  edges: [DatabaseSettingsModuleEdge]!
+
+  """A list of `DatabaseSettingsModule` objects."""
+  nodes: [DatabaseSettingsModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `DatabaseSettingsModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `DatabaseSettingsModule` edge in the connection."""
+type DatabaseSettingsModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DatabaseSettingsModule` at the end of the edge."""
+  node: DatabaseSettingsModule
+}
+
+"""
+A filter to be used against `DatabaseSettingsModule` object types. All fields are combined with a logical ‘and.’
+"""
+input DatabaseSettingsModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [DatabaseSettingsModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `databaseSettingsTableId` field."""
+  databaseSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `databaseSettingsTableName` field."""
+  databaseSettingsTableName: StringFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: DatabaseSettingsModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [DatabaseSettingsModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `pubkeySettingsTableId` field."""
+  pubkeySettingsTableId: UUIDFilter
+
+  """Filter by the object’s `pubkeySettingsTableName` field."""
+  pubkeySettingsTableName: StringFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `rlsSettingsTableId` field."""
+  rlsSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `rlsSettingsTableName` field."""
+  rlsSettingsTableName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `webauthnSettingsTableId` field."""
+  webauthnSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `webauthnSettingsTableName` field."""
+  webauthnSettingsTableName: StringFilter
+}
+
+"""An input for mutations affecting `DatabaseSettingsModule`"""
+input DatabaseSettingsModuleInput {
+  apiName: String
+  databaseId: UUID!
+  databaseSettingsTableId: UUID
+  databaseSettingsTableName: String
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  pubkeySettingsTableId: UUID
+  pubkeySettingsTableName: String
+  publicSchemaName: String
+  rlsSettingsTableId: UUID
+  rlsSettingsTableName: String
+  schemaId: UUID
+  scope: String
+  webauthnSettingsTableId: UUID
+  webauthnSettingsTableName: String
+}
+
+"""Methods to use when ordering `DatabaseSettingsModule`."""
+enum DatabaseSettingsModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DATABASE_SETTINGS_TABLE_ID_ASC
+  DATABASE_SETTINGS_TABLE_ID_DESC
+  DATABASE_SETTINGS_TABLE_NAME_ASC
+  DATABASE_SETTINGS_TABLE_NAME_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBKEY_SETTINGS_TABLE_ID_ASC
+  PUBKEY_SETTINGS_TABLE_ID_DESC
+  PUBKEY_SETTINGS_TABLE_NAME_ASC
+  PUBKEY_SETTINGS_TABLE_NAME_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  RLS_SETTINGS_TABLE_ID_ASC
+  RLS_SETTINGS_TABLE_ID_DESC
+  RLS_SETTINGS_TABLE_NAME_ASC
+  RLS_SETTINGS_TABLE_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  WEBAUTHN_SETTINGS_TABLE_ID_ASC
+  WEBAUTHN_SETTINGS_TABLE_ID_DESC
+  WEBAUTHN_SETTINGS_TABLE_NAME_ASC
+  WEBAUTHN_SETTINGS_TABLE_NAME_DESC
+}
+
+"""
+Represents an update to a `DatabaseSettingsModule`. Fields that are set will be updated.
+"""
+input DatabaseSettingsModulePatch {
+  apiName: String
+  databaseId: UUID
+  databaseSettingsTableId: UUID
+  databaseSettingsTableName: String
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  pubkeySettingsTableId: UUID
+  pubkeySettingsTableName: String
+  publicSchemaName: String
+  rlsSettingsTableId: UUID
+  rlsSettingsTableName: String
+  schemaId: UUID
+  scope: String
+  webauthnSettingsTableId: UUID
+  webauthnSettingsTableName: String
 }
 
 """
@@ -6675,6 +7956,72 @@ type DeleteAgentModulePayload {
   query: Query
 }
 
+"""All input for the `deleteApiSurfaceModule` mutation."""
+input DeleteApiSurfaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `ApiSurfaceModule` mutation."""
+type DeleteApiSurfaceModulePayload {
+  """The `ApiSurfaceModule` that was deleted by this mutation."""
+  apiSurfaceModule: ApiSurfaceModule
+
+  """An edge for our `ApiSurfaceModule`. May be used by Relay 1."""
+  apiSurfaceModuleEdge(
+    """The method to use when ordering `ApiSurfaceModule`."""
+    orderBy: [ApiSurfaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiSurfaceModuleEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteAppModule` mutation."""
+input DeleteAppModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AppModule` mutation."""
+type DeleteAppModulePayload {
+  """The `AppModule` that was deleted by this mutation."""
+  appModule: AppModule
+
+  """An edge for our `AppModule`. May be used by Relay 1."""
+  appModuleEdge(
+    """The method to use when ordering `AppModule`."""
+    orderBy: [AppModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppModuleEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deleteBillingModule` mutation."""
 input DeleteBillingModuleInput {
   """
@@ -6833,6 +8180,39 @@ type DeleteBlueprintTemplatePayload {
     """The method to use when ordering `BlueprintTemplate`."""
     orderBy: [BlueprintTemplateOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BlueprintTemplateEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteCatalogModule` mutation."""
+input DeleteCatalogModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `CatalogModule` mutation."""
+type DeleteCatalogModulePayload {
+  """The `CatalogModule` that was deleted by this mutation."""
+  catalogModule: CatalogModule
+
+  """An edge for our `CatalogModule`. May be used by Relay 1."""
+  catalogModuleEdge(
+    """The method to use when ordering `CatalogModule`."""
+    orderBy: [CatalogModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CatalogModuleEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -7037,6 +8417,39 @@ type DeleteDatabaseProvisionModulePayload {
     """The method to use when ordering `DatabaseProvisionModule`."""
     orderBy: [DatabaseProvisionModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DatabaseProvisionModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteDatabaseSettingsModule` mutation."""
+input DeleteDatabaseSettingsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `DatabaseSettingsModule` mutation."""
+type DeleteDatabaseSettingsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSettingsModule` that was deleted by this mutation."""
+  databaseSettingsModule: DatabaseSettingsModule
+
+  """An edge for our `DatabaseSettingsModule`. May be used by Relay 1."""
+  databaseSettingsModuleEdge(
+    """The method to use when ordering `DatabaseSettingsModule`."""
+    orderBy: [DatabaseSettingsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingsModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -7268,6 +8681,39 @@ type DeleteDevicesModulePayload {
     """The method to use when ordering `DevicesModule`."""
     orderBy: [DevicesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DevicesModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteDomainModule` mutation."""
+input DeleteDomainModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `DomainModule` mutation."""
+type DeleteDomainModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainModule` that was deleted by this mutation."""
+  domainModule: DomainModule
+
+  """An edge for our `DomainModule`. May be used by Relay 1."""
+  domainModuleEdge(
+    """The method to use when ordering `DomainModule`."""
+    orderBy: [DomainModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8434,6 +9880,39 @@ type DeleteRlsModulePayload {
   ): RlsModuleEdge
 }
 
+"""All input for the `deleteRouteModule` mutation."""
+input DeleteRouteModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `RouteModule` mutation."""
+type DeleteRouteModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RouteModule` that was deleted by this mutation."""
+  routeModule: RouteModule
+
+  """An edge for our `RouteModule`. May be used by Relay 1."""
+  routeModuleEdge(
+    """The method to use when ordering `RouteModule`."""
+    orderBy: [RouteModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RouteModuleEdge
+}
+
 """All input for the `deleteSecureTableProvision` mutation."""
 input DeleteSecureTableProvisionInput {
   """
@@ -8533,6 +10012,39 @@ type DeleteSessionsModulePayload {
     """The method to use when ordering `SessionsModule`."""
     orderBy: [SessionsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SessionsModuleEdge
+}
+
+"""All input for the `deleteSiteSurfaceModule` mutation."""
+input DeleteSiteSurfaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `SiteSurfaceModule` mutation."""
+type DeleteSiteSurfaceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SiteSurfaceModule` that was deleted by this mutation."""
+  siteSurfaceModule: SiteSurfaceModule
+
+  """An edge for our `SiteSurfaceModule`. May be used by Relay 1."""
+  siteSurfaceModuleEdge(
+    """The method to use when ordering `SiteSurfaceModule`."""
+    orderBy: [SiteSurfaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteSurfaceModuleEdge
 }
 
 """All input for the `deleteStorageLogModule` mutation."""
@@ -9170,6 +10682,251 @@ input DevicesModulePatch {
   schemaId: UUID
   userDevicesTableId: UUID
   userDevicesTableName: String
+}
+
+type DomainModule {
+  apiName: String
+
+  """Reads a single `CatalogModule` that is related to this `DomainModule`."""
+  catalogModule: CatalogModule
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  domainEventsTableId: UUID!
+  domainEventsTableName: String!
+  domainVerificationsTableId: UUID!
+  domainVerificationsTableName: String!
+  domainsTableId: UUID!
+  domainsTableName: String!
+  entityField: String
+  entityTableId: UUID
+  id: UUID!
+  managedDomainsTableId: UUID!
+  managedDomainsTableName: String!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID!
+  scope: String!
+}
+
+"""A connection to a list of `DomainModule` values."""
+type DomainModuleConnection {
+  """
+  A list of edges which contains the `DomainModule` and cursor to aid in pagination.
+  """
+  edges: [DomainModuleEdge]!
+
+  """A list of `DomainModule` objects."""
+  nodes: [DomainModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `DomainModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `DomainModule` edge in the connection."""
+type DomainModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DomainModule` at the end of the edge."""
+  node: DomainModule
+}
+
+"""
+A filter to be used against `DomainModule` object types. All fields are combined with a logical ‘and.’
+"""
+input DomainModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [DomainModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `catalogModule` relation."""
+  catalogModule: CatalogModuleFilter
+
+  """A related `catalogModule` exists."""
+  catalogModuleExists: Boolean
+
+  """Filter by the object’s `catalogModuleId` field."""
+  catalogModuleId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `domainEventsTableId` field."""
+  domainEventsTableId: UUIDFilter
+
+  """Filter by the object’s `domainEventsTableName` field."""
+  domainEventsTableName: StringFilter
+
+  """Filter by the object’s `domainVerificationsTableId` field."""
+  domainVerificationsTableId: UUIDFilter
+
+  """Filter by the object’s `domainVerificationsTableName` field."""
+  domainVerificationsTableName: StringFilter
+
+  """Filter by the object’s `domainsTableId` field."""
+  domainsTableId: UUIDFilter
+
+  """Filter by the object’s `domainsTableName` field."""
+  domainsTableName: StringFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `managedDomainsTableId` field."""
+  managedDomainsTableId: UUIDFilter
+
+  """Filter by the object’s `managedDomainsTableName` field."""
+  managedDomainsTableName: StringFilter
+
+  """Negates the expression."""
+  not: DomainModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [DomainModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+}
+
+"""An input for mutations affecting `DomainModule`"""
+input DomainModuleInput {
+  apiName: String
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  domainEventsTableId: UUID
+  domainEventsTableName: String
+  domainVerificationsTableId: UUID
+  domainVerificationsTableName: String
+  domainsTableId: UUID
+  domainsTableName: String
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  managedDomainsTableId: UUID
+  managedDomainsTableName: String
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+}
+
+"""Methods to use when ordering `DomainModule`."""
+enum DomainModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  CATALOG_MODULE_ID_ASC
+  CATALOG_MODULE_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  DOMAINS_TABLE_ID_ASC
+  DOMAINS_TABLE_ID_DESC
+  DOMAINS_TABLE_NAME_ASC
+  DOMAINS_TABLE_NAME_DESC
+  DOMAIN_EVENTS_TABLE_ID_ASC
+  DOMAIN_EVENTS_TABLE_ID_DESC
+  DOMAIN_EVENTS_TABLE_NAME_ASC
+  DOMAIN_EVENTS_TABLE_NAME_DESC
+  DOMAIN_VERIFICATIONS_TABLE_ID_ASC
+  DOMAIN_VERIFICATIONS_TABLE_ID_DESC
+  DOMAIN_VERIFICATIONS_TABLE_NAME_ASC
+  DOMAIN_VERIFICATIONS_TABLE_NAME_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  ID_ASC
+  ID_DESC
+  MANAGED_DOMAINS_TABLE_ID_ASC
+  MANAGED_DOMAINS_TABLE_ID_DESC
+  MANAGED_DOMAINS_TABLE_NAME_ASC
+  MANAGED_DOMAINS_TABLE_NAME_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+}
+
+"""
+Represents an update to a `DomainModule`. Fields that are set will be updated.
+"""
+input DomainModulePatch {
+  apiName: String
+  catalogModuleId: UUID
+  databaseId: UUID
+  defaultPermissions: [String]
+  domainEventsTableId: UUID
+  domainEventsTableName: String
+  domainVerificationsTableId: UUID
+  domainVerificationsTableName: String
+  domainsTableId: UUID
+  domainsTableName: String
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  managedDomainsTableId: UUID
+  managedDomainsTableName: String
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
 }
 
 type EmailsModule {
@@ -11104,6 +12861,8 @@ input FunctionDeploymentModulePatch {
 
 type FunctionInvocationModule {
   apiName: String
+  attemptsTableId: UUID!
+  attemptsTableName: String!
   databaseId: UUID!
   defaultPermissions: [String]
   entityField: String
@@ -11161,6 +12920,12 @@ input FunctionInvocationModuleFilter {
 
   """Filter by the object’s `apiName` field."""
   apiName: StringFilter
+
+  """Filter by the object’s `attemptsTableId` field."""
+  attemptsTableId: UUIDFilter
+
+  """Filter by the object’s `attemptsTableName` field."""
+  attemptsTableName: StringFilter
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
@@ -11226,6 +12991,8 @@ input FunctionInvocationModuleFilter {
 """An input for mutations affecting `FunctionInvocationModule`"""
 input FunctionInvocationModuleInput {
   apiName: String
+  attemptsTableId: UUID
+  attemptsTableName: String
   databaseId: UUID!
   defaultPermissions: [String]
   entityField: String
@@ -11250,6 +13017,10 @@ input FunctionInvocationModuleInput {
 enum FunctionInvocationModuleOrderBy {
   API_NAME_ASC
   API_NAME_DESC
+  ATTEMPTS_TABLE_ID_ASC
+  ATTEMPTS_TABLE_ID_DESC
+  ATTEMPTS_TABLE_NAME_ASC
+  ATTEMPTS_TABLE_NAME_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DEFAULT_PERMISSIONS_ASC
@@ -11296,6 +13067,8 @@ Represents an update to a `FunctionInvocationModule`. Fields that are set will b
 """
 input FunctionInvocationModulePatch {
   apiName: String
+  attemptsTableId: UUID
+  attemptsTableName: String
   databaseId: UUID
   defaultPermissions: [String]
   entityField: String
@@ -15599,9 +17372,56 @@ type MetaRelations {
   manyToMany: [MetaManyToManyRelation!]!
 }
 
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
 """Root meta schema type"""
 type MetaSchema {
   tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
 }
 
 """Search metadata for a table"""
@@ -15671,6 +17491,9 @@ type MetaTable {
   relations: MetaRelations!
   schemaName: String!
 
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
   """Search metadata (null if no search configured)"""
   search: MetaSearch
 
@@ -15681,6 +17504,8 @@ type MetaTable {
 
 """Information about a PostgreSQL type"""
 type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
   gqlType: String!
   hasDefault: Boolean
   isArray: Boolean!
@@ -15727,6 +17552,22 @@ type Mutation {
     input: CreateAgentModuleInput!
   ): CreateAgentModulePayload
 
+  """Creates a single `ApiSurfaceModule`."""
+  createApiSurfaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateApiSurfaceModuleInput!
+  ): CreateApiSurfaceModulePayload
+
+  """Creates a single `AppModule`."""
+  createAppModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppModuleInput!
+  ): CreateAppModulePayload
+
   """Creates a single `BillingModule`."""
   createBillingModule(
     """
@@ -15766,6 +17607,14 @@ type Mutation {
     """
     input: CreateBlueprintTemplateInput!
   ): CreateBlueprintTemplatePayload
+
+  """Creates a single `CatalogModule`."""
+  createCatalogModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCatalogModuleInput!
+  ): CreateCatalogModulePayload
 
   """Creates a single `ComputeLogModule`."""
   createComputeLogModule(
@@ -15814,6 +17663,14 @@ type Mutation {
     """
     input: CreateDatabaseProvisionModuleInput!
   ): CreateDatabaseProvisionModulePayload
+
+  """Creates a single `DatabaseSettingsModule`."""
+  createDatabaseSettingsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDatabaseSettingsModuleInput!
+  ): CreateDatabaseSettingsModulePayload
 
   """Creates a single `DbPool`."""
   createDbPool(
@@ -15870,6 +17727,14 @@ type Mutation {
     """
     input: CreateDevicesModuleInput!
   ): CreateDevicesModulePayload
+
+  """Creates a single `DomainModule`."""
+  createDomainModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDomainModuleInput!
+  ): CreateDomainModulePayload
 
   """Creates a single `EmailsModule`."""
   createEmailsModule(
@@ -16151,6 +18016,14 @@ type Mutation {
     input: CreateRlsModuleInput!
   ): CreateRlsModulePayload
 
+  """Creates a single `RouteModule`."""
+  createRouteModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRouteModuleInput!
+  ): CreateRouteModulePayload
+
   """Creates a single `SecureTableProvision`."""
   createSecureTableProvision(
     """
@@ -16174,6 +18047,14 @@ type Mutation {
     """
     input: CreateSessionsModuleInput!
   ): CreateSessionsModulePayload
+
+  """Creates a single `SiteSurfaceModule`."""
+  createSiteSurfaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSiteSurfaceModuleInput!
+  ): CreateSiteSurfaceModulePayload
 
   """Creates a single `StorageLogModule`."""
   createStorageLogModule(
@@ -16271,6 +18152,22 @@ type Mutation {
     input: DeleteAgentModuleInput!
   ): DeleteAgentModulePayload
 
+  """Deletes a single `ApiSurfaceModule` using a unique key."""
+  deleteApiSurfaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteApiSurfaceModuleInput!
+  ): DeleteApiSurfaceModulePayload
+
+  """Deletes a single `AppModule` using a unique key."""
+  deleteAppModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppModuleInput!
+  ): DeleteAppModulePayload
+
   """Deletes a single `BillingModule` using a unique key."""
   deleteBillingModule(
     """
@@ -16310,6 +18207,14 @@ type Mutation {
     """
     input: DeleteBlueprintTemplateInput!
   ): DeleteBlueprintTemplatePayload
+
+  """Deletes a single `CatalogModule` using a unique key."""
+  deleteCatalogModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCatalogModuleInput!
+  ): DeleteCatalogModulePayload
 
   """Deletes a single `ComputeLogModule` using a unique key."""
   deleteComputeLogModule(
@@ -16358,6 +18263,14 @@ type Mutation {
     """
     input: DeleteDatabaseProvisionModuleInput!
   ): DeleteDatabaseProvisionModulePayload
+
+  """Deletes a single `DatabaseSettingsModule` using a unique key."""
+  deleteDatabaseSettingsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDatabaseSettingsModuleInput!
+  ): DeleteDatabaseSettingsModulePayload
 
   """Deletes a single `DbPool` using a unique key."""
   deleteDbPool(
@@ -16414,6 +18327,14 @@ type Mutation {
     """
     input: DeleteDevicesModuleInput!
   ): DeleteDevicesModulePayload
+
+  """Deletes a single `DomainModule` using a unique key."""
+  deleteDomainModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDomainModuleInput!
+  ): DeleteDomainModulePayload
 
   """Deletes a single `EmailsModule` using a unique key."""
   deleteEmailsModule(
@@ -16695,6 +18616,14 @@ type Mutation {
     input: DeleteRlsModuleInput!
   ): DeleteRlsModulePayload
 
+  """Deletes a single `RouteModule` using a unique key."""
+  deleteRouteModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRouteModuleInput!
+  ): DeleteRouteModulePayload
+
   """Deletes a single `SecureTableProvision` using a unique key."""
   deleteSecureTableProvision(
     """
@@ -16718,6 +18647,14 @@ type Mutation {
     """
     input: DeleteSessionsModuleInput!
   ): DeleteSessionsModulePayload
+
+  """Deletes a single `SiteSurfaceModule` using a unique key."""
+  deleteSiteSurfaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSiteSurfaceModuleInput!
+  ): DeleteSiteSurfaceModulePayload
 
   """Deletes a single `StorageLogModule` using a unique key."""
   deleteStorageLogModule(
@@ -16898,6 +18835,22 @@ type Mutation {
     input: UpdateAgentModuleInput!
   ): UpdateAgentModulePayload
 
+  """Updates a single `ApiSurfaceModule` using a unique key and a patch."""
+  updateApiSurfaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateApiSurfaceModuleInput!
+  ): UpdateApiSurfaceModulePayload
+
+  """Updates a single `AppModule` using a unique key and a patch."""
+  updateAppModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppModuleInput!
+  ): UpdateAppModulePayload
+
   """Updates a single `BillingModule` using a unique key and a patch."""
   updateBillingModule(
     """
@@ -16941,6 +18894,14 @@ type Mutation {
     """
     input: UpdateBlueprintTemplateInput!
   ): UpdateBlueprintTemplatePayload
+
+  """Updates a single `CatalogModule` using a unique key and a patch."""
+  updateCatalogModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCatalogModuleInput!
+  ): UpdateCatalogModulePayload
 
   """Updates a single `ComputeLogModule` using a unique key and a patch."""
   updateComputeLogModule(
@@ -16997,6 +18958,16 @@ type Mutation {
     """
     input: UpdateDatabaseProvisionModuleInput!
   ): UpdateDatabaseProvisionModulePayload
+
+  """
+  Updates a single `DatabaseSettingsModule` using a unique key and a patch.
+  """
+  updateDatabaseSettingsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDatabaseSettingsModuleInput!
+  ): UpdateDatabaseSettingsModulePayload
 
   """Updates a single `DbPool` using a unique key and a patch."""
   updateDbPool(
@@ -17055,6 +19026,14 @@ type Mutation {
     """
     input: UpdateDevicesModuleInput!
   ): UpdateDevicesModulePayload
+
+  """Updates a single `DomainModule` using a unique key and a patch."""
+  updateDomainModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDomainModuleInput!
+  ): UpdateDomainModulePayload
 
   """Updates a single `EmailsModule` using a unique key and a patch."""
   updateEmailsModule(
@@ -17352,6 +19331,14 @@ type Mutation {
     input: UpdateRlsModuleInput!
   ): UpdateRlsModulePayload
 
+  """Updates a single `RouteModule` using a unique key and a patch."""
+  updateRouteModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRouteModuleInput!
+  ): UpdateRouteModulePayload
+
   """
   Updates a single `SecureTableProvision` using a unique key and a patch.
   """
@@ -17379,6 +19366,14 @@ type Mutation {
     """
     input: UpdateSessionsModuleInput!
   ): UpdateSessionsModulePayload
+
+  """Updates a single `SiteSurfaceModule` using a unique key and a patch."""
+  updateSiteSurfaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSiteSurfaceModuleInput!
+  ): UpdateSiteSurfaceModulePayload
 
   """Updates a single `StorageLogModule` using a unique key and a patch."""
   updateStorageLogModule(
@@ -19194,14 +21189,14 @@ input ProvisionSpatialRelationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  pDatabaseId: UUID
-  pName: String
-  pOperator: String
-  pParamName: String
-  pSourceFieldId: UUID
-  pSourceTableId: UUID
-  pTargetFieldId: UUID
-  pTargetTableId: UUID
+  databaseId: UUID
+  name: String
+  operator: String
+  paramName: String
+  sourceFieldId: UUID
+  sourceTableId: UUID
+  targetFieldId: UUID
+  targetTableId: UUID
 }
 
 """The output of our `provisionSpatialRelation` mutation."""
@@ -19322,6 +21317,64 @@ type Query {
     """
     where: AgentModuleFilter
   ): AgentModuleConnection
+
+  """Reads and enables pagination through a set of `ApiSurfaceModule`."""
+  apiSurfaceModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ApiSurfaceModule`."""
+    orderBy: [ApiSurfaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ApiSurfaceModuleFilter
+  ): ApiSurfaceModuleConnection
+
+  """Reads and enables pagination through a set of `AppModule`."""
+  appModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AppModule`."""
+    orderBy: [AppModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppModuleFilter
+  ): AppModuleConnection
 
   """Reads and enables pagination through a set of `BillingModule`."""
   billingModules(
@@ -19467,6 +21520,35 @@ type Query {
     """
     where: BlueprintFilter
   ): BlueprintConnection
+
+  """Reads and enables pagination through a set of `CatalogModule`."""
+  catalogModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CatalogModule`."""
+    orderBy: [CatalogModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CatalogModuleFilter
+  ): CatalogModuleConnection
 
   """Reads and enables pagination through a set of `ComputeLogModule`."""
   computeLogModules(
@@ -19647,6 +21729,37 @@ type Query {
     """
     where: DatabaseProvisionModuleFilter
   ): DatabaseProvisionModuleConnection
+
+  """
+  Reads and enables pagination through a set of `DatabaseSettingsModule`.
+  """
+  databaseSettingsModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DatabaseSettingsModule`."""
+    orderBy: [DatabaseSettingsModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DatabaseSettingsModuleFilter
+  ): DatabaseSettingsModuleConnection
 
   """Reads and enables pagination through a set of `DbPoolConfig`."""
   dbPoolConfigs(
@@ -19852,6 +21965,35 @@ type Query {
     """
     where: DevicesModuleFilter
   ): DevicesModuleConnection
+
+  """Reads and enables pagination through a set of `DomainModule`."""
+  domainModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainModule`."""
+    orderBy: [DomainModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainModuleFilter
+  ): DomainModuleConnection
 
   """Reads and enables pagination through a set of `EmailsModule`."""
   emailsModules(
@@ -20886,6 +23028,35 @@ type Query {
     where: RlsModuleFilter
   ): RlsModuleConnection
 
+  """Reads and enables pagination through a set of `RouteModule`."""
+  routeModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RouteModule`."""
+    orderBy: [RouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RouteModuleFilter
+  ): RouteModuleConnection
+
   """Reads and enables pagination through a set of `SecureTableProvision`."""
   secureTableProvisions(
     """Read all values in the set after (below) this cursor."""
@@ -20972,6 +23143,35 @@ type Query {
     """
     where: SessionsModuleFilter
   ): SessionsModuleConnection
+
+  """Reads and enables pagination through a set of `SiteSurfaceModule`."""
+  siteSurfaceModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SiteSurfaceModule`."""
+    orderBy: [SiteSurfaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SiteSurfaceModuleFilter
+  ): SiteSurfaceModuleConnection
 
   """Reads and enables pagination through a set of `StorageLogModule`."""
   storageLogModules(
@@ -23023,6 +25223,276 @@ input RlsModulePatch {
   usersTableId: UUID
 }
 
+type RouteModule {
+  apiName: String
+
+  """Reads a single `CatalogModule` that is related to this `RouteModule`."""
+  catalogModule: CatalogModule
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+
+  """Reads a single `DomainModule` that is related to this `RouteModule`."""
+  domainModule: DomainModule
+  domainModuleId: UUID
+  entityField: String
+  entityTableId: UUID
+  hostnameBindingsTableId: UUID!
+  hostnameBindingsTableName: String!
+  id: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  privateSchemaId: UUID!
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  resolverFunctionName: String
+  routeBindingsTableId: UUID!
+  routeBindingsTableName: String!
+  routesTableId: UUID!
+  routesTableName: String!
+  schemaId: UUID!
+  scope: String!
+}
+
+"""A connection to a list of `RouteModule` values."""
+type RouteModuleConnection {
+  """
+  A list of edges which contains the `RouteModule` and cursor to aid in pagination.
+  """
+  edges: [RouteModuleEdge]!
+
+  """A list of `RouteModule` objects."""
+  nodes: [RouteModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RouteModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RouteModule` edge in the connection."""
+type RouteModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RouteModule` at the end of the edge."""
+  node: RouteModule
+}
+
+"""
+A filter to be used against `RouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input RouteModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [RouteModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `catalogModule` relation."""
+  catalogModule: CatalogModuleFilter
+
+  """A related `catalogModule` exists."""
+  catalogModuleExists: Boolean
+
+  """Filter by the object’s `catalogModuleId` field."""
+  catalogModuleId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `domainModule` relation."""
+  domainModule: DomainModuleFilter
+
+  """A related `domainModule` exists."""
+  domainModuleExists: Boolean
+
+  """Filter by the object’s `domainModuleId` field."""
+  domainModuleId: UUIDFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `hostnameBindingsTableId` field."""
+  hostnameBindingsTableId: UUIDFilter
+
+  """Filter by the object’s `hostnameBindingsTableName` field."""
+  hostnameBindingsTableName: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: RouteModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [RouteModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `resolverFunctionName` field."""
+  resolverFunctionName: StringFilter
+
+  """Filter by the object’s `routeBindingsTableId` field."""
+  routeBindingsTableId: UUIDFilter
+
+  """Filter by the object’s `routeBindingsTableName` field."""
+  routeBindingsTableName: StringFilter
+
+  """Filter by the object’s `routesTableId` field."""
+  routesTableId: UUIDFilter
+
+  """Filter by the object’s `routesTableName` field."""
+  routesTableName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+}
+
+"""An input for mutations affecting `RouteModule`"""
+input RouteModuleInput {
+  apiName: String
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  domainModuleId: UUID
+  entityField: String
+  entityTableId: UUID
+  hostnameBindingsTableId: UUID
+  hostnameBindingsTableName: String
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  resolverFunctionName: String
+  routeBindingsTableId: UUID
+  routeBindingsTableName: String
+  routesTableId: UUID
+  routesTableName: String
+  schemaId: UUID
+  scope: String
+}
+
+"""Methods to use when ordering `RouteModule`."""
+enum RouteModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  CATALOG_MODULE_ID_ASC
+  CATALOG_MODULE_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  DOMAIN_MODULE_ID_ASC
+  DOMAIN_MODULE_ID_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  HOSTNAME_BINDINGS_TABLE_ID_ASC
+  HOSTNAME_BINDINGS_TABLE_ID_DESC
+  HOSTNAME_BINDINGS_TABLE_NAME_ASC
+  HOSTNAME_BINDINGS_TABLE_NAME_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  RESOLVER_FUNCTION_NAME_ASC
+  RESOLVER_FUNCTION_NAME_DESC
+  ROUTES_TABLE_ID_ASC
+  ROUTES_TABLE_ID_DESC
+  ROUTES_TABLE_NAME_ASC
+  ROUTES_TABLE_NAME_DESC
+  ROUTE_BINDINGS_TABLE_ID_ASC
+  ROUTE_BINDINGS_TABLE_ID_DESC
+  ROUTE_BINDINGS_TABLE_NAME_ASC
+  ROUTE_BINDINGS_TABLE_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+}
+
+"""
+Represents an update to a `RouteModule`. Fields that are set will be updated.
+"""
+input RouteModulePatch {
+  apiName: String
+  catalogModuleId: UUID
+  databaseId: UUID
+  defaultPermissions: [String]
+  domainModuleId: UUID
+  entityField: String
+  entityTableId: UUID
+  hostnameBindingsTableId: UUID
+  hostnameBindingsTableName: String
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  resolverFunctionName: String
+  routeBindingsTableId: UUID
+  routeBindingsTableName: String
+  routesTableId: UUID
+  routesTableName: String
+  schemaId: UUID
+  scope: String
+}
+
 """
 Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
 """
@@ -23564,6 +26034,255 @@ input SessionsModulePatch {
   sessionsTableId: UUID
   sessionsTableName: String
   usersTableId: UUID
+}
+
+type SiteSurfaceModule {
+  apiName: String
+
+  """
+  Reads a single `CatalogModule` that is related to this `SiteSurfaceModule`.
+  """
+  catalogModule: CatalogModule
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID!
+  scope: String!
+  siteMetadataTableId: UUID!
+  siteMetadataTableName: String!
+  siteModulesTableId: UUID!
+  siteModulesTableName: String!
+  siteThemesTableId: UUID!
+  siteThemesTableName: String!
+  sitesTableId: UUID!
+  sitesTableName: String!
+}
+
+"""A connection to a list of `SiteSurfaceModule` values."""
+type SiteSurfaceModuleConnection {
+  """
+  A list of edges which contains the `SiteSurfaceModule` and cursor to aid in pagination.
+  """
+  edges: [SiteSurfaceModuleEdge]!
+
+  """A list of `SiteSurfaceModule` objects."""
+  nodes: [SiteSurfaceModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SiteSurfaceModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SiteSurfaceModule` edge in the connection."""
+type SiteSurfaceModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SiteSurfaceModule` at the end of the edge."""
+  node: SiteSurfaceModule
+}
+
+"""
+A filter to be used against `SiteSurfaceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input SiteSurfaceModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [SiteSurfaceModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `catalogModule` relation."""
+  catalogModule: CatalogModuleFilter
+
+  """A related `catalogModule` exists."""
+  catalogModuleExists: Boolean
+
+  """Filter by the object’s `catalogModuleId` field."""
+  catalogModuleId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: SiteSurfaceModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [SiteSurfaceModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `siteMetadataTableId` field."""
+  siteMetadataTableId: UUIDFilter
+
+  """Filter by the object’s `siteMetadataTableName` field."""
+  siteMetadataTableName: StringFilter
+
+  """Filter by the object’s `siteModulesTableId` field."""
+  siteModulesTableId: UUIDFilter
+
+  """Filter by the object’s `siteModulesTableName` field."""
+  siteModulesTableName: StringFilter
+
+  """Filter by the object’s `siteThemesTableId` field."""
+  siteThemesTableId: UUIDFilter
+
+  """Filter by the object’s `siteThemesTableName` field."""
+  siteThemesTableName: StringFilter
+
+  """Filter by the object’s `sitesTableId` field."""
+  sitesTableId: UUIDFilter
+
+  """Filter by the object’s `sitesTableName` field."""
+  sitesTableName: StringFilter
+}
+
+"""An input for mutations affecting `SiteSurfaceModule`"""
+input SiteSurfaceModuleInput {
+  apiName: String
+  catalogModuleId: UUID
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+  siteMetadataTableId: UUID
+  siteMetadataTableName: String
+  siteModulesTableId: UUID
+  siteModulesTableName: String
+  siteThemesTableId: UUID
+  siteThemesTableName: String
+  sitesTableId: UUID
+  sitesTableName: String
+}
+
+"""Methods to use when ordering `SiteSurfaceModule`."""
+enum SiteSurfaceModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  CATALOG_MODULE_ID_ASC
+  CATALOG_MODULE_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  SITES_TABLE_ID_ASC
+  SITES_TABLE_ID_DESC
+  SITES_TABLE_NAME_ASC
+  SITES_TABLE_NAME_DESC
+  SITE_METADATA_TABLE_ID_ASC
+  SITE_METADATA_TABLE_ID_DESC
+  SITE_METADATA_TABLE_NAME_ASC
+  SITE_METADATA_TABLE_NAME_DESC
+  SITE_MODULES_TABLE_ID_ASC
+  SITE_MODULES_TABLE_ID_DESC
+  SITE_MODULES_TABLE_NAME_ASC
+  SITE_MODULES_TABLE_NAME_DESC
+  SITE_THEMES_TABLE_ID_ASC
+  SITE_THEMES_TABLE_ID_DESC
+  SITE_THEMES_TABLE_NAME_ASC
+  SITE_THEMES_TABLE_NAME_DESC
+}
+
+"""
+Represents an update to a `SiteSurfaceModule`. Fields that are set will be updated.
+"""
+input SiteSurfaceModulePatch {
+  apiName: String
+  catalogModuleId: UUID
+  databaseId: UUID
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+  siteMetadataTableId: UUID
+  siteMetadataTableName: String
+  siteModulesTableId: UUID
+  siteModulesTableName: String
+  siteThemesTableId: UUID
+  siteThemesTableName: String
+  sitesTableId: UUID
+  sitesTableName: String
 }
 
 type StorageLogModule {
@@ -24733,6 +27452,82 @@ type UpdateAgentModulePayload {
   query: Query
 }
 
+"""All input for the `updateApiSurfaceModule` mutation."""
+input UpdateApiSurfaceModuleInput {
+  """
+  An object where the defined keys will be set on the `ApiSurfaceModule` being updated.
+  """
+  apiSurfaceModulePatch: ApiSurfaceModulePatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our update `ApiSurfaceModule` mutation."""
+type UpdateApiSurfaceModulePayload {
+  """The `ApiSurfaceModule` that was updated by this mutation."""
+  apiSurfaceModule: ApiSurfaceModule
+
+  """An edge for our `ApiSurfaceModule`. May be used by Relay 1."""
+  apiSurfaceModuleEdge(
+    """The method to use when ordering `ApiSurfaceModule`."""
+    orderBy: [ApiSurfaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiSurfaceModuleEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateAppModule` mutation."""
+input UpdateAppModuleInput {
+  """
+  An object where the defined keys will be set on the `AppModule` being updated.
+  """
+  appModulePatch: AppModulePatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our update `AppModule` mutation."""
+type UpdateAppModulePayload {
+  """The `AppModule` that was updated by this mutation."""
+  appModule: AppModule
+
+  """An edge for our `AppModule`. May be used by Relay 1."""
+  appModuleEdge(
+    """The method to use when ordering `AppModule`."""
+    orderBy: [AppModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppModuleEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updateBillingModule` mutation."""
 input UpdateBillingModuleInput {
   """
@@ -24916,6 +27711,44 @@ type UpdateBlueprintTemplatePayload {
     """The method to use when ordering `BlueprintTemplate`."""
     orderBy: [BlueprintTemplateOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BlueprintTemplateEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateCatalogModule` mutation."""
+input UpdateCatalogModuleInput {
+  """
+  An object where the defined keys will be set on the `CatalogModule` being updated.
+  """
+  catalogModulePatch: CatalogModulePatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our update `CatalogModule` mutation."""
+type UpdateCatalogModulePayload {
+  """The `CatalogModule` that was updated by this mutation."""
+  catalogModule: CatalogModule
+
+  """An edge for our `CatalogModule`. May be used by Relay 1."""
+  catalogModuleEdge(
+    """The method to use when ordering `CatalogModule`."""
+    orderBy: [CatalogModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CatalogModuleEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -25150,6 +27983,44 @@ type UpdateDatabaseProvisionModulePayload {
     """The method to use when ordering `DatabaseProvisionModule`."""
     orderBy: [DatabaseProvisionModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DatabaseProvisionModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateDatabaseSettingsModule` mutation."""
+input UpdateDatabaseSettingsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DatabaseSettingsModule` being updated.
+  """
+  databaseSettingsModulePatch: DatabaseSettingsModulePatch!
+  id: UUID!
+}
+
+"""The output of our update `DatabaseSettingsModule` mutation."""
+type UpdateDatabaseSettingsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSettingsModule` that was updated by this mutation."""
+  databaseSettingsModule: DatabaseSettingsModule
+
+  """An edge for our `DatabaseSettingsModule`. May be used by Relay 1."""
+  databaseSettingsModuleEdge(
+    """The method to use when ordering `DatabaseSettingsModule`."""
+    orderBy: [DatabaseSettingsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingsModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -25416,6 +28287,44 @@ type UpdateDevicesModulePayload {
     """The method to use when ordering `DevicesModule`."""
     orderBy: [DevicesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DevicesModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateDomainModule` mutation."""
+input UpdateDomainModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DomainModule` being updated.
+  """
+  domainModulePatch: DomainModulePatch!
+  id: UUID!
+}
+
+"""The output of our update `DomainModule` mutation."""
+type UpdateDomainModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainModule` that was updated by this mutation."""
+  domainModule: DomainModule
+
+  """An edge for our `DomainModule`. May be used by Relay 1."""
+  domainModuleEdge(
+    """The method to use when ordering `DomainModule`."""
+    orderBy: [DomainModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -26757,6 +29666,44 @@ type UpdateRlsModulePayload {
   ): RlsModuleEdge
 }
 
+"""All input for the `updateRouteModule` mutation."""
+input UpdateRouteModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `RouteModule` being updated.
+  """
+  routeModulePatch: RouteModulePatch!
+}
+
+"""The output of our update `RouteModule` mutation."""
+type UpdateRouteModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RouteModule` that was updated by this mutation."""
+  routeModule: RouteModule
+
+  """An edge for our `RouteModule`. May be used by Relay 1."""
+  routeModuleEdge(
+    """The method to use when ordering `RouteModule`."""
+    orderBy: [RouteModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RouteModuleEdge
+}
+
 """All input for the `updateSecureTableProvision` mutation."""
 input UpdateSecureTableProvisionInput {
   """
@@ -26871,6 +29818,44 @@ type UpdateSessionsModulePayload {
     """The method to use when ordering `SessionsModule`."""
     orderBy: [SessionsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SessionsModuleEdge
+}
+
+"""All input for the `updateSiteSurfaceModule` mutation."""
+input UpdateSiteSurfaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `SiteSurfaceModule` being updated.
+  """
+  siteSurfaceModulePatch: SiteSurfaceModulePatch!
+}
+
+"""The output of our update `SiteSurfaceModule` mutation."""
+type UpdateSiteSurfaceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SiteSurfaceModule` that was updated by this mutation."""
+  siteSurfaceModule: SiteSurfaceModule
+
+  """An edge for our `SiteSurfaceModule`. May be used by Relay 1."""
+  siteSurfaceModuleEdge(
+    """The method to use when ordering `SiteSurfaceModule`."""
+    orderBy: [SiteSurfaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteSurfaceModuleEdge
 }
 
 """All input for the `updateStorageLogModule` mutation."""

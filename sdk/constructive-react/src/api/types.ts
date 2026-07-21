@@ -174,6 +174,34 @@ export interface Domain {
   siteId: string | null;
   subdomain: ConstructiveInternalTypeHostname | null;
 }
+export interface DomainEvent {
+  actorId: string | null;
+  createdAt: string | null;
+  domainVerificationId: string | null;
+  eventType: string | null;
+  id: string | null;
+  managedDomainId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+  ownerId: string | null;
+}
+export interface DomainVerification {
+  attempts: number | null;
+  createdAt: string | null;
+  error: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  lastCheckedAt: string | null;
+  managedDomainId: string | null;
+  method: string | null;
+  ownerId: string | null;
+  recordName: string | null;
+  recordType: string | null;
+  recordValue: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  verifiedAt: string | null;
+}
 export interface EmbeddingChunk {
   chunkOverlap: number | null;
   chunkSize: number | null;
@@ -305,7 +333,9 @@ export interface Index {
   whereClause: unknown | null;
 }
 export interface ManagedDomain {
+  allowPublicUsage: boolean | null;
   annotations: unknown | null;
+  certStatus: string | null;
   databaseId: string | null;
   domain: ConstructiveInternalTypeHostname | null;
   id: string | null;
