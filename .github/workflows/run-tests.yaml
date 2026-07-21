@@ -143,7 +143,7 @@ jobs:
   # =========================================================================
   pg-tests:
     needs: build
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -194,6 +194,9 @@ jobs:
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: password
+      # Pin an explicit heap cap: on smaller runners Node's memory-derived
+      # default can land near ~2GB and OOM Jest.
+      NODE_OPTIONS: '--max-old-space-size=4096'
 
     services:
       pg_db:
@@ -259,7 +262,7 @@ jobs:
   # =========================================================================
   integration-tests:
     needs: build
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -296,6 +299,9 @@ jobs:
       AWS_ACCESS_KEY: minioadmin
       AWS_SECRET_KEY: minioadmin
       AWS_REGION: us-east-1
+      # Pin an explicit heap cap: on smaller runners Node's memory-derived
+      # default can land near ~2GB and OOM Jest.
+      NODE_OPTIONS: '--max-old-space-size=4096'
 
     services:
       pg_db:
@@ -375,7 +381,7 @@ jobs:
   # =========================================================================
   ai-tests:
     needs: build
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -389,6 +395,9 @@ jobs:
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: password
+      # Pin an explicit heap cap: on smaller runners Node's memory-derived
+      # default can land near ~2GB and OOM Jest.
+      NODE_OPTIONS: '--max-old-space-size=4096'
 
     services:
       pg_db:
