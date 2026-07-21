@@ -161,6 +161,14 @@ describe('getEnvOptions', () => {
     });
   });
 
+  it('accepts custom SMS provider names', () => {
+    const result = getGraphQLEnvVars({
+      SMS_PROVIDER: 'custom-sms-gateway'
+    });
+
+    expect(result.sms?.provider).toBe('custom-sms-gateway');
+  });
+
   it('honors defaults, config, env, and runtime override priority for SMS', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-sms-'));
     writeConfig(tempDir, {

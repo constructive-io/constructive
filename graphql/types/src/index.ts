@@ -32,7 +32,6 @@ export {
 
 // Export SMS types
 export {
-  SmsProviderName,
   SmsOptions,
   DevSmsOptions,
   smsDefaults
