@@ -759,4 +759,159 @@ relocatable = false
       }
     });
   });
+
+  describe('Export with excludeCategories', () => {
+    const DATABASE_ID = 'a1b2c3d4-e5f6-4708-b250-000000000001';
+    const OPEN_EXTENSION_NAME = 'pets-open';
+    const OPEN_META_EXTENSION_NAME = 'pets-open-svc';
+    const POLICY_DEPLOY = 'schemas/pets_public/tables/pets/policies/pets_policy';
+    let exportError: Error | null = null;
+
+    const scaffoldModule = (name: string, description: string) => {
+      const moduleDir = join(exportWorkspaceDir, 'packages', name);
+      mkdirSync(moduleDir, { recursive: true });
+      writeFileSync(join(moduleDir, 'package.json'), JSON.stringify({
+        name,
+        version: '1.0.0',
+        description
+      }, null, 2));
+      writeFileSync(join(moduleDir, `${name}.control`), `# ${name} extension
+comment = '${description}'
+default_version = '1.0.0'
+relocatable = false
+`);
+      writeFileSync(join(moduleDir, 'pgpm.plan'), `%syntax-version=1.0.0
+%project=${name}
+%uri=https://github.com/test/${name}
+`);
+    };
+
+    beforeAll(async () => {
+      // Add a category column (the real db_migrate.sql_actions has one) and
+      // tag a policy action as 'security'
+      await pg.query(`ALTER TABLE db_migrate.sql_actions ADD COLUMN IF NOT EXISTS category text DEFAULT 'ddl'`);
+      await pg.query(
+        `INSERT INTO db_migrate.sql_actions (name, database_id, deploy, deps, content, revert, verify, category)
+         VALUES (
+           'Create pets policy',
+           $1,
+           $2,
+           ARRAY['schemas/pets_public/tables/pets/table']::text[],
+           'CREATE POLICY pets_policy ON pets_public.pets FOR SELECT USING (true);',
+           'DROP POLICY pets_policy ON pets_public.pets;',
+           'SELECT 1;',
+           'security'
+         )
+         ON CONFLICT (database_id, deploy) DO NOTHING`,
+        [DATABASE_ID, POLICY_DEPLOY]
+      );
+
+      const schemaResult = await pg.query(
+        'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
+        [DATABASE_ID]
+      );
+      const schemaNames = schemaResult.rows.map((r: any) => r.schema_name);
+
+      scaffoldModule(OPEN_EXTENSION_NAME, 'Exported pets database schema (security excluded)');
+      scaffoldModule(OPEN_META_EXTENSION_NAME, 'Exported pets service metadata (security excluded)');
+
+      const project = new PgpmPackage(exportWorkspaceDir);
+
+      try {
+        await exportMigrations({
+          project,
+          options: {
+            pg: dbConfig
+          },
+          dbInfo: {
+            dbname: dbConfig.database,
+            databaseName: 'pets',
+            database_ids: [DATABASE_ID]
+          },
+          author: 'test <test@test.local>',
+          outdir: join(exportWorkspaceDir, 'packages'),
+          schema_names: schemaNames,
+          extensionName: OPEN_EXTENSION_NAME,
+          extensionDesc: 'Exported pets database schema (security excluded)',
+          metaExtensionName: OPEN_META_EXTENSION_NAME,
+          metaExtensionDesc: 'Exported pets service metadata (security excluded)',
+          excludeCategories: ['security']
+        });
+      } catch (err) {
+        exportError = err as Error;
+      }
+    }, 180000);
+
+    it('should have completed export without errors', () => {
+      if (exportError) {
+        console.error('Export error:', exportError);
+      }
+      expect(exportError).toBeNull();
+    });
+
+    it('should omit security-categorized actions from the plan', () => {
+      const planPath = join(exportWorkspaceDir, 'packages', OPEN_EXTENSION_NAME, 'pgpm.plan');
+      expect(existsSync(planPath)).toBe(true);
+
+      // The replacer renames pets_public -> pets_open_public in the exported module
+      const planContent = readFileSync(planPath, 'utf-8');
+      expect(planContent).not.toContain('/policies/pets_policy');
+      // Non-security actions (category 'ddl' via the column default) are kept
+      expect(planContent).toContain('schemas/pets_open_public/tables/pets/table');
+    });
+
+    it('should not write deploy files for excluded actions', () => {
+      const policyDeployPath = join(
+        exportWorkspaceDir, 'packages', OPEN_EXTENSION_NAME, 'deploy',
+        'schemas/pets_open_public/tables/pets/policies/pets_policy.sql'
+      );
+      expect(existsSync(policyDeployPath)).toBe(false);
+
+      const tableDeployPath = join(
+        exportWorkspaceDir, 'packages', OPEN_EXTENSION_NAME, 'deploy', 'schemas/pets_open_public/tables/pets/table.sql'
+      );
+      expect(existsSync(tableDeployPath)).toBe(true);
+    });
+
+    it('should include security actions when excludeCategories is not passed', async () => {
+      const FULL_EXTENSION_NAME = 'pets-full';
+      const FULL_META_EXTENSION_NAME = 'pets-full-svc';
+
+      const schemaResult = await pg.query(
+        'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
+        [DATABASE_ID]
+      );
+      const schemaNames = schemaResult.rows.map((r: any) => r.schema_name);
+
+      scaffoldModule(FULL_EXTENSION_NAME, 'Exported pets database schema (full)');
+      scaffoldModule(FULL_META_EXTENSION_NAME, 'Exported pets service metadata (full)');
+
+      const project = new PgpmPackage(exportWorkspaceDir);
+
+      await exportMigrations({
+        project,
+        options: {
+          pg: dbConfig
+        },
+        dbInfo: {
+          dbname: dbConfig.database,
+          databaseName: 'pets',
+          database_ids: [DATABASE_ID]
+        },
+        author: 'test <test@test.local>',
+        outdir: join(exportWorkspaceDir, 'packages'),
+        schema_names: schemaNames,
+        extensionName: FULL_EXTENSION_NAME,
+        extensionDesc: 'Exported pets database schema (full)',
+        metaExtensionName: FULL_META_EXTENSION_NAME,
+        metaExtensionDesc: 'Exported pets service metadata (full)'
+      });
+
+      const planContent = readFileSync(
+        join(exportWorkspaceDir, 'packages', FULL_EXTENSION_NAME, 'pgpm.plan'),
+        'utf-8'
+      );
+      expect(planContent).toContain('schemas/pets_full_public/tables/pets/policies/pets_policy');
+    }, 180000);
+  });
 });

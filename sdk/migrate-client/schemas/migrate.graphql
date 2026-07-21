@@ -662,6 +662,7 @@ type SqlAction {
   actionId: UUID
   actionName: String
   actorId: UUID
+  category: String
   content: String
   createdAt: Datetime
   databaseId: UUID
@@ -716,6 +717,9 @@ input SqlActionFilter {
   """Checks for all expressions in this list."""
   and: [SqlActionFilter!]
 
+  """Filter by the object’s `category` field."""
+  category: StringFilter
+
   """Filter by the object’s `content` field."""
   content: StringFilter
 
@@ -758,6 +762,8 @@ enum SqlActionOrderBy {
   ACTION_NAME_DESC
   ACTOR_ID_ASC
   ACTOR_ID_DESC
+  CATEGORY_ASC
+  CATEGORY_DESC
   CONTENT_ASC
   CONTENT_DESC
   CREATED_AT_ASC
