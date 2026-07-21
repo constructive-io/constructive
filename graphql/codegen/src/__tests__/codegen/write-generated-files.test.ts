@@ -1,12 +1,14 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { createHash } from 'node:crypto';
 
 import {
   GENERATED_FILES_MANIFEST,
   writeGeneratedFileJobs,
   writeGeneratedFiles,
 } from '../../core/output';
+import { acquireOutputLocks } from '../../core/output/lock';
 
 describe('writeGeneratedFiles', () => {
   let tempDir: string;
@@ -358,6 +360,9 @@ describe('writeGeneratedFiles', () => {
     const renameSpy = jest
       .spyOn(nativeFs, 'renameSync')
       .mockImplementation((source, destination) => {
+        if (String(source).includes('.constructive-codegen.lock.')) {
+          return originalRename(source, destination);
+        }
         renameCall += 1;
         if (renameCall === 2) throw new Error('injected commit failure');
         if (renameCall === 3) throw new Error('injected restore failure');
@@ -526,6 +531,45 @@ describe('writeGeneratedFiles', () => {
     expect(
       fs.readFileSync(path.join(secondOutput, 'model.ts'), 'utf8')
     ).toContain('handwritten');
+  });
+
+  it('plans against state observed while holding the output lock', async () => {
+    const generated = path.join(tempDir, 'model.ts');
+    const manifestPath = path.join(tempDir, GENERATED_FILES_MANIFEST);
+    const initial = await writeGeneratedFiles(
+      [{ path: 'model.ts', content: 'export const version = 1;\n' }],
+      tempDir,
+      [],
+      { showProgress: false, formatFiles: false }
+    );
+    expect(initial.success).toBe(true);
+
+    const locks = await acquireOutputLocks([tempDir]);
+    const pending = writeGeneratedFiles(
+      [{ path: 'model.ts', content: 'export const version = 3;\n' }],
+      tempDir,
+      [],
+      { showProgress: false, formatFiles: false }
+    );
+    const concurrentContent = 'export const version = 2;\n';
+    const concurrentHash = createHash('sha256')
+      .update(concurrentContent)
+      .digest('hex');
+    try {
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      fs.writeFileSync(generated, concurrentContent);
+      manifest.files['model.ts'].sha256 = concurrentHash;
+      fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    } finally {
+      await locks.release();
+    }
+
+    const result = await pending;
+    expect(result.success).toBe(true);
+    expect(
+      result.plan?.changes.find((change) => change.path === 'model.ts')
+        ?.previousHash
+    ).toBe(concurrentHash);
   });
 
   it('rolls back earlier output roots when a later commit fails', async () => {

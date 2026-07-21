@@ -11,6 +11,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import type { GeneratedFile } from '../codegen';
+import { rethrowIfCancelled, throwIfAborted } from '../cancellation';
+import { acquireOutputLocks } from './lock';
 
 export type { GeneratedFile };
 
@@ -1135,32 +1137,24 @@ export async function writeGeneratedFileJobs(
   jobs: GeneratedFileWriteJob[],
   options: WriteBatchOptions = {}
 ): Promise<WriteBatchResult> {
-  if (options.signal?.aborted) {
-    throw (
-      options.signal.reason ??
-      Object.assign(new Error('Operation cancelled.'), { name: 'AbortError' })
-    );
-  }
-  let preparedPlans: PreparedPlan[];
-  try {
-    preparedPlans = await Promise.all(
-      mergeWriteJobs(jobs).map((job) =>
+  throwIfAborted(options.signal);
+  const mergedJobs = mergeWriteJobs(jobs);
+  const preparePlans = async (): Promise<PreparedPlan[]> =>
+    Promise.all(
+      mergedJobs.map((job) =>
         prepareGenerationPlan(job.files, job.outputDir, job.options ?? {})
       )
     );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, results: [], errors: [message] };
-  }
-
-  if (options.signal?.aborted) {
-    throw (
-      options.signal.reason ??
-      Object.assign(new Error('Operation cancelled.'), { name: 'AbortError' })
-    );
-  }
-
   if (options.dryRun) {
+    let preparedPlans: PreparedPlan[];
+    try {
+      preparedPlans = await preparePlans();
+      throwIfAborted(options.signal);
+    } catch (error) {
+      rethrowIfCancelled(error, options.signal);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, results: [], errors: [message] };
+    }
     const results = preparedPlans.map((prepared) => {
       const errors = conflictErrors(prepared.publicPlan);
       return resultForPrepared(prepared, {
@@ -1176,5 +1170,20 @@ export async function writeGeneratedFileJobs(
     };
   }
 
-  return applyPreparedPlans(preparedPlans, options.showProgress ?? true);
+  let locks: Awaited<ReturnType<typeof acquireOutputLocks>> | undefined;
+  try {
+    locks = await acquireOutputLocks(
+      mergedJobs.map((job) => job.outputDir),
+      options.signal
+    );
+    const preparedPlans = await preparePlans();
+    throwIfAborted(options.signal);
+    return applyPreparedPlans(preparedPlans, options.showProgress ?? true);
+  } catch (error) {
+    rethrowIfCancelled(error, options.signal);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { success: false, results: [], errors: [message] };
+  } finally {
+    await locks?.release();
+  }
 }
