@@ -147,53 +147,26 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
+      # Each package's actual `pnpm test` step runs only a few seconds, while
+      # every matrix job pays ~50s of fixed overhead (service container init
+      # dominates). Batch packages into a few jobs that run tests sequentially
+      # against one shared Postgres container to amortize that overhead.
       matrix:
         include:
-          - package: pgpm/core
-            env: {}
-          - package: pgpm/cli
-            env: {}
-          - package: packages/client
-            env:
-              TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
-          - package: packages/safegres
-            env: {}
-          - package: postgres/pg-codegen
-            env: {}
-          - package: postgres/pgsql-test
-            env: {}
-          - package: postgres/drizzle-orm-test
-            env: {}
-          - package: postgres/introspectron
-            env: {}
-          - package: graphile/graphile-test
-            env: {}
-          - package: graphile/graphile-connection-filter
-            env: {}
-          - package: graphile/graphile-postgis
-            env: {}
-          - package: graphile/graphile-search
-            env: {}
-          - package: graphile/graphile-ltree
-            env: {}
-          - package: graphile/graphile-bulk-mutations
-            env: {}
-          - package: graphile/graphile-function-bindings
-            env: {}
-          - package: graphql/orm-test
-            env: {}
-          - package: graphql/test
-            env: {}
-          - package: graphql/playwright-test
-            env: {}
-          - package: jobs/knative-job-service
-            env: {}
+          - batch: pg-core
+            packages: 'pgpm/core pgpm/cli jobs/knative-job-service packages/client packages/safegres postgres/pg-codegen'
+          - batch: pg-postgres
+            packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis'
+          - batch: pg-graphql
+            packages: 'graphile/graphile-search graphile/graphile-ltree graphile/graphile-bulk-mutations graphile/graphile-function-bindings graphql/orm-test graphql/test graphql/playwright-test'
 
     env:
       PGHOST: localhost
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: password
+      # packages/client reads TEST_DATABASE_URL; harmless for the others.
+      TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
       # Pin an explicit heap cap: on smaller runners Node's memory-derived
       # default can land near ~2GB and OOM Jest.
       NODE_OPTIONS: '--max-old-space-size=4096'
@@ -206,9 +179,9 @@ jobs:
           POSTGRES_PASSWORD: password
         options: >-
           --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
+          --health-interval 3s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
         ports:
           - 5432:5432
 
@@ -253,9 +226,13 @@ jobs:
       - name: Install pgpm fixture modules
         run: pnpm fixtures:install
 
-      - name: Test ${{ matrix.package }}
-        run: cd ./${{ matrix.package }} && pnpm test
-        env: ${{ matrix.env }}
+      - name: Test ${{ matrix.batch }}
+        run: |
+          for pkg in ${{ matrix.packages }}; do
+            echo "::group::Testing $pkg"
+            (cd ./$pkg && pnpm test)
+            echo "::endgroup::"
+          done
 
   # =========================================================================
   # TIER 3 – Integration tests (PostgreSQL + MinIO)
@@ -266,29 +243,14 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
+      # Batched to amortize per-job fixed overhead (service container init
+      # dominates) — see the pg-tests tier for rationale.
       matrix:
         include:
-          - package: pgpm/env
-            env: {}
-          - package: uploads/s3-streamer
-            env:
-              BUCKET_NAME: test-bucket
-          - package: packages/upload-client
-            env: {}
-          - package: packages/bucket-provisioner
-            env: {}
-          - package: graphile/graphile-settings
-            env: {}
-          - package: graphile/graphile-presigned-url-plugin
-            env: {}
-          - package: graphile/graphile-bucket-provisioner-plugin
-            env: {}
-          - package: graphql/server-test
-            env: {}
-          - package: graphql/env
-            env: {}
-          - package: graphql/server
-            env: {}
+          - batch: integration-graphql
+            packages: 'graphql/server-test graphql/server graphql/env pgpm/env'
+          - batch: integration-uploads
+            packages: 'uploads/s3-streamer packages/upload-client packages/bucket-provisioner graphile/graphile-settings graphile/graphile-presigned-url-plugin graphile/graphile-bucket-provisioner-plugin'
 
     env:
       PGHOST: localhost
@@ -299,6 +261,8 @@ jobs:
       AWS_ACCESS_KEY: minioadmin
       AWS_SECRET_KEY: minioadmin
       AWS_REGION: us-east-1
+      # uploads/s3-streamer reads BUCKET_NAME; harmless for the others.
+      BUCKET_NAME: test-bucket
       # Pin an explicit heap cap: on smaller runners Node's memory-derived
       # default can land near ~2GB and OOM Jest.
       NODE_OPTIONS: '--max-old-space-size=4096'
@@ -311,9 +275,9 @@ jobs:
           POSTGRES_PASSWORD: password
         options: >-
           --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
+          --health-interval 3s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
         ports:
           - 5432:5432
 
@@ -327,9 +291,9 @@ jobs:
           - 9001:9001
         options: >-
           --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
-          --health-interval 10s
+          --health-interval 3s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
     steps:
       - name: Download workspace
@@ -372,9 +336,13 @@ jobs:
       - name: Install pgpm fixture modules
         run: pnpm fixtures:install
 
-      - name: Test ${{ matrix.package }}
-        run: cd ./${{ matrix.package }} && pnpm test
-        env: ${{ matrix.env }}
+      - name: Test ${{ matrix.batch }}
+        run: |
+          for pkg in ${{ matrix.packages }}; do
+            echo "::group::Testing $pkg"
+            (cd ./$pkg && pnpm test)
+            echo "::endgroup::"
+          done
 
   # =========================================================================
   # TIER 4 – AI integration tests (PostgreSQL + Ollama)
@@ -407,9 +375,9 @@ jobs:
           POSTGRES_PASSWORD: password
         options: >-
           --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
+          --health-interval 3s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
         ports:
           - 5432:5432
 
