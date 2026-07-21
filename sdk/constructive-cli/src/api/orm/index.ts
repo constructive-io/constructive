@@ -19,6 +19,8 @@ import { DatabaseSettingModel } from './models/databaseSetting';
 import { DatabaseTransferModel } from './models/databaseTransfer';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { DomainModel } from './models/domain';
+import { DomainEventModel } from './models/domainEvent';
+import { DomainVerificationModel } from './models/domainVerification';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { EnumModel } from './models/enum';
 import { FieldModel } from './models/field';
@@ -101,6 +103,8 @@ export function createClient(config: OrmClientConfig) {
     databaseTransfer: new DatabaseTransferModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
     domain: new DomainModel(client),
+    domainEvent: new DomainEventModel(client),
+    domainVerification: new DomainVerificationModel(client),
     embeddingChunk: new EmbeddingChunkModel(client),
     enum: new EnumModel(client),
     field: new FieldModel(client),
