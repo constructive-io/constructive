@@ -19,7 +19,7 @@ export const orgIsManagerOfQueryKey = customQueryKeys.orgIsManagerOf;
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useOrgIsManagerOfQuery({ variables: { pEntityId, pManagerId, pUserId, pMaxDepth } });
+ * const { data, isLoading } = useOrgIsManagerOfQuery({ variables: { pEntityId, pManagerId, pMaxDepth, pUserId } });
  *
  * if (data?.orgIsManagerOf) {
  *   console.log(data.orgIsManagerOf);
@@ -76,7 +76,7 @@ export function useOrgIsManagerOfQuery<
  *
  * @example
  * ```ts
- * const data = await fetchOrgIsManagerOfQuery({ variables: { pEntityId, pManagerId, pUserId, pMaxDepth } });
+ * const data = await fetchOrgIsManagerOfQuery({ variables: { pEntityId, pManagerId, pMaxDepth, pUserId } });
  * ```
  */
 export async function fetchOrgIsManagerOfQuery(params?: { variables?: OrgIsManagerOfVariables }) {
@@ -88,7 +88,7 @@ export async function fetchOrgIsManagerOfQuery(params?: { variables?: OrgIsManag
  *
  * @example
  * ```ts
- * await prefetchOrgIsManagerOfQuery(queryClient, { variables: { pEntityId, pManagerId, pUserId, pMaxDepth } });
+ * await prefetchOrgIsManagerOfQuery(queryClient, { variables: { pEntityId, pManagerId, pMaxDepth, pUserId } });
  * ```
  */
 export async function prefetchOrgIsManagerOfQuery(

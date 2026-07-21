@@ -7,8 +7,8 @@ Site-level module configuration; stores module name and JSON settings used by th
 ## Usage
 
 ```typescript
-useSiteModulesQuery({ selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true } } })
-useSiteModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true } } })
+useSiteModulesQuery({ selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } } })
+useSiteModuleQuery({ id: '<UUID>', selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } } })
 useCreateSiteModuleMutation({ selection: { fields: { id: true } } })
 useUpdateSiteModuleMutation({ selection: { fields: { id: true } } })
 useDeleteSiteModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteModulesQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true } },
+  selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSiteModulesQuery({
 const { mutate } = useCreateSiteModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', siteId: '<UUID>', name: '<String>', data: '<JSON>' });
+mutate({ data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' });
 ```

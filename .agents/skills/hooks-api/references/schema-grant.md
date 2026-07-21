@@ -7,8 +7,8 @@ React Query hooks for SchemaGrant data operations
 ## Usage
 
 ```typescript
-useSchemaGrantsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } } })
-useSchemaGrantQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } } })
+useSchemaGrantsQuery({ selection: { fields: { createdAt: true, databaseId: true, granteeName: true, id: true, schemaId: true, updatedAt: true } } })
+useSchemaGrantQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, granteeName: true, id: true, schemaId: true, updatedAt: true } } })
 useCreateSchemaGrantMutation({ selection: { fields: { id: true } } })
 useUpdateSchemaGrantMutation({ selection: { fields: { id: true } } })
 useDeleteSchemaGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteSchemaGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useSchemaGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, granteeName: true, id: true, schemaId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSchemaGrantsQuery({
 const { mutate } = useCreateSchemaGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', granteeName: '<String>' });
+mutate({ databaseId: '<UUID>', granteeName: '<String>', schemaId: '<UUID>' });
 ```

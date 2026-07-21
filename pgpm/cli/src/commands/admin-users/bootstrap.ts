@@ -17,9 +17,13 @@ Admin Users Bootstrap Command:
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
+  --client                Also create the restricted authenticated_client role
+                          (for SQL-level proxy clients: inherits from
+                          authenticated; server-enforced statement_timeout)
 
 Examples:
   pgpm admin-users bootstrap              # Initialize postgres roles
+  pgpm admin-users bootstrap --client     # Also create authenticated_client
 `;
 
 export default async (
@@ -56,6 +60,9 @@ export default async (
   
   try {
     await init.bootstrapRoles(db.roles!);
+    if (argv.client) {
+      await init.bootstrapClientRole(db.roles!);
+    }
     log.success('postgres roles and permissions initialized successfully.');
   } finally {
     await init.close();

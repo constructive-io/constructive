@@ -3,6 +3,94 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.22.5](https://github.com/constructive-io/constructive/compare/pgsql-client@3.22.4...pgsql-client@3.22.5) (2026-07-21)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.22.4](https://github.com/constructive-io/constructive/compare/pgsql-client@3.22.3...pgsql-client@3.22.4) (2026-07-20)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.22.3](https://github.com/constructive-io/constructive/compare/pgsql-client@3.22.2...pgsql-client@3.22.3) (2026-07-20)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.22.2](https://github.com/constructive-io/constructive/compare/pgsql-client@3.22.1...pgsql-client@3.22.2) (2026-07-18)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.22.1](https://github.com/constructive-io/constructive/compare/pgsql-client@3.22.0...pgsql-client@3.22.1) (2026-07-18)
+
+**Note:** Version bump only for package pgsql-client
+
+# [3.22.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.21.3...pgsql-client@3.22.0) (2026-07-18)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.21.3](https://github.com/constructive-io/constructive/compare/pgsql-client@3.21.2...pgsql-client@3.21.3) (2026-07-17)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.21.2](https://github.com/constructive-io/constructive/compare/pgsql-client@3.21.1...pgsql-client@3.21.2) (2026-07-13)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.21.1](https://github.com/constructive-io/constructive/compare/pgsql-client@3.21.0...pgsql-client@3.21.1) (2026-07-13)
+
+**Note:** Version bump only for package pgsql-client
+
+# [3.21.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.20.5...pgsql-client@3.21.0) (2026-07-12)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.20.5](https://github.com/constructive-io/constructive/compare/pgsql-client@3.20.4...pgsql-client@3.20.5) (2026-07-12)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.20.4](https://github.com/constructive-io/constructive/compare/pgsql-client@3.20.3...pgsql-client@3.20.4) (2026-07-12)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.20.3](https://github.com/constructive-io/constructive/compare/pgsql-client@3.20.2...pgsql-client@3.20.3) (2026-07-11)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.20.2](https://github.com/constructive-io/constructive/compare/pgsql-client@3.20.1...pgsql-client@3.20.2) (2026-07-11)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.20.1](https://github.com/constructive-io/constructive/compare/pgsql-client@3.20.0...pgsql-client@3.20.1) (2026-07-10)
+
+**Note:** Version bump only for package pgsql-client
+
+# [3.20.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.19.0...pgsql-client@3.20.0) (2026-07-10)
+
+### Features
+
+- **pglite:** client-factory seam + pglite-test drop-in getConnections ([bb269ce](https://github.com/constructive-io/constructive/commit/bb269ce23aaace29fedfcf25ec81ec0faa8710eb))
+
+# [3.19.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.18.1...pgsql-client@3.19.0) (2026-07-08)
+
+### Features
+
+- **pgpm:** opt-in authenticated_client role via admin-users bootstrap --client ([d3158e0](https://github.com/constructive-io/constructive/commit/d3158e0940635e4decea97d161bd7a1af6b8a703))
+
+## [3.18.1](https://github.com/constructive-io/constructive/compare/pgsql-client@3.18.0...pgsql-client@3.18.1) (2026-06-28)
+
+**Note:** Version bump only for package pgsql-client
+
+# [3.18.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.17.0...pgsql-client@3.18.0) (2026-06-28)
+
+**Note:** Version bump only for package pgsql-client
+
+# [3.17.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.16.5...pgsql-client@3.17.0) (2026-06-27)
+
+**Note:** Version bump only for package pgsql-client
+
+## [3.16.5](https://github.com/constructive-io/constructive/compare/pgsql-client@3.16.4...pgsql-client@3.16.5) (2026-06-22)
+
+**Note:** Version bump only for package pgsql-client
+
 ## [3.16.4](https://github.com/constructive-io/constructive/compare/pgsql-client@3.16.3...pgsql-client@3.16.4) (2026-06-07)
 
 **Note:** Version bump only for package pgsql-client

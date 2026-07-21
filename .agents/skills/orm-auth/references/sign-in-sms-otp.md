@@ -7,7 +7,7 @@ Execute the signInSmsOtp mutation
 ## Usage
 
 ```typescript
-db.mutation.signInSmsOtp({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } }).execute()
+db.mutation.signInSmsOtp({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.signInSmsOtp({ input: { phone: '<String>', code: '<String>', credent
 ### Run signInSmsOtp
 
 ```typescript
-const result = await db.mutation.signInSmsOtp({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } }).execute();
+const result = await db.mutation.signInSmsOtp({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } }).execute();
 ```

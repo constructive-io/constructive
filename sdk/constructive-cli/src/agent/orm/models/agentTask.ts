@@ -196,7 +196,8 @@ export class AgentTaskModel {
       'UpdateAgentTaskInput',
       'id',
       'agentTaskPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.2](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.19.1...simple-smtp-server@0.19.2) (2026-07-18)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.19.1](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.19.0...simple-smtp-server@0.19.1) (2026-07-18)
+
+**Note:** Version bump only for package simple-smtp-server
+
+# [0.19.0](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.18.0...simple-smtp-server@0.19.0) (2026-07-18)
+
+**Note:** Version bump only for package simple-smtp-server
+
+# [0.18.0](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.5...simple-smtp-server@0.18.0) (2026-07-12)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.17.5](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.4...simple-smtp-server@0.17.5) (2026-07-12)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.17.4](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.3...simple-smtp-server@0.17.4) (2026-07-11)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.17.3](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.2...simple-smtp-server@0.17.3) (2026-07-11)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.17.2](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.1...simple-smtp-server@0.17.2) (2026-07-10)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.17.1](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.0...simple-smtp-server@0.17.1) (2026-07-08)
+
+**Note:** Version bump only for package simple-smtp-server
+
+# [0.17.0](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.16.1...simple-smtp-server@0.17.0) (2026-06-28)
+
+**Note:** Version bump only for package simple-smtp-server
+
+## [0.16.1](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.16.0...simple-smtp-server@0.16.1) (2026-06-22)
+
+**Note:** Version bump only for package simple-smtp-server
+
 # [0.16.0](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.15.1...simple-smtp-server@0.16.0) (2026-05-30)
 
 **Note:** Version bump only for package simple-smtp-server

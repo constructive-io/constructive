@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  data: 'json',
-  senderId: 'uuid',
-  receiverId: 'uuid',
   createdAt: 'string',
+  data: 'json',
+  id: 'uuid',
+  receiverId: 'uuid',
+  senderId: 'uuid',
   updatedAt: 'string',
 };
 const usage =
@@ -74,11 +74,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      data: true,
-      senderId: true,
-      receiverId: true,
       createdAt: true,
+      data: true,
+      id: true,
+      receiverId: true,
+      senderId: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -100,11 +100,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      data: true,
-      senderId: true,
-      receiverId: true,
       createdAt: true,
+      data: true,
+      id: true,
+      receiverId: true,
+      senderId: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -138,11 +138,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          data: true,
-          senderId: true,
-          receiverId: true,
           createdAt: true,
+          data: true,
+          id: true,
+          receiverId: true,
+          senderId: true,
           updatedAt: true,
         },
       })
@@ -168,15 +168,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'senderId',
-        message: 'senderId',
+        name: 'receiverId',
+        message: 'receiverId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'receiverId',
-        message: 'receiverId',
+        name: 'senderId',
+        message: 'senderId',
         required: false,
         skipPrompt: true,
       },
@@ -191,15 +191,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           data: cleanedData.data,
-          senderId: cleanedData.senderId,
           receiverId: cleanedData.receiverId,
+          senderId: cleanedData.senderId,
         },
         select: {
-          id: true,
-          data: true,
-          senderId: true,
-          receiverId: true,
           createdAt: true,
+          data: true,
+          id: true,
+          receiverId: true,
+          senderId: true,
           updatedAt: true,
         },
       })
@@ -231,15 +231,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'senderId',
-        message: 'senderId',
+        name: 'receiverId',
+        message: 'receiverId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'receiverId',
-        message: 'receiverId',
+        name: 'senderId',
+        message: 'senderId',
         required: false,
         skipPrompt: true,
       },
@@ -254,15 +254,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           data: cleanedData.data,
-          senderId: cleanedData.senderId,
           receiverId: cleanedData.receiverId,
+          senderId: cleanedData.senderId,
         },
         select: {
-          id: true,
-          data: true,
-          senderId: true,
-          receiverId: true,
           createdAt: true,
+          data: true,
+          id: true,
+          receiverId: true,
+          senderId: true,
           updatedAt: true,
         },
       })

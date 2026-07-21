@@ -9,8 +9,8 @@ API endpoint configurations: each record defines a PostGraphile/PostgREST API wi
 ```typescript
 db.api.findMany({ select: { id: true } }).execute()
 db.api.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.api.create({ data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>' }, select: { id: true } }).execute()
-db.api.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.api.create({ data: { annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute()
+db.api.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
 db.api.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.api.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.api.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, annotations: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.api.findMany({
 
 ```typescript
 const item = await db.api.create({
-  data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>' },
+  data: { annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' },
   select: { id: true }
 }).execute();
 ```

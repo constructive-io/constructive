@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/env",
-  "version": "2.25.0",
+  "version": "2.28.2",
   "author": "Dan Lynch <Dan Lynch>",
   "description": "PGPM environment management",
   "main": "index.js",
@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "deepmerge": "^4.3.1"
   },

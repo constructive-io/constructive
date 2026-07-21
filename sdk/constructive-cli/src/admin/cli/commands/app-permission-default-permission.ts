@@ -16,9 +16,9 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
   id: 'uuid',
   permissionId: 'uuid',
-  createdAt: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -72,9 +72,9 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       id: true,
       permissionId: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -100,9 +100,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       id: true,
       permissionId: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -140,9 +140,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
           id: true,
           permissionId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -178,9 +178,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           permissionId: cleanedData.permissionId,
         },
         select: {
+          createdAt: true,
           id: true,
           permissionId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -222,9 +222,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           permissionId: cleanedData.permissionId,
         },
         select: {
+          createdAt: true,
           id: true,
           permissionId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })

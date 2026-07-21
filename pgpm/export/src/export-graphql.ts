@@ -144,7 +144,7 @@ export const exportGraphQL = async ({
             verify: true,
             content: true,
             deps: true,
-            action: true,
+            actionName: true,
             actionId: true,
             actorId: true,
             payload: true

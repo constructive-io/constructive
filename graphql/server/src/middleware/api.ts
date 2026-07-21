@@ -14,6 +14,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
+import { resolveRoute, routeToApiStructure } from './routing';
 import './types';
 
 const log = new Logger('api');
@@ -120,12 +121,8 @@ interface ResolveContext {
   domain: string;
   subdomain: string | null;
   cacheKey: string;
-  headers: {
-    schemata?: string;
-    apiName?: string;
-    metaSchema?: string;
-    databaseId?: string;
-  };
+  headers: RoutingHeaders;
+  host: string;
 }
 
 type ResolutionMode = 
@@ -134,6 +131,15 @@ type ResolutionMode =
   | 'api-name-header'
   | 'meta-schema-header'
   | 'domain-lookup';
+
+type PrivateHeaderMode = Exclude<ResolutionMode, 'services-disabled' | 'domain-lookup'>;
+
+interface RoutingHeaders {
+  schemata?: string;
+  apiName?: string;
+  metaSchema?: string;
+  databaseId?: string;
+}
 
 // =============================================================================
 // Module Resolution (via loader registry)
@@ -208,6 +214,20 @@ const isApiError = (result: ApiConfigResult): result is ApiError =>
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value.split(',').map((s) => s.trim()).filter(Boolean);
 
+const getPrivateHeaderMode = (headers: RoutingHeaders): PrivateHeaderMode | null => {
+  if (headers.apiName) return 'api-name-header';
+  if (headers.schemata) return 'schemata-header';
+  if (headers.metaSchema) return 'meta-schema-header';
+  return null;
+};
+
+const getRoutingHeaders = (req: Request): RoutingHeaders => ({
+  schemata: req.get('X-Schemata'),
+  apiName: req.get('X-Api-Name'),
+  metaSchema: req.get('X-Meta-Schema'),
+  databaseId: req.get('X-Database-Id'),
+});
+
 const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const parsed = parseUrl(fullUrl);
@@ -227,14 +247,16 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   const baseKey = subdomains.filter((n) => n !== 'www').concat(domain).join('.');
 
   if (opts.api?.isPublic === false) {
-    if (req.get('X-Api-Name')) {
-      return `api:${req.get('X-Database-Id')}:${req.get('X-Api-Name')}`;
+    const headers = getRoutingHeaders(req);
+    const mode = getPrivateHeaderMode(headers);
+    if (mode === 'api-name-header') {
+      return `api:${headers.databaseId}:${headers.apiName}`;
     }
-    if (req.get('X-Schemata')) {
-      return `schemata:${req.get('X-Database-Id')}:${req.get('X-Schemata')}`;
+    if (mode === 'schemata-header') {
+      return `schemata:${headers.databaseId}:${headers.schemata}`;
     }
-    if (req.get('X-Meta-Schema')) {
-      return `metaschema:api:${req.get('X-Database-Id')}`;
+    if (mode === 'meta-schema-header') {
+      return `metaschema:api:${headers.databaseId}`;
     }
   }
   return baseKey;
@@ -319,9 +341,7 @@ const determineMode = (ctx: ResolveContext): ResolutionMode => {
   
   if (opts.api?.enableServicesApi === false) return 'services-disabled';
   if (opts.api?.isPublic === false) {
-    if (headers.schemata) return 'schemata-header';
-    if (headers.apiName) return 'api-name-header';
-    if (headers.metaSchema) return 'meta-schema-header';
+    return getPrivateHeaderMode(headers) ?? 'domain-lookup';
   }
   return 'domain-lookup';
 };
@@ -379,6 +399,50 @@ const resolveMetaSchemaHeader = (
   validatedSchemas: string[]
 ): ApiStructure => {
   return createAdminStructure(ctx.opts, validatedSchemas, ctx.headers.databaseId);
+};
+
+/**
+ * Scoped routing plane resolution (additive, host-only): one indexed
+ * resolve_route() call against the compiled hostname/route bindings.
+ * Path/method routing belongs to Traefik/Ingress — the server only maps
+ * host → tenant/api/db/role. Returns null (fall back to the legacy
+ * services_public lookup) when disabled, unmatched, resolver not installed,
+ * or the target is not an api surface.
+ */
+const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
+  const { opts, pool, host } = ctx;
+  if (!opts.api?.enableScopedRouting) return null;
+
+  const schema = opts.api?.scopedRoutingSchema || 'constructive_routing_public';
+  const route = await resolveRoute(pool, schema, host);
+  if (!route) return null;
+
+  const structure = routeToApiStructure(route, opts);
+  if (!structure) return null;
+
+  log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} db=${structure.dbname}`);
+
+  if (!structure.databaseId || !structure.apiId) return structure;
+
+  const loaderCtx = buildLoaderContext(pool, opts, {
+    api_id: structure.apiId,
+    database_id: structure.databaseId,
+    dbname: structure.dbname,
+    role_name: structure.roleName,
+    anon_role: structure.anonRole,
+    is_public: structure.isPublic ?? false,
+    schemas: structure.schema,
+  });
+  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
+  return {
+    ...structure,
+    rlsModule: settings.rlsModule,
+    authSettings: settings.authSettings,
+    corsOrigins: settings.corsOrigins,
+    databaseSettings: settings.databaseSettings,
+    pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
+    webauthnSettings: settings.webauthnSettings,
+  };
 };
 
 const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
@@ -479,12 +543,8 @@ export const getApiConfig = async (
     domain,
     subdomain,
     cacheKey,
-    headers: {
-      schemata: req.get('X-Schemata'),
-      apiName: req.get('X-Api-Name'),
-      metaSchema: req.get('X-Meta-Schema'),
-      databaseId: req.get('X-Database-Id'),
-    },
+    headers: getRoutingHeaders(req),
+    host: req.get('host') || '',
   };
 
   // Validate schemas upfront for modes that need them
@@ -527,7 +587,10 @@ export const getApiConfig = async (
       break;
 
     case 'domain-lookup':
-      result = await resolveDomainLookup(ctx);
+      result = await resolveScopedRoute(ctx);
+      if (!result) {
+        result = await resolveDomainLookup(ctx);
+      }
       if (!result && apiOpts.isPublic) {
         const fallback = await buildDevFallbackError(ctx, req);
         if (fallback) return fallback;
@@ -560,6 +623,7 @@ export const createApiMiddleware = (opts: ApiOptions) => {
         subdomain: null,
         cacheKey: 'meta-api-off',
         headers: {},
+        host: '',
       });
       req.databaseId = req.api.databaseId;
       req.svc_key = 'meta-api-off';

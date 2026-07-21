@@ -7,8 +7,8 @@ Per-entity cap overrides. Allows specific orgs/entities to have different cap va
 ## Usage
 
 ```typescript
-useOrgLimitCapsQuery({ selection: { fields: { id: true, name: true, entityId: true, max: true } } })
-useOrgLimitCapQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, entityId: true, max: true } } })
+useOrgLimitCapsQuery({ selection: { fields: { entityId: true, id: true, max: true, name: true } } })
+useOrgLimitCapQuery({ id: '<UUID>', selection: { fields: { entityId: true, id: true, max: true, name: true } } })
 useCreateOrgLimitCapMutation({ selection: { fields: { id: true } } })
 useUpdateOrgLimitCapMutation({ selection: { fields: { id: true } } })
 useDeleteOrgLimitCapMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgLimitCapMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgLimitCapsQuery({
-  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+  selection: { fields: { entityId: true, id: true, max: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgLimitCapsQuery({
 const { mutate } = useCreateOrgLimitCapMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+mutate({ entityId: '<UUID>', max: '<BigInt>', name: '<String>' });
 ```

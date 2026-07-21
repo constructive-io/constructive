@@ -7,8 +7,8 @@ Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown
 ## Usage
 
 ```typescript
-useOrgLimitAggregatesQuery({ selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true, organizationId: true, entityType: true } } })
-useOrgLimitAggregateQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true, organizationId: true, entityType: true } } })
+useOrgLimitAggregatesQuery({ selection: { fields: { entityId: true, entityType: true, id: true, max: true, name: true, num: true, organizationId: true, periodCredits: true, planMax: true, purchasedCredits: true, reserved: true, softMax: true, windowDuration: true, windowStart: true } } })
+useOrgLimitAggregateQuery({ id: '<UUID>', selection: { fields: { entityId: true, entityType: true, id: true, max: true, name: true, num: true, organizationId: true, periodCredits: true, planMax: true, purchasedCredits: true, reserved: true, softMax: true, windowDuration: true, windowStart: true } } })
 useCreateOrgLimitAggregateMutation({ selection: { fields: { id: true } } })
 useUpdateOrgLimitAggregateMutation({ selection: { fields: { id: true } } })
 useDeleteOrgLimitAggregateMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgLimitAggregateMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgLimitAggregatesQuery({
-  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true, organizationId: true, entityType: true } },
+  selection: { fields: { entityId: true, entityType: true, id: true, max: true, name: true, num: true, organizationId: true, periodCredits: true, planMax: true, purchasedCredits: true, reserved: true, softMax: true, windowDuration: true, windowStart: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgLimitAggregatesQuery({
 const { mutate } = useCreateOrgLimitAggregateMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', reserved: '<BigInt>', organizationId: '<UUID>', entityType: '<String>' });
+mutate({ entityId: '<UUID>', entityType: '<String>', max: '<BigInt>', name: '<String>', num: '<BigInt>', organizationId: '<UUID>', periodCredits: '<BigInt>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', reserved: '<BigInt>', softMax: '<BigInt>', windowDuration: '<Interval>', windowStart: '<Datetime>' });
 ```

@@ -196,7 +196,8 @@ export class SiteModel {
       'UpdateSiteInput',
       'id',
       'sitePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

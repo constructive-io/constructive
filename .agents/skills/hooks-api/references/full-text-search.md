@@ -7,8 +7,8 @@ React Query hooks for FullTextSearch data operations
 ## Usage
 
 ```typescript
-useFullTextSearchesQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, fieldIds: true, weights: true, langs: true, langColumn: true, createdAt: true, updatedAt: true } } })
-useFullTextSearchQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, fieldIds: true, weights: true, langs: true, langColumn: true, createdAt: true, updatedAt: true } } })
+useFullTextSearchesQuery({ selection: { fields: { createdAt: true, databaseId: true, fieldId: true, fieldIds: true, id: true, langColumn: true, langs: true, tableId: true, updatedAt: true, weights: true } } })
+useFullTextSearchQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, fieldId: true, fieldIds: true, id: true, langColumn: true, langs: true, tableId: true, updatedAt: true, weights: true } } })
 useCreateFullTextSearchMutation({ selection: { fields: { id: true } } })
 useUpdateFullTextSearchMutation({ selection: { fields: { id: true } } })
 useDeleteFullTextSearchMutation({})
@@ -20,7 +20,7 @@ useDeleteFullTextSearchMutation({})
 
 ```typescript
 const { data, isLoading } = useFullTextSearchesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, fieldIds: true, weights: true, langs: true, langColumn: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, fieldId: true, fieldIds: true, id: true, langColumn: true, langs: true, tableId: true, updatedAt: true, weights: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFullTextSearchesQuery({
 const { mutate } = useCreateFullTextSearchMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', fieldIds: '<UUID>', weights: '<String>', langs: '<String>', langColumn: '<String>' });
+mutate({ databaseId: '<UUID>', fieldId: '<UUID>', fieldIds: '<UUID>', langColumn: '<String>', langs: '<String>', tableId: '<UUID>', weights: '<String>' });
 ```

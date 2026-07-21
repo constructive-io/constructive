@@ -1,6 +1,8 @@
 import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
-import { JobsConfig } from './jobs';
+
+import { PgpmDriverConfig } from './driver';
+import { JobsConfig, jobsDefaults } from './jobs';
 
 /**
  * Authentication options for test client sessions
@@ -60,6 +62,8 @@ export interface RoleMapping {
     authenticated?: string;
     /** Administrator role name */
     administrator?: string;
+    /** Restricted proxy client role name (opt-in; created via `admin-users bootstrap --client`) */
+    authenticatedClient?: string;
     /** Default role for new connections */
     default?: string;
 }
@@ -214,6 +218,26 @@ export interface PgpmWorkspaceConfig {
   };
   /** Deployment configuration for the workspace */
   deployment?: Omit<DeploymentOptions, 'toChange'>;
+  /**
+   * Workspace-level pgpm module dependencies (npm package name -> exact version).
+   * Recorded by `pgpm install` when run at the workspace root; `pgpm install`
+   * with no arguments at the workspace root installs these into extensions/.
+   */
+  dependencies?: Record<string, string>;
+  /**
+   * Template source recorded at scaffold time when the workspace is created
+   * from a non-default boilerplate repo (e.g. via `pgpm init workspace --pglite`
+   * or `--repo`). `pgpm init` reads this so modules created inside the workspace
+   * inherit the same boilerplate source without re-specifying the flag.
+   */
+  boilerplates?: {
+    /** Template repository URL */
+    repo: string;
+    /** Branch/tag to clone */
+    branch?: string;
+    /** Template variant directory */
+    dir?: string;
+  };
 }
 
 /**
@@ -265,6 +289,12 @@ export interface PgpmOptions {
     smtp?: SmtpOptions;
     /** OAuth configuration */
     oauth?: OAuthOptions;
+    /**
+     * Pluggable migration backend. Undefined = built-in `pg` (server) path.
+     * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved
+     * from the consumer's `node_modules`.
+     */
+    driver?: PgpmDriverConfig;
 }
 
 /**
@@ -299,13 +329,13 @@ export const pgpmDefaults: PgpmOptions = {
     port: 5432,
     user: 'postgres',
     password: 'password',
-    database: 'postgres',
+    database: 'postgres'
   },
   server: {
     host: 'localhost',
     port: 3000,
     trustProxy: false,
-    strictAuth: false,
+    strictAuth: false
   },
   cdn: {
     provider: 'minio',
@@ -314,7 +344,7 @@ export const pgpmDefaults: PgpmOptions = {
     awsAccessKey: 'minioadmin',
     awsSecretKey: 'minioadmin',
     endpoint: 'http://localhost:9000',
-    publicUrlPrefix: 'http://localhost:9000/test-bucket'
+    publicUrlPrefix: 'http://localhost:9000'
   },
   deployment: {
     useTx: true,
@@ -329,27 +359,7 @@ export const pgpmDefaults: PgpmOptions = {
       useTx: false
     }
   },
-  jobs: {
-    schema: {
-      schema: 'app_jobs'
-    },
-    worker: {
-      schema: 'app_jobs',
-      hostname: 'worker-0',
-      supportAny: true,
-      supported: [],
-      pollInterval: 1000,
-      gracefulShutdown: true
-    },
-    scheduler: {
-      schema: 'app_jobs',
-      hostname: 'scheduler-0',
-      supportAny: true,
-      supported: [],
-      pollInterval: 1000,
-      gracefulShutdown: true
-    }
-  },
+  jobs: jobsDefaults,
   errorOutput: {
     queryHistoryLimit: 30,
     maxLength: 10000,

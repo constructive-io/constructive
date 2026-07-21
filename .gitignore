@@ -13,3 +13,6 @@ postgres/pgsql-test/output/
 .env.local
 graphql/server/logs/
 graphql/server/*.heapsnapshot
+
+# Ephemeral pgpm modules installed by `pnpm fixtures:install` (pgpm install)
+/extensions/

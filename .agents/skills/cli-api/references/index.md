@@ -12,8 +12,8 @@ csdk index list --where.<field>.<op> <value> --orderBy <values>
 csdk index list --limit 10 --after <cursor>
 csdk index find-first --where.<field>.<op> <value>
 csdk index get --id <UUID>
-csdk index create --databaseId <UUID> --tableId <UUID> [--name <String>] [--fieldIds <UUID>] [--includeFieldIds <UUID>] [--accessMethod <String>] [--indexParams <JSON>] [--whereClause <JSON>] [--isUnique <Boolean>] [--options <JSON>] [--opClasses <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
-csdk index update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--fieldIds <UUID>] [--includeFieldIds <UUID>] [--accessMethod <String>] [--indexParams <JSON>] [--whereClause <JSON>] [--isUnique <Boolean>] [--options <JSON>] [--opClasses <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk index create --databaseId <UUID> --tableId <UUID> [--accessMethod <String>] [--category <ObjectCategory>] [--fieldIds <UUID>] [--includeFieldIds <UUID>] [--indexParams <JSON>] [--isUnique <Boolean>] [--name <String>] [--opClasses <String>] [--options <JSON>] [--smartTags <JSON>] [--tags <String>] [--whereClause <JSON>]
+csdk index update --id <UUID> [--accessMethod <String>] [--category <ObjectCategory>] [--databaseId <UUID>] [--fieldIds <UUID>] [--includeFieldIds <UUID>] [--indexParams <JSON>] [--isUnique <Boolean>] [--name <String>] [--opClasses <String>] [--options <JSON>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--whereClause <JSON>]
 csdk index delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk index list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a index
 
 ```bash
-csdk index create --databaseId <UUID> --tableId <UUID> [--name <String>] [--fieldIds <UUID>] [--includeFieldIds <UUID>] [--accessMethod <String>] [--indexParams <JSON>] [--whereClause <JSON>] [--isUnique <Boolean>] [--options <JSON>] [--opClasses <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk index create --databaseId <UUID> --tableId <UUID> [--accessMethod <String>] [--category <ObjectCategory>] [--fieldIds <UUID>] [--includeFieldIds <UUID>] [--indexParams <JSON>] [--isUnique <Boolean>] [--name <String>] [--opClasses <String>] [--options <JSON>] [--smartTags <JSON>] [--tags <String>] [--whereClause <JSON>]
 ```
 
 ### Get a index by id

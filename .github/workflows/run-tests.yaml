@@ -4,10 +4,20 @@ on:
     branches:
       - main
       - v1
+    paths-ignore:
+      - '**.md'
+      - '**/*.md'
+      - '.agents/skills/**'
+      - 'docs/**'
   pull_request:
     branches:
       - main
       - v1
+    paths-ignore:
+      - '**.md'
+      - '**/*.md'
+      - '.agents/skills/**'
+      - 'docs/**'
   workflow_dispatch:
   workflow_call:
 
@@ -89,11 +99,13 @@ jobs:
           - batch: uploads
             packages: 'uploads/mime-bytes uploads/uuid-hash uploads/uuid-stream uploads/etag-hash uploads/etag-stream uploads/stream-to-etag uploads/content-type-stream uploads/upload-names'
           - batch: packages-core
-            packages: 'packages/url-domains packages/query-builder packages/csrf packages/oauth packages/12factor-env packages/orm'
+            packages: 'packages/url-domains postgres/query-builder packages/csrf packages/oauth packages/12factor-env packages/orm'
           - batch: packages-services
             packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
+          - batch: pglite
+            packages: 'postgres/pglite-adapter postgres/pglite-test examples/pglite-socket'
 
     steps:
       - name: Download workspace
@@ -166,6 +178,8 @@ jobs:
             env: {}
           - package: graphile/graphile-bulk-mutations
             env: {}
+          - package: graphile/graphile-function-bindings
+            env: {}
           - package: graphql/orm-test
             env: {}
           - package: graphql/test
@@ -223,10 +237,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Durability is irrelevant for throwaway CI databases. Disabling fsync
+      # and synchronous commit avoids checkpoint I/O stalls on CI runners.
+      - name: Tune Postgres for CI (disable durability)
+        run: pnpm --filter pgpm exec node dist/index.js tune --yes
+
       - name: Seed app_user
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Install pgpm fixture modules
+        run: pnpm fixtures:install
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test
@@ -331,10 +353,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Durability is irrelevant for throwaway CI databases. Disabling fsync
+      # and synchronous commit avoids checkpoint I/O stalls on CI runners.
+      - name: Tune Postgres for CI (disable durability)
+        run: pnpm --filter pgpm exec node dist/index.js tune --yes
+
       - name: Seed app_user
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Install pgpm fixture modules
+        run: pnpm fixtures:install
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test
@@ -401,6 +431,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Durability is irrelevant for throwaway CI databases. Disabling fsync
+      # and synchronous commit avoids checkpoint I/O stalls on CI runners.
+      - name: Tune Postgres for CI (disable durability)
+        run: pnpm --filter pgpm exec node dist/index.js tune --yes
 
       - name: Seed app_user
         run: |

@@ -7,7 +7,7 @@ Execute the applyRegistryDefaults query
 ## Usage
 
 ```typescript
-db.query.applyRegistryDefaults({ nodeType: '<String>', data: '<JSON>' }).execute()
+db.query.applyRegistryDefaults({ data: '<JSON>', nodeType: '<String>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.applyRegistryDefaults({ nodeType: '<String>', data: '<JSON>' }).execute
 ### Run applyRegistryDefaults
 
 ```typescript
-const result = await db.query.applyRegistryDefaults({ nodeType: '<String>', data: '<JSON>' }).execute();
+const result = await db.query.applyRegistryDefaults({ data: '<JSON>', nodeType: '<String>' }).execute();
 ```

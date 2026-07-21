@@ -196,7 +196,8 @@ export class OrgLimitCreditModel {
       'UpdateOrgLimitCreditInput',
       'id',
       'orgLimitCreditPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

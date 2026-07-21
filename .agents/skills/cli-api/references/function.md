@@ -12,8 +12,8 @@ csdk function list --where.<field>.<op> <value> --orderBy <values>
 csdk function list --limit 10 --after <cursor>
 csdk function find-first --where.<field>.<op> <value>
 csdk function get --id <UUID>
-csdk function create --databaseId <UUID> --schemaId <UUID> --name <String>
-csdk function update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--name <String>]
+csdk function create --databaseId <UUID> --name <String> --schemaId <UUID>
+csdk function update --id <UUID> [--databaseId <UUID>] [--name <String>] [--schemaId <UUID>]
 csdk function delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a function
 
 ```bash
-csdk function create --databaseId <UUID> --schemaId <UUID> --name <String>
+csdk function create --databaseId <UUID> --name <String> --schemaId <UUID>
 ```
 
 ### Get a function by id

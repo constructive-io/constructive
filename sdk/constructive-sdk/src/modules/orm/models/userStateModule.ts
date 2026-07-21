@@ -196,7 +196,8 @@ export class UserStateModuleModel {
       'UpdateUserStateModuleInput',
       'id',
       'userStateModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

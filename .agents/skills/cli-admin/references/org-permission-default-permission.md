@@ -12,8 +12,8 @@ csdk org-permission-default-permission list --where.<field>.<op> <value> --order
 csdk org-permission-default-permission list --limit 10 --after <cursor>
 csdk org-permission-default-permission find-first --where.<field>.<op> <value>
 csdk org-permission-default-permission get --id <UUID>
-csdk org-permission-default-permission create --permissionId <UUID> --entityId <UUID>
-csdk org-permission-default-permission update --id <UUID> [--permissionId <UUID>] [--entityId <UUID>]
+csdk org-permission-default-permission create --entityId <UUID> --permissionId <UUID>
+csdk org-permission-default-permission update --id <UUID> [--entityId <UUID>] [--permissionId <UUID>]
 csdk org-permission-default-permission delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-permission-default-permission list --where.id.equalTo <value> --orderBy
 ### Create a orgPermissionDefaultPermission
 
 ```bash
-csdk org-permission-default-permission create --permissionId <UUID> --entityId <UUID>
+csdk org-permission-default-permission create --entityId <UUID> --permissionId <UUID>
 ```
 
 ### Get a orgPermissionDefaultPermission by id

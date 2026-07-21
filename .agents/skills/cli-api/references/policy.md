@@ -12,8 +12,8 @@ csdk policy list --where.<field>.<op> <value> --orderBy <values>
 csdk policy list --limit 10 --after <cursor>
 csdk policy find-first --where.<field>.<op> <value>
 csdk policy get --id <UUID>
-csdk policy create --tableId <UUID> [--databaseId <UUID>] [--name <String>] [--granteeName <String>] [--privilege <String>] [--permissive <Boolean>] [--disabled <Boolean>] [--policyType <String>] [--data <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
-csdk policy update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--granteeName <String>] [--privilege <String>] [--permissive <Boolean>] [--disabled <Boolean>] [--policyType <String>] [--data <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk policy create --tableId <UUID> [--category <ObjectCategory>] [--data <JSON>] [--databaseId <UUID>] [--disabled <Boolean>] [--granteeName <String>] [--name <String>] [--permissive <Boolean>] [--policyType <String>] [--privilege <String>] [--smartTags <JSON>] [--tags <String>] [--withCheck <JSON>]
+csdk policy update --id <UUID> [--category <ObjectCategory>] [--data <JSON>] [--databaseId <UUID>] [--disabled <Boolean>] [--granteeName <String>] [--name <String>] [--permissive <Boolean>] [--policyType <String>] [--privilege <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--withCheck <JSON>]
 csdk policy delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk policy list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a policy
 
 ```bash
-csdk policy create --tableId <UUID> [--databaseId <UUID>] [--name <String>] [--granteeName <String>] [--privilege <String>] [--permissive <Boolean>] [--disabled <Boolean>] [--policyType <String>] [--data <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk policy create --tableId <UUID> [--category <ObjectCategory>] [--data <JSON>] [--databaseId <UUID>] [--disabled <Boolean>] [--granteeName <String>] [--name <String>] [--permissive <Boolean>] [--policyType <String>] [--privilege <String>] [--smartTags <JSON>] [--tags <String>] [--withCheck <JSON>]
 ```
 
 ### Get a policy by id

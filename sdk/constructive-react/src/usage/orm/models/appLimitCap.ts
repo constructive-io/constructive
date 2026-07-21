@@ -196,7 +196,8 @@ export class AppLimitCapModel {
       'UpdateAppLimitCapInput',
       'id',
       'appLimitCapPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

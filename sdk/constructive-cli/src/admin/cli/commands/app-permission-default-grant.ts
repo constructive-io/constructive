@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  permissionId: 'uuid',
-  isGrant: 'boolean',
-  grantorId: 'uuid',
   createdAt: 'string',
+  grantorId: 'uuid',
+  id: 'uuid',
+  isGrant: 'boolean',
+  permissionId: 'uuid',
   updatedAt: 'string',
 };
 const usage =
@@ -74,11 +74,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      permissionId: true,
-      isGrant: true,
-      grantorId: true,
       createdAt: true,
+      grantorId: true,
+      id: true,
+      isGrant: true,
+      permissionId: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -104,11 +104,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      permissionId: true,
-      isGrant: true,
-      grantorId: true,
       createdAt: true,
+      grantorId: true,
+      id: true,
+      isGrant: true,
+      permissionId: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -146,11 +146,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          permissionId: true,
-          isGrant: true,
-          grantorId: true,
           createdAt: true,
+          grantorId: true,
+          id: true,
+          isGrant: true,
+          permissionId: true,
           updatedAt: true,
         },
       })
@@ -169,9 +169,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'permissionId',
-        message: 'permissionId',
-        required: true,
+        name: 'grantorId',
+        message: 'grantorId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -182,10 +183,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'grantorId',
-        message: 'grantorId',
-        required: false,
-        skipPrompt: true,
+        name: 'permissionId',
+        message: 'permissionId',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -197,16 +197,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.appPermissionDefaultGrant
       .create({
         data: {
-          permissionId: cleanedData.permissionId,
-          isGrant: cleanedData.isGrant,
           grantorId: cleanedData.grantorId,
+          isGrant: cleanedData.isGrant,
+          permissionId: cleanedData.permissionId,
         },
         select: {
-          id: true,
-          permissionId: true,
-          isGrant: true,
-          grantorId: true,
           createdAt: true,
+          grantorId: true,
+          id: true,
+          isGrant: true,
+          permissionId: true,
           updatedAt: true,
         },
       })
@@ -231,9 +231,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'permissionId',
-        message: 'permissionId',
+        name: 'grantorId',
+        message: 'grantorId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -244,10 +245,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'grantorId',
-        message: 'grantorId',
+        name: 'permissionId',
+        message: 'permissionId',
         required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -259,16 +259,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          permissionId: cleanedData.permissionId,
-          isGrant: cleanedData.isGrant,
           grantorId: cleanedData.grantorId,
+          isGrant: cleanedData.isGrant,
+          permissionId: cleanedData.permissionId,
         },
         select: {
-          id: true,
-          permissionId: true,
-          isGrant: true,
-          grantorId: true,
           createdAt: true,
+          grantorId: true,
+          id: true,
+          isGrant: true,
+          permissionId: true,
           updatedAt: true,
         },
       })

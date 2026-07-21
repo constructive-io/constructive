@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
+  details: 'json',
   id: 'uuid',
+  identifier: 'string',
+  isVerified: 'boolean',
   ownerId: 'uuid',
   service: 'string',
-  identifier: 'string',
-  details: 'json',
-  isVerified: 'boolean',
-  createdAt: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -70,13 +70,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      details: true,
       id: true,
+      identifier: true,
+      isVerified: true,
       ownerId: true,
       service: true,
-      identifier: true,
-      details: true,
-      isVerified: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -102,13 +102,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      details: true,
       id: true,
+      identifier: true,
+      isVerified: true,
       ownerId: true,
       service: true,
-      identifier: true,
-      details: true,
-      isVerified: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -135,39 +135,34 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'service',
-        message: 'service',
-        required: false,
-        skipPrompt: true,
+        type: 'json',
+        name: 'details',
+        message: 'details',
+        required: true,
       },
       {
         type: 'text',
         name: 'identifier',
         message: 'identifier',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'json',
-        name: 'details',
-        message: 'details',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'boolean',
         name: 'isVerified',
         message: 'isVerified',
-        required: false,
-        skipPrompt: true,
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'ownerId',
+        message: 'ownerId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'service',
+        message: 'service',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -179,20 +174,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.userConnectedAccount
       .create({
         data: {
+          details: cleanedData.details,
+          identifier: cleanedData.identifier,
+          isVerified: cleanedData.isVerified,
           ownerId: cleanedData.ownerId,
           service: cleanedData.service,
-          identifier: cleanedData.identifier,
-          details: cleanedData.details,
-          isVerified: cleanedData.isVerified,
         },
         select: {
+          createdAt: true,
+          details: true,
           id: true,
+          identifier: true,
+          isVerified: true,
           ownerId: true,
           service: true,
-          identifier: true,
-          details: true,
-          isVerified: true,
-          createdAt: true,
           updatedAt: true,
         },
       })

@@ -7,8 +7,8 @@ Per-entity cap overrides. Allows specific orgs/entities to have different cap va
 ## Usage
 
 ```typescript
-useAppLimitCapsQuery({ selection: { fields: { id: true, name: true, entityId: true, max: true } } })
-useAppLimitCapQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, entityId: true, max: true } } })
+useAppLimitCapsQuery({ selection: { fields: { entityId: true, id: true, max: true, name: true } } })
+useAppLimitCapQuery({ id: '<UUID>', selection: { fields: { entityId: true, id: true, max: true, name: true } } })
 useCreateAppLimitCapMutation({ selection: { fields: { id: true } } })
 useUpdateAppLimitCapMutation({ selection: { fields: { id: true } } })
 useDeleteAppLimitCapMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLimitCapMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLimitCapsQuery({
-  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+  selection: { fields: { entityId: true, id: true, max: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLimitCapsQuery({
 const { mutate } = useCreateAppLimitCapMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+mutate({ entityId: '<UUID>', max: '<BigInt>', name: '<String>' });
 ```

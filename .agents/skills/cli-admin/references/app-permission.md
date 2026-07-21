@@ -12,8 +12,8 @@ csdk app-permission list --where.<field>.<op> <value> --orderBy <values>
 csdk app-permission list --limit 10 --after <cursor>
 csdk app-permission find-first --where.<field>.<op> <value>
 csdk app-permission get --id <UUID>
-csdk app-permission create [--name <String>] [--bitnum <Int>] [--bitstr <BitString>] [--description <String>]
-csdk app-permission update --id <UUID> [--name <String>] [--bitnum <Int>] [--bitstr <BitString>] [--description <String>]
+csdk app-permission create [--bitnum <Int>] [--bitstr <BitString>] [--description <String>] [--name <String>]
+csdk app-permission update --id <UUID> [--bitnum <Int>] [--bitstr <BitString>] [--description <String>] [--name <String>]
 csdk app-permission delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-permission list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appPermission
 
 ```bash
-csdk app-permission create [--name <String>] [--bitnum <Int>] [--bitstr <BitString>] [--description <String>]
+csdk app-permission create [--bitnum <Int>] [--bitstr <BitString>] [--description <String>] [--name <String>]
 ```
 
 ### Get a appPermission by id

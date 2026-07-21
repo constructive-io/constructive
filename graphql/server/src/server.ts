@@ -27,6 +27,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
+import { createFnRouter } from './middleware/fn';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
@@ -204,6 +205,9 @@ class Server {
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile
     app.use(createAgenticRouter());
+
+    // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
+    app.use(createFnRouter());
 
     app.use(graphile(effectiveOpts));
     app.use(flush);

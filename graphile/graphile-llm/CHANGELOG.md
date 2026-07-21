@@ -3,6 +3,120 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.6](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.5...graphile-llm@0.19.6) (2026-07-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.19.5](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.4...graphile-llm@0.19.5) (2026-07-20)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.19.4](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.3...graphile-llm@0.19.4) (2026-07-20)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.19.3](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.2...graphile-llm@0.19.3) (2026-07-20)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.19.2](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.1...graphile-llm@0.19.2) (2026-07-18)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.19.1](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.0...graphile-llm@0.19.1) (2026-07-18)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.19.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.18.3...graphile-llm@0.19.0) (2026-07-18)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.18.3](https://github.com/constructive-io/constructive/compare/graphile-llm@0.18.2...graphile-llm@0.18.3) (2026-07-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.18.2](https://github.com/constructive-io/constructive/compare/graphile-llm@0.18.1...graphile-llm@0.18.2) (2026-07-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.18.1](https://github.com/constructive-io/constructive/compare/graphile-llm@0.18.0...graphile-llm@0.18.1) (2026-07-15)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.18.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.17.3...graphile-llm@0.18.0) (2026-07-14)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.17.3](https://github.com/constructive-io/constructive/compare/graphile-llm@0.17.2...graphile-llm@0.17.3) (2026-07-14)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.17.2](https://github.com/constructive-io/constructive/compare/graphile-llm@0.17.1...graphile-llm@0.17.2) (2026-07-13)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.17.1](https://github.com/constructive-io/constructive/compare/graphile-llm@0.17.0...graphile-llm@0.17.1) (2026-07-13)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.17.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.8...graphile-llm@0.17.0) (2026-07-12)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.8](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.7...graphile-llm@0.16.8) (2026-07-12)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.7](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.6...graphile-llm@0.16.7) (2026-07-12)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.6](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.5...graphile-llm@0.16.6) (2026-07-11)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.5](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.4...graphile-llm@0.16.5) (2026-07-11)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.4](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.3...graphile-llm@0.16.4) (2026-07-10)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.3](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.2...graphile-llm@0.16.3) (2026-07-10)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.2](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.1...graphile-llm@0.16.2) (2026-07-08)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.16.1](https://github.com/constructive-io/constructive/compare/graphile-llm@0.16.0...graphile-llm@0.16.1) (2026-06-28)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.16.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.15.0...graphile-llm@0.16.0) (2026-06-28)
+
+### Bug Fixes
+
+- replace workspace:^ in peerDependencies with real version ranges ([17951e1](https://github.com/constructive-io/constructive/commit/17951e1c233eabe984dba28392f6eba13597d9ab))
+
+# [0.15.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.14.0...graphile-llm@0.15.0) (2026-06-28)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.14.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.13.0...graphile-llm@0.14.0) (2026-06-27)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.13.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.12.2...graphile-llm@0.13.0) (2026-06-27)
+
+**Note:** Version bump only for package graphile-llm
+
+## [0.12.2](https://github.com/constructive-io/constructive/compare/graphile-llm@0.12.1...graphile-llm@0.12.2) (2026-06-22)
+
+**Note:** Version bump only for package graphile-llm
+
 ## [0.12.1](https://github.com/constructive-io/constructive/compare/graphile-llm@0.12.0...graphile-llm@0.12.1) (2026-06-14)
 
 **Note:** Version bump only for package graphile-llm

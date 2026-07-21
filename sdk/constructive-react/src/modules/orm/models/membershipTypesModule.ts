@@ -198,7 +198,8 @@ export class MembershipTypesModuleModel {
       'UpdateMembershipTypesModuleInput',
       'id',
       'membershipTypesModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -196,7 +196,8 @@ export class UserSettingsModuleModel {
       'UpdateUserSettingsModuleInput',
       'id',
       'userSettingsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

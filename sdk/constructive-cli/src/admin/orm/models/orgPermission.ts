@@ -196,7 +196,8 @@ export class OrgPermissionModel {
       'UpdateOrgPermissionInput',
       'id',
       'orgPermissionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -128,9 +128,15 @@ pgpm upgrade-modules --modules @pgpm/base32,@pgpm/faker
 pgpm upgrade-modules --workspace --all
 ```
 
-**pgpm extension** — Interactively manage module dependencies
+**pgpm extension** — Manage a module's dependencies (the `.control` `requires` line)
 
 ```bash
+# Non-interactive (edits only the requires line; preserves other .control fields)
+pgpm extension --add pgcrypto,citext   # add one or more
+pgpm extension --remove pgcrypto       # remove one or more
+pgpm extension --set pgpm-base32       # replace the whole set
+
+# Interactive picker (no flags)
 pgpm extension
 ```
 
@@ -142,8 +148,12 @@ pgpm extension
 # Create new workspace
 pgpm init workspace
 
-# Create new module (inside workspace)
+# Create new module (inside workspace) — scaffolds with NO extensions by default
 pgpm init
+
+# Pre-select extensions non-interactively, or open the interactive picker
+pgpm init --extensions plpgsql,pgcrypto
+pgpm init --with-extensions
 
 # Use full template path (recommended)
 pgpm init --template pnpm/module

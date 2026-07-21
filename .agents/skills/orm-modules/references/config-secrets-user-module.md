@@ -9,8 +9,8 @@ ORM operations for ConfigSecretsUserModule records
 ```typescript
 db.configSecretsUserModule.findMany({ select: { id: true } }).execute()
 db.configSecretsUserModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.configSecretsUserModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', configDefinitionsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
-db.configSecretsUserModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.configSecretsUserModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
+db.configSecretsUserModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.configSecretsUserModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.configSecretsUserModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.configSecretsUserModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.configSecretsUserModule.findMany({
 
 ```typescript
 const item = await db.configSecretsUserModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', configDefinitionsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>' },
+  data: { apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

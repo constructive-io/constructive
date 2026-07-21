@@ -41,6 +41,7 @@ export function useUpdateCommitMutation<S extends CommitSelect>(
       Error,
       {
         id: string;
+        databaseId: string;
         commitPatch: CommitPatch;
       }
     >,
@@ -55,6 +56,7 @@ export function useUpdateCommitMutation<S extends CommitSelect>(
   Error,
   {
     id: string;
+    databaseId: string;
     commitPatch: CommitPatch;
   }
 >;
@@ -67,6 +69,7 @@ export function useUpdateCommitMutation(
       Error,
       {
         id: string;
+        databaseId: string;
         commitPatch: CommitPatch;
       }
     >,
@@ -79,11 +82,20 @@ export function useUpdateCommitMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: commitMutationKeys.all,
-    mutationFn: ({ id, commitPatch }: { id: string; commitPatch: CommitPatch }) =>
+    mutationFn: ({
+      id,
+      databaseId,
+      commitPatch,
+    }: {
+      id: string;
+      databaseId: string;
+      commitPatch: CommitPatch;
+    }) =>
       getClient()
         .commit.update({
           where: {
             id,
+            databaseId,
           },
           data: commitPatch,
           select: args.select,

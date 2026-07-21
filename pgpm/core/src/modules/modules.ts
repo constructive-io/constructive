@@ -9,8 +9,10 @@ export type ModuleMap = Record<string, Module>;
  * Native PostgreSQL extensions (plpgsql, uuid-ossp, etc.) are not included.
  */
 export const PGPM_MODULE_MAP: Record<string, string> = {
+  'pgpm-app-scope': '@pgpm/app-scope',
   'pgpm-base32': '@pgpm/base32',
   'pgpm-database-jobs': '@pgpm/database-jobs',
+  'pgpm-function-resolution': '@pgpm/function-resolution',
   'metaschema-modules': '@pgpm/metaschema-modules',
   'metaschema-schema': '@pgpm/metaschema-schema',
   'services': '@pgpm/services',

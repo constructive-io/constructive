@@ -3,6 +3,122 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.17.3](https://github.com/constructive-io/constructive/compare/graphile-settings@5.17.2...graphile-settings@5.17.3) (2026-07-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.17.2](https://github.com/constructive-io/constructive/compare/graphile-settings@5.17.1...graphile-settings@5.17.2) (2026-07-20)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.17.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.17.0...graphile-settings@5.17.1) (2026-07-20)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.17.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.16.0...graphile-settings@5.17.0) (2026-07-20)
+
+### Features
+
+- **meta:** add scalar encoding contracts to \_meta field types ([987aa87](https://github.com/constructive-io/constructive/commit/987aa8783166e8e8bf6afa61ae6f2164321e13b7))
+
+# [5.16.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.15.1...graphile-settings@5.16.0) (2026-07-18)
+
+### Features
+
+- **meta:** add scope block to \_meta introspection plugin ([08c8f06](https://github.com/constructive-io/constructive/commit/08c8f06de86722583b02261f2dbdef035a949cbc))
+
+## [5.15.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.15.0...graphile-settings@5.15.1) (2026-07-18)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.15.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.14.3...graphile-settings@5.15.0) (2026-07-18)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.14.3](https://github.com/constructive-io/constructive/compare/graphile-settings@5.14.2...graphile-settings@5.14.3) (2026-07-17)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.14.2](https://github.com/constructive-io/constructive/compare/graphile-settings@5.14.1...graphile-settings@5.14.2) (2026-07-17)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.14.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.14.0...graphile-settings@5.14.1) (2026-07-15)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.14.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.13.3...graphile-settings@5.14.0) (2026-07-14)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.13.3](https://github.com/constructive-io/constructive/compare/graphile-settings@5.13.2...graphile-settings@5.13.3) (2026-07-14)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.13.2](https://github.com/constructive-io/constructive/compare/graphile-settings@5.13.1...graphile-settings@5.13.2) (2026-07-13)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.13.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.13.0...graphile-settings@5.13.1) (2026-07-13)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.13.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.8...graphile-settings@5.13.0) (2026-07-12)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.8](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.7...graphile-settings@5.12.8) (2026-07-12)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.7](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.6...graphile-settings@5.12.7) (2026-07-12)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.6](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.5...graphile-settings@5.12.6) (2026-07-11)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.5](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.4...graphile-settings@5.12.5) (2026-07-11)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.4](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.3...graphile-settings@5.12.4) (2026-07-10)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.3](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.2...graphile-settings@5.12.3) (2026-07-10)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.2](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.1...graphile-settings@5.12.2) (2026-07-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.12.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.12.0...graphile-settings@5.12.1) (2026-06-28)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.12.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.11.0...graphile-settings@5.12.0) (2026-06-28)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.11.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.10.0...graphile-settings@5.11.0) (2026-06-28)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.10.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.9.0...graphile-settings@5.10.0) (2026-06-27)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.9.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.8.2...graphile-settings@5.9.0) (2026-06-27)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.8.2](https://github.com/constructive-io/constructive/compare/graphile-settings@5.8.1...graphile-settings@5.8.2) (2026-06-22)
+
+**Note:** Version bump only for package graphile-settings
+
 ## [5.8.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.8.0...graphile-settings@5.8.1) (2026-06-18)
 
 **Note:** Version bump only for package graphile-settings

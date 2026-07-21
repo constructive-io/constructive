@@ -44,7 +44,7 @@ const SITE_ID = 'c1000001-0000-0000-0000-000000000001';
 const DOMAIN_ID = 'c2000001-0000-0000-0000-000000000001';
 const API_SCHEMA_ID = 'c3000001-0000-0000-0000-000000000001';
 const INDEX_ID = 'd0000001-0000-0000-0000-000000000001';
-const RLS_FUNCTION_ID = 'd1000001-0000-0000-0000-000000000001';
+const POLICY_ID = 'd1000001-0000-0000-0000-000000000001';
 const CORS_SETTINGS_ID = 'd2000001-0000-0000-0000-000000000001';
 const USER_AUTH_MODULE_ID = 'd3000001-0000-0000-0000-000000000001';
 
@@ -390,7 +390,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             predicates jsonb,
             is_unique boolean
           );
-          CREATE TABLE metaschema_public.rls_function (
+          CREATE TABLE metaschema_public.policy (
             id uuid PRIMARY KEY,
             database_id uuid,
             schema_id uuid,
@@ -478,11 +478,11 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
           VALUES ($1, $2, $3, $4, 'users_pkey', 'btree', ARRAY[$5]::uuid[], '{"columns": ["id"]}'::jsonb, true)
         `, [INDEX_ID, DATABASE_ID, SCHEMA_ID_PUB, TABLE_ID_USERS, FIELD_ID_1]);
 
-        // rls_function table — tests boolean and int columns
+        // policy table — tests boolean and int columns
         await pg.query(`
-          INSERT INTO metaschema_public.rls_function (id, database_id, schema_id, table_id, role_name, command, function_name, is_using, force_enabled, priority)
+          INSERT INTO metaschema_public.policy (id, database_id, schema_id, table_id, role_name, command, function_name, is_using, force_enabled, priority)
           VALUES ($1, $2, $3, $4, 'authenticated', 'SELECT', 'check_owner', true, true, 10)
-        `, [RLS_FUNCTION_ID, DATABASE_ID, SCHEMA_ID_PUB, TABLE_ID_USERS]);
+        `, [POLICY_ID, DATABASE_ID, SCHEMA_ID_PUB, TABLE_ID_USERS]);
 
         // cors_settings table — tests text[] columns
         await pg.query(`
@@ -660,7 +660,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
     expect(gqlResult['index']?.trim()).toBe(sqlResult['index']?.trim());
   });
 
-  it('rls_function table with boolean and int columns should be identical across both flows', async () => {
+  it('policy table with boolean and int columns should be identical across both flows', async () => {
     const sqlResult = await exportMeta({
       opts: { pg: dbConfig },
       dbname: dbConfig.database,
@@ -673,9 +673,9 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
       database_id: DATABASE_ID
     });
 
-    expect(sqlResult['rls_function']).toBeDefined();
-    expect(gqlResult['rls_function']).toBeDefined();
-    expect(gqlResult['rls_function']?.trim()).toBe(sqlResult['rls_function']?.trim());
+    expect(sqlResult['policy']).toBeDefined();
+    expect(gqlResult['policy']).toBeDefined();
+    expect(gqlResult['policy']?.trim()).toBe(sqlResult['policy']?.trim());
   });
 
   it('cors_settings table with text[] columns should be identical across both flows', async () => {

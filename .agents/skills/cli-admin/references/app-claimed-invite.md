@@ -12,8 +12,8 @@ csdk app-claimed-invite list --where.<field>.<op> <value> --orderBy <values>
 csdk app-claimed-invite list --limit 10 --after <cursor>
 csdk app-claimed-invite find-first --where.<field>.<op> <value>
 csdk app-claimed-invite get --id <UUID>
-csdk app-claimed-invite create [--data <JSON>] [--senderId <UUID>] [--receiverId <UUID>]
-csdk app-claimed-invite update --id <UUID> [--data <JSON>] [--senderId <UUID>] [--receiverId <UUID>]
+csdk app-claimed-invite create [--data <JSON>] [--receiverId <UUID>] [--senderId <UUID>]
+csdk app-claimed-invite update --id <UUID> [--data <JSON>] [--receiverId <UUID>] [--senderId <UUID>]
 csdk app-claimed-invite delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-claimed-invite list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appClaimedInvite
 
 ```bash
-csdk app-claimed-invite create [--data <JSON>] [--senderId <UUID>] [--receiverId <UUID>]
+csdk app-claimed-invite create [--data <JSON>] [--receiverId <UUID>] [--senderId <UUID>]
 ```
 
 ### Get a appClaimedInvite by id

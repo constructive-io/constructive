@@ -5,6 +5,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
   "api": {
     "anonRole": "env_anon",
     "defaultDatabaseId": "override_db",
+    "enableScopedRouting": false,
     "enableServicesApi": false,
     "exposedSchemas": [
       "public",
@@ -16,6 +17,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "env_meta2",
     ],
     "roleName": "env_role",
+    "scopedRoutingSchema": "constructive_routing_public",
   },
   "cdn": {
     "awsAccessKey": "minioadmin",
@@ -24,7 +26,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "bucketName": "test-bucket",
     "endpoint": "http://localhost:9000",
     "provider": "minio",
-    "publicUrlPrefix": "http://localhost:9000/test-bucket",
+    "publicUrlPrefix": "http://localhost:9000",
   },
   "db": {
     "connections": {
@@ -75,6 +77,11 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     ],
   },
   "jobs": {
+    "gateway": {
+      "callbackPort": 12345,
+      "callbackUrl": "http://callback:12345",
+      "gatewayUrl": "http://gateway:8080",
+    },
     "scheduler": {
       "gracefulShutdown": true,
       "hostname": "scheduler-0",

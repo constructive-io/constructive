@@ -41,6 +41,7 @@ export function useDeleteCommitMutation<S extends CommitSelect>(
       Error,
       {
         id: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -54,6 +55,7 @@ export function useDeleteCommitMutation<S extends CommitSelect>(
   Error,
   {
     id: string;
+    databaseId: string;
   }
 >;
 export function useDeleteCommitMutation(
@@ -65,6 +67,7 @@ export function useDeleteCommitMutation(
       Error,
       {
         id: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -76,11 +79,12 @@ export function useDeleteCommitMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: commitMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
       getClient()
         .commit.delete({
           where: {
             id,
+            databaseId,
           },
           select: args.select,
         })

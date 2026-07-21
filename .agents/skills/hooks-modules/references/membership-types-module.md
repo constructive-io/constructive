@@ -7,8 +7,8 @@ React Query hooks for MembershipTypesModule data operations
 ## Usage
 
 ```typescript
-useMembershipTypesModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
-useMembershipTypesModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
+useMembershipTypesModulesQuery({ selection: { fields: { databaseId: true, id: true, schemaId: true, tableId: true, tableName: true } } })
+useMembershipTypesModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateMembershipTypesModuleMutation({ selection: { fields: { id: true } } })
 useUpdateMembershipTypesModuleMutation({ selection: { fields: { id: true } } })
 useDeleteMembershipTypesModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteMembershipTypesModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useMembershipTypesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { databaseId: true, id: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 

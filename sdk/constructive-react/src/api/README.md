@@ -8,9 +8,9 @@
 
 ## Overview
 
-- **Tables:** 46
-- **Custom queries:** 1
-- **Custom mutations:** 9
+- **Tables:** 47
+- **Custom queries:** 2
+- **Custom mutations:** 7
 
 **Generators:** ORM, React Query
 

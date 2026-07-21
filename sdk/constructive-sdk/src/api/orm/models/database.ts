@@ -196,7 +196,8 @@ export class DatabaseModel {
       'UpdateDatabaseInput',
       'id',
       'databasePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

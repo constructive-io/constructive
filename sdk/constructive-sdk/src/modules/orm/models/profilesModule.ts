@@ -196,7 +196,8 @@ export class ProfilesModuleModel {
       'UpdateProfilesModuleInput',
       'id',
       'profilesModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

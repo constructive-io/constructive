@@ -41,6 +41,7 @@ export function useDeleteAppLimitEventMutation<S extends AppLimitEventSelect>(
       Error,
       {
         id: string;
+        createdAt: string;
       }
     >,
     'mutationFn'
@@ -54,6 +55,7 @@ export function useDeleteAppLimitEventMutation<S extends AppLimitEventSelect>(
   Error,
   {
     id: string;
+    createdAt: string;
   }
 >;
 export function useDeleteAppLimitEventMutation(
@@ -65,6 +67,7 @@ export function useDeleteAppLimitEventMutation(
       Error,
       {
         id: string;
+        createdAt: string;
       }
     >,
     'mutationFn'
@@ -76,11 +79,12 @@ export function useDeleteAppLimitEventMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: appLimitEventMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id, createdAt }: { id: string; createdAt: string }) =>
       getClient()
         .appLimitEvent.delete({
           where: {
             id,
+            createdAt,
           },
           select: args.select,
         })

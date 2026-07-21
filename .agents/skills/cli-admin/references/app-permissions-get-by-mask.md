@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `AppPermission`.
 ## Usage
 
 ```bash
-csdk app-permissions-get-by-mask --mask <BitString> --first <Int> --offset <Int> --after <Cursor>
+csdk app-permissions-get-by-mask --after <Cursor> --first <Int> --mask <BitString> --offset <Int>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk app-permissions-get-by-mask --mask <BitString> --first <Int> --offset <Int>
 ### Run appPermissionsGetByMask
 
 ```bash
-csdk app-permissions-get-by-mask --mask <BitString> --first <Int> --offset <Int> --after <Cursor>
+csdk app-permissions-get-by-mask --after <Cursor> --first <Int> --mask <BitString> --offset <Int>
 ```

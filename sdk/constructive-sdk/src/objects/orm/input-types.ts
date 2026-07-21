@@ -230,72 +230,72 @@ export interface UUIDListFilter {
   anyGreaterThan?: string;
   anyGreaterThanOrEqualTo?: string;
 }
-// ============ Entity Types ============
-export interface GetAllRecord {
-  path?: string[] | null;
-  data?: Record<string, unknown> | null;
-}
-/** Branch heads — mutable pointers into the commit chain */
-export interface Ref {
-  /** Unique ref identifier */
-  id: string;
-  /** Ref name (e.g. HEAD, main) */
-  name?: string | null;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string | null;
-  /** Store this ref belongs to */
-  storeId?: string | null;
-  /** Commit this ref points to */
-  commitId?: string | null;
-}
-/** Named stores — one per version-controlled tree (e.g. one graph, one definition set) */
-export interface Store {
-  /** Unique store identifier */
-  id: string;
-  /** Human-readable store name */
-  name?: string | null;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string | null;
-  /** Current root object hash of this store */
-  hash?: string | null;
-  /** Timestamp of store creation */
-  createdAt?: string | null;
-}
-/** Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children */
-export interface Object {
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string | null;
-  /** Ordered array of child object IDs */
-  kids?: string[] | null;
-  /** Ordered array of child path names (parallel to kids) */
-  ktree?: string[] | null;
-  /** Payload data for this object node */
-  data?: Record<string, unknown> | null;
-  /** Timestamp of object creation */
-  createdAt?: string | null;
-}
 /** Commit history — each commit snapshots a tree root for a store */
+// ============ Entity Types ============
 export interface Commit {
-  /** Unique commit identifier */
-  id: string;
-  /** Optional commit message */
-  message?: string | null;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string | null;
-  /** Store this commit belongs to */
-  storeId?: string | null;
-  /** Parent commit IDs (supports merge commits) */
-  parentIds?: string[] | null;
   /** User who authored the changes */
   authorId?: string | null;
   /** User who committed (may differ from author) */
   committerId?: string | null;
-  /** Root object ID of the tree snapshot at this commit */
-  treeId?: string | null;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string | null;
   /** Commit timestamp */
   date?: string | null;
+  /** Unique commit identifier */
+  id: string;
+  /** Optional commit message */
+  message?: string | null;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[] | null;
+  /** Store this commit belongs to */
+  storeId?: string | null;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string | null;
+}
+export interface GetAllTreeNodesRecord {
+  data?: Record<string, unknown> | null;
+  path?: string[] | null;
+}
+/** Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children */
+export interface Object {
+  /** Timestamp of object creation */
+  createdAt?: string | null;
+  /** Payload data for this object node */
+  data?: Record<string, unknown> | null;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string | null;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[] | null;
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[] | null;
+}
+/** Branch heads — mutable pointers into the commit chain */
+export interface Ref {
+  /** Commit this ref points to */
+  commitId?: string | null;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string | null;
+  /** Unique ref identifier */
+  id: string;
+  /** Ref name (e.g. HEAD, main) */
+  name?: string | null;
+  /** Store this ref belongs to */
+  storeId?: string | null;
+}
+/** Named stores — one per version-controlled tree (e.g. one graph, one definition set) */
+export interface Store {
+  /** Timestamp of store creation */
+  createdAt?: string | null;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string | null;
+  /** Current root object hash of this store */
+  hash?: string | null;
+  /** Unique store identifier */
+  id: string;
+  /** Human-readable store name */
+  name?: string | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -310,255 +310,312 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
-export interface GetAllRecordRelations {}
+export interface CommitRelations {}
+export interface GetAllTreeNodesRecordRelations {}
+export interface ObjectRelations {}
 export interface RefRelations {}
 export interface StoreRelations {}
-export interface ObjectRelations {}
-export interface CommitRelations {}
 // ============ Entity Types With Relations ============
-export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
+export type CommitWithRelations = Commit & CommitRelations;
+export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord &
+  GetAllTreeNodesRecordRelations;
+export type ObjectWithRelations = Object & ObjectRelations;
 export type RefWithRelations = Ref & RefRelations;
 export type StoreWithRelations = Store & StoreRelations;
-export type ObjectWithRelations = Object & ObjectRelations;
-export type CommitWithRelations = Commit & CommitRelations;
 // ============ Entity Select Types ============
-export type GetAllRecordSelect = {
-  path?: boolean;
-  data?: boolean;
-};
-export type RefSelect = {
-  id?: boolean;
-  name?: boolean;
-  databaseId?: boolean;
-  storeId?: boolean;
-  commitId?: boolean;
-};
-export type StoreSelect = {
-  id?: boolean;
-  name?: boolean;
-  databaseId?: boolean;
-  hash?: boolean;
-  createdAt?: boolean;
-};
-export type ObjectSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  kids?: boolean;
-  ktree?: boolean;
-  data?: boolean;
-  createdAt?: boolean;
-};
 export type CommitSelect = {
-  id?: boolean;
-  message?: boolean;
-  databaseId?: boolean;
-  storeId?: boolean;
-  parentIds?: boolean;
   authorId?: boolean;
   committerId?: boolean;
-  treeId?: boolean;
+  databaseId?: boolean;
   date?: boolean;
+  id?: boolean;
+  message?: boolean;
+  parentIds?: boolean;
+  storeId?: boolean;
+  treeId?: boolean;
+};
+export type GetAllTreeNodesRecordSelect = {
+  data?: boolean;
+  path?: boolean;
+};
+export type ObjectSelect = {
+  createdAt?: boolean;
+  data?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  kids?: boolean;
+  ktree?: boolean;
+};
+export type RefSelect = {
+  commitId?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  name?: boolean;
+  storeId?: boolean;
+};
+export type StoreSelect = {
+  createdAt?: boolean;
+  databaseId?: boolean;
+  hash?: boolean;
+  id?: boolean;
+  name?: boolean;
 };
 // ============ Table Filter Types ============
-export interface GetAllRecordFilter {
-  path?: StringListFilter;
-  data?: JSONFilter;
-  and?: GetAllRecordFilter[];
-  or?: GetAllRecordFilter[];
-  not?: GetAllRecordFilter;
-}
-export interface RefFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `commitId` field. */
-  commitId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: RefFilter[];
-  /** Checks for any expressions in this list. */
-  or?: RefFilter[];
-  /** Negates the expression. */
-  not?: RefFilter;
-}
-export interface StoreFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `hash` field. */
-  hash?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: StoreFilter[];
-  /** Checks for any expressions in this list. */
-  or?: StoreFilter[];
-  /** Negates the expression. */
-  not?: StoreFilter;
-}
-export interface ObjectFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `kids` field. */
-  kids?: UUIDListFilter;
-  /** Filter by the object’s `ktree` field. */
-  ktree?: StringListFilter;
-  /** Filter by the object’s `data` field. */
-  data?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: ObjectFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ObjectFilter[];
-  /** Negates the expression. */
-  not?: ObjectFilter;
-}
 export interface CommitFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `parentIds` field. */
-  parentIds?: UUIDListFilter;
+  /** Checks for all expressions in this list. */
+  and?: CommitFilter[];
   /** Filter by the object’s `authorId` field. */
   authorId?: UUIDFilter;
   /** Filter by the object’s `committerId` field. */
   committerId?: UUIDFilter;
-  /** Filter by the object’s `treeId` field. */
-  treeId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `date` field. */
   date?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: CommitFilter[];
-  /** Checks for any expressions in this list. */
-  or?: CommitFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
   /** Negates the expression. */
   not?: CommitFilter;
+  /** Checks for any expressions in this list. */
+  or?: CommitFilter[];
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
+  treeId?: UUIDFilter;
+}
+export interface GetAllTreeNodesRecordFilter {
+  data?: JSONFilter;
+  path?: StringListFilter;
+  and?: GetAllTreeNodesRecordFilter[];
+  or?: GetAllTreeNodesRecordFilter[];
+  not?: GetAllTreeNodesRecordFilter;
+}
+export interface ObjectFilter {
+  /** Checks for all expressions in this list. */
+  and?: ObjectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Negates the expression. */
+  not?: ObjectFilter;
+  /** Checks for any expressions in this list. */
+  or?: ObjectFilter[];
+}
+export interface RefFilter {
+  /** Checks for all expressions in this list. */
+  and?: RefFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: RefFilter;
+  /** Checks for any expressions in this list. */
+  or?: RefFilter[];
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+}
+export interface StoreFilter {
+  /** Checks for all expressions in this list. */
+  and?: StoreFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: StoreFilter;
+  /** Checks for any expressions in this list. */
+  or?: StoreFilter[];
 }
 // ============ OrderBy Types ============
-export type GetAllRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC';
-export type RefOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC';
-export type StoreOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
-export type ObjectOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
 export type CommitOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
   | 'AUTHOR_ID_ASC'
   | 'AUTHOR_ID_DESC'
   | 'COMMITTER_ID_ASC'
   | 'COMMITTER_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DATE_ASC'
-  | 'DATE_DESC';
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+export type GetAllTreeNodesRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'PATH_ASC'
+  | 'PATH_DESC';
+export type ObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type RefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+export type StoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 // ============ CRUD Input Types ============
-export interface CreateGetAllRecordInput {
+export interface CreateCommitInput {
   clientMutationId?: string;
-  getAllRecord: {
-    path?: string[];
-    data?: Record<string, unknown>;
+  commit: {
+    authorId?: string;
+    committerId?: string;
+    databaseId: string;
+    date?: string;
+    message?: string;
+    parentIds?: string[];
+    storeId: string;
+    treeId?: string;
   };
 }
-export interface GetAllRecordPatch {
-  path?: string[] | null;
-  data?: Record<string, unknown> | null;
+export interface CommitPatch {
+  authorId?: string | null;
+  committerId?: string | null;
+  databaseId?: string | null;
+  date?: string | null;
+  message?: string | null;
+  parentIds?: string[] | null;
+  storeId?: string | null;
+  treeId?: string | null;
 }
-export interface UpdateGetAllRecordInput {
+export interface UpdateCommitInput {
   clientMutationId?: string;
   id: string;
-  getAllRecordPatch: GetAllRecordPatch;
+  commitPatch: CommitPatch;
 }
-export interface DeleteGetAllRecordInput {
+export interface DeleteCommitInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateGetAllTreeNodesRecordInput {
+  clientMutationId?: string;
+  getAllTreeNodesRecord: {
+    data?: Record<string, unknown>;
+    path?: string[];
+  };
+}
+export interface GetAllTreeNodesRecordPatch {
+  data?: Record<string, unknown> | null;
+  path?: string[] | null;
+}
+export interface UpdateGetAllTreeNodesRecordInput {
+  clientMutationId?: string;
+  id: string;
+  getAllTreeNodesRecordPatch: GetAllTreeNodesRecordPatch;
+}
+export interface DeleteGetAllTreeNodesRecordInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateObjectInput {
+  clientMutationId?: string;
+  object: {
+    data?: Record<string, unknown>;
+    databaseId: string;
+    kids?: string[];
+    ktree?: string[];
+  };
+}
+export interface ObjectPatch {
+  data?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
+}
+export interface UpdateObjectInput {
+  clientMutationId?: string;
+  id: string;
+  objectPatch: ObjectPatch;
+}
+export interface DeleteObjectInput {
   clientMutationId?: string;
   id: string;
 }
 export interface CreateRefInput {
   clientMutationId?: string;
   ref: {
-    name: string;
-    databaseId: string;
-    storeId: string;
     commitId?: string;
+    databaseId: string;
+    name: string;
+    storeId: string;
   };
 }
 export interface RefPatch {
-  name?: string | null;
-  databaseId?: string | null;
-  storeId?: string | null;
   commitId?: string | null;
+  databaseId?: string | null;
+  name?: string | null;
+  storeId?: string | null;
 }
 export interface UpdateRefInput {
   clientMutationId?: string;
@@ -572,15 +629,15 @@ export interface DeleteRefInput {
 export interface CreateStoreInput {
   clientMutationId?: string;
   store: {
-    name: string;
     databaseId: string;
     hash?: string;
+    name: string;
   };
 }
 export interface StorePatch {
-  name?: string | null;
   databaseId?: string | null;
   hash?: string | null;
+  name?: string | null;
 }
 export interface UpdateStoreInput {
   clientMutationId?: string;
@@ -588,62 +645,6 @@ export interface UpdateStoreInput {
   storePatch: StorePatch;
 }
 export interface DeleteStoreInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateObjectInput {
-  clientMutationId?: string;
-  object: {
-    databaseId: string;
-    kids?: string[];
-    ktree?: string[];
-    data?: Record<string, unknown>;
-  };
-}
-export interface ObjectPatch {
-  databaseId?: string | null;
-  kids?: string[] | null;
-  ktree?: string[] | null;
-  data?: Record<string, unknown> | null;
-}
-export interface UpdateObjectInput {
-  clientMutationId?: string;
-  id: string;
-  objectPatch: ObjectPatch;
-}
-export interface DeleteObjectInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateCommitInput {
-  clientMutationId?: string;
-  commit: {
-    message?: string;
-    databaseId: string;
-    storeId: string;
-    parentIds?: string[];
-    authorId?: string;
-    committerId?: string;
-    treeId?: string;
-    date?: string;
-  };
-}
-export interface CommitPatch {
-  message?: string | null;
-  databaseId?: string | null;
-  storeId?: string | null;
-  parentIds?: string[] | null;
-  authorId?: string | null;
-  committerId?: string | null;
-  treeId?: string | null;
-  date?: string | null;
-}
-export interface UpdateCommitInput {
-  clientMutationId?: string;
-  id: string;
-  commitPatch: CommitPatch;
-}
-export interface DeleteCommitInput {
   clientMutationId?: string;
   id: string;
 }
@@ -655,21 +656,14 @@ export interface InitEmptyRepoInput {
   sId?: string;
   storeId?: string;
 }
-export interface SetDataAtPathInput {
-  clientMutationId?: string;
-  sId?: string;
-  root?: string;
-  path?: string[];
-  data?: Record<string, unknown>;
-}
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
-  sId?: string;
-  root?: string;
-  path?: string[];
   data?: Record<string, unknown>;
   kids?: string[];
   ktree?: string[];
+  path?: string[];
+  root?: string;
+  sId?: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -680,67 +674,74 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
-/** An input for mutations affecting `Ref` */
-export interface RefInput {
-  /** Unique ref identifier */
-  id?: string;
-  /** Ref name (e.g. HEAD, main) */
-  name: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Store this ref belongs to */
-  storeId: string;
-  /** Commit this ref points to */
-  commitId?: string;
-}
-/** An input for mutations affecting `Store` */
-export interface StoreInput {
-  /** Unique store identifier */
-  id?: string;
-  /** Human-readable store name */
-  name: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Current root object hash of this store */
-  hash?: string;
-  /** Timestamp of store creation */
-  createdAt?: string;
-}
-/** An input for mutations affecting `Object` */
-export interface ObjectInput {
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Ordered array of child object IDs */
-  kids?: string[];
-  /** Ordered array of child path names (parallel to kids) */
-  ktree?: string[];
-  /** Payload data for this object node */
+export interface SetDataAtPathInput {
+  clientMutationId?: string;
   data?: Record<string, unknown>;
-  /** Timestamp of object creation */
-  createdAt?: string;
+  path?: string[];
+  root?: string;
+  sId?: string;
 }
 /** An input for mutations affecting `Commit` */
 export interface CommitInput {
-  /** Unique commit identifier */
-  id?: string;
-  /** Optional commit message */
-  message?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId: string;
-  /** Store this commit belongs to */
-  storeId: string;
-  /** Parent commit IDs (supports merge commits) */
-  parentIds?: string[];
   /** User who authored the changes */
   authorId?: string;
   /** User who committed (may differ from author) */
   committerId?: string;
-  /** Root object ID of the tree snapshot at this commit */
-  treeId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
   /** Commit timestamp */
   date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Store this commit belongs to */
+  storeId: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** An input for mutations affecting `Object` */
+export interface ObjectInput {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: Record<string, unknown>;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+}
+/** An input for mutations affecting `Ref` */
+export interface RefInput {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name: string;
+  /** Store this ref belongs to */
+  storeId: string;
+}
+/** An input for mutations affecting `Store` */
+export interface StoreInput {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name: string;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface InitEmptyRepoPayload {
@@ -748,14 +749,6 @@ export interface InitEmptyRepoPayload {
 }
 export type InitEmptyRepoPayloadSelect = {
   clientMutationId?: boolean;
-};
-export interface SetDataAtPathPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type SetDataAtPathPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
 };
 export interface InsertNodeAtPathPayload {
   clientMutationId?: string | null;
@@ -766,26 +759,124 @@ export type InsertNodeAtPathPayloadSelect = {
   result?: boolean;
 };
 export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
   /** The access type applied */
   accessType: string;
-  /** The storage provider used */
-  provider: string;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
   /** The S3 endpoint (null for AWS S3 default) */
   endpoint?: string | null;
   /** Error message if provisioning failed */
   error?: string | null;
+  /** The storage provider used */
+  provider: string;
+  /** Whether provisioning succeeded */
+  success: boolean;
 }
 export type ProvisionBucketPayloadSelect = {
-  success?: boolean;
-  bucketName?: boolean;
   accessType?: boolean;
-  provider?: boolean;
+  bucketName?: boolean;
   endpoint?: boolean;
   error?: boolean;
+  provider?: boolean;
+  success?: boolean;
+};
+export interface SetDataAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type SetDataAtPathPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface CreateCommitPayload {
+  clientMutationId?: string | null;
+  /** The `Commit` that was created by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
+}
+export type CreateCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  commit?: {
+    select: CommitSelect;
+  };
+  commitEdge?: {
+    select: CommitEdgeSelect;
+  };
+};
+export interface UpdateCommitPayload {
+  clientMutationId?: string | null;
+  /** The `Commit` that was updated by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
+}
+export type UpdateCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  commit?: {
+    select: CommitSelect;
+  };
+  commitEdge?: {
+    select: CommitEdgeSelect;
+  };
+};
+export interface DeleteCommitPayload {
+  clientMutationId?: string | null;
+  /** The `Commit` that was deleted by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
+}
+export type DeleteCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  commit?: {
+    select: CommitSelect;
+  };
+  commitEdge?: {
+    select: CommitEdgeSelect;
+  };
+};
+export interface CreateObjectPayload {
+  clientMutationId?: string | null;
+  /** The `Object` that was created by this mutation. */
+  object?: Object | null;
+  objectEdge?: ObjectEdge | null;
+}
+export type CreateObjectPayloadSelect = {
+  clientMutationId?: boolean;
+  object?: {
+    select: ObjectSelect;
+  };
+  objectEdge?: {
+    select: ObjectEdgeSelect;
+  };
+};
+export interface UpdateObjectPayload {
+  clientMutationId?: string | null;
+  /** The `Object` that was updated by this mutation. */
+  object?: Object | null;
+  objectEdge?: ObjectEdge | null;
+}
+export type UpdateObjectPayloadSelect = {
+  clientMutationId?: boolean;
+  object?: {
+    select: ObjectSelect;
+  };
+  objectEdge?: {
+    select: ObjectEdgeSelect;
+  };
+};
+export interface DeleteObjectPayload {
+  clientMutationId?: string | null;
+  /** The `Object` that was deleted by this mutation. */
+  object?: Object | null;
+  objectEdge?: ObjectEdge | null;
+}
+export type DeleteObjectPayloadSelect = {
+  clientMutationId?: boolean;
+  object?: {
+    select: ObjectSelect;
+  };
+  objectEdge?: {
+    select: ObjectEdgeSelect;
+  };
 };
 export interface CreateRefPayload {
   clientMutationId?: string | null;
@@ -877,94 +968,28 @@ export type DeleteStorePayloadSelect = {
     select: StoreEdgeSelect;
   };
 };
-export interface CreateObjectPayload {
-  clientMutationId?: string | null;
-  /** The `Object` that was created by this mutation. */
-  object?: Object | null;
-  objectEdge?: ObjectEdge | null;
+/** A `Commit` edge in the connection. */
+export interface CommitEdge {
+  cursor?: string | null;
+  /** The `Commit` at the end of the edge. */
+  node?: Commit | null;
 }
-export type CreateObjectPayloadSelect = {
-  clientMutationId?: boolean;
-  object?: {
-    select: ObjectSelect;
-  };
-  objectEdge?: {
-    select: ObjectEdgeSelect;
-  };
-};
-export interface UpdateObjectPayload {
-  clientMutationId?: string | null;
-  /** The `Object` that was updated by this mutation. */
-  object?: Object | null;
-  objectEdge?: ObjectEdge | null;
-}
-export type UpdateObjectPayloadSelect = {
-  clientMutationId?: boolean;
-  object?: {
-    select: ObjectSelect;
-  };
-  objectEdge?: {
-    select: ObjectEdgeSelect;
-  };
-};
-export interface DeleteObjectPayload {
-  clientMutationId?: string | null;
-  /** The `Object` that was deleted by this mutation. */
-  object?: Object | null;
-  objectEdge?: ObjectEdge | null;
-}
-export type DeleteObjectPayloadSelect = {
-  clientMutationId?: boolean;
-  object?: {
-    select: ObjectSelect;
-  };
-  objectEdge?: {
-    select: ObjectEdgeSelect;
-  };
-};
-export interface CreateCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was created by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
-export type CreateCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  commit?: {
+export type CommitEdgeSelect = {
+  cursor?: boolean;
+  node?: {
     select: CommitSelect;
   };
-  commitEdge?: {
-    select: CommitEdgeSelect;
-  };
 };
-export interface UpdateCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was updated by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
+/** A `Object` edge in the connection. */
+export interface ObjectEdge {
+  cursor?: string | null;
+  /** The `Object` at the end of the edge. */
+  node?: Object | null;
 }
-export type UpdateCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  commit?: {
-    select: CommitSelect;
-  };
-  commitEdge?: {
-    select: CommitEdgeSelect;
-  };
-};
-export interface DeleteCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was deleted by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
-export type DeleteCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  commit?: {
-    select: CommitSelect;
-  };
-  commitEdge?: {
-    select: CommitEdgeSelect;
+export type ObjectEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ObjectSelect;
   };
 };
 /** A `Ref` edge in the connection. */
@@ -989,29 +1014,5 @@ export type StoreEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: StoreSelect;
-  };
-};
-/** A `Object` edge in the connection. */
-export interface ObjectEdge {
-  cursor?: string | null;
-  /** The `Object` at the end of the edge. */
-  node?: Object | null;
-}
-export type ObjectEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: ObjectSelect;
-  };
-};
-/** A `Commit` edge in the connection. */
-export interface CommitEdge {
-  cursor?: string | null;
-  /** The `Commit` at the end of the edge. */
-  node?: Commit | null;
-}
-export type CommitEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: CommitSelect;
   };
 };

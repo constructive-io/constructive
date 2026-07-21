@@ -7,8 +7,8 @@ React Query hooks for UniqueConstraint data operations
 ## Usage
 
 ```typescript
-useUniqueConstraintsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
-useUniqueConstraintQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
+useUniqueConstraintsQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } } })
+useUniqueConstraintQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } } })
 useCreateUniqueConstraintMutation({ selection: { fields: { id: true } } })
 useUpdateUniqueConstraintMutation({ selection: { fields: { id: true } } })
 useDeleteUniqueConstraintMutation({})
@@ -20,7 +20,7 @@ useDeleteUniqueConstraintMutation({})
 
 ```typescript
 const { data, isLoading } = useUniqueConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUniqueConstraintsQuery({
 const { mutate } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
 ```

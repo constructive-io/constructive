@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `OrgPermission`.
 ## Usage
 
 ```typescript
-db.query.orgPermissionsGetByMask({ mask: '<BitString>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute()
+db.query.orgPermissionsGetByMask({ after: '<Cursor>', first: '<Int>', mask: '<BitString>', offset: '<Int>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.orgPermissionsGetByMask({ mask: '<BitString>', first: '<Int>', offset: 
 ### Run orgPermissionsGetByMask
 
 ```typescript
-const result = await db.query.orgPermissionsGetByMask({ mask: '<BitString>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
+const result = await db.query.orgPermissionsGetByMask({ after: '<Cursor>', first: '<Int>', mask: '<BitString>', offset: '<Int>' }).execute();
 ```

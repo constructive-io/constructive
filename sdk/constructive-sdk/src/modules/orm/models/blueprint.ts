@@ -196,7 +196,8 @@ export class BlueprintModel {
       'UpdateBlueprintInput',
       'id',
       'blueprintPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

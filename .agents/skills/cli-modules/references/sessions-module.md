@@ -12,8 +12,8 @@ csdk sessions-module list --where.<field>.<op> <value> --orderBy <values>
 csdk sessions-module list --limit 10 --after <cursor>
 csdk sessions-module find-first --where.<field>.<op> <value>
 csdk sessions-module get --id <UUID>
-csdk sessions-module create --databaseId <UUID> [--schemaId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--authSettingsTableId <UUID>] [--usersTableId <UUID>] [--sessionsDefaultExpiration <Interval>] [--sessionsTable <String>] [--sessionCredentialsTable <String>] [--authSettingsTable <String>]
-csdk sessions-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--authSettingsTableId <UUID>] [--usersTableId <UUID>] [--sessionsDefaultExpiration <Interval>] [--sessionsTable <String>] [--sessionCredentialsTable <String>] [--authSettingsTable <String>]
+csdk sessions-module create --databaseId <UUID> [--authSettingsTableId <UUID>] [--authSettingsTableName <String>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionCredentialsTableName <String>] [--sessionsDefaultExpiration <Interval>] [--sessionsTableId <UUID>] [--sessionsTableName <String>] [--usersTableId <UUID>]
+csdk sessions-module update --id <UUID> [--authSettingsTableId <UUID>] [--authSettingsTableName <String>] [--databaseId <UUID>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionCredentialsTableName <String>] [--sessionsDefaultExpiration <Interval>] [--sessionsTableId <UUID>] [--sessionsTableName <String>] [--usersTableId <UUID>]
 csdk sessions-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk sessions-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a sessionsModule
 
 ```bash
-csdk sessions-module create --databaseId <UUID> [--schemaId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--authSettingsTableId <UUID>] [--usersTableId <UUID>] [--sessionsDefaultExpiration <Interval>] [--sessionsTable <String>] [--sessionCredentialsTable <String>] [--authSettingsTable <String>]
+csdk sessions-module create --databaseId <UUID> [--authSettingsTableId <UUID>] [--authSettingsTableName <String>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionCredentialsTableName <String>] [--sessionsDefaultExpiration <Interval>] [--sessionsTableId <UUID>] [--sessionsTableName <String>] [--usersTableId <UUID>]
 ```
 
 ### Get a sessionsModule by id

@@ -16,12 +16,12 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
+  createdAt: 'string',
+  data: 'json',
   databaseId: 'uuid',
+  id: 'uuid',
   kids: 'uuid',
   ktree: 'string',
-  data: 'json',
-  createdAt: 'string',
 };
 const usage =
   '\nobject <command>\n\nCommands:\n  list                  List object records\n  find-first            Find first matching object record\n  get                   Get a object by ID\n  create                Create a new object\n  update                Update an existing object\n  delete                Delete a object\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -74,12 +74,12 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      createdAt: true,
+      data: true,
       databaseId: true,
+      id: true,
       kids: true,
       ktree: true,
-      data: true,
-      createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ObjectSelect, ObjectFilter, ObjectOrderBy> & {
@@ -100,12 +100,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      createdAt: true,
+      data: true,
       databaseId: true,
+      id: true,
       kids: true,
       ktree: true,
-      data: true,
-      createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ObjectSelect, ObjectFilter, ObjectOrderBy> & {
@@ -138,12 +138,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
+          createdAt: true,
+          data: true,
           databaseId: true,
+          id: true,
           kids: true,
           ktree: true,
-          data: true,
-          createdAt: true,
         },
       })
       .execute();
@@ -159,6 +159,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'json',
+        name: 'data',
+        message: 'data',
+        required: false,
+        skipPrompt: true,
+      },
       {
         type: 'text',
         name: 'databaseId',
@@ -179,13 +186,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'json',
-        name: 'data',
-        message: 'data',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateObjectInput['object'];
@@ -193,18 +193,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.object
       .create({
         data: {
+          data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
-          data: cleanedData.data,
         },
         select: {
-          id: true,
+          createdAt: true,
+          data: true,
           databaseId: true,
+          id: true,
           kids: true,
           ktree: true,
-          data: true,
-          createdAt: true,
         },
       })
       .execute();
@@ -230,7 +230,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'databaseId',
         message: 'databaseId',
+        required: true,
+      },
+      {
+        type: 'json',
+        name: 'data',
+        message: 'data',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -246,13 +253,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'json',
-        name: 'data',
-        message: 'data',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ObjectPatch;
@@ -261,20 +261,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       .update({
         where: {
           id: answers.id as string,
+          databaseId: answers.databaseId as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
+          data: cleanedData.data,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
-          data: cleanedData.data,
         },
         select: {
-          id: true,
+          createdAt: true,
+          data: true,
           databaseId: true,
+          id: true,
           kids: true,
           ktree: true,
-          data: true,
-          createdAt: true,
         },
       })
       .execute();
@@ -296,6 +296,12 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'id',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient();
@@ -303,6 +309,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       .delete({
         where: {
           id: answers.id as string,
+          databaseId: answers.databaseId as string,
         },
         select: {
           id: true,

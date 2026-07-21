@@ -176,6 +176,7 @@ export class OrgLimitEventModel {
       S,
       {
         id: string;
+        createdAt: string;
       },
       OrgLimitEventPatch
     > & {
@@ -196,7 +197,10 @@ export class OrgLimitEventModel {
       'UpdateOrgLimitEventInput',
       'id',
       'orgLimitEventPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      {
+        createdAt: args.where.createdAt,
+      }
     );
     return new QueryBuilder({
       client: this.client,
@@ -211,6 +215,7 @@ export class OrgLimitEventModel {
     args: DeleteArgs<
       {
         id: string;
+        createdAt: string;
       },
       S
     > & {
@@ -227,6 +232,7 @@ export class OrgLimitEventModel {
       'orgLimitEvent',
       {
         id: args.where.id,
+        createdAt: args.where.createdAt,
       },
       'DeleteOrgLimitEventInput',
       args.select,

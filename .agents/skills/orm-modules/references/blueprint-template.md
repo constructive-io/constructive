@@ -9,8 +9,8 @@ A shareable, versioned schema recipe for the blueprint marketplace. Templates de
 ```typescript
 db.blueprintTemplate.findMany({ select: { id: true } }).execute()
 db.blueprintTemplate.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.blueprintTemplate.create({ data: { name: '<String>', version: '<String>', displayName: '<String>', description: '<String>', ownerId: '<UUID>', visibility: '<String>', categories: '<String>', tags: '<String>', definition: '<JSON>', definitionSchemaVersion: '<String>', source: '<String>', complexity: '<String>', copyCount: '<Int>', forkCount: '<Int>', forkedFromId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' }, select: { id: true } }).execute()
-db.blueprintTemplate.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.blueprintTemplate.create({ data: { categories: '<String>', complexity: '<String>', copyCount: '<Int>', definition: '<JSON>', definitionHash: '<UUID>', definitionSchemaVersion: '<String>', description: '<String>', displayName: '<String>', forkCount: '<Int>', forkedFromId: '<UUID>', name: '<String>', ownerId: '<UUID>', source: '<String>', tableHashes: '<JSON>', tags: '<String>', version: '<String>', visibility: '<String>' }, select: { id: true } }).execute()
+db.blueprintTemplate.update({ where: { id: '<UUID>' }, data: { categories: '<String>' }, select: { id: true } }).execute()
 db.blueprintTemplate.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.blueprintTemplate.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.blueprintTemplate.findMany({
-  select: { id: true, name: true }
+  select: { id: true, categories: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.blueprintTemplate.findMany({
 
 ```typescript
 const item = await db.blueprintTemplate.create({
-  data: { name: '<String>', version: '<String>', displayName: '<String>', description: '<String>', ownerId: '<UUID>', visibility: '<String>', categories: '<String>', tags: '<String>', definition: '<JSON>', definitionSchemaVersion: '<String>', source: '<String>', complexity: '<String>', copyCount: '<Int>', forkCount: '<Int>', forkedFromId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' },
+  data: { categories: '<String>', complexity: '<String>', copyCount: '<Int>', definition: '<JSON>', definitionHash: '<UUID>', definitionSchemaVersion: '<String>', description: '<String>', displayName: '<String>', forkCount: '<Int>', forkedFromId: '<UUID>', name: '<String>', ownerId: '<UUID>', source: '<String>', tableHashes: '<JSON>', tags: '<String>', version: '<String>', visibility: '<String>' },
   select: { id: true }
 }).execute();
 ```

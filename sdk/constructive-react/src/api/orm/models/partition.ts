@@ -196,7 +196,8 @@ export class PartitionModel {
       'UpdatePartitionInput',
       'id',
       'partitionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

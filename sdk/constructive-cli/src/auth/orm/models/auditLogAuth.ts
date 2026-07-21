@@ -176,6 +176,7 @@ export class AuditLogAuthModel {
       S,
       {
         id: string;
+        createdAt: string;
       },
       AuditLogAuthPatch
     > & {
@@ -196,7 +197,10 @@ export class AuditLogAuthModel {
       'UpdateAuditLogAuthInput',
       'id',
       'auditLogAuthPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      {
+        createdAt: args.where.createdAt,
+      }
     );
     return new QueryBuilder({
       client: this.client,
@@ -211,6 +215,7 @@ export class AuditLogAuthModel {
     args: DeleteArgs<
       {
         id: string;
+        createdAt: string;
       },
       S
     > & {
@@ -227,6 +232,7 @@ export class AuditLogAuthModel {
       'auditLogAuth',
       {
         id: args.where.id,
+        createdAt: args.where.createdAt,
       },
       'DeleteAuditLogAuthInput',
       args.select,

@@ -3,6 +3,138 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.55.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.55.4...@constructive-io/graphql-codegen@4.55.5) (2026-07-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.55.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.55.3...@constructive-io/graphql-codegen@4.55.4) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.55.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.55.2...@constructive-io/graphql-codegen@4.55.3) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.55.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.55.1...@constructive-io/graphql-codegen@4.55.2) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.55.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.55.0...@constructive-io/graphql-codegen@4.55.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.55.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.54.1...@constructive-io/graphql-codegen@4.55.0) (2026-07-18)
+
+### Features
+
+- **query-spec:** shared query language spec package; wire codegen + query-builder ([9412943](https://github.com/constructive-io/constructive/commit/9412943be8ccbe7bc2e6feac3ac0fdfbe52ff553))
+
+## [4.54.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.54.0...@constructive-io/graphql-codegen@4.54.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.54.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.53.3...@constructive-io/graphql-codegen@4.54.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.53.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.53.2...@constructive-io/graphql-codegen@4.53.3) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.53.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.53.1...@constructive-io/graphql-codegen@4.53.2) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.53.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.53.0...@constructive-io/graphql-codegen@4.53.1) (2026-07-15)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.53.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.52.3...@constructive-io/graphql-codegen@4.53.0) (2026-07-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.52.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.52.2...@constructive-io/graphql-codegen@4.52.3) (2026-07-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.52.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.52.1...@constructive-io/graphql-codegen@4.52.2) (2026-07-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.52.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.52.0...@constructive-io/graphql-codegen@4.52.1) (2026-07-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.52.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.9...@constructive-io/graphql-codegen@4.52.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.8...@constructive-io/graphql-codegen@4.51.9) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.7...@constructive-io/graphql-codegen@4.51.8) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.6...@constructive-io/graphql-codegen@4.51.7) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.5...@constructive-io/graphql-codegen@4.51.6) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.4...@constructive-io/graphql-codegen@4.51.5) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.3...@constructive-io/graphql-codegen@4.51.4) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.2...@constructive-io/graphql-codegen@4.51.3) (2026-07-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.1...@constructive-io/graphql-codegen@4.51.2) (2026-07-05)
+
+### Bug Fixes
+
+- distinguish custom SQL function mutations from CRUD in codegen ([b7e1169](https://github.com/constructive-io/constructive/commit/b7e11690b363fd21ed0afa185fddcf4968013f97))
+- resolve entity field names for delete select instead of selecting all fields ([ca6010b](https://github.com/constructive-io/constructive/commit/ca6010b0fa80db9cc51a9ba650fc767c88dea741))
+- use entity field names in CLI delete select instead of PK constraint names ([d87b887](https://github.com/constructive-io/constructive/commit/d87b887f8fff80eaeb79965f6127beeaf43c40f6))
+
+## [4.51.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.0...@constructive-io/graphql-codegen@4.51.1) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.51.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.50.0...@constructive-io/graphql-codegen@4.51.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.50.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.49.0...@constructive-io/graphql-codegen@4.50.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.49.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.48.0...@constructive-io/graphql-codegen@4.49.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.48.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.16...@constructive-io/graphql-codegen@4.48.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.47.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.15...@constructive-io/graphql-codegen@4.47.16) (2026-06-23)
+
+### Bug Fixes
+
+- handle composite PK where clauses in CLI codegen ([da2afae](https://github.com/constructive-io/constructive/commit/da2afae4e4050d6dda03b0a90a8eac50c6d9f380))
+
+## [4.47.15](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.14...@constructive-io/graphql-codegen@4.47.15) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 ## [4.47.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.13...@constructive-io/graphql-codegen@4.47.14) (2026-06-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

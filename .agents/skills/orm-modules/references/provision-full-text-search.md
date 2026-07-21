@@ -7,7 +7,7 @@ Creates a full-text search configuration on a table. Accepts a jsonb definition 
 ## Usage
 
 ```typescript
-db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute()
+db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', tableId: '<
 ### Run provisionFullTextSearch
 
 ```typescript
-const result = await db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+const result = await db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
 ```

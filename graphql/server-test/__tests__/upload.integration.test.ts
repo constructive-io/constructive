@@ -41,6 +41,7 @@ const sql = (seedDir: string, file: string) =>
   path.join(localSeedRoot, seedDir, file);
 const shared = (...segments: string[]) =>
   path.join(sharedSeedRoot, ...segments);
+const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 
 // =========================================================================
 // Tenant constants
@@ -69,11 +70,12 @@ const metaSchemas = [
   'metaschema_modules_public',
 ];
 
-const seedFiles = [
-  shared('services', 'setup.sql'),
-  sql('simple-seed-storage', 'setup.sql'),
-  sql('simple-seed-storage', 'schema.sql'),
-  sql('simple-seed-storage', 'test-data.sql'),
+const seedAdapters = [
+  seed.pgpm(pgpmWorkspace),
+  seed.sqlfile([
+    sql('simple-seed-storage', 'schema.sql'),
+    sql('simple-seed-storage', 'test-data.sql'),
+  ]),
 ];
 
 // =========================================================================
@@ -319,7 +321,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
           },
         },
       },
-      [seed.sqlfile(seedFiles)],
+      seedAdapters,
     ));
   });
 

@@ -1,7 +1,9 @@
+import { parseEnvNumber } from '12factor-env';
 import pg from 'pg';
 import { getPgEnvOptions, PgConfig, PgPoolConfig } from 'pg-env';
 import { Logger } from '@pgpmjs/logger';
 
+import { getActivePgPoolFactory, PgPoolFactory } from './driver';
 import { pgCache } from './lru';
 
 const log = new Logger('pg-cache');
@@ -15,12 +17,6 @@ export const buildConnectionString = (
 ): string =>
   `postgres://${user}:${password}@${host}:${port}/${database}`;
 
-const parseEnvInt = (val: string | undefined, fallback: number): number => {
-  if (!val) return fallback;
-  const n = parseInt(val, 10);
-  return isNaN(n) ? fallback : n;
-};
-
 /**
  * Read per-pool configuration from environment variables.
  *
@@ -31,20 +27,20 @@ const parseEnvInt = (val: string | undefined, fallback: number): number => {
  */
 export function getPgPoolConfig(overrides?: PgPoolConfig): pg.PoolConfig {
   return {
-    max: overrides?.max ?? parseEnvInt(process.env.PG_POOL_MAX, 5),
-    idleTimeoutMillis: overrides?.idleTimeoutMillis ?? parseEnvInt(process.env.PG_POOL_IDLE_TIMEOUT_MS, 30000),
-    connectionTimeoutMillis: overrides?.connectionTimeoutMillis ?? parseEnvInt(process.env.PG_POOL_CONNECTION_TIMEOUT_MS, 5000),
+    max: overrides?.max ?? parseEnvNumber(process.env.PG_POOL_MAX) ?? 5,
+    idleTimeoutMillis: overrides?.idleTimeoutMillis ?? parseEnvNumber(process.env.PG_POOL_IDLE_TIMEOUT_MS) ?? 30000,
+    connectionTimeoutMillis: overrides?.connectionTimeoutMillis ?? parseEnvNumber(process.env.PG_POOL_CONNECTION_TIMEOUT_MS) ?? 5000,
     ...(overrides?.allowExitOnIdle !== undefined && { allowExitOnIdle: overrides.allowExitOnIdle }),
   };
 }
 
-export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig }): pg.Pool => {
+/**
+ * Default pool factory: builds a real `pg.Pool` over TCP. This is the behavior
+ * used whenever no alternate driver is registered (see `./driver`).
+ */
+export const defaultPgPoolFactory: PgPoolFactory = (pgConfig): pg.Pool => {
   const config = getPgEnvOptions(pgConfig);
-  const { user, password, host, port, database, } = config;
-  if (pgCache.has(database)) {
-    const cached = pgCache.get(database);
-    if (cached) return cached;
-  }
+  const { user, password, host, port, database } = config;
   const connectionString = buildConnectionString(user, password, host, port, database);
   const poolConfig = getPgPoolConfig(pgConfig.pool);
   const pgPool = new pg.Pool({ connectionString, ...poolConfig });
@@ -100,7 +96,24 @@ export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig })
       log.error(`Pool ${database} unexpected idle connection error [${err.code || 'unknown'}]: ${err.message}`);
     }
   });
-  
+
+  return pgPool;
+};
+
+export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig }): pg.Pool => {
+  const config = getPgEnvOptions(pgConfig);
+  const { database } = config;
+  if (pgCache.has(database)) {
+    const cached = pgCache.get(database);
+    if (cached) return cached;
+  }
+
+  // Route through the registered driver (default = pg.Pool over TCP). A custom
+  // factory may return any QueryablePool (e.g. an in-process PGlite pool); it is
+  // treated as a pg.Pool since that is the only surface consumers use.
+  const factory = getActivePgPoolFactory() ?? defaultPgPoolFactory;
+  const pgPool = factory(pgConfig) as pg.Pool;
+
   pgCache.set(database, pgPool);
   return pgPool;
 };

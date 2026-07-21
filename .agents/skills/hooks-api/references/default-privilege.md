@@ -7,8 +7,8 @@ React Query hooks for DefaultPrivilege data operations
 ## Usage
 
 ```typescript
-useDefaultPrivilegesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } } })
-useDefaultPrivilegeQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } } })
+useDefaultPrivilegesQuery({ selection: { fields: { databaseId: true, granteeName: true, id: true, isGrant: true, objectType: true, privilege: true, schemaId: true } } })
+useDefaultPrivilegeQuery({ id: '<UUID>', selection: { fields: { databaseId: true, granteeName: true, id: true, isGrant: true, objectType: true, privilege: true, schemaId: true } } })
 useCreateDefaultPrivilegeMutation({ selection: { fields: { id: true } } })
 useUpdateDefaultPrivilegeMutation({ selection: { fields: { id: true } } })
 useDeleteDefaultPrivilegeMutation({})
@@ -20,7 +20,7 @@ useDeleteDefaultPrivilegeMutation({})
 
 ```typescript
 const { data, isLoading } = useDefaultPrivilegesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } },
+  selection: { fields: { databaseId: true, granteeName: true, id: true, isGrant: true, objectType: true, privilege: true, schemaId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDefaultPrivilegesQuery({
 const { mutate } = useCreateDefaultPrivilegeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', objectType: '<String>', privilege: '<String>', granteeName: '<String>', isGrant: '<Boolean>' });
+mutate({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', objectType: '<String>', privilege: '<String>', schemaId: '<UUID>' });
 ```

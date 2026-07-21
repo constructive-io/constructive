@@ -12,8 +12,8 @@ csdk audit-log-auth list --where.<field>.<op> <value> --orderBy <values>
 csdk audit-log-auth list --limit 10 --after <cursor>
 csdk audit-log-auth find-first --where.<field>.<op> <value>
 csdk audit-log-auth get --id <UUID>
-csdk audit-log-auth create --event <String> --success <Boolean> [--actorId <UUID>] [--origin <Origin>] [--userAgent <String>] [--ipAddress <InternetAddress>]
-csdk audit-log-auth update --id <UUID> [--event <String>] [--actorId <UUID>] [--origin <Origin>] [--userAgent <String>] [--ipAddress <InternetAddress>] [--success <Boolean>]
+csdk audit-log-auth create --event <String> --success <Boolean> [--actorId <UUID>] [--ipAddress <InternetAddress>] [--origin <Origin>] [--userAgent <String>]
+csdk audit-log-auth update --id <UUID> [--actorId <UUID>] [--event <String>] [--ipAddress <InternetAddress>] [--origin <Origin>] [--success <Boolean>] [--userAgent <String>]
 csdk audit-log-auth delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk audit-log-auth list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a auditLogAuth
 
 ```bash
-csdk audit-log-auth create --event <String> --success <Boolean> [--actorId <UUID>] [--origin <Origin>] [--userAgent <String>] [--ipAddress <InternetAddress>]
+csdk audit-log-auth create --event <String> --success <Boolean> [--actorId <UUID>] [--ipAddress <InternetAddress>] [--origin <Origin>] [--userAgent <String>]
 ```
 
 ### Get a auditLogAuth by id

@@ -7,7 +7,7 @@ React Query mutation hook for requestCrossOriginToken
 ## Usage
 
 ```typescript
-const { mutate } = useRequestCrossOriginTokenMutation(); mutate({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } });
+const { mutate } = useRequestCrossOriginTokenMutation(); mutate({ input: { email: '<String>', origin: '<Origin>', password: '<String>', rememberMe: '<Boolean>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useRequestCrossOriginTokenMutation(); mutate({ input: { email
 
 ```typescript
 const { mutate, isLoading } = useRequestCrossOriginTokenMutation();
-mutate({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } });
+mutate({ input: { email: '<String>', origin: '<Origin>', password: '<String>', rememberMe: '<Boolean>' } });
 ```

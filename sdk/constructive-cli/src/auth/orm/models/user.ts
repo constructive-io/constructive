@@ -196,7 +196,8 @@ export class UserModel {
       'UpdateUserInput',
       'id',
       'userPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

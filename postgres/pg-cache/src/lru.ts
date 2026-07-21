@@ -1,3 +1,4 @@
+import { parseEnvNumber } from '12factor-env';
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
 import pg from 'pg';
@@ -25,12 +26,6 @@ export interface PgCacheConfig {
   ttl: number;
 }
 
-const parseEnvInt = (val: string | undefined, fallback: number): number => {
-  if (!val) return fallback;
-  const n = parseInt(val, 10);
-  return isNaN(n) ? fallback : n;
-};
-
 /**
  * Read cache configuration from environment variables.
  *
@@ -40,8 +35,8 @@ const parseEnvInt = (val: string | undefined, fallback: number): number => {
  */
 export function getPgCacheConfig(): PgCacheConfig {
   return {
-    max: parseEnvInt(process.env.PG_CACHE_MAX, 50),
-    ttl: parseEnvInt(process.env.PG_CACHE_TTL_MS, ONE_YEAR),
+    max: parseEnvNumber(process.env.PG_CACHE_MAX) ?? 50,
+    ttl: parseEnvNumber(process.env.PG_CACHE_TTL_MS) ?? ONE_YEAR,
   };
 }
 

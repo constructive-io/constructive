@@ -1,22 +1,7 @@
+import { parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
 import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
 
-export const parseEnvNumber = (val?: string): number | undefined => {
-  const num = Number(val);
-  return !isNaN(num) ? num : undefined;
-};
-
-export const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined) return undefined;
-  return ['true', '1', 'yes'].includes(val.toLowerCase());
-};
-
-const parseEnvStringArray = (val?: string): string[] | undefined => {
-  if (!val) return undefined;
-  return val
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-};
+export { parseEnvBoolean, parseEnvList, parseEnvNumber };
 
 /**
  * Parse core PGPM environment variables.
@@ -184,7 +169,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
             supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
           }),
           ...(JOBS_SUPPORTED && {
-            supported: parseEnvStringArray(JOBS_SUPPORTED)
+            supported: parseEnvList(JOBS_SUPPORTED)
           })
         },
         scheduler: {
@@ -192,7 +177,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
             supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
           }),
           ...(JOBS_SUPPORTED && {
-            supported: parseEnvStringArray(JOBS_SUPPORTED)
+            supported: parseEnvList(JOBS_SUPPORTED)
           })
         }
       }),

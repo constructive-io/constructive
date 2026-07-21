@@ -7,7 +7,7 @@ Executes a blueprint definition by delegating to provision_* procedures. Creates
 ## Usage
 
 ```bash
-csdk construct-blueprint --input.clientMutationId <String> --input.blueprintId <UUID> --input.schemaId <UUID>
+csdk construct-blueprint --input.blueprintId <UUID> --input.clientMutationId <String> --input.schemaId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk construct-blueprint --input.clientMutationId <String> --input.blueprintId <
 ### Run constructBlueprint
 
 ```bash
-csdk construct-blueprint --input.clientMutationId <String> --input.blueprintId <UUID> --input.schemaId <UUID>
+csdk construct-blueprint --input.blueprintId <UUID> --input.clientMutationId <String> --input.schemaId <UUID>
 ```

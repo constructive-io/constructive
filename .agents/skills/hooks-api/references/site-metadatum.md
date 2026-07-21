@@ -7,8 +7,8 @@ SEO and social sharing metadata for a site: page title, description, and Open Gr
 ## Usage
 
 ```typescript
-useSiteMetadataQuery({ selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } } })
-useSiteMetadatumQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } } })
+useSiteMetadataQuery({ selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } } })
+useSiteMetadatumQuery({ id: '<UUID>', selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } } })
 useCreateSiteMetadatumMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMetadatumMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMetadatumMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMetadatumMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } },
+  selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSiteMetadataQuery({
 const { mutate } = useCreateSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', siteId: '<UUID>', title: '<String>', description: '<String>', ogImage: '<Image>' });
+mutate({ databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' });
 ```

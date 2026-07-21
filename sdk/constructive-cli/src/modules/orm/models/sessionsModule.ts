@@ -196,7 +196,8 @@ export class SessionsModuleModel {
       'UpdateSessionsModuleInput',
       'id',
       'sessionsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

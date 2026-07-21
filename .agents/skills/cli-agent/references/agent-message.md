@@ -12,8 +12,8 @@ csdk agent-message list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-message list --limit 10 --after <cursor>
 csdk agent-message find-first --where.<field>.<op> <value>
 csdk agent-message get --id <UUID>
-csdk agent-message create --threadId <UUID> --authorRole <String> [--actorId <UUID>] [--parts <JSON>] [--model <String>] [--agentId <UUID>]
-csdk agent-message update --id <UUID> [--actorId <UUID>] [--parts <JSON>] [--threadId <UUID>] [--authorRole <String>] [--model <String>] [--agentId <UUID>]
+csdk agent-message create --authorRole <String> --databaseId <UUID> --threadId <UUID> [--actorId <UUID>] [--agentId <UUID>] [--model <String>] [--parts <JSON>]
+csdk agent-message update --id <UUID> [--actorId <UUID>] [--agentId <UUID>] [--authorRole <String>] [--databaseId <UUID>] [--model <String>] [--parts <JSON>] [--threadId <UUID>]
 csdk agent-message delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-message list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentMessage
 
 ```bash
-csdk agent-message create --threadId <UUID> --authorRole <String> [--actorId <UUID>] [--parts <JSON>] [--model <String>] [--agentId <UUID>]
+csdk agent-message create --authorRole <String> --databaseId <UUID> --threadId <UUID> [--actorId <UUID>] [--agentId <UUID>] [--model <String>] [--parts <JSON>]
 ```
 
 ### Get a agentMessage by id

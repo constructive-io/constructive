@@ -16,15 +16,16 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  createdAt: 'string',
-  updatedAt: 'string',
   actorId: 'uuid',
+  agentId: 'uuid',
+  authorRole: 'string',
+  createdAt: 'string',
+  databaseId: 'uuid',
+  id: 'uuid',
+  model: 'string',
   parts: 'json',
   threadId: 'uuid',
-  authorRole: 'string',
-  model: 'string',
-  agentId: 'uuid',
+  updatedAt: 'string',
 };
 const usage =
   '\nagent-message <command>\n\nCommands:\n  list                  List agentMessage records\n  find-first            Find first matching agentMessage record\n  get                   Get a agentMessage by ID\n  create                Create a new agentMessage\n  update                Update an existing agentMessage\n  delete                Delete a agentMessage\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +78,16 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
       actorId: true,
+      agentId: true,
+      authorRole: true,
+      createdAt: true,
+      databaseId: true,
+      id: true,
+      model: true,
       parts: true,
       threadId: true,
-      authorRole: true,
-      model: true,
-      agentId: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentMessageSelect, AgentMessageFilter, AgentMessageOrderBy> & {
@@ -106,15 +108,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
       actorId: true,
+      agentId: true,
+      authorRole: true,
+      createdAt: true,
+      databaseId: true,
+      id: true,
+      model: true,
       parts: true,
       threadId: true,
-      authorRole: true,
-      model: true,
-      agentId: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentMessageSelect, AgentMessageFilter, AgentMessageOrderBy> & {
@@ -147,15 +150,16 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
           actorId: true,
+          agentId: true,
+          authorRole: true,
+          createdAt: true,
+          databaseId: true,
+          id: true,
+          model: true,
           parts: true,
           threadId: true,
-          authorRole: true,
-          model: true,
-          agentId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -179,6 +183,32 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'agentId',
+        message: 'agentId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'authorRole',
+        message: 'authorRole',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'model',
+        message: 'model',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'parts',
         message: 'parts',
@@ -191,26 +221,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'threadId',
         required: true,
       },
-      {
-        type: 'text',
-        name: 'authorRole',
-        message: 'authorRole',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'model',
-        message: 'model',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'agentId',
-        message: 'agentId',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -222,22 +232,24 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           actorId: cleanedData.actorId,
+          agentId: cleanedData.agentId,
+          authorRole: cleanedData.authorRole,
+          databaseId: cleanedData.databaseId,
+          model: cleanedData.model,
           parts: cleanedData.parts,
           threadId: cleanedData.threadId,
-          authorRole: cleanedData.authorRole,
-          model: cleanedData.model,
-          agentId: cleanedData.agentId,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
           actorId: true,
+          agentId: true,
+          authorRole: true,
+          createdAt: true,
+          databaseId: true,
+          id: true,
+          model: true,
           parts: true,
           threadId: true,
-          authorRole: true,
-          model: true,
-          agentId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -267,6 +279,32 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'agentId',
+        message: 'agentId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'authorRole',
+        message: 'authorRole',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'model',
+        message: 'model',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'parts',
         message: 'parts',
@@ -279,26 +317,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'threadId',
         required: false,
       },
-      {
-        type: 'text',
-        name: 'authorRole',
-        message: 'authorRole',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'model',
-        message: 'model',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'agentId',
-        message: 'agentId',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentMessagePatch;
@@ -310,22 +328,24 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           actorId: cleanedData.actorId,
+          agentId: cleanedData.agentId,
+          authorRole: cleanedData.authorRole,
+          databaseId: cleanedData.databaseId,
+          model: cleanedData.model,
           parts: cleanedData.parts,
           threadId: cleanedData.threadId,
-          authorRole: cleanedData.authorRole,
-          model: cleanedData.model,
-          agentId: cleanedData.agentId,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
           actorId: true,
+          agentId: true,
+          authorRole: true,
+          createdAt: true,
+          databaseId: true,
+          id: true,
+          model: true,
           parts: true,
           threadId: true,
-          authorRole: true,
-          model: true,
-          agentId: true,
+          updatedAt: true,
         },
       })
       .execute();

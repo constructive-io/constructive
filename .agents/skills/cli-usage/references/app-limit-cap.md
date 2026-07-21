@@ -12,8 +12,8 @@ csdk app-limit-cap list --where.<field>.<op> <value> --orderBy <values>
 csdk app-limit-cap list --limit 10 --after <cursor>
 csdk app-limit-cap find-first --where.<field>.<op> <value>
 csdk app-limit-cap get --id <UUID>
-csdk app-limit-cap create --name <String> --entityId <UUID> [--max <BigInt>]
-csdk app-limit-cap update --id <UUID> [--name <String>] [--entityId <UUID>] [--max <BigInt>]
+csdk app-limit-cap create --entityId <UUID> --name <String> [--max <BigInt>]
+csdk app-limit-cap update --id <UUID> [--entityId <UUID>] [--max <BigInt>] [--name <String>]
 csdk app-limit-cap delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit-cap list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appLimitCap
 
 ```bash
-csdk app-limit-cap create --name <String> --entityId <UUID> [--max <BigInt>]
+csdk app-limit-cap create --entityId <UUID> --name <String> [--max <BigInt>]
 ```
 
 ### Get a appLimitCap by id

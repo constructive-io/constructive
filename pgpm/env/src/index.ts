@@ -1,16 +1,16 @@
-export { getEnvOptions, getConnEnvOptions, getDeploymentEnvOptions } from './merge';
+export { assertProductionEnvOptions, findUnsafeProductionDefaults } from './assert';
+export type { WorkspaceType } from './config';
 export { 
+  loadConfigFileSync, 
   loadConfigSync, 
   loadConfigSyncFromDir, 
-  loadConfigFileSync, 
-  resolvePgpmPath,
-  resolvePnpmWorkspace,
   resolveLernaWorkspace,
   resolveNpmWorkspace,
+  resolvePgpmPath,
+  resolvePnpmWorkspace,
   resolveWorkspaceByType
 } from './config';
-export type { WorkspaceType } from './config';
-export { getEnvVars, getNodeEnv, parseEnvBoolean, parseEnvNumber } from './env';
-export { walkUp, replaceArrays } from './utils';
-
-export type { PgpmOptions, PgTestConnectionOptions, DeploymentOptions } from '@pgpmjs/types';
+export { getEnvVars, getNodeEnv, parseEnvBoolean, parseEnvList, parseEnvNumber } from './env';
+export { getConnEnvOptions, getDeploymentEnvOptions,getEnvOptions } from './merge';
+export { replaceArrays,walkUp } from './utils';
+export type { DeploymentOptions,PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';

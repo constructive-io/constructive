@@ -16,16 +16,16 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   agentResourceId: 'uuid',
   body: 'string',
   chunkIndex: 'int',
-  embedding: 'string',
-  metadata: 'json',
   createdAt: 'string',
-  updatedAt: 'string',
+  embedding: 'string',
   embeddingVectorDistance: 'float',
+  id: 'uuid',
+  metadata: 'json',
   searchScore: 'float',
+  updatedAt: 'string',
 };
 import { resolveEmbedder, autoEmbedWhere, autoEmbedInput } from '../embedder';
 const usage =
@@ -81,13 +81,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       agentResourceId: true,
       body: true,
       chunkIndex: true,
-      embedding: true,
-      metadata: true,
       createdAt: true,
+      embedding: true,
+      id: true,
+      metadata: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -123,13 +123,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       agentResourceId: true,
       body: true,
       chunkIndex: true,
-      embedding: true,
-      metadata: true,
       createdAt: true,
+      embedding: true,
+      id: true,
+      metadata: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -175,13 +175,13 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
       await autoEmbedWhere(searchWhere ?? {}, ['embedding'], embedder);
     }
     const defaultSelect = {
-      id: true,
       agentResourceId: true,
       body: true,
       chunkIndex: true,
-      embedding: true,
-      metadata: true,
       createdAt: true,
+      embedding: true,
+      id: true,
+      metadata: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -219,13 +219,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           agentResourceId: true,
           body: true,
           chunkIndex: true,
-          embedding: true,
-          metadata: true,
           createdAt: true,
+          embedding: true,
+          id: true,
+          metadata: true,
           updatedAt: true,
         },
       })
@@ -302,13 +302,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           metadata: cleanedData.metadata,
         },
         select: {
-          id: true,
           agentResourceId: true,
           body: true,
           chunkIndex: true,
-          embedding: true,
-          metadata: true,
           createdAt: true,
+          embedding: true,
+          id: true,
+          metadata: true,
           updatedAt: true,
         },
       })
@@ -391,13 +391,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           metadata: cleanedData.metadata,
         },
         select: {
-          id: true,
           agentResourceId: true,
           body: true,
           chunkIndex: true,
-          embedding: true,
-          metadata: true,
           createdAt: true,
+          embedding: true,
+          id: true,
+          metadata: true,
           updatedAt: true,
         },
       })

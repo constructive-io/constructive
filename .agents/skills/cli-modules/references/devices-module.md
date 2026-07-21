@@ -12,8 +12,8 @@ csdk devices-module list --where.<field>.<op> <value> --orderBy <values>
 csdk devices-module list --limit 10 --after <cursor>
 csdk devices-module find-first --where.<field>.<op> <value>
 csdk devices-module get --id <UUID>
-csdk devices-module create --databaseId <UUID> [--schemaId <UUID>] [--userDevicesTableId <UUID>] [--deviceSettingsTableId <UUID>] [--userDevicesTable <String>] [--deviceSettingsTable <String>]
-csdk devices-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--userDevicesTableId <UUID>] [--deviceSettingsTableId <UUID>] [--userDevicesTable <String>] [--deviceSettingsTable <String>]
+csdk devices-module create --databaseId <UUID> [--deviceSettingsTableId <UUID>] [--deviceSettingsTableName <String>] [--schemaId <UUID>] [--userDevicesTableId <UUID>] [--userDevicesTableName <String>]
+csdk devices-module update --id <UUID> [--databaseId <UUID>] [--deviceSettingsTableId <UUID>] [--deviceSettingsTableName <String>] [--schemaId <UUID>] [--userDevicesTableId <UUID>] [--userDevicesTableName <String>]
 csdk devices-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk devices-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a devicesModule
 
 ```bash
-csdk devices-module create --databaseId <UUID> [--schemaId <UUID>] [--userDevicesTableId <UUID>] [--deviceSettingsTableId <UUID>] [--userDevicesTable <String>] [--deviceSettingsTable <String>]
+csdk devices-module create --databaseId <UUID> [--deviceSettingsTableId <UUID>] [--deviceSettingsTableName <String>] [--schemaId <UUID>] [--userDevicesTableId <UUID>] [--userDevicesTableName <String>]
 ```
 
 ### Get a devicesModule by id

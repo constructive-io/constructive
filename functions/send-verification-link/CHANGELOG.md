@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.17.2](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.17.1...@constructive-io/send-verification-link-fn@2.17.2) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.17.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.17.0...@constructive-io/send-verification-link-fn@2.17.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+# [2.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.16.1...@constructive-io/send-verification-link-fn@2.17.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.16.0...@constructive-io/send-verification-link-fn@2.16.1) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+# [2.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.15.5...@constructive-io/send-verification-link-fn@2.16.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.15.5](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.15.4...@constructive-io/send-verification-link-fn@2.15.5) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.15.4](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.15.3...@constructive-io/send-verification-link-fn@2.15.4) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.15.3](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.15.2...@constructive-io/send-verification-link-fn@2.15.3) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.15.2](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.15.1...@constructive-io/send-verification-link-fn@2.15.2) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.15.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.15.0...@constructive-io/send-verification-link-fn@2.15.1) (2026-07-08)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+# [2.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.14.1...@constructive-io/send-verification-link-fn@2.15.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
+## [2.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.14.0...@constructive-io/send-verification-link-fn@2.14.1) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
 # [2.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.13.1...@constructive-io/send-verification-link-fn@2.14.0) (2026-05-30)
 
 **Note:** Version bump only for package @constructive-io/send-verification-link-fn

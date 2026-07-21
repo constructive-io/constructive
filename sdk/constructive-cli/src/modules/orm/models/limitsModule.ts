@@ -196,7 +196,8 @@ export class LimitsModuleModel {
       'UpdateLimitsModuleInput',
       'id',
       'limitsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

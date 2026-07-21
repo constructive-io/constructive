@@ -9,8 +9,8 @@ Per-database and per-API CORS origin configuration; typed replacement for api_mo
 ```typescript
 db.corsSetting.findMany({ select: { id: true } }).execute()
 db.corsSetting.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.corsSetting.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', allowedOrigins: '<String>' }, select: { id: true } }).execute()
-db.corsSetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.corsSetting.create({ data: { allowedOrigins: '<String>', apiId: '<UUID>', databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.corsSetting.update({ where: { id: '<UUID>' }, data: { allowedOrigins: '<String>' }, select: { id: true } }).execute()
 db.corsSetting.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.corsSetting.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.corsSetting.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, allowedOrigins: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.corsSetting.findMany({
 
 ```typescript
 const item = await db.corsSetting.create({
-  data: { databaseId: '<UUID>', apiId: '<UUID>', allowedOrigins: '<String>' },
+  data: { allowedOrigins: '<String>', apiId: '<UUID>', databaseId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

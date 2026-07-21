@@ -7,8 +7,8 @@ React Query hooks for AstMigration data operations
 ## Usage
 
 ```typescript
-useAstMigrationsQuery({ selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } } })
-useAstMigrationQuery({ id: '<Int>', selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } } })
+useAstMigrationsQuery({ selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } } })
+useAstMigrationQuery({ id: '<Int>', selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } } })
 useCreateAstMigrationMutation({ selection: { fields: { id: true } } })
 useUpdateAstMigrationMutation({ selection: { fields: { id: true } } })
 useDeleteAstMigrationMutation({})
@@ -20,7 +20,7 @@ useDeleteAstMigrationMutation({})
 
 ```typescript
 const { data, isLoading } = useAstMigrationsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAstMigrationsQuery({
 const { mutate } = useCreateAstMigrationMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' });
+mutate({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
 ```

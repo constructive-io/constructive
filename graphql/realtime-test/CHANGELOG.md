@@ -3,6 +3,134 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.6...@constructive-io/graphql-realtime-test@0.11.7) (2026-07-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.11.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.5...@constructive-io/graphql-realtime-test@0.11.6) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.4...@constructive-io/graphql-realtime-test@0.11.5) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.11.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.3...@constructive-io/graphql-realtime-test@0.11.4) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.11.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.2...@constructive-io/graphql-realtime-test@0.11.3) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.11.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.1...@constructive-io/graphql-realtime-test@0.11.2) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.11.0...@constructive-io/graphql-realtime-test@0.11.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.10.3...@constructive-io/graphql-realtime-test@0.11.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.10.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.10.2...@constructive-io/graphql-realtime-test@0.10.3) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.10.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.10.1...@constructive-io/graphql-realtime-test@0.10.2) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.10.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.10.0...@constructive-io/graphql-realtime-test@0.10.1) (2026-07-15)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.9.3...@constructive-io/graphql-realtime-test@0.10.0) (2026-07-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.9.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.9.2...@constructive-io/graphql-realtime-test@0.9.3) (2026-07-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.9.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.9.1...@constructive-io/graphql-realtime-test@0.9.2) (2026-07-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.9.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.9.0...@constructive-io/graphql-realtime-test@0.9.1) (2026-07-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.9...@constructive-io/graphql-realtime-test@0.9.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.8...@constructive-io/graphql-realtime-test@0.8.9) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.7...@constructive-io/graphql-realtime-test@0.8.8) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.6...@constructive-io/graphql-realtime-test@0.8.7) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.5...@constructive-io/graphql-realtime-test@0.8.6) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.4...@constructive-io/graphql-realtime-test@0.8.5) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.3...@constructive-io/graphql-realtime-test@0.8.4) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.2...@constructive-io/graphql-realtime-test@0.8.3) (2026-07-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.1...@constructive-io/graphql-realtime-test@0.8.2) (2026-07-05)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.8.0...@constructive-io/graphql-realtime-test@0.8.1) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.7.0...@constructive-io/graphql-realtime-test@0.8.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.6.1...@constructive-io/graphql-realtime-test@0.7.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.6.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.6.0...@constructive-io/graphql-realtime-test@0.6.1) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.5.0...@constructive-io/graphql-realtime-test@0.6.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.4.18...@constructive-io/graphql-realtime-test@0.5.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.4.18](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.4.17...@constructive-io/graphql-realtime-test@0.4.18) (2026-06-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
+## [0.4.17](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.4.16...@constructive-io/graphql-realtime-test@0.4.17) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-realtime-test
+
 ## [0.4.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@0.4.15...@constructive-io/graphql-realtime-test@0.4.16) (2026-06-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-realtime-test

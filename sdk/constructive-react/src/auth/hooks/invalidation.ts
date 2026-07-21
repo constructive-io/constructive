@@ -15,15 +15,19 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  emailKeys,
-  phoneNumberKeys,
-  cryptoAddressKeys,
-  webauthnCredentialKeys,
   auditLogAuthKeys,
+  cryptoAddressKeys,
+  emailKeys,
   identityProviderKeys,
+  orgApiKeyListKeys,
+  phoneNumberKeys,
+  principalKeys,
+  principalEntityKeys,
+  principalScopeOverrideKeys,
   roleTypeKeys,
   userConnectedAccountKeys,
   userKeys,
+  webauthnCredentialKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -45,35 +49,21 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate email queries */ email: {
-    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate auditLogAuth queries */ auditLogAuth: {
+    /** Invalidate all auditLogAuth queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: emailKeys.all,
+        queryKey: auditLogAuthKeys.all,
       }),
-    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate auditLogAuth list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: emailKeys.lists(),
+        queryKey: auditLogAuthKeys.lists(),
       }),
-    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: emailKeys.detail(id),
-      }),
-  },
-  /** Invalidate phoneNumber queries */ phoneNumber: {
-    /** Invalidate all phoneNumber queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: phoneNumberKeys.all,
-      }),
-    /** Invalidate phoneNumber list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: phoneNumberKeys.lists(),
-      }),
-    /** Invalidate a specific phoneNumber */ detail: (
+    /** Invalidate a specific auditLogAuth */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: phoneNumberKeys.detail(id),
+        queryKey: auditLogAuthKeys.detail(id),
       }),
   },
   /** Invalidate cryptoAddress queries */ cryptoAddress: {
@@ -93,38 +83,18 @@ export const invalidate = {
         queryKey: cryptoAddressKeys.detail(id),
       }),
   },
-  /** Invalidate webauthnCredential queries */ webauthnCredential: {
-    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate email queries */ email: {
+    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: webauthnCredentialKeys.all,
+        queryKey: emailKeys.all,
       }),
-    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: webauthnCredentialKeys.lists(),
+        queryKey: emailKeys.lists(),
       }),
-    /** Invalidate a specific webauthnCredential */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
+    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
-        queryKey: webauthnCredentialKeys.detail(id),
-      }),
-  },
-  /** Invalidate auditLogAuth queries */ auditLogAuth: {
-    /** Invalidate all auditLogAuth queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: auditLogAuthKeys.all,
-      }),
-    /** Invalidate auditLogAuth list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: auditLogAuthKeys.lists(),
-      }),
-    /** Invalidate a specific auditLogAuth */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: auditLogAuthKeys.detail(id),
+        queryKey: emailKeys.detail(id),
       }),
   },
   /** Invalidate identityProvider queries */ identityProvider: {
@@ -142,6 +112,91 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: identityProviderKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgApiKeyList queries */ orgApiKeyList: {
+    /** Invalidate all orgApiKeyList queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.all,
+      }),
+    /** Invalidate orgApiKeyList list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.lists(),
+      }),
+    /** Invalidate a specific orgApiKeyList */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.detail(id),
+      }),
+  },
+  /** Invalidate phoneNumber queries */ phoneNumber: {
+    /** Invalidate all phoneNumber queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumberKeys.all,
+      }),
+    /** Invalidate phoneNumber list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumberKeys.lists(),
+      }),
+    /** Invalidate a specific phoneNumber */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumberKeys.detail(id),
+      }),
+  },
+  /** Invalidate principal queries */ principal: {
+    /** Invalidate all principal queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.all,
+      }),
+    /** Invalidate principal list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.lists(),
+      }),
+    /** Invalidate a specific principal */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.detail(id),
+      }),
+  },
+  /** Invalidate principalEntity queries */ principalEntity: {
+    /** Invalidate all principalEntity queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.all,
+      }),
+    /** Invalidate principalEntity list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.lists(),
+      }),
+    /** Invalidate a specific principalEntity */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.detail(id),
+      }),
+  },
+  /** Invalidate principalScopeOverride queries */ principalScopeOverride: {
+    /** Invalidate all principalScopeOverride queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.all,
+      }),
+    /** Invalidate principalScopeOverride list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.lists(),
+      }),
+    /** Invalidate a specific principalScopeOverride */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.detail(id),
       }),
   },
   /** Invalidate roleType queries */ roleType: {
@@ -189,6 +244,23 @@ export const invalidate = {
         queryKey: userKeys.detail(id),
       }),
   },
+  /** Invalidate webauthnCredential queries */ webauthnCredential: {
+    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.all,
+      }),
+    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnCredential */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.detail(id),
+      }),
+  },
 } as const;
 /**
 
@@ -202,17 +274,12 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: emailKeys.detail(id),
-    });
-  },
-  /** Remove phoneNumber from cache */ phoneNumber: (
+  /** Remove auditLogAuth from cache */ auditLogAuth: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: phoneNumberKeys.detail(id),
+      queryKey: auditLogAuthKeys.detail(id),
     });
   },
   /** Remove cryptoAddress from cache */ cryptoAddress: (
@@ -223,20 +290,9 @@ export const remove = {
       queryKey: cryptoAddressKeys.detail(id),
     });
   },
-  /** Remove webauthnCredential from cache */ webauthnCredential: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: webauthnCredentialKeys.detail(id),
-    });
-  },
-  /** Remove auditLogAuth from cache */ auditLogAuth: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: auditLogAuthKeys.detail(id),
+      queryKey: emailKeys.detail(id),
     });
   },
   /** Remove identityProvider from cache */ identityProvider: (
@@ -245,6 +301,43 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: identityProviderKeys.detail(id),
+    });
+  },
+  /** Remove orgApiKeyList from cache */ orgApiKeyList: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgApiKeyListKeys.detail(id),
+    });
+  },
+  /** Remove phoneNumber from cache */ phoneNumber: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: phoneNumberKeys.detail(id),
+    });
+  },
+  /** Remove principal from cache */ principal: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: principalKeys.detail(id),
+    });
+  },
+  /** Remove principalEntity from cache */ principalEntity: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalEntityKeys.detail(id),
+    });
+  },
+  /** Remove principalScopeOverride from cache */ principalScopeOverride: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalScopeOverrideKeys.detail(id),
     });
   },
   /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
@@ -263,6 +356,14 @@ export const remove = {
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: userKeys.detail(id),
+    });
+  },
+  /** Remove webauthnCredential from cache */ webauthnCredential: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnCredentialKeys.detail(id),
     });
   },
 } as const;

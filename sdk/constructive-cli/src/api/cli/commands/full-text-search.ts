@@ -16,16 +16,16 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
+  createdAt: 'string',
   databaseId: 'uuid',
-  tableId: 'uuid',
   fieldId: 'uuid',
   fieldIds: 'uuid',
-  weights: 'string',
-  langs: 'string',
+  id: 'uuid',
   langColumn: 'string',
-  createdAt: 'string',
+  langs: 'string',
+  tableId: 'uuid',
   updatedAt: 'string',
+  weights: 'string',
 };
 const usage =
   '\nfull-text-search <command>\n\nCommands:\n  list                  List fullTextSearch records\n  find-first            Find first matching fullTextSearch record\n  get                   Get a fullTextSearch by ID\n  create                Create a new fullTextSearch\n  update                Update an existing fullTextSearch\n  delete                Delete a fullTextSearch\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -78,16 +78,16 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      createdAt: true,
       databaseId: true,
-      tableId: true,
       fieldId: true,
       fieldIds: true,
-      weights: true,
-      langs: true,
+      id: true,
       langColumn: true,
-      createdAt: true,
+      langs: true,
+      tableId: true,
       updatedAt: true,
+      weights: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<FullTextSearchSelect, FullTextSearchFilter, FullTextSearchOrderBy> & {
@@ -108,16 +108,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      createdAt: true,
       databaseId: true,
-      tableId: true,
       fieldId: true,
       fieldIds: true,
-      weights: true,
-      langs: true,
+      id: true,
       langColumn: true,
-      createdAt: true,
+      langs: true,
+      tableId: true,
       updatedAt: true,
+      weights: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<FullTextSearchSelect, FullTextSearchFilter, FullTextSearchOrderBy> & {
@@ -150,16 +150,16 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
+          createdAt: true,
           databaseId: true,
-          tableId: true,
           fieldId: true,
           fieldIds: true,
-          weights: true,
-          langs: true,
+          id: true,
           langColumn: true,
-          createdAt: true,
+          langs: true,
+          tableId: true,
           updatedAt: true,
+          weights: true,
         },
       })
       .execute();
@@ -184,12 +184,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'tableId',
-        message: 'tableId',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'fieldId',
         message: 'fieldId',
         required: true,
@@ -202,9 +196,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'weights',
-        message: 'weights',
-        required: true,
+        name: 'langColumn',
+        message: 'langColumn',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -214,10 +209,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'langColumn',
-        message: 'langColumn',
-        required: false,
-        skipPrompt: true,
+        name: 'tableId',
+        message: 'tableId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'weights',
+        message: 'weights',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -230,24 +230,24 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          tableId: cleanedData.tableId,
           fieldId: cleanedData.fieldId,
           fieldIds: cleanedData.fieldIds,
-          weights: cleanedData.weights,
-          langs: cleanedData.langs,
           langColumn: cleanedData.langColumn,
+          langs: cleanedData.langs,
+          tableId: cleanedData.tableId,
+          weights: cleanedData.weights,
         },
         select: {
-          id: true,
+          createdAt: true,
           databaseId: true,
-          tableId: true,
           fieldId: true,
           fieldIds: true,
-          weights: true,
-          langs: true,
+          id: true,
           langColumn: true,
-          createdAt: true,
+          langs: true,
+          tableId: true,
           updatedAt: true,
+          weights: true,
         },
       })
       .execute();
@@ -278,12 +278,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'tableId',
-        message: 'tableId',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'fieldId',
         message: 'fieldId',
         required: false,
@@ -296,9 +290,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'weights',
-        message: 'weights',
+        name: 'langColumn',
+        message: 'langColumn',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -308,10 +303,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'langColumn',
-        message: 'langColumn',
+        name: 'tableId',
+        message: 'tableId',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'weights',
+        message: 'weights',
+        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -324,24 +324,24 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          tableId: cleanedData.tableId,
           fieldId: cleanedData.fieldId,
           fieldIds: cleanedData.fieldIds,
-          weights: cleanedData.weights,
-          langs: cleanedData.langs,
           langColumn: cleanedData.langColumn,
+          langs: cleanedData.langs,
+          tableId: cleanedData.tableId,
+          weights: cleanedData.weights,
         },
         select: {
-          id: true,
+          createdAt: true,
           databaseId: true,
-          tableId: true,
           fieldId: true,
           fieldIds: true,
-          weights: true,
-          langs: true,
+          id: true,
           langColumn: true,
-          createdAt: true,
+          langs: true,
+          tableId: true,
           updatedAt: true,
+          weights: true,
         },
       })
       .execute();

@@ -12,8 +12,8 @@ csdk i-18-n-module list --where.<field>.<op> <value> --orderBy <values>
 csdk i-18-n-module list --limit 10 --after <cursor>
 csdk i-18-n-module find-first --where.<field>.<op> <value>
 csdk i-18-n-module get --id <UUID>
-csdk i-18-n-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--settingsTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
-csdk i-18-n-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--settingsTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk i-18-n-module create --databaseId <UUID> [--apiName <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--settingsTableId <UUID>]
+csdk i-18-n-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--settingsTableId <UUID>]
 csdk i-18-n-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk i-18-n-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a i18NModule
 
 ```bash
-csdk i-18-n-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--settingsTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk i-18-n-module create --databaseId <UUID> [--apiName <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--settingsTableId <UUID>]
 ```
 
 ### Get a i18NModule by id

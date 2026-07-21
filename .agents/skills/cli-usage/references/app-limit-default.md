@@ -13,7 +13,7 @@ csdk app-limit-default list --limit 10 --after <cursor>
 csdk app-limit-default find-first --where.<field>.<op> <value>
 csdk app-limit-default get --id <UUID>
 csdk app-limit-default create --name <String> [--max <BigInt>] [--softMax <BigInt>]
-csdk app-limit-default update --id <UUID> [--name <String>] [--max <BigInt>] [--softMax <BigInt>]
+csdk app-limit-default update --id <UUID> [--max <BigInt>] [--name <String>] [--softMax <BigInt>]
 csdk app-limit-default delete --id <UUID>
 ```
 

@@ -3,6 +3,130 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.28.7](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.6...@constructive-io/test-codegen-app@1.28.7) (2026-07-21)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.28.6](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.5...@constructive-io/test-codegen-app@1.28.6) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.28.5](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.4...@constructive-io/test-codegen-app@1.28.5) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.28.4](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.3...@constructive-io/test-codegen-app@1.28.4) (2026-07-20)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.28.3](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.2...@constructive-io/test-codegen-app@1.28.3) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.28.2](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.1...@constructive-io/test-codegen-app@1.28.2) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.28.1](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.28.0...@constructive-io/test-codegen-app@1.28.1) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.27.3...@constructive-io/test-codegen-app@1.28.0) (2026-07-18)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.27.3](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.27.2...@constructive-io/test-codegen-app@1.27.3) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.27.2](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.27.1...@constructive-io/test-codegen-app@1.27.2) (2026-07-17)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.27.1](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.27.0...@constructive-io/test-codegen-app@1.27.1) (2026-07-15)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.26.3...@constructive-io/test-codegen-app@1.27.0) (2026-07-14)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.26.3](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.26.2...@constructive-io/test-codegen-app@1.26.3) (2026-07-14)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.26.2](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.26.1...@constructive-io/test-codegen-app@1.26.2) (2026-07-13)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.26.1](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.26.0...@constructive-io/test-codegen-app@1.26.1) (2026-07-13)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.9...@constructive-io/test-codegen-app@1.26.0) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.9](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.8...@constructive-io/test-codegen-app@1.25.9) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.8](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.7...@constructive-io/test-codegen-app@1.25.8) (2026-07-12)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.7](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.6...@constructive-io/test-codegen-app@1.25.7) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.6](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.5...@constructive-io/test-codegen-app@1.25.6) (2026-07-11)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.5](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.4...@constructive-io/test-codegen-app@1.25.5) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.4](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.3...@constructive-io/test-codegen-app@1.25.4) (2026-07-10)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.3](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.2...@constructive-io/test-codegen-app@1.25.3) (2026-07-08)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.2](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.1...@constructive-io/test-codegen-app@1.25.2) (2026-07-05)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.25.0...@constructive-io/test-codegen-app@1.25.1) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.24.0...@constructive-io/test-codegen-app@1.25.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.23.0...@constructive-io/test-codegen-app@1.24.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.22.0...@constructive-io/test-codegen-app@1.23.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+# [1.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.21.18...@constructive-io/test-codegen-app@1.22.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.21.18](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.21.17...@constructive-io/test-codegen-app@1.21.18) (2026-06-23)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
+## [1.21.17](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.21.16...@constructive-io/test-codegen-app@1.21.17) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-io/test-codegen-app
+
 ## [1.21.16](https://github.com/constructive-io/constructive/compare/@constructive-io/test-codegen-app@1.21.15...@constructive-io/test-codegen-app@1.21.16) (2026-06-18)
 
 **Note:** Version bump only for package @constructive-io/test-codegen-app

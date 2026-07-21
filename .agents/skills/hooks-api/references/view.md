@@ -7,8 +7,8 @@ React Query hooks for View data operations
 ## Usage
 
 ```typescript
-useViewsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } } })
-useViewQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } } })
+useViewsQuery({ selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } } })
+useViewQuery({ id: '<UUID>', selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } } })
 useCreateViewMutation({ selection: { fields: { id: true } } })
 useUpdateViewMutation({ selection: { fields: { id: true } } })
 useDeleteViewMutation({})
@@ -20,7 +20,7 @@ useDeleteViewMutation({})
 
 ```typescript
 const { data, isLoading } = useViewsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } },
+  selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useViewsQuery({
 const { mutate } = useCreateViewMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', tableId: '<UUID>', viewType: '<String>', data: '<JSON>', filterType: '<String>', filterData: '<JSON>', securityInvoker: '<Boolean>', isReadOnly: '<Boolean>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' });
 ```

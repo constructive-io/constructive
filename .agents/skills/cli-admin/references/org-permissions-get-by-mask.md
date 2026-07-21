@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `OrgPermission`.
 ## Usage
 
 ```bash
-csdk org-permissions-get-by-mask --mask <BitString> --first <Int> --offset <Int> --after <Cursor>
+csdk org-permissions-get-by-mask --after <Cursor> --first <Int> --mask <BitString> --offset <Int>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk org-permissions-get-by-mask --mask <BitString> --first <Int> --offset <Int>
 ### Run orgPermissionsGetByMask
 
 ```bash
-csdk org-permissions-get-by-mask --mask <BitString> --first <Int> --offset <Int> --after <Cursor>
+csdk org-permissions-get-by-mask --after <Cursor> --first <Int> --mask <BitString> --offset <Int>
 ```

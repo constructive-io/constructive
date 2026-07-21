@@ -196,7 +196,8 @@ export class TransferLogModuleModel {
       'UpdateTransferLogModuleInput',
       'id',
       'transferLogModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -13,13 +13,13 @@ React Query hooks for the objects API — provides typed query and mutation hook
 
 ```typescript
 // Import hooks
-import { useGetAllQuery } from './hooks';
+import { useCommitsQuery } from './hooks';
 
 // Query hooks: use<Model>Query, use<Model>sQuery
 // Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation
 // Bulk mutation hooks (when enabled): useBulkCreate<Model>Mutation, useBulkUpsert<Model>Mutation, etc.
 
-const { data, isLoading } = useGetAllQuery({
+const { data, isLoading } = useCommitsQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -29,7 +29,7 @@ const { data, isLoading } = useGetAllQuery({
 ### Query records
 
 ```typescript
-const { data, isLoading } = useGetAllQuery({
+const { data, isLoading } = useCommitsQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -38,12 +38,12 @@ const { data, isLoading } = useGetAllQuery({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [get-all-record](references/get-all-record.md)
+- [commit](references/commit.md)
+- [get-all-tree-nodes-record](references/get-all-tree-nodes-record.md)
+- [object](references/object.md)
 - [ref](references/ref.md)
 - [store](references/store.md)
-- [object](references/object.md)
-- [commit](references/commit.md)
 - [init-empty-repo](references/init-empty-repo.md)
-- [set-data-at-path](references/set-data-at-path.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [provision-bucket](references/provision-bucket.md)
+- [set-data-at-path](references/set-data-at-path.md)

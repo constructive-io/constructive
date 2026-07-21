@@ -7,7 +7,7 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
 ## Usage
 
 ```bash
-csdk copy-template-to-blueprint --input.clientMutationId <String> --input.templateId <UUID> --input.databaseId <UUID> --input.ownerId <UUID> --input.nameOverride <String> --input.displayNameOverride <String>
+csdk copy-template-to-blueprint --input.clientMutationId <String> --input.databaseId <UUID> --input.displayNameOverride <String> --input.nameOverride <String> --input.ownerId <UUID> --input.templateId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk copy-template-to-blueprint --input.clientMutationId <String> --input.templa
 ### Run copyTemplateToBlueprint
 
 ```bash
-csdk copy-template-to-blueprint --input.clientMutationId <String> --input.templateId <UUID> --input.databaseId <UUID> --input.ownerId <UUID> --input.nameOverride <String> --input.displayNameOverride <String>
+csdk copy-template-to-blueprint --input.clientMutationId <String> --input.databaseId <UUID> --input.displayNameOverride <String> --input.nameOverride <String> --input.ownerId <UUID> --input.templateId <UUID>
 ```

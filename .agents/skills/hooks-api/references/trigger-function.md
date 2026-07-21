@@ -7,8 +7,8 @@ React Query hooks for TriggerFunction data operations
 ## Usage
 
 ```typescript
-useTriggerFunctionsQuery({ selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } } })
-useTriggerFunctionQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } } })
+useTriggerFunctionsQuery({ selection: { fields: { code: true, createdAt: true, databaseId: true, id: true, name: true, updatedAt: true } } })
+useTriggerFunctionQuery({ id: '<UUID>', selection: { fields: { code: true, createdAt: true, databaseId: true, id: true, name: true, updatedAt: true } } })
 useCreateTriggerFunctionMutation({ selection: { fields: { id: true } } })
 useUpdateTriggerFunctionMutation({ selection: { fields: { id: true } } })
 useDeleteTriggerFunctionMutation({})
@@ -20,7 +20,7 @@ useDeleteTriggerFunctionMutation({})
 
 ```typescript
 const { data, isLoading } = useTriggerFunctionsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { code: true, createdAt: true, databaseId: true, id: true, name: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useTriggerFunctionsQuery({
 const { mutate } = useCreateTriggerFunctionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', name: '<String>', code: '<String>' });
+mutate({ code: '<String>', databaseId: '<UUID>', name: '<String>' });
 ```

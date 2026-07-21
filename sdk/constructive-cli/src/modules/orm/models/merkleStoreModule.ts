@@ -196,7 +196,8 @@ export class MerkleStoreModuleModel {
       'UpdateMerkleStoreModuleInput',
       'id',
       'merkleStoreModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

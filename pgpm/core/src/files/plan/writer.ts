@@ -1,8 +1,28 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Change, PlanFile, PgpmRow, Tag, ExtendedPlanFile } from '../types';
 import { parseAuthor } from '../../utils/author';
+import { Change, ExtendedPlanFile,PgpmRow, Tag } from '../types';
+
+/**
+ * Sort dependencies by their order in the supplied plan, so prerequisites
+ * (parent migrations) appear before their dependents in the bracket.
+ * Internal dependencies are sorted by their plan index, and external
+ * dependencies (not in the plan) preserve their original order.
+ */
+const sortDependencies = (deps: string[], order: Map<string, number>): string[] => {
+  const originalOrder = new Map(deps.map((dep, index) => [dep, index]));
+  return [...deps].sort((a, b) => {
+    const aIndex = order.get(a);
+    const bIndex = order.get(b);
+    const aOriginal = originalOrder.get(a)!;
+    const bOriginal = originalOrder.get(b)!;
+    if (aIndex !== undefined && bIndex !== undefined) return aIndex - bIndex || aOriginal - bOriginal;
+    if (aIndex !== undefined) return -1;
+    if (bIndex !== undefined) return 1;
+    return aOriginal - bOriginal;
+  });
+};
 
 export interface PlanWriteOptions {
   outdir: string;
@@ -26,6 +46,9 @@ export function writePgpmPlan(rows: PgpmRow[], opts: PlanWriteOptions): void {
 
   const duplicates: Record<string, boolean> = {};
 
+  // Build an order map from the row list so brackets can be sorted by plan order
+  const rowOrder = new Map(rows.map((row, index) => [row.deploy, index]));
+
   const plan = opts.replacer(`%syntax-version=1.0.0
 %project=constructive-extension-name
 %uri=constructive-extension-name
@@ -39,7 +62,7 @@ ${rows
       duplicates[row.deploy] = true;
 
       if (row.deps?.length) {
-        return `${row.deploy} [${row.deps.join(' ')}] ${date()} ${authorName} <${authorEmail}> # add ${row.name}`;
+        return `${row.deploy} [${sortDependencies(row.deps, rowOrder).join(' ')}] ${date()} ${authorName} <${authorEmail}> # add ${row.name}`;
       }
       return `${row.deploy} ${date()} ${authorName} <${authorEmail}> # add ${row.name}`;
     })
@@ -62,42 +85,45 @@ export function writePlanFile(planPath: string, plan: ExtendedPlanFile): void {
  */
 export function generatePlanFileContent(plan: ExtendedPlanFile): string {
   const { package: packageName, uri, changes, tags } = plan;
-  
+
   let content = `%syntax-version=1.0.0\n`;
   content += `%project=${packageName}\n`;
-  
+
   if (uri) {
     content += `%uri=${uri}\n`;
   }
-  
+
   content += `\n`;
-  
+
+  // Build an order map from the change list so brackets can be sorted by plan order
+  const changeOrder = new Map(changes.map((change, index) => [change.name, index]));
+
   // Add changes and their associated tags
   for (const change of changes) {
-    content += generateChangeLineContent(change);
+    content += generateChangeLineContent(change, changeOrder);
     content += `\n`;
-    
+
     const associatedTags = tags.filter(tag => tag.change === change.name);
     for (const tag of associatedTags) {
       content += generateTagLineContent(tag);
       content += `\n`;
     }
   }
-  
+
   return content;
 }
 
 /**
  * Generate a line for a change in a plan file
  */
-export function generateChangeLineContent(change: Change): string {
+export function generateChangeLineContent(change: Change, changeOrder?: Map<string, number>): string {
   const { name, dependencies, timestamp, planner, email, comment } = change;
-  
+
   let line = name;
-  
-  // Add dependencies if present
+
+  // Add dependencies if present, sorted by plan order
   if (dependencies && dependencies.length > 0) {
-    line += ` [${dependencies.join(' ')}]`;
+    line += ` [${sortDependencies(dependencies, changeOrder || new Map()).join(' ')}]`;
   }
   
   // Add timestamp if present

@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  permissions: 'string',
-  isGrant: 'boolean',
   actorId: 'uuid',
+  createdAt: 'string',
   entityId: 'uuid',
   grantorId: 'uuid',
-  createdAt: 'string',
+  id: 'uuid',
+  isGrant: 'boolean',
+  permissions: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -76,13 +76,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      permissions: true,
-      isGrant: true,
       actorId: true,
+      createdAt: true,
       entityId: true,
       grantorId: true,
-      createdAt: true,
+      id: true,
+      isGrant: true,
+      permissions: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -104,13 +104,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      permissions: true,
-      isGrant: true,
       actorId: true,
+      createdAt: true,
       entityId: true,
       grantorId: true,
-      createdAt: true,
+      id: true,
+      isGrant: true,
+      permissions: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -144,13 +144,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          permissions: true,
-          isGrant: true,
           actorId: true,
+          createdAt: true,
           entityId: true,
           grantorId: true,
-          createdAt: true,
+          id: true,
+          isGrant: true,
+          permissions: true,
           updatedAt: true,
         },
       })
@@ -167,20 +167,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'permissions',
-        message: 'permissions',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
-        required: false,
-        skipPrompt: true,
-      },
       {
         type: 'text',
         name: 'actorId',
@@ -201,6 +187,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'permissions',
+        message: 'permissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateOrgGrantInput['orgGrant'];
@@ -208,20 +208,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgGrant
       .create({
         data: {
-          permissions: cleanedData.permissions,
-          isGrant: cleanedData.isGrant,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
           grantorId: cleanedData.grantorId,
+          isGrant: cleanedData.isGrant,
+          permissions: cleanedData.permissions,
         },
         select: {
-          id: true,
-          permissions: true,
-          isGrant: true,
           actorId: true,
+          createdAt: true,
           entityId: true,
           grantorId: true,
-          createdAt: true,
+          id: true,
+          isGrant: true,
+          permissions: true,
           updatedAt: true,
         },
       })
@@ -246,20 +246,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'permissions',
-        message: 'permissions',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'actorId',
         message: 'actorId',
         required: false,
@@ -278,6 +264,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'permissions',
+        message: 'permissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as OrgGrantPatch;
@@ -288,20 +288,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          permissions: cleanedData.permissions,
-          isGrant: cleanedData.isGrant,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
           grantorId: cleanedData.grantorId,
+          isGrant: cleanedData.isGrant,
+          permissions: cleanedData.permissions,
         },
         select: {
-          id: true,
-          permissions: true,
-          isGrant: true,
           actorId: true,
+          createdAt: true,
           entityId: true,
           grantorId: true,
-          createdAt: true,
+          id: true,
+          isGrant: true,
+          permissions: true,
           updatedAt: true,
         },
       })

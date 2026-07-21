@@ -7,8 +7,8 @@ Records of individual permission grants and revocations for members via bitmask
 ## Usage
 
 ```typescript
-useOrgGrantsQuery({ selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } } })
-useOrgGrantQuery({ id: '<UUID>', selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } } })
+useOrgGrantsQuery({ selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } } })
+useOrgGrantQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } } })
 useCreateOrgGrantMutation({ selection: { fields: { id: true } } })
 useUpdateOrgGrantMutation({ selection: { fields: { id: true } } })
 useDeleteOrgGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgGrantsQuery({
-  selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissions: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgGrantsQuery({
 const { mutate } = useCreateOrgGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
+mutate({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' });
 ```

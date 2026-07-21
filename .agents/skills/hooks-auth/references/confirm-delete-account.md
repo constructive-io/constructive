@@ -7,7 +7,7 @@ React Query mutation hook for confirmDeleteAccount
 ## Usage
 
 ```typescript
-const { mutate } = useConfirmDeleteAccountMutation(); mutate({ input: { userId: '<UUID>', token: '<String>' } });
+const { mutate } = useConfirmDeleteAccountMutation(); mutate({ input: { token: '<String>', userId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useConfirmDeleteAccountMutation(); mutate({ input: { userId: 
 
 ```typescript
 const { mutate, isLoading } = useConfirmDeleteAccountMutation();
-mutate({ input: { userId: '<UUID>', token: '<String>' } });
+mutate({ input: { token: '<String>', userId: '<UUID>' } });
 ```

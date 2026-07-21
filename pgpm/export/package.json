@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/export",
-  "version": "0.22.1",
+  "version": "0.32.7",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM export tools for SQL and GraphQL database migration extraction",
   "main": "index.js",
@@ -50,7 +50,7 @@
     "csv-to-pg": "workspace:^",
     "glob": "^13.0.6",
     "inflekt": "^0.7.1",
-    "inquirerer": "^4.8.1",
+    "inquirerer": "^4.9.1",
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^"

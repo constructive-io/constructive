@@ -196,7 +196,8 @@ export class NotificationsModuleModel {
       'UpdateNotificationsModuleInput',
       'id',
       'notificationsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -50,14 +50,14 @@ function identityProvidersModuleRow(databaseId: string, scope: string) {
 }
 
 describe('identityProvidersLoader metadata resolution', () => {
-  it('resolves provider secrets table through config_secrets_module schema metadata', async () => {
+  it('resolves provider secrets table through internal_secrets_module schema metadata', async () => {
     const tenant = createMockPool([
       () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
     ]);
     const services = createMockPool([
       () => ({ rows: [{ database_id: 'platform-db' }] }),
       () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
-      () => ({ rows: [{ table_id: 'secrets-table-id' }] }),
+      () => ({ rows: [{ internal_secrets_table_id: 'secrets-table-id' }] }),
       () => ({
         rows: [
           {
@@ -97,7 +97,7 @@ describe('identityProvidersLoader metadata resolution', () => {
       authorizationParams: { prompt: 'select_account' },
     });
     expect(services.queries[0].values).toEqual(['constructive-test']);
-    expect(services.queries[2].sql).toContain('config_secrets_module');
+    expect(services.queries[2].sql).toContain('internal_secrets_module');
     expect(services.queries[2].values).toEqual(['platform-db', 'platform']);
     expect(services.queries[4].sql).toContain('secret_private.resolved_secrets');
     expect(services.queries[4].sql).not.toContain(
@@ -120,7 +120,7 @@ describe('identityProvidersLoader metadata resolution', () => {
     expect(sql).not.toContain('platform_secrets');
   });
 
-  it('throws a clear error when config_secrets_module is missing for scope', async () => {
+  it('throws a clear error when internal_secrets_module is missing for scope', async () => {
     const tenant = createMockPool([
       () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
     ]);
@@ -133,18 +133,18 @@ describe('identityProvidersLoader metadata resolution', () => {
     await expect(
       resolveIdentityProvidersConfig(createContext(services.pool, tenant.pool)),
     ).rejects.toThrow(
-      'config_secrets_module missing for scope platform on database platform-db',
+      'internal_secrets_module missing for scope platform on database platform-db',
     );
   });
 
-  it('throws a clear error when config_secrets_module table resolution fails', async () => {
+  it('throws a clear error when internal_secrets_module table resolution fails', async () => {
     const tenant = createMockPool([
       () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
     ]);
     const services = createMockPool([
       () => ({ rows: [{ database_id: 'platform-db' }] }),
       () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
-      () => ({ rows: [{ table_id: 'missing-table-id' }] }),
+      () => ({ rows: [{ internal_secrets_table_id: 'missing-table-id' }] }),
       () => {
         throw new Error('NOT_FOUND');
       },
@@ -153,7 +153,7 @@ describe('identityProvidersLoader metadata resolution', () => {
     await expect(
       resolveIdentityProvidersConfig(createContext(services.pool, tenant.pool)),
     ).rejects.toThrow(
-      'schema/table resolution missing for config_secrets_module scope platform on database platform-db',
+      'schema/table resolution missing for internal_secrets_module scope platform on database platform-db',
     );
   });
 });

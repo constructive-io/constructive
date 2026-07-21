@@ -16,9 +16,9 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  entityId: 'uuid',
   id: 'uuid',
   permissions: 'string',
-  entityId: 'uuid',
 };
 const usage =
   '\norg-permission-default <command>\n\nCommands:\n  list                  List orgPermissionDefault records\n  find-first            Find first matching orgPermissionDefault record\n  get                   Get a orgPermissionDefault by ID\n  create                Create a new orgPermissionDefault\n  update                Update an existing orgPermissionDefault\n  delete                Delete a orgPermissionDefault\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -71,9 +71,9 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      entityId: true,
       id: true,
       permissions: true,
-      entityId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -98,9 +98,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      entityId: true,
       id: true,
       permissions: true,
-      entityId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -137,9 +137,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          entityId: true,
           id: true,
           permissions: true,
-          entityId: true,
         },
       })
       .execute();
@@ -157,16 +157,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'entityId',
+        message: 'entityId',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'permissions',
         message: 'permissions',
         required: false,
         skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'entityId',
-        message: 'entityId',
-        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -178,13 +178,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgPermissionDefault
       .create({
         data: {
-          permissions: cleanedData.permissions,
           entityId: cleanedData.entityId,
+          permissions: cleanedData.permissions,
         },
         select: {
+          entityId: true,
           id: true,
           permissions: true,
-          entityId: true,
         },
       })
       .execute();
@@ -208,16 +208,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'entityId',
+        message: 'entityId',
+        required: false,
+      },
+      {
+        type: 'text',
         name: 'permissions',
         message: 'permissions',
         required: false,
         skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'entityId',
-        message: 'entityId',
-        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -229,13 +229,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          permissions: cleanedData.permissions,
           entityId: cleanedData.entityId,
+          permissions: cleanedData.permissions,
         },
         select: {
+          entityId: true,
           id: true,
           permissions: true,
-          entityId: true,
         },
       })
       .execute();

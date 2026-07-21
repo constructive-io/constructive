@@ -105,6 +105,12 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "relations.manyToMany.rightTable.name",
   "relations.manyToMany.type",
   "schemaName",
+  "scope",
+  "scope.entityTable",
+  "scope.keyColumn",
+  "scope.scope",
+  "scope.source",
+  "scope.tier",
   "search",
   "search.algorithms",
   "search.columns",
@@ -293,6 +299,13 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
       realtime {
         subscriptionFieldName
       }
+      scope {
+        scope
+        tier
+        keyColumn
+        entityTable
+        source
+      }
     }
   }
 }"
@@ -314,6 +327,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "authorId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -334,6 +350,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -362,6 +381,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "postId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -382,6 +404,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -411,6 +436,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -434,6 +462,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "authorId",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": false,
           "isArray": false,
@@ -451,6 +482,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "body",
         "type": {
+          "encoding": null,
           "gqlType": "String",
           "hasDefault": false,
           "isArray": false,
@@ -468,6 +500,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": true,
         "name": "id",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": true,
           "isArray": false,
@@ -485,6 +520,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "postId",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": false,
           "isArray": false,
@@ -506,6 +544,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "authorId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -526,6 +567,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -554,6 +598,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "postId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -574,6 +621,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -608,6 +658,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -649,6 +702,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -684,6 +740,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "authorId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -711,6 +770,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "postId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -732,6 +794,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [],
@@ -750,6 +813,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "authorId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -770,6 +836,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -799,6 +868,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -822,6 +894,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "authorId",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": false,
           "isArray": false,
@@ -839,6 +914,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": true,
         "name": "id",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": true,
           "isArray": false,
@@ -856,6 +934,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "metadata",
         "type": {
+          "encoding": null,
           "gqlType": "JSON",
           "hasDefault": false,
           "isArray": false,
@@ -873,6 +952,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "title",
         "type": {
+          "encoding": null,
           "gqlType": "String",
           "hasDefault": false,
           "isArray": false,
@@ -894,6 +974,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "authorId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -914,6 +997,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -948,6 +1034,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -989,6 +1078,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -1024,6 +1116,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "authorId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1053,6 +1148,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1080,6 +1178,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1109,6 +1210,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1136,6 +1240,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1166,6 +1273,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "postId",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": false,
                   "isArray": false,
@@ -1186,6 +1296,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "id",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": true,
                   "isArray": false,
@@ -1213,6 +1326,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "postId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1233,6 +1349,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "tagId",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": false,
                   "isArray": false,
@@ -1253,6 +1372,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "id",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": true,
                   "isArray": false,
@@ -1280,6 +1402,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "tagId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1302,6 +1427,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1321,6 +1449,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1338,6 +1469,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       ],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [],
@@ -1356,6 +1488,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "postId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1376,6 +1511,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1404,6 +1542,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "tagId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1424,6 +1565,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -1453,6 +1597,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "postId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1470,6 +1617,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "tagId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1493,6 +1643,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": true,
         "name": "postId",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": false,
           "isArray": false,
@@ -1510,6 +1663,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": true,
         "name": "tagId",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": false,
           "isArray": false,
@@ -1531,6 +1687,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "postId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1551,6 +1710,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -1579,6 +1741,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "tagId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1599,6 +1764,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -1634,6 +1802,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "postId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1651,6 +1822,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "tagId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1692,6 +1866,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "postId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1709,6 +1886,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "tagId",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": false,
               "isArray": false,
@@ -1744,6 +1924,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "postId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1771,6 +1954,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "tagId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -1792,6 +1978,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [],
@@ -1810,6 +1997,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -1833,6 +2023,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "slug",
               "type": {
+                "encoding": null,
                 "gqlType": "String",
                 "hasDefault": false,
                 "isArray": false,
@@ -1856,6 +2047,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": true,
         "name": "id",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": true,
           "isArray": false,
@@ -1873,6 +2067,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "slug",
         "type": {
+          "encoding": null,
           "gqlType": "String",
           "hasDefault": false,
           "isArray": false,
@@ -1899,6 +2094,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -1926,6 +2124,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "slug",
             "type": {
+              "encoding": null,
               "gqlType": "String",
               "hasDefault": false,
               "isArray": false,
@@ -1967,6 +2166,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -2003,6 +2205,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2032,6 +2237,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2062,6 +2270,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "tagId",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": false,
                   "isArray": false,
@@ -2082,6 +2293,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "id",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": true,
                   "isArray": false,
@@ -2109,6 +2323,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "tagId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -2129,6 +2346,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "postId",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": false,
                   "isArray": false,
@@ -2149,6 +2369,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
                 "isPrimaryKey": false,
                 "name": "id",
                 "type": {
+                  "encoding": {
+                    "kind": "uuid",
+                  },
                   "gqlType": "UUID",
                   "hasDefault": true,
                   "isArray": false,
@@ -2176,6 +2399,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "postId",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": false,
                 "isArray": false,
@@ -2198,6 +2424,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2217,6 +2446,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2234,6 +2466,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       ],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [
@@ -2248,6 +2481,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "slug",
             "type": {
+              "encoding": null,
               "gqlType": "String",
               "hasDefault": false,
               "isArray": false,
@@ -2275,6 +2509,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -2298,6 +2535,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "emailAddress",
               "type": {
+                "encoding": null,
                 "gqlType": "ConstructiveInternalTypeEmail",
                 "hasDefault": false,
                 "isArray": false,
@@ -2321,6 +2559,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "displayName",
         "type": {
+          "encoding": null,
           "gqlType": "String",
           "hasDefault": false,
           "isArray": false,
@@ -2338,6 +2577,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": false,
         "name": "emailAddress",
         "type": {
+          "encoding": null,
           "gqlType": "ConstructiveInternalTypeEmail",
           "hasDefault": false,
           "isArray": false,
@@ -2355,6 +2595,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "isPrimaryKey": true,
         "name": "id",
         "type": {
+          "encoding": {
+            "kind": "uuid",
+          },
           "gqlType": "UUID",
           "hasDefault": true,
           "isArray": false,
@@ -2381,6 +2624,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "emailAddress",
             "type": {
+              "encoding": null,
               "gqlType": "ConstructiveInternalTypeEmail",
               "hasDefault": false,
               "isArray": false,
@@ -2408,6 +2652,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -2449,6 +2696,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "id",
             "type": {
+              "encoding": {
+                "kind": "uuid",
+              },
               "gqlType": "UUID",
               "hasDefault": true,
               "isArray": false,
@@ -2485,6 +2735,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2512,6 +2765,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2541,6 +2797,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2568,6 +2827,9 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
               "isPrimaryKey": false,
               "name": "id",
               "type": {
+                "encoding": {
+                  "kind": "uuid",
+                },
                 "gqlType": "UUID",
                 "hasDefault": true,
                 "isArray": false,
@@ -2587,6 +2849,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [
@@ -2601,6 +2864,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "isPrimaryKey": false,
             "name": "emailAddress",
             "type": {
+              "encoding": null,
               "gqlType": "ConstructiveInternalTypeEmail",
               "hasDefault": false,
               "isArray": false,

@@ -7,7 +7,7 @@ Resolves a table_name (with optional schema_name) to a table_id. Resolution orde
 ## Usage
 
 ```typescript
-db.query.resolveBlueprintTable({ databaseId: '<UUID>', tableName: '<String>', schemaName: '<String>', tableMap: '<JSON>', defaultSchemaId: '<UUID>' }).execute()
+db.query.resolveBlueprintTable({ databaseId: '<UUID>', defaultSchemaId: '<UUID>', schemaName: '<String>', tableMap: '<JSON>', tableName: '<String>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.resolveBlueprintTable({ databaseId: '<UUID>', tableName: '<String>', sc
 ### Run resolveBlueprintTable
 
 ```typescript
-const result = await db.query.resolveBlueprintTable({ databaseId: '<UUID>', tableName: '<String>', schemaName: '<String>', tableMap: '<JSON>', defaultSchemaId: '<UUID>' }).execute();
+const result = await db.query.resolveBlueprintTable({ databaseId: '<UUID>', defaultSchemaId: '<UUID>', schemaName: '<String>', tableMap: '<JSON>', tableName: '<String>' }).execute();
 ```

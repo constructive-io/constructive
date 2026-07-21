@@ -11,7 +11,7 @@ Per-user bcrypt credential store (password hashes, API key hashes).
 ```typescript
 db.userCredentialsModule.findMany({ select: { id: true } }).execute()
 db.userCredentialsModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.userCredentialsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
+db.userCredentialsModule.create({ data: { databaseId: '<UUID>', entityField: '<String>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
 db.userCredentialsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.userCredentialsModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -30,7 +30,7 @@ const items = await db.userCredentialsModule.findMany({
 
 ```typescript
 const item = await db.userCredentialsModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' },
+  data: { databaseId: '<UUID>', entityField: '<String>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

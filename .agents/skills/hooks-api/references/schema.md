@@ -7,8 +7,8 @@ React Query hooks for Schema data operations
 ## Usage
 
 ```typescript
-useSchemasQuery({ selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } } })
-useSchemaQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } } })
+useSchemasQuery({ selection: { fields: { apiExposure: true, category: true, createdAt: true, databaseId: true, description: true, id: true, isPublic: true, label: true, name: true, schemaName: true, smartTags: true, tags: true, updatedAt: true } } })
+useSchemaQuery({ id: '<UUID>', selection: { fields: { apiExposure: true, category: true, createdAt: true, databaseId: true, description: true, id: true, isPublic: true, label: true, name: true, schemaName: true, smartTags: true, tags: true, updatedAt: true } } })
 useCreateSchemaMutation({ selection: { fields: { id: true } } })
 useUpdateSchemaMutation({ selection: { fields: { id: true } } })
 useDeleteSchemaMutation({})
@@ -20,7 +20,7 @@ useDeleteSchemaMutation({})
 
 ```typescript
 const { data, isLoading } = useSchemasQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { apiExposure: true, category: true, createdAt: true, databaseId: true, description: true, id: true, isPublic: true, label: true, name: true, schemaName: true, smartTags: true, tags: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSchemasQuery({
 const { mutate } = useCreateSchemaMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>' });
+mutate({ apiExposure: '<ApiExposureLevel>', category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', isPublic: '<Boolean>', label: '<String>', name: '<String>', schemaName: '<String>', smartTags: '<JSON>', tags: '<String>' });
 ```

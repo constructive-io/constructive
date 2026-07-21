@@ -290,7 +290,7 @@ function buildCleanTable(
 
   // Match query and mutation operations
   const queryOps = matchQueryOperations(entityName, queryFields, entityToConnection);
-  const mutationOps = matchMutationOperations(entityName, mutationFields);
+  const mutationOps = matchMutationOperations(entityName, mutationFields, typeMap);
 
   // Check if we found at least one real operation (not a fallback)
   const hasRealOperation = !!(
@@ -700,6 +700,30 @@ interface MutationOperations {
 }
 
 /**
+ * Check whether a mutation field is a real PostGraphile CRUD mutation.
+ *
+ * CRUD mutation payloads always contain a field named lcFirst(entityName)
+ * whose type is the entity itself (e.g. DeleteUserPayload has `user: User`).
+ * Custom SQL-function mutations that happen to follow the same naming
+ * convention (e.g. `deletePrincipal`) return something else — typically
+ * `result: Boolean` or `result: UUID` — and must not be treated as CRUD.
+ */
+function isCrudMutation(
+  field: IntrospectionField,
+  entityName: string,
+  typeMap: Map<string, IntrospectionType>,
+): boolean {
+  const payloadTypeName = getBaseTypeName(field.type);
+  if (!payloadTypeName) return false;
+  const payloadType = typeMap.get(payloadTypeName);
+  if (!payloadType || !payloadType.fields) return false;
+  const entityFieldName = lcFirst(entityName);
+  return payloadType.fields.some(
+    (f) => f.name === entityFieldName && getBaseTypeName(f.type) === entityName,
+  );
+}
+
+/**
  * Match mutation operations for an entity
  *
  * Looks for mutations named:
@@ -710,10 +734,15 @@ interface MutationOperations {
  * - bulkUpsert{PluralName} (bulk upsert)
  * - bulkUpdate{PluralName} (bulk update)
  * - bulkDelete{PluralName} (bulk delete)
+ *
+ * A candidate is only accepted if its payload type returns the entity
+ * (i.e. it is a real CRUD mutation, not a custom SQL function that
+ * happens to share the naming convention).
  */
 function matchMutationOperations(
   entityName: string,
   mutationFields: IntrospectionField[],
+  typeMap: Map<string, IntrospectionType>,
 ): MutationOperations {
   let create: string | null = null;
   let update: string | null = null;
@@ -736,28 +765,30 @@ function matchMutationOperations(
 
   for (const field of mutationFields) {
     // Exact match for create
-    if (field.name === expectedCreate) {
+    if (field.name === expectedCreate && isCrudMutation(field, entityName, typeMap)) {
       create = field.name;
     }
 
     // Match update (could be updateUser, updateUserById, or updateUserByFooAndBar for composite PKs)
-    if (field.name === expectedUpdate) {
+    if (field.name === expectedUpdate && isCrudMutation(field, entityName, typeMap)) {
       update = field.name;
     } else if (
       !update &&
       (field.name === `${expectedUpdate}ById` ||
-        field.name.startsWith(`${expectedUpdate}By`))
+        field.name.startsWith(`${expectedUpdate}By`)) &&
+      isCrudMutation(field, entityName, typeMap)
     ) {
       update = field.name;
     }
 
     // Match delete (could be deleteUser, deleteUserById, or deleteUserByFooAndBar for composite PKs)
-    if (field.name === expectedDelete) {
+    if (field.name === expectedDelete && isCrudMutation(field, entityName, typeMap)) {
       del = field.name;
     } else if (
       !del &&
       (field.name === `${expectedDelete}ById` ||
-        field.name.startsWith(`${expectedDelete}By`))
+        field.name.startsWith(`${expectedDelete}By`)) &&
+      isCrudMutation(field, entityName, typeMap)
     ) {
       del = field.name;
     }

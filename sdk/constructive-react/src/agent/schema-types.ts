@@ -32,443 +32,1051 @@ import type {
   UUIDListFilter,
   VectorFilter,
 } from './types';
-/** Methods to use when ordering `Agent`. */
-export type AgentOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PERSONA_ID_ASC'
-  | 'PERSONA_ID_DESC'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'IS_EPHEMERAL_ASC'
-  | 'IS_EPHEMERAL_DESC';
-/** Methods to use when ordering `AgentThread`. */
-export type AgentThreadOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'IS_ARCHIVED_ASC'
-  | 'IS_ARCHIVED_DESC'
-  | 'ARCHIVED_AT_ASC'
-  | 'ARCHIVED_AT_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'MODE_ASC'
-  | 'MODE_DESC'
-  | 'MODEL_ASC'
-  | 'MODEL_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'PROMPT_TEMPLATE_ID_ASC'
-  | 'PROMPT_TEMPLATE_ID_DESC'
-  | 'AGENT_ID_ASC'
-  | 'AGENT_ID_DESC'
-  | 'PARENT_THREAD_ID_ASC'
-  | 'PARENT_THREAD_ID_DESC';
 /** Methods to use when ordering `AgentMessage`. */
 export type AgentMessageOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
-  | 'PARTS_ASC'
-  | 'PARTS_DESC'
-  | 'THREAD_ID_ASC'
-  | 'THREAD_ID_DESC'
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC'
   | 'AUTHOR_ROLE_ASC'
   | 'AUTHOR_ROLE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'MODEL_ASC'
   | 'MODEL_DESC'
-  | 'AGENT_ID_ASC'
-  | 'AGENT_ID_DESC';
-/** Methods to use when ordering `AgentPlan`. */
-export type AgentPlanOrderBy =
+  | 'NATURAL'
+  | 'PARTS_ASC'
+  | 'PARTS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `Agent`. */
+export type AgentOrderBy =
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_EPHEMERAL_ASC'
+  | 'IS_EPHEMERAL_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'PERSONA_ID_ASC'
+  | 'PERSONA_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AgentPersona`. */
+export type AgentPersonaOrderBy =
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `AgentPlan`. */
+export type AgentPlanOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
   | 'THREAD_ID_ASC'
   | 'THREAD_ID_DESC'
   | 'TITLE_ASC'
   | 'TITLE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC';
-/** Methods to use when ordering `AgentTask`. */
-export type AgentTaskOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'PLAN_ID_ASC'
-  | 'PLAN_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'ORDER_INDEX_ASC'
-  | 'ORDER_INDEX_DESC'
-  | 'REQUIRES_APPROVAL_ASC'
-  | 'REQUIRES_APPROVAL_DESC'
-  | 'APPROVAL_STATUS_ASC'
-  | 'APPROVAL_STATUS_DESC'
-  | 'APPROVED_BY_ASC'
-  | 'APPROVED_BY_DESC'
-  | 'APPROVED_AT_ASC'
-  | 'APPROVED_AT_DESC'
-  | 'APPROVAL_FEEDBACK_ASC'
-  | 'APPROVAL_FEEDBACK_DESC';
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `AgentPrompt`. */
 export type AgentPromptOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'CONTENT_ASC'
   | 'CONTENT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'IS_DEFAULT_ASC'
   | 'IS_DEFAULT_DESC'
   | 'METADATA_ASC'
-  | 'METADATA_DESC';
-/** Similarity metric for vector search */
-export type VectorMetric = 'COSINE' | 'L2' | 'IP';
-/** Methods to use when ordering `AgentResourceChunk`. */
-export type AgentResourceChunkOrderBy =
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `AgentResourceChunk`. */
+export type AgentResourceChunkOrderBy =
   | 'AGENT_RESOURCE_ID_ASC'
   | 'AGENT_RESOURCE_ID_DESC'
   | 'BODY_ASC'
   | 'BODY_DESC'
   | 'CHUNK_INDEX_ASC'
   | 'CHUNK_INDEX_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
   | 'EMBEDDING_VECTOR_DISTANCE_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-/** Methods to use when ordering `AgentPersona`. */
-export type AgentPersonaOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC';
-/** Methods to use when ordering `AgentResource`. */
-export type AgentResourceOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'BODY_ASC'
-  | 'BODY_DESC'
-  | 'KEYWORDS_ASC'
-  | 'KEYWORDS_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
   | 'METADATA_ASC'
   | 'METADATA_DESC'
-  | 'IS_ARCHIVED_ASC'
-  | 'IS_ARCHIVED_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AgentResource`. */
+export type AgentResourceOrderBy =
   | 'ARCHIVED_AT_ASC'
   | 'ARCHIVED_AT_DESC'
-  | 'SEARCH_ASC'
-  | 'SEARCH_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
-  | 'SEARCH_TSV_RANK_ASC'
-  | 'SEARCH_TSV_RANK_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
   | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'KEYWORDS_ASC'
+  | 'KEYWORDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
   | 'KIND_TRGM_SIMILARITY_ASC'
   | 'KIND_TRGM_SIMILARITY_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
   | 'TITLE_TRGM_SIMILARITY_ASC'
   | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'BODY_TRGM_SIMILARITY_ASC'
-  | 'BODY_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+/** Methods to use when ordering `AgentTask`. */
+export type AgentTaskOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'APPROVAL_FEEDBACK_ASC'
+  | 'APPROVAL_FEEDBACK_DESC'
+  | 'APPROVAL_STATUS_ASC'
+  | 'APPROVAL_STATUS_DESC'
+  | 'APPROVED_AT_ASC'
+  | 'APPROVED_AT_DESC'
+  | 'APPROVED_BY_ASC'
+  | 'APPROVED_BY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'ORDER_INDEX_ASC'
+  | 'ORDER_INDEX_DESC'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRES_APPROVAL_ASC'
+  | 'REQUIRES_APPROVAL_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AgentThread`. */
+export type AgentThreadOrderBy =
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC'
+  | 'ARCHIVED_AT_ASC'
+  | 'ARCHIVED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARENT_THREAD_ID_ASC'
+  | 'PARENT_THREAD_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROMPT_TEMPLATE_ID_ASC'
+  | 'PROMPT_TEMPLATE_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Similarity metric for vector search */
+export type VectorMetric = 'COSINE' | 'IP' | 'L2';
 /** A filter to be used against `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `personaId` field. */
-  personaId?: UUIDFilter;
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `isEphemeral` field. */
-  isEphemeral?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentFilter[];
-  /** Negates the expression. */
-  not?: AgentFilter;
-  /** Filter by the object’s `parent` relation. */
-  parent?: AgentFilter;
-  /** A related `parent` exists. */
-  parentExists?: boolean;
-  /** Filter by the object’s `persona` relation. */
-  persona?: AgentPersonaFilter;
-  /** A related `persona` exists. */
-  personaExists?: boolean;
-  /** Filter by the object’s `agentThreads` relation. */
-  agentThreads?: AgentToManyAgentThreadFilter;
-  /** `agentThreads` exist. */
-  agentThreadsExist?: boolean;
   /** Filter by the object’s `agentMessages` relation. */
   agentMessages?: AgentToManyAgentMessageFilter;
   /** `agentMessages` exist. */
   agentMessagesExist?: boolean;
+  /** Filter by the object’s `agentThreads` relation. */
+  agentThreads?: AgentToManyAgentThreadFilter;
+  /** `agentThreads` exist. */
+  agentThreadsExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentFilter[];
   /** Filter by the object’s `childAgents` relation. */
   childAgents?: AgentToManyAgentFilter;
   /** `childAgents` exist. */
   childAgentsExist?: boolean;
-}
-/** A filter to be used against `AgentPersona` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPersonaFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `systemPrompt` field. */
-  systemPrompt?: StringFilter;
-  /** Filter by the object’s `resources` field. */
-  resources?: StringListFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPersonaFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPersonaFilter[];
-  /** Negates the expression. */
-  not?: AgentPersonaFilter;
-  /** Filter by the object’s `agentsByPersonaId` relation. */
-  agentsByPersonaId?: AgentPersonaToManyAgentFilter;
-  /** `agentsByPersonaId` exist. */
-  agentsByPersonaIdExist?: boolean;
-}
-/** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPersonaToManyAgentFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentFilter;
-}
-/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentToManyAgentThreadFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentThreadFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentThreadFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentThreadFilter;
-}
-/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentThreadFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isEphemeral` field. */
+  isEphemeral?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentFilter[];
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: AgentFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `persona` relation. */
+  persona?: AgentPersonaFilter;
+  /** A related `persona` exists. */
+  personaExists?: boolean;
+  /** Filter by the object’s `personaId` field. */
+  personaId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
-  /** Filter by the object’s `isArchived` field. */
-  isArchived?: BooleanFilter;
-  /** Filter by the object’s `archivedAt` field. */
-  archivedAt?: DatetimeFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `mode` field. */
-  mode?: StringFilter;
-  /** Filter by the object’s `model` field. */
-  model?: StringFilter;
   /** Filter by the object’s `systemPrompt` field. */
   systemPrompt?: StringFilter;
-  /** Filter by the object’s `tags` field. */
-  tags?: StringListFilter;
-  /** Filter by the object’s `promptTemplateId` field. */
-  promptTemplateId?: UUIDFilter;
-  /** Filter by the object’s `agentId` field. */
-  agentId?: UUIDFilter;
-  /** Filter by the object’s `parentThreadId` field. */
-  parentThreadId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentThreadFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentThreadFilter[];
-  /** Negates the expression. */
-  not?: AgentThreadFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `Agent` */
+export interface AgentInput {
+  /** Per-instance config overrides (model, temperature, tools) */
+  config?: unknown;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** If true, agent is deleted when its spawning thread is deleted */
+  isEphemeral?: boolean;
+  /** Display name for this agent instance */
+  name: string;
+  /** Human who owns/manages this agent */
+  ownerId?: string;
+  /** Parent agent (for sub-agent delegation hierarchy) */
+  parentId?: string;
+  /** Persona template this agent was created from */
+  personaId?: string;
+  /** Agent lifecycle status: active, paused, terminated */
+  status?: string;
+  /** System prompt override (NULL = inherit from persona) */
+  systemPrompt?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentMessageFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
   /** Filter by the object’s `agent` relation. */
   agent?: AgentFilter;
   /** A related `agent` exists. */
   agentExists?: boolean;
-  /** Filter by the object’s `parentThread` relation. */
-  parentThread?: AgentThreadFilter;
-  /** A related `parentThread` exists. */
-  parentThreadExists?: boolean;
-  /** Filter by the object’s `promptTemplate` relation. */
-  promptTemplate?: AgentPromptFilter;
-  /** A related `promptTemplate` exists. */
-  promptTemplateExists?: boolean;
-  /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
-  agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
-  /** `agentThreadsByParentThreadId` exist. */
-  agentThreadsByParentThreadIdExist?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AgentMessage` */
+export interface AgentMessageInput {
+  /** User who authored this message */
+  actorId?: string;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string;
+  /** Who authored this message: user or assistant */
+  authorRole: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** LLM model that generated this response */
+  model?: string;
+  /** Message content: TextPart and ToolPart array */
+  parts?: unknown;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentMessage`. Fields that are set will be updated. */
+export interface AgentMessagePatch {
+  /** User who authored this message */
+  actorId?: string;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string;
+  /** Who authored this message: user or assistant */
+  authorRole?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** LLM model that generated this response */
+  model?: string;
+  /** Message content: TextPart and ToolPart array */
+  parts?: unknown;
+  /** Foreign key to agent_thread */
+  threadId?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `Agent`. Fields that are set will be updated. */
+export interface AgentPatch {
+  /** Per-instance config overrides (model, temperature, tools) */
+  config?: unknown;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** If true, agent is deleted when its spawning thread is deleted */
+  isEphemeral?: boolean;
+  /** Display name for this agent instance */
+  name?: string;
+  /** Human who owns/manages this agent */
+  ownerId?: string;
+  /** Parent agent (for sub-agent delegation hierarchy) */
+  parentId?: string;
+  /** Persona template this agent was created from */
+  personaId?: string;
+  /** Agent lifecycle status: active, paused, terminated */
+  status?: string;
+  /** System prompt override (NULL = inherit from persona) */
+  systemPrompt?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AgentPersona` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPersonaFilter {
+  /** Filter by the object’s `agentsByPersonaId` relation. */
+  agentsByPersonaId?: AgentPersonaToManyAgentFilter;
+  /** `agentsByPersonaId` exist. */
+  agentsByPersonaIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPersonaFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentPersonaFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPersonaFilter[];
+  /** Filter by the object’s `resources` field. */
+  resources?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `AgentPersona` */
+export interface AgentPersonaInput {
+  /** Model preferences, temperature, tool access, constraints */
+  config?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Brief description of this persona role */
+  description?: string;
+  id?: string;
+  /** Whether this persona is available for use */
+  isActive?: boolean;
+  /** Display name for this persona */
+  name: string;
+  /** Slugs of agent_resource entries to link when spawning */
+  resources?: string[];
+  /** Unique human-readable identifier for this persona */
+  slug: string;
+  /** Default system prompt for agents using this persona */
+  systemPrompt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `AgentPersona`. Fields that are set will be updated. */
+export interface AgentPersonaPatch {
+  /** Model preferences, temperature, tool access, constraints */
+  config?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Brief description of this persona role */
+  description?: string;
+  id?: string;
+  /** Whether this persona is available for use */
+  isActive?: boolean;
+  /** Display name for this persona */
+  name?: string;
+  /** Slugs of agent_resource entries to link when spawning */
+  resources?: string[];
+  /** Unique human-readable identifier for this persona */
+  slug?: string;
+  /** Default system prompt for agents using this persona */
+  systemPrompt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPersonaToManyAgentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentFilter;
+}
+/** A filter to be used against `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPlanFilter {
+  /** Filter by the object’s `agentTasksByPlanId` relation. */
+  agentTasksByPlanId?: AgentPlanToManyAgentTaskFilter;
+  /** `agentTasksByPlanId` exist. */
+  agentTasksByPlanIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPlanFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentPlanFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPlanFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AgentPlan` */
+export interface AgentPlanInput {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Overall goal or context for this plan */
+  description?: string;
+  id?: string;
+  /** User who owns this plan */
+  ownerId?: string;
+  /** Plan lifecycle: draft, active, completed, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  /** Human-readable plan name */
+  title: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentPlan`. Fields that are set will be updated. */
+export interface AgentPlanPatch {
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Overall goal or context for this plan */
+  description?: string;
+  id?: string;
+  /** User who owns this plan */
+  ownerId?: string;
+  /** Plan lifecycle: draft, active, completed, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId?: string;
+  /** Human-readable plan name */
+  title?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPlanToManyAgentTaskFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+}
+/** A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPromptFilter {
+  /** Filter by the object’s `agentThreadsByPromptTemplateId` relation. */
+  agentThreadsByPromptTemplateId?: AgentPromptToManyAgentThreadFilter;
+  /** `agentThreadsByPromptTemplateId` exist. */
+  agentThreadsByPromptTemplateIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentPromptFilter[];
+  /** Filter by the object’s `content` field. */
+  content?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentPromptFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentPromptFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `AgentPrompt` */
+export interface AgentPromptInput {
+  /** The system prompt template content */
+  content: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** What this prompt template is for */
+  description?: string;
+  id?: string;
+  /** Whether this is the default prompt for the entity/app */
+  isDefault?: boolean;
+  /** Variables, tags, category metadata */
+  metadata?: unknown;
+  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
+  name: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `AgentPrompt`. Fields that are set will be updated. */
+export interface AgentPromptPatch {
+  /** The system prompt template content */
+  content?: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** What this prompt template is for */
+  description?: string;
+  id?: string;
+  /** Whether this is the default prompt for the entity/app */
+  isDefault?: boolean;
+  /** Variables, tags, category metadata */
+  metadata?: unknown;
+  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
+  name?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPromptToManyAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
+}
+/** A filter to be used against `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentResourceChunkFilter {
+  /** Filter by the object’s `agentResource` relation. */
+  agentResource?: AgentResourceFilter;
+  /** Filter by the object’s `agentResourceId` field. */
+  agentResourceId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentResourceChunkFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringFilter;
+  /** Filter by the object’s `chunkIndex` field. */
+  chunkIndex?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: AgentResourceChunkFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentResourceChunkFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `AgentResourceChunk` */
+export interface AgentResourceChunkInput {
+  agentResourceId: string;
+  body: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentResourceChunk`. Fields that are set will be updated. */
+export interface AgentResourceChunkPatch {
+  agentResourceId?: string;
+  body?: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  updatedAt?: string;
+}
+/** A filter to be used against `AgentResource` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentResourceFilter {
+  /** Filter by the object’s `agentResourceChunks` relation. */
+  agentResourceChunks?: AgentResourceToManyAgentResourceChunkFilter;
+  /** `agentResourceChunks` exist. */
+  agentResourceChunksExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentResourceFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringTrgmFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `keywords` field. */
+  keywords?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringTrgmFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: AgentResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentResourceFilter[];
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringTrgmFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringTrgmFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `kind` column. */
+  trgmKind?: TrgmSearchInput;
+  /** TRGM search on the `title` column. */
+  trgmTitle?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `AgentResource` */
+export interface AgentResourceInput {
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  /** Full content (instructions for skills, reference text for knowledge) */
+  body: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Brief description of this resource */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  embeddingUpdatedAt?: string;
+  id?: string;
+  /** Whether this resource is active and retrievable */
+  isActive?: boolean;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Keywords for deterministic retrieval routing */
+  keywords?: string[];
+  /** Resource type: skill, knowledge, or convention */
+  kind?: string;
+  /** Structured metadata: category, version, author, custom attributes */
+  metadata?: unknown;
+  /** Unique human-readable identifier for portable references */
+  slug: string;
+  /** Resource name or title */
+  title: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `AgentResource`. Fields that are set will be updated. */
+export interface AgentResourcePatch {
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  /** Full content (instructions for skills, reference text for knowledge) */
+  body?: string;
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Brief description of this resource */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  embeddingUpdatedAt?: string;
+  id?: string;
+  /** Whether this resource is active and retrievable */
+  isActive?: boolean;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Keywords for deterministic retrieval routing */
+  keywords?: string[];
+  /** Resource type: skill, knowledge, or convention */
+  kind?: string;
+  /** Structured metadata: category, version, author, custom attributes */
+  metadata?: unknown;
+  /** Unique human-readable identifier for portable references */
+  slug?: string;
+  /** Resource name or title */
+  title?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** A filter to be used against many `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentResourceToManyAgentResourceChunkFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentResourceChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentResourceChunkFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentResourceChunkFilter;
+}
+/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentTaskFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Filter by the object’s `approvalFeedback` field. */
+  approvalFeedback?: StringFilter;
+  /** Filter by the object’s `approvalStatus` field. */
+  approvalStatus?: StringFilter;
+  /** Filter by the object’s `approvedAt` field. */
+  approvedAt?: DatetimeFilter;
+  /** Filter by the object’s `approvedBy` field. */
+  approvedBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Filter by the object’s `orderIndex` field. */
+  orderIndex?: IntFilter;
+  /** Filter by the object’s `plan` relation. */
+  plan?: AgentPlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `requiresApproval` field. */
+  requiresApproval?: BooleanFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `AgentTask` */
+export interface AgentTaskInput {
+  /** User who authored this task */
+  actorId?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Natural-language description of the work to do */
+  description: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  id?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Foreign key to agent_plan */
+  planId: string;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Current status of this task */
+  status?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentTask`. Fields that are set will be updated. */
+export interface AgentTaskPatch {
+  /** User who authored this task */
+  actorId?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Natural-language description of the work to do */
+  description?: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  id?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Foreign key to agent_plan */
+  planId?: string;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Current status of this task */
+  status?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadFilter {
+  /** Filter by the object’s `agent` relation. */
+  agent?: AgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
   /** Filter by the object’s `agentMessagesByThreadId` relation. */
   agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
   /** `agentMessagesByThreadId` exist. */
@@ -477,900 +1085,217 @@ export interface AgentThreadFilter {
   agentPlansByThreadId?: AgentThreadToManyAgentPlanFilter;
   /** `agentPlansByThreadId` exist. */
   agentPlansByThreadIdExist?: boolean;
-}
-/** A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPromptFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
+  /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
+  agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
+  /** `agentThreadsByParentThreadId` exist. */
+  agentThreadsByParentThreadIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Negates the expression. */
+  not?: AgentThreadFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parentThread` relation. */
+  parentThread?: AgentThreadFilter;
+  /** A related `parentThread` exists. */
+  parentThreadExists?: boolean;
+  /** Filter by the object’s `parentThreadId` field. */
+  parentThreadId?: UUIDFilter;
+  /** Filter by the object’s `promptTemplate` relation. */
+  promptTemplate?: AgentPromptFilter;
+  /** A related `promptTemplate` exists. */
+  promptTemplateExists?: boolean;
+  /** Filter by the object’s `promptTemplateId` field. */
+  promptTemplateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `content` field. */
-  content?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `isDefault` field. */
-  isDefault?: BooleanFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPromptFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPromptFilter[];
-  /** Negates the expression. */
-  not?: AgentPromptFilter;
 }
-/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentThreadToManyAgentThreadFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentThreadFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentThreadFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentThreadFilter;
+/** An input for mutations affecting `AgentThread` */
+export interface AgentThreadInput {
+  /** Agent instance assigned to this thread */
+  agentId?: string;
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
+  mode?: string;
+  /** LLM model id this thread is bound to */
+  model?: string;
+  /** User who owns this thread */
+  ownerId?: string;
+  /** Parent thread that spawned this sub-conversation */
+  parentThreadId?: string;
+  /** Optional FK to a shared prompt template */
+  promptTemplateId?: string;
+  /** Current status of this thread */
+  status?: string;
+  /** System prompt active for this thread */
+  systemPrompt?: string;
+  /** User-defined labels for organizing and filtering threads */
+  tags?: string[];
+  /** Human-readable conversation title */
+  title?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentThread`. Fields that are set will be updated. */
+export interface AgentThreadPatch {
+  /** Agent instance assigned to this thread */
+  agentId?: string;
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  id?: string;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
+  mode?: string;
+  /** LLM model id this thread is bound to */
+  model?: string;
+  /** User who owns this thread */
+  ownerId?: string;
+  /** Parent thread that spawned this sub-conversation */
+  parentThreadId?: string;
+  /** Optional FK to a shared prompt template */
+  promptTemplateId?: string;
+  /** Current status of this thread */
+  status?: string;
+  /** System prompt active for this thread */
+  systemPrompt?: string;
+  /** User-defined labels for organizing and filtering threads */
+  tags?: string[];
+  /** Human-readable conversation title */
+  title?: string;
+  updatedAt?: string;
 }
 /** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentThreadToManyAgentMessageFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentMessageFilter;
   /** Filters to entities where every related entity matches. */
   every?: AgentMessageFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentMessageFilter;
-}
-/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentMessageFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `parts` field. */
-  parts?: JSONFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `authorRole` field. */
-  authorRole?: StringFilter;
-  /** Filter by the object’s `model` field. */
-  model?: StringFilter;
-  /** Filter by the object’s `agentId` field. */
-  agentId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentMessageFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentMessageFilter[];
-  /** Negates the expression. */
-  not?: AgentMessageFilter;
-  /** Filter by the object’s `agent` relation. */
-  agent?: AgentFilter;
-  /** A related `agent` exists. */
-  agentExists?: boolean;
-  /** Filter by the object’s `thread` relation. */
-  thread?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
 }
 /** A filter to be used against many `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentThreadToManyAgentPlanFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentPlanFilter;
   /** Filters to entities where every related entity matches. */
   every?: AgentPlanFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentPlanFilter;
-}
-/** A filter to be used against `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPlanFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentPlanFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentPlanFilter[];
-  /** Negates the expression. */
-  not?: AgentPlanFilter;
-  /** Filter by the object’s `thread` relation. */
-  thread?: AgentThreadFilter;
-  /** Filter by the object’s `agentTasksByPlanId` relation. */
-  agentTasksByPlanId?: AgentPlanToManyAgentTaskFilter;
-  /** `agentTasksByPlanId` exist. */
-  agentTasksByPlanIdExist?: boolean;
-}
-/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentPlanToManyAgentTaskFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: AgentTaskFilter;
+  some?: AgentPlanFilter;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentThreadFilter {
   /** Filters to entities where every related entity matches. */
-  every?: AgentTaskFilter;
+  every?: AgentThreadFilter;
   /** Filters to entities where no related entity matches. */
-  none?: AgentTaskFilter;
-}
-/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentTaskFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `planId` field. */
-  planId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `source` field. */
-  source?: StringFilter;
-  /** Filter by the object’s `error` field. */
-  error?: StringFilter;
-  /** Filter by the object’s `orderIndex` field. */
-  orderIndex?: IntFilter;
-  /** Filter by the object’s `requiresApproval` field. */
-  requiresApproval?: BooleanFilter;
-  /** Filter by the object’s `approvalStatus` field. */
-  approvalStatus?: StringFilter;
-  /** Filter by the object’s `approvedBy` field. */
-  approvedBy?: UUIDFilter;
-  /** Filter by the object’s `approvedAt` field. */
-  approvedAt?: DatetimeFilter;
-  /** Filter by the object’s `approvalFeedback` field. */
-  approvalFeedback?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentTaskFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentTaskFilter[];
-  /** Negates the expression. */
-  not?: AgentTaskFilter;
-  /** Filter by the object’s `plan` relation. */
-  plan?: AgentPlanFilter;
-}
-/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentToManyAgentMessageFilter {
+  none?: AgentThreadFilter;
   /** Filters to entities where at least one related entity matches. */
-  some?: AgentMessageFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AgentMessageFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AgentMessageFilter;
+  some?: AgentThreadFilter;
 }
 /** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentToManyAgentFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AgentFilter;
   /** Filters to entities where every related entity matches. */
   every?: AgentFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentFilter;
-}
-/** A filter to be used against `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentResourceChunkFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `agentResourceId` field. */
-  agentResourceId?: UUIDFilter;
-  /** Filter by the object’s `body` field. */
-  body?: StringFilter;
-  /** Filter by the object’s `chunkIndex` field. */
-  chunkIndex?: IntFilter;
-  /** Filter by the object’s `embedding` field. */
-  embedding?: VectorFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentResourceChunkFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentResourceChunkFilter[];
-  /** Negates the expression. */
-  not?: AgentResourceChunkFilter;
-  /** Filter by the object’s `agentResource` relation. */
-  agentResource?: AgentResourceFilter;
-  /** VECTOR search on the `embedding` column. */
-  vectorEmbedding?: VectorNearbyInput;
-}
-/** A filter to be used against `AgentResource` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentResourceFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringTrgmFilter;
-  /** Filter by the object’s `kind` field. */
-  kind?: StringTrgmFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringTrgmFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringTrgmFilter;
-  /** Filter by the object’s `body` field. */
-  body?: StringTrgmFilter;
-  /** Filter by the object’s `keywords` field. */
-  keywords?: StringListFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `isArchived` field. */
-  isArchived?: BooleanFilter;
-  /** Filter by the object’s `archivedAt` field. */
-  archivedAt?: DatetimeFilter;
-  /** Filter by the object’s `search` field. */
-  search?: FullTextFilter;
-  /** Filter by the object’s `embedding` field. */
-  embedding?: VectorFilter;
-  /** Filter by the object’s `embeddingUpdatedAt` field. */
-  embeddingUpdatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentResourceFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentResourceFilter[];
-  /** Negates the expression. */
-  not?: AgentResourceFilter;
-  /** Filter by the object’s `agentResourceChunks` relation. */
-  agentResourceChunks?: AgentResourceToManyAgentResourceChunkFilter;
-  /** `agentResourceChunks` exist. */
-  agentResourceChunksExist?: boolean;
-  /** TSV search on the `search` column. */
-  tsvSearch?: string;
-  /** VECTOR search on the `embedding` column. */
-  vectorEmbedding?: VectorNearbyInput;
-  /** TRGM search on the `kind` column. */
-  trgmKind?: TrgmSearchInput;
-  /** TRGM search on the `title` column. */
-  trgmTitle?: TrgmSearchInput;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /** TRGM search on the `body` column. */
-  trgmBody?: TrgmSearchInput;
-  /**
-   * Composite unified search. Provide a search string and it will be dispatched to
-   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  unifiedSearch?: string;
-}
-/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
-export interface StringTrgmFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Contains the specified string (case-sensitive). */
-  includes?: string;
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: string;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: string;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: string;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: string;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: string;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: string;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: string;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: string;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: string;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: string;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: string;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: string;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
-  similarTo?: TrgmSearchInput;
-  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
-  wordSimilarTo?: TrgmSearchInput;
-}
-/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
-export interface TrgmSearchInput {
-  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
-  value: string;
-  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
-  threshold?: number;
-}
-/** A filter to be used against many `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentResourceToManyAgentResourceChunkFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: AgentResourceChunkFilter;
+  some?: AgentFilter;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentToManyAgentMessageFilter {
   /** Filters to entities where every related entity matches. */
-  every?: AgentResourceChunkFilter;
+  every?: AgentMessageFilter;
   /** Filters to entities where no related entity matches. */
-  none?: AgentResourceChunkFilter;
+  none?: AgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
 }
-/** Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold. */
-export interface VectorNearbyInput {
-  /** Query vector for similarity search. */
-  vector: number[];
-  /** Similarity metric to use (default: COSINE). */
-  metric?: VectorMetric;
-  /** Maximum distance threshold. Only rows within this distance are returned. */
-  distance?: number;
-  /** When true (default for tables with @hasChunks), transparently queries the chunks table and returns the minimum distance across parent + all chunks. Set to false to only search the parent embedding. */
-  includeChunks?: boolean;
-}
-export interface CreateAgentPlanInput {
-  clientMutationId?: string;
-  /** The `AgentPlan` to be created by this mutation. */
-  agentPlan: AgentPlanInput;
-}
-/** An input for mutations affecting `AgentPlan` */
-export interface AgentPlanInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who owns this plan */
-  ownerId?: string;
-  /** Foreign key to agent_thread */
-  threadId: string;
-  /** Human-readable plan name */
-  title: string;
-  /** Overall goal or context for this plan */
-  description?: string;
-  /** Plan lifecycle: draft, active, completed, failed, cancelled */
-  status?: string;
-}
-export interface CreateAgentPromptInput {
-  clientMutationId?: string;
-  /** The `AgentPrompt` to be created by this mutation. */
-  agentPrompt: AgentPromptInput;
-}
-/** An input for mutations affecting `AgentPrompt` */
-export interface AgentPromptInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
-  name: string;
-  /** The system prompt template content */
-  content: string;
-  /** What this prompt template is for */
-  description?: string;
-  /** Whether this is the default prompt for the entity/app */
-  isDefault?: boolean;
-  /** Variables, tags, category metadata */
-  metadata?: unknown;
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentToManyAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
 }
 export interface CreateAgentInput {
-  clientMutationId?: string;
   /** The `Agent` to be created by this mutation. */
   agent: AgentInput;
-}
-/** An input for mutations affecting `Agent` */
-export interface AgentInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Human who owns/manages this agent */
-  ownerId?: string;
-  /** Persona template this agent was created from */
-  personaId?: string;
-  /** Parent agent (for sub-agent delegation hierarchy) */
-  parentId?: string;
-  /** Display name for this agent instance */
-  name: string;
-  /** System prompt override (NULL = inherit from persona) */
-  systemPrompt?: string;
-  /** Per-instance config overrides (model, temperature, tools) */
-  config?: unknown;
-  /** Agent lifecycle status: active, paused, terminated */
-  status?: string;
-  /** If true, agent is deleted when its spawning thread is deleted */
-  isEphemeral?: boolean;
+  clientMutationId?: string;
 }
 export interface CreateAgentMessageInput {
-  clientMutationId?: string;
   /** The `AgentMessage` to be created by this mutation. */
   agentMessage: AgentMessageInput;
-}
-/** An input for mutations affecting `AgentMessage` */
-export interface AgentMessageInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who authored this message */
-  actorId?: string;
-  /** Message content: TextPart and ToolPart array */
-  parts?: unknown;
-  /** Foreign key to agent_thread */
-  threadId: string;
-  /** Who authored this message: user or assistant */
-  authorRole: string;
-  /** LLM model that generated this response */
-  model?: string;
-  /** Agent that authored this message (NULL for human messages) */
-  agentId?: string;
-}
-export interface CreateAgentTaskInput {
   clientMutationId?: string;
-  /** The `AgentTask` to be created by this mutation. */
-  agentTask: AgentTaskInput;
-}
-/** An input for mutations affecting `AgentTask` */
-export interface AgentTaskInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who authored this task */
-  actorId?: string;
-  /** Current status of this task */
-  status?: string;
-  /** Foreign key to agent_plan */
-  planId: string;
-  /** Natural-language description of the work to do */
-  description: string;
-  /** Who created the task: agent or user */
-  source?: string;
-  /** Error message captured when the task failed */
-  error?: string;
-  /** Position within the plan (for ordered task lists) */
-  orderIndex?: number;
-  /** Whether this task is an approval gate requiring human decision */
-  requiresApproval?: boolean;
-  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
-  approvalStatus?: string;
-  /** User who approved or rejected this task */
-  approvedBy?: string;
-  /** Timestamp of the approval or rejection decision */
-  approvedAt?: string;
-  /** Reviewer feedback or reason for the decision */
-  approvalFeedback?: string;
-}
-export interface CreateAgentResourceChunkInput {
-  clientMutationId?: string;
-  /** The `AgentResourceChunk` to be created by this mutation. */
-  agentResourceChunk: AgentResourceChunkInput;
-}
-/** An input for mutations affecting `AgentResourceChunk` */
-export interface AgentResourceChunkInput {
-  id?: string;
-  agentResourceId: string;
-  body: string;
-  chunkIndex?: number;
-  embedding?: number[];
-  metadata?: unknown;
-  createdAt?: string;
-  updatedAt?: string;
 }
 export interface CreateAgentPersonaInput {
-  clientMutationId?: string;
   /** The `AgentPersona` to be created by this mutation. */
   agentPersona: AgentPersonaInput;
-}
-/** An input for mutations affecting `AgentPersona` */
-export interface AgentPersonaInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique human-readable identifier for this persona */
-  slug: string;
-  /** Display name for this persona */
-  name: string;
-  /** Brief description of this persona role */
-  description?: string;
-  /** Default system prompt for agents using this persona */
-  systemPrompt?: string;
-  /** Slugs of agent_resource entries to link when spawning */
-  resources?: string[];
-  /** Model preferences, temperature, tool access, constraints */
-  config?: unknown;
-  /** Whether this persona is available for use */
-  isActive?: boolean;
-}
-export interface CreateAgentThreadInput {
   clientMutationId?: string;
-  /** The `AgentThread` to be created by this mutation. */
-  agentThread: AgentThreadInput;
 }
-/** An input for mutations affecting `AgentThread` */
-export interface AgentThreadInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who owns this thread */
-  ownerId?: string;
-  /** Current status of this thread */
-  status?: string;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean;
-  /** Timestamp when this record was archived, NULL if active */
-  archivedAt?: string;
-  /** Human-readable conversation title */
-  title?: string;
-  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
-  mode?: string;
-  /** LLM model id this thread is bound to */
-  model?: string;
-  /** System prompt active for this thread */
-  systemPrompt?: string;
-  /** User-defined labels for organizing and filtering threads */
-  tags?: string[];
-  /** Optional FK to a shared prompt template */
-  promptTemplateId?: string;
-  /** Agent instance assigned to this thread */
-  agentId?: string;
-  /** Parent thread that spawned this sub-conversation */
-  parentThreadId?: string;
+export interface CreateAgentPlanInput {
+  /** The `AgentPlan` to be created by this mutation. */
+  agentPlan: AgentPlanInput;
+  clientMutationId?: string;
+}
+export interface CreateAgentPromptInput {
+  /** The `AgentPrompt` to be created by this mutation. */
+  agentPrompt: AgentPromptInput;
+  clientMutationId?: string;
+}
+export interface CreateAgentResourceChunkInput {
+  /** The `AgentResourceChunk` to be created by this mutation. */
+  agentResourceChunk: AgentResourceChunkInput;
+  clientMutationId?: string;
 }
 export interface CreateAgentResourceInput {
-  clientMutationId?: string;
   /** The `AgentResource` to be created by this mutation. */
   agentResource: AgentResourceInput;
-}
-/** An input for mutations affecting `AgentResource` */
-export interface AgentResourceInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique human-readable identifier for portable references */
-  slug: string;
-  /** Resource type: skill, knowledge, or convention */
-  kind?: string;
-  /** Resource name or title */
-  title: string;
-  /** Brief description of this resource */
-  description?: string;
-  /** Full content (instructions for skills, reference text for knowledge) */
-  body: string;
-  /** Keywords for deterministic retrieval routing */
-  keywords?: string[];
-  /** Whether this resource is active and retrievable */
-  isActive?: boolean;
-  /** Structured metadata: category, version, author, custom attributes */
-  metadata?: unknown;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean;
-  /** Timestamp when this record was archived, NULL if active */
-  archivedAt?: string;
-  embedding?: number[];
-  embeddingUpdatedAt?: string;
-}
-export interface UpdateAgentPlanInput {
   clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentPlan` being updated. */
-  agentPlanPatch: AgentPlanPatch;
 }
-/** Represents an update to a `AgentPlan`. Fields that are set will be updated. */
-export interface AgentPlanPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who owns this plan */
-  ownerId?: string;
-  /** Foreign key to agent_thread */
-  threadId?: string;
-  /** Human-readable plan name */
-  title?: string;
-  /** Overall goal or context for this plan */
-  description?: string;
-  /** Plan lifecycle: draft, active, completed, failed, cancelled */
-  status?: string;
-}
-export interface UpdateAgentPromptInput {
+export interface CreateAgentTaskInput {
+  /** The `AgentTask` to be created by this mutation. */
+  agentTask: AgentTaskInput;
   clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentPrompt` being updated. */
-  agentPromptPatch: AgentPromptPatch;
 }
-/** Represents an update to a `AgentPrompt`. Fields that are set will be updated. */
-export interface AgentPromptPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
-  name?: string;
-  /** The system prompt template content */
-  content?: string;
-  /** What this prompt template is for */
-  description?: string;
-  /** Whether this is the default prompt for the entity/app */
-  isDefault?: boolean;
-  /** Variables, tags, category metadata */
-  metadata?: unknown;
-}
-export interface UpdateAgentInput {
+export interface CreateAgentThreadInput {
+  /** The `AgentThread` to be created by this mutation. */
+  agentThread: AgentThreadInput;
   clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Agent` being updated. */
-  agentPatch: AgentPatch;
-}
-/** Represents an update to a `Agent`. Fields that are set will be updated. */
-export interface AgentPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Human who owns/manages this agent */
-  ownerId?: string;
-  /** Persona template this agent was created from */
-  personaId?: string;
-  /** Parent agent (for sub-agent delegation hierarchy) */
-  parentId?: string;
-  /** Display name for this agent instance */
-  name?: string;
-  /** System prompt override (NULL = inherit from persona) */
-  systemPrompt?: string;
-  /** Per-instance config overrides (model, temperature, tools) */
-  config?: unknown;
-  /** Agent lifecycle status: active, paused, terminated */
-  status?: string;
-  /** If true, agent is deleted when its spawning thread is deleted */
-  isEphemeral?: boolean;
-}
-export interface UpdateAgentMessageInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentMessage` being updated. */
-  agentMessagePatch: AgentMessagePatch;
-}
-/** Represents an update to a `AgentMessage`. Fields that are set will be updated. */
-export interface AgentMessagePatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who authored this message */
-  actorId?: string;
-  /** Message content: TextPart and ToolPart array */
-  parts?: unknown;
-  /** Foreign key to agent_thread */
-  threadId?: string;
-  /** Who authored this message: user or assistant */
-  authorRole?: string;
-  /** LLM model that generated this response */
-  model?: string;
-  /** Agent that authored this message (NULL for human messages) */
-  agentId?: string;
-}
-export interface UpdateAgentTaskInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentTask` being updated. */
-  agentTaskPatch: AgentTaskPatch;
-}
-/** Represents an update to a `AgentTask`. Fields that are set will be updated. */
-export interface AgentTaskPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who authored this task */
-  actorId?: string;
-  /** Current status of this task */
-  status?: string;
-  /** Foreign key to agent_plan */
-  planId?: string;
-  /** Natural-language description of the work to do */
-  description?: string;
-  /** Who created the task: agent or user */
-  source?: string;
-  /** Error message captured when the task failed */
-  error?: string;
-  /** Position within the plan (for ordered task lists) */
-  orderIndex?: number;
-  /** Whether this task is an approval gate requiring human decision */
-  requiresApproval?: boolean;
-  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
-  approvalStatus?: string;
-  /** User who approved or rejected this task */
-  approvedBy?: string;
-  /** Timestamp of the approval or rejection decision */
-  approvedAt?: string;
-  /** Reviewer feedback or reason for the decision */
-  approvalFeedback?: string;
-}
-export interface UpdateAgentResourceChunkInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentResourceChunk` being updated. */
-  agentResourceChunkPatch: AgentResourceChunkPatch;
-}
-/** Represents an update to a `AgentResourceChunk`. Fields that are set will be updated. */
-export interface AgentResourceChunkPatch {
-  id?: string;
-  agentResourceId?: string;
-  body?: string;
-  chunkIndex?: number;
-  embedding?: number[];
-  metadata?: unknown;
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateAgentPersonaInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentPersona` being updated. */
-  agentPersonaPatch: AgentPersonaPatch;
-}
-/** Represents an update to a `AgentPersona`. Fields that are set will be updated. */
-export interface AgentPersonaPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique human-readable identifier for this persona */
-  slug?: string;
-  /** Display name for this persona */
-  name?: string;
-  /** Brief description of this persona role */
-  description?: string;
-  /** Default system prompt for agents using this persona */
-  systemPrompt?: string;
-  /** Slugs of agent_resource entries to link when spawning */
-  resources?: string[];
-  /** Model preferences, temperature, tool access, constraints */
-  config?: unknown;
-  /** Whether this persona is available for use */
-  isActive?: boolean;
-}
-export interface UpdateAgentThreadInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentThread` being updated. */
-  agentThreadPatch: AgentThreadPatch;
-}
-/** Represents an update to a `AgentThread`. Fields that are set will be updated. */
-export interface AgentThreadPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who owns this thread */
-  ownerId?: string;
-  /** Current status of this thread */
-  status?: string;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean;
-  /** Timestamp when this record was archived, NULL if active */
-  archivedAt?: string;
-  /** Human-readable conversation title */
-  title?: string;
-  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
-  mode?: string;
-  /** LLM model id this thread is bound to */
-  model?: string;
-  /** System prompt active for this thread */
-  systemPrompt?: string;
-  /** User-defined labels for organizing and filtering threads */
-  tags?: string[];
-  /** Optional FK to a shared prompt template */
-  promptTemplateId?: string;
-  /** Agent instance assigned to this thread */
-  agentId?: string;
-  /** Parent thread that spawned this sub-conversation */
-  parentThreadId?: string;
-}
-export interface UpdateAgentResourceInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentResource` being updated. */
-  agentResourcePatch: AgentResourcePatch;
-}
-/** Represents an update to a `AgentResource`. Fields that are set will be updated. */
-export interface AgentResourcePatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Unique human-readable identifier for portable references */
-  slug?: string;
-  /** Resource type: skill, knowledge, or convention */
-  kind?: string;
-  /** Resource name or title */
-  title?: string;
-  /** Brief description of this resource */
-  description?: string;
-  /** Full content (instructions for skills, reference text for knowledge) */
-  body?: string;
-  /** Keywords for deterministic retrieval routing */
-  keywords?: string[];
-  /** Whether this resource is active and retrievable */
-  isActive?: boolean;
-  /** Structured metadata: category, version, author, custom attributes */
-  metadata?: unknown;
-  /** Whether this record has been archived by the user */
-  isArchived?: boolean;
-  /** Timestamp when this record was archived, NULL if active */
-  archivedAt?: string;
-  embedding?: number[];
-  embeddingUpdatedAt?: string;
-}
-export interface DeleteAgentPlanInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAgentPromptInput {
-  clientMutationId?: string;
-  id: string;
 }
 export interface DeleteAgentInput {
   clientMutationId?: string;
@@ -1380,7 +1305,15 @@ export interface DeleteAgentMessageInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAgentTaskInput {
+export interface DeleteAgentPersonaInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentPlanInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentPromptInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1388,15 +1321,15 @@ export interface DeleteAgentResourceChunkInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAgentPersonaInput {
+export interface DeleteAgentResourceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentTaskInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeleteAgentThreadInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAgentResourceInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1409,277 +1342,425 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
-/** A connection to a list of `AgentPlan` values. */
-export interface AgentPlanConnection {
-  nodes: AgentPlan[];
-  edges: AgentPlanEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
+export interface StringTrgmFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
+  similarTo?: TrgmSearchInput;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
+  wordSimilarTo?: TrgmSearchInput;
 }
-/** A connection to a list of `AgentPrompt` values. */
-export interface AgentPromptConnection {
-  nodes: AgentPrompt[];
-  edges: AgentPromptEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
 }
-/** A connection to a list of `Agent` values. */
-export interface AgentConnection {
-  nodes: Agent[];
-  edges: AgentEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentInput {
+  /** An object where the defined keys will be set on the `Agent` being updated. */
+  agentPatch: AgentPatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** A connection to a list of `AgentMessage` values. */
-export interface AgentMessageConnection {
-  nodes: AgentMessage[];
-  edges: AgentMessageEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentMessageInput {
+  /** An object where the defined keys will be set on the `AgentMessage` being updated. */
+  agentMessagePatch: AgentMessagePatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** A connection to a list of `AgentTask` values. */
-export interface AgentTaskConnection {
-  nodes: AgentTask[];
-  edges: AgentTaskEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentPersonaInput {
+  /** An object where the defined keys will be set on the `AgentPersona` being updated. */
+  agentPersonaPatch: AgentPersonaPatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** A connection to a list of `AgentResourceChunk` values. */
-export interface AgentResourceChunkConnection {
-  nodes: AgentResourceChunk[];
-  edges: AgentResourceChunkEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentPlanInput {
+  /** An object where the defined keys will be set on the `AgentPlan` being updated. */
+  agentPlanPatch: AgentPlanPatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** A connection to a list of `AgentPersona` values. */
-export interface AgentPersonaConnection {
-  nodes: AgentPersona[];
-  edges: AgentPersonaEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentPromptInput {
+  /** An object where the defined keys will be set on the `AgentPrompt` being updated. */
+  agentPromptPatch: AgentPromptPatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** A connection to a list of `AgentThread` values. */
-export interface AgentThreadConnection {
-  nodes: AgentThread[];
-  edges: AgentThreadEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentResourceChunkInput {
+  /** An object where the defined keys will be set on the `AgentResourceChunk` being updated. */
+  agentResourceChunkPatch: AgentResourceChunkPatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** A connection to a list of `AgentResource` values. */
-export interface AgentResourceConnection {
-  nodes: AgentResource[];
-  edges: AgentResourceEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface UpdateAgentResourceInput {
+  /** An object where the defined keys will be set on the `AgentResource` being updated. */
+  agentResourcePatch: AgentResourcePatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAgentTaskInput {
+  /** An object where the defined keys will be set on the `AgentTask` being updated. */
+  agentTaskPatch: AgentTaskPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAgentThreadInput {
+  /** An object where the defined keys will be set on the `AgentThread` being updated. */
+  agentThreadPatch: AgentThreadPatch;
+  clientMutationId?: string;
+  id: string;
+}
+/** Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold. */
+export interface VectorNearbyInput {
+  /** Maximum distance threshold. Only rows within this distance are returned. */
+  distance?: number;
+  /** When true (default for tables with @hasChunks), transparently queries the chunks table and returns the minimum distance across parent + all chunks. Set to false to only search the parent embedding. */
+  includeChunks?: boolean;
+  /** Similarity metric to use (default: COSINE). */
+  metric?: VectorMetric;
+  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  text?: string;
+  /** Query vector for similarity search. */
+  vector: number[];
 }
 /** Root meta schema type */
 export interface MetaSchema {
   tables: MetaTable[];
 }
-export interface CreateAgentPlanPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPlan` that was created by this mutation. */
-  agentPlan?: AgentPlan | null;
-  agentPlanEdge?: AgentPlanEdge | null;
+/** A connection to a list of `AgentMessage` values. */
+export interface AgentMessageConnection {
+  edges: AgentMessageEdge[];
+  nodes: AgentMessage[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
-export interface CreateAgentPromptPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPrompt` that was created by this mutation. */
-  agentPrompt?: AgentPrompt | null;
-  agentPromptEdge?: AgentPromptEdge | null;
+/** A connection to a list of `AgentPersona` values. */
+export interface AgentPersonaConnection {
+  edges: AgentPersonaEdge[];
+  nodes: AgentPersona[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentPlan` values. */
+export interface AgentPlanConnection {
+  edges: AgentPlanEdge[];
+  nodes: AgentPlan[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentPrompt` values. */
+export interface AgentPromptConnection {
+  edges: AgentPromptEdge[];
+  nodes: AgentPrompt[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentResourceChunk` values. */
+export interface AgentResourceChunkConnection {
+  edges: AgentResourceChunkEdge[];
+  nodes: AgentResourceChunk[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentResource` values. */
+export interface AgentResourceConnection {
+  edges: AgentResourceEdge[];
+  nodes: AgentResource[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentTask` values. */
+export interface AgentTaskConnection {
+  edges: AgentTaskEdge[];
+  nodes: AgentTask[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentThread` values. */
+export interface AgentThreadConnection {
+  edges: AgentThreadEdge[];
+  nodes: AgentThread[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Agent` values. */
+export interface AgentConnection {
+  edges: AgentEdge[];
+  nodes: Agent[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
 export interface CreateAgentPayload {
-  clientMutationId?: string | null;
   /** The `Agent` that was created by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
 }
 export interface CreateAgentMessagePayload {
-  clientMutationId?: string | null;
   /** The `AgentMessage` that was created by this mutation. */
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
-}
-export interface CreateAgentTaskPayload {
   clientMutationId?: string | null;
-  /** The `AgentTask` that was created by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
-export interface CreateAgentResourceChunkPayload {
-  clientMutationId?: string | null;
-  /** The `AgentResourceChunk` that was created by this mutation. */
-  agentResourceChunk?: AgentResourceChunk | null;
-  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
 }
 export interface CreateAgentPersonaPayload {
-  clientMutationId?: string | null;
   /** The `AgentPersona` that was created by this mutation. */
   agentPersona?: AgentPersona | null;
   agentPersonaEdge?: AgentPersonaEdge | null;
-}
-export interface CreateAgentThreadPayload {
   clientMutationId?: string | null;
-  /** The `AgentThread` that was created by this mutation. */
-  agentThread?: AgentThread | null;
-  agentThreadEdge?: AgentThreadEdge | null;
+}
+export interface CreateAgentPlanPayload {
+  /** The `AgentPlan` that was created by this mutation. */
+  agentPlan?: AgentPlan | null;
+  agentPlanEdge?: AgentPlanEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAgentPromptPayload {
+  /** The `AgentPrompt` that was created by this mutation. */
+  agentPrompt?: AgentPrompt | null;
+  agentPromptEdge?: AgentPromptEdge | null;
+  clientMutationId?: string | null;
 }
 export interface CreateAgentResourcePayload {
-  clientMutationId?: string | null;
   /** The `AgentResource` that was created by this mutation. */
   agentResource?: AgentResource | null;
   agentResourceEdge?: AgentResourceEdge | null;
-}
-export interface UpdateAgentPlanPayload {
   clientMutationId?: string | null;
-  /** The `AgentPlan` that was updated by this mutation. */
-  agentPlan?: AgentPlan | null;
-  agentPlanEdge?: AgentPlanEdge | null;
 }
-export interface UpdateAgentPromptPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPrompt` that was updated by this mutation. */
-  agentPrompt?: AgentPrompt | null;
-  agentPromptEdge?: AgentPromptEdge | null;
-}
-export interface UpdateAgentPayload {
-  clientMutationId?: string | null;
-  /** The `Agent` that was updated by this mutation. */
-  agent?: Agent | null;
-  agentEdge?: AgentEdge | null;
-}
-export interface UpdateAgentMessagePayload {
-  clientMutationId?: string | null;
-  /** The `AgentMessage` that was updated by this mutation. */
-  agentMessage?: AgentMessage | null;
-  agentMessageEdge?: AgentMessageEdge | null;
-}
-export interface UpdateAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was updated by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
-export interface UpdateAgentResourceChunkPayload {
-  clientMutationId?: string | null;
-  /** The `AgentResourceChunk` that was updated by this mutation. */
+export interface CreateAgentResourceChunkPayload {
+  /** The `AgentResourceChunk` that was created by this mutation. */
   agentResourceChunk?: AgentResourceChunk | null;
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
-}
-export interface UpdateAgentPersonaPayload {
   clientMutationId?: string | null;
-  /** The `AgentPersona` that was updated by this mutation. */
-  agentPersona?: AgentPersona | null;
-  agentPersonaEdge?: AgentPersonaEdge | null;
 }
-export interface UpdateAgentThreadPayload {
+export interface CreateAgentTaskPayload {
+  /** The `AgentTask` that was created by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
   clientMutationId?: string | null;
-  /** The `AgentThread` that was updated by this mutation. */
+}
+export interface CreateAgentThreadPayload {
+  /** The `AgentThread` that was created by this mutation. */
   agentThread?: AgentThread | null;
   agentThreadEdge?: AgentThreadEdge | null;
-}
-export interface UpdateAgentResourcePayload {
   clientMutationId?: string | null;
-  /** The `AgentResource` that was updated by this mutation. */
-  agentResource?: AgentResource | null;
-  agentResourceEdge?: AgentResourceEdge | null;
-}
-export interface DeleteAgentPlanPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPlan` that was deleted by this mutation. */
-  agentPlan?: AgentPlan | null;
-  agentPlanEdge?: AgentPlanEdge | null;
-}
-export interface DeleteAgentPromptPayload {
-  clientMutationId?: string | null;
-  /** The `AgentPrompt` that was deleted by this mutation. */
-  agentPrompt?: AgentPrompt | null;
-  agentPromptEdge?: AgentPromptEdge | null;
 }
 export interface DeleteAgentPayload {
-  clientMutationId?: string | null;
   /** The `Agent` that was deleted by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
 }
 export interface DeleteAgentMessagePayload {
-  clientMutationId?: string | null;
   /** The `AgentMessage` that was deleted by this mutation. */
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
-}
-export interface DeleteAgentTaskPayload {
   clientMutationId?: string | null;
-  /** The `AgentTask` that was deleted by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
-export interface DeleteAgentResourceChunkPayload {
-  clientMutationId?: string | null;
-  /** The `AgentResourceChunk` that was deleted by this mutation. */
-  agentResourceChunk?: AgentResourceChunk | null;
-  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
 }
 export interface DeleteAgentPersonaPayload {
-  clientMutationId?: string | null;
   /** The `AgentPersona` that was deleted by this mutation. */
   agentPersona?: AgentPersona | null;
   agentPersonaEdge?: AgentPersonaEdge | null;
-}
-export interface DeleteAgentThreadPayload {
   clientMutationId?: string | null;
-  /** The `AgentThread` that was deleted by this mutation. */
-  agentThread?: AgentThread | null;
-  agentThreadEdge?: AgentThreadEdge | null;
+}
+export interface DeleteAgentPlanPayload {
+  /** The `AgentPlan` that was deleted by this mutation. */
+  agentPlan?: AgentPlan | null;
+  agentPlanEdge?: AgentPlanEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAgentPromptPayload {
+  /** The `AgentPrompt` that was deleted by this mutation. */
+  agentPrompt?: AgentPrompt | null;
+  agentPromptEdge?: AgentPromptEdge | null;
+  clientMutationId?: string | null;
 }
 export interface DeleteAgentResourcePayload {
-  clientMutationId?: string | null;
   /** The `AgentResource` that was deleted by this mutation. */
   agentResource?: AgentResource | null;
   agentResourceEdge?: AgentResourceEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAgentResourceChunkPayload {
+  /** The `AgentResourceChunk` that was deleted by this mutation. */
+  agentResourceChunk?: AgentResourceChunk | null;
+  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAgentTaskPayload {
+  /** The `AgentTask` that was deleted by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAgentThreadPayload {
+  /** The `AgentThread` that was deleted by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+  clientMutationId?: string | null;
 }
 export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
   /** The access type applied */
   accessType: string;
-  /** The storage provider used */
-  provider: string;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
   /** The S3 endpoint (null for AWS S3 default) */
   endpoint?: string | null;
   /** Error message if provisioning failed */
   error?: string | null;
+  /** The storage provider used */
+  provider: string;
+  /** Whether provisioning succeeded */
+  success: boolean;
 }
-/** A `AgentPlan` edge in the connection. */
-export interface AgentPlanEdge {
-  cursor?: string | null;
-  /** The `AgentPlan` at the end of the edge. */
-  node?: AgentPlan | null;
+export interface UpdateAgentPayload {
+  /** The `Agent` that was updated by this mutation. */
+  agent?: Agent | null;
+  agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
 }
-/** Information about pagination in a connection. */
-export interface PageInfo {
-  /** When paginating forwards, are there more items? */
-  hasNextPage: boolean;
-  /** When paginating backwards, are there more items? */
-  hasPreviousPage: boolean;
-  /** When paginating backwards, the cursor to continue. */
-  startCursor?: string | null;
-  /** When paginating forwards, the cursor to continue. */
-  endCursor?: string | null;
+export interface UpdateAgentMessagePayload {
+  /** The `AgentMessage` that was updated by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
+  clientMutationId?: string | null;
 }
-/** A `AgentPrompt` edge in the connection. */
-export interface AgentPromptEdge {
-  cursor?: string | null;
-  /** The `AgentPrompt` at the end of the edge. */
-  node?: AgentPrompt | null;
+export interface UpdateAgentPersonaPayload {
+  /** The `AgentPersona` that was updated by this mutation. */
+  agentPersona?: AgentPersona | null;
+  agentPersonaEdge?: AgentPersonaEdge | null;
+  clientMutationId?: string | null;
 }
-/** A `Agent` edge in the connection. */
-export interface AgentEdge {
-  cursor?: string | null;
-  /** The `Agent` at the end of the edge. */
-  node?: Agent | null;
+export interface UpdateAgentPlanPayload {
+  /** The `AgentPlan` that was updated by this mutation. */
+  agentPlan?: AgentPlan | null;
+  agentPlanEdge?: AgentPlanEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentPromptPayload {
+  /** The `AgentPrompt` that was updated by this mutation. */
+  agentPrompt?: AgentPrompt | null;
+  agentPromptEdge?: AgentPromptEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentResourcePayload {
+  /** The `AgentResource` that was updated by this mutation. */
+  agentResource?: AgentResource | null;
+  agentResourceEdge?: AgentResourceEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentResourceChunkPayload {
+  /** The `AgentResourceChunk` that was updated by this mutation. */
+  agentResourceChunk?: AgentResourceChunk | null;
+  agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentTaskPayload {
+  /** The `AgentTask` that was updated by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentThreadPayload {
+  /** The `AgentThread` that was updated by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+  clientMutationId?: string | null;
+}
+/** Information about a database table */
+export interface MetaTable {
+  constraints: MetaConstraints;
+  fields: MetaField[];
+  foreignKeyConstraints: MetaForeignKeyConstraint[];
+  /** i18n metadata (null if no @i18n tag) */
+  i18n?: MetaI18n | null;
+  indexes: MetaIndex[];
+  inflection: MetaInflection;
+  name: string;
+  primaryKeyConstraints: MetaPrimaryKeyConstraint[];
+  query: MetaQuery;
+  /** Realtime metadata (null if no @realtime tag) */
+  realtime?: MetaRealtime | null;
+  relations: MetaRelations;
+  schemaName: string;
+  /** Search metadata (null if no search configured) */
+  search?: MetaSearch | null;
+  /** Storage metadata (null if not a storage table) */
+  storage?: MetaStorage | null;
+  uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `AgentMessage` edge in the connection. */
 export interface AgentMessageEdge {
@@ -1687,17 +1768,16 @@ export interface AgentMessageEdge {
   /** The `AgentMessage` at the end of the edge. */
   node?: AgentMessage | null;
 }
-/** A `AgentTask` edge in the connection. */
-export interface AgentTaskEdge {
-  cursor?: string | null;
-  /** The `AgentTask` at the end of the edge. */
-  node?: AgentTask | null;
-}
-/** A `AgentResourceChunk` edge in the connection. */
-export interface AgentResourceChunkEdge {
-  cursor?: string | null;
-  /** The `AgentResourceChunk` at the end of the edge. */
-  node?: AgentResourceChunk | null;
+/** Information about pagination in a connection. */
+export interface PageInfo {
+  /** When paginating forwards, the cursor to continue. */
+  endCursor?: string | null;
+  /** When paginating forwards, are there more items? */
+  hasNextPage: boolean;
+  /** When paginating backwards, are there more items? */
+  hasPreviousPage: boolean;
+  /** When paginating backwards, the cursor to continue. */
+  startCursor?: string | null;
 }
 /** A `AgentPersona` edge in the connection. */
 export interface AgentPersonaEdge {
@@ -1705,11 +1785,23 @@ export interface AgentPersonaEdge {
   /** The `AgentPersona` at the end of the edge. */
   node?: AgentPersona | null;
 }
-/** A `AgentThread` edge in the connection. */
-export interface AgentThreadEdge {
+/** A `AgentPlan` edge in the connection. */
+export interface AgentPlanEdge {
   cursor?: string | null;
-  /** The `AgentThread` at the end of the edge. */
-  node?: AgentThread | null;
+  /** The `AgentPlan` at the end of the edge. */
+  node?: AgentPlan | null;
+}
+/** A `AgentPrompt` edge in the connection. */
+export interface AgentPromptEdge {
+  cursor?: string | null;
+  /** The `AgentPrompt` at the end of the edge. */
+  node?: AgentPrompt | null;
+}
+/** A `AgentResourceChunk` edge in the connection. */
+export interface AgentResourceChunkEdge {
+  cursor?: string | null;
+  /** The `AgentResourceChunk` at the end of the edge. */
+  node?: AgentResourceChunk | null;
 }
 /** A `AgentResource` edge in the connection. */
 export interface AgentResourceEdge {
@@ -1717,133 +1809,201 @@ export interface AgentResourceEdge {
   /** The `AgentResource` at the end of the edge. */
   node?: AgentResource | null;
 }
-/** Information about a database table */
-export interface MetaTable {
-  name: string;
-  schemaName: string;
-  fields: MetaField[];
-  indexes: MetaIndex[];
-  constraints: MetaConstraints;
-  foreignKeyConstraints: MetaForeignKeyConstraint[];
-  primaryKeyConstraints: MetaPrimaryKeyConstraint[];
-  uniqueConstraints: MetaUniqueConstraint[];
-  relations: MetaRelations;
-  inflection: MetaInflection;
-  query: MetaQuery;
+/** A `AgentTask` edge in the connection. */
+export interface AgentTaskEdge {
+  cursor?: string | null;
+  /** The `AgentTask` at the end of the edge. */
+  node?: AgentTask | null;
 }
-/** Information about a table field/column */
-export interface MetaField {
-  name: string;
-  type: MetaType;
-  isNotNull: boolean;
-  hasDefault: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
-  description?: string | null;
+/** A `AgentThread` edge in the connection. */
+export interface AgentThreadEdge {
+  cursor?: string | null;
+  /** The `AgentThread` at the end of the edge. */
+  node?: AgentThread | null;
 }
-/** Information about a database index */
-export interface MetaIndex {
-  name: string;
-  isUnique: boolean;
-  isPrimary: boolean;
-  columns: string[];
-  fields?: MetaField[] | null;
+/** A `Agent` edge in the connection. */
+export interface AgentEdge {
+  cursor?: string | null;
+  /** The `Agent` at the end of the edge. */
+  node?: Agent | null;
 }
 /** Table constraints */
 export interface MetaConstraints {
+  foreignKey: MetaForeignKeyConstraint[];
   primaryKey?: MetaPrimaryKeyConstraint | null;
   unique: MetaUniqueConstraint[];
-  foreignKey: MetaForeignKeyConstraint[];
+}
+/** Information about a table field/column */
+export interface MetaField {
+  description?: string | null;
+  /** Enum metadata if this field has an enum type */
+  enumValues?: MetaEnum | null;
+  hasDefault: boolean;
+  isForeignKey: boolean;
+  isNotNull: boolean;
+  isPrimaryKey: boolean;
+  name: string;
+  type: MetaType;
 }
 /** Information about a foreign key constraint */
 export interface MetaForeignKeyConstraint {
-  name: string;
   fields: MetaField[];
-  referencedTable: string;
-  referencedFields: string[];
+  name: string;
   refFields?: MetaField[] | null;
   refTable?: MetaRefTable | null;
+  referencedFields: string[];
+  referencedTable: string;
+}
+/** i18n metadata for a table with @i18n tag */
+export interface MetaI18n {
+  /** Fields that are translatable */
+  translatableFields: MetaI18nField[];
+  /** Name of the translation table */
+  translationTable: string;
+}
+/** Information about a database index */
+export interface MetaIndex {
+  columns: string[];
+  fields?: MetaField[] | null;
+  isPrimary: boolean;
+  isUnique: boolean;
+  name: string;
+}
+/** Table inflection names */
+export interface MetaInflection {
+  allRows: string;
+  conditionType: string;
+  connection: string;
+  createInputType: string;
+  createPayloadType: string;
+  deletePayloadType: string;
+  edge: string;
+  filterType?: string | null;
+  orderByType: string;
+  patchType?: string | null;
+  tableType: string;
+  updatePayloadType?: string | null;
 }
 /** Information about a primary key constraint */
 export interface MetaPrimaryKeyConstraint {
-  name: string;
   fields: MetaField[];
+  name: string;
 }
-/** Information about a unique constraint */
-export interface MetaUniqueConstraint {
-  name: string;
-  fields: MetaField[];
+/** Table query/mutation names */
+export interface MetaQuery {
+  all: string;
+  create?: string | null;
+  delete?: string | null;
+  one?: string | null;
+  update?: string | null;
+}
+/** Realtime metadata for a table with @realtime tag */
+export interface MetaRealtime {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
 }
 /** Table relations */
 export interface MetaRelations {
   belongsTo: MetaBelongsToRelation[];
   has: MetaHasRelation[];
-  hasOne: MetaHasRelation[];
   hasMany: MetaHasRelation[];
+  hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
 }
-/** Table inflection names */
-export interface MetaInflection {
-  tableType: string;
-  allRows: string;
-  connection: string;
-  edge: string;
-  filterType?: string | null;
-  orderByType: string;
-  conditionType: string;
-  patchType?: string | null;
-  createInputType: string;
-  createPayloadType: string;
-  updatePayloadType?: string | null;
-  deletePayloadType: string;
+/** Search metadata for a table */
+export interface MetaSearch {
+  /** Active search algorithms on this table */
+  algorithms: string[];
+  /** Searchable columns with their algorithm */
+  columns: MetaSearchColumn[];
+  /** Per-table search configuration */
+  config?: MetaSearchConfig | null;
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
 }
-/** Table query/mutation names */
-export interface MetaQuery {
-  all: string;
-  one?: string | null;
-  create?: string | null;
-  update?: string | null;
-  delete?: string | null;
+/** Storage metadata for a table */
+export interface MetaStorage {
+  /** Whether this table is a storage buckets table */
+  isBucketsTable: boolean;
+  /** Whether this table is a storage files table */
+  isFilesTable: boolean;
+}
+/** Information about a unique constraint */
+export interface MetaUniqueConstraint {
+  fields: MetaField[];
+  name: string;
+}
+/** Information about a PostgreSQL enum type */
+export interface MetaEnum {
+  /** The PostgreSQL enum type name */
+  name: string;
+  /** Allowed values for this enum */
+  values: string[];
 }
 /** Information about a PostgreSQL type */
 export interface MetaType {
-  pgType: string;
   gqlType: string;
+  hasDefault?: boolean | null;
   isArray: boolean;
   isNotNull?: boolean | null;
-  hasDefault?: boolean | null;
+  pgType: string;
   subtype?: string | null;
 }
 /** Reference to a related table */
 export interface MetaRefTable {
   name: string;
 }
+/** A translatable field */
+export interface MetaI18nField {
+  /** GraphQL field name */
+  name: string;
+  /** PostgreSQL column type (text, citext) */
+  type: string;
+}
 /** A belongs-to (forward FK) relation */
 export interface MetaBelongsToRelation {
   fieldName?: string | null;
   isUnique: boolean;
-  type?: string | null;
   keys: MetaField[];
   references: MetaRefTable;
+  type?: string | null;
 }
 /** A has-one or has-many (reverse FK) relation */
 export interface MetaHasRelation {
   fieldName?: string | null;
   isUnique: boolean;
-  type?: string | null;
   keys: MetaField[];
   referencedBy: MetaRefTable;
+  type?: string | null;
 }
 /** A many-to-many relation via junction table */
 export interface MetaManyToManyRelation {
   fieldName?: string | null;
-  type?: string | null;
-  junctionTable: MetaRefTable;
   junctionLeftConstraint: MetaForeignKeyConstraint;
   junctionLeftKeyAttributes: MetaField[];
   junctionRightConstraint: MetaForeignKeyConstraint;
   junctionRightKeyAttributes: MetaField[];
+  junctionTable: MetaRefTable;
   leftKeyAttributes: MetaField[];
   rightKeyAttributes: MetaField[];
   rightTable: MetaRefTable;
+  type?: string | null;
+}
+/** A searchable column with its algorithm */
+export interface MetaSearchColumn {
+  /** Search algorithm: tsvector, bm25, trgm, or vector */
+  algorithm: string;
+  /** Column name (camelCase) */
+  name: string;
+}
+/** Per-table search configuration from @searchConfig smart tag */
+export interface MetaSearchConfig {
+  /** Exponential decay factor per day */
+  boostRecencyDecay?: number | null;
+  /** Field used for recency decay */
+  boostRecencyField?: string | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** JSON-encoded per-adapter score weights */
+  weights?: string | null;
 }

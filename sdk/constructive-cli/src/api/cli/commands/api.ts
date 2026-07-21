@@ -16,13 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  name: 'string',
-  dbname: 'string',
-  roleName: 'string',
+  annotations: 'json',
   anonRole: 'string',
+  databaseId: 'uuid',
+  dbname: 'string',
+  id: 'uuid',
   isPublic: 'boolean',
+  labels: 'json',
+  name: 'string',
+  roleName: 'string',
 };
 const usage =
   '\napi <command>\n\nCommands:\n  list                  List api records\n  find-first            Find first matching api record\n  get                   Get a api by ID\n  create                Create a new api\n  update                Update an existing api\n  delete                Delete a api\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,13 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      name: true,
-      dbname: true,
-      roleName: true,
+      annotations: true,
       anonRole: true,
+      databaseId: true,
+      dbname: true,
+      id: true,
       isPublic: true,
+      labels: true,
+      name: true,
+      roleName: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ApiSelect, ApiFilter, ApiOrderBy> & {
@@ -102,13 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      name: true,
-      dbname: true,
-      roleName: true,
+      annotations: true,
       anonRole: true,
+      databaseId: true,
+      dbname: true,
+      id: true,
       isPublic: true,
+      labels: true,
+      name: true,
+      roleName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ApiSelect, ApiFilter, ApiOrderBy> & {
@@ -141,13 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          name: true,
-          dbname: true,
-          roleName: true,
+          annotations: true,
           anonRole: true,
+          databaseId: true,
+          dbname: true,
+          id: true,
           isPublic: true,
+          labels: true,
+          name: true,
+          roleName: true,
         },
       })
       .execute();
@@ -164,28 +172,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'dbname',
-        message: 'dbname',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'roleName',
-        message: 'roleName',
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
         required: false,
         skipPrompt: true,
       },
@@ -197,9 +186,42 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'dbname',
+        message: 'dbname',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'boolean',
         name: 'isPublic',
         message: 'isPublic',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'roleName',
+        message: 'roleName',
         required: false,
         skipPrompt: true,
       },
@@ -210,21 +232,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.api
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
-          name: cleanedData.name,
-          dbname: cleanedData.dbname,
-          roleName: cleanedData.roleName,
+          annotations: cleanedData.annotations,
           anonRole: cleanedData.anonRole,
+          databaseId: cleanedData.databaseId,
+          dbname: cleanedData.dbname,
           isPublic: cleanedData.isPublic,
+          labels: cleanedData.labels,
+          name: cleanedData.name,
+          roleName: cleanedData.roleName,
         },
         select: {
-          id: true,
-          databaseId: true,
-          name: true,
-          dbname: true,
-          roleName: true,
+          annotations: true,
           anonRole: true,
+          databaseId: true,
+          dbname: true,
+          id: true,
           isPublic: true,
+          labels: true,
+          name: true,
+          roleName: true,
         },
       })
       .execute();
@@ -247,28 +273,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'dbname',
-        message: 'dbname',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'roleName',
-        message: 'roleName',
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
         required: false,
         skipPrompt: true,
       },
@@ -280,9 +287,42 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'dbname',
+        message: 'dbname',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'boolean',
         name: 'isPublic',
         message: 'isPublic',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'roleName',
+        message: 'roleName',
         required: false,
         skipPrompt: true,
       },
@@ -296,21 +336,25 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
-          name: cleanedData.name,
-          dbname: cleanedData.dbname,
-          roleName: cleanedData.roleName,
+          annotations: cleanedData.annotations,
           anonRole: cleanedData.anonRole,
+          databaseId: cleanedData.databaseId,
+          dbname: cleanedData.dbname,
           isPublic: cleanedData.isPublic,
+          labels: cleanedData.labels,
+          name: cleanedData.name,
+          roleName: cleanedData.roleName,
         },
         select: {
-          id: true,
-          databaseId: true,
-          name: true,
-          dbname: true,
-          roleName: true,
+          annotations: true,
           anonRole: true,
+          databaseId: true,
+          dbname: true,
+          id: true,
           isPublic: true,
+          labels: true,
+          name: true,
+          roleName: true,
         },
       })
       .execute();

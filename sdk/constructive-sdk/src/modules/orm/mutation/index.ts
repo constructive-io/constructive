@@ -8,35 +8,35 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   ConstructBlueprintInput,
+  CopyTemplateToBlueprintInput,
+  ProvisionBucketInput,
+  ProvisionCheckConstraintInput,
   ProvisionFullTextSearchInput,
   ProvisionIndexInput,
-  ProvisionCheckConstraintInput,
-  ProvisionUniqueConstraintInput,
-  CopyTemplateToBlueprintInput,
+  ProvisionRelationInput,
   ProvisionSpatialRelationInput,
   ProvisionTableInput,
-  ProvisionRelationInput,
-  ProvisionBucketInput,
+  ProvisionUniqueConstraintInput,
   ConstructBlueprintPayload,
+  CopyTemplateToBlueprintPayload,
+  ProvisionBucketPayload,
+  ProvisionCheckConstraintPayload,
   ProvisionFullTextSearchPayload,
   ProvisionIndexPayload,
-  ProvisionCheckConstraintPayload,
-  ProvisionUniqueConstraintPayload,
-  CopyTemplateToBlueprintPayload,
+  ProvisionRelationPayload,
   ProvisionSpatialRelationPayload,
   ProvisionTablePayload,
-  ProvisionRelationPayload,
-  ProvisionBucketPayload,
+  ProvisionUniqueConstraintPayload,
   ConstructBlueprintPayloadSelect,
+  CopyTemplateToBlueprintPayloadSelect,
+  ProvisionBucketPayloadSelect,
+  ProvisionCheckConstraintPayloadSelect,
   ProvisionFullTextSearchPayloadSelect,
   ProvisionIndexPayloadSelect,
-  ProvisionCheckConstraintPayloadSelect,
-  ProvisionUniqueConstraintPayloadSelect,
-  CopyTemplateToBlueprintPayloadSelect,
+  ProvisionRelationPayloadSelect,
   ProvisionSpatialRelationPayloadSelect,
   ProvisionTablePayloadSelect,
-  ProvisionRelationPayloadSelect,
-  ProvisionBucketPayloadSelect,
+  ProvisionUniqueConstraintPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 /**
@@ -45,6 +45,30 @@ import { connectionFieldsMap } from '../input-types';
  */
 export interface ConstructBlueprintVariables {
   input: ConstructBlueprintInput;
+}
+/**
+ * Variables for copyTemplateToBlueprint
+ * Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
+ */
+export interface CopyTemplateToBlueprintVariables {
+  input: CopyTemplateToBlueprintInput;
+}
+/**
+ * Variables for provisionBucket
+ * Provision an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then creates and configures
+the S3 bucket with the appropriate privacy policies, CORS rules,
+and lifecycle settings.
+ */
+export interface ProvisionBucketVariables {
+  input: ProvisionBucketInput;
+}
+/**
+ * Variables for provisionCheckConstraint
+ * Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
+ */
+export interface ProvisionCheckConstraintVariables {
+  input: ProvisionCheckConstraintInput;
 }
 /**
  * Variables for provisionFullTextSearch
@@ -61,25 +85,11 @@ export interface ProvisionIndexVariables {
   input: ProvisionIndexInput;
 }
 /**
- * Variables for provisionCheckConstraint
- * Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
+ * Variables for provisionRelation
+ * Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
  */
-export interface ProvisionCheckConstraintVariables {
-  input: ProvisionCheckConstraintInput;
-}
-/**
- * Variables for provisionUniqueConstraint
- * Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
- */
-export interface ProvisionUniqueConstraintVariables {
-  input: ProvisionUniqueConstraintInput;
-}
-/**
- * Variables for copyTemplateToBlueprint
- * Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
- */
-export interface CopyTemplateToBlueprintVariables {
-  input: CopyTemplateToBlueprintInput;
+export interface ProvisionRelationVariables {
+  input: ProvisionRelationInput;
 }
 /**
  * Variables for provisionSpatialRelation
@@ -96,21 +106,11 @@ export interface ProvisionTableVariables {
   input: ProvisionTableInput;
 }
 /**
- * Variables for provisionRelation
- * Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+ * Variables for provisionUniqueConstraint
+ * Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
  */
-export interface ProvisionRelationVariables {
-  input: ProvisionRelationInput;
-}
-/**
- * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
- */
-export interface ProvisionBucketVariables {
-  input: ProvisionBucketInput;
+export interface ProvisionUniqueConstraintVariables {
+  input: ProvisionUniqueConstraintInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -141,6 +141,93 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ConstructBlueprintPayload'
+        ),
+      }),
+    copyTemplateToBlueprint: <S extends CopyTemplateToBlueprintPayloadSelect>(
+      args: CopyTemplateToBlueprintVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CopyTemplateToBlueprintPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        copyTemplateToBlueprint: InferSelectResult<CopyTemplateToBlueprintPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CopyTemplateToBlueprint',
+        fieldName: 'copyTemplateToBlueprint',
+        ...buildCustomDocument(
+          'mutation',
+          'CopyTemplateToBlueprint',
+          'copyTemplateToBlueprint',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CopyTemplateToBlueprintInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CopyTemplateToBlueprintPayload'
+        ),
+      }),
+    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
+      args: ProvisionBucketVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionBucket',
+        fieldName: 'provisionBucket',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionBucket',
+          'provisionBucket',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionBucketInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionBucketPayload'
+        ),
+      }),
+    provisionCheckConstraint: <S extends ProvisionCheckConstraintPayloadSelect>(
+      args: ProvisionCheckConstraintVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionCheckConstraintPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionCheckConstraint: InferSelectResult<ProvisionCheckConstraintPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionCheckConstraint',
+        fieldName: 'provisionCheckConstraint',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionCheckConstraint',
+          'provisionCheckConstraint',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionCheckConstraintInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionCheckConstraintPayload'
         ),
       }),
     provisionFullTextSearch: <S extends ProvisionFullTextSearchPayloadSelect>(
@@ -201,91 +288,33 @@ export function createMutationOperations(client: OrmClient) {
           'ProvisionIndexPayload'
         ),
       }),
-    provisionCheckConstraint: <S extends ProvisionCheckConstraintPayloadSelect>(
-      args: ProvisionCheckConstraintVariables,
+    provisionRelation: <S extends ProvisionRelationPayloadSelect>(
+      args: ProvisionRelationVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ProvisionCheckConstraintPayloadSelect>
+      } & StrictSelect<S, ProvisionRelationPayloadSelect>
     ) =>
       new QueryBuilder<{
-        provisionCheckConstraint: InferSelectResult<ProvisionCheckConstraintPayload, S> | null;
+        provisionRelation: InferSelectResult<ProvisionRelationPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ProvisionCheckConstraint',
-        fieldName: 'provisionCheckConstraint',
+        operationName: 'ProvisionRelation',
+        fieldName: 'provisionRelation',
         ...buildCustomDocument(
           'mutation',
-          'ProvisionCheckConstraint',
-          'provisionCheckConstraint',
+          'ProvisionRelation',
+          'provisionRelation',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ProvisionCheckConstraintInput!',
+              type: 'ProvisionRelationInput!',
             },
           ],
           connectionFieldsMap,
-          'ProvisionCheckConstraintPayload'
-        ),
-      }),
-    provisionUniqueConstraint: <S extends ProvisionUniqueConstraintPayloadSelect>(
-      args: ProvisionUniqueConstraintVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionUniqueConstraintPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionUniqueConstraint: InferSelectResult<ProvisionUniqueConstraintPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionUniqueConstraint',
-        fieldName: 'provisionUniqueConstraint',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionUniqueConstraint',
-          'provisionUniqueConstraint',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionUniqueConstraintInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionUniqueConstraintPayload'
-        ),
-      }),
-    copyTemplateToBlueprint: <S extends CopyTemplateToBlueprintPayloadSelect>(
-      args: CopyTemplateToBlueprintVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CopyTemplateToBlueprintPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        copyTemplateToBlueprint: InferSelectResult<CopyTemplateToBlueprintPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CopyTemplateToBlueprint',
-        fieldName: 'copyTemplateToBlueprint',
-        ...buildCustomDocument(
-          'mutation',
-          'CopyTemplateToBlueprint',
-          'copyTemplateToBlueprint',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CopyTemplateToBlueprintInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CopyTemplateToBlueprintPayload'
+          'ProvisionRelationPayload'
         ),
       }),
     provisionSpatialRelation: <S extends ProvisionSpatialRelationPayloadSelect>(
@@ -346,62 +375,33 @@ export function createMutationOperations(client: OrmClient) {
           'ProvisionTablePayload'
         ),
       }),
-    provisionRelation: <S extends ProvisionRelationPayloadSelect>(
-      args: ProvisionRelationVariables,
+    provisionUniqueConstraint: <S extends ProvisionUniqueConstraintPayloadSelect>(
+      args: ProvisionUniqueConstraintVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ProvisionRelationPayloadSelect>
+      } & StrictSelect<S, ProvisionUniqueConstraintPayloadSelect>
     ) =>
       new QueryBuilder<{
-        provisionRelation: InferSelectResult<ProvisionRelationPayload, S> | null;
+        provisionUniqueConstraint: InferSelectResult<ProvisionUniqueConstraintPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ProvisionRelation',
-        fieldName: 'provisionRelation',
+        operationName: 'ProvisionUniqueConstraint',
+        fieldName: 'provisionUniqueConstraint',
         ...buildCustomDocument(
           'mutation',
-          'ProvisionRelation',
-          'provisionRelation',
+          'ProvisionUniqueConstraint',
+          'provisionUniqueConstraint',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ProvisionRelationInput!',
+              type: 'ProvisionUniqueConstraintInput!',
             },
           ],
           connectionFieldsMap,
-          'ProvisionRelationPayload'
-        ),
-      }),
-    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
-      args: ProvisionBucketVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionBucketPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionBucket',
-        fieldName: 'provisionBucket',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionBucket',
-          'provisionBucket',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionBucketInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionBucketPayload'
+          'ProvisionUniqueConstraintPayload'
         ),
       }),
   };

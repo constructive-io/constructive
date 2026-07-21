@@ -198,7 +198,8 @@ export class IdentityProvidersModuleModel {
       'UpdateIdentityProvidersModuleInput',
       'id',
       'identityProvidersModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

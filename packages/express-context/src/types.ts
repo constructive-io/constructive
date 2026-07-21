@@ -141,6 +141,7 @@ export type ApiConfigResult = ApiStructure | ApiError | null;
 export type ConstructiveAPIToken = {
   id?: string;
   user_id?: string;
+  principal_id?: string;
   session_id?: string;
   access_level?: string;
   kind?: string;
@@ -248,8 +249,8 @@ export interface IdentityProvidersModuleRow {
   prefix: string | null;
 }
 
-export interface ConfigSecretsModuleRow {
-  table_id: string;
+export interface InternalSecretsModuleRow {
+  internal_secrets_table_id: string;
 }
 
 export interface SchemaAndTableRow {
@@ -286,6 +287,33 @@ export interface ConnectedAccountsModuleRow {
   schema_name: string;
   private_schema_name: string;
   table_name: string;
+}
+
+// ─── Compute Types ────────────────────────────────────────────────────────────
+
+/** One provisioned function-module scope's compute table names. */
+export interface ComputeModuleConfig {
+  schemaName: string;
+  definitionsTableName: string;
+  bindingsTableName: string;
+  invocationsSchemaName: string;
+  invocationsTableName: string;
+  /**
+   * Scope-key column of the invocations table, read from the metaschema
+   * (`function_invocation_module.entity_field`): `database_id` for the
+   * database scope, `NULL` for global scopes (platform/app), or the entity
+   * key column for entity scopes. Consumers set this column on invocation
+   * inserts instead of switching on scope name.
+   */
+  invocationsEntityField: string | null;
+}
+
+/**
+ * All function modules provisioned on the database. A database may have one
+ * per scope; every module is exposed and RLS governs access to each.
+ */
+export interface ComputeConfig {
+  modules: ComputeModuleConfig[];
 }
 
 export interface LlmConfig {
@@ -325,6 +353,7 @@ export interface BuiltinModuleMap {
   identityProviders: IdentityProvidersConfig;
   connectedAccountsModule: ConnectedAccountsModuleConfig;
   llm: LlmConfig;
+  compute: ComputeConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

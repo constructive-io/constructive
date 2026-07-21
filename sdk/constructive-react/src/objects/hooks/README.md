@@ -32,8 +32,18 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
-| `useGetAllQuery` | Query | List all getAll |
-| `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
+| `useCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useCreateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useUpdateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useDeleteCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useGetAllTreeNodesQuery` | Query | List all getAllTreeNodes |
+| `useCreateGetAllTreeNodesRecordMutation` | Mutation | Create a getAllTreeNodesRecord |
+| `useObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useCreateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useUpdateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useDeleteObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useRefsQuery` | Query | Branch heads — mutable pointers into the commit chain |
 | `useRefQuery` | Query | Branch heads — mutable pointers into the commit chain |
 | `useCreateRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
@@ -44,81 +54,50 @@ function App() {
 | `useCreateStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useUpdateStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useDeleteStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
-| `useObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useCreateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useUpdateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useDeleteObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
-| `useCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
-| `useCreateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
-| `useUpdateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
-| `useDeleteCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useInitEmptyRepoMutation` | Mutation | initEmptyRepo |
-| `useSetDataAtPathMutation` | Mutation | setDataAtPath |
 | `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `useSetDataAtPathMutation` | Mutation | setDataAtPath |
 
 ## Table Hooks
 
-### GetAllRecord
+### Commit
 
 ```typescript
-// List all getAll
-const { data, isLoading } = useGetAllQuery({
-  selection: { fields: { path: true, data: true } },
+// List all commits
+const { data, isLoading } = useCommitsQuery({
+  selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } },
 });
 
-// Create a getAllRecord
-const { mutate: create } = useCreateGetAllRecordMutation({
+// Get one commit
+const { data: item } = useCommitQuery({
+  id: '<UUID>',
+  selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } },
+});
+
+// Create a commit
+const { mutate: create } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-create({ path: '<String>', data: '<JSON>' });
+create({ authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
 ```
 
-### Ref
+### GetAllTreeNodesRecord
 
 ```typescript
-// List all refs
-const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+// List all getAllTreeNodes
+const { data, isLoading } = useGetAllTreeNodesQuery({
+  selection: { fields: { data: true, path: true } },
 });
 
-// Get one ref
-const { data: item } = useRefQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
-});
-
-// Create a ref
-const { mutate: create } = useCreateRefMutation({
+// Create a getAllTreeNodesRecord
+const { mutate: create } = useCreateGetAllTreeNodesRecordMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' });
-```
-
-### Store
-
-```typescript
-// List all stores
-const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
-});
-
-// Get one store
-const { data: item } = useStoreQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
-});
-
-// Create a store
-const { mutate: create } = useCreateStoreMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
+create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### Object
@@ -126,41 +105,62 @@ create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
 ```typescript
 // List all objects
 const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } },
 });
 
 // Get one object
 const { data: item } = useObjectQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } },
 });
 
 // Create a object
 const { mutate: create } = useCreateObjectMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' });
+create({ data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' });
 ```
 
-### Commit
+### Ref
 
 ```typescript
-// List all commits
-const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+// List all refs
+const { data, isLoading } = useRefsQuery({
+  selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } },
 });
 
-// Get one commit
-const { data: item } = useCommitQuery({
+// Get one ref
+const { data: item } = useRefQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } },
 });
 
-// Create a commit
-const { mutate: create } = useCreateCommitMutation({
+// Create a ref
+const { mutate: create } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
+create({ commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' });
+```
+
+### Store
+
+```typescript
+// List all stores
+const { data, isLoading } = useStoresQuery({
+  selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } },
+});
+
+// Get one store
+const { data: item } = useStoreQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, hash: true, id: true, name: true } },
+});
+
+// Create a store
+const { mutate: create } = useCreateStoreMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', hash: '<UUID>', name: '<String>' });
 ```
 
 ## Custom Operation Hooks
@@ -175,17 +175,6 @@ initEmptyRepo
   | Argument | Type |
   |----------|------|
   | `input` | InitEmptyRepoInput (required) |
-
-### `useSetDataAtPathMutation`
-
-setDataAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetDataAtPathInput (required) |
 
 ### `useInsertNodeAtPathMutation`
 
@@ -211,6 +200,17 @@ and lifecycle settings.
   | Argument | Type |
   |----------|------|
   | `input` | ProvisionBucketInput (required) |
+
+### `useSetDataAtPathMutation`
+
+setDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetDataAtPathInput (required) |
 
 ---
 

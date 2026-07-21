@@ -1,6 +1,6 @@
 {
   "name": "pg-env",
-  "version": "1.16.0",
+  "version": "1.18.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL environment configuration utilities",
   "main": "index.js",
@@ -35,6 +35,9 @@
     "config",
     "constructive"
   ],
+  "dependencies": {
+    "12factor-env": "workspace:^"
+  },
   "devDependencies": {
     "makage": "^0.3.0"
   }

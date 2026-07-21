@@ -221,7 +221,8 @@ export class AppPermissionDefaultPermissionModel {
       'UpdateAppPermissionDefaultPermissionInput',
       'id',
       'appPermissionDefaultPermissionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

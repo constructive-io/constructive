@@ -1,701 +1,31 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Schema Snapshot should generate consistent GraphQL SDL from the test schema 1`] = `
-""""The root query type which gives access points into the data universe."""
-type Query {
-  """Reads and enables pagination through a set of \`PostTag\`."""
-  postTags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PostTagFilter
-
-    """The method to use when ordering \`PostTag\`."""
-    orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostTagConnection
-
-  """Reads and enables pagination through a set of \`Tag\`."""
-  tags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: TagFilter
-
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TagConnection
-
-  """Reads and enables pagination through a set of \`User\`."""
-  users(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: UserFilter
-
-    """The method to use when ordering \`User\`."""
-    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UserConnection
-
-  """Reads and enables pagination through a set of \`Comment\`."""
-  comments(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CommentFilter
-
-    """The method to use when ordering \`Comment\`."""
-    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CommentConnection
-
-  """Reads and enables pagination through a set of \`Post\`."""
-  posts(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PostFilter
-
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostConnection
-
-  """
-  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
-  """
-  _meta: MetaSchema
-}
-
-"""A connection to a list of \`PostTag\` values."""
-type PostTagConnection {
-  """A list of \`PostTag\` objects."""
-  nodes: [PostTag]!
-
-  """
-  A list of edges which contains the \`PostTag\` and cursor to aid in pagination.
-  """
-  edges: [PostTagEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`PostTag\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type PostTag {
-  id: UUID!
-  postId: UUID!
-  tagId: UUID!
-  createdAt: Datetime
-
-  """Reads a single \`Post\` that is related to this \`PostTag\`."""
-  post: Post
-
-  """Reads a single \`Tag\` that is related to this \`PostTag\`."""
-  tag: Tag
-}
-
-"""
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-"""
-scalar UUID
-
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
-3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
-that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
-to unexpected results.
-"""
-scalar Datetime
-
-type Post {
-  id: UUID!
-  authorId: UUID!
-  title: String!
-  slug: String!
-  content: String
-  excerpt: String
-  isPublished: Boolean
-  publishedAt: Datetime
-  viewCount: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads and enables pagination through a set of \`Tag\`."""
-  tags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: TagFilter
-
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostTagsManyToManyConnection!
-
-  """Reads a single \`User\` that is related to this \`Post\`."""
-  author: User
-
-  """Reads and enables pagination through a set of \`PostTag\`."""
-  postTags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PostTagFilter
-
-    """The method to use when ordering \`PostTag\`."""
-    orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostTagConnection!
-
-  """Reads and enables pagination through a set of \`Comment\`."""
-  comments(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CommentFilter
-
-    """The method to use when ordering \`Comment\`."""
-    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CommentConnection!
-}
-
-"""A connection to a list of \`Tag\` values, with data from \`PostTag\`."""
-type PostTagsManyToManyConnection {
-  """A list of \`Tag\` objects."""
-  nodes: [Tag]!
-
-  """
-  A list of edges which contains the \`Tag\`, info from the \`PostTag\`, and the cursor to aid in pagination.
-  """
-  edges: [PostTagsManyToManyEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Tag\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Tag {
-  id: UUID!
-  name: String!
-  slug: String!
-  description: String
-  color: String
-  createdAt: Datetime
-
-  """Reads and enables pagination through a set of \`Post\`."""
-  posts(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PostFilter
-
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TagPostsManyToManyConnection!
-
-  """Reads and enables pagination through a set of \`PostTag\`."""
-  postTags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PostTagFilter
-
-    """The method to use when ordering \`PostTag\`."""
-    orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostTagConnection!
-}
-
-"""A connection to a list of \`Post\` values, with data from \`PostTag\`."""
-type TagPostsManyToManyConnection {
-  """A list of \`Post\` objects."""
-  nodes: [Post]!
-
-  """
-  A list of edges which contains the \`Post\`, info from the \`PostTag\`, and the cursor to aid in pagination.
-  """
-  edges: [TagPostsManyToManyEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Post\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Post\` edge in the connection, with data from \`PostTag\`."""
-type TagPostsManyToManyEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Post\` at the end of the edge."""
-  node: Post
-  id: UUID!
-  createdAt: Datetime
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
-"""
-A filter to be used against \`Post\` object types. All fields are combined with a logical ‘and.’
-"""
-input PostFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`authorId\` field."""
-  authorId: UUIDFilter
-
-  """Filter by the object’s \`title\` field."""
-  title: StringFilter
-
-  """Filter by the object’s \`slug\` field."""
-  slug: StringFilter
-
-  """Filter by the object’s \`content\` field."""
-  content: StringFilter
-
-  """Filter by the object’s \`excerpt\` field."""
-  excerpt: StringFilter
-
-  """Filter by the object’s \`isPublished\` field."""
-  isPublished: BooleanFilter
-
-  """Filter by the object’s \`publishedAt\` field."""
-  publishedAt: DatetimeFilter
-
-  """Filter by the object’s \`viewCount\` field."""
-  viewCount: IntFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s \`updatedAt\` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [PostFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [PostFilter!]
-
-  """Negates the expression."""
-  not: PostFilter
-
-  """Filter by the object’s \`author\` relation."""
-  author: UserFilter
-
-  """Filter by the object’s \`postTags\` relation."""
-  postTags: PostToManyPostTagFilter
-
-  """\`postTags\` exist."""
-  postTagsExist: Boolean
-
-  """Filter by the object’s \`comments\` relation."""
-  comments: PostToManyCommentFilter
-
-  """\`comments\` exist."""
-  commentsExist: Boolean
-}
-
-"""
-A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDFilter {
-  """
-  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: UUID
-
-  """Not equal to the specified value."""
-  notEqualTo: UUID
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: UUID
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: UUID
-
-  """Included in the specified list."""
-  in: [UUID!]
-
-  """Not included in the specified list."""
-  notIn: [UUID!]
-
-  """Less than the specified value."""
-  lessThan: UUID
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: UUID
-
-  """Greater than the specified value."""
-  greaterThan: UUID
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: UUID
-}
-
-"""
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
-}
-
-"""
+""""
 A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
 """
 input BooleanFilter {
-  """
-  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Boolean
-
-  """Not equal to the specified value."""
-  notEqualTo: Boolean
-
   """
   Not equal to the specified value, treating null like an ordinary value.
   """
   distinctFrom: Boolean
 
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Boolean
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
 
   """Included in the specified list."""
   in: [Boolean!]
 
-  """Not included in the specified list."""
-  notIn: [Boolean!]
+  """
+  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
+  """
+  isNull: Boolean
 
   """Less than the specified value."""
   lessThan: Boolean
@@ -703,479 +33,29 @@ input BooleanFilter {
   """Less than or equal to the specified value."""
   lessThanOrEqualTo: Boolean
 
-  """Greater than the specified value."""
-  greaterThan: Boolean
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Boolean
-}
-
-"""
-A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
-"""
-input DatetimeFilter {
-  """
-  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Datetime
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
 
   """Not equal to the specified value."""
-  notEqualTo: Datetime
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Datetime
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Datetime
-
-  """Included in the specified list."""
-  in: [Datetime!]
+  notEqualTo: Boolean
 
   """Not included in the specified list."""
-  notIn: [Datetime!]
-
-  """Less than the specified value."""
-  lessThan: Datetime
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Datetime
-
-  """Greater than the specified value."""
-  greaterThan: Datetime
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Datetime
+  notIn: [Boolean!]
 }
 
-"""
-A filter to be used against Int fields. All fields are combined with a logical ‘and.’
-"""
-input IntFilter {
-  """
-  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Int
-
-  """Not equal to the specified value."""
-  notEqualTo: Int
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Int
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Int
-
-  """Included in the specified list."""
-  in: [Int!]
-
-  """Not included in the specified list."""
-  notIn: [Int!]
-
-  """Less than the specified value."""
-  lessThan: Int
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Int
-
-  """Greater than the specified value."""
-  greaterThan: Int
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Int
-}
-
-"""
-A filter to be used against \`User\` object types. All fields are combined with a logical ‘and.’
-"""
-input UserFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`email\` field."""
-  email: StringFilter
-
-  """Filter by the object’s \`username\` field."""
-  username: StringFilter
-
-  """Filter by the object’s \`displayName\` field."""
-  displayName: StringFilter
-
-  """Filter by the object’s \`bio\` field."""
-  bio: StringFilter
-
-  """Filter by the object’s \`isActive\` field."""
-  isActive: BooleanFilter
-
-  """Filter by the object’s \`role\` field."""
-  role: StringFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s \`updatedAt\` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [UserFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [UserFilter!]
-
-  """Negates the expression."""
-  not: UserFilter
-
-  """Filter by the object’s \`authoredPosts\` relation."""
-  authoredPosts: UserToManyPostFilter
-
-  """\`authoredPosts\` exist."""
-  authoredPostsExist: Boolean
-
-  """Filter by the object’s \`authoredComments\` relation."""
-  authoredComments: UserToManyCommentFilter
-
-  """\`authoredComments\` exist."""
-  authoredCommentsExist: Boolean
-}
-
-"""
-A filter to be used against many \`Post\` object types. All fields are combined with a logical ‘and.’
-"""
-input UserToManyPostFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: PostFilter
-
-  """Filters to entities where every related entity matches."""
-  every: PostFilter
-
-  """Filters to entities where no related entity matches."""
-  none: PostFilter
-}
-
-"""
-A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
-"""
-input UserToManyCommentFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: CommentFilter
-
-  """Filters to entities where every related entity matches."""
-  every: CommentFilter
-
-  """Filters to entities where no related entity matches."""
-  none: CommentFilter
-}
-
-"""
-A filter to be used against \`Comment\` object types. All fields are combined with a logical ‘and.’
-"""
-input CommentFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`postId\` field."""
-  postId: UUIDFilter
-
-  """Filter by the object’s \`authorId\` field."""
-  authorId: UUIDFilter
-
-  """Filter by the object’s \`parentId\` field."""
-  parentId: UUIDFilter
-
-  """Filter by the object’s \`content\` field."""
-  content: StringFilter
-
-  """Filter by the object’s \`isApproved\` field."""
-  isApproved: BooleanFilter
-
-  """Filter by the object’s \`likesCount\` field."""
-  likesCount: IntFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s \`updatedAt\` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [CommentFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [CommentFilter!]
-
-  """Negates the expression."""
-  not: CommentFilter
-
-  """Filter by the object’s \`author\` relation."""
-  author: UserFilter
-
-  """Filter by the object’s \`parent\` relation."""
-  parent: CommentFilter
-
-  """A related \`parent\` exists."""
-  parentExists: Boolean
-
-  """Filter by the object’s \`post\` relation."""
-  post: PostFilter
-
-  """Filter by the object’s \`childComments\` relation."""
-  childComments: CommentToManyCommentFilter
-
-  """\`childComments\` exist."""
-  childCommentsExist: Boolean
-}
-
-"""
-A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
-"""
-input CommentToManyCommentFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: CommentFilter
-
-  """Filters to entities where every related entity matches."""
-  every: CommentFilter
-
-  """Filters to entities where no related entity matches."""
-  none: CommentFilter
-}
-
-"""
-A filter to be used against many \`PostTag\` object types. All fields are combined with a logical ‘and.’
-"""
-input PostToManyPostTagFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: PostTagFilter
-
-  """Filters to entities where every related entity matches."""
-  every: PostTagFilter
-
-  """Filters to entities where no related entity matches."""
-  none: PostTagFilter
-}
-
-"""
-A filter to be used against \`PostTag\` object types. All fields are combined with a logical ‘and.’
-"""
-input PostTagFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`postId\` field."""
-  postId: UUIDFilter
-
-  """Filter by the object’s \`tagId\` field."""
-  tagId: UUIDFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [PostTagFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [PostTagFilter!]
-
-  """Negates the expression."""
-  not: PostTagFilter
-
-  """Filter by the object’s \`post\` relation."""
-  post: PostFilter
-
-  """Filter by the object’s \`tag\` relation."""
-  tag: TagFilter
-}
-
-"""
-A filter to be used against \`Tag\` object types. All fields are combined with a logical ‘and.’
-"""
-input TagFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`name\` field."""
-  name: StringFilter
-
-  """Filter by the object’s \`slug\` field."""
-  slug: StringFilter
-
-  """Filter by the object’s \`description\` field."""
-  description: StringFilter
-
-  """Filter by the object’s \`color\` field."""
-  color: StringFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [TagFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [TagFilter!]
-
-  """Negates the expression."""
-  not: TagFilter
-
-  """Filter by the object’s \`postTags\` relation."""
-  postTags: TagToManyPostTagFilter
-
-  """\`postTags\` exist."""
-  postTagsExist: Boolean
-}
-
-"""
-A filter to be used against many \`PostTag\` object types. All fields are combined with a logical ‘and.’
-"""
-input TagToManyPostTagFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: PostTagFilter
-
-  """Filters to entities where every related entity matches."""
-  every: PostTagFilter
-
-  """Filters to entities where no related entity matches."""
-  none: PostTagFilter
-}
-
-"""
-A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
-"""
-input PostToManyCommentFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: CommentFilter
-
-  """Filters to entities where every related entity matches."""
-  every: CommentFilter
-
-  """Filters to entities where no related entity matches."""
-  none: CommentFilter
-}
-
-"""Methods to use when ordering \`Post\`."""
-enum PostOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  TITLE_ASC
-  TITLE_DESC
-  SLUG_ASC
-  SLUG_DESC
-  CONTENT_ASC
-  CONTENT_DESC
-  EXCERPT_ASC
-  EXCERPT_DESC
-  IS_PUBLISHED_ASC
-  IS_PUBLISHED_DESC
-  PUBLISHED_AT_ASC
-  PUBLISHED_AT_DESC
-  VIEW_COUNT_ASC
-  VIEW_COUNT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""Methods to use when ordering \`PostTag\`."""
-enum PostTagOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POST_ID_ASC
-  POST_ID_DESC
-  TAG_ID_ASC
-  TAG_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-}
-
-"""A \`Tag\` edge in the connection, with data from \`PostTag\`."""
-type PostTagsManyToManyEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Tag\` at the end of the edge."""
-  node: Tag
-  id: UUID!
-  createdAt: Datetime
-}
-
-"""Methods to use when ordering \`Tag\`."""
-enum TagOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  SLUG_ASC
-  SLUG_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  COLOR_ASC
-  COLOR_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-}
-
-type User {
-  id: UUID!
-  email: String!
-  username: String!
-  displayName: String
-  bio: String
-  isActive: Boolean
-  role: String
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads and enables pagination through a set of \`Post\`."""
-  authoredPosts(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PostFilter
-
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostConnection!
+type Comment {
+  """Reads a single \`User\` that is related to this \`Comment\`."""
+  author: User
+  authorId: UUID!
 
   """Reads and enables pagination through a set of \`Comment\`."""
-  authoredComments(
+  childComments(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1188,138 +68,45 @@ type User {
     """
     offset: Int
 
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
+    """The method to use when ordering \`Comment\`."""
+    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
     where: CommentFilter
-
-    """The method to use when ordering \`Comment\`."""
-    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
-}
+  content: String!
+  createdAt: Datetime
+  id: UUID!
+  isApproved: Boolean
+  likesCount: Int
 
-"""A connection to a list of \`Post\` values."""
-type PostConnection {
-  """A list of \`Post\` objects."""
-  nodes: [Post]!
+  """Reads a single \`Comment\` that is related to this \`Comment\`."""
+  parent: Comment
+  parentId: UUID
 
-  """
-  A list of edges which contains the \`Post\` and cursor to aid in pagination.
-  """
-  edges: [PostEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Post\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Post\` edge in the connection."""
-type PostEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Post\` at the end of the edge."""
-  node: Post
+  """Reads a single \`Post\` that is related to this \`Comment\`."""
+  post: Post
+  postId: UUID!
+  updatedAt: Datetime
 }
 
 """A connection to a list of \`Comment\` values."""
 type CommentConnection {
-  """A list of \`Comment\` objects."""
-  nodes: [Comment]!
-
   """
   A list of edges which contains the \`Comment\` and cursor to aid in pagination.
   """
   edges: [CommentEdge]!
+
+  """A list of \`Comment\` objects."""
+  nodes: [Comment]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """The count of *all* \`Comment\` you could get from the connection."""
   totalCount: Int!
-}
-
-type Comment {
-  id: UUID!
-  postId: UUID!
-  authorId: UUID!
-  parentId: UUID
-  content: String!
-  isApproved: Boolean
-  likesCount: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single \`User\` that is related to this \`Comment\`."""
-  author: User
-
-  """Reads a single \`Comment\` that is related to this \`Comment\`."""
-  parent: Comment
-
-  """Reads a single \`Post\` that is related to this \`Comment\`."""
-  post: Post
-
-  """Reads and enables pagination through a set of \`Comment\`."""
-  childComments(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CommentFilter
-
-    """The method to use when ordering \`Comment\`."""
-    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CommentConnection!
-}
-
-"""Methods to use when ordering \`Comment\`."""
-enum CommentOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POST_ID_ASC
-  POST_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CONTENT_ASC
-  CONTENT_DESC
-  IS_APPROVED_ASC
-  IS_APPROVED_DESC
-  LIKES_COUNT_ASC
-  LIKES_COUNT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
 }
 
 """A \`Comment\` edge in the connection."""
@@ -1331,146 +118,582 @@ type CommentEdge {
   node: Comment
 }
 
-"""A \`PostTag\` edge in the connection."""
-type PostTagEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+"""
+A filter to be used against \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input CommentFilter {
+  """Checks for all expressions in this list."""
+  and: [CommentFilter!]
 
-  """The \`PostTag\` at the end of the edge."""
-  node: PostTag
+  """Filter by the object’s \`author\` relation."""
+  author: UserFilter
+
+  """Filter by the object’s \`authorId\` field."""
+  authorId: UUIDFilter
+
+  """Filter by the object’s \`childComments\` relation."""
+  childComments: CommentToManyCommentFilter
+
+  """\`childComments\` exist."""
+  childCommentsExist: Boolean
+
+  """Filter by the object’s \`content\` field."""
+  content: StringFilter
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s \`isApproved\` field."""
+  isApproved: BooleanFilter
+
+  """Filter by the object’s \`likesCount\` field."""
+  likesCount: IntFilter
+
+  """Negates the expression."""
+  not: CommentFilter
+
+  """Checks for any expressions in this list."""
+  or: [CommentFilter!]
+
+  """Filter by the object’s \`parent\` relation."""
+  parent: CommentFilter
+
+  """A related \`parent\` exists."""
+  parentExists: Boolean
+
+  """Filter by the object’s \`parentId\` field."""
+  parentId: UUIDFilter
+
+  """Filter by the object’s \`post\` relation."""
+  post: PostFilter
+
+  """Filter by the object’s \`postId\` field."""
+  postId: UUIDFilter
+
+  """Filter by the object’s \`updatedAt\` field."""
+  updatedAt: DatetimeFilter
 }
 
-"""A connection to a list of \`Tag\` values."""
-type TagConnection {
-  """A list of \`Tag\` objects."""
-  nodes: [Tag]!
-
-  """
-  A list of edges which contains the \`Tag\` and cursor to aid in pagination.
-  """
-  edges: [TagEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Tag\` you could get from the connection."""
-  totalCount: Int!
+"""An input for mutations affecting \`Comment\`"""
+input CommentInput {
+  authorId: UUID!
+  content: String!
+  createdAt: Datetime
+  id: UUID
+  isApproved: Boolean
+  likesCount: Int
+  parentId: UUID
+  postId: UUID!
+  updatedAt: Datetime
 }
 
-"""A \`Tag\` edge in the connection."""
-type TagEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Tag\` at the end of the edge."""
-  node: Tag
-}
-
-"""A connection to a list of \`User\` values."""
-type UserConnection {
-  """A list of \`User\` objects."""
-  nodes: [User]!
-
-  """
-  A list of edges which contains the \`User\` and cursor to aid in pagination.
-  """
-  edges: [UserEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`User\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`User\` edge in the connection."""
-type UserEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`User\` at the end of the edge."""
-  node: User
-}
-
-"""Methods to use when ordering \`User\`."""
-enum UserOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  USERNAME_ASC
-  USERNAME_DESC
-  DISPLAY_NAME_ASC
-  DISPLAY_NAME_DESC
-  BIO_ASC
-  BIO_DESC
-  IS_ACTIVE_ASC
-  IS_ACTIVE_DESC
-  ROLE_ASC
-  ROLE_DESC
+"""Methods to use when ordering \`Comment\`."""
+enum CommentOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CONTENT_ASC
+  CONTENT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_APPROVED_ASC
+  IS_APPROVED_DESC
+  LIKES_COUNT_ASC
+  LIKES_COUNT_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POST_ID_ASC
+  POST_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
 }
 
-"""Root meta schema type"""
-type MetaSchema {
-  tables: [MetaTable!]!
+"""
+Represents an update to a \`Comment\`. Fields that are set will be updated.
+"""
+input CommentPatch {
+  authorId: UUID
+  content: String
+  createdAt: Datetime
+  id: UUID
+  isApproved: Boolean
+  likesCount: Int
+  parentId: UUID
+  postId: UUID
+  updatedAt: Datetime
 }
 
-"""Information about a database table"""
-type MetaTable {
-  name: String!
-  schemaName: String!
-  fields: [MetaField!]!
-  indexes: [MetaIndex!]!
-  constraints: MetaConstraints!
-  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
-  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
-  uniqueConstraints: [MetaUniqueConstraint!]!
-  relations: MetaRelations!
-  inflection: MetaInflection!
-  query: MetaQuery!
+"""
+A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input CommentToManyCommentFilter {
+  """Filters to entities where every related entity matches."""
+  every: CommentFilter
 
-  """Storage metadata (null if not a storage table)"""
-  storage: MetaStorage
+  """Filters to entities where no related entity matches."""
+  none: CommentFilter
 
-  """Search metadata (null if no search configured)"""
-  search: MetaSearch
-
-  """i18n metadata (null if no @i18n tag)"""
-  i18n: MetaI18n
-
-  """Realtime metadata (null if no @realtime tag)"""
-  realtime: MetaRealtime
+  """Filters to entities where at least one related entity matches."""
+  some: CommentFilter
 }
 
-"""Information about a table field/column"""
-type MetaField {
-  name: String!
-  type: MetaType!
-  isNotNull: Boolean!
-  hasDefault: Boolean!
-  isPrimaryKey: Boolean!
-  isForeignKey: Boolean!
-  description: String
+"""All input for the create \`Comment\` mutation."""
+input CreateCommentInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 
-  """Enum metadata if this field has an enum type"""
-  enumValues: MetaEnum
+  """The \`Comment\` to be created by this mutation."""
+  comment: CommentInput!
 }
 
-"""Information about a PostgreSQL type"""
-type MetaType {
-  pgType: String!
-  gqlType: String!
-  isArray: Boolean!
-  isNotNull: Boolean
-  hasDefault: Boolean
-  subtype: String
+"""The output of our create \`Comment\` mutation."""
+type CreateCommentPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Comment\` that was created by this mutation."""
+  comment: Comment
+
+  """An edge for our \`Comment\`. May be used by Relay 1."""
+  commentEdge(
+    """The method to use when ordering \`Comment\`."""
+    orderBy: [CommentOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommentEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create \`Post\` mutation."""
+input CreatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Post\` to be created by this mutation."""
+  post: PostInput!
+}
+
+"""The output of our create \`Post\` mutation."""
+type CreatePostPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Post\` that was created by this mutation."""
+  post: Post
+
+  """An edge for our \`Post\`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create \`PostTag\` mutation."""
+input CreatePostTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`PostTag\` to be created by this mutation."""
+  postTag: PostTagInput!
+}
+
+"""The output of our create \`PostTag\` mutation."""
+type CreatePostTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PostTag\` that was created by this mutation."""
+  postTag: PostTag
+
+  """An edge for our \`PostTag\`. May be used by Relay 1."""
+  postTagEdge(
+    """The method to use when ordering \`PostTag\`."""
+    orderBy: [PostTagOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostTagEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create \`Tag\` mutation."""
+input CreateTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Tag\` to be created by this mutation."""
+  tag: TagInput!
+}
+
+"""The output of our create \`Tag\` mutation."""
+type CreateTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`Tag\` that was created by this mutation."""
+  tag: Tag
+
+  """An edge for our \`Tag\`. May be used by Relay 1."""
+  tagEdge(
+    """The method to use when ordering \`Tag\`."""
+    orderBy: [TagOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TagEdge
+}
+
+"""All input for the create \`User\` mutation."""
+input CreateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`User\` to be created by this mutation."""
+  user: UserInput!
+}
+
+"""The output of our create \`User\` mutation."""
+type CreateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`User\` that was created by this mutation."""
+  user: User
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """
+  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+}
+
+"""All input for the \`deleteComment\` mutation."""
+input DeleteCommentInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete \`Comment\` mutation."""
+type DeleteCommentPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Comment\` that was deleted by this mutation."""
+  comment: Comment
+
+  """An edge for our \`Comment\`. May be used by Relay 1."""
+  commentEdge(
+    """The method to use when ordering \`Comment\`."""
+    orderBy: [CommentOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommentEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`deletePost\` mutation."""
+input DeletePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete \`Post\` mutation."""
+type DeletePostPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Post\` that was deleted by this mutation."""
+  post: Post
+
+  """An edge for our \`Post\`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`deletePostTag\` mutation."""
+input DeletePostTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete \`PostTag\` mutation."""
+type DeletePostTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PostTag\` that was deleted by this mutation."""
+  postTag: PostTag
+
+  """An edge for our \`PostTag\`. May be used by Relay 1."""
+  postTagEdge(
+    """The method to use when ordering \`PostTag\`."""
+    orderBy: [PostTagOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostTagEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`deleteTag\` mutation."""
+input DeleteTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete \`Tag\` mutation."""
+type DeleteTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`Tag\` that was deleted by this mutation."""
+  tag: Tag
+
+  """An edge for our \`Tag\`. May be used by Relay 1."""
+  tagEdge(
+    """The method to use when ordering \`Tag\`."""
+    orderBy: [TagOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TagEdge
+}
+
+"""All input for the \`deleteUser\` mutation."""
+input DeleteUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete \`User\` mutation."""
+type DeleteUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`User\` that was deleted by this mutation."""
+  user: User
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value."""
+  equalTo: Int
+
+  """Greater than the specified value."""
+  greaterThan: Int
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """
+  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """Not included in the specified list."""
+  notIn: [Int!]
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
 }
 
 """Information about a PostgreSQL enum type"""
@@ -1482,170 +705,46 @@ type MetaEnum {
   values: [String!]!
 }
 
-"""Information about a database index"""
-type MetaIndex {
-  name: String!
-  isUnique: Boolean!
-  isPrimary: Boolean!
-  columns: [String!]!
-  fields: [MetaField!]
-}
+"""Information about a table field/column"""
+type MetaField {
+  description: String
 
-"""Table constraints"""
-type MetaConstraints {
-  primaryKey: MetaPrimaryKeyConstraint
-  unique: [MetaUniqueConstraint!]!
-  foreignKey: [MetaForeignKeyConstraint!]!
-}
-
-"""Information about a primary key constraint"""
-type MetaPrimaryKeyConstraint {
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
   name: String!
-  fields: [MetaField!]!
-}
-
-"""Information about a unique constraint"""
-type MetaUniqueConstraint {
-  name: String!
-  fields: [MetaField!]!
+  type: MetaType!
 }
 
 """Information about a foreign key constraint"""
 type MetaForeignKeyConstraint {
-  name: String!
   fields: [MetaField!]!
-  referencedTable: String!
-  referencedFields: [String!]!
+  name: String!
   refFields: [MetaField!]
   refTable: MetaRefTable
-}
-
-"""Reference to a related table"""
-type MetaRefTable {
-  name: String!
-}
-
-"""Table relations"""
-type MetaRelations {
-  belongsTo: [MetaBelongsToRelation!]!
-  has: [MetaHasRelation!]!
-  hasOne: [MetaHasRelation!]!
-  hasMany: [MetaHasRelation!]!
-  manyToMany: [MetaManyToManyRelation!]!
-}
-
-"""A belongs-to (forward FK) relation"""
-type MetaBelongsToRelation {
-  fieldName: String
-  isUnique: Boolean!
-  type: String
-  keys: [MetaField!]!
-  references: MetaRefTable!
+  referencedFields: [String!]!
+  referencedTable: String!
 }
 
 """A has-one or has-many (reverse FK) relation"""
 type MetaHasRelation {
   fieldName: String
   isUnique: Boolean!
-  type: String
   keys: [MetaField!]!
   referencedBy: MetaRefTable!
-}
-
-"""A many-to-many relation via junction table"""
-type MetaManyToManyRelation {
-  fieldName: String
   type: String
-  junctionTable: MetaRefTable!
-  junctionLeftConstraint: MetaForeignKeyConstraint!
-  junctionLeftKeyAttributes: [MetaField!]!
-  junctionRightConstraint: MetaForeignKeyConstraint!
-  junctionRightKeyAttributes: [MetaField!]!
-  leftKeyAttributes: [MetaField!]!
-  rightKeyAttributes: [MetaField!]!
-  rightTable: MetaRefTable!
-}
-
-"""Table inflection names"""
-type MetaInflection {
-  tableType: String!
-  allRows: String!
-  connection: String!
-  edge: String!
-  filterType: String
-  orderByType: String!
-  conditionType: String!
-  patchType: String
-  createInputType: String!
-  createPayloadType: String!
-  updatePayloadType: String
-  deletePayloadType: String!
-}
-
-"""Table query/mutation names"""
-type MetaQuery {
-  all: String!
-  one: String
-  create: String
-  update: String
-  delete: String
-}
-
-"""Storage metadata for a table"""
-type MetaStorage {
-  """Whether this table is a storage files table"""
-  isFilesTable: Boolean!
-
-  """Whether this table is a storage buckets table"""
-  isBucketsTable: Boolean!
-}
-
-"""Search metadata for a table"""
-type MetaSearch {
-  """Active search algorithms on this table"""
-  algorithms: [String!]!
-
-  """Searchable columns with their algorithm"""
-  columns: [MetaSearchColumn!]!
-
-  """Whether unifiedSearch composite filter is available"""
-  hasUnifiedSearch: Boolean!
-
-  """Per-table search configuration"""
-  config: MetaSearchConfig
-}
-
-"""A searchable column with its algorithm"""
-type MetaSearchColumn {
-  """Column name (camelCase)"""
-  name: String!
-
-  """Search algorithm: tsvector, bm25, trgm, or vector"""
-  algorithm: String!
-}
-
-"""Per-table search configuration from @searchConfig smart tag"""
-type MetaSearchConfig {
-  """JSON-encoded per-adapter score weights"""
-  weights: String
-
-  """Whether recency boosting is enabled"""
-  boostRecent: Boolean!
-
-  """Field used for recency decay"""
-  boostRecencyField: String
-
-  """Exponential decay factor per day"""
-  boostRecencyDecay: Float
 }
 
 """i18n metadata for a table with @i18n tag"""
 type MetaI18n {
-  """Name of the translation table"""
-  translationTable: String!
-
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
 }
 
 """A translatable field"""
@@ -1657,16 +756,248 @@ type MetaI18nField {
   type: String!
 }
 
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
 """Realtime metadata for a table with @realtime tag"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
 }
 
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
 """
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  """Creates a single \`Comment\`."""
+  createComment(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCommentInput!
+  ): CreateCommentPayload
+
+  """Creates a single \`Post\`."""
+  createPost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePostInput!
+  ): CreatePostPayload
+
   """Creates a single \`PostTag\`."""
   createPostTag(
     """
@@ -1691,61 +1022,21 @@ type Mutation {
     input: CreateUserInput!
   ): CreateUserPayload
 
-  """Creates a single \`Comment\`."""
-  createComment(
+  """Deletes a single \`Comment\` using a unique key."""
+  deleteComment(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateCommentInput!
-  ): CreateCommentPayload
+    input: DeleteCommentInput!
+  ): DeleteCommentPayload
 
-  """Creates a single \`Post\`."""
-  createPost(
+  """Deletes a single \`Post\` using a unique key."""
+  deletePost(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreatePostInput!
-  ): CreatePostPayload
-
-  """Updates a single \`PostTag\` using a unique key and a patch."""
-  updatePostTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePostTagInput!
-  ): UpdatePostTagPayload
-
-  """Updates a single \`Tag\` using a unique key and a patch."""
-  updateTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateTagInput!
-  ): UpdateTagPayload
-
-  """Updates a single \`User\` using a unique key and a patch."""
-  updateUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateUserInput!
-  ): UpdateUserPayload
-
-  """Updates a single \`Comment\` using a unique key and a patch."""
-  updateComment(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateCommentInput!
-  ): UpdateCommentPayload
-
-  """Updates a single \`Post\` using a unique key and a patch."""
-  updatePost(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePostInput!
-  ): UpdatePostPayload
+    input: DeletePostInput!
+  ): DeletePostPayload
 
   """Deletes a single \`PostTag\` using a unique key."""
   deletePostTag(
@@ -1771,22 +1062,6 @@ type Mutation {
     input: DeleteUserInput!
   ): DeleteUserPayload
 
-  """Deletes a single \`Comment\` using a unique key."""
-  deleteComment(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteCommentInput!
-  ): DeleteCommentPayload
-
-  """Deletes a single \`Post\` using a unique key."""
-  deletePost(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePostInput!
-  ): DeletePostPayload
-
   """
   Provision an S3 bucket for a logical bucket in the database.
   Reads the bucket config via RLS, then creates and configures
@@ -1799,387 +1074,1063 @@ type Mutation {
     """
     input: ProvisionBucketInput!
   ): ProvisionBucketPayload
+
+  """Updates a single \`Comment\` using a unique key and a patch."""
+  updateComment(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCommentInput!
+  ): UpdateCommentPayload
+
+  """Updates a single \`Post\` using a unique key and a patch."""
+  updatePost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  """Updates a single \`PostTag\` using a unique key and a patch."""
+  updatePostTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostTagInput!
+  ): UpdatePostTagPayload
+
+  """Updates a single \`Tag\` using a unique key and a patch."""
+  updateTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTagInput!
+  ): UpdateTagPayload
+
+  """Updates a single \`User\` using a unique key and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
 }
 
-"""The output of our create \`PostTag\` mutation."""
-type CreatePostTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
 
-  """The \`PostTag\` that was created by this mutation."""
-  postTag: PostTag
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
 
-  """An edge for our \`PostTag\`. May be used by Relay 1."""
-  postTagEdge(
-    """The method to use when ordering \`PostTag\`."""
-    orderBy: [PostTagOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostTagEdge
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
 }
 
-"""All input for the create \`PostTag\` mutation."""
-input CreatePostTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`PostTag\` to be created by this mutation."""
-  postTag: PostTagInput!
-}
-
-"""An input for mutations affecting \`PostTag\`"""
-input PostTagInput {
-  id: UUID
-  postId: UUID!
-  tagId: UUID!
-  createdAt: Datetime
-}
-
-"""The output of our create \`Tag\` mutation."""
-type CreateTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Tag\` that was created by this mutation."""
-  tag: Tag
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Tag\`. May be used by Relay 1."""
-  tagEdge(
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TagEdge
-}
-
-"""All input for the create \`Tag\` mutation."""
-input CreateTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`Tag\` to be created by this mutation."""
-  tag: TagInput!
-}
-
-"""An input for mutations affecting \`Tag\`"""
-input TagInput {
-  id: UUID
-  name: String!
-  slug: String!
-  description: String
-  color: String
-  createdAt: Datetime
-}
-
-"""The output of our create \`User\` mutation."""
-type CreateUserPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`User\` that was created by this mutation."""
-  user: User
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`User\`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering \`User\`."""
-    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UserEdge
-}
-
-"""All input for the create \`User\` mutation."""
-input CreateUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`User\` to be created by this mutation."""
-  user: UserInput!
-}
-
-"""An input for mutations affecting \`User\`"""
-input UserInput {
-  id: UUID
-  email: String!
-  username: String!
-  displayName: String
-  bio: String
-  isActive: Boolean
-  role: String
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create \`Comment\` mutation."""
-type CreateCommentPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Comment\` that was created by this mutation."""
-  comment: Comment
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Comment\`. May be used by Relay 1."""
-  commentEdge(
-    """The method to use when ordering \`Comment\`."""
-    orderBy: [CommentOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommentEdge
-}
-
-"""All input for the create \`Comment\` mutation."""
-input CreateCommentInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`Comment\` to be created by this mutation."""
-  comment: CommentInput!
-}
-
-"""An input for mutations affecting \`Comment\`"""
-input CommentInput {
-  id: UUID
-  postId: UUID!
+type Post {
+  """Reads a single \`User\` that is related to this \`Post\`."""
+  author: User
   authorId: UUID!
-  parentId: UUID
-  content: String!
-  isApproved: Boolean
-  likesCount: Int
+
+  """Reads and enables pagination through a set of \`Comment\`."""
+  comments(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Comment\`."""
+    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CommentFilter
+  ): CommentConnection!
+  content: String
   createdAt: Datetime
+  excerpt: String
+  id: UUID!
+  isPublished: Boolean
+
+  """Reads and enables pagination through a set of \`PostTag\`."""
+  postTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`PostTag\`."""
+    orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PostTagFilter
+  ): PostTagConnection!
+  publishedAt: Datetime
+  slug: String!
+
+  """Reads and enables pagination through a set of \`Tag\`."""
+  tags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Tag\`."""
+    orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: TagFilter
+  ): PostTagsManyToManyConnection!
+  title: String!
   updatedAt: Datetime
+  viewCount: Int
 }
 
-"""The output of our create \`Post\` mutation."""
-type CreatePostPayload {
+"""A connection to a list of \`Post\` values."""
+type PostConnection {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  A list of edges which contains the \`Post\` and cursor to aid in pagination.
   """
-  clientMutationId: String
+  edges: [PostEdge]!
 
-  """The \`Post\` that was created by this mutation."""
-  post: Post
+  """A list of \`Post\` objects."""
+  nodes: [Post]!
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
-  """An edge for our \`Post\`. May be used by Relay 1."""
-  postEdge(
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostEdge
+  """The count of *all* \`Post\` you could get from the connection."""
+  totalCount: Int!
 }
 
-"""All input for the create \`Post\` mutation."""
-input CreatePostInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
+"""A \`Post\` edge in the connection."""
+type PostEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-  """The \`Post\` to be created by this mutation."""
-  post: PostInput!
+  """The \`Post\` at the end of the edge."""
+  node: Post
+}
+
+"""
+A filter to be used against \`Post\` object types. All fields are combined with a logical ‘and.’
+"""
+input PostFilter {
+  """Checks for all expressions in this list."""
+  and: [PostFilter!]
+
+  """Filter by the object’s \`author\` relation."""
+  author: UserFilter
+
+  """Filter by the object’s \`authorId\` field."""
+  authorId: UUIDFilter
+
+  """Filter by the object’s \`comments\` relation."""
+  comments: PostToManyCommentFilter
+
+  """\`comments\` exist."""
+  commentsExist: Boolean
+
+  """Filter by the object’s \`content\` field."""
+  content: StringFilter
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`excerpt\` field."""
+  excerpt: StringFilter
+
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s \`isPublished\` field."""
+  isPublished: BooleanFilter
+
+  """Negates the expression."""
+  not: PostFilter
+
+  """Checks for any expressions in this list."""
+  or: [PostFilter!]
+
+  """Filter by the object’s \`postTags\` relation."""
+  postTags: PostToManyPostTagFilter
+
+  """\`postTags\` exist."""
+  postTagsExist: Boolean
+
+  """Filter by the object’s \`publishedAt\` field."""
+  publishedAt: DatetimeFilter
+
+  """Filter by the object’s \`slug\` field."""
+  slug: StringFilter
+
+  """Filter by the object’s \`title\` field."""
+  title: StringFilter
+
+  """Filter by the object’s \`updatedAt\` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s \`viewCount\` field."""
+  viewCount: IntFilter
 }
 
 """An input for mutations affecting \`Post\`"""
 input PostInput {
-  id: UUID
   authorId: UUID!
-  title: String!
-  slug: String!
   content: String
+  createdAt: Datetime
   excerpt: String
+  id: UUID
   isPublished: Boolean
   publishedAt: Datetime
-  viewCount: Int
-  createdAt: Datetime
+  slug: String!
+  title: String!
   updatedAt: Datetime
+  viewCount: Int
 }
 
-"""The output of our update \`PostTag\` mutation."""
-type UpdatePostTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`PostTag\` that was updated by this mutation."""
-  postTag: PostTag
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`PostTag\`. May be used by Relay 1."""
-  postTagEdge(
-    """The method to use when ordering \`PostTag\`."""
-    orderBy: [PostTagOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostTagEdge
+"""Methods to use when ordering \`Post\`."""
+enum PostOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CONTENT_ASC
+  CONTENT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EXCERPT_ASC
+  EXCERPT_DESC
+  ID_ASC
+  ID_DESC
+  IS_PUBLISHED_ASC
+  IS_PUBLISHED_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PUBLISHED_AT_ASC
+  PUBLISHED_AT_DESC
+  SLUG_ASC
+  SLUG_DESC
+  TITLE_ASC
+  TITLE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VIEW_COUNT_ASC
+  VIEW_COUNT_DESC
 }
 
-"""All input for the \`updatePostTag\` mutation."""
-input UpdatePostTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
+"""Represents an update to a \`Post\`. Fields that are set will be updated."""
+input PostPatch {
+  authorId: UUID
+  content: String
+  createdAt: Datetime
+  excerpt: String
+  id: UUID
+  isPublished: Boolean
+  publishedAt: Datetime
+  slug: String
+  title: String
+  updatedAt: Datetime
+  viewCount: Int
+}
+
+type PostTag {
+  createdAt: Datetime
   id: UUID!
 
+  """Reads a single \`Post\` that is related to this \`PostTag\`."""
+  post: Post
+  postId: UUID!
+
+  """Reads a single \`Tag\` that is related to this \`PostTag\`."""
+  tag: Tag
+  tagId: UUID!
+}
+
+"""A connection to a list of \`PostTag\` values."""
+type PostTagConnection {
   """
-  An object where the defined keys will be set on the \`PostTag\` being updated.
+  A list of edges which contains the \`PostTag\` and cursor to aid in pagination.
   """
-  postTagPatch: PostTagPatch!
+  edges: [PostTagEdge]!
+
+  """A list of \`PostTag\` objects."""
+  nodes: [PostTag]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`PostTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`PostTag\` edge in the connection."""
+type PostTagEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`PostTag\` at the end of the edge."""
+  node: PostTag
+}
+
+"""
+A filter to be used against \`PostTag\` object types. All fields are combined with a logical ‘and.’
+"""
+input PostTagFilter {
+  """Checks for all expressions in this list."""
+  and: [PostTagFilter!]
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: PostTagFilter
+
+  """Checks for any expressions in this list."""
+  or: [PostTagFilter!]
+
+  """Filter by the object’s \`post\` relation."""
+  post: PostFilter
+
+  """Filter by the object’s \`postId\` field."""
+  postId: UUIDFilter
+
+  """Filter by the object’s \`tag\` relation."""
+  tag: TagFilter
+
+  """Filter by the object’s \`tagId\` field."""
+  tagId: UUIDFilter
+}
+
+"""An input for mutations affecting \`PostTag\`"""
+input PostTagInput {
+  createdAt: Datetime
+  id: UUID
+  postId: UUID!
+  tagId: UUID!
+}
+
+"""Methods to use when ordering \`PostTag\`."""
+enum PostTagOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POST_ID_ASC
+  POST_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TAG_ID_ASC
+  TAG_ID_DESC
 }
 
 """
 Represents an update to a \`PostTag\`. Fields that are set will be updated.
 """
 input PostTagPatch {
+  createdAt: Datetime
   id: UUID
   postId: UUID
   tagId: UUID
+}
+
+"""A connection to a list of \`Tag\` values, with data from \`PostTag\`."""
+type PostTagsManyToManyConnection {
+  """
+  A list of edges which contains the \`Tag\`, info from the \`PostTag\`, and the cursor to aid in pagination.
+  """
+  edges: [PostTagsManyToManyEdge!]!
+
+  """A list of \`Tag\` objects."""
+  nodes: [Tag]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Tag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Tag\` edge in the connection, with data from \`PostTag\`."""
+type PostTagsManyToManyEdge {
   createdAt: Datetime
-}
 
-"""The output of our update \`Tag\` mutation."""
-type UpdateTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Tag\` that was updated by this mutation."""
-  tag: Tag
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Tag\`. May be used by Relay 1."""
-  tagEdge(
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TagEdge
-}
-
-"""All input for the \`updateTag\` mutation."""
-input UpdateTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
+  """A cursor for use in pagination."""
+  cursor: Cursor
   id: UUID!
 
+  """The \`Tag\` at the end of the edge."""
+  node: Tag
+}
+
+"""
+A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input PostToManyCommentFilter {
+  """Filters to entities where every related entity matches."""
+  every: CommentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: CommentFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: CommentFilter
+}
+
+"""
+A filter to be used against many \`PostTag\` object types. All fields are combined with a logical ‘and.’
+"""
+input PostToManyPostTagFilter {
+  """Filters to entities where every related entity matches."""
+  every: PostTagFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PostTagFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PostTagFilter
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
   """
-  An object where the defined keys will be set on the \`Tag\` being updated.
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
   """
-  tagPatch: TagPatch!
+  ownerId: UUID
+}
+
+type ProvisionBucketPayload {
+  """The access type applied"""
+  accessType: String!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+
+  """Reads and enables pagination through a set of \`Comment\`."""
+  comments(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Comment\`."""
+    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CommentFilter
+  ): CommentConnection
+
+  """Reads and enables pagination through a set of \`PostTag\`."""
+  postTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`PostTag\`."""
+    orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PostTagFilter
+  ): PostTagConnection
+
+  """Reads and enables pagination through a set of \`Post\`."""
+  posts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PostFilter
+  ): PostConnection
+
+  """Reads and enables pagination through a set of \`Tag\`."""
+  tags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Tag\`."""
+    orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: TagFilter
+  ): TagConnection
+
+  """Reads and enables pagination through a set of \`User\`."""
+  users(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserFilter
+  ): UserConnection
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+type Tag {
+  color: String
+  createdAt: Datetime
+  description: String
+  id: UUID!
+  name: String!
+
+  """Reads and enables pagination through a set of \`PostTag\`."""
+  postTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`PostTag\`."""
+    orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PostTagFilter
+  ): PostTagConnection!
+
+  """Reads and enables pagination through a set of \`Post\`."""
+  posts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PostFilter
+  ): TagPostsManyToManyConnection!
+  slug: String!
+}
+
+"""A connection to a list of \`Tag\` values."""
+type TagConnection {
+  """
+  A list of edges which contains the \`Tag\` and cursor to aid in pagination.
+  """
+  edges: [TagEdge]!
+
+  """A list of \`Tag\` objects."""
+  nodes: [Tag]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Tag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Tag\` edge in the connection."""
+type TagEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Tag\` at the end of the edge."""
+  node: Tag
+}
+
+"""
+A filter to be used against \`Tag\` object types. All fields are combined with a logical ‘and.’
+"""
+input TagFilter {
+  """Checks for all expressions in this list."""
+  and: [TagFilter!]
+
+  """Filter by the object’s \`color\` field."""
+  color: StringFilter
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`description\` field."""
+  description: StringFilter
+
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s \`name\` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: TagFilter
+
+  """Checks for any expressions in this list."""
+  or: [TagFilter!]
+
+  """Filter by the object’s \`postTags\` relation."""
+  postTags: TagToManyPostTagFilter
+
+  """\`postTags\` exist."""
+  postTagsExist: Boolean
+
+  """Filter by the object’s \`slug\` field."""
+  slug: StringFilter
+}
+
+"""An input for mutations affecting \`Tag\`"""
+input TagInput {
+  color: String
+  createdAt: Datetime
+  description: String
+  id: UUID
+  name: String!
+  slug: String!
+}
+
+"""Methods to use when ordering \`Tag\`."""
+enum TagOrderBy {
+  COLOR_ASC
+  COLOR_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SLUG_ASC
+  SLUG_DESC
 }
 
 """Represents an update to a \`Tag\`. Fields that are set will be updated."""
 input TagPatch {
+  color: String
+  createdAt: Datetime
+  description: String
   id: UUID
   name: String
   slug: String
-  description: String
-  color: String
+}
+
+"""A connection to a list of \`Post\` values, with data from \`PostTag\`."""
+type TagPostsManyToManyConnection {
+  """
+  A list of edges which contains the \`Post\`, info from the \`PostTag\`, and the cursor to aid in pagination.
+  """
+  edges: [TagPostsManyToManyEdge!]!
+
+  """A list of \`Post\` objects."""
+  nodes: [Post]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Post\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Post\` edge in the connection, with data from \`PostTag\`."""
+type TagPostsManyToManyEdge {
   createdAt: Datetime
+
+  """A cursor for use in pagination."""
+  cursor: Cursor
+  id: UUID!
+
+  """The \`Post\` at the end of the edge."""
+  node: Post
 }
 
-"""The output of our update \`User\` mutation."""
-type UpdateUserPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+"""
+A filter to be used against many \`PostTag\` object types. All fields are combined with a logical ‘and.’
+"""
+input TagToManyPostTagFilter {
+  """Filters to entities where every related entity matches."""
+  every: PostTagFilter
 
-  """The \`User\` that was updated by this mutation."""
-  user: User
+  """Filters to entities where no related entity matches."""
+  none: PostTagFilter
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`User\`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering \`User\`."""
-    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UserEdge
+  """Filters to entities where at least one related entity matches."""
+  some: PostTagFilter
 }
 
-"""All input for the \`updateUser\` mutation."""
-input UpdateUserInput {
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if \`true\` is specified) or is not null (if \`false\` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+}
+
+"""All input for the \`updateComment\` mutation."""
+input UpdateCommentInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the \`Comment\` being updated.
+  """
+  commentPatch: CommentPatch!
   id: UUID!
-
-  """
-  An object where the defined keys will be set on the \`User\` being updated.
-  """
-  userPatch: UserPatch!
-}
-
-"""Represents an update to a \`User\`. Fields that are set will be updated."""
-input UserPatch {
-  id: UUID
-  email: String
-  username: String
-  displayName: String
-  bio: String
-  isActive: Boolean
-  role: String
-  createdAt: Datetime
-  updatedAt: Datetime
 }
 
 """The output of our update \`Comment\` mutation."""
@@ -2193,69 +2144,16 @@ type UpdateCommentPayload {
   """The \`Comment\` that was updated by this mutation."""
   comment: Comment
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
   """An edge for our \`Comment\`. May be used by Relay 1."""
   commentEdge(
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CommentEdge
-}
-
-"""All input for the \`updateComment\` mutation."""
-input UpdateCommentInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the \`Comment\` being updated.
-  """
-  commentPatch: CommentPatch!
-}
-
-"""
-Represents an update to a \`Comment\`. Fields that are set will be updated.
-"""
-input CommentPatch {
-  id: UUID
-  postId: UUID
-  authorId: UUID
-  parentId: UUID
-  content: String
-  isApproved: Boolean
-  likesCount: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update \`Post\` mutation."""
-type UpdatePostPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Post\` that was updated by this mutation."""
-  post: Post
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our \`Post\`. May be used by Relay 1."""
-  postEdge(
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostEdge
 }
 
 """All input for the \`updatePost\` mutation."""
@@ -2273,69 +2171,97 @@ input UpdatePostInput {
   postPatch: PostPatch!
 }
 
-"""Represents an update to a \`Post\`. Fields that are set will be updated."""
-input PostPatch {
-  id: UUID
-  authorId: UUID
-  title: String
-  slug: String
-  content: String
-  excerpt: String
-  isPublished: Boolean
-  publishedAt: Datetime
-  viewCount: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our delete \`PostTag\` mutation."""
-type DeletePostTagPayload {
+"""The output of our update \`Post\` mutation."""
+type UpdatePostPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`PostTag\` that was deleted by this mutation."""
-  postTag: PostTag
+  """The \`Post\` that was updated by this mutation."""
+  post: Post
+
+  """An edge for our \`Post\`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our \`PostTag\`. May be used by Relay 1."""
-  postTagEdge(
-    """The method to use when ordering \`PostTag\`."""
-    orderBy: [PostTagOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostTagEdge
 }
 
-"""All input for the \`deletePostTag\` mutation."""
-input DeletePostTagInput {
+"""All input for the \`updatePostTag\` mutation."""
+input UpdatePostTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   id: UUID!
+
+  """
+  An object where the defined keys will be set on the \`PostTag\` being updated.
+  """
+  postTagPatch: PostTagPatch!
 }
 
-"""The output of our delete \`Tag\` mutation."""
-type DeleteTagPayload {
+"""The output of our update \`PostTag\` mutation."""
+type UpdatePostTagPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Tag\` that was deleted by this mutation."""
-  tag: Tag
+  """The \`PostTag\` that was updated by this mutation."""
+  postTag: PostTag
+
+  """An edge for our \`PostTag\`. May be used by Relay 1."""
+  postTagEdge(
+    """The method to use when ordering \`PostTag\`."""
+    orderBy: [PostTagOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostTagEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""All input for the \`updateTag\` mutation."""
+input UpdateTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the \`Tag\` being updated.
+  """
+  tagPatch: TagPatch!
+}
+
+"""The output of our update \`Tag\` mutation."""
+type UpdateTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`Tag\` that was updated by this mutation."""
+  tag: Tag
 
   """An edge for our \`Tag\`. May be used by Relay 1."""
   tagEdge(
@@ -2344,31 +2270,36 @@ type DeleteTagPayload {
   ): TagEdge
 }
 
-"""All input for the \`deleteTag\` mutation."""
-input DeleteTagInput {
+"""All input for the \`updateUser\` mutation."""
+input UpdateUserInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   id: UUID!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
 }
 
-"""The output of our delete \`User\` mutation."""
-type DeleteUserPayload {
+"""The output of our update \`User\` mutation."""
+type UpdateUserPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`User\` that was deleted by this mutation."""
-  user: User
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+
+  """The \`User\` that was updated by this mutation."""
+  user: User
 
   """An edge for our \`User\`. May be used by Relay 1."""
   userEdge(
@@ -2377,110 +2308,230 @@ type DeleteUserPayload {
   ): UserEdge
 }
 
-"""All input for the \`deleteUser\` mutation."""
-input DeleteUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
+type User {
+  """Reads and enables pagination through a set of \`Comment\`."""
+  authoredComments(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
 
-"""The output of our delete \`Comment\` mutation."""
-type DeleteCommentPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
 
-  """The \`Comment\` that was deleted by this mutation."""
-  comment: Comment
+    """Only read the first \`n\` values of the set."""
+    first: Int
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+    """Only read the last \`n\` values of the set."""
+    last: Int
 
-  """An edge for our \`Comment\`. May be used by Relay 1."""
-  commentEdge(
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
     """The method to use when ordering \`Comment\`."""
-    orderBy: [CommentOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommentEdge
-}
+    orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
 
-"""All input for the \`deleteComment\` mutation."""
-input DeleteCommentInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CommentFilter
+  ): CommentConnection!
 
-"""The output of our delete \`Post\` mutation."""
-type DeletePostPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+  """Reads and enables pagination through a set of \`Post\`."""
+  authoredPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
 
-  """The \`Post\` that was deleted by this mutation."""
-  post: Post
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
+    """Only read the first \`n\` values of the set."""
+    first: Int
 
-  """An edge for our \`Post\`. May be used by Relay 1."""
-  postEdge(
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
     """The method to use when ordering \`Post\`."""
-    orderBy: [PostOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostEdge
-}
+    orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
 
-"""All input for the \`deletePost\` mutation."""
-input DeletePostInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PostFilter
+  ): PostConnection!
+  bio: String
+  createdAt: Datetime
+  displayName: String
+  email: String!
   id: UUID!
+  isActive: Boolean
+  role: String
+  updatedAt: Datetime
+  username: String!
 }
 
-input ProvisionBucketInput {
-  """The logical bucket key (e.g., "public", "private")"""
-  bucketKey: String!
+"""A connection to a list of \`User\` values."""
+type UserConnection {
+  """
+  A list of edges which contains the \`User\` and cursor to aid in pagination.
+  """
+  edges: [UserEdge]!
 
-  """
-  Owner entity ID for entity-scoped bucket provisioning.
-  Omit for app-level (database-wide) storage.
-  """
-  ownerId: UUID
+  """A list of \`User\` objects."""
+  nodes: [User]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`User\` you could get from the connection."""
+  totalCount: Int!
 }
 
-type ProvisionBucketPayload {
-  """Whether provisioning succeeded"""
-  success: Boolean!
+"""A \`User\` edge in the connection."""
+type UserEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-  """The S3 bucket name that was provisioned"""
-  bucketName: String!
+  """The \`User\` at the end of the edge."""
+  node: User
+}
 
-  """The access type applied"""
-  accessType: String!
+"""
+A filter to be used against \`User\` object types. All fields are combined with a logical ‘and.’
+"""
+input UserFilter {
+  """Checks for all expressions in this list."""
+  and: [UserFilter!]
 
-  """The storage provider used"""
-  provider: String!
+  """Filter by the object’s \`authoredComments\` relation."""
+  authoredComments: UserToManyCommentFilter
 
-  """The S3 endpoint (null for AWS S3 default)"""
-  endpoint: String
+  """\`authoredComments\` exist."""
+  authoredCommentsExist: Boolean
 
-  """Error message if provisioning failed"""
-  error: String
+  """Filter by the object’s \`authoredPosts\` relation."""
+  authoredPosts: UserToManyPostFilter
+
+  """\`authoredPosts\` exist."""
+  authoredPostsExist: Boolean
+
+  """Filter by the object’s \`bio\` field."""
+  bio: StringFilter
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`displayName\` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s \`email\` field."""
+  email: StringFilter
+
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s \`isActive\` field."""
+  isActive: BooleanFilter
+
+  """Negates the expression."""
+  not: UserFilter
+
+  """Checks for any expressions in this list."""
+  or: [UserFilter!]
+
+  """Filter by the object’s \`role\` field."""
+  role: StringFilter
+
+  """Filter by the object’s \`updatedAt\` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s \`username\` field."""
+  username: StringFilter
+}
+
+"""An input for mutations affecting \`User\`"""
+input UserInput {
+  bio: String
+  createdAt: Datetime
+  displayName: String
+  email: String!
+  id: UUID
+  isActive: Boolean
+  role: String
+  updatedAt: Datetime
+  username: String!
+}
+
+"""Methods to use when ordering \`User\`."""
+enum UserOrderBy {
+  BIO_ASC
+  BIO_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROLE_ASC
+  ROLE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  USERNAME_ASC
+  USERNAME_DESC
+}
+
+"""Represents an update to a \`User\`. Fields that are set will be updated."""
+input UserPatch {
+  bio: String
+  createdAt: Datetime
+  displayName: String
+  email: String
+  id: UUID
+  isActive: Boolean
+  role: String
+  updatedAt: Datetime
+  username: String
+}
+
+"""
+A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyCommentFilter {
+  """Filters to entities where every related entity matches."""
+  every: CommentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: CommentFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: CommentFilter
+}
+
+"""
+A filter to be used against many \`Post\` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyPostFilter {
+  """Filters to entities where every related entity matches."""
+  every: PostFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PostFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PostFilter
 }"
 `;

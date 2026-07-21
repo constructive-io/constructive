@@ -40,7 +40,7 @@ export const PresetAuthHardened: ModulePreset = {
     'sessions_module',
     'user_state_module',
     'user_credentials_module',
-    'config_secrets_module',
+    'internal_secrets_module',
     'emails_module',
     'rls_module',
     'user_auth_module',

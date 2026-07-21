@@ -41,6 +41,7 @@ export function useUpdateRefMutation<S extends RefSelect>(
       Error,
       {
         id: string;
+        databaseId: string;
         refPatch: RefPatch;
       }
     >,
@@ -55,6 +56,7 @@ export function useUpdateRefMutation<S extends RefSelect>(
   Error,
   {
     id: string;
+    databaseId: string;
     refPatch: RefPatch;
   }
 >;
@@ -67,6 +69,7 @@ export function useUpdateRefMutation(
       Error,
       {
         id: string;
+        databaseId: string;
         refPatch: RefPatch;
       }
     >,
@@ -79,11 +82,20 @@ export function useUpdateRefMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: refMutationKeys.all,
-    mutationFn: ({ id, refPatch }: { id: string; refPatch: RefPatch }) =>
+    mutationFn: ({
+      id,
+      databaseId,
+      refPatch,
+    }: {
+      id: string;
+      databaseId: string;
+      refPatch: RefPatch;
+    }) =>
       getClient()
         .ref.update({
           where: {
             id,
+            databaseId,
           },
           data: refPatch,
           select: args.select,

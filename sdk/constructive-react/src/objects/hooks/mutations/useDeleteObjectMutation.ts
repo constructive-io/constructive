@@ -41,6 +41,7 @@ export function useDeleteObjectMutation<S extends ObjectSelect>(
       Error,
       {
         id: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -54,6 +55,7 @@ export function useDeleteObjectMutation<S extends ObjectSelect>(
   Error,
   {
     id: string;
+    databaseId: string;
   }
 >;
 export function useDeleteObjectMutation(
@@ -65,6 +67,7 @@ export function useDeleteObjectMutation(
       Error,
       {
         id: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -76,11 +79,12 @@ export function useDeleteObjectMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: objectMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
       getClient()
         .object.delete({
           where: {
             id,
+            databaseId,
           },
           select: args.select,
         })

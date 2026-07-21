@@ -144,6 +144,7 @@ The `.agents/skills/` directory contains tooling-focused skills for this monorep
 | Skill | Description | When to Use |
 |-------|-------------|-------------|
 | `pgpm` | PostgreSQL Package Manager — migrations, CLI, Docker, CI/CD, project scaffolding, table creation rules, DB export | Database migrations, workspace/module creation, `pgpm init`, deploy/revert |
+| `constructive-starter-kits` | Project scaffolding router — `pgpm init` templates, Next.js app boilerplate, custom template repos, boilerplate authoring (routes to the `pgpm` skill's scaffolding references) | Creating a new project, scaffolding a workspace/module, starting a boilerplate, setting up a Next.js app, authoring templates |
 | `constructive-pnpm` | PNPM workspace management — monorepo config, dist-folder publishing with makage/lerna, dependency management | Configuring pnpm workspaces, publishing packages, managing monorepo dependencies |
 | `constructive-setup` | Monorepo setup — install dependencies, start PostgreSQL, bootstrap users, build, run tests, local email services | Setting up the development environment, local dev, full pipeline |
 | `constructive-testing` | PostgreSQL testing frameworks — pgsql-test, drizzle-orm-test, supabase-test | Writing database tests, testing RLS policies, seeding test data |

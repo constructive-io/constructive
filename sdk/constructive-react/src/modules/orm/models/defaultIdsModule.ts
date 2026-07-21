@@ -196,7 +196,8 @@ export class DefaultIdsModuleModel {
       'UpdateDefaultIdsModuleInput',
       'id',
       'defaultIdsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

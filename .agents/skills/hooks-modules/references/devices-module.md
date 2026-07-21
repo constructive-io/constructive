@@ -7,8 +7,8 @@ React Query hooks for DevicesModule data operations
 ## Usage
 
 ```typescript
-useDevicesModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } } })
-useDevicesModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } } })
+useDevicesModulesQuery({ selection: { fields: { databaseId: true, deviceSettingsTableId: true, deviceSettingsTableName: true, id: true, schemaId: true, userDevicesTableId: true, userDevicesTableName: true } } })
+useDevicesModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, deviceSettingsTableId: true, deviceSettingsTableName: true, id: true, schemaId: true, userDevicesTableId: true, userDevicesTableName: true } } })
 useCreateDevicesModuleMutation({ selection: { fields: { id: true } } })
 useUpdateDevicesModuleMutation({ selection: { fields: { id: true } } })
 useDeleteDevicesModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteDevicesModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useDevicesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } },
+  selection: { fields: { databaseId: true, deviceSettingsTableId: true, deviceSettingsTableName: true, id: true, schemaId: true, userDevicesTableId: true, userDevicesTableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDevicesModulesQuery({
 const { mutate } = useCreateDevicesModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', deviceSettingsTableId: '<UUID>', userDevicesTable: '<String>', deviceSettingsTable: '<String>' });
+mutate({ databaseId: '<UUID>', deviceSettingsTableId: '<UUID>', deviceSettingsTableName: '<String>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', userDevicesTableName: '<String>' });
 ```

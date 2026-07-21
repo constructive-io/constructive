@@ -41,6 +41,7 @@ export function useDeleteOrgLimitEventMutation<S extends OrgLimitEventSelect>(
       Error,
       {
         id: string;
+        createdAt: string;
       }
     >,
     'mutationFn'
@@ -54,6 +55,7 @@ export function useDeleteOrgLimitEventMutation<S extends OrgLimitEventSelect>(
   Error,
   {
     id: string;
+    createdAt: string;
   }
 >;
 export function useDeleteOrgLimitEventMutation(
@@ -65,6 +67,7 @@ export function useDeleteOrgLimitEventMutation(
       Error,
       {
         id: string;
+        createdAt: string;
       }
     >,
     'mutationFn'
@@ -76,11 +79,12 @@ export function useDeleteOrgLimitEventMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: orgLimitEventMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id, createdAt }: { id: string; createdAt: string }) =>
       getClient()
         .orgLimitEvent.delete({
           where: {
             id,
+            createdAt,
           },
           select: args.select,
         })

@@ -196,7 +196,8 @@ export class ComputeLogModuleModel {
       'UpdateComputeLogModuleInput',
       'id',
       'computeLogModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -7,8 +7,8 @@ React Query hooks for User data operations
 ## Usage
 
 ```typescript
-useUsersQuery({ selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } } })
-useUserQuery({ id: '<UUID>', selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } } })
+useUsersQuery({ selection: { fields: { createdAt: true, displayName: true, displayNameTrgmSimilarity: true, id: true, profilePicture: true, searchScore: true, searchTsv: true, searchTsvRank: true, type: true, updatedAt: true, username: true } } })
+useUserQuery({ id: '<UUID>', selection: { fields: { createdAt: true, displayName: true, displayNameTrgmSimilarity: true, id: true, profilePicture: true, searchScore: true, searchTsv: true, searchTsvRank: true, type: true, updatedAt: true, username: true } } })
 useCreateUserMutation({ selection: { fields: { id: true } } })
 useUpdateUserMutation({ selection: { fields: { id: true } } })
 useDeleteUserMutation({})
@@ -20,7 +20,7 @@ useDeleteUserMutation({})
 
 ```typescript
 const { data, isLoading } = useUsersQuery({
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { createdAt: true, displayName: true, displayNameTrgmSimilarity: true, id: true, profilePicture: true, searchScore: true, searchTsv: true, searchTsvRank: true, type: true, updatedAt: true, username: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUsersQuery({
 const { mutate } = useCreateUserMutation({
   selection: { fields: { id: true } },
 });
-mutate({ username: '<String>', displayName: '<String>', profilePicture: '<Image>', searchTsv: '<FullText>', type: '<Int>', searchTsvRank: '<Float>', displayNameTrgmSimilarity: '<Float>', searchScore: '<Float>' });
+mutate({ displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' });
 ```

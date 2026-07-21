@@ -72,14 +72,6 @@ SET allow_identity_sign_in = true,
     oauth_require_verified_email = false,
     cookie_secure = false;
 
--- rotate_identity_provider_platform_secret currently expects this namespace.
-INSERT INTO constructive_infra_public.platform_namespaces (database_id, name, status)
-SELECT database_id, 'default', 'ready'
-FROM services_public.apis
-WHERE name = 'auth'
-LIMIT 1
-ON CONFLICT (database_id, name) DO NOTHING;
-
 -- Google local callback alias: localhost -> auth API.
 DELETE FROM services_public.domains
 WHERE domain = 'localhost'
@@ -136,15 +128,24 @@ PGPASSWORD=password psql -h localhost -U postgres -d constructive \
   -v ON_ERROR_STOP=1 \
   -v github_client_id="$GITHUB_OAUTH_CLIENT_ID" \
   -v github_client_secret="$GITHUB_OAUTH_CLIENT_SECRET" <<'SQL'
-UPDATE constructive_auth_private.identity_providers
-SET enabled = true,
-    client_id = :'github_client_id',
-    authorization_url = 'https://github.com/login/oauth/authorize',
-    token_url = 'https://github.com/login/oauth/access_token',
-    userinfo_url = 'https://api.github.com/user',
-    scopes = ARRAY['read:user', 'user:email'],
-    pkce_enabled = true
-WHERE slug = 'github';
+INSERT INTO constructive_auth_private.identity_providers (
+  slug, kind, display_name, enabled, client_id,
+  authorization_url, token_url, userinfo_url, scopes, pkce_enabled
+)
+VALUES (
+  'github', 'oauth2', 'GitHub', true, :'github_client_id',
+  'https://github.com/login/oauth/authorize',
+  'https://github.com/login/oauth/access_token',
+  'https://api.github.com/user', ARRAY['read:user', 'user:email'], true
+)
+ON CONFLICT (slug) DO UPDATE
+SET enabled = EXCLUDED.enabled,
+    client_id = EXCLUDED.client_id,
+    authorization_url = EXCLUDED.authorization_url,
+    token_url = EXCLUDED.token_url,
+    userinfo_url = EXCLUDED.userinfo_url,
+    scopes = EXCLUDED.scopes,
+    pkce_enabled = EXCLUDED.pkce_enabled;
 
 SELECT constructive_auth_private.rotate_identity_provider_platform_secret(
   (SELECT id FROM constructive_auth_private.identity_providers WHERE slug = 'github'),
@@ -160,15 +161,25 @@ PGPASSWORD=password psql -h localhost -U postgres -d constructive \
   -v ON_ERROR_STOP=1 \
   -v google_client_id="$GOOGLE_OAUTH_CLIENT_ID" \
   -v google_client_secret="$GOOGLE_OAUTH_CLIENT_SECRET" <<'SQL'
-UPDATE constructive_auth_private.identity_providers
-SET enabled = true,
-    client_id = :'google_client_id',
-    authorization_url = 'https://accounts.google.com/o/oauth2/v2/auth',
-    token_url = 'https://oauth2.googleapis.com/token',
-    userinfo_url = 'https://openidconnect.googleapis.com/v1/userinfo',
-    scopes = ARRAY['openid', 'email', 'profile'],
-    pkce_enabled = true
-WHERE slug = 'google';
+INSERT INTO constructive_auth_private.identity_providers (
+  slug, kind, display_name, enabled, client_id,
+  authorization_url, token_url, userinfo_url, scopes, pkce_enabled
+)
+VALUES (
+  'google', 'oauth2', 'Google', true, :'google_client_id',
+  'https://accounts.google.com/o/oauth2/v2/auth',
+  'https://oauth2.googleapis.com/token',
+  'https://openidconnect.googleapis.com/v1/userinfo',
+  ARRAY['openid', 'email', 'profile'], true
+)
+ON CONFLICT (slug) DO UPDATE
+SET enabled = EXCLUDED.enabled,
+    client_id = EXCLUDED.client_id,
+    authorization_url = EXCLUDED.authorization_url,
+    token_url = EXCLUDED.token_url,
+    userinfo_url = EXCLUDED.userinfo_url,
+    scopes = EXCLUDED.scopes,
+    pkce_enabled = EXCLUDED.pkce_enabled;
 
 SELECT constructive_auth_private.rotate_identity_provider_platform_secret(
   (SELECT id FROM constructive_auth_private.identity_providers WHERE slug = 'google'),

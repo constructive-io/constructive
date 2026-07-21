@@ -12,8 +12,8 @@ csdk unique-constraint list --where.<field>.<op> <value> --orderBy <values>
 csdk unique-constraint list --limit 10 --after <cursor>
 csdk unique-constraint find-first --where.<field>.<op> <value>
 csdk unique-constraint get --id <UUID>
-csdk unique-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--description <String>] [--smartTags <JSON>] [--type <String>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
-csdk unique-constraint update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--description <String>] [--smartTags <JSON>] [--type <String>] [--fieldIds <UUID>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk unique-constraint create --fieldIds <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--description <String>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>]
+csdk unique-constraint update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--description <String>] [--fieldIds <UUID>] [--name <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <String>]
 csdk unique-constraint delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk unique-constraint list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a uniqueConstraint
 
 ```bash
-csdk unique-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--description <String>] [--smartTags <JSON>] [--type <String>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk unique-constraint create --fieldIds <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--description <String>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>]
 ```
 
 ### Get a uniqueConstraint by id

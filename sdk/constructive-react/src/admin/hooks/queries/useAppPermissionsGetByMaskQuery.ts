@@ -20,7 +20,7 @@ export const appPermissionsGetByMaskQueryKey = customQueryKeys.appPermissionsGet
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useAppPermissionsGetByMaskQuery({ variables: { mask, first, offset, after } });
+ * const { data, isLoading } = useAppPermissionsGetByMaskQuery({ variables: { after, first, mask, offset } });
  *
  * if (data?.appPermissionsGetByMask) {
  *   console.log(data.appPermissionsGetByMask);
@@ -77,7 +77,7 @@ export function useAppPermissionsGetByMaskQuery<
  *
  * @example
  * ```ts
- * const data = await fetchAppPermissionsGetByMaskQuery({ variables: { mask, first, offset, after } });
+ * const data = await fetchAppPermissionsGetByMaskQuery({ variables: { after, first, mask, offset } });
  * ```
  */
 export async function fetchAppPermissionsGetByMaskQuery(params?: {
@@ -91,7 +91,7 @@ export async function fetchAppPermissionsGetByMaskQuery(params?: {
  *
  * @example
  * ```ts
- * await prefetchAppPermissionsGetByMaskQuery(queryClient, { variables: { mask, first, offset, after } });
+ * await prefetchAppPermissionsGetByMaskQuery(queryClient, { variables: { after, first, mask, offset } });
  * ```
  */
 export async function prefetchAppPermissionsGetByMaskQuery(

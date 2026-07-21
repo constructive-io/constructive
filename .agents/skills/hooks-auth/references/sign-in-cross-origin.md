@@ -7,7 +7,7 @@ React Query mutation hook for signInCrossOrigin
 ## Usage
 
 ```typescript
-const { mutate } = useSignInCrossOriginMutation(); mutate({ input: { token: '<String>', credentialKind: '<String>' } });
+const { mutate } = useSignInCrossOriginMutation(); mutate({ input: { credentialKind: '<String>', token: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSignInCrossOriginMutation(); mutate({ input: { token: '<St
 
 ```typescript
 const { mutate, isLoading } = useSignInCrossOriginMutation();
-mutate({ input: { token: '<String>', credentialKind: '<String>' } });
+mutate({ input: { credentialKind: '<String>', token: '<String>' } });
 ```

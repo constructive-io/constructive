@@ -12,8 +12,8 @@ csdk app-limit-credit-code list --where.<field>.<op> <value> --orderBy <values>
 csdk app-limit-credit-code list --limit 10 --after <cursor>
 csdk app-limit-credit-code find-first --where.<field>.<op> <value>
 csdk app-limit-credit-code get --id <UUID>
-csdk app-limit-credit-code create --code <String> [--maxRedemptions <Int>] [--currentRedemptions <Int>] [--expiresAt <Datetime>]
-csdk app-limit-credit-code update --id <UUID> [--code <String>] [--maxRedemptions <Int>] [--currentRedemptions <Int>] [--expiresAt <Datetime>]
+csdk app-limit-credit-code create --code <String> [--currentRedemptions <Int>] [--expiresAt <Datetime>] [--maxRedemptions <Int>]
+csdk app-limit-credit-code update --id <UUID> [--code <String>] [--currentRedemptions <Int>] [--expiresAt <Datetime>] [--maxRedemptions <Int>]
 csdk app-limit-credit-code delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit-credit-code list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appLimitCreditCode
 
 ```bash
-csdk app-limit-credit-code create --code <String> [--maxRedemptions <Int>] [--currentRedemptions <Int>] [--expiresAt <Datetime>]
+csdk app-limit-credit-code create --code <String> [--currentRedemptions <Int>] [--expiresAt <Datetime>] [--maxRedemptions <Int>]
 ```
 
 ### Get a appLimitCreditCode by id

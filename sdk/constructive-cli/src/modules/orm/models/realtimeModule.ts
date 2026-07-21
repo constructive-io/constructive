@@ -196,7 +196,8 @@ export class RealtimeModuleModel {
       'UpdateRealtimeModuleInput',
       'id',
       'realtimeModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

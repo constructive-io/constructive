@@ -7,8 +7,8 @@ React Query hooks for ForeignKeyConstraint data operations
 ## Usage
 
 ```typescript
-useForeignKeyConstraintsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
-useForeignKeyConstraintQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
+useForeignKeyConstraintsQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } } })
+useForeignKeyConstraintQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } } })
 useCreateForeignKeyConstraintMutation({ selection: { fields: { id: true } } })
 useUpdateForeignKeyConstraintMutation({ selection: { fields: { id: true } } })
 useDeleteForeignKeyConstraintMutation({})
@@ -20,7 +20,7 @@ useDeleteForeignKeyConstraintMutation({})
 
 ```typescript
 const { data, isLoading } = useForeignKeyConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useForeignKeyConstraintsQuery({
 const { mutate } = useCreateForeignKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', refTableId: '<UUID>', refFieldIds: '<UUID>', deleteAction: '<String>', updateAction: '<String>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', description: '<String>', fieldIds: '<UUID>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>' });
 ```

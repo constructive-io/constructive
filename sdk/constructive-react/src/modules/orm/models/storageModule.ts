@@ -196,7 +196,8 @@ export class StorageModuleModel {
       'UpdateStorageModuleInput',
       'id',
       'storageModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

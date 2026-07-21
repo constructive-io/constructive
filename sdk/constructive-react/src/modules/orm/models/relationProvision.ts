@@ -196,7 +196,8 @@ export class RelationProvisionModel {
       'UpdateRelationProvisionInput',
       'id',
       'relationProvisionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -12,8 +12,8 @@ csdk api-schema list --where.<field>.<op> <value> --orderBy <values>
 csdk api-schema list --limit 10 --after <cursor>
 csdk api-schema find-first --where.<field>.<op> <value>
 csdk api-schema get --id <UUID>
-csdk api-schema create --databaseId <UUID> --schemaId <UUID> --apiId <UUID>
-csdk api-schema update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--apiId <UUID>]
+csdk api-schema create --apiId <UUID> --databaseId <UUID> --schemaId <UUID>
+csdk api-schema update --id <UUID> [--apiId <UUID>] [--databaseId <UUID>] [--schemaId <UUID>]
 csdk api-schema delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk api-schema list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a apiSchema
 
 ```bash
-csdk api-schema create --databaseId <UUID> --schemaId <UUID> --apiId <UUID>
+csdk api-schema create --apiId <UUID> --databaseId <UUID> --schemaId <UUID>
 ```
 
 ### Get a apiSchema by id

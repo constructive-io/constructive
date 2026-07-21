@@ -196,7 +196,8 @@ export class RlsModuleModel {
       'UpdateRlsModuleInput',
       'id',
       'rlsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

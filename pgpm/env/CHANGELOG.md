@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.28.1...@pgpmjs/env@2.28.2) (2026-07-18)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.28.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.28.0...@pgpmjs/env@2.28.1) (2026-07-18)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+# [2.28.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.27.0...@pgpmjs/env@2.28.0) (2026-07-18)
+
+### Features
+
+- **env:** enforce production-safe env options at the getEnvOptions chokepoint ([ac696fb](https://github.com/constructive-io/constructive/commit/ac696fbfe27fa0cb5a2da9a8bff1d5d3b57e1d39))
+- **env:** STRICT_ENV valve + production-safety assert for baked dev defaults ([270d3bf](https://github.com/constructive-io/constructive/commit/270d3bf4c71e266125d687c0a4dbd4d36bb620d6))
+
+# [2.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.5...@pgpmjs/env@2.27.0) (2026-07-12)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.26.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.4...@pgpmjs/env@2.26.5) (2026-07-12)
+
+### Bug Fixes
+
+- **pgpm:** drop authenticated_client from default roles map, default it in client role generator ([4b26a76](https://github.com/constructive-io/constructive/commit/4b26a760f853826489e86f27c9c547d12554096e))
+
+## [2.26.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.3...@pgpmjs/env@2.26.4) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.26.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.2...@pgpmjs/env@2.26.3) (2026-07-11)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.26.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.1...@pgpmjs/env@2.26.2) (2026-07-10)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.26.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.0...@pgpmjs/env@2.26.1) (2026-07-08)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+# [2.26.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.25.1...@pgpmjs/env@2.26.0) (2026-06-28)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.25.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.25.0...@pgpmjs/env@2.25.1) (2026-06-22)
+
+**Note:** Version bump only for package @pgpmjs/env
+
 # [2.25.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.24.1...@pgpmjs/env@2.25.0) (2026-05-30)
 
 **Note:** Version bump only for package @pgpmjs/env

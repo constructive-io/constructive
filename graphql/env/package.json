@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-env",
-  "version": "3.13.0",
+  "version": "3.16.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive environment configuration with GraphQL/Graphile support",
   "main": "index.js",
@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "deepmerge": "^4.3.1"

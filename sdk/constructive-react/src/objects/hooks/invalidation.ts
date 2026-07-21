@@ -14,7 +14,13 @@
 // ============================================================================
 
 import type { QueryClient } from '@tanstack/react-query';
-import { getAllRecordKeys, refKeys, storeKeys, objectKeys, commitKeys } from './query-keys';
+import {
+  commitKeys,
+  getAllTreeNodesRecordKeys,
+  objectKeys,
+  refKeys,
+  storeKeys,
+} from './query-keys';
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -35,21 +41,49 @@ import { getAllRecordKeys, refKeys, storeKeys, objectKeys, commitKeys } from './
  * ```
  */
 export const invalidate = {
-  /** Invalidate getAllRecord queries */ getAllRecord: {
-    /** Invalidate all getAllRecord queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate commit queries */ commit: {
+    /** Invalidate all commit queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.all,
+        queryKey: commitKeys.all,
       }),
-    /** Invalidate getAllRecord list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate commit list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.lists(),
+        queryKey: commitKeys.lists(),
       }),
-    /** Invalidate a specific getAllRecord */ detail: (
+    /** Invalidate a specific commit */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: commitKeys.detail(id),
+      }),
+  },
+  /** Invalidate getAllTreeNodesRecord queries */ getAllTreeNodesRecord: {
+    /** Invalidate all getAllTreeNodesRecord queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllTreeNodesRecordKeys.all,
+      }),
+    /** Invalidate getAllTreeNodesRecord list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllTreeNodesRecordKeys.lists(),
+      }),
+    /** Invalidate a specific getAllTreeNodesRecord */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.detail(id),
+        queryKey: getAllTreeNodesRecordKeys.detail(id),
+      }),
+  },
+  /** Invalidate object queries */ object: {
+    /** Invalidate all object queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: objectKeys.all,
+      }),
+    /** Invalidate object list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: objectKeys.lists(),
+      }),
+    /** Invalidate a specific object */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: objectKeys.detail(id),
       }),
   },
   /** Invalidate ref queries */ ref: {
@@ -80,34 +114,6 @@ export const invalidate = {
         queryKey: storeKeys.detail(id),
       }),
   },
-  /** Invalidate object queries */ object: {
-    /** Invalidate all object queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.all,
-      }),
-    /** Invalidate object list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.lists(),
-      }),
-    /** Invalidate a specific object */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.detail(id),
-      }),
-  },
-  /** Invalidate commit queries */ commit: {
-    /** Invalidate all commit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.all,
-      }),
-    /** Invalidate commit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.lists(),
-      }),
-    /** Invalidate a specific commit */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.detail(id),
-      }),
-  },
 } as const;
 /**
 
@@ -121,12 +127,22 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove getAllRecord from cache */ getAllRecord: (
+  /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: commitKeys.detail(id),
+    });
+  },
+  /** Remove getAllTreeNodesRecord from cache */ getAllTreeNodesRecord: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: getAllRecordKeys.detail(id),
+      queryKey: getAllTreeNodesRecordKeys.detail(id),
+    });
+  },
+  /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: objectKeys.detail(id),
     });
   },
   /** Remove ref from cache */ ref: (queryClient: QueryClient, id: string | number) => {
@@ -137,16 +153,6 @@ export const remove = {
   /** Remove store from cache */ store: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: storeKeys.detail(id),
-    });
-  },
-  /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: objectKeys.detail(id),
-    });
-  },
-  /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: commitKeys.detail(id),
     });
   },
 } as const;

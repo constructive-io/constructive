@@ -12,8 +12,8 @@ csdk transfer-log-module list --where.<field>.<op> <value> --orderBy <values>
 csdk transfer-log-module list --limit 10 --after <cursor>
 csdk transfer-log-module find-first --where.<field>.<op> <value>
 csdk transfer-log-module get --id <UUID>
-csdk transfer-log-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--transferLogTableId <UUID>] [--transferLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
-csdk transfer-log-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--transferLogTableId <UUID>] [--transferLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk transfer-log-module create --databaseId <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--transferLogTableId <UUID>] [--transferLogTableName <String>] [--usageSummaryTableId <UUID>] [--usageSummaryTableName <String>]
+csdk transfer-log-module update --id <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--transferLogTableId <UUID>] [--transferLogTableName <String>] [--usageSummaryTableId <UUID>] [--usageSummaryTableName <String>]
 csdk transfer-log-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk transfer-log-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a transferLogModule
 
 ```bash
-csdk transfer-log-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--transferLogTableId <UUID>] [--transferLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk transfer-log-module create --databaseId <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--transferLogTableId <UUID>] [--transferLogTableName <String>] [--usageSummaryTableId <UUID>] [--usageSummaryTableName <String>]
 ```
 
 ### Get a transferLogModule by id

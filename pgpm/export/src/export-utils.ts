@@ -1,10 +1,12 @@
+import { getMissingInstallableModules, parseAuthor,PgpmPackage } from '@pgpmjs/core';
 import { mkdirSync, rmSync } from 'fs';
 import { sync as glob } from 'glob';
-import { Inquirerer } from 'inquirerer';
 import { toSnakeCase } from 'inflekt';
+import { Inquirerer } from 'inquirerer';
 import path from 'path';
+import type { Pool } from 'pg';
 
-import { PgpmPackage, getMissingInstallableModules, parseAuthor } from '@pgpmjs/core';
+import metaExportTables from './meta-export-tables.json';
 import { lookupByPgUdt } from './type-map';
 
 // =============================================================================
@@ -34,6 +36,8 @@ export const DB_REQUIRED_EXTENSIONS = [
   'pgpm-utils',
   'pgpm-database-jobs',
   'pgpm-jwt-claims',
+  'pgpm-app-scope',
+  'pgpm-function-resolution',
   'pgpm-stamps',
   'pgpm-base32',
   'pgpm-totp',
@@ -50,6 +54,54 @@ export const DB_REQUIRED_EXTENSIONS = [
 export const mapPgTypeToFieldType = (udtName: string): FieldType => {
   const entry = lookupByPgUdt(udtName);
   return entry?.fieldType ?? 'text';
+};
+
+export interface TableColumnInfo {
+  udt_name: string;
+  column_default: string | null;
+}
+
+/**
+ * Query actual columns from information_schema for a given table.
+ * Returns a map of column_name -> { udt_name, column_default }.
+ */
+export const getTableColumnsWithDefaults = async (
+  pool: Pool,
+  schemaName: string,
+  tableName: string
+): Promise<Map<string, TableColumnInfo>> => {
+  const result = await pool.query(
+    `
+      SELECT column_name, udt_name, column_default
+      FROM information_schema.columns
+      WHERE table_schema = $1 AND table_name = $2
+      ORDER BY ordinal_position
+    `,
+    [schemaName, tableName]
+  );
+
+  const columns = new Map<string, TableColumnInfo>();
+  for (const row of result.rows) {
+    columns.set(row.column_name, {
+      udt_name: row.udt_name,
+      column_default: row.column_default
+    });
+  }
+  return columns;
+};
+
+/**
+ * Detect whether a column default expression is a non-deterministic timestamp
+ * default (now(), CURRENT_TIMESTAMP, clock_timestamp(), or now() + interval).
+ * Exported INSERT rows must omit these columns so the DDL DEFAULT applies at
+ * deploy time, keeping generated migrations deterministic.
+ */
+export const isTimestampDefaultColumn = (columnDefault: string | null): boolean => {
+  if (!columnDefault) return false;
+  const normalized = columnDefault.trim().toLowerCase();
+  return /^(now\s*\(\s*\)|current_timestamp(?:\s*\(\s*\d*\s*\))?|clock_timestamp\s*\(\s*\))(?:\s*\+\s*'[^']*'\s*::\s*interval)?$/i.test(
+    normalized
+  );
 };
 
 /**
@@ -89,109 +141,6 @@ $LQLMIGRATION$;`;
 export const META_COMMON_FOOTER = `
 SET session_replication_role TO DEFAULT;`;
 
-/**
- * Ordered list of meta tables for export.
- * Tables are processed in this order to satisfy foreign key dependencies.
- */
-export const META_TABLE_ORDER = [
-  'database',
-  'schema',
-  'function',
-  'table',
-  'field',
-  'spatial_relation',
-  'policy',
-  'index',
-  'trigger',
-  'trigger_function',
-  'rls_function',
-  'foreign_key_constraint',
-  'primary_key_constraint',
-  'unique_constraint',
-  'check_constraint',
-  'full_text_search',
-  'schema_grant',
-  'table_grant',
-  'default_privilege',
-  'domains',
-  'sites',
-  'apis',
-  'apps',
-  'site_modules',
-  'site_themes',
-  'site_metadata',
-  'api_modules',
-  'api_extensions',
-  'api_schemas',
-  'database_settings',
-  'api_settings',
-  'rls_settings',
-  'cors_settings',
-  'pubkey_settings',
-  'webauthn_settings',
-  'rls_module',
-  'user_auth_module',
-  'memberships_module',
-  'permissions_module',
-  'limits_module',
-  'levels_module',
-  'events_module',
-  'users_module',
-  'hierarchy_module',
-  'membership_types_module',
-  'invites_module',
-  'emails_module',
-  'sessions_module',
-  'user_state_module',
-  'profiles_module',
-  'config_secrets_user_module',
-  'user_credentials_module',
-  'user_settings_module',
-  'connected_accounts_module',
-  'phone_numbers_module',
-  'crypto_addresses_module',
-  'crypto_auth_module',
-  'field_module',
-  'table_module',
-  'secure_table_provision',
-  'uuid_module',
-  'default_ids_module',
-  'denormalized_table_field',
-  // NOTE: blueprint_template, blueprint, and blueprint_construction are intentionally
-  // excluded from the export flow — they are runtime-only tables not exported as metadata.
-  'relation_provision',
-  'entity_type_provision',
-  'rate_limits_module',
-  'storage_module',
-  'billing_module',
-  'billing_provider_module',
-  'devices_module',
-  'identity_providers_module',
-  'notifications_module',
-  'plans_module',
-  'realtime_module',
-  'session_secrets_module',
-  'config_secrets_org_module',
-  'config_secrets_module',
-  'i18n_module',
-  'agent_module',
-  'function_module',
-  'namespace_module',
-  'merkle_store_module',
-  'graph_module',
-  'graph_execution_module',
-  'function_deployment_module',
-  'function_invocation_module',
-  'compute_log_module',
-  'db_usage_module',
-  'storage_log_module',
-  'transfer_log_module',
-  'webauthn_auth_module',
-  'webauthn_credentials_module',
-  'inference_log_module',
-  'rate_limit_meters_module'
-] as const;
-
 // =============================================================================
 // Shared types for table config
 // =============================================================================
@@ -213,103 +162,25 @@ export interface TableConfig {
 }
 
 /**
- * Shared metadata table configuration.
- * 
- * Fields are discovered dynamically at runtime via introspection:
- * - SQL flow: uses information_schema.columns + mapPgTypeToFieldType()
- * - GraphQL flow: uses __type introspection + mapGraphQLTypeToFieldType()
- * 
- * Only `typeOverrides` are hardcoded for special types (image, upload, url)
- * that cannot be inferred from database/GraphQL types alone.
- * 
+ * A single entry in the generated meta export table manifest
+ * (meta-export-tables.json, generated by constructive-db and propagated
+ * here via constructive-hub's schema-propagation workflow).
  */
-export const META_TABLE_CONFIG: Record<string, TableConfig> = {
-  // =============================================================================
-  // metaschema_public tables
-  // =============================================================================
-  database: {
-    schema: 'metaschema_public',
-    table: 'database'
-  },
-  schema: {
-    schema: 'metaschema_public',
-    table: 'schema'
-  },
-  function: {
-    schema: 'metaschema_public',
-    table: 'function'
-  },
-  table: {
-    schema: 'metaschema_public',
-    table: 'table'
-  },
-  field: {
-    schema: 'metaschema_public',
-    table: 'field',
-    conflictDoNothing: true
-  },
-  policy: {
-    schema: 'metaschema_public',
-    table: 'policy'
-  },
-  index: {
-    schema: 'metaschema_public',
-    table: 'index'
-  },
-  trigger: {
-    schema: 'metaschema_public',
-    table: 'trigger'
-  },
-  trigger_function: {
-    schema: 'metaschema_public',
-    table: 'trigger_function'
-  },
-  rls_function: {
-    schema: 'metaschema_public',
-    table: 'rls_function'
-  },
-  foreign_key_constraint: {
-    schema: 'metaschema_public',
-    table: 'foreign_key_constraint'
-  },
-  primary_key_constraint: {
-    schema: 'metaschema_public',
-    table: 'primary_key_constraint'
-  },
-  unique_constraint: {
-    schema: 'metaschema_public',
-    table: 'unique_constraint'
-  },
-  check_constraint: {
-    schema: 'metaschema_public',
-    table: 'check_constraint'
-  },
-  full_text_search: {
-    schema: 'metaschema_public',
-    table: 'full_text_search'
-  },
-  schema_grant: {
-    schema: 'metaschema_public',
-    table: 'schema_grant'
-  },
-  table_grant: {
-    schema: 'metaschema_public',
-    table: 'table_grant'
-  },
-  default_privilege: {
-    schema: 'metaschema_public',
-    table: 'default_privilege'
-  },
-  // =============================================================================
-  // services_public tables
-  // =============================================================================
-  domains: {
-    schema: 'services_public',
-    table: 'domains'
-  },
+export interface MetaExportTableEntry {
+  key: string;
+  schema: string;
+  table: string;
+}
+
+/**
+ * Hand-authored per-table overrides layered on top of the generated
+ * table manifest. Only exceptional exporter behavior lives here:
+ * conflict handling, special field types (image, upload, url) that
+ * cannot be inferred, GraphQL type name overrides, and columns whose
+ * values must come from DDL defaults at deploy time.
+ */
+export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | 'table'>> = {
   sites: {
-    schema: 'services_public',
-    table: 'sites',
     typeOverrides: {
       og_image: 'image',
       favicon: 'upload',
@@ -321,318 +192,63 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
     }
   },
   apis: {
-    schema: 'services_public',
-    table: 'apis',
     columnDefaults: {
       dbname: 'current_database()'
     }
   },
   apps: {
-    schema: 'services_public',
-    table: 'apps',
     typeOverrides: {
       app_image: 'image',
       app_store_link: 'url',
       play_store_link: 'url'
     }
   },
-  site_modules: {
-    schema: 'services_public',
-    table: 'site_modules'
-  },
-  site_themes: {
-    schema: 'services_public',
-    table: 'site_themes'
-  },
   site_metadata: {
-    schema: 'services_public',
-    table: 'site_metadata',
     typeOverrides: {
       og_image: 'image'
     }
   },
-  api_modules: {
-    schema: 'services_public',
-    table: 'api_modules'
-  },
-  api_extensions: {
-    schema: 'services_public',
-    table: 'api_extensions'
-  },
-  api_schemas: {
-    schema: 'services_public',
-    table: 'api_schemas'
-  },
-  database_settings: {
-    schema: 'services_public',
-    table: 'database_settings'
-  },
-  api_settings: {
-    schema: 'services_public',
-    table: 'api_settings'
-  },
-  rls_settings: {
-    schema: 'services_public',
-    table: 'rls_settings'
-  },
-  cors_settings: {
-    schema: 'services_public',
-    table: 'cors_settings'
-  },
-  pubkey_settings: {
-    schema: 'services_public',
-    table: 'pubkey_settings'
-  },
-  webauthn_settings: {
-    schema: 'services_public',
-    table: 'webauthn_settings'
-  },
-  // =============================================================================
-  // metaschema_modules_public tables
-  // =============================================================================
-  rls_module: {
-    schema: 'metaschema_modules_public',
-    table: 'rls_module'
-  },
-  user_auth_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_auth_module'
-  },
-  memberships_module: {
-    schema: 'metaschema_modules_public',
-    table: 'memberships_module'
-  },
-  permissions_module: {
-    schema: 'metaschema_modules_public',
-    table: 'permissions_module'
-  },
-  limits_module: {
-    schema: 'metaschema_modules_public',
-    table: 'limits_module'
-  },
-  levels_module: {
-    schema: 'metaschema_modules_public',
-    table: 'levels_module'
-  },
-  events_module: {
-    schema: 'metaschema_modules_public',
-    table: 'events_module'
-  },
-  users_module: {
-    schema: 'metaschema_modules_public',
-    table: 'users_module'
-  },
-  hierarchy_module: {
-    schema: 'metaschema_modules_public',
-    table: 'hierarchy_module'
-  },
-  membership_types_module: {
-    schema: 'metaschema_modules_public',
-    table: 'membership_types_module'
-  },
-  invites_module: {
-    schema: 'metaschema_modules_public',
-    table: 'invites_module'
-  },
-  emails_module: {
-    schema: 'metaschema_modules_public',
-    table: 'emails_module'
-  },
-  sessions_module: {
-    schema: 'metaschema_modules_public',
-    table: 'sessions_module'
-  },
-  user_state_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_state_module'
-  },
-  profiles_module: {
-    schema: 'metaschema_modules_public',
-    table: 'profiles_module'
-  },
-  config_secrets_user_module: {
-    schema: 'metaschema_modules_public',
-    table: 'config_secrets_user_module'
-  },
-  user_credentials_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_credentials_module'
-  },
-  user_settings_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_settings_module'
-  },
-  connected_accounts_module: {
-    schema: 'metaschema_modules_public',
-    table: 'connected_accounts_module'
-  },
-  phone_numbers_module: {
-    schema: 'metaschema_modules_public',
-    table: 'phone_numbers_module'
-  },
-  crypto_addresses_module: {
-    schema: 'metaschema_modules_public',
-    table: 'crypto_addresses_module'
-  },
-  crypto_auth_module: {
-    schema: 'metaschema_modules_public',
-    table: 'crypto_auth_module'
-  },
-  field_module: {
-    schema: 'metaschema_modules_public',
-    table: 'field_module'
-  },
-  table_module: {
-    schema: 'metaschema_modules_public',
-    table: 'table_module'
-  },
-  // NOTE: table_template_module has been removed from pgpm-modules (superseded by blueprints)
-  secure_table_provision: {
-    schema: 'metaschema_modules_public',
-    table: 'secure_table_provision'
-  },
-  uuid_module: {
-    schema: 'metaschema_modules_public',
-    table: 'uuid_module'
-  },
-  default_ids_module: {
-    schema: 'metaschema_modules_public',
-    table: 'default_ids_module'
-  },
-  denormalized_table_field: {
-    schema: 'metaschema_modules_public',
-    table: 'denormalized_table_field'
-  },
-  relation_provision: {
-    schema: 'metaschema_modules_public',
-    table: 'relation_provision'
-  },
-  entity_type_provision: {
-    schema: 'metaschema_modules_public',
-    table: 'entity_type_provision'
-  },
-  rate_limits_module: {
-    schema: 'metaschema_modules_public',
-    table: 'rate_limits_module'
-  },
-  storage_module: {
-    schema: 'metaschema_modules_public',
-    table: 'storage_module'
-  },
-  billing_module: {
-    schema: 'metaschema_modules_public',
-    table: 'billing_module'
-  },
-  billing_provider_module: {
-    schema: 'metaschema_modules_public',
-    table: 'billing_provider_module'
-  },
-  devices_module: {
-    schema: 'metaschema_modules_public',
-    table: 'devices_module'
-  },
-  identity_providers_module: {
-    schema: 'metaschema_modules_public',
-    table: 'identity_providers_module'
-  },
-  notifications_module: {
-    schema: 'metaschema_modules_public',
-    table: 'notifications_module'
-  },
-  plans_module: {
-    schema: 'metaschema_modules_public',
-    table: 'plans_module'
-  },
-  realtime_module: {
-    schema: 'metaschema_modules_public',
-    table: 'realtime_module'
-  },
-  session_secrets_module: {
-    schema: 'metaschema_modules_public',
-    table: 'session_secrets_module'
-  },
-  config_secrets_org_module: {
-    schema: 'metaschema_modules_public',
-    table: 'config_secrets_org_module'
-  },
-  config_secrets_module: {
-    schema: 'metaschema_modules_public',
-    table: 'config_secrets_module'
-  },
   i18n_module: {
-    schema: 'metaschema_modules_public',
-    table: 'i18n_module',
     gqlTypeName: 'I18NModule' // i18n is a well-known abbreviation; PostGraphile inflector capitalizes the N
-  },
-  agent_module: {
-    schema: 'metaschema_modules_public',
-    table: 'agent_module'
-  },
-  function_module: {
-    schema: 'metaschema_modules_public',
-    table: 'function_module'
-  },
-  namespace_module: {
-    schema: 'metaschema_modules_public',
-    table: 'namespace_module'
-  },
-  merkle_store_module: {
-    schema: 'metaschema_modules_public',
-    table: 'merkle_store_module'
-  },
-  graph_module: {
-    schema: 'metaschema_modules_public',
-    table: 'graph_module'
-  },
-  graph_execution_module: {
-    schema: 'metaschema_modules_public',
-    table: 'graph_execution_module'
-  },
-  function_deployment_module: {
-    schema: 'metaschema_modules_public',
-    table: 'function_deployment_module'
-  },
-  function_invocation_module: {
-    schema: 'metaschema_modules_public',
-    table: 'function_invocation_module'
-  },
-  compute_log_module: {
-    schema: 'metaschema_modules_public',
-    table: 'compute_log_module'
-  },
-  db_usage_module: {
-    schema: 'metaschema_modules_public',
-    table: 'db_usage_module'
-  },
-  storage_log_module: {
-    schema: 'metaschema_modules_public',
-    table: 'storage_log_module'
-  },
-  transfer_log_module: {
-    schema: 'metaschema_modules_public',
-    table: 'transfer_log_module'
-  },
-  webauthn_auth_module: {
-    schema: 'metaschema_modules_public',
-    table: 'webauthn_auth_module'
-  },
-  webauthn_credentials_module: {
-    schema: 'metaschema_modules_public',
-    table: 'webauthn_credentials_module'
-  },
-  inference_log_module: {
-    schema: 'metaschema_modules_public',
-    table: 'inference_log_module',
-  },
-  rate_limit_meters_module: {
-    schema: 'metaschema_modules_public',
-    table: 'rate_limit_meters_module',
-  },
-  spatial_relation: {
-    schema: 'metaschema_public',
-    table: 'spatial_relation'
   }
 };
+
+/**
+ * Ordered list of meta tables for export, derived from the generated
+ * manifest. Tables are already topologically sorted by foreign key
+ * dependencies at generation time.
+ */
+export const META_TABLE_ORDER: string[] = (metaExportTables as { tables: MetaExportTableEntry[] }).tables.map(t => t.key);
+
+/**
+ * Shared metadata table configuration, built from the generated manifest
+ * plus META_TABLE_OVERRIDES.
+ *
+ * Fields are discovered dynamically at runtime via introspection:
+ * - SQL flow: uses information_schema.columns + mapPgTypeToFieldType()
+ * - GraphQL flow: uses __type introspection + mapGraphQLTypeToFieldType()
+ *
+ * Only `typeOverrides` are hardcoded for special types (image, upload, url)
+ * that cannot be inferred from database/GraphQL types alone.
+ */
+export const META_TABLE_CONFIG: Record<string, TableConfig> = Object.fromEntries(
+  (metaExportTables as { tables: MetaExportTableEntry[] }).tables.map(t => [
+    t.key,
+    { schema: t.schema, table: t.table, ...META_TABLE_OVERRIDES[t.key] }
+  ])
+);
+
+/**
+ * Per-table timestamptz columns whose DDL default is non-deterministic
+ * (now(), CURRENT_TIMESTAMP, clock_timestamp(), now() + interval).
+ * Generated by constructive-db and propagated here via constructive-hub.
+ * The GraphQL export path uses this to omit those columns without a DB pool.
+ */
+export const META_TABLE_TIMESTAMP_DEFAULTS: Record<string, string[]> =
+  (metaExportTables as { timestampDefaultColumns?: Record<string, string[]> }).timestampDefaultColumns || {};
+
+export const getTimestampDefaultColumnsForTable = (schema: string, table: string): string[] =>
+  META_TABLE_TIMESTAMP_DEFAULTS[`${schema}.${table}`] || [];
 
 // =============================================================================
 // Shared interfaces
@@ -763,7 +379,10 @@ export const installMissingModules = async (
 export const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOptions): ReplacerResult => {
   const replacements: [string, string] = ['constructive-extension-name', name];
   const prefix = schemaPrefix || name;
-  const schemaReplacers: [string, string][] = schemas.map((schema) => [
+  const sortedSchemas = [...schemas].sort((a, b) =>
+    b.schema_name.length - a.schema_name.length || a.schema_name.localeCompare(b.schema_name)
+  );
+  const schemaReplacers: [string, string][] = sortedSchemas.map((schema) => [
     schema.schema_name,
     toSnakeCase(`${prefix}_${schema.name}`)
   ]);
@@ -806,7 +425,7 @@ export const preparePackage = async ({
   process.chdir(pgpmDir);
 
   try {
-    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
+    const plan = glob(path.join(pgpmDir, 'pgpm.plan')).sort((a, b) => a.localeCompare(b));
     if (!plan.length) {
       const { fullName, email } = parseAuthor(author);
 

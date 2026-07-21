@@ -1,0 +1,4081 @@
+"""
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+"""
+input BooleanFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
+
+  """Included in the specified list."""
+  in: [Boolean!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Boolean
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Boolean
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
+
+  """Not equal to the specified value."""
+  notEqualTo: Boolean
+
+  """Not included in the specified list."""
+  notIn: [Boolean!]
+}
+
+"""All input for the create `DbPreset` mutation."""
+input CreateDbPresetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DbPreset` to be created by this mutation."""
+  dbPreset: DbPresetInput!
+}
+
+"""The output of our create `DbPreset` mutation."""
+type CreateDbPresetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DbPreset` that was created by this mutation."""
+  dbPreset: DbPreset
+
+  """An edge for our `DbPreset`. May be used by Relay 1."""
+  dbPresetEdge(
+    """The method to use when ordering `DbPreset`."""
+    orderBy: [DbPresetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DbPresetEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `NamespaceEvent` mutation."""
+input CreateNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `NamespaceEvent` to be created by this mutation."""
+  namespaceEvent: NamespaceEventInput!
+}
+
+"""The output of our create `NamespaceEvent` mutation."""
+type CreateNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NamespaceEvent` that was created by this mutation."""
+  namespaceEvent: NamespaceEvent
+
+  """An edge for our `NamespaceEvent`. May be used by Relay 1."""
+  namespaceEventEdge(
+    """The method to use when ordering `NamespaceEvent`."""
+    orderBy: [NamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Namespace` mutation."""
+input CreateNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Namespace` to be created by this mutation."""
+  namespace: NamespaceInput!
+}
+
+"""The output of our create `Namespace` mutation."""
+type CreateNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Namespace` that was created by this mutation."""
+  namespace: Namespace
+
+  """An edge for our `Namespace`. May be used by Relay 1."""
+  namespaceEdge(
+    """The method to use when ordering `Namespace`."""
+    orderBy: [NamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformInfraCommit` mutation."""
+input CreatePlatformInfraCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraCommit` to be created by this mutation."""
+  platformInfraCommit: PlatformInfraCommitInput!
+}
+
+"""The output of our create `PlatformInfraCommit` mutation."""
+type CreatePlatformInfraCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraCommit` that was created by this mutation."""
+  platformInfraCommit: PlatformInfraCommit
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformInfraObject` mutation."""
+input CreatePlatformInfraObjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraObject` to be created by this mutation."""
+  platformInfraObject: PlatformInfraObjectInput!
+}
+
+"""The output of our create `PlatformInfraObject` mutation."""
+type CreatePlatformInfraObjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraObject` that was created by this mutation."""
+  platformInfraObject: PlatformInfraObject
+
+  """An edge for our `PlatformInfraObject`. May be used by Relay 1."""
+  platformInfraObjectEdge(
+    """The method to use when ordering `PlatformInfraObject`."""
+    orderBy: [PlatformInfraObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraObjectEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformInfraRef` mutation."""
+input CreatePlatformInfraRefInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraRef` to be created by this mutation."""
+  platformInfraRef: PlatformInfraRefInput!
+}
+
+"""The output of our create `PlatformInfraRef` mutation."""
+type CreatePlatformInfraRefPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraRef` that was created by this mutation."""
+  platformInfraRef: PlatformInfraRef
+
+  """An edge for our `PlatformInfraRef`. May be used by Relay 1."""
+  platformInfraRefEdge(
+    """The method to use when ordering `PlatformInfraRef`."""
+    orderBy: [PlatformInfraRefOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraRefEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformInfraStore` mutation."""
+input CreatePlatformInfraStoreInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraStore` to be created by this mutation."""
+  platformInfraStore: PlatformInfraStoreInput!
+}
+
+"""The output of our create `PlatformInfraStore` mutation."""
+type CreatePlatformInfraStorePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraStore` that was created by this mutation."""
+  platformInfraStore: PlatformInfraStore
+
+  """An edge for our `PlatformInfraStore`. May be used by Relay 1."""
+  platformInfraStoreEdge(
+    """The method to use when ordering `PlatformInfraStore`."""
+    orderBy: [PlatformInfraStoreOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraStoreEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformNamespaceEvent` mutation."""
+input CreatePlatformNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` to be created by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEventInput!
+}
+
+"""The output of our create `PlatformNamespaceEvent` mutation."""
+type CreatePlatformNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` that was created by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEvent
+
+  """An edge for our `PlatformNamespaceEvent`. May be used by Relay 1."""
+  platformNamespaceEventEdge(
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformNamespace` mutation."""
+input CreatePlatformNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespace` to be created by this mutation."""
+  platformNamespace: PlatformNamespaceInput!
+}
+
+"""The output of our create `PlatformNamespace` mutation."""
+type CreatePlatformNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespace` that was created by this mutation."""
+  platformNamespace: PlatformNamespace
+
+  """An edge for our `PlatformNamespace`. May be used by Relay 1."""
+  platformNamespaceEdge(
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+}
+
+"""
+Database provisioning preset catalog — merkle-versioned head over the infra store
+"""
+type DbPreset {
+  """Whether this preset is selectable for new databases"""
+  active: Boolean!
+
+  """
+  Infra store commit for the current definition (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+
+  """Timestamp of preset creation"""
+  createdAt: Datetime!
+
+  """
+  Preset definition (modules + options) — the readily-cached head; history lives in the infra store
+  """
+  definition: JSON!
+
+  """Human-readable description of the preset"""
+  description: String
+
+  """Unique preset identifier"""
+  id: UUID!
+
+  """Human-readable preset name"""
+  label: String
+
+  """
+  Content-address of definition->modules via metaschema_private.modules_hash (stamped by the versioned trigger); fast exact-match lookup key for provisioning requests
+  """
+  modulesHash: UUID
+
+  """
+  Preset slug (unique per scope); the preset's path in the infra tree is [db_preset, slug]
+  """
+  slug: String!
+
+  """
+  Infra Merkle store holding this preset's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime!
+}
+
+"""A connection to a list of `DbPreset` values."""
+type DbPresetConnection {
+  """
+  A list of edges which contains the `DbPreset` and cursor to aid in pagination.
+  """
+  edges: [DbPresetEdge]!
+
+  """A list of `DbPreset` objects."""
+  nodes: [DbPreset]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `DbPreset` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `DbPreset` edge in the connection."""
+type DbPresetEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DbPreset` at the end of the edge."""
+  node: DbPreset
+}
+
+"""
+A filter to be used against `DbPreset` object types. All fields are combined with a logical ‘and.’
+"""
+input DbPresetFilter {
+  """Filter by the object’s `active` field."""
+  active: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [DbPresetFilter!]
+
+  """Filter by the object’s `commitId` field."""
+  commitId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `definition` field."""
+  definition: JSONFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `label` field."""
+  label: StringFilter
+
+  """Filter by the object’s `modulesHash` field."""
+  modulesHash: UUIDFilter
+
+  """Negates the expression."""
+  not: DbPresetFilter
+
+  """Checks for any expressions in this list."""
+  or: [DbPresetFilter!]
+
+  """Filter by the object’s `slug` field."""
+  slug: StringFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `DbPreset`"""
+input DbPresetInput {
+  """Whether this preset is selectable for new databases"""
+  active: Boolean
+
+  """
+  Infra store commit for the current definition (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+
+  """Timestamp of preset creation"""
+  createdAt: Datetime
+
+  """
+  Preset definition (modules + options) — the readily-cached head; history lives in the infra store
+  """
+  definition: JSON!
+
+  """Human-readable description of the preset"""
+  description: String
+
+  """Unique preset identifier"""
+  id: UUID
+
+  """Human-readable preset name"""
+  label: String
+
+  """
+  Content-address of definition->modules via metaschema_private.modules_hash (stamped by the versioned trigger); fast exact-match lookup key for provisioning requests
+  """
+  modulesHash: UUID
+
+  """
+  Preset slug (unique per scope); the preset's path in the infra tree is [db_preset, slug]
+  """
+  slug: String!
+
+  """
+  Infra Merkle store holding this preset's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `DbPreset`."""
+enum DbPresetOrderBy {
+  ACTIVE_ASC
+  ACTIVE_DESC
+  COMMIT_ID_ASC
+  COMMIT_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DEFINITION_ASC
+  DEFINITION_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABEL_ASC
+  LABEL_DESC
+  MODULES_HASH_ASC
+  MODULES_HASH_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SLUG_ASC
+  SLUG_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `DbPreset`. Fields that are set will be updated.
+"""
+input DbPresetPatch {
+  """Whether this preset is selectable for new databases"""
+  active: Boolean
+
+  """
+  Infra store commit for the current definition (stamped by the versioned trigger on every write)
+  """
+  commitId: UUID
+
+  """Timestamp of preset creation"""
+  createdAt: Datetime
+
+  """
+  Preset definition (modules + options) — the readily-cached head; history lives in the infra store
+  """
+  definition: JSON
+
+  """Human-readable description of the preset"""
+  description: String
+
+  """Unique preset identifier"""
+  id: UUID
+
+  """Human-readable preset name"""
+  label: String
+
+  """
+  Content-address of definition->modules via metaschema_private.modules_hash (stamped by the versioned trigger); fast exact-match lookup key for provisioning requests
+  """
+  modulesHash: UUID
+
+  """
+  Preset slug (unique per scope); the preset's path in the infra tree is [db_preset, slug]
+  """
+  slug: String
+
+  """
+  Infra Merkle store holding this preset's history (stamped by the versioned trigger)
+  """
+  storeId: UUID
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime
+}
+
+"""All input for the `deleteDbPreset` mutation."""
+input DeleteDbPresetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique preset identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `DbPreset` mutation."""
+type DeleteDbPresetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DbPreset` that was deleted by this mutation."""
+  dbPreset: DbPreset
+
+  """An edge for our `DbPreset`. May be used by Relay 1."""
+  dbPresetEdge(
+    """The method to use when ordering `DbPreset`."""
+    orderBy: [DbPresetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DbPresetEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteNamespaceEvent` mutation."""
+input DeleteNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `NamespaceEvent` mutation."""
+type DeleteNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NamespaceEvent` that was deleted by this mutation."""
+  namespaceEvent: NamespaceEvent
+
+  """An edge for our `NamespaceEvent`. May be used by Relay 1."""
+  namespaceEventEdge(
+    """The method to use when ordering `NamespaceEvent`."""
+    orderBy: [NamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteNamespace` mutation."""
+input DeleteNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Namespace` mutation."""
+type DeleteNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Namespace` that was deleted by this mutation."""
+  namespace: Namespace
+
+  """An edge for our `Namespace`. May be used by Relay 1."""
+  namespaceEdge(
+    """The method to use when ordering `Namespace`."""
+    orderBy: [NamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformInfraCommit` mutation."""
+input DeletePlatformInfraCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique commit identifier"""
+  id: UUID!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""The output of our delete `PlatformInfraCommit` mutation."""
+type DeletePlatformInfraCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraCommit` that was deleted by this mutation."""
+  platformInfraCommit: PlatformInfraCommit
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformInfraObject` mutation."""
+input DeletePlatformInfraObjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""The output of our delete `PlatformInfraObject` mutation."""
+type DeletePlatformInfraObjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraObject` that was deleted by this mutation."""
+  platformInfraObject: PlatformInfraObject
+
+  """An edge for our `PlatformInfraObject`. May be used by Relay 1."""
+  platformInfraObjectEdge(
+    """The method to use when ordering `PlatformInfraObject`."""
+    orderBy: [PlatformInfraObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraObjectEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformInfraRef` mutation."""
+input DeletePlatformInfraRefInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique ref identifier"""
+  id: UUID!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""The output of our delete `PlatformInfraRef` mutation."""
+type DeletePlatformInfraRefPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraRef` that was deleted by this mutation."""
+  platformInfraRef: PlatformInfraRef
+
+  """An edge for our `PlatformInfraRef`. May be used by Relay 1."""
+  platformInfraRefEdge(
+    """The method to use when ordering `PlatformInfraRef`."""
+    orderBy: [PlatformInfraRefOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraRefEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformInfraStore` mutation."""
+input DeletePlatformInfraStoreInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique store identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `PlatformInfraStore` mutation."""
+type DeletePlatformInfraStorePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraStore` that was deleted by this mutation."""
+  platformInfraStore: PlatformInfraStore
+
+  """An edge for our `PlatformInfraStore`. May be used by Relay 1."""
+  platformInfraStoreEdge(
+    """The method to use when ordering `PlatformInfraStore`."""
+    orderBy: [PlatformInfraStoreOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraStoreEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformNamespaceEvent` mutation."""
+input DeletePlatformNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `PlatformNamespaceEvent` mutation."""
+type DeletePlatformNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` that was deleted by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEvent
+
+  """An edge for our `PlatformNamespaceEvent`. May be used by Relay 1."""
+  platformNamespaceEventEdge(
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformNamespace` mutation."""
+input DeletePlatformNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformNamespace` mutation."""
+type DeletePlatformNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespace` that was deleted by this mutation."""
+  platformNamespace: PlatformNamespace
+
+  """An edge for our `PlatformNamespace`. May be used by Relay 1."""
+  platformNamespaceEdge(
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """Contained by the specified JSON."""
+  containedBy: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
+  name: String!
+  type: MetaType!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+  referencedFields: [String!]!
+  referencedTable: String!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+  type: String
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `DbPreset`."""
+  createDbPreset(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDbPresetInput!
+  ): CreateDbPresetPayload
+
+  """Creates a single `Namespace`."""
+  createNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNamespaceInput!
+  ): CreateNamespacePayload
+
+  """Creates a single `NamespaceEvent`."""
+  createNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNamespaceEventInput!
+  ): CreateNamespaceEventPayload
+
+  """Creates a single `PlatformInfraCommit`."""
+  createPlatformInfraCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformInfraCommitInput!
+  ): CreatePlatformInfraCommitPayload
+
+  """Creates a single `PlatformInfraObject`."""
+  createPlatformInfraObject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformInfraObjectInput!
+  ): CreatePlatformInfraObjectPayload
+
+  """Creates a single `PlatformInfraRef`."""
+  createPlatformInfraRef(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformInfraRefInput!
+  ): CreatePlatformInfraRefPayload
+
+  """Creates a single `PlatformInfraStore`."""
+  createPlatformInfraStore(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformInfraStoreInput!
+  ): CreatePlatformInfraStorePayload
+
+  """Creates a single `PlatformNamespace`."""
+  createPlatformNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformNamespaceInput!
+  ): CreatePlatformNamespacePayload
+
+  """Creates a single `PlatformNamespaceEvent`."""
+  createPlatformNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformNamespaceEventInput!
+  ): CreatePlatformNamespaceEventPayload
+
+  """Deletes a single `DbPreset` using a unique key."""
+  deleteDbPreset(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDbPresetInput!
+  ): DeleteDbPresetPayload
+
+  """Deletes a single `Namespace` using a unique key."""
+  deleteNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNamespaceInput!
+  ): DeleteNamespacePayload
+
+  """Deletes a single `NamespaceEvent` using a unique key."""
+  deleteNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNamespaceEventInput!
+  ): DeleteNamespaceEventPayload
+
+  """Deletes a single `PlatformInfraCommit` using a unique key."""
+  deletePlatformInfraCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformInfraCommitInput!
+  ): DeletePlatformInfraCommitPayload
+
+  """Deletes a single `PlatformInfraObject` using a unique key."""
+  deletePlatformInfraObject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformInfraObjectInput!
+  ): DeletePlatformInfraObjectPayload
+
+  """Deletes a single `PlatformInfraRef` using a unique key."""
+  deletePlatformInfraRef(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformInfraRefInput!
+  ): DeletePlatformInfraRefPayload
+
+  """Deletes a single `PlatformInfraStore` using a unique key."""
+  deletePlatformInfraStore(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformInfraStoreInput!
+  ): DeletePlatformInfraStorePayload
+
+  """Deletes a single `PlatformNamespace` using a unique key."""
+  deletePlatformNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformNamespaceInput!
+  ): DeletePlatformNamespacePayload
+
+  """Deletes a single `PlatformNamespaceEvent` using a unique key."""
+  deletePlatformNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformNamespaceEventInput!
+  ): DeletePlatformNamespaceEventPayload
+  platformInfraInitEmptyRepo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraInitEmptyRepoInput!
+  ): PlatformInfraInitEmptyRepoPayload
+  platformInfraInsertNodeAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraInsertNodeAtPathInput!
+  ): PlatformInfraInsertNodeAtPathPayload
+  platformInfraSetDataAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PlatformInfraSetDataAtPathInput!
+  ): PlatformInfraSetDataAtPathPayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+
+  """Updates a single `DbPreset` using a unique key and a patch."""
+  updateDbPreset(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDbPresetInput!
+  ): UpdateDbPresetPayload
+
+  """Updates a single `Namespace` using a unique key and a patch."""
+  updateNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNamespaceInput!
+  ): UpdateNamespacePayload
+
+  """Updates a single `NamespaceEvent` using a unique key and a patch."""
+  updateNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNamespaceEventInput!
+  ): UpdateNamespaceEventPayload
+
+  """Updates a single `PlatformInfraCommit` using a unique key and a patch."""
+  updatePlatformInfraCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformInfraCommitInput!
+  ): UpdatePlatformInfraCommitPayload
+
+  """Updates a single `PlatformInfraObject` using a unique key and a patch."""
+  updatePlatformInfraObject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformInfraObjectInput!
+  ): UpdatePlatformInfraObjectPayload
+
+  """Updates a single `PlatformInfraRef` using a unique key and a patch."""
+  updatePlatformInfraRef(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformInfraRefInput!
+  ): UpdatePlatformInfraRefPayload
+
+  """Updates a single `PlatformInfraStore` using a unique key and a patch."""
+  updatePlatformInfraStore(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformInfraStoreInput!
+  ): UpdatePlatformInfraStorePayload
+
+  """Updates a single `PlatformNamespace` using a unique key and a patch."""
+  updatePlatformNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformNamespaceInput!
+  ): UpdatePlatformNamespacePayload
+
+  """
+  Updates a single `PlatformNamespaceEvent` using a unique key and a patch.
+  """
+  updatePlatformNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformNamespaceEventInput!
+  ): UpdatePlatformNamespaceEventPayload
+}
+
+"""
+Logical namespace containers for grouping secrets, config, functions, and other resources
+"""
+type Namespace {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Optional human-readable description of this namespace"""
+  description: String
+  id: UUID!
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean!
+
+  """
+  true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally)
+  """
+  isManaged: Boolean!
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON!
+
+  """Most recent provisioning or reconcile error message"""
+  lastError: String
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String!
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String!
+
+  """
+  Namespace provisioning lifecycle status: pending, provisioning, active, failed
+  """
+  status: String!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `Namespace` values."""
+type NamespaceConnection {
+  """
+  A list of edges which contains the `Namespace` and cursor to aid in pagination.
+  """
+  edges: [NamespaceEdge]!
+
+  """A list of `Namespace` objects."""
+  nodes: [Namespace]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Namespace` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Namespace` edge in the connection."""
+type NamespaceEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Namespace` at the end of the edge."""
+  node: Namespace
+}
+
+"""
+Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
+"""
+type NamespaceEvent {
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID!
+}
+
+"""A connection to a list of `NamespaceEvent` values."""
+type NamespaceEventConnection {
+  """
+  A list of edges which contains the `NamespaceEvent` and cursor to aid in pagination.
+  """
+  edges: [NamespaceEventEdge]!
+
+  """A list of `NamespaceEvent` objects."""
+  nodes: [NamespaceEvent]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `NamespaceEvent` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `NamespaceEvent` edge in the connection."""
+type NamespaceEventEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NamespaceEvent` at the end of the edge."""
+  node: NamespaceEvent
+}
+
+"""
+A filter to be used against `NamespaceEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceEventFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [NamespaceEventFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `eventType` field."""
+  eventType: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: NamespaceEventFilter
+
+  """Checks for any expressions in this list."""
+  or: [NamespaceEventFilter!]
+}
+
+"""An input for mutations affecting `NamespaceEvent`"""
+input NamespaceEventInput {
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String!
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID!
+}
+
+"""Methods to use when ordering `NamespaceEvent`."""
+enum NamespaceEventOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  EVENT_TYPE_ASC
+  EVENT_TYPE_DESC
+  ID_ASC
+  ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `NamespaceEvent`. Fields that are set will be updated.
+"""
+input NamespaceEventPatch {
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID
+}
+
+"""
+A filter to be used against `Namespace` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceFilter {
+  """Checks for all expressions in this list."""
+  and: [NamespaceFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isManaged` field."""
+  isManaged: BooleanFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `lastError` field."""
+  lastError: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceName` field."""
+  namespaceName: StringFilter
+
+  """Negates the expression."""
+  not: NamespaceFilter
+
+  """Checks for any expressions in this list."""
+  or: [NamespaceFilter!]
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `Namespace`"""
+input NamespaceInput {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Optional human-readable description of this namespace"""
+  description: String
+  id: UUID
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean
+
+  """
+  true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally)
+  """
+  isManaged: Boolean
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON
+
+  """Most recent provisioning or reconcile error message"""
+  lastError: String
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String!
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String!
+
+  """
+  Namespace provisioning lifecycle status: pending, provisioning, active, failed
+  """
+  status: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `Namespace`."""
+enum NamespaceOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_MANAGED_ASC
+  IS_MANAGED_DESC
+  LABELS_ASC
+  LABELS_DESC
+  LAST_ERROR_ASC
+  LAST_ERROR_DESC
+  NAMESPACE_NAME_ASC
+  NAMESPACE_NAME_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STATUS_ASC
+  STATUS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `Namespace`. Fields that are set will be updated.
+"""
+input NamespacePatch {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Optional human-readable description of this namespace"""
+  description: String
+  id: UUID
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean
+
+  """
+  true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally)
+  """
+  isManaged: Boolean
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON
+
+  """Most recent provisioning or reconcile error message"""
+  lastError: String
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String
+
+  """
+  Namespace provisioning lifecycle status: pending, provisioning, active, failed
+  """
+  status: String
+  updatedAt: Datetime
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""Commit history — each commit snapshots a tree root for a store"""
+type PlatformInfraCommit {
+  """User who authored the changes"""
+  authorId: UUID
+
+  """User who committed (may differ from author)"""
+  committerId: UUID
+
+  """Commit timestamp"""
+  date: Datetime!
+
+  """Unique commit identifier"""
+  id: UUID!
+
+  """Optional commit message"""
+  message: String
+
+  """Parent commit IDs (supports merge commits)"""
+  parentIds: [UUID]
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+
+  """Store this commit belongs to"""
+  storeId: UUID!
+
+  """Root object ID of the tree snapshot at this commit"""
+  treeId: UUID
+}
+
+"""A connection to a list of `PlatformInfraCommit` values."""
+type PlatformInfraCommitConnection {
+  """
+  A list of edges which contains the `PlatformInfraCommit` and cursor to aid in pagination.
+  """
+  edges: [PlatformInfraCommitEdge]!
+
+  """A list of `PlatformInfraCommit` objects."""
+  nodes: [PlatformInfraCommit]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInfraCommit` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformInfraCommit` edge in the connection."""
+type PlatformInfraCommitEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformInfraCommit` at the end of the edge."""
+  node: PlatformInfraCommit
+}
+
+"""
+A filter to be used against `PlatformInfraCommit` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformInfraCommitFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformInfraCommitFilter!]
+
+  """Filter by the object’s `authorId` field."""
+  authorId: UUIDFilter
+
+  """Filter by the object’s `committerId` field."""
+  committerId: UUIDFilter
+
+  """Filter by the object’s `date` field."""
+  date: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Negates the expression."""
+  not: PlatformInfraCommitFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformInfraCommitFilter!]
+
+  """Filter by the object’s `parentIds` field."""
+  parentIds: UUIDListFilter
+
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `treeId` field."""
+  treeId: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformInfraCommit`"""
+input PlatformInfraCommitInput {
+  """User who authored the changes"""
+  authorId: UUID
+
+  """User who committed (may differ from author)"""
+  committerId: UUID
+
+  """Commit timestamp"""
+  date: Datetime
+
+  """Unique commit identifier"""
+  id: UUID
+
+  """Optional commit message"""
+  message: String
+
+  """Parent commit IDs (supports merge commits)"""
+  parentIds: [UUID]
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+
+  """Store this commit belongs to"""
+  storeId: UUID!
+
+  """Root object ID of the tree snapshot at this commit"""
+  treeId: UUID
+}
+
+"""Methods to use when ordering `PlatformInfraCommit`."""
+enum PlatformInfraCommitOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  COMMITTER_ID_ASC
+  COMMITTER_ID_DESC
+  DATE_ASC
+  DATE_DESC
+  ID_ASC
+  ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  NATURAL
+  PARENT_IDS_ASC
+  PARENT_IDS_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  TREE_ID_ASC
+  TREE_ID_DESC
+}
+
+"""
+Represents an update to a `PlatformInfraCommit`. Fields that are set will be updated.
+"""
+input PlatformInfraCommitPatch {
+  """User who authored the changes"""
+  authorId: UUID
+
+  """User who committed (may differ from author)"""
+  committerId: UUID
+
+  """Commit timestamp"""
+  date: Datetime
+
+  """Unique commit identifier"""
+  id: UUID
+
+  """Optional commit message"""
+  message: String
+
+  """Parent commit IDs (supports merge commits)"""
+  parentIds: [UUID]
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID
+
+  """Store this commit belongs to"""
+  storeId: UUID
+
+  """Root object ID of the tree snapshot at this commit"""
+  treeId: UUID
+}
+
+"""A connection to a list of `PlatformInfraGetAllTreeNodesRecord` values."""
+type PlatformInfraGetAllTreeNodesConnection {
+  """
+  A list of edges which contains the `PlatformInfraGetAllTreeNodesRecord` and cursor to aid in pagination.
+  """
+  edges: [PlatformInfraGetAllTreeNodesEdge]!
+
+  """A list of `PlatformInfraGetAllTreeNodesRecord` objects."""
+  nodes: [PlatformInfraGetAllTreeNodesRecord]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInfraGetAllTreeNodesRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformInfraGetAllTreeNodesRecord` edge in the connection."""
+type PlatformInfraGetAllTreeNodesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformInfraGetAllTreeNodesRecord` at the end of the edge."""
+  node: PlatformInfraGetAllTreeNodesRecord
+}
+
+type PlatformInfraGetAllTreeNodesRecord {
+  data: JSON
+  path: [String]
+}
+
+"""All input for the `platformInfraInitEmptyRepo` mutation."""
+input PlatformInfraInitEmptyRepoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  sId: UUID
+  storeId: UUID
+}
+
+"""The output of our `platformInfraInitEmptyRepo` mutation."""
+type PlatformInfraInitEmptyRepoPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `platformInfraInsertNodeAtPath` mutation."""
+input PlatformInfraInsertNodeAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+  path: [String]
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `platformInfraInsertNodeAtPath` mutation."""
+type PlatformInfraInsertNodeAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
+"""
+Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
+"""
+type PlatformInfraObject {
+  """Timestamp of object creation"""
+  createdAt: Datetime
+
+  """Payload data for this object node"""
+  data: JSON
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
+
+  """Ordered array of child object IDs"""
+  kids: [UUID]
+
+  """Ordered array of child path names (parallel to kids)"""
+  ktree: [String]
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""A connection to a list of `PlatformInfraObject` values."""
+type PlatformInfraObjectConnection {
+  """
+  A list of edges which contains the `PlatformInfraObject` and cursor to aid in pagination.
+  """
+  edges: [PlatformInfraObjectEdge]!
+
+  """A list of `PlatformInfraObject` objects."""
+  nodes: [PlatformInfraObject]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInfraObject` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformInfraObject` edge in the connection."""
+type PlatformInfraObjectEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformInfraObject` at the end of the edge."""
+  node: PlatformInfraObject
+}
+
+"""
+A filter to be used against `PlatformInfraObject` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformInfraObjectFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformInfraObjectFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `data` field."""
+  data: JSONFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `kids` field."""
+  kids: UUIDListFilter
+
+  """Filter by the object’s `ktree` field."""
+  ktree: StringListFilter
+
+  """Negates the expression."""
+  not: PlatformInfraObjectFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformInfraObjectFilter!]
+
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformInfraObject`"""
+input PlatformInfraObjectInput {
+  """Timestamp of object creation"""
+  createdAt: Datetime
+
+  """Payload data for this object node"""
+  data: JSON
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
+
+  """Ordered array of child object IDs"""
+  kids: [UUID]
+
+  """Ordered array of child path names (parallel to kids)"""
+  ktree: [String]
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""Methods to use when ordering `PlatformInfraObject`."""
+enum PlatformInfraObjectOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATA_ASC
+  DATA_DESC
+  ID_ASC
+  ID_DESC
+  KIDS_ASC
+  KIDS_DESC
+  KTREE_ASC
+  KTREE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
+}
+
+"""
+Represents an update to a `PlatformInfraObject`. Fields that are set will be updated.
+"""
+input PlatformInfraObjectPatch {
+  """Timestamp of object creation"""
+  createdAt: Datetime
+
+  """Payload data for this object node"""
+  data: JSON
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID
+
+  """Ordered array of child object IDs"""
+  kids: [UUID]
+
+  """Ordered array of child path names (parallel to kids)"""
+  ktree: [String]
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID
+}
+
+"""Branch heads — mutable pointers into the commit chain"""
+type PlatformInfraRef {
+  """Commit this ref points to"""
+  commitId: UUID
+
+  """Unique ref identifier"""
+  id: UUID!
+
+  """Ref name (e.g. HEAD, main)"""
+  name: String!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+
+  """Store this ref belongs to"""
+  storeId: UUID!
+}
+
+"""A connection to a list of `PlatformInfraRef` values."""
+type PlatformInfraRefConnection {
+  """
+  A list of edges which contains the `PlatformInfraRef` and cursor to aid in pagination.
+  """
+  edges: [PlatformInfraRefEdge]!
+
+  """A list of `PlatformInfraRef` objects."""
+  nodes: [PlatformInfraRef]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInfraRef` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformInfraRef` edge in the connection."""
+type PlatformInfraRefEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformInfraRef` at the end of the edge."""
+  node: PlatformInfraRef
+}
+
+"""
+A filter to be used against `PlatformInfraRef` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformInfraRefFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformInfraRefFilter!]
+
+  """Filter by the object’s `commitId` field."""
+  commitId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformInfraRefFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformInfraRefFilter!]
+
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformInfraRef`"""
+input PlatformInfraRefInput {
+  """Commit this ref points to"""
+  commitId: UUID
+
+  """Unique ref identifier"""
+  id: UUID
+
+  """Ref name (e.g. HEAD, main)"""
+  name: String!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+
+  """Store this ref belongs to"""
+  storeId: UUID!
+}
+
+"""Methods to use when ordering `PlatformInfraRef`."""
+enum PlatformInfraRefOrderBy {
+  COMMIT_ID_ASC
+  COMMIT_ID_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+}
+
+"""
+Represents an update to a `PlatformInfraRef`. Fields that are set will be updated.
+"""
+input PlatformInfraRefPatch {
+  """Commit this ref points to"""
+  commitId: UUID
+
+  """Unique ref identifier"""
+  id: UUID
+
+  """Ref name (e.g. HEAD, main)"""
+  name: String
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID
+
+  """Store this ref belongs to"""
+  storeId: UUID
+}
+
+"""All input for the `platformInfraSetDataAtPath` mutation."""
+input PlatformInfraSetDataAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: JSON
+  path: [String]
+  root: UUID
+  sId: UUID
+}
+
+"""The output of our `platformInfraSetDataAtPath` mutation."""
+type PlatformInfraSetDataAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: UUID
+}
+
+"""
+Named stores — one per version-controlled tree (e.g. one graph, one definition set)
+"""
+type PlatformInfraStore {
+  """Timestamp of store creation"""
+  createdAt: Datetime
+
+  """Current root object hash of this store"""
+  hash: UUID
+
+  """Unique store identifier"""
+  id: UUID!
+
+  """Human-readable store name"""
+  name: String!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""A connection to a list of `PlatformInfraStore` values."""
+type PlatformInfraStoreConnection {
+  """
+  A list of edges which contains the `PlatformInfraStore` and cursor to aid in pagination.
+  """
+  edges: [PlatformInfraStoreEdge]!
+
+  """A list of `PlatformInfraStore` objects."""
+  nodes: [PlatformInfraStore]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformInfraStore` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformInfraStore` edge in the connection."""
+type PlatformInfraStoreEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformInfraStore` at the end of the edge."""
+  node: PlatformInfraStore
+}
+
+"""
+A filter to be used against `PlatformInfraStore` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformInfraStoreFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformInfraStoreFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `hash` field."""
+  hash: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: PlatformInfraStoreFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformInfraStoreFilter!]
+
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformInfraStore`"""
+input PlatformInfraStoreInput {
+  """Timestamp of store creation"""
+  createdAt: Datetime
+
+  """Current root object hash of this store"""
+  hash: UUID
+
+  """Unique store identifier"""
+  id: UUID
+
+  """Human-readable store name"""
+  name: String!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""Methods to use when ordering `PlatformInfraStore`."""
+enum PlatformInfraStoreOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  HASH_ASC
+  HASH_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
+}
+
+"""
+Represents an update to a `PlatformInfraStore`. Fields that are set will be updated.
+"""
+input PlatformInfraStorePatch {
+  """Timestamp of store creation"""
+  createdAt: Datetime
+
+  """Current root object hash of this store"""
+  hash: UUID
+
+  """Unique store identifier"""
+  id: UUID
+
+  """Human-readable store name"""
+  name: String
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID
+}
+
+"""
+Logical namespace containers for grouping secrets, config, functions, and other resources
+"""
+type PlatformNamespace {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+  createdAt: Datetime
+
+  """Optional human-readable description of this namespace"""
+  description: String
+  id: UUID!
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean!
+
+  """
+  true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally)
+  """
+  isManaged: Boolean!
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON!
+
+  """Most recent provisioning or reconcile error message"""
+  lastError: String
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String!
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String!
+
+  """
+  Namespace provisioning lifecycle status: pending, provisioning, active, failed
+  """
+  status: String!
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `PlatformNamespace` values."""
+type PlatformNamespaceConnection {
+  """
+  A list of edges which contains the `PlatformNamespace` and cursor to aid in pagination.
+  """
+  edges: [PlatformNamespaceEdge]!
+
+  """A list of `PlatformNamespace` objects."""
+  nodes: [PlatformNamespace]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformNamespace` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformNamespace` edge in the connection."""
+type PlatformNamespaceEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformNamespace` at the end of the edge."""
+  node: PlatformNamespace
+}
+
+"""
+Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
+"""
+type PlatformNamespaceEvent {
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID!
+}
+
+"""A connection to a list of `PlatformNamespaceEvent` values."""
+type PlatformNamespaceEventConnection {
+  """
+  A list of edges which contains the `PlatformNamespaceEvent` and cursor to aid in pagination.
+  """
+  edges: [PlatformNamespaceEventEdge]!
+
+  """A list of `PlatformNamespaceEvent` objects."""
+  nodes: [PlatformNamespaceEvent]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformNamespaceEvent` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformNamespaceEvent` edge in the connection."""
+type PlatformNamespaceEventEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformNamespaceEvent` at the end of the edge."""
+  node: PlatformNamespaceEvent
+}
+
+"""
+A filter to be used against `PlatformNamespaceEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceEventFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformNamespaceEventFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `eventType` field."""
+  eventType: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformNamespaceEventFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformNamespaceEventFilter!]
+}
+
+"""An input for mutations affecting `PlatformNamespaceEvent`"""
+input PlatformNamespaceEventInput {
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String!
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID!
+}
+
+"""Methods to use when ordering `PlatformNamespaceEvent`."""
+enum PlatformNamespaceEventOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EVENT_TYPE_ASC
+  EVENT_TYPE_DESC
+  ID_ASC
+  ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated.
+"""
+input PlatformNamespaceEventPatch {
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID
+}
+
+"""
+A filter to be used against `PlatformNamespace` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformNamespaceFilter!]
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isManaged` field."""
+  isManaged: BooleanFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `lastError` field."""
+  lastError: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceName` field."""
+  namespaceName: StringFilter
+
+  """Negates the expression."""
+  not: PlatformNamespaceFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformNamespaceFilter!]
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `PlatformNamespace`"""
+input PlatformNamespaceInput {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Optional human-readable description of this namespace"""
+  description: String
+  id: UUID
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean
+
+  """
+  true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally)
+  """
+  isManaged: Boolean
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON
+
+  """Most recent provisioning or reconcile error message"""
+  lastError: String
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String!
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String!
+
+  """
+  Namespace provisioning lifecycle status: pending, provisioning, active, failed
+  """
+  status: String
+  updatedAt: Datetime
+}
+
+"""Methods to use when ordering `PlatformNamespace`."""
+enum PlatformNamespaceOrderBy {
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_MANAGED_ASC
+  IS_MANAGED_DESC
+  LABELS_ASC
+  LABELS_DESC
+  LAST_ERROR_ASC
+  LAST_ERROR_DESC
+  NAMESPACE_NAME_ASC
+  NAMESPACE_NAME_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STATUS_ASC
+  STATUS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `PlatformNamespace`. Fields that are set will be updated.
+"""
+input PlatformNamespacePatch {
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+  createdAt: Datetime
+
+  """Optional human-readable description of this namespace"""
+  description: String
+  id: UUID
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean
+
+  """
+  true = provisioned by the platform via jobs, false = unmanaged/platform-native (bootstrapped externally)
+  """
+  isManaged: Boolean
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON
+
+  """Most recent provisioning or reconcile error message"""
+  lastError: String
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String
+
+  """
+  Namespace provisioning lifecycle status: pending, provisioning, active, failed
+  """
+  status: String
+  updatedAt: Datetime
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
+  """
+  ownerId: UUID
+}
+
+type ProvisionBucketPayload {
+  """The access type applied"""
+  accessType: String!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+
+  """Reads and enables pagination through a set of `DbPreset`."""
+  dbPresets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DbPreset`."""
+    orderBy: [DbPresetOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DbPresetFilter
+  ): DbPresetConnection
+
+  """Reads and enables pagination through a set of `NamespaceEvent`."""
+  namespaceEvents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `NamespaceEvent`."""
+    orderBy: [NamespaceEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: NamespaceEventFilter
+  ): NamespaceEventConnection
+
+  """Reads and enables pagination through a set of `Namespace`."""
+  namespaces(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Namespace`."""
+    orderBy: [NamespaceOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: NamespaceFilter
+  ): NamespaceConnection
+
+  """Reads and enables pagination through a set of `PlatformInfraCommit`."""
+  platformInfraCommits(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformInfraCommitFilter
+  ): PlatformInfraCommitConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformInfraGetAllTreeNodesRecord`.
+  """
+  platformInfraGetAllTreeNodes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+    id: UUID
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+    sId: UUID
+  ): PlatformInfraGetAllTreeNodesConnection
+  platformInfraGetNodeAtPath(id: UUID, path: [String], sId: UUID): PlatformInfraObject
+
+  """Reads and enables pagination through a set of `PlatformInfraObject`."""
+  platformInfraObjects(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformInfraObject`."""
+    orderBy: [PlatformInfraObjectOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformInfraObjectFilter
+  ): PlatformInfraObjectConnection
+
+  """Reads and enables pagination through a set of `PlatformInfraRef`."""
+  platformInfraRefs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformInfraRef`."""
+    orderBy: [PlatformInfraRefOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformInfraRefFilter
+  ): PlatformInfraRefConnection
+
+  """Reads and enables pagination through a set of `PlatformInfraStore`."""
+  platformInfraStores(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformInfraStore`."""
+    orderBy: [PlatformInfraStoreOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformInfraStoreFilter
+  ): PlatformInfraStoreConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformNamespaceEvent`.
+  """
+  platformNamespaceEvents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformNamespaceEventFilter
+  ): PlatformNamespaceEventConnection
+
+  """Reads and enables pagination through a set of `PlatformNamespace`."""
+  platformNamespaces(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformNamespaceFilter
+  ): PlatformNamespaceConnection
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+}
+
+"""
+A filter to be used against UUID List fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: UUID
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: UUID
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: UUID
+
+  """Any array item is less than the specified value."""
+  anyLessThan: UUID
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: UUID
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: UUID
+
+  """Contained by the specified list of values."""
+  containedBy: [UUID]
+
+  """Contains the specified list of values."""
+  contains: [UUID]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [UUID]
+
+  """Equal to the specified value."""
+  equalTo: [UUID]
+
+  """Greater than the specified value."""
+  greaterThan: [UUID]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [UUID]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [UUID]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [UUID]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [UUID]
+
+  """Not equal to the specified value."""
+  notEqualTo: [UUID]
+
+  """Overlaps the specified list of values."""
+  overlaps: [UUID]
+}
+
+"""All input for the `updateDbPreset` mutation."""
+input UpdateDbPresetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DbPreset` being updated.
+  """
+  dbPresetPatch: DbPresetPatch!
+
+  """Unique preset identifier"""
+  id: UUID!
+}
+
+"""The output of our update `DbPreset` mutation."""
+type UpdateDbPresetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DbPreset` that was updated by this mutation."""
+  dbPreset: DbPreset
+
+  """An edge for our `DbPreset`. May be used by Relay 1."""
+  dbPresetEdge(
+    """The method to use when ordering `DbPreset`."""
+    orderBy: [DbPresetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DbPresetEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNamespaceEvent` mutation."""
+input UpdateNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `NamespaceEvent` being updated.
+  """
+  namespaceEventPatch: NamespaceEventPatch!
+}
+
+"""The output of our update `NamespaceEvent` mutation."""
+type UpdateNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NamespaceEvent` that was updated by this mutation."""
+  namespaceEvent: NamespaceEvent
+
+  """An edge for our `NamespaceEvent`. May be used by Relay 1."""
+  namespaceEventEdge(
+    """The method to use when ordering `NamespaceEvent`."""
+    orderBy: [NamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNamespace` mutation."""
+input UpdateNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Namespace` being updated.
+  """
+  namespacePatch: NamespacePatch!
+}
+
+"""The output of our update `Namespace` mutation."""
+type UpdateNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Namespace` that was updated by this mutation."""
+  namespace: Namespace
+
+  """An edge for our `Namespace`. May be used by Relay 1."""
+  namespaceEdge(
+    """The method to use when ordering `Namespace`."""
+    orderBy: [NamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformInfraCommit` mutation."""
+input UpdatePlatformInfraCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique commit identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformInfraCommit` being updated.
+  """
+  platformInfraCommitPatch: PlatformInfraCommitPatch!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""The output of our update `PlatformInfraCommit` mutation."""
+type UpdatePlatformInfraCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraCommit` that was updated by this mutation."""
+  platformInfraCommit: PlatformInfraCommit
+
+  """An edge for our `PlatformInfraCommit`. May be used by Relay 1."""
+  platformInfraCommitEdge(
+    """The method to use when ordering `PlatformInfraCommit`."""
+    orderBy: [PlatformInfraCommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraCommitEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformInfraObject` mutation."""
+input UpdatePlatformInfraObjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Content-addressed UUID v5 — deterministic hash of (data, kids, ktree)"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformInfraObject` being updated.
+  """
+  platformInfraObjectPatch: PlatformInfraObjectPatch!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""The output of our update `PlatformInfraObject` mutation."""
+type UpdatePlatformInfraObjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraObject` that was updated by this mutation."""
+  platformInfraObject: PlatformInfraObject
+
+  """An edge for our `PlatformInfraObject`. May be used by Relay 1."""
+  platformInfraObjectEdge(
+    """The method to use when ordering `PlatformInfraObject`."""
+    orderBy: [PlatformInfraObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraObjectEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformInfraRef` mutation."""
+input UpdatePlatformInfraRefInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique ref identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformInfraRef` being updated.
+  """
+  platformInfraRefPatch: PlatformInfraRefPatch!
+
+  """Opaque store partition key for the global tier"""
+  scopeId: UUID!
+}
+
+"""The output of our update `PlatformInfraRef` mutation."""
+type UpdatePlatformInfraRefPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraRef` that was updated by this mutation."""
+  platformInfraRef: PlatformInfraRef
+
+  """An edge for our `PlatformInfraRef`. May be used by Relay 1."""
+  platformInfraRefEdge(
+    """The method to use when ordering `PlatformInfraRef`."""
+    orderBy: [PlatformInfraRefOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraRefEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformInfraStore` mutation."""
+input UpdatePlatformInfraStoreInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique store identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformInfraStore` being updated.
+  """
+  platformInfraStorePatch: PlatformInfraStorePatch!
+}
+
+"""The output of our update `PlatformInfraStore` mutation."""
+type UpdatePlatformInfraStorePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformInfraStore` that was updated by this mutation."""
+  platformInfraStore: PlatformInfraStore
+
+  """An edge for our `PlatformInfraStore`. May be used by Relay 1."""
+  platformInfraStoreEdge(
+    """The method to use when ordering `PlatformInfraStore`."""
+    orderBy: [PlatformInfraStoreOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformInfraStoreEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformNamespaceEvent` mutation."""
+input UpdatePlatformNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformNamespaceEvent` being updated.
+  """
+  platformNamespaceEventPatch: PlatformNamespaceEventPatch!
+}
+
+"""The output of our update `PlatformNamespaceEvent` mutation."""
+type UpdatePlatformNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` that was updated by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEvent
+
+  """An edge for our `PlatformNamespaceEvent`. May be used by Relay 1."""
+  platformNamespaceEventEdge(
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformNamespace` mutation."""
+input UpdatePlatformNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformNamespace` being updated.
+  """
+  platformNamespacePatch: PlatformNamespacePatch!
+}
+
+"""The output of our update `PlatformNamespace` mutation."""
+type UpdatePlatformNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespace` that was updated by this mutation."""
+  platformNamespace: PlatformNamespace
+
+  """An edge for our `PlatformNamespace`. May be used by Relay 1."""
+  platformNamespaceEdge(
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}

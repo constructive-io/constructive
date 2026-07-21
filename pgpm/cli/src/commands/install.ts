@@ -9,10 +9,15 @@ Install Command:
 
   pgpm install [package]...
 
-  Install pgpm modules into current module.
+  Install pgpm modules into the workspace extensions/ directory.
 
-  When called without arguments, installs any missing modules that are
-  listed in the module's .control file but not yet installed in the workspace.
+  Inside a module, installing without arguments installs any missing modules
+  listed in the module's .control file, and explicit installs are recorded in
+  the module's package.json and .control file.
+
+  With -W (--workspace-root), installs target the workspace root: no-arg
+  installs read the modules pinned in the workspace pgpm.json \`dependencies\`
+  field, and explicit installs are recorded there.
 
 Arguments:
   package                 One or more package names to install (optional)
@@ -20,10 +25,15 @@ Arguments:
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
+  --force                 Reinstall modules even if already installed
+  -W, --workspace-root    Install at the workspace root (pgpm.json dependencies)
 
 Examples:
-  pgpm install                                 Install missing modules from .control file
+  pgpm install                                 Install missing modules from the module's .control
+  pgpm install -W                              Install modules pinned in the workspace pgpm.json
+  pgpm install -W --force                      Reinstall all pinned workspace modules
   pgpm install @pgpm/base32                    Install single package
+  pgpm install @pgpm/base32@latest             Install the latest published version
   pgpm install @pgpm/base32 @pgpm/utils        Install multiple packages
 `;
 
@@ -40,9 +50,40 @@ export default async (
   const { cwd = process.cwd() } = argv;
 
   const project = new PgpmPackage(cwd);
+  const force = Boolean(argv.force);
+  const workspaceRoot = Boolean(argv.W || argv['workspace-root'] || argv.workspaceRoot);
 
-  if (!project.isInModule()) {
-    throw new Error('You must run this command inside a PGPM module.');
+  if (!project.isInModule() && !project.isInWorkspace()) {
+    throw new Error('You must run this command inside a PGPM module or workspace.');
+  }
+
+  if (!project.isInModule() && !workspaceRoot) {
+    throw new Error(
+      'Not inside a PGPM module. To install at the workspace root (pinned in pgpm.json `dependencies`), pass -W / --workspace-root.'
+    );
+  }
+
+  // Workspace root: install pinned dependencies from pgpm.json
+  if (workspaceRoot) {
+    if (project.isInModule()) {
+      throw new Error('-W / --workspace-root must be run from the workspace root, not inside a module.');
+    }
+    const installSpinner = createSpinner('Installing workspace dependencies...');
+    installSpinner.start();
+
+    if (argv._.length > 0) {
+      await project.installModules(...argv._);
+      installSpinner.succeed(`Installed ${argv._.length} module(s) successfully.`);
+      return;
+    }
+
+    const installed = await project.installWorkspaceDependencies({ force });
+    if (installed.length === 0) {
+      installSpinner.succeed('All workspace dependencies are already installed.');
+    } else {
+      installSpinner.succeed(`Installed ${installed.length} module(s): ${installed.join(', ')}`);
+    }
+    return;
   }
 
   // If no packages specified, install missing modules from .control file
@@ -51,7 +92,7 @@ export default async (
     checkSpinner.start();
     
     const requiredExtensions = project.getRequiredModules();
-    const installedModules = project.getWorkspaceInstalledModules();
+    const installedModules = force ? [] : project.getWorkspaceInstalledModules();
     const missingModules = getMissingInstallableModules(requiredExtensions, installedModules);
 
     if (missingModules.length === 0) {

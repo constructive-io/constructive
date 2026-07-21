@@ -54,6 +54,7 @@ export { userAuthModuleLoader } from './user-auth-module';
 export { identityProvidersLoader } from './identity-providers';
 export { connectedAccountsModuleLoader } from './connected-accounts-module';
 export { llmLoader } from './llm';
+export { computeLoader } from './compute';
 
 /**
  * Convenience: create a registry pre-loaded with all built-in loaders.
@@ -72,6 +73,7 @@ import { userAuthModuleLoader } from './user-auth-module';
 import { identityProvidersLoader } from './identity-providers';
 import { connectedAccountsModuleLoader } from './connected-accounts-module';
 import { llmLoader } from './llm';
+import { computeLoader } from './compute';
 
 export function createDefaultRegistry() {
   const registry = createLoaderRegistry();
@@ -88,5 +90,6 @@ export function createDefaultRegistry() {
   registry.register(identityProvidersLoader);
   registry.register(connectedAccountsModuleLoader);
   registry.register(llmLoader);
+  registry.register(computeLoader);
   return registry;
 }

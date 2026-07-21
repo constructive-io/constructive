@@ -7,8 +7,8 @@ API endpoint configurations: each record defines a PostGraphile/PostgREST API wi
 ## Usage
 
 ```typescript
-useApisQuery({ selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } } })
-useApiQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } } })
+useApisQuery({ selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } } })
+useApiQuery({ id: '<UUID>', selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } } })
 useCreateApiMutation({ selection: { fields: { id: true } } })
 useUpdateApiMutation({ selection: { fields: { id: true } } })
 useDeleteApiMutation({})
@@ -20,7 +20,7 @@ useDeleteApiMutation({})
 
 ```typescript
 const { data, isLoading } = useApisQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } },
+  selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useApisQuery({
 const { mutate } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>' });
+mutate({ annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' });
 ```

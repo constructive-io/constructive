@@ -9,8 +9,8 @@ Per-database public-key crypto auth runtime configuration; typed replacement for
 ```typescript
 db.pubkeySetting.findMany({ select: { id: true } }).execute()
 db.pubkeySetting.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.pubkeySetting.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', cryptoNetwork: '<String>', userField: '<String>', signUpWithKeyFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>' }, select: { id: true } }).execute()
-db.pubkeySetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.pubkeySetting.create({ data: { cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>', signUpWithKeyFunctionId: '<UUID>', userField: '<String>' }, select: { id: true } }).execute()
+db.pubkeySetting.update({ where: { id: '<UUID>' }, data: { cryptoNetwork: '<String>' }, select: { id: true } }).execute()
 db.pubkeySetting.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.pubkeySetting.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.pubkeySetting.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, cryptoNetwork: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.pubkeySetting.findMany({
 
 ```typescript
 const item = await db.pubkeySetting.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', cryptoNetwork: '<String>', userField: '<String>', signUpWithKeyFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>' },
+  data: { cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>', signUpWithKeyFunctionId: '<UUID>', userField: '<String>' },
   select: { id: true }
 }).execute();
 ```

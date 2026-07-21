@@ -196,7 +196,8 @@ export class SchemaGrantModel {
       'UpdateSchemaGrantInput',
       'id',
       'schemaGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

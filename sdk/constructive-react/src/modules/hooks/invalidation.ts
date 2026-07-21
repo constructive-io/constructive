@@ -15,63 +15,74 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  defaultIdsModuleKeys,
-  membershipTypesModuleKeys,
-  userStateModuleKeys,
-  sessionSecretsModuleKeys,
-  configSecretsOrgModuleKeys,
-  devicesModuleKeys,
-  i18NModuleKeys,
-  userCredentialsModuleKeys,
-  userSettingsModuleKeys,
+  agentModuleKeys,
+  billingModuleKeys,
+  billingProviderModuleKeys,
+  blueprintKeys,
+  blueprintConstructionKeys,
+  blueprintTemplateKeys,
+  computeLogModuleKeys,
   configSecretsUserModuleKeys,
   connectedAccountsModuleKeys,
-  emailsModuleKeys,
-  phoneNumbersModuleKeys,
-  rateLimitsModuleKeys,
-  usersModuleKeys,
-  webauthnCredentialsModuleKeys,
   cryptoAddressesModuleKeys,
-  denormalizedTableFieldKeys,
-  identityProvidersModuleKeys,
-  rlsModuleKeys,
-  blueprintKeys,
-  blueprintTemplateKeys,
-  blueprintConstructionKeys,
   cryptoAuthModuleKeys,
-  sessionsModuleKeys,
-  secureTableProvisionKeys,
-  merkleStoreModuleKeys,
-  graphModuleKeys,
   databaseProvisionModuleKeys,
-  configSecretsModuleKeys,
-  rateLimitMetersModuleKeys,
-  realtimeModuleKeys,
-  webauthnAuthModuleKeys,
+  dbPoolConfigKeys,
+  dbPoolKeys,
+  dbPresetModuleKeys,
+  dbUsageModuleKeys,
+  defaultIdsModuleKeys,
+  denormalizedTableFieldKeys,
+  devicesModuleKeys,
+  emailsModuleKeys,
+  entityTypeProvisionKeys,
+  eventsModuleKeys,
+  functionDeploymentModuleKeys,
   functionInvocationModuleKeys,
   functionModuleKeys,
-  invitesModuleKeys,
-  namespaceModuleKeys,
-  computeLogModuleKeys,
-  inferenceLogModuleKeys,
-  storageLogModuleKeys,
-  transferLogModuleKeys,
-  plansModuleKeys,
-  billingProviderModuleKeys,
-  dbUsageModuleKeys,
+  graphExecutionModuleKeys,
+  graphModuleKeys,
   hierarchyModuleKeys,
-  permissionsModuleKeys,
-  notificationsModuleKeys,
-  profilesModuleKeys,
-  billingModuleKeys,
-  relationProvisionKeys,
-  userAuthModuleKeys,
-  agentModuleKeys,
+  httpRouteModuleKeys,
+  i18NModuleKeys,
+  identityProvidersModuleKeys,
+  inferenceLogModuleKeys,
+  infraConfigModuleKeys,
+  infraSecretsModuleKeys,
+  integrationProvidersModuleKeys,
+  internalSecretsModuleKeys,
+  invitesModuleKeys,
   limitsModuleKeys,
+  membershipTypesModuleKeys,
   membershipsModuleKeys,
-  entityTypeProvisionKeys,
+  merkleStoreModuleKeys,
+  namespaceModuleKeys,
+  notificationsModuleKeys,
+  permissionsModuleKeys,
+  phoneNumbersModuleKeys,
+  plansModuleKeys,
+  principalAuthModuleKeys,
+  profilesModuleKeys,
+  rateLimitMetersModuleKeys,
+  rateLimitsModuleKeys,
+  realtimeModuleKeys,
+  relationProvisionKeys,
+  resourceModuleKeys,
+  rlsModuleKeys,
+  secureTableProvisionKeys,
+  sessionSecretsModuleKeys,
+  sessionsModuleKeys,
+  storageLogModuleKeys,
   storageModuleKeys,
-  eventsModuleKeys,
+  transferLogModuleKeys,
+  userAuthModuleKeys,
+  userCredentialsModuleKeys,
+  userSettingsModuleKeys,
+  userStateModuleKeys,
+  usersModuleKeys,
+  webauthnAuthModuleKeys,
+  webauthnCredentialsModuleKeys,
+  webhookModuleKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -93,157 +104,123 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate defaultIdsModule queries */ defaultIdsModule: {
-    /** Invalidate all defaultIdsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate agentModule queries */ agentModule: {
+    /** Invalidate all agentModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: defaultIdsModuleKeys.all,
+        queryKey: agentModuleKeys.all,
       }),
-    /** Invalidate defaultIdsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate agentModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: defaultIdsModuleKeys.lists(),
+        queryKey: agentModuleKeys.lists(),
       }),
-    /** Invalidate a specific defaultIdsModule */ detail: (
+    /** Invalidate a specific agentModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: defaultIdsModuleKeys.detail(id),
+        queryKey: agentModuleKeys.detail(id),
       }),
   },
-  /** Invalidate membershipTypesModule queries */ membershipTypesModule: {
-    /** Invalidate all membershipTypesModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate billingModule queries */ billingModule: {
+    /** Invalidate all billingModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: membershipTypesModuleKeys.all,
+        queryKey: billingModuleKeys.all,
       }),
-    /** Invalidate membershipTypesModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate billingModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: membershipTypesModuleKeys.lists(),
+        queryKey: billingModuleKeys.lists(),
       }),
-    /** Invalidate a specific membershipTypesModule */ detail: (
+    /** Invalidate a specific billingModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: membershipTypesModuleKeys.detail(id),
+        queryKey: billingModuleKeys.detail(id),
       }),
   },
-  /** Invalidate userStateModule queries */ userStateModule: {
-    /** Invalidate all userStateModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate billingProviderModule queries */ billingProviderModule: {
+    /** Invalidate all billingProviderModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: userStateModuleKeys.all,
+        queryKey: billingProviderModuleKeys.all,
       }),
-    /** Invalidate userStateModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate billingProviderModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: userStateModuleKeys.lists(),
+        queryKey: billingProviderModuleKeys.lists(),
       }),
-    /** Invalidate a specific userStateModule */ detail: (
+    /** Invalidate a specific billingProviderModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: userStateModuleKeys.detail(id),
+        queryKey: billingProviderModuleKeys.detail(id),
       }),
   },
-  /** Invalidate sessionSecretsModule queries */ sessionSecretsModule: {
-    /** Invalidate all sessionSecretsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate blueprint queries */ blueprint: {
+    /** Invalidate all blueprint queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: sessionSecretsModuleKeys.all,
+        queryKey: blueprintKeys.all,
       }),
-    /** Invalidate sessionSecretsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate blueprint list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: sessionSecretsModuleKeys.lists(),
+        queryKey: blueprintKeys.lists(),
       }),
-    /** Invalidate a specific sessionSecretsModule */ detail: (
+    /** Invalidate a specific blueprint */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: sessionSecretsModuleKeys.detail(id),
+        queryKey: blueprintKeys.detail(id),
       }),
   },
-  /** Invalidate configSecretsOrgModule queries */ configSecretsOrgModule: {
-    /** Invalidate all configSecretsOrgModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate blueprintConstruction queries */ blueprintConstruction: {
+    /** Invalidate all blueprintConstruction queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsOrgModuleKeys.all,
+        queryKey: blueprintConstructionKeys.all,
       }),
-    /** Invalidate configSecretsOrgModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate blueprintConstruction list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsOrgModuleKeys.lists(),
+        queryKey: blueprintConstructionKeys.lists(),
       }),
-    /** Invalidate a specific configSecretsOrgModule */ detail: (
+    /** Invalidate a specific blueprintConstruction */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsOrgModuleKeys.detail(id),
+        queryKey: blueprintConstructionKeys.detail(id),
       }),
   },
-  /** Invalidate devicesModule queries */ devicesModule: {
-    /** Invalidate all devicesModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate blueprintTemplate queries */ blueprintTemplate: {
+    /** Invalidate all blueprintTemplate queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: devicesModuleKeys.all,
+        queryKey: blueprintTemplateKeys.all,
       }),
-    /** Invalidate devicesModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate blueprintTemplate list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: devicesModuleKeys.lists(),
+        queryKey: blueprintTemplateKeys.lists(),
       }),
-    /** Invalidate a specific devicesModule */ detail: (
+    /** Invalidate a specific blueprintTemplate */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: devicesModuleKeys.detail(id),
+        queryKey: blueprintTemplateKeys.detail(id),
       }),
   },
-  /** Invalidate i18NModule queries */ i18NModule: {
-    /** Invalidate all i18NModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate computeLogModule queries */ computeLogModule: {
+    /** Invalidate all computeLogModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: i18NModuleKeys.all,
+        queryKey: computeLogModuleKeys.all,
       }),
-    /** Invalidate i18NModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate computeLogModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: i18NModuleKeys.lists(),
+        queryKey: computeLogModuleKeys.lists(),
       }),
-    /** Invalidate a specific i18NModule */ detail: (
+    /** Invalidate a specific computeLogModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: i18NModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate userCredentialsModule queries */ userCredentialsModule: {
-    /** Invalidate all userCredentialsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: userCredentialsModuleKeys.all,
-      }),
-    /** Invalidate userCredentialsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: userCredentialsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific userCredentialsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: userCredentialsModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate userSettingsModule queries */ userSettingsModule: {
-    /** Invalidate all userSettingsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: userSettingsModuleKeys.all,
-      }),
-    /** Invalidate userSettingsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: userSettingsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific userSettingsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: userSettingsModuleKeys.detail(id),
+        queryKey: computeLogModuleKeys.detail(id),
       }),
   },
   /** Invalidate configSecretsUserModule queries */ configSecretsUserModule: {
@@ -280,91 +257,6 @@ export const invalidate = {
         queryKey: connectedAccountsModuleKeys.detail(id),
       }),
   },
-  /** Invalidate emailsModule queries */ emailsModule: {
-    /** Invalidate all emailsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: emailsModuleKeys.all,
-      }),
-    /** Invalidate emailsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: emailsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific emailsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: emailsModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate phoneNumbersModule queries */ phoneNumbersModule: {
-    /** Invalidate all phoneNumbersModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: phoneNumbersModuleKeys.all,
-      }),
-    /** Invalidate phoneNumbersModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: phoneNumbersModuleKeys.lists(),
-      }),
-    /** Invalidate a specific phoneNumbersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: phoneNumbersModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate rateLimitsModule queries */ rateLimitsModule: {
-    /** Invalidate all rateLimitsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitsModuleKeys.all,
-      }),
-    /** Invalidate rateLimitsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific rateLimitsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitsModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate usersModule queries */ usersModule: {
-    /** Invalidate all usersModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: usersModuleKeys.all,
-      }),
-    /** Invalidate usersModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: usersModuleKeys.lists(),
-      }),
-    /** Invalidate a specific usersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: usersModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate webauthnCredentialsModule queries */ webauthnCredentialsModule: {
-    /** Invalidate all webauthnCredentialsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnCredentialsModuleKeys.all,
-      }),
-    /** Invalidate webauthnCredentialsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnCredentialsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific webauthnCredentialsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnCredentialsModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate cryptoAddressesModule queries */ cryptoAddressesModule: {
     /** Invalidate all cryptoAddressesModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -380,108 +272,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: cryptoAddressesModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate denormalizedTableField queries */ denormalizedTableField: {
-    /** Invalidate all denormalizedTableField queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: denormalizedTableFieldKeys.all,
-      }),
-    /** Invalidate denormalizedTableField list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: denormalizedTableFieldKeys.lists(),
-      }),
-    /** Invalidate a specific denormalizedTableField */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: denormalizedTableFieldKeys.detail(id),
-      }),
-  },
-  /** Invalidate identityProvidersModule queries */ identityProvidersModule: {
-    /** Invalidate all identityProvidersModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.all,
-      }),
-    /** Invalidate identityProvidersModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.lists(),
-      }),
-    /** Invalidate a specific identityProvidersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate rlsModule queries */ rlsModule: {
-    /** Invalidate all rlsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rlsModuleKeys.all,
-      }),
-    /** Invalidate rlsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rlsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific rlsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: rlsModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate blueprint queries */ blueprint: {
-    /** Invalidate all blueprint queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintKeys.all,
-      }),
-    /** Invalidate blueprint list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
-      }),
-    /** Invalidate a specific blueprint */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(id),
-      }),
-  },
-  /** Invalidate blueprintTemplate queries */ blueprintTemplate: {
-    /** Invalidate all blueprintTemplate queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintTemplateKeys.all,
-      }),
-    /** Invalidate blueprintTemplate list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintTemplateKeys.lists(),
-      }),
-    /** Invalidate a specific blueprintTemplate */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintTemplateKeys.detail(id),
-      }),
-  },
-  /** Invalidate blueprintConstruction queries */ blueprintConstruction: {
-    /** Invalidate all blueprintConstruction queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintConstructionKeys.all,
-      }),
-    /** Invalidate blueprintConstruction list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintConstructionKeys.lists(),
-      }),
-    /** Invalidate a specific blueprintConstruction */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: blueprintConstructionKeys.detail(id),
       }),
   },
   /** Invalidate cryptoAuthModule queries */ cryptoAuthModule: {
@@ -501,74 +291,6 @@ export const invalidate = {
         queryKey: cryptoAuthModuleKeys.detail(id),
       }),
   },
-  /** Invalidate sessionsModule queries */ sessionsModule: {
-    /** Invalidate all sessionsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: sessionsModuleKeys.all,
-      }),
-    /** Invalidate sessionsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: sessionsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific sessionsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: sessionsModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate secureTableProvision queries */ secureTableProvision: {
-    /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.all,
-      }),
-    /** Invalidate secureTableProvision list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.lists(),
-      }),
-    /** Invalidate a specific secureTableProvision */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.detail(id),
-      }),
-  },
-  /** Invalidate merkleStoreModule queries */ merkleStoreModule: {
-    /** Invalidate all merkleStoreModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.all,
-      }),
-    /** Invalidate merkleStoreModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.lists(),
-      }),
-    /** Invalidate a specific merkleStoreModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate graphModule queries */ graphModule: {
-    /** Invalidate all graphModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: graphModuleKeys.all,
-      }),
-    /** Invalidate graphModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: graphModuleKeys.lists(),
-      }),
-    /** Invalidate a specific graphModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: graphModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -586,72 +308,188 @@ export const invalidate = {
         queryKey: databaseProvisionModuleKeys.detail(id),
       }),
   },
-  /** Invalidate configSecretsModule queries */ configSecretsModule: {
-    /** Invalidate all configSecretsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate dbPoolConfig queries */ dbPoolConfig: {
+    /** Invalidate all dbPoolConfig queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsModuleKeys.all,
+        queryKey: dbPoolConfigKeys.all,
       }),
-    /** Invalidate configSecretsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate dbPoolConfig list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsModuleKeys.lists(),
+        queryKey: dbPoolConfigKeys.lists(),
       }),
-    /** Invalidate a specific configSecretsModule */ detail: (
+    /** Invalidate a specific dbPoolConfig */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsModuleKeys.detail(id),
+        queryKey: dbPoolConfigKeys.detail(id),
       }),
   },
-  /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
-    /** Invalidate all rateLimitMetersModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate dbPool queries */ dbPool: {
+    /** Invalidate all dbPool queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.all,
+        queryKey: dbPoolKeys.all,
       }),
-    /** Invalidate rateLimitMetersModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate dbPool list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.lists(),
+        queryKey: dbPoolKeys.lists(),
       }),
-    /** Invalidate a specific rateLimitMetersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
+    /** Invalidate a specific dbPool */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.detail(id),
+        queryKey: dbPoolKeys.detail(id),
       }),
   },
-  /** Invalidate realtimeModule queries */ realtimeModule: {
-    /** Invalidate all realtimeModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate dbPresetModule queries */ dbPresetModule: {
+    /** Invalidate all dbPresetModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.all,
+        queryKey: dbPresetModuleKeys.all,
       }),
-    /** Invalidate realtimeModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate dbPresetModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.lists(),
+        queryKey: dbPresetModuleKeys.lists(),
       }),
-    /** Invalidate a specific realtimeModule */ detail: (
+    /** Invalidate a specific dbPresetModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.detail(id),
+        queryKey: dbPresetModuleKeys.detail(id),
       }),
   },
-  /** Invalidate webauthnAuthModule queries */ webauthnAuthModule: {
-    /** Invalidate all webauthnAuthModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate dbUsageModule queries */ dbUsageModule: {
+    /** Invalidate all dbUsageModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: webauthnAuthModuleKeys.all,
+        queryKey: dbUsageModuleKeys.all,
       }),
-    /** Invalidate webauthnAuthModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate dbUsageModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: webauthnAuthModuleKeys.lists(),
+        queryKey: dbUsageModuleKeys.lists(),
       }),
-    /** Invalidate a specific webauthnAuthModule */ detail: (
+    /** Invalidate a specific dbUsageModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: webauthnAuthModuleKeys.detail(id),
+        queryKey: dbUsageModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate defaultIdsModule queries */ defaultIdsModule: {
+    /** Invalidate all defaultIdsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: defaultIdsModuleKeys.all,
+      }),
+    /** Invalidate defaultIdsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: defaultIdsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific defaultIdsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: defaultIdsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate denormalizedTableField queries */ denormalizedTableField: {
+    /** Invalidate all denormalizedTableField queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: denormalizedTableFieldKeys.all,
+      }),
+    /** Invalidate denormalizedTableField list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: denormalizedTableFieldKeys.lists(),
+      }),
+    /** Invalidate a specific denormalizedTableField */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: denormalizedTableFieldKeys.detail(id),
+      }),
+  },
+  /** Invalidate devicesModule queries */ devicesModule: {
+    /** Invalidate all devicesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: devicesModuleKeys.all,
+      }),
+    /** Invalidate devicesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: devicesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific devicesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: devicesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate emailsModule queries */ emailsModule: {
+    /** Invalidate all emailsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: emailsModuleKeys.all,
+      }),
+    /** Invalidate emailsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: emailsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific emailsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: emailsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate entityTypeProvision queries */ entityTypeProvision: {
+    /** Invalidate all entityTypeProvision queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.all,
+      }),
+    /** Invalidate entityTypeProvision list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.lists(),
+      }),
+    /** Invalidate a specific entityTypeProvision */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate eventsModule queries */ eventsModule: {
+    /** Invalidate all eventsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: eventsModuleKeys.all,
+      }),
+    /** Invalidate eventsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: eventsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific eventsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: eventsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionDeploymentModule queries */ functionDeploymentModule: {
+    /** Invalidate all functionDeploymentModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentModuleKeys.all,
+      }),
+    /** Invalidate functionDeploymentModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentModuleKeys.lists(),
+      }),
+    /** Invalidate a specific functionDeploymentModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentModuleKeys.detail(id),
       }),
   },
   /** Invalidate functionInvocationModule queries */ functionInvocationModule: {
@@ -688,157 +526,38 @@ export const invalidate = {
         queryKey: functionModuleKeys.detail(id),
       }),
   },
-  /** Invalidate invitesModule queries */ invitesModule: {
-    /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate graphExecutionModule queries */ graphExecutionModule: {
+    /** Invalidate all graphExecutionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.all,
+        queryKey: graphExecutionModuleKeys.all,
       }),
-    /** Invalidate invitesModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate graphExecutionModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.lists(),
+        queryKey: graphExecutionModuleKeys.lists(),
       }),
-    /** Invalidate a specific invitesModule */ detail: (
+    /** Invalidate a specific graphExecutionModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.detail(id),
+        queryKey: graphExecutionModuleKeys.detail(id),
       }),
   },
-  /** Invalidate namespaceModule queries */ namespaceModule: {
-    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate graphModule queries */ graphModule: {
+    /** Invalidate all graphModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.all,
+        queryKey: graphModuleKeys.all,
       }),
-    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate graphModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.lists(),
+        queryKey: graphModuleKeys.lists(),
       }),
-    /** Invalidate a specific namespaceModule */ detail: (
+    /** Invalidate a specific graphModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate computeLogModule queries */ computeLogModule: {
-    /** Invalidate all computeLogModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: computeLogModuleKeys.all,
-      }),
-    /** Invalidate computeLogModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: computeLogModuleKeys.lists(),
-      }),
-    /** Invalidate a specific computeLogModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: computeLogModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate inferenceLogModule queries */ inferenceLogModule: {
-    /** Invalidate all inferenceLogModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: inferenceLogModuleKeys.all,
-      }),
-    /** Invalidate inferenceLogModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: inferenceLogModuleKeys.lists(),
-      }),
-    /** Invalidate a specific inferenceLogModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: inferenceLogModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate storageLogModule queries */ storageLogModule: {
-    /** Invalidate all storageLogModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: storageLogModuleKeys.all,
-      }),
-    /** Invalidate storageLogModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: storageLogModuleKeys.lists(),
-      }),
-    /** Invalidate a specific storageLogModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: storageLogModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate transferLogModule queries */ transferLogModule: {
-    /** Invalidate all transferLogModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: transferLogModuleKeys.all,
-      }),
-    /** Invalidate transferLogModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: transferLogModuleKeys.lists(),
-      }),
-    /** Invalidate a specific transferLogModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: transferLogModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate plansModule queries */ plansModule: {
-    /** Invalidate all plansModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.all,
-      }),
-    /** Invalidate plansModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.lists(),
-      }),
-    /** Invalidate a specific plansModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate billingProviderModule queries */ billingProviderModule: {
-    /** Invalidate all billingProviderModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.all,
-      }),
-    /** Invalidate billingProviderModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.lists(),
-      }),
-    /** Invalidate a specific billingProviderModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate dbUsageModule queries */ dbUsageModule: {
-    /** Invalidate all dbUsageModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.all,
-      }),
-    /** Invalidate dbUsageModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.lists(),
-      }),
-    /** Invalidate a specific dbUsageModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.detail(id),
+        queryKey: graphModuleKeys.detail(id),
       }),
   },
   /** Invalidate hierarchyModule queries */ hierarchyModule: {
@@ -858,123 +577,157 @@ export const invalidate = {
         queryKey: hierarchyModuleKeys.detail(id),
       }),
   },
-  /** Invalidate permissionsModule queries */ permissionsModule: {
-    /** Invalidate all permissionsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate httpRouteModule queries */ httpRouteModule: {
+    /** Invalidate all httpRouteModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: permissionsModuleKeys.all,
+        queryKey: httpRouteModuleKeys.all,
       }),
-    /** Invalidate permissionsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate httpRouteModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: permissionsModuleKeys.lists(),
+        queryKey: httpRouteModuleKeys.lists(),
       }),
-    /** Invalidate a specific permissionsModule */ detail: (
+    /** Invalidate a specific httpRouteModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: permissionsModuleKeys.detail(id),
+        queryKey: httpRouteModuleKeys.detail(id),
       }),
   },
-  /** Invalidate notificationsModule queries */ notificationsModule: {
-    /** Invalidate all notificationsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate i18NModule queries */ i18NModule: {
+    /** Invalidate all i18NModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: notificationsModuleKeys.all,
+        queryKey: i18NModuleKeys.all,
       }),
-    /** Invalidate notificationsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate i18NModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: notificationsModuleKeys.lists(),
+        queryKey: i18NModuleKeys.lists(),
       }),
-    /** Invalidate a specific notificationsModule */ detail: (
+    /** Invalidate a specific i18NModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: notificationsModuleKeys.detail(id),
+        queryKey: i18NModuleKeys.detail(id),
       }),
   },
-  /** Invalidate profilesModule queries */ profilesModule: {
-    /** Invalidate all profilesModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate identityProvidersModule queries */ identityProvidersModule: {
+    /** Invalidate all identityProvidersModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: profilesModuleKeys.all,
+        queryKey: identityProvidersModuleKeys.all,
       }),
-    /** Invalidate profilesModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate identityProvidersModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: profilesModuleKeys.lists(),
+        queryKey: identityProvidersModuleKeys.lists(),
       }),
-    /** Invalidate a specific profilesModule */ detail: (
+    /** Invalidate a specific identityProvidersModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: profilesModuleKeys.detail(id),
+        queryKey: identityProvidersModuleKeys.detail(id),
       }),
   },
-  /** Invalidate billingModule queries */ billingModule: {
-    /** Invalidate all billingModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate inferenceLogModule queries */ inferenceLogModule: {
+    /** Invalidate all inferenceLogModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.all,
+        queryKey: inferenceLogModuleKeys.all,
       }),
-    /** Invalidate billingModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate inferenceLogModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.lists(),
+        queryKey: inferenceLogModuleKeys.lists(),
       }),
-    /** Invalidate a specific billingModule */ detail: (
+    /** Invalidate a specific inferenceLogModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.detail(id),
+        queryKey: inferenceLogModuleKeys.detail(id),
       }),
   },
-  /** Invalidate relationProvision queries */ relationProvision: {
-    /** Invalidate all relationProvision queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate infraConfigModule queries */ infraConfigModule: {
+    /** Invalidate all infraConfigModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.all,
+        queryKey: infraConfigModuleKeys.all,
       }),
-    /** Invalidate relationProvision list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate infraConfigModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.lists(),
+        queryKey: infraConfigModuleKeys.lists(),
       }),
-    /** Invalidate a specific relationProvision */ detail: (
+    /** Invalidate a specific infraConfigModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.detail(id),
+        queryKey: infraConfigModuleKeys.detail(id),
       }),
   },
-  /** Invalidate userAuthModule queries */ userAuthModule: {
-    /** Invalidate all userAuthModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate infraSecretsModule queries */ infraSecretsModule: {
+    /** Invalidate all infraSecretsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: userAuthModuleKeys.all,
+        queryKey: infraSecretsModuleKeys.all,
       }),
-    /** Invalidate userAuthModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate infraSecretsModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: userAuthModuleKeys.lists(),
+        queryKey: infraSecretsModuleKeys.lists(),
       }),
-    /** Invalidate a specific userAuthModule */ detail: (
+    /** Invalidate a specific infraSecretsModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: userAuthModuleKeys.detail(id),
+        queryKey: infraSecretsModuleKeys.detail(id),
       }),
   },
-  /** Invalidate agentModule queries */ agentModule: {
-    /** Invalidate all agentModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate integrationProvidersModule queries */ integrationProvidersModule: {
+    /** Invalidate all integrationProvidersModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: agentModuleKeys.all,
+        queryKey: integrationProvidersModuleKeys.all,
       }),
-    /** Invalidate agentModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate integrationProvidersModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: agentModuleKeys.lists(),
+        queryKey: integrationProvidersModuleKeys.lists(),
       }),
-    /** Invalidate a specific agentModule */ detail: (
+    /** Invalidate a specific integrationProvidersModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: agentModuleKeys.detail(id),
+        queryKey: integrationProvidersModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate internalSecretsModule queries */ internalSecretsModule: {
+    /** Invalidate all internalSecretsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: internalSecretsModuleKeys.all,
+      }),
+    /** Invalidate internalSecretsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: internalSecretsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific internalSecretsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: internalSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate invitesModule queries */ invitesModule: {
+    /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.all,
+      }),
+    /** Invalidate invitesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific invitesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.detail(id),
       }),
   },
   /** Invalidate limitsModule queries */ limitsModule: {
@@ -994,6 +747,23 @@ export const invalidate = {
         queryKey: limitsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate membershipTypesModule queries */ membershipTypesModule: {
+    /** Invalidate all membershipTypesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypesModuleKeys.all,
+      }),
+    /** Invalidate membershipTypesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific membershipTypesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypesModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate membershipsModule queries */ membershipsModule: {
     /** Invalidate all membershipsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1011,21 +781,310 @@ export const invalidate = {
         queryKey: membershipsModuleKeys.detail(id),
       }),
   },
-  /** Invalidate entityTypeProvision queries */ entityTypeProvision: {
-    /** Invalidate all entityTypeProvision queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate merkleStoreModule queries */ merkleStoreModule: {
+    /** Invalidate all merkleStoreModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.all,
+        queryKey: merkleStoreModuleKeys.all,
       }),
-    /** Invalidate entityTypeProvision list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate merkleStoreModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.lists(),
+        queryKey: merkleStoreModuleKeys.lists(),
       }),
-    /** Invalidate a specific entityTypeProvision */ detail: (
+    /** Invalidate a specific merkleStoreModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.detail(id),
+        queryKey: merkleStoreModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate namespaceModule queries */ namespaceModule: {
+    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.all,
+      }),
+    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific namespaceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate notificationsModule queries */ notificationsModule: {
+    /** Invalidate all notificationsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.all,
+      }),
+    /** Invalidate notificationsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific notificationsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate permissionsModule queries */ permissionsModule: {
+    /** Invalidate all permissionsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: permissionsModuleKeys.all,
+      }),
+    /** Invalidate permissionsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: permissionsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific permissionsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: permissionsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate phoneNumbersModule queries */ phoneNumbersModule: {
+    /** Invalidate all phoneNumbersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumbersModuleKeys.all,
+      }),
+    /** Invalidate phoneNumbersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumbersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific phoneNumbersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumbersModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate plansModule queries */ plansModule: {
+    /** Invalidate all plansModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: plansModuleKeys.all,
+      }),
+    /** Invalidate plansModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: plansModuleKeys.lists(),
+      }),
+    /** Invalidate a specific plansModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: plansModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate principalAuthModule queries */ principalAuthModule: {
+    /** Invalidate all principalAuthModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalAuthModuleKeys.all,
+      }),
+    /** Invalidate principalAuthModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalAuthModuleKeys.lists(),
+      }),
+    /** Invalidate a specific principalAuthModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate profilesModule queries */ profilesModule: {
+    /** Invalidate all profilesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: profilesModuleKeys.all,
+      }),
+    /** Invalidate profilesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: profilesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific profilesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: profilesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
+    /** Invalidate all rateLimitMetersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.all,
+      }),
+    /** Invalidate rateLimitMetersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific rateLimitMetersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate rateLimitsModule queries */ rateLimitsModule: {
+    /** Invalidate all rateLimitsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitsModuleKeys.all,
+      }),
+    /** Invalidate rateLimitsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific rateLimitsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate realtimeModule queries */ realtimeModule: {
+    /** Invalidate all realtimeModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: realtimeModuleKeys.all,
+      }),
+    /** Invalidate realtimeModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: realtimeModuleKeys.lists(),
+      }),
+    /** Invalidate a specific realtimeModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: realtimeModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate relationProvision queries */ relationProvision: {
+    /** Invalidate all relationProvision queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: relationProvisionKeys.all,
+      }),
+    /** Invalidate relationProvision list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: relationProvisionKeys.lists(),
+      }),
+    /** Invalidate a specific relationProvision */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: relationProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate resourceModule queries */ resourceModule: {
+    /** Invalidate all resourceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceModuleKeys.all,
+      }),
+    /** Invalidate resourceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific resourceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate rlsModule queries */ rlsModule: {
+    /** Invalidate all rlsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rlsModuleKeys.all,
+      }),
+    /** Invalidate rlsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rlsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific rlsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: rlsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate secureTableProvision queries */ secureTableProvision: {
+    /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: secureTableProvisionKeys.all,
+      }),
+    /** Invalidate secureTableProvision list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: secureTableProvisionKeys.lists(),
+      }),
+    /** Invalidate a specific secureTableProvision */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: secureTableProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate sessionSecretsModule queries */ sessionSecretsModule: {
+    /** Invalidate all sessionSecretsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionSecretsModuleKeys.all,
+      }),
+    /** Invalidate sessionSecretsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionSecretsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific sessionSecretsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate sessionsModule queries */ sessionsModule: {
+    /** Invalidate all sessionsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionsModuleKeys.all,
+      }),
+    /** Invalidate sessionsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific sessionsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate storageLogModule queries */ storageLogModule: {
+    /** Invalidate all storageLogModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: storageLogModuleKeys.all,
+      }),
+    /** Invalidate storageLogModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: storageLogModuleKeys.lists(),
+      }),
+    /** Invalidate a specific storageLogModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: storageLogModuleKeys.detail(id),
       }),
   },
   /** Invalidate storageModule queries */ storageModule: {
@@ -1045,21 +1104,157 @@ export const invalidate = {
         queryKey: storageModuleKeys.detail(id),
       }),
   },
-  /** Invalidate eventsModule queries */ eventsModule: {
-    /** Invalidate all eventsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate transferLogModule queries */ transferLogModule: {
+    /** Invalidate all transferLogModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: eventsModuleKeys.all,
+        queryKey: transferLogModuleKeys.all,
       }),
-    /** Invalidate eventsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate transferLogModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: eventsModuleKeys.lists(),
+        queryKey: transferLogModuleKeys.lists(),
       }),
-    /** Invalidate a specific eventsModule */ detail: (
+    /** Invalidate a specific transferLogModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: eventsModuleKeys.detail(id),
+        queryKey: transferLogModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate userAuthModule queries */ userAuthModule: {
+    /** Invalidate all userAuthModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userAuthModuleKeys.all,
+      }),
+    /** Invalidate userAuthModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userAuthModuleKeys.lists(),
+      }),
+    /** Invalidate a specific userAuthModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate userCredentialsModule queries */ userCredentialsModule: {
+    /** Invalidate all userCredentialsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userCredentialsModuleKeys.all,
+      }),
+    /** Invalidate userCredentialsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userCredentialsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific userCredentialsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userCredentialsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate userSettingsModule queries */ userSettingsModule: {
+    /** Invalidate all userSettingsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsModuleKeys.all,
+      }),
+    /** Invalidate userSettingsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific userSettingsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userSettingsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate userStateModule queries */ userStateModule: {
+    /** Invalidate all userStateModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userStateModuleKeys.all,
+      }),
+    /** Invalidate userStateModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userStateModuleKeys.lists(),
+      }),
+    /** Invalidate a specific userStateModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userStateModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate usersModule queries */ usersModule: {
+    /** Invalidate all usersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: usersModuleKeys.all,
+      }),
+    /** Invalidate usersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: usersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific usersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: usersModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate webauthnAuthModule queries */ webauthnAuthModule: {
+    /** Invalidate all webauthnAuthModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.all,
+      }),
+    /** Invalidate webauthnAuthModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnAuthModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate webauthnCredentialsModule queries */ webauthnCredentialsModule: {
+    /** Invalidate all webauthnCredentialsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialsModuleKeys.all,
+      }),
+    /** Invalidate webauthnCredentialsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnCredentialsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate webhookModule queries */ webhookModule: {
+    /** Invalidate all webhookModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webhookModuleKeys.all,
+      }),
+    /** Invalidate webhookModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webhookModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webhookModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webhookModuleKeys.detail(id),
       }),
   },
 } as const;
@@ -1075,76 +1270,57 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove defaultIdsModule from cache */ defaultIdsModule: (
+  /** Remove agentModule from cache */ agentModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: defaultIdsModuleKeys.detail(id),
+      queryKey: agentModuleKeys.detail(id),
     });
   },
-  /** Remove membershipTypesModule from cache */ membershipTypesModule: (
+  /** Remove billingModule from cache */ billingModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: membershipTypesModuleKeys.detail(id),
+      queryKey: billingModuleKeys.detail(id),
     });
   },
-  /** Remove userStateModule from cache */ userStateModule: (
+  /** Remove billingProviderModule from cache */ billingProviderModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: userStateModuleKeys.detail(id),
+      queryKey: billingProviderModuleKeys.detail(id),
     });
   },
-  /** Remove sessionSecretsModule from cache */ sessionSecretsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove blueprint from cache */ blueprint: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: sessionSecretsModuleKeys.detail(id),
+      queryKey: blueprintKeys.detail(id),
     });
   },
-  /** Remove configSecretsOrgModule from cache */ configSecretsOrgModule: (
+  /** Remove blueprintConstruction from cache */ blueprintConstruction: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: configSecretsOrgModuleKeys.detail(id),
+      queryKey: blueprintConstructionKeys.detail(id),
     });
   },
-  /** Remove devicesModule from cache */ devicesModule: (
+  /** Remove blueprintTemplate from cache */ blueprintTemplate: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: devicesModuleKeys.detail(id),
+      queryKey: blueprintTemplateKeys.detail(id),
     });
   },
-  /** Remove i18NModule from cache */ i18NModule: (
+  /** Remove computeLogModule from cache */ computeLogModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: i18NModuleKeys.detail(id),
-    });
-  },
-  /** Remove userCredentialsModule from cache */ userCredentialsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: userCredentialsModuleKeys.detail(id),
-    });
-  },
-  /** Remove userSettingsModule from cache */ userSettingsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: userSettingsModuleKeys.detail(id),
+      queryKey: computeLogModuleKeys.detail(id),
     });
   },
   /** Remove configSecretsUserModule from cache */ configSecretsUserModule: (
@@ -1163,94 +1339,12 @@ export const remove = {
       queryKey: connectedAccountsModuleKeys.detail(id),
     });
   },
-  /** Remove emailsModule from cache */ emailsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: emailsModuleKeys.detail(id),
-    });
-  },
-  /** Remove phoneNumbersModule from cache */ phoneNumbersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: phoneNumbersModuleKeys.detail(id),
-    });
-  },
-  /** Remove rateLimitsModule from cache */ rateLimitsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: rateLimitsModuleKeys.detail(id),
-    });
-  },
-  /** Remove usersModule from cache */ usersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: usersModuleKeys.detail(id),
-    });
-  },
-  /** Remove webauthnCredentialsModule from cache */ webauthnCredentialsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: webauthnCredentialsModuleKeys.detail(id),
-    });
-  },
   /** Remove cryptoAddressesModule from cache */ cryptoAddressesModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: cryptoAddressesModuleKeys.detail(id),
-    });
-  },
-  /** Remove denormalizedTableField from cache */ denormalizedTableField: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: denormalizedTableFieldKeys.detail(id),
-    });
-  },
-  /** Remove identityProvidersModule from cache */ identityProvidersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: identityProvidersModuleKeys.detail(id),
-    });
-  },
-  /** Remove rlsModule from cache */ rlsModule: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: rlsModuleKeys.detail(id),
-    });
-  },
-  /** Remove blueprint from cache */ blueprint: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: blueprintKeys.detail(id),
-    });
-  },
-  /** Remove blueprintTemplate from cache */ blueprintTemplate: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: blueprintTemplateKeys.detail(id),
-    });
-  },
-  /** Remove blueprintConstruction from cache */ blueprintConstruction: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: blueprintConstructionKeys.detail(id),
     });
   },
   /** Remove cryptoAuthModule from cache */ cryptoAuthModule: (
@@ -1261,38 +1355,6 @@ export const remove = {
       queryKey: cryptoAuthModuleKeys.detail(id),
     });
   },
-  /** Remove sessionsModule from cache */ sessionsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: sessionsModuleKeys.detail(id),
-    });
-  },
-  /** Remove secureTableProvision from cache */ secureTableProvision: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: secureTableProvisionKeys.detail(id),
-    });
-  },
-  /** Remove merkleStoreModule from cache */ merkleStoreModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: merkleStoreModuleKeys.detail(id),
-    });
-  },
-  /** Remove graphModule from cache */ graphModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: graphModuleKeys.detail(id),
-    });
-  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1301,36 +1363,89 @@ export const remove = {
       queryKey: databaseProvisionModuleKeys.detail(id),
     });
   },
-  /** Remove configSecretsModule from cache */ configSecretsModule: (
+  /** Remove dbPoolConfig from cache */ dbPoolConfig: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: configSecretsModuleKeys.detail(id),
+      queryKey: dbPoolConfigKeys.detail(id),
     });
   },
-  /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove dbPool from cache */ dbPool: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: rateLimitMetersModuleKeys.detail(id),
+      queryKey: dbPoolKeys.detail(id),
     });
   },
-  /** Remove realtimeModule from cache */ realtimeModule: (
+  /** Remove dbPresetModule from cache */ dbPresetModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: realtimeModuleKeys.detail(id),
+      queryKey: dbPresetModuleKeys.detail(id),
     });
   },
-  /** Remove webauthnAuthModule from cache */ webauthnAuthModule: (
+  /** Remove dbUsageModule from cache */ dbUsageModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: webauthnAuthModuleKeys.detail(id),
+      queryKey: dbUsageModuleKeys.detail(id),
+    });
+  },
+  /** Remove defaultIdsModule from cache */ defaultIdsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: defaultIdsModuleKeys.detail(id),
+    });
+  },
+  /** Remove denormalizedTableField from cache */ denormalizedTableField: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: denormalizedTableFieldKeys.detail(id),
+    });
+  },
+  /** Remove devicesModule from cache */ devicesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: devicesModuleKeys.detail(id),
+    });
+  },
+  /** Remove emailsModule from cache */ emailsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: emailsModuleKeys.detail(id),
+    });
+  },
+  /** Remove entityTypeProvision from cache */ entityTypeProvision: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: entityTypeProvisionKeys.detail(id),
+    });
+  },
+  /** Remove eventsModule from cache */ eventsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: eventsModuleKeys.detail(id),
+    });
+  },
+  /** Remove functionDeploymentModule from cache */ functionDeploymentModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionDeploymentModuleKeys.detail(id),
     });
   },
   /** Remove functionInvocationModule from cache */ functionInvocationModule: (
@@ -1349,76 +1464,20 @@ export const remove = {
       queryKey: functionModuleKeys.detail(id),
     });
   },
-  /** Remove invitesModule from cache */ invitesModule: (
+  /** Remove graphExecutionModule from cache */ graphExecutionModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: invitesModuleKeys.detail(id),
+      queryKey: graphExecutionModuleKeys.detail(id),
     });
   },
-  /** Remove namespaceModule from cache */ namespaceModule: (
+  /** Remove graphModule from cache */ graphModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: namespaceModuleKeys.detail(id),
-    });
-  },
-  /** Remove computeLogModule from cache */ computeLogModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: computeLogModuleKeys.detail(id),
-    });
-  },
-  /** Remove inferenceLogModule from cache */ inferenceLogModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: inferenceLogModuleKeys.detail(id),
-    });
-  },
-  /** Remove storageLogModule from cache */ storageLogModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: storageLogModuleKeys.detail(id),
-    });
-  },
-  /** Remove transferLogModule from cache */ transferLogModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: transferLogModuleKeys.detail(id),
-    });
-  },
-  /** Remove plansModule from cache */ plansModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: plansModuleKeys.detail(id),
-    });
-  },
-  /** Remove billingProviderModule from cache */ billingProviderModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: billingProviderModuleKeys.detail(id),
-    });
-  },
-  /** Remove dbUsageModule from cache */ dbUsageModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: dbUsageModuleKeys.detail(id),
+      queryKey: graphModuleKeys.detail(id),
     });
   },
   /** Remove hierarchyModule from cache */ hierarchyModule: (
@@ -1429,60 +1488,76 @@ export const remove = {
       queryKey: hierarchyModuleKeys.detail(id),
     });
   },
-  /** Remove permissionsModule from cache */ permissionsModule: (
+  /** Remove httpRouteModule from cache */ httpRouteModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: permissionsModuleKeys.detail(id),
+      queryKey: httpRouteModuleKeys.detail(id),
     });
   },
-  /** Remove notificationsModule from cache */ notificationsModule: (
+  /** Remove i18NModule from cache */ i18NModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: notificationsModuleKeys.detail(id),
+      queryKey: i18NModuleKeys.detail(id),
     });
   },
-  /** Remove profilesModule from cache */ profilesModule: (
+  /** Remove identityProvidersModule from cache */ identityProvidersModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: profilesModuleKeys.detail(id),
+      queryKey: identityProvidersModuleKeys.detail(id),
     });
   },
-  /** Remove billingModule from cache */ billingModule: (
+  /** Remove inferenceLogModule from cache */ inferenceLogModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: billingModuleKeys.detail(id),
+      queryKey: inferenceLogModuleKeys.detail(id),
     });
   },
-  /** Remove relationProvision from cache */ relationProvision: (
+  /** Remove infraConfigModule from cache */ infraConfigModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: relationProvisionKeys.detail(id),
+      queryKey: infraConfigModuleKeys.detail(id),
     });
   },
-  /** Remove userAuthModule from cache */ userAuthModule: (
+  /** Remove infraSecretsModule from cache */ infraSecretsModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: userAuthModuleKeys.detail(id),
+      queryKey: infraSecretsModuleKeys.detail(id),
     });
   },
-  /** Remove agentModule from cache */ agentModule: (
+  /** Remove integrationProvidersModule from cache */ integrationProvidersModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: agentModuleKeys.detail(id),
+      queryKey: integrationProvidersModuleKeys.detail(id),
+    });
+  },
+  /** Remove internalSecretsModule from cache */ internalSecretsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: internalSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove invitesModule from cache */ invitesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: invitesModuleKeys.detail(id),
     });
   },
   /** Remove limitsModule from cache */ limitsModule: (
@@ -1493,6 +1568,14 @@ export const remove = {
       queryKey: limitsModuleKeys.detail(id),
     });
   },
+  /** Remove membershipTypesModule from cache */ membershipTypesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: membershipTypesModuleKeys.detail(id),
+    });
+  },
   /** Remove membershipsModule from cache */ membershipsModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1501,12 +1584,145 @@ export const remove = {
       queryKey: membershipsModuleKeys.detail(id),
     });
   },
-  /** Remove entityTypeProvision from cache */ entityTypeProvision: (
+  /** Remove merkleStoreModule from cache */ merkleStoreModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: entityTypeProvisionKeys.detail(id),
+      queryKey: merkleStoreModuleKeys.detail(id),
+    });
+  },
+  /** Remove namespaceModule from cache */ namespaceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: namespaceModuleKeys.detail(id),
+    });
+  },
+  /** Remove notificationsModule from cache */ notificationsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: notificationsModuleKeys.detail(id),
+    });
+  },
+  /** Remove permissionsModule from cache */ permissionsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: permissionsModuleKeys.detail(id),
+    });
+  },
+  /** Remove phoneNumbersModule from cache */ phoneNumbersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: phoneNumbersModuleKeys.detail(id),
+    });
+  },
+  /** Remove plansModule from cache */ plansModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: plansModuleKeys.detail(id),
+    });
+  },
+  /** Remove principalAuthModule from cache */ principalAuthModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove profilesModule from cache */ profilesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: profilesModuleKeys.detail(id),
+    });
+  },
+  /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: rateLimitMetersModuleKeys.detail(id),
+    });
+  },
+  /** Remove rateLimitsModule from cache */ rateLimitsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: rateLimitsModuleKeys.detail(id),
+    });
+  },
+  /** Remove realtimeModule from cache */ realtimeModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: realtimeModuleKeys.detail(id),
+    });
+  },
+  /** Remove relationProvision from cache */ relationProvision: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: relationProvisionKeys.detail(id),
+    });
+  },
+  /** Remove resourceModule from cache */ resourceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: resourceModuleKeys.detail(id),
+    });
+  },
+  /** Remove rlsModule from cache */ rlsModule: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: rlsModuleKeys.detail(id),
+    });
+  },
+  /** Remove secureTableProvision from cache */ secureTableProvision: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: secureTableProvisionKeys.detail(id),
+    });
+  },
+  /** Remove sessionSecretsModule from cache */ sessionSecretsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: sessionSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove sessionsModule from cache */ sessionsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: sessionsModuleKeys.detail(id),
+    });
+  },
+  /** Remove storageLogModule from cache */ storageLogModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: storageLogModuleKeys.detail(id),
     });
   },
   /** Remove storageModule from cache */ storageModule: (
@@ -1517,12 +1733,76 @@ export const remove = {
       queryKey: storageModuleKeys.detail(id),
     });
   },
-  /** Remove eventsModule from cache */ eventsModule: (
+  /** Remove transferLogModule from cache */ transferLogModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: eventsModuleKeys.detail(id),
+      queryKey: transferLogModuleKeys.detail(id),
+    });
+  },
+  /** Remove userAuthModule from cache */ userAuthModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove userCredentialsModule from cache */ userCredentialsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userCredentialsModuleKeys.detail(id),
+    });
+  },
+  /** Remove userSettingsModule from cache */ userSettingsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userSettingsModuleKeys.detail(id),
+    });
+  },
+  /** Remove userStateModule from cache */ userStateModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userStateModuleKeys.detail(id),
+    });
+  },
+  /** Remove usersModule from cache */ usersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: usersModuleKeys.detail(id),
+    });
+  },
+  /** Remove webauthnAuthModule from cache */ webauthnAuthModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove webauthnCredentialsModule from cache */ webauthnCredentialsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnCredentialsModuleKeys.detail(id),
+    });
+  },
+  /** Remove webhookModule from cache */ webhookModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webhookModuleKeys.detail(id),
     });
   },
 } as const;

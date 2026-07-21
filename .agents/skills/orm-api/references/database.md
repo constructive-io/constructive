@@ -9,8 +9,8 @@ ORM operations for Database records
 ```typescript
 db.database.findMany({ select: { id: true } }).execute()
 db.database.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.database.create({ data: { ownerId: '<UUID>', schemaHash: '<String>', name: '<String>', label: '<String>', hash: '<UUID>' }, select: { id: true } }).execute()
-db.database.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.database.create({ data: { hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>', schemaHash: '<String>' }, select: { id: true } }).execute()
+db.database.update({ where: { id: '<UUID>' }, data: { hash: '<UUID>' }, select: { id: true } }).execute()
 db.database.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.database.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.database.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, hash: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.database.findMany({
 
 ```typescript
 const item = await db.database.create({
-  data: { ownerId: '<UUID>', schemaHash: '<String>', name: '<String>', label: '<String>', hash: '<UUID>' },
+  data: { hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>', schemaHash: '<String>' },
   select: { id: true }
 }).execute();
 ```

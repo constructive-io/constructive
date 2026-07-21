@@ -7,8 +7,8 @@ React Query hooks for SpatialRelation data operations
 ## Usage
 
 ```typescript
-useSpatialRelationsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
-useSpatialRelationQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
+useSpatialRelationsQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, fieldId: true, id: true, name: true, operator: true, paramName: true, refFieldId: true, refTableId: true, tableId: true, tags: true, updatedAt: true } } })
+useSpatialRelationQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, fieldId: true, id: true, name: true, operator: true, paramName: true, refFieldId: true, refTableId: true, tableId: true, tags: true, updatedAt: true } } })
 useCreateSpatialRelationMutation({ selection: { fields: { id: true } } })
 useUpdateSpatialRelationMutation({ selection: { fields: { id: true } } })
 useDeleteSpatialRelationMutation({})
@@ -20,7 +20,7 @@ useDeleteSpatialRelationMutation({})
 
 ```typescript
 const { data, isLoading } = useSpatialRelationsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldId: true, id: true, name: true, operator: true, paramName: true, refFieldId: true, refTableId: true, tableId: true, tags: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSpatialRelationsQuery({
 const { mutate } = useCreateSpatialRelationMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', refFieldId: '<UUID>', refTableId: '<UUID>', tableId: '<UUID>', tags: '<String>' });
 ```

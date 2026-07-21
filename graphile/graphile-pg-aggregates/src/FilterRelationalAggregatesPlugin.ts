@@ -12,6 +12,7 @@ import type {
 import type { GrafastInputFieldConfigMap, Modifier } from 'grafast';
 import type {} from 'graphile-build';
 import type {} from 'graphile-connection-filter';
+import { isComputedScalarAttributeResource } from 'graphile-plugin-utils';
 import type {
   GraphQLInputObjectType,
   GraphQLInputObjectTypeConfig,
@@ -900,27 +901,4 @@ interface PgAggregateConditionExpressionClass {
   ): PgAggregateConditionExpression;
 }
 
-function isComputedScalarAttributeResource(
-  s: PgResource<any, any, any, any, any>
-): s is PgResource<
-  string,
-  PgCodec,
-  never[],
-  PgResourceParameter[],
-  PgRegistry
-> {
-  if (!s.parameters || s.parameters.length < 1) {
-    return false;
-  }
-  if (s.codec.attributes) {
-    return false;
-  }
-  if (!s.isUnique) {
-    return false;
-  }
-  const firstParameter = s.parameters[0] as PgResourceParameter;
-  if (!firstParameter?.codec.attributes) {
-    return false;
-  }
-  return true;
-}
+

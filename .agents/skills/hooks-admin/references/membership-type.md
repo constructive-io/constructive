@@ -7,8 +7,8 @@ Defines the different scopes of membership (e.g. App Member, Organization Member
 ## Usage
 
 ```typescript
-useMembershipTypesQuery({ selection: { fields: { id: true, name: true, description: true, scope: true, parentMembershipType: true, hasUsersTableEntry: true } } })
-useMembershipTypeQuery({ id: '<Int>', selection: { fields: { id: true, name: true, description: true, scope: true, parentMembershipType: true, hasUsersTableEntry: true } } })
+useMembershipTypesQuery({ selection: { fields: { description: true, hasUsersTableEntry: true, id: true, name: true, parentMembershipType: true, scope: true } } })
+useMembershipTypeQuery({ id: '<Int>', selection: { fields: { description: true, hasUsersTableEntry: true, id: true, name: true, parentMembershipType: true, scope: true } } })
 useCreateMembershipTypeMutation({ selection: { fields: { id: true } } })
 useUpdateMembershipTypeMutation({ selection: { fields: { id: true } } })
 useDeleteMembershipTypeMutation({})
@@ -20,7 +20,7 @@ useDeleteMembershipTypeMutation({})
 
 ```typescript
 const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, scope: true, parentMembershipType: true, hasUsersTableEntry: true } },
+  selection: { fields: { description: true, hasUsersTableEntry: true, id: true, name: true, parentMembershipType: true, scope: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useMembershipTypesQuery({
 const { mutate } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', description: '<String>', scope: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' });
+mutate({ description: '<String>', hasUsersTableEntry: '<Boolean>', name: '<String>', parentMembershipType: '<Int>', scope: '<String>' });
 ```

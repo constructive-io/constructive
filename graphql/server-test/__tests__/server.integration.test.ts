@@ -15,6 +15,7 @@ jest.setTimeout(30000);
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
 const shared = (...segments: string[]) =>
   path.join(sharedSeedRoot, ...segments);
+const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const servicesDatabaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const metaSchemas = [
@@ -98,26 +99,30 @@ const scenarios: Scenario[] = [
   },
 ];
 
-const seedFilesFor = (seedDir: Scenario['seedDir']) => {
+const seedAdaptersFor = (seedDir: Scenario['seedDir']) => {
   if (seedDir === 'simple-seed-services') {
+    // Real metaschema/services DDL from published pgpm modules
+    // (installed via `pnpm fixtures:install`), then app schema + data.
     return [
-      shared('services', 'setup.sql'),
-      shared('app-schemas', 'simple-pets', 'schema.sql'),
-      shared('services', 'test-data.sql'),
-      shared('app-schemas', 'simple-pets', 'test-data.sql'),
+      seed.pgpm(pgpmWorkspace),
+      seed.sqlfile([
+        shared('app-schemas', 'simple-pets', 'schema.sql'),
+        shared('services', 'test-data.sql'),
+        shared('app-schemas', 'simple-pets', 'test-data.sql'),
+      ]),
     ];
   }
   // simple-seed: base setup + shared app-schemas
   return [
-    shared('base', 'setup.sql'),
-    shared('app-schemas', 'simple-pets', 'schema.sql'),
-    shared('app-schemas', 'simple-pets', 'test-data.sql'),
+    seed.sqlfile([
+      shared('base', 'setup.sql'),
+      shared('app-schemas', 'simple-pets', 'schema.sql'),
+      shared('app-schemas', 'simple-pets', 'test-data.sql'),
+    ]),
   ];
 };
 
-const buildSeedAdapters = (scenario: Scenario) => [
-  seed.sqlfile(seedFilesFor(scenario.seedDir)),
-];
+const buildSeedAdapters = (scenario: Scenario) => seedAdaptersFor(scenario.seedDir);
 
 describe.each(scenarios)('$name', (scenario) => {
   let server: ServerInfo;
@@ -284,7 +289,7 @@ describe('services enabled + private via X-Meta-Schema', () => {
           },
         },
       },
-      [seed.sqlfile(seedFilesFor('simple-seed-services'))]
+      seedAdaptersFor('simple-seed-services')
     ));
     teardowns.push(teardown);
   });
@@ -374,7 +379,7 @@ describe('Error paths', () => {
           },
         },
       },
-      [seed.sqlfile(seedFilesFor('simple-seed-services'))]
+      seedAdaptersFor('simple-seed-services')
     ));
     teardowns.push(teardown);
   });
@@ -424,7 +429,7 @@ describe('Error paths', () => {
             },
           },
         },
-        [seed.sqlfile(seedFilesFor('simple-seed'))]
+        seedAdaptersFor('simple-seed')
       ));
       teardowns.push(noSchemasTeardown);
     });
@@ -460,7 +465,7 @@ describe('Error paths', () => {
             },
           },
         },
-        [seed.sqlfile(seedFilesFor('simple-seed-services'))]
+        seedAdaptersFor('simple-seed-services')
       ));
       teardowns.push(publicTeardown);
     });
@@ -499,7 +504,7 @@ describe('Error paths', () => {
             },
           },
         },
-        [seed.sqlfile(seedFilesFor('simple-seed-services'))]
+        seedAdaptersFor('simple-seed-services')
       ));
       teardowns.push(devTeardown);
 

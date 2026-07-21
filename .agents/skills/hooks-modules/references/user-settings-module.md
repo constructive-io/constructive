@@ -7,8 +7,8 @@ React Query hooks for UserSettingsModule data operations
 ## Usage
 
 ```typescript
-useUserSettingsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true } } })
-useUserSettingsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true } } })
+useUserSettingsModulesQuery({ selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, schemaId: true, tableId: true, tableName: true } } })
+useUserSettingsModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateUserSettingsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateUserSettingsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteUserSettingsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteUserSettingsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useUserSettingsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true } },
+  selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUserSettingsModulesQuery({
 const { mutate } = useCreateUserSettingsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

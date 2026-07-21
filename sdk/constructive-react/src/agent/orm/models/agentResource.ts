@@ -196,7 +196,8 @@ export class AgentResourceModel {
       'UpdateAgentResourceInput',
       'id',
       'agentResourcePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

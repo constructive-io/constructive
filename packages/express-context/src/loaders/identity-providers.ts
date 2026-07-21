@@ -8,7 +8,7 @@
 import { QuoteUtils } from '@pgsql/quotes';
 
 import type {
-  ConfigSecretsModuleRow,
+  InternalSecretsModuleRow,
   IdentityProviderConfigMap,
   IdentityProvidersConfig,
   IdentityProvidersModuleRow,
@@ -36,11 +36,11 @@ const IDENTITY_PROVIDERS_MODULE_SQL = `
   LIMIT 1
 `;
 
-const CONFIG_SECRETS_MODULE_SQL = `
-  SELECT csm.table_id
-  FROM metaschema_modules_public.config_secrets_module csm
-  WHERE csm.database_id = $1
-    AND csm.scope = $2
+const INTERNAL_SECRETS_MODULE_SQL = `
+  SELECT ism.internal_secrets_table_id
+  FROM metaschema_modules_public.internal_secrets_module ism
+  WHERE ism.database_id = $1
+    AND ism.scope = $2
   LIMIT 1
 `;
 
@@ -129,21 +129,21 @@ async function resolveSecretsTable(
   scope: string,
 ): Promise<SchemaAndTableRow> {
   const secretsModuleResult =
-    await ctx.servicesPool.query<ConfigSecretsModuleRow>(
-      CONFIG_SECRETS_MODULE_SQL,
+    await ctx.servicesPool.query<InternalSecretsModuleRow>(
+      INTERNAL_SECRETS_MODULE_SQL,
       [databaseId, scope],
     );
   const secretsModuleRow = secretsModuleResult.rows[0];
   if (!secretsModuleRow) {
     throw new Error(
-      `config_secrets_module missing for scope ${scope} on database ${databaseId}`,
+      `internal_secrets_module missing for scope ${scope} on database ${databaseId}`,
     );
   }
 
   try {
     const schemaResult = await ctx.servicesPool.query<SchemaAndTableRow>(
       SCHEMA_AND_TABLE_SQL,
-      [secretsModuleRow.table_id],
+      [secretsModuleRow.internal_secrets_table_id],
     );
     const schemaRow = schemaResult.rows[0];
     if (schemaRow) return schemaRow;
@@ -152,7 +152,7 @@ async function resolveSecretsTable(
   }
 
   throw new Error(
-    `schema/table resolution missing for config_secrets_module scope ${scope} on database ${databaseId}`,
+    `schema/table resolution missing for internal_secrets_module scope ${scope} on database ${databaseId}`,
   );
 }
 

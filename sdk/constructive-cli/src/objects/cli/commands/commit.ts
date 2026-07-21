@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  message: 'string',
-  databaseId: 'uuid',
-  storeId: 'uuid',
-  parentIds: 'uuid',
   authorId: 'uuid',
   committerId: 'uuid',
-  treeId: 'uuid',
+  databaseId: 'uuid',
   date: 'string',
+  id: 'uuid',
+  message: 'string',
+  parentIds: 'uuid',
+  storeId: 'uuid',
+  treeId: 'uuid',
 };
 const usage =
   '\ncommit <command>\n\nCommands:\n  list                  List commit records\n  find-first            Find first matching commit record\n  get                   Get a commit by ID\n  create                Create a new commit\n  update                Update an existing commit\n  delete                Delete a commit\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      message: true,
-      databaseId: true,
-      storeId: true,
-      parentIds: true,
       authorId: true,
       committerId: true,
-      treeId: true,
+      databaseId: true,
       date: true,
+      id: true,
+      message: true,
+      parentIds: true,
+      storeId: true,
+      treeId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<CommitSelect, CommitFilter, CommitOrderBy> & {
@@ -106,15 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      message: true,
-      databaseId: true,
-      storeId: true,
-      parentIds: true,
       authorId: true,
       committerId: true,
-      treeId: true,
+      databaseId: true,
       date: true,
+      id: true,
+      message: true,
+      parentIds: true,
+      storeId: true,
+      treeId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<CommitSelect, CommitFilter, CommitOrderBy> & {
@@ -147,15 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          message: true,
-          databaseId: true,
-          storeId: true,
-          parentIds: true,
           authorId: true,
           committerId: true,
-          treeId: true,
+          databaseId: true,
           date: true,
+          id: true,
+          message: true,
+          parentIds: true,
+          storeId: true,
+          treeId: true,
         },
       })
       .execute();
@@ -173,32 +173,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'message',
-        message: 'message',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'storeId',
-        message: 'storeId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'parentIds',
-        message: 'parentIds',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'authorId',
         message: 'authorId',
         required: false,
@@ -213,15 +187,41 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'treeId',
-        message: 'treeId',
-        required: false,
-        skipPrompt: true,
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
       },
       {
         type: 'text',
         name: 'date',
         message: 'date',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'message',
+        message: 'message',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'parentIds',
+        message: 'parentIds',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'storeId',
+        message: 'storeId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'treeId',
+        message: 'treeId',
         required: false,
         skipPrompt: true,
       },
@@ -232,25 +232,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.commit
       .create({
         data: {
-          message: cleanedData.message,
-          databaseId: cleanedData.databaseId,
-          storeId: cleanedData.storeId,
-          parentIds: cleanedData.parentIds,
           authorId: cleanedData.authorId,
           committerId: cleanedData.committerId,
-          treeId: cleanedData.treeId,
+          databaseId: cleanedData.databaseId,
           date: cleanedData.date,
+          message: cleanedData.message,
+          parentIds: cleanedData.parentIds,
+          storeId: cleanedData.storeId,
+          treeId: cleanedData.treeId,
         },
         select: {
-          id: true,
-          message: true,
-          databaseId: true,
-          storeId: true,
-          parentIds: true,
           authorId: true,
           committerId: true,
-          treeId: true,
+          databaseId: true,
           date: true,
+          id: true,
+          message: true,
+          parentIds: true,
+          storeId: true,
+          treeId: true,
         },
       })
       .execute();
@@ -274,29 +274,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'message',
-        message: 'message',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'storeId',
-        message: 'storeId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'parentIds',
-        message: 'parentIds',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
@@ -314,15 +294,35 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'treeId',
-        message: 'treeId',
+        name: 'date',
+        message: 'date',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'date',
-        message: 'date',
+        name: 'message',
+        message: 'message',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'parentIds',
+        message: 'parentIds',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'storeId',
+        message: 'storeId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'treeId',
+        message: 'treeId',
         required: false,
         skipPrompt: true,
       },
@@ -334,27 +334,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       .update({
         where: {
           id: answers.id as string,
+          databaseId: answers.databaseId as string,
         },
         data: {
-          message: cleanedData.message,
-          databaseId: cleanedData.databaseId,
-          storeId: cleanedData.storeId,
-          parentIds: cleanedData.parentIds,
           authorId: cleanedData.authorId,
           committerId: cleanedData.committerId,
-          treeId: cleanedData.treeId,
           date: cleanedData.date,
+          message: cleanedData.message,
+          parentIds: cleanedData.parentIds,
+          storeId: cleanedData.storeId,
+          treeId: cleanedData.treeId,
         },
         select: {
-          id: true,
-          message: true,
-          databaseId: true,
-          storeId: true,
-          parentIds: true,
           authorId: true,
           committerId: true,
-          treeId: true,
+          databaseId: true,
           date: true,
+          id: true,
+          message: true,
+          parentIds: true,
+          storeId: true,
+          treeId: true,
         },
       })
       .execute();
@@ -376,6 +376,12 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'id',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient();
@@ -383,6 +389,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       .delete({
         where: {
           id: answers.id as string,
+          databaseId: answers.databaseId as string,
         },
         select: {
           id: true,

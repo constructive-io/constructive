@@ -7,8 +7,8 @@ Append-only ledger of credit grants that automatically update limit ceilings
 ## Usage
 
 ```typescript
-useOrgLimitCreditsQuery({ selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, organizationId: true, entityType: true, amount: true, creditType: true, reason: true } } })
-useOrgLimitCreditQuery({ id: '<UUID>', selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, organizationId: true, entityType: true, amount: true, creditType: true, reason: true } } })
+useOrgLimitCreditsQuery({ selection: { fields: { actorId: true, amount: true, creditType: true, defaultLimitId: true, entityId: true, entityType: true, id: true, organizationId: true, reason: true } } })
+useOrgLimitCreditQuery({ id: '<UUID>', selection: { fields: { actorId: true, amount: true, creditType: true, defaultLimitId: true, entityId: true, entityType: true, id: true, organizationId: true, reason: true } } })
 useCreateOrgLimitCreditMutation({ selection: { fields: { id: true } } })
 useUpdateOrgLimitCreditMutation({ selection: { fields: { id: true } } })
 useDeleteOrgLimitCreditMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgLimitCreditMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgLimitCreditsQuery({
-  selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, organizationId: true, entityType: true, amount: true, creditType: true, reason: true } },
+  selection: { fields: { actorId: true, amount: true, creditType: true, defaultLimitId: true, entityId: true, entityType: true, id: true, organizationId: true, reason: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgLimitCreditsQuery({
 const { mutate } = useCreateOrgLimitCreditMutation({
   selection: { fields: { id: true } },
 });
-mutate({ defaultLimitId: '<UUID>', actorId: '<UUID>', entityId: '<UUID>', organizationId: '<UUID>', entityType: '<String>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
+mutate({ actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', defaultLimitId: '<UUID>', entityId: '<UUID>', entityType: '<String>', organizationId: '<UUID>', reason: '<String>' });
 ```

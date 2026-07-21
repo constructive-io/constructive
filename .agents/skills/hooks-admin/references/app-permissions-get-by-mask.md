@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `AppPermission`.
 ## Usage
 
 ```typescript
-useAppPermissionsGetByMaskQuery({ mask: '<BitString>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
+useAppPermissionsGetByMaskQuery({ after: '<Cursor>', first: '<Int>', mask: '<BitString>', offset: '<Int>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useAppPermissionsGetByMaskQuery({ mask: '<BitString>', first: '<Int>', offset: '
 ### Use useAppPermissionsGetByMaskQuery
 
 ```typescript
-const { data, isLoading } = useAppPermissionsGetByMaskQuery({ mask: '<BitString>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
+const { data, isLoading } = useAppPermissionsGetByMaskQuery({ after: '<Cursor>', first: '<Int>', mask: '<BitString>', offset: '<Int>' });
 ```

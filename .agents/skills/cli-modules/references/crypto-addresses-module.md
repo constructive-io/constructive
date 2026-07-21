@@ -12,8 +12,8 @@ csdk crypto-addresses-module list --where.<field>.<op> <value> --orderBy <values
 csdk crypto-addresses-module list --limit 10 --after <cursor>
 csdk crypto-addresses-module find-first --where.<field>.<op> <value>
 csdk crypto-addresses-module get --id <UUID>
-csdk crypto-addresses-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--cryptoNetwork <String>] [--apiName <String>] [--privateApiName <String>]
-csdk crypto-addresses-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--cryptoNetwork <String>] [--apiName <String>] [--privateApiName <String>]
+csdk crypto-addresses-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--cryptoNetwork <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
+csdk crypto-addresses-module update --id <UUID> [--apiName <String>] [--cryptoNetwork <String>] [--databaseId <UUID>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk crypto-addresses-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk crypto-addresses-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a cryptoAddressesModule
 
 ```bash
-csdk crypto-addresses-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--cryptoNetwork <String>] [--apiName <String>] [--privateApiName <String>]
+csdk crypto-addresses-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--cryptoNetwork <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
 ```
 
 ### Get a cryptoAddressesModule by id

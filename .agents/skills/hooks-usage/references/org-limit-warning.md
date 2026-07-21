@@ -7,8 +7,8 @@ Warning configuration for soft limits. Each row defines a warning threshold and 
 ## Usage
 
 ```typescript
-useOrgLimitWarningsQuery({ selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } } })
-useOrgLimitWarningQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } } })
+useOrgLimitWarningsQuery({ selection: { fields: { entityId: true, id: true, name: true, taskIdentifier: true, thresholdValue: true, warningType: true } } })
+useOrgLimitWarningQuery({ id: '<UUID>', selection: { fields: { entityId: true, id: true, name: true, taskIdentifier: true, thresholdValue: true, warningType: true } } })
 useCreateOrgLimitWarningMutation({ selection: { fields: { id: true } } })
 useUpdateOrgLimitWarningMutation({ selection: { fields: { id: true } } })
 useDeleteOrgLimitWarningMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgLimitWarningMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgLimitWarningsQuery({
-  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } },
+  selection: { fields: { entityId: true, id: true, name: true, taskIdentifier: true, thresholdValue: true, warningType: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgLimitWarningsQuery({
 const { mutate } = useCreateOrgLimitWarningMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>', entityId: '<UUID>' });
+mutate({ entityId: '<UUID>', name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' });
 ```

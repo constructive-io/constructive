@@ -1,7 +1,6 @@
 import { loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import yanse from 'yanse';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
@@ -10,24 +9,24 @@ import { parse } from 'parse-package-name';
 import path, { dirname, resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+import yanse from 'yanse';
 
-import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TTL_MS, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate } from '../template-scaffold';
 import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '../../files';
-import { Tag, ExtendedPlanFile, Change } from '../../files/types';
-import { parsePlanFile } from '../../files/plan/parser';
-import { isValidTagName, isValidChangeName, parseReference } from '../../files/plan/validators';
-import { getNow as getPlanTimestamp } from '../../files/plan/generator';
-import { resolveTagToChangeName } from '../../resolution/resolve';
 import {
   ExtensionInfo,
   getExtensionInfo,
   getExtensionName,
   getInstalledExtensions,
   parseControlFile,
-  writeExtensions,
+  writeExtensions
 } from '../../files';
 import { generateControlFileContent, writeExtensionMakefile } from '../../files/extension/writer';
+import { getNow as getPlanTimestamp } from '../../files/plan/generator';
+import { parsePlanFile } from '../../files/plan/parser';
+import { isValidChangeName, isValidTagName, parseReference } from '../../files/plan/validators';
+import { Change, Tag } from '../../files/types';
+import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,
@@ -37,10 +36,9 @@ import {
   ModuleMap
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
-import { resolveExtensionDependencies, resolveDependencies } from '../../resolution/deps';
-import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
-
+import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { parseTarget } from '../../utils/target-utils';
+import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
 
 const logger = new Logger('pgpm');
@@ -51,26 +49,9 @@ const logger = new Logger('pgpm');
  */
 const EXTENSIONS_DIR = 'extensions';
 
-function getUTCTimestamp(d: Date = new Date()): string {
-  return (
-    d.getUTCFullYear() +
-    '-' + String(d.getUTCMonth() + 1).padStart(2, '0') +
-    '-' + String(d.getUTCDate()).padStart(2, '0') +
-    'T' + String(d.getUTCHours()).padStart(2, '0') +
-    ':' + String(d.getUTCMinutes()).padStart(2, '0') +
-    ':' + String(d.getUTCSeconds()).padStart(2, '0') +
-    'Z'
-  );
-}
-
 function sortObjectByKey<T extends Record<string, any>>(obj: T): T {
   return Object.fromEntries(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))) as T;
 }
-
-const getNow = () =>
-  process.env.NODE_ENV === 'test'
-    ? getUTCTimestamp(new Date('2017-08-11T08:11:51Z'))
-    : getUTCTimestamp(new Date());
 
 
 /**
@@ -95,7 +76,7 @@ const truncateExtensionsToTarget = (
     resolved: workspaceExtensions.resolved.slice(targetIndex),
     external: workspaceExtensions.external
   };
-}
+};
 
 export enum PackageContext {
   Outside = 'outside',
@@ -184,7 +165,7 @@ export class PgpmPackage {
     );
     const resolvedDirs = dirs.map(dir => path.resolve(dir));
     // Remove duplicates by converting to Set and back to array
-    return [...new Set(resolvedDirs)];
+    return [...new Set(resolvedDirs.sort((a, b) => a.localeCompare(b)))];
   }
 
   private loadAllowedParentDirs(): string[] {
@@ -303,9 +284,20 @@ export class PgpmPackage {
   listModules(): ModuleMap {
     if (!this.workspacePath) return {};
 
-    const moduleFiles = glob.sync(`${this.workspacePath}/**/*.control`).filter(
+    // Workspace membership is first-class: modules are discovered from the
+    // workspace's declared `packages` globs plus the installed extensions/
+    // directory — never from an unscoped workspace-wide scan. This keeps
+    // nested workspaces (e.g. test fixtures) out of the module map.
+    const packageDirs = [
+      ...this.allowedDirs,
+      ...glob.sync(path.join(this.workspacePath, EXTENSIONS_DIR, '{*,@*/*}'))
+    ];
+
+    const moduleFiles = [...new Set(
+      packageDirs.flatMap(dir => glob.sync(`${dir}/**/*.control`))
+    )].filter(
       (file: string) => !/node_modules/.test(file)
-    );
+    ).sort((a, b) => a.localeCompare(b));
 
     // Group files by module name to handle collisions
     const filesByName = new Map<string, string[]>();
@@ -484,7 +476,7 @@ export class PgpmPackage {
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
       toolName: options.toolName ?? DEFAULT_TEMPLATE_TOOL_NAME,
       cwd: this.cwd,
-      prompter: options.prompter,
+      prompter: options.prompter
     });
 
     // Only create pgpm files (pgpm.plan, .control, deploy/revert/verify dirs) for pgpm-managed modules
@@ -808,7 +800,7 @@ export class PgpmPackage {
     }
     
     if (!isValidChangeName(changeName)) {
-      throw errors.INVALID_NAME({ name: changeName, type: 'change', rules: "Change names must follow Sqitch naming rules" });
+      throw errors.INVALID_NAME({ name: changeName, type: 'change', rules: 'Change names must follow Sqitch naming rules' });
     }
     
     if (!this.isInWorkspace() && !this.isInModule()) {
@@ -987,28 +979,38 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   }
 
   /**
-    * Installs an extension npm package into the local skitch extensions directory,
-    * and automatically adds it to the current module’s package.json dependencies.
+    * Installs an extension npm package into the workspace extensions directory.
+    *
+    * When run inside a module, the installed version is recorded in the
+    * module's package.json dependencies and its .control requires list.
+    * When run at the workspace root, the installed version is recorded in
+    * the workspace pgpm.json `dependencies` field instead — no .control
+    * file is needed.
     */
-
-
   async installModules(...pkgstrs: string[]): Promise<void> {
     this.ensureWorkspace();
-    this.ensureModule();
-  
+
+    const inModule = this.isInModule();
     const originalDir = process.cwd();
     const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
-    const pkgJsonPath = path.join(this.modulePath!, 'package.json');
-  
-    if (!fs.existsSync(pkgJsonPath)) {
-      throw new Error(`No package.json found at module path: ${this.modulePath}`);
+
+    let pkgJsonPath: string | undefined;
+    let pkgData: Record<string, any> | undefined;
+
+    if (inModule) {
+      pkgJsonPath = path.join(this.modulePath!, 'package.json');
+
+      if (!fs.existsSync(pkgJsonPath)) {
+        throw new Error(`No package.json found at module path: ${this.modulePath}`);
+      }
+
+      pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+      pkgData.dependencies = pkgData.dependencies || {};
     }
-  
-    const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
-    pkgData.dependencies = pkgData.dependencies || {};
-  
+
     const newlyAdded: string[] = [];
-  
+    const installedVersions: Record<string, string> = {};
+
     for (const pkgstr of pkgstrs) {
       const { name } = parse(pkgstr);
       const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-install-'));
@@ -1048,7 +1050,10 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           }
   
           const { version } = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8'));
-          pkgData.dependencies[name] = `${version}`;
+          installedVersions[name] = `${version}`;
+          if (pkgData) {
+            pkgData.dependencies[name] = `${version}`;
+          }
   
           const extensionName = getExtensionName(dst);
           newlyAdded.push(extensionName);
@@ -1060,23 +1065,94 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       }
     }
   
-    const { dependencies, devDependencies, ...rest } = pkgData;
-    const finalPkgData: Record<string, any> = { ...rest };
+    if (inModule && pkgData && pkgJsonPath) {
+      const { dependencies, devDependencies, ...rest } = pkgData;
+      const finalPkgData: Record<string, any> = { ...rest };
   
-    if (dependencies) {
-      finalPkgData.dependencies = sortObjectByKey(dependencies);
+      if (dependencies) {
+        finalPkgData.dependencies = sortObjectByKey(dependencies);
+      }
+      if (devDependencies) {
+        finalPkgData.devDependencies = sortObjectByKey(devDependencies);
+      }
+  
+      fs.writeFileSync(pkgJsonPath, JSON.stringify(finalPkgData, null, 2));
+      logger.success(`📦 Updated package.json with: ${pkgstrs.join(', ')}`);
+  
+      // ─── Update .control file with actual extension names ──────────────
+      const currentDeps = this.getRequiredModules();
+      const updatedDeps = Array.from(new Set([...currentDeps, ...newlyAdded])).sort();
+      writeExtensions(this.modulePath!, updatedDeps);
+    } else {
+      this.recordWorkspaceDependencies(installedVersions);
     }
-    if (devDependencies) {
-      finalPkgData.devDependencies = sortObjectByKey(devDependencies);
+  }
+
+  /**
+   * Returns the workspace-level pgpm module dependencies recorded in
+   * the workspace pgpm.json `dependencies` field.
+   */
+  getWorkspaceDependencies(): Record<string, string> {
+    this.ensureWorkspace();
+
+    const configPath = path.join(this.workspacePath!, 'pgpm.json');
+    if (!fs.existsSync(configPath)) {
+      return {};
     }
-  
-    fs.writeFileSync(pkgJsonPath, JSON.stringify(finalPkgData, null, 2));
-    logger.success(`📦 Updated package.json with: ${pkgstrs.join(', ')}`);
-  
-    // ─── Update .control file with actual extension names ──────────────
-    const currentDeps = this.getRequiredModules();
-    const updatedDeps = Array.from(new Set([...currentDeps, ...newlyAdded])).sort();
-    writeExtensions(this.modulePath!, updatedDeps);
+
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    return config.dependencies || {};
+  }
+
+  /**
+   * Records installed module versions into the workspace pgpm.json
+   * `dependencies` field. No-op when the workspace uses pgpm.config.js.
+   */
+  recordWorkspaceDependencies(versions: Record<string, string>): void {
+    this.ensureWorkspace();
+
+    if (Object.keys(versions).length === 0) return;
+
+    const configPath = path.join(this.workspacePath!, 'pgpm.json');
+    if (!fs.existsSync(configPath)) {
+      logger.warn('No pgpm.json found at workspace root — skipping dependency recording.');
+      return;
+    }
+
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    config.dependencies = sortObjectByKey({
+      ...(config.dependencies || {}),
+      ...versions
+    });
+
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+    logger.success(`📦 Updated pgpm.json dependencies with: ${Object.keys(versions).join(', ')}`);
+  }
+
+  /**
+   * Installs the workspace-level dependencies declared in pgpm.json into
+   * the workspace extensions/ directory. Skips modules already present
+   * unless `force` is set.
+   *
+   * @returns The list of installed package specs (name@version)
+   */
+  async installWorkspaceDependencies(options?: { force?: boolean }): Promise<string[]> {
+    this.ensureWorkspace();
+
+    const { force = false } = options || {};
+    const dependencies = this.getWorkspaceDependencies();
+    const installedModules = this.getWorkspaceInstalledModules();
+
+    const toInstall = Object.entries(dependencies)
+      .filter(([name]) => force || !installedModules.includes(name))
+      .map(([name, version]) => `${name}@${version}`);
+
+    if (toInstall.length === 0) {
+      return [];
+    }
+
+    await this.installModules(...toInstall);
+    return toInstall;
   }
 
   /**
@@ -1125,7 +1201,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   getInstalledModules(): { 
     installed: string[]; 
     installedVersions: Record<string, string>;
-  } {
+    } {
     this.ensureModule();
     this.ensureWorkspace();
 

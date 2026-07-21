@@ -196,7 +196,8 @@ export class CorsSettingModel {
       'UpdateCorsSettingInput',
       'id',
       'corsSettingPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

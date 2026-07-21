@@ -23,7 +23,7 @@ import { createModuleLoader } from './create-loader';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const AUTH_SETTINGS_DISCOVERY_SQL = `
-  SELECT s.schema_name, sm.auth_settings_table AS table_name
+  SELECT s.schema_name, sm.auth_settings_table_name AS table_name
   FROM metaschema_modules_public.sessions_module sm
   JOIN metaschema_public.schema s ON s.id = sm.schema_id
   WHERE sm.database_id = $1
