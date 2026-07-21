@@ -9,6 +9,12 @@ import * as path from 'node:path';
 
 import { createJiti } from 'jiti';
 
+import type {
+  GraphQLSDKConfigTarget,
+  GraphQLSDKMultiConfig,
+} from '../../types/config';
+import { normalizeCodegenConfig, type NormalizedCodegenConfig } from './schema';
+
 export const CONFIG_FILENAME = 'graphql-codegen.config.ts';
 export const JSON_CONFIG_FILENAME = 'graphql-codegen.config.json';
 export const CONFIG_FILENAMES = [
@@ -50,13 +56,18 @@ export function findConfigFile(
   }
 }
 
-export interface LoadConfigFileResult {
-  success: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config?: any;
-  error?: string;
-  code?: LoadConfigFileErrorCode;
-}
+export type LoadConfigFileResult =
+  | {
+      success: true;
+      config: GraphQLSDKConfigTarget | GraphQLSDKMultiConfig;
+      normalized: NormalizedCodegenConfig;
+    }
+  | {
+      success: false;
+      error: string;
+      code: LoadConfigFileErrorCode;
+      path?: string;
+    };
 
 /**
  * Load and validate a config file
@@ -104,17 +115,21 @@ export async function loadConfigFile(
           fsCache: false,
         }).import(resolvedPath, { default: true });
 
-    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+    const normalized = normalizeCodegenConfig(config);
+    if ('message' in normalized) {
       return {
         success: false,
         code: 'CODEGEN_CONFIG_INVALID',
-        error: 'Config file must export a configuration object',
+        error: `Invalid codegen configuration at ${normalized.path}: ${normalized.message}.`,
+        path: normalized.path,
       };
     }
 
     return {
       success: true,
-      config,
+      config:
+        normalized.kind === 'single' ? normalized.target : normalized.targets,
+      normalized,
     };
   } catch (err) {
     if (declarativeJson) {

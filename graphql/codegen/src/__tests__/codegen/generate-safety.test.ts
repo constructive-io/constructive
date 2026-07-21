@@ -80,6 +80,29 @@ describe('generate() filesystem safety', () => {
     expect(fs.existsSync(output)).toBe(false);
   });
 
+  it('accepts a multi-target config whose target is named endpoint', async () => {
+    const configPath = path.join(tempDir, 'graphql-codegen.config.json');
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({
+        endpoint: {
+          schemaFile: EXAMPLE_SCHEMA,
+          output: './generated/endpoint',
+          orm: true,
+          docs: false,
+        },
+      })
+    );
+
+    const result = await runCodegenOperation(
+      { config: configPath, dryRun: true },
+      { cwd: tempDir, onProgress: () => undefined }
+    );
+
+    expect(result.hasError).toBe(false);
+    expect(result.results.map(({ name }) => name)).toEqual(['endpoint']);
+  });
+
   it('prunes stale owned files while preserving unknown handwritten files', async () => {
     const output = path.join(tempDir, 'generated');
     const initial = await generate({

@@ -75,6 +75,24 @@ describe('codegen configuration security policy', () => {
     });
   });
 
+  it('rejects malformed target fields while loading configuration', async () => {
+    const configPath = path.join(cwd, 'graphql-codegen.config.json');
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({
+        public: { schemaFile: 42, output: false, orm: 'yes' },
+      })
+    );
+
+    await expect(
+      loadConfigFile(configPath, cwd, {}, { allowExecutableConfig: false })
+    ).resolves.toMatchObject({
+      success: false,
+      code: 'CODEGEN_CONFIG_INVALID',
+      path: '/public/schemaFile',
+    });
+  });
+
   it('retains explicit executable-config compatibility for the legacy adapter', async () => {
     const configPath = path.join(cwd, 'graphql-codegen.config.ts');
     fs.writeFileSync(

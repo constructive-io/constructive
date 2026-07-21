@@ -460,6 +460,9 @@ export interface GraphQLSDKConfigTarget {
  */
 export type GraphQLSDKConfig = GraphQLSDKConfigTarget;
 
+/** Named targets accepted by multi-target codegen configuration files. */
+export type GraphQLSDKMultiConfig = Record<string, GraphQLSDKConfigTarget>;
+
 /**
  * Watch mode configuration options
  *

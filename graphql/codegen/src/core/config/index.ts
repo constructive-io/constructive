@@ -13,6 +13,11 @@ export {
   type LoadConfigFileResult,
 } from './loader';
 export {
+  normalizeCodegenConfig,
+  type ConfigValidationFailure,
+  type NormalizedCodegenConfig,
+} from './schema';
+export {
   type ConfigOverrideOptions,
   loadAndResolveConfig,
   type LoadConfigResult,

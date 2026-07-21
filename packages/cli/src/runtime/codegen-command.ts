@@ -387,6 +387,7 @@ export const codegenCommand = defineCommand({
             code: error.code,
             category: 'configuration',
             message: error.message,
+            path: error.path,
             cause: error,
           });
         }

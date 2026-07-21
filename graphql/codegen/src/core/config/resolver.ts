@@ -70,10 +70,16 @@ export async function loadAndResolveConfig(
 
   if (resolvedConfigPath) {
     const loadResult = await loadConfigFile(resolvedConfigPath, cwd);
-    if (!loadResult.success) {
+    if (loadResult.success === false) {
       return { success: false, error: loadResult.error };
     }
-    baseConfig = loadResult.config;
+    if (loadResult.normalized.kind !== 'single') {
+      return {
+        success: false,
+        error: 'This operation requires a single-target codegen configuration.',
+      };
+    }
+    baseConfig = loadResult.normalized.target;
   }
 
   const mergedConfig = mergeConfig(baseConfig, overrides);
@@ -121,11 +127,15 @@ export async function loadWatchConfig(options: {
 
   if (configPath) {
     const loadResult = await loadConfigFile(configPath, cwd);
-    if (!loadResult.success) {
+    if (loadResult.success === false) {
       console.error('x', loadResult.error);
       return null;
     }
-    baseConfig = loadResult.config;
+    if (loadResult.normalized.kind !== 'single') {
+      console.error('x Watch mode requires a single-target configuration.');
+      return null;
+    }
+    baseConfig = loadResult.normalized.target;
   }
 
   const sourceOverrides: GraphQLSDKConfigTarget = {};
