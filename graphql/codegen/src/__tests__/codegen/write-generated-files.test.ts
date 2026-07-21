@@ -387,6 +387,58 @@ describe('writeGeneratedFiles', () => {
     ).toBe(true);
   });
 
+  it('leaves no manifest staging artifact when publication fails', async () => {
+    const generated = path.join(tempDir, 'model.ts');
+    const manifest = path.join(tempDir, GENERATED_FILES_MANIFEST);
+    const initial = await writeGeneratedFiles(
+      [{ path: 'model.ts', content: 'export const version = 1;\n' }],
+      tempDir,
+      [],
+      { showProgress: false, formatFiles: false }
+    );
+    expect(initial.success).toBe(true);
+    const before = {
+      entries: fs.readdirSync(tempDir).sort(),
+      generated: fs.readFileSync(generated),
+      manifest: fs.readFileSync(manifest),
+    };
+
+    const nativeFs = require('node:fs') as typeof fs;
+    const originalRename = nativeFs.renameSync;
+    let failureInjected = false;
+    const renameSpy = jest
+      .spyOn(nativeFs, 'renameSync')
+      .mockImplementation((source, destination) => {
+        if (
+          !failureInjected &&
+          String(source).includes('.codegen-transaction-') &&
+          path.basename(String(source)) === GENERATED_FILES_MANIFEST &&
+          path.basename(String(destination)) === GENERATED_FILES_MANIFEST
+        ) {
+          failureInjected = true;
+          throw new Error('injected manifest publication failure');
+        }
+        return originalRename(source, destination);
+      });
+
+    let result: Awaited<ReturnType<typeof writeGeneratedFiles>>;
+    try {
+      result = await writeGeneratedFiles(
+        [{ path: 'model.ts', content: 'export const version = 2;\n' }],
+        tempDir,
+        [],
+        { showProgress: false, formatFiles: false }
+      );
+    } finally {
+      renameSpy.mockRestore();
+    }
+
+    expect(result.success).toBe(false);
+    expect(fs.readdirSync(tempDir).sort()).toEqual(before.entries);
+    expect(fs.readFileSync(generated)).toEqual(before.generated);
+    expect(fs.readFileSync(manifest)).toEqual(before.manifest);
+  });
+
   it('does not roll back committed files when transaction cleanup fails', async () => {
     const generated = path.join(tempDir, 'model.ts');
     const initial = await writeGeneratedFiles(

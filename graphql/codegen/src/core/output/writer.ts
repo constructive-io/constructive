@@ -694,6 +694,14 @@ function stagePlan(transaction: PlanTransaction): void {
     fs.mkdirSync(path.dirname(stagedPath), { recursive: true });
     fs.writeFileSync(stagedPath, desired.content, 'utf8');
   }
+  if (prepared.manifestChanged && prepared.manifestContent !== undefined) {
+    const stagedManifestPath = path.join(stagedRoot, GENERATED_FILES_MANIFEST);
+    fs.mkdirSync(path.dirname(stagedManifestPath), { recursive: true });
+    fs.writeFileSync(stagedManifestPath, prepared.manifestContent, {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
+  }
 }
 
 function readOptionalHash(filePath: string): string | undefined {
@@ -774,7 +782,7 @@ function commitPlanFiles(
 }
 
 function publishPlanManifest(transaction: PlanTransaction): void {
-  const { prepared, backupRoot } = transaction;
+  const { prepared, backupRoot, stagedRoot } = transaction;
   if (!prepared.manifestChanged) return;
 
   const manifestBackupPath = path.join(backupRoot, GENERATED_FILES_MANIFEST);
@@ -785,15 +793,8 @@ function publishPlanManifest(transaction: PlanTransaction): void {
   }
 
   if (prepared.manifestContent === undefined) return;
-  const manifestTempPath = path.join(
-    prepared.publicPlan.outputDir,
-    `.${GENERATED_FILES_MANIFEST}.${process.pid}.${Date.now()}.tmp`
-  );
-  fs.writeFileSync(manifestTempPath, prepared.manifestContent, {
-    encoding: 'utf8',
-    mode: 0o600,
-  });
-  fs.renameSync(manifestTempPath, prepared.publicPlan.manifestPath);
+  const stagedManifestPath = path.join(stagedRoot, GENERATED_FILES_MANIFEST);
+  fs.renameSync(stagedManifestPath, prepared.publicPlan.manifestPath);
   transaction.manifestPublished = true;
 }
 
