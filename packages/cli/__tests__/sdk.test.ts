@@ -2,7 +2,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
+  CURRENT_STATE_VERSION,
   ConfigStore,
+  type CncState,
   createContext,
   setContextCredentials,
 } from '../src/config';
@@ -202,5 +204,36 @@ describe('GraphQL operation analysis and execution', () => {
       operationName: 'Check',
     });
     fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  it('resolves endpoint and credentials from one state snapshot', async () => {
+    const state = (endpoint: string, token: string): CncState => ({
+      stateVersion: CURRENT_STATE_VERSION,
+      settings: {},
+      contexts: {
+        production: {
+          name: 'production',
+          endpoint,
+          createdAt: NOW.toISOString(),
+          updatedAt: NOW.toISOString(),
+        },
+      },
+      credentials: { tokens: { production: { token } } },
+    });
+    const read = jest
+      .fn()
+      .mockReturnValueOnce(state('https://old.example/graphql', 'old-token'))
+      .mockReturnValue(state('https://new.example/graphql', 'new-token'));
+
+    await expect(
+      getExecutionContext({
+        contextName: 'production',
+        store: { read } as unknown as ConfigStore,
+      })
+    ).resolves.toMatchObject({
+      context: { endpoint: 'https://old.example/graphql' },
+      token: 'old-token',
+    });
+    expect(read).toHaveBeenCalledTimes(1);
   });
 });

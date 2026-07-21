@@ -4,7 +4,7 @@ import {
   getDefaultConfigStore,
   validateContextName,
 } from './config-manager';
-import type { ContextConfig } from './types';
+import type { CncState, ContextConfig } from './types';
 
 export type EnvironmentMap = Readonly<Record<string, string | undefined>>;
 
@@ -20,14 +20,13 @@ export interface ResolvedContext {
   source: 'argument' | 'environment' | 'current';
 }
 
-/**
- * Resolve an explicit argument first, then CNC_CONTEXT, then (for human
- * compatibility only) the globally selected context.
- */
-export function resolveContext(
-  options: ResolveContextOptions = {}
+type ResolveContextFromStateOptions = Omit<ResolveContextOptions, 'store'>;
+
+/** Resolve a context from one immutable state snapshot. */
+export function resolveContextFromState(
+  state: CncState,
+  options: ResolveContextFromStateOptions = {}
 ): ResolvedContext {
-  const store = options.store ?? getDefaultConfigStore();
   const explicit = options.contextName?.trim();
   const fromEnvironment = options.env?.CNC_CONTEXT?.trim();
   const selected = explicit || fromEnvironment;
@@ -36,7 +35,6 @@ export function resolveContext(
     : fromEnvironment
       ? 'environment'
       : 'current';
-  const state = store.read();
 
   if (!selected) {
     if (
@@ -68,6 +66,17 @@ export function resolveContext(
     );
   }
   return { context, source };
+}
+
+/**
+ * Resolve an explicit argument first, then CNC_CONTEXT, then (for human
+ * compatibility only) the globally selected context.
+ */
+export function resolveContext(
+  options: ResolveContextOptions = {}
+): ResolvedContext {
+  const store = options.store ?? getDefaultConfigStore();
+  return resolveContextFromState(store.read(), options);
 }
 
 // Preserve a named type export for callers that only import this module.

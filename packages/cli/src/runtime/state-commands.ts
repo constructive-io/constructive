@@ -13,13 +13,15 @@ import {
   deleteContext,
   getContextCredentials,
   getCurrentContext,
-  listContexts,
+  listContextsFromState,
   removeContextCredentials,
   resolveContext,
+  resolveContextFromState,
   resolveToken,
   setContextCredentials,
   setCurrentContext,
   type ConfigStore,
+  type CncState,
   type ContextConfig,
   type ContextCredentials,
 } from '../config';
@@ -146,15 +148,22 @@ const summarizeContext = (
 const resolveTargetContext = (
   contextName: string | undefined,
   context: OperationContext,
-  store: ConfigStore
+  store: ConfigStore,
+  state?: CncState
 ) =>
   runStateOperation(() =>
-    resolveContext({
-      contextName,
-      env: context.env,
-      allowCurrentContext: context.mode === 'human',
-      store,
-    })
+    state
+      ? resolveContextFromState(state, {
+          contextName,
+          env: context.env,
+          allowCurrentContext: context.mode === 'human',
+        })
+      : resolveContext({
+          contextName,
+          env: context.env,
+          allowCurrentContext: context.mode === 'human',
+          store,
+        })
   ).context;
 
 const ContextNameInputSchema = Type.Object(
@@ -244,14 +253,13 @@ export function createContextCommands(dependencies: StateCommandDependencies) {
       const state = runStateOperation(() => store.read());
       return {
         data: {
-          contexts: runStateOperation(() => listContexts(store)).map(
-            (configured) =>
-              summarizeContext(
-                configured,
-                state.settings.currentContext,
-                state.credentials.tokens[configured.name] ?? null,
-                context.now()
-              )
+          contexts: listContextsFromState(state).map((configured) =>
+            summarizeContext(
+              configured,
+              state.settings.currentContext,
+              state.credentials.tokens[configured.name] ?? null,
+              context.now()
+            )
           ),
         },
       };
@@ -579,9 +587,11 @@ export function createAuthCommands(dependencies: StateCommandDependencies) {
       const state = runStateOperation(() => store.read());
       let selected: ContextConfig[];
       if (input.contextName || context.env.CNC_CONTEXT) {
-        selected = [resolveTargetContext(input.contextName, context, store)];
+        selected = [
+          resolveTargetContext(input.contextName, context, store, state),
+        ];
       } else if (context.mode === 'human') {
-        selected = runStateOperation(() => listContexts(store));
+        selected = listContextsFromState(state);
       } else {
         throw new CliError({
           code: 'CONTEXT_REQUIRED',
