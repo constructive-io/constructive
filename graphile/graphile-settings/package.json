@@ -41,7 +41,7 @@
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.2",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@pgsql/quotes": "^17.1.0",
+    "@pgsql/quotes": "^18.1.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "grafast": "1.0.2",
