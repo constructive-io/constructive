@@ -184,4 +184,51 @@ describe('command registry and argument bindings', () => {
       expect.objectContaining({ code: 'CLI_EVENT_SCHEMA_INVALID' })
     );
   });
+
+  it('enforces metadata and shell-bound requirements at registration', () => {
+    const command = createExampleCommand();
+    const malformedBinding = {
+      ...command,
+      bindings: [
+        {
+          ...command.bindings[0],
+          description: 42,
+        },
+        ...command.bindings.slice(1),
+      ],
+    } as unknown as typeof command;
+    expect(() => createCommandRegistry([malformedBinding])).toThrow(
+      expect.objectContaining({ code: 'CLI_BINDING_SCHEMA_INVALID' })
+    );
+
+    const missingRequiredShellInput = defineCommand({
+      id: 'adapter.run',
+      path: ['adapter', 'run'],
+      summary: 'Run with adapter input.',
+      input: Type.Object(
+        {
+          name: Type.String({ minLength: 1 }),
+          adapterValue: Type.Optional(Type.String()),
+        },
+        { additionalProperties: false }
+      ),
+      output: Type.Null(),
+      bindings: [
+        {
+          property: 'name',
+          sources: [{ kind: 'option', name: 'name' }],
+        },
+        { property: 'adapterValue', sources: [] },
+      ],
+      examples: [{ argv: ['adapter', 'run'] }],
+      lifecycle: 'finite',
+      effect: 'read',
+      async execute() {
+        return { data: null };
+      },
+    });
+    expect(() => createCommandRegistry([missingRequiredShellInput])).toThrow(
+      expect.objectContaining({ code: 'CLI_COMMAND_EXAMPLE_INVALID' })
+    );
+  });
 });

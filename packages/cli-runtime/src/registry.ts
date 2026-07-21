@@ -94,6 +94,42 @@ export type CommandSchemaDocument = Static<typeof CommandSchemaDocumentSchema>;
 const commandSchemaDocumentValidator = compileSchema<CommandSchemaDocument>(
   CommandSchemaDocumentSchema
 );
+const inputBindingMetadataValidator = compileSchema(InputBindingSchema);
+const commandExampleMetadataValidator = compileSchema(CommandExampleSchema);
+const safetyCapabilitiesMetadataValidator = compileSchema(
+  SafetyCapabilitiesSchema
+);
+
+function validateMetadata(command: CommandDefinition): void {
+  for (const [index, binding] of command.bindings.entries()) {
+    if (!inputBindingMetadataValidator.validate(binding)) {
+      throw new ContractError(
+        'CLI_BINDING_SCHEMA_INVALID',
+        `Binding ${index + 1} in "${command.id}" violates the command metadata schema.`,
+        { issues: inputBindingMetadataValidator.issues() }
+      );
+    }
+  }
+  for (const [index, example] of command.examples.entries()) {
+    if (!commandExampleMetadataValidator.validate(example)) {
+      throw new ContractError(
+        'CLI_COMMAND_EXAMPLE_INVALID',
+        `Example ${index + 1} for "${command.id}" violates the command metadata schema.`,
+        { issues: commandExampleMetadataValidator.issues() }
+      );
+    }
+  }
+  if (
+    command.capabilities !== undefined &&
+    !safetyCapabilitiesMetadataValidator.validate(command.capabilities)
+  ) {
+    throw new ContractError(
+      'CLI_COMMAND_CAPABILITY_INVALID',
+      `Capabilities for "${command.id}" violate the command metadata schema.`,
+      { issues: safetyCapabilitiesMetadataValidator.issues() }
+    );
+  }
+}
 
 function snapshotCapabilities(
   capabilities: SafetyCapabilities | undefined
@@ -640,6 +676,22 @@ function validateBindings(command: CommandDefinition): void {
 }
 
 function validateExamples(command: CommandDefinition): void {
+  const sourceLessProperties = new Set(
+    command.bindings
+      .filter((binding) => binding.sources.length === 0)
+      .map((binding) => binding.property)
+  );
+  const exampleInputSchema = cloneSchema(command.input) as TSchema & {
+    required?: unknown;
+  };
+  if (Array.isArray(exampleInputSchema.required)) {
+    exampleInputSchema.required = exampleInputSchema.required.filter(
+      (property): property is string =>
+        typeof property === 'string' && !sourceLessProperties.has(property)
+    );
+  }
+  const exampleInputValidator = compileSchema(exampleInputSchema);
+
   for (const [index, example] of command.examples.entries()) {
     if (
       example === null ||
@@ -681,14 +733,19 @@ function validateExamples(command: CommandDefinition): void {
           `The example does not resolve to "${command.path.join(' ')}" after global options are parsed.`
         );
       }
-      bindArguments(command, {
+      const bound = bindArguments(command, {
         argv: parsed.argv.slice(command.path.length),
         env: {},
         strict: true,
-        validate: !command.bindings.some(
-          (binding) => binding.sources.length === 0
-        ),
+        validate: false,
       });
+      if (!exampleInputValidator.validate(bound.input)) {
+        throw new InvocationError(
+          'CLI_INPUT_INVALID',
+          'The example does not satisfy the command input schema.',
+          { details: { issues: exampleInputValidator.issues() } }
+        );
+      }
     } catch (error) {
       throw new ContractError(
         'CLI_COMMAND_EXAMPLE_INVALID',
@@ -708,6 +765,7 @@ export class CommandRegistry {
     for (const sourceCommand of commands) {
       const command = snapshotCommand(sourceCommand);
       validateIdentifier(command);
+      validateMetadata(command);
       validateBindings(command);
       validateEventSchema(command);
       const pathKey = command.path.join(' ');
