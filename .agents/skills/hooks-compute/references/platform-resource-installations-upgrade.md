@@ -7,7 +7,7 @@ React Query mutation hook for platformResourceInstallationsUpgrade
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformResourceInstallationsUpgradeMutation(); mutate({ input: { pInstallationId: '<UUID>', pParams: '<JSON>' } });
+const { mutate } = usePlatformResourceInstallationsUpgradeMutation(); mutate({ input: { newParams: '<JSON>', targetInstallationId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformResourceInstallationsUpgradeMutation(); mutate({ i
 
 ```typescript
 const { mutate, isLoading } = usePlatformResourceInstallationsUpgradeMutation();
-mutate({ input: { pInstallationId: '<UUID>', pParams: '<JSON>' } });
+mutate({ input: { newParams: '<JSON>', targetInstallationId: '<UUID>' } });
 ```

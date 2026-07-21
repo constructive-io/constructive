@@ -486,6 +486,60 @@ export interface Domain {
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname | null;
 }
+/** Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. */
+export interface DomainEvent {
+  /** User who triggered this event (NULL for system/automated transitions) */
+  actorId?: string | null;
+  /** Event timestamp */
+  createdAt?: string | null;
+  /** The verification challenge this event relates to, when applicable */
+  domainVerificationId?: string | null;
+  /** Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked */
+  eventType?: string | null;
+  /** Unique event identifier */
+  id: string;
+  /** The managed_domain this event belongs to */
+  managedDomainId?: string | null;
+  /** Human-readable description of the event */
+  message?: string | null;
+  /** Structured context (challenge record, cert-manager detail, error details, ...) */
+  metadata?: Record<string, unknown> | null;
+  /** Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS */
+  ownerId?: string | null;
+}
+/** One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. */
+export interface DomainVerification {
+  /** Number of times domain:verify has polled for this challenge (drives backoff / max_attempts) */
+  attempts?: number | null;
+  /** When this challenge was minted (domain:issue_challenge) */
+  createdAt?: string | null;
+  /** Last verification error (mismatch, NXDOMAIN, timeout, ...) */
+  error?: string | null;
+  /** When this challenge expires and must be reissued */
+  expiresAt?: string | null;
+  /** Unique identifier for this verification challenge */
+  id: string;
+  /** When domain:verify last polled DNS/HTTP for this challenge */
+  lastCheckedAt?: string | null;
+  /** The managed_domain this challenge proves ownership of */
+  managedDomainId?: string | null;
+  /** Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge) */
+  method?: string | null;
+  /** Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity. */
+  ownerId?: string | null;
+  /** DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01 */
+  recordName?: string | null;
+  /** DNS record type to create: TXT | CNAME | A; NULL for http_01 */
+  recordType?: string | null;
+  /** The public challenge token the user must publish (ends up in a public DNS record). NOT a secret. */
+  recordValue?: string | null;
+  /** Challenge lifecycle: pending | checking | verified | failed | expired */
+  status?: string | null;
+  /** When this row was last updated */
+  updatedAt?: string | null;
+  /** When status last became verified */
+  verifiedAt?: string | null;
+}
 export interface EmbeddingChunk {
   chunkOverlap?: number | null;
   chunkSize?: number | null;
@@ -627,8 +681,12 @@ export interface Index {
 }
 /** One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) */
 export interface ManagedDomain {
+  /** Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy. */
+  allowPublicUsage?: boolean | null;
   /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
   annotations?: Record<string, unknown> | null;
+  /** cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error */
+  certStatus?: string | null;
   /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
   databaseId?: string | null;
   /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
@@ -639,9 +697,9 @@ export interface ManagedDomain {
   isWildcard?: boolean | null;
   /** When tls_status last became active */
   tlsReadyAt?: string | null;
-  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  /** TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed */
   tlsStatus?: string | null;
-  /** Domain ownership verification state: pending | verified | failed */
+  /** Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired */
   verificationStatus?: string | null;
   /** When verification_status last became verified */
   verifiedAt?: string | null;
@@ -1128,6 +1186,14 @@ export interface DomainRelations {
   site?: Site | null;
   httpRoutes?: ConnectionResult<HttpRoute>;
 }
+export interface DomainEventRelations {
+  domainVerification?: DomainVerification | null;
+  managedDomain?: ManagedDomain | null;
+}
+export interface DomainVerificationRelations {
+  managedDomain?: ManagedDomain | null;
+  domainEvents?: ConnectionResult<DomainEvent>;
+}
 export interface EmbeddingChunkRelations {
   chunksTable?: Table | null;
   database?: Database | null;
@@ -1167,6 +1233,8 @@ export interface IndexRelations {
 }
 export interface ManagedDomainRelations {
   database?: Database | null;
+  domainEvents?: ConnectionResult<DomainEvent>;
+  domainVerifications?: ConnectionResult<DomainVerification>;
 }
 export interface NodeTypeRegistryRelations {}
 export interface PartitionRelations {
@@ -1329,6 +1397,8 @@ export type DatabaseSettingWithRelations = DatabaseSetting & DatabaseSettingRela
 export type DatabaseTransferWithRelations = DatabaseTransfer & DatabaseTransferRelations;
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
 export type DomainWithRelations = Domain & DomainRelations;
+export type DomainEventWithRelations = DomainEvent & DomainEventRelations;
+export type DomainVerificationWithRelations = DomainVerification & DomainVerificationRelations;
 export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type EnumWithRelations = Enum & EnumRelations;
 export type FieldWithRelations = Field & FieldRelations;
@@ -1873,6 +1943,49 @@ export type DomainSelect = {
     orderBy?: HttpRouteOrderBy[];
   };
 };
+export type DomainEventSelect = {
+  actorId?: boolean;
+  createdAt?: boolean;
+  domainVerificationId?: boolean;
+  eventType?: boolean;
+  id?: boolean;
+  managedDomainId?: boolean;
+  message?: boolean;
+  metadata?: boolean;
+  ownerId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  managedDomain?: {
+    select: ManagedDomainSelect;
+  };
+};
+export type DomainVerificationSelect = {
+  attempts?: boolean;
+  createdAt?: boolean;
+  error?: boolean;
+  expiresAt?: boolean;
+  id?: boolean;
+  lastCheckedAt?: boolean;
+  managedDomainId?: boolean;
+  method?: boolean;
+  ownerId?: boolean;
+  recordName?: boolean;
+  recordType?: boolean;
+  recordValue?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  verifiedAt?: boolean;
+  managedDomain?: {
+    select: ManagedDomainSelect;
+  };
+  domainEvents?: {
+    select: DomainEventSelect;
+    first?: number;
+    filter?: DomainEventFilter;
+    orderBy?: DomainEventOrderBy[];
+  };
+};
 export type EmbeddingChunkSelect = {
   chunkOverlap?: boolean;
   chunkSize?: boolean;
@@ -2073,7 +2186,9 @@ export type IndexSelect = {
   };
 };
 export type ManagedDomainSelect = {
+  allowPublicUsage?: boolean;
   annotations?: boolean;
+  certStatus?: boolean;
   databaseId?: boolean;
   domain?: boolean;
   id?: boolean;
@@ -2084,6 +2199,18 @@ export type ManagedDomainSelect = {
   verifiedAt?: boolean;
   database?: {
     select: DatabaseSelect;
+  };
+  domainEvents?: {
+    select: DomainEventSelect;
+    first?: number;
+    filter?: DomainEventFilter;
+    orderBy?: DomainEventOrderBy[];
+  };
+  domainVerifications?: {
+    select: DomainVerificationSelect;
+    first?: number;
+    filter?: DomainVerificationFilter;
+    orderBy?: DomainVerificationOrderBy[];
   };
 };
 export type NodeTypeRegistrySelect = {
@@ -3405,6 +3532,82 @@ export interface DomainFilter {
   /** Filter by the object’s `subdomain` field. */
   subdomain?: ConstructiveInternalTypeHostnameFilter;
 }
+export interface DomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: DomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: DomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainEventFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+}
+export interface DomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: DomainVerificationToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainVerificationFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
 export interface EmbeddingChunkFilter {
   /** Checks for all expressions in this list. */
   and?: EmbeddingChunkFilter[];
@@ -3750,16 +3953,28 @@ export interface IndexFilter {
   whereClause?: JSONFilter;
 }
 export interface ManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: ManagedDomainFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: ManagedDomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: ManagedDomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isWildcard` field. */
@@ -5104,6 +5319,62 @@ export type DomainOrderBy =
   | 'SITE_ID_DESC'
   | 'SUBDOMAIN_ASC'
   | 'SUBDOMAIN_DESC';
+export type DomainEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DOMAIN_VERIFICATION_ID_ASC'
+  | 'DOMAIN_VERIFICATION_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MANAGED_DOMAIN_ID_ASC'
+  | 'MANAGED_DOMAIN_ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type DomainVerificationOrderBy =
+  | 'ATTEMPTS_ASC'
+  | 'ATTEMPTS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_CHECKED_AT_ASC'
+  | 'LAST_CHECKED_AT_DESC'
+  | 'MANAGED_DOMAIN_ID_ASC'
+  | 'MANAGED_DOMAIN_ID_DESC'
+  | 'METHOD_ASC'
+  | 'METHOD_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECORD_NAME_ASC'
+  | 'RECORD_NAME_DESC'
+  | 'RECORD_TYPE_ASC'
+  | 'RECORD_TYPE_DESC'
+  | 'RECORD_VALUE_ASC'
+  | 'RECORD_VALUE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VERIFIED_AT_ASC'
+  | 'VERIFIED_AT_DESC';
 export type EmbeddingChunkOrderBy =
   | 'CHUNKING_TASK_NAME_ASC'
   | 'CHUNKING_TASK_NAME_DESC'
@@ -5365,8 +5636,12 @@ export type IndexOrderBy =
   | 'WHERE_CLAUSE_ASC'
   | 'WHERE_CLAUSE_DESC';
 export type ManagedDomainOrderBy =
+  | 'ALLOW_PUBLIC_USAGE_ASC'
+  | 'ALLOW_PUBLIC_USAGE_DESC'
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CERT_STATUS_ASC'
+  | 'CERT_STATUS_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DOMAIN_ASC'
@@ -6434,6 +6709,76 @@ export interface DeleteDomainInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateDomainEventInput {
+  clientMutationId?: string;
+  domainEvent: {
+    actorId?: string;
+    domainVerificationId?: string;
+    eventType: string;
+    managedDomainId: string;
+    message?: string;
+    metadata?: Record<string, unknown>;
+    ownerId: string;
+  };
+}
+export interface DomainEventPatch {
+  actorId?: string | null;
+  domainVerificationId?: string | null;
+  eventType?: string | null;
+  managedDomainId?: string | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+  ownerId?: string | null;
+}
+export interface UpdateDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+  domainEventPatch: DomainEventPatch;
+}
+export interface DeleteDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDomainVerificationInput {
+  clientMutationId?: string;
+  domainVerification: {
+    attempts?: number;
+    error?: string;
+    expiresAt?: string;
+    lastCheckedAt?: string;
+    managedDomainId: string;
+    method?: string;
+    ownerId: string;
+    recordName?: string;
+    recordType?: string;
+    recordValue?: string;
+    status?: string;
+    verifiedAt?: string;
+  };
+}
+export interface DomainVerificationPatch {
+  attempts?: number | null;
+  error?: string | null;
+  expiresAt?: string | null;
+  lastCheckedAt?: string | null;
+  managedDomainId?: string | null;
+  method?: string | null;
+  ownerId?: string | null;
+  recordName?: string | null;
+  recordType?: string | null;
+  recordValue?: string | null;
+  status?: string | null;
+  verifiedAt?: string | null;
+}
+export interface UpdateDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+  domainVerificationPatch: DomainVerificationPatch;
+}
+export interface DeleteDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateEmbeddingChunkInput {
   clientMutationId?: string;
   embeddingChunk: {
@@ -6753,7 +7098,9 @@ export interface DeleteIndexInput {
 export interface CreateManagedDomainInput {
   clientMutationId?: string;
   managedDomain: {
+    allowPublicUsage?: boolean;
     annotations?: Record<string, unknown>;
+    certStatus?: string;
     databaseId: string;
     domain: ConstructiveInternalTypeHostname;
     isWildcard?: boolean;
@@ -6764,7 +7111,9 @@ export interface CreateManagedDomainInput {
   };
 }
 export interface ManagedDomainPatch {
+  allowPublicUsage?: boolean | null;
   annotations?: Record<string, unknown> | null;
+  certStatus?: string | null;
   databaseId?: string | null;
   domain?: ConstructiveInternalTypeHostname | null;
   isWildcard?: boolean | null;
@@ -7624,9 +7973,16 @@ export const connectionFieldsMap = {
   Domain: {
     httpRoutes: 'HttpRoute',
   },
+  DomainVerification: {
+    domainEvents: 'DomainEvent',
+  },
   Field: {
     spatialRelations: 'SpatialRelation',
     spatialRelationsByRefFieldId: 'SpatialRelation',
+  },
+  ManagedDomain: {
+    domainEvents: 'DomainEvent',
+    domainVerifications: 'DomainVerification',
   },
   Schema: {
     apiSchemas: 'ApiSchema',
@@ -8314,6 +8670,15 @@ export interface DomainToManyHttpRouteFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: HttpRouteFilter;
 }
+/** A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainVerificationToManyDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainEventFilter;
+}
 /** A filter to be used against many `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldToManySpatialRelationFilter {
   /** Filters to entities where every related entity matches. */
@@ -8322,6 +8687,24 @@ export interface FieldToManySpatialRelationFilter {
   none?: SpatialRelationFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: SpatialRelationFilter;
+}
+/** A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainToManyDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainEventFilter;
+}
+/** A filter to be used against many `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainToManyDomainVerificationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainVerificationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainVerificationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainVerificationFilter;
 }
 /** A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’ */
 export interface ApiExposureLevelFilter {
@@ -8923,6 +9306,60 @@ export interface DomainInput {
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname;
 }
+/** An input for mutations affecting `DomainEvent` */
+export interface DomainEventInput {
+  /** User who triggered this event (NULL for system/automated transitions) */
+  actorId?: string;
+  /** Event timestamp */
+  createdAt?: string;
+  /** The verification challenge this event relates to, when applicable */
+  domainVerificationId?: string;
+  /** Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** The managed_domain this event belongs to */
+  managedDomainId: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (challenge record, cert-manager detail, error details, ...) */
+  metadata?: Record<string, unknown>;
+  /** Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS */
+  ownerId: string;
+}
+/** An input for mutations affecting `DomainVerification` */
+export interface DomainVerificationInput {
+  /** Number of times domain:verify has polled for this challenge (drives backoff / max_attempts) */
+  attempts?: number;
+  /** When this challenge was minted (domain:issue_challenge) */
+  createdAt?: string;
+  /** Last verification error (mismatch, NXDOMAIN, timeout, ...) */
+  error?: string;
+  /** When this challenge expires and must be reissued */
+  expiresAt?: string;
+  /** Unique identifier for this verification challenge */
+  id?: string;
+  /** When domain:verify last polled DNS/HTTP for this challenge */
+  lastCheckedAt?: string;
+  /** The managed_domain this challenge proves ownership of */
+  managedDomainId: string;
+  /** Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge) */
+  method?: string;
+  /** Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity. */
+  ownerId: string;
+  /** DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01 */
+  recordName?: string;
+  /** DNS record type to create: TXT | CNAME | A; NULL for http_01 */
+  recordType?: string;
+  /** The public challenge token the user must publish (ends up in a public DNS record). NOT a secret. */
+  recordValue?: string;
+  /** Challenge lifecycle: pending | checking | verified | failed | expired */
+  status?: string;
+  /** When this row was last updated */
+  updatedAt?: string;
+  /** When status last became verified */
+  verifiedAt?: string;
+}
 /** An input for mutations affecting `EmbeddingChunk` */
 export interface EmbeddingChunkInput {
   chunkOverlap?: number;
@@ -9071,8 +9508,12 @@ export interface IndexInput {
 }
 /** An input for mutations affecting `ManagedDomain` */
 export interface ManagedDomainInput {
+  /** Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy. */
+  allowPublicUsage?: boolean;
   /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
   annotations?: Record<string, unknown>;
+  /** cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error */
+  certStatus?: string;
   /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
   databaseId: string;
   /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
@@ -9083,9 +9524,9 @@ export interface ManagedDomainInput {
   isWildcard?: boolean;
   /** When tls_status last became active */
   tlsReadyAt?: string;
-  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  /** TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed */
   tlsStatus?: string;
-  /** Domain ownership verification state: pending | verified | failed */
+  /** Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired */
   verificationStatus?: string;
   /** When verification_status last became verified */
   verifiedAt?: string;
@@ -10146,16 +10587,28 @@ export interface IndexFilter {
 }
 /** A filter to be used against `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
 export interface ManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: ManagedDomainFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: ManagedDomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: ManagedDomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isWildcard` field. */
@@ -10978,6 +11431,84 @@ export interface HttpRouteFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+}
+/** A filter to be used against `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: DomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: DomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainEventFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+}
+/** A filter to be used against `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: DomainVerificationToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainVerificationFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
 }
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
@@ -12426,6 +12957,96 @@ export type DeleteDomainPayloadSelect = {
     select: DomainEdgeSelect;
   };
 };
+export interface CreateDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was created by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type CreateDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface UpdateDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was updated by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type UpdateDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface DeleteDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was deleted by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type DeleteDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface CreateDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was created by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type CreateDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
+export interface UpdateDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was updated by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type UpdateDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
+export interface DeleteDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was deleted by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type DeleteDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
 export interface CreateEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was created by this mutation. */
@@ -13868,6 +14489,8 @@ export type DeleteWebauthnSettingPayloadSelect = {
 };
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
+  /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
+  async: boolean;
   /** Error message from the most recent failed bootstrap attempt */
   bootstrapError?: string | null;
   /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
@@ -13901,6 +14524,7 @@ export interface DatabaseProvisionModule {
   updatedAt: string;
 }
 export type DatabaseProvisionModuleSelect = {
+  async?: boolean;
   bootstrapError?: boolean;
   bootstrapStatus?: boolean;
   bootstrapUser?: boolean;
@@ -14074,6 +14698,30 @@ export type DomainEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DomainSelect;
+  };
+};
+/** A `DomainEvent` edge in the connection. */
+export interface DomainEventEdge {
+  cursor?: string | null;
+  /** The `DomainEvent` at the end of the edge. */
+  node?: DomainEvent | null;
+}
+export type DomainEventEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainEventSelect;
+  };
+};
+/** A `DomainVerification` edge in the connection. */
+export interface DomainVerificationEdge {
+  cursor?: string | null;
+  /** The `DomainVerification` at the end of the edge. */
+  node?: DomainVerification | null;
+}
+export type DomainVerificationEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainVerificationSelect;
   };
 };
 /** A `EmbeddingChunk` edge in the connection. */
