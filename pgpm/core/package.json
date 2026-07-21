@@ -41,7 +41,7 @@
     "sqitch"
   ],
   "devDependencies": {
-    "@pgsql/types": "^17.6.2",
+    "@pgsql/types": "^18.0.0",
     "@types/pg": "^8.20.0",
     "copyfiles": "^2.4.1",
     "inquirerer": "^4.9.1",
@@ -60,8 +60,8 @@
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.18.5",
-    "pgsql-parser": "^17.9.17",
+    "pgsql-deparser": "^18.1.1",
+    "pgsql-parser": "^18.1.1",
     "yanse": "^0.2.1"
   }
 }

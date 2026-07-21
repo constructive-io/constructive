@@ -382,7 +382,7 @@ export async function parseAndValidateSqlExpression(
     }
 
     const stmt = parseResult.stmts[0]?.stmt;
-    if (!stmt?.SelectStmt) {
+    if (!stmt || !('SelectStmt' in stmt) || !stmt.SelectStmt) {
       return { valid: false, error: 'Unexpected parse result structure' };
     }
 
@@ -394,7 +394,7 @@ export async function parseAndValidateSqlExpression(
       'lockingClause', 'distinctClause'
     ];
     for (const dangerousKey of DANGEROUS_SELECT_KEYS) {
-      if (selectStmt[dangerousKey] !== undefined) {
+      if ((selectStmt as Record<string, unknown>)[dangerousKey] !== undefined) {
         return {
           valid: false,
           error: `Expression contains disallowed SQL clause: ${dangerousKey}`
@@ -407,7 +407,8 @@ export async function parseAndValidateSqlExpression(
       return { valid: false, error: 'Expected single expression' };
     }
 
-    const resTarget = targetList[0]?.ResTarget;
+    const targetNode = targetList[0];
+    const resTarget = targetNode && 'ResTarget' in targetNode ? targetNode.ResTarget : undefined;
     if (!resTarget || !resTarget.val) {
       return {
         valid: false,

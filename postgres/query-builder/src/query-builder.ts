@@ -855,15 +855,16 @@ export class QueryBuilder {
   // Internal: RETURNING list (no aliases to get clean output)
   // -------------------------------------------------------------------------
 
-  private _buildReturningList(): unknown[] | undefined {
+  private _buildReturningClause(): { exprs: unknown[] } | undefined {
     if (!this._returning) return undefined;
     const alloc = this._alloc;
-    return this._returning.map((item) => {
+    const exprs = this._returning.map((item) => {
       if (typeof item === 'string') {
         return resTargetVal(colRef(item));
       }
       return resTargetVal(item.expr(alloc), item.as);
     });
+    return { exprs };
   }
 
   // -------------------------------------------------------------------------
@@ -1039,7 +1040,7 @@ export class QueryBuilder {
       relation: unwrappedRangeVar(this._table!, this._schema) as any,
       cols: cols as any[],
       selectStmt: selectStmt as any,
-      returningList: this._buildReturningList() as any[],
+      returningClause: this._buildReturningClause() as any,
       onConflictClause: this._buildOnConflictClause() as any,
       override: 'OVERRIDING_NOT_SET' as any,
     });
@@ -1119,7 +1120,7 @@ export class QueryBuilder {
       relation: unwrappedRangeVar(this._table!, this._schema) as any,
       targetList: targetList as any[],
       whereClause: whereClause as any,
-      returningList: this._buildReturningList() as any[],
+      returningClause: this._buildReturningClause() as any,
     });
 
     if (withClause) {
@@ -1143,7 +1144,7 @@ export class QueryBuilder {
     const deleteNode = nodes.deleteStmt({
       relation: unwrappedRangeVar(this._table!, this._schema) as any,
       whereClause: whereClause as any,
-      returningList: this._buildReturningList() as any[],
+      returningClause: this._buildReturningClause() as any,
     });
 
     if (withClause) {

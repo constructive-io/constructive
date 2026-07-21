@@ -43,13 +43,13 @@
   "dependencies": {
     "@inquirerer/utils": "^3.3.9",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/traverse": "^17.2.6",
-    "@pgsql/types": "^17.6.2",
+    "@pgsql/traverse": "^18.1.0",
+    "@pgsql/types": "^18.0.0",
     "inquirerer": "^4.9.1",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.18.5",
-    "pgsql-parser": "^17.9.17",
+    "pgsql-deparser": "^18.1.1",
+    "pgsql-parser": "^18.1.1",
     "yanse": "^0.2.1"
   },
   "devDependencies": {
