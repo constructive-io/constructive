@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/constructive-io/constructive/compare/graphile-realtime-subscriptions@0.10.0...graphile-realtime-subscriptions@1.0.0) (2026-07-21)
+
+### Features
+
+- upgrade parser stack to PG18 (pgsql-parser 18.1.1, libpg-query 18.1.2) ([5cccf91](https://github.com/constructive-io/constructive/commit/5cccf9136ec696ef356aa42c0b9a3e06caa101eb))
+
 # [0.10.0](https://github.com/constructive-io/constructive/compare/graphile-realtime-subscriptions@0.9.1...graphile-realtime-subscriptions@0.10.0) (2026-07-12)
 
 **Note:** Version bump only for package graphile-realtime-subscriptions

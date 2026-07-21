@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://github.com/constructive-io/constructive/compare/pgpm@4.41.0...pgpm@5.0.0) (2026-07-21)
+
+### Features
+
+- upgrade parser stack to PG18 (pgsql-parser 18.1.1, libpg-query 18.1.2) ([5cccf91](https://github.com/constructive-io/constructive/commit/5cccf9136ec696ef356aa42c0b9a3e06caa101eb))
+
 # [4.41.0](https://github.com/constructive-io/constructive/compare/pgpm@4.40.6...pgpm@4.41.0) (2026-07-21)
 
 ### Features
