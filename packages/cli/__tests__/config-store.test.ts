@@ -227,16 +227,38 @@ describe('ConfigStore', () => {
     ).toThrow(expect.objectContaining({ code: 'CONFIG_LOCK_TIMEOUT' }));
   });
 
-  it('recovers a stale lock but refuses a symlinked config directory', () => {
+  it('reclaims only stale locks whose owning process is dead', () => {
     const staleStore = new ConfigStore({
       configDir: root,
       lockTimeoutMs: 50,
       staleLockMs: 10,
     });
     const lock = path.join(root, 'state.lock');
-    fs.writeFileSync(lock, 'stale');
-    const old = new Date(Date.now() - 1_000);
-    fs.utimesSync(lock, old, old);
+    const writeOwner = (pid: number, token: string) => {
+      fs.mkdirSync(lock);
+      fs.writeFileSync(
+        path.join(lock, 'owner.json'),
+        JSON.stringify({
+          token,
+          pid,
+          hostname: os.hostname(),
+          createdAt: Date.now() - 1_000,
+        })
+      );
+    };
+
+    writeOwner(process.pid, 'live-owner');
+    expect(() =>
+      createContext(
+        'blocked',
+        'https://api.example.com/graphql',
+        staleStore,
+        NOW
+      )
+    ).toThrow(expect.objectContaining({ code: 'CONFIG_LOCK_TIMEOUT' }));
+    fs.rmSync(lock, { recursive: true });
+
+    writeOwner(2_147_483_647, 'dead-owner');
     createContext(
       'recovered',
       'https://api.example.com/graphql',
@@ -244,20 +266,6 @@ describe('ConfigStore', () => {
       NOW
     );
     expect(staleStore.read().contexts.recovered).toBeDefined();
-
-    const target = fs.mkdtempSync(
-      path.join(REAL_TMP_DIR, 'cnc-config-target-')
-    );
-    const link = `${target}-link`;
-    fs.symlinkSync(target, link, 'dir');
-    try {
-      expect(() => new ConfigStore({ configDir: link }).read()).toThrow(
-        expect.objectContaining({ code: 'CONFIG_SYMLINK_REJECTED' })
-      );
-    } finally {
-      fs.unlinkSync(link);
-      fs.rmSync(target, { recursive: true, force: true });
-    }
   });
 
   it('refuses a symlink in an existing config directory ancestor', () => {
@@ -270,6 +278,9 @@ describe('ConfigStore', () => {
     fs.symlinkSync(target, linkedParent, 'dir');
 
     try {
+      expect(() => new ConfigStore({ configDir: linkedParent }).read()).toThrow(
+        expect.objectContaining({ code: 'CONFIG_SYMLINK_REJECTED' })
+      );
       const nestedStore = new ConfigStore({
         configDir: path.join(linkedParent, 'nested', 'config'),
       });
