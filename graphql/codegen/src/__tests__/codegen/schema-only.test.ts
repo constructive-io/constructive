@@ -141,13 +141,22 @@ describe('generate() with schema.enabled', () => {
 
     const nativeFs = require('node:fs') as typeof fs;
     const originalRename = nativeFs.renameSync;
-    let renameCall = 0;
+    const target = path.join(fs.realpathSync(output), 'schema.graphql');
     const renameSpy = jest
       .spyOn(nativeFs, 'renameSync')
       .mockImplementation((from, to) => {
-        renameCall += 1;
-        if (renameCall === 2) throw new Error('injected commit failure');
-        if (renameCall === 3) throw new Error('injected restore failure');
+        const sourcePath = String(from);
+        if (
+          String(to) === target &&
+          sourcePath.includes('.codegen-transaction-')
+        ) {
+          if (sourcePath.includes(`${path.sep}staged${path.sep}`)) {
+            throw new Error('injected commit failure');
+          }
+          if (sourcePath.includes(`${path.sep}backup${path.sep}`)) {
+            throw new Error('injected restore failure');
+          }
+        }
         return originalRename(from, to);
       });
 

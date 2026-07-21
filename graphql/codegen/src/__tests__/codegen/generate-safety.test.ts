@@ -206,8 +206,61 @@ describe('generate() filesystem safety', () => {
     });
 
     expect(result.hasError).toBe(true);
+    expect(result.results[0].result).toMatchObject({
+      success: false,
+      message: expect.stringContaining('was not applied'),
+      filesWritten: [],
+    });
+    expect(result.results[0].result.message).not.toMatch(/generated|written/i);
     expect(fs.existsSync(firstOutput)).toBe(false);
     expect(fs.existsSync(secondOutput)).toBe(false);
+  });
+
+  it('does not report a target as applied when the coordinated write fails', async () => {
+    const output = path.join(tempDir, 'generated', 'only');
+    const nativeFs = require('node:fs') as typeof fs;
+    const originalRename = nativeFs.renameSync;
+    let failureInjected = false;
+    const renameSpy = jest
+      .spyOn(nativeFs, 'renameSync')
+      .mockImplementation((from, to) => {
+        if (
+          !failureInjected &&
+          String(from).includes('.codegen-transaction-') &&
+          String(from).includes(`${path.sep}staged${path.sep}`)
+        ) {
+          failureInjected = true;
+          throw new Error('injected coordinated write failure');
+        }
+        return originalRename(from, to);
+      });
+
+    let result: Awaited<ReturnType<typeof generateMulti>>;
+    try {
+      result = await generateMulti({
+        configs: {
+          only: {
+            schemaFile: EXAMPLE_SCHEMA,
+            output,
+            orm: true,
+            docs: false,
+          },
+        },
+        cwd: tempDir,
+        onProgress: () => undefined,
+      });
+    } finally {
+      renameSpy.mockRestore();
+    }
+
+    expect(result.hasError).toBe(true);
+    expect(result.results[0].result).toMatchObject({
+      success: false,
+      message: expect.stringContaining('was not applied'),
+      filesWritten: [],
+    });
+    expect(result.results[0].result.message).not.toMatch(/generated|written/i);
+    expect(fs.existsSync(path.join(output, 'index.ts'))).toBe(false);
   });
 
   it('preserves retained-transaction warnings on multi-target results', async () => {
