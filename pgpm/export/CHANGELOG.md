@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.33.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.32.7...@pgpmjs/export@0.33.0) (2026-07-21)
+
+### Features
+
+- **export:** excludeCategories filtering in GraphQL export mode ([89fcfbd](https://github.com/constructive-io/constructive/commit/89fcfbd7cf7d51366c0bf1da3ae7c1ffdcb4f373))
+- **export:** explicit excludeCategories filtering in exportMigrations ([1f967d5](https://github.com/constructive-io/constructive/commit/1f967d5653d96519de5c938819b49e0676e6a8d9))
+
 ## [0.32.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.32.6...@pgpmjs/export@0.32.7) (2026-07-21)
 
 **Note:** Version bump only for package @pgpmjs/export

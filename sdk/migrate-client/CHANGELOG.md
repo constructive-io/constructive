@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.23.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.22.7...@pgpmjs/migrate-client@0.23.0) (2026-07-21)
+
+### Features
+
+- **export:** excludeCategories filtering in GraphQL export mode ([89fcfbd](https://github.com/constructive-io/constructive/commit/89fcfbd7cf7d51366c0bf1da3ae7c1ffdcb4f373))
+
 ## [0.22.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.22.6...@pgpmjs/migrate-client@0.22.7) (2026-07-21)
 
 **Note:** Version bump only for package @pgpmjs/migrate-client
