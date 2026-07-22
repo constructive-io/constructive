@@ -12,6 +12,7 @@ export * from './apply';
 export * from './create';
 export * from './diff';
 export * from './io';
+export * from './reconcile';
 export * from './transpile';
 export * from './types';
 export * from './verify';
