@@ -93,6 +93,74 @@ export interface RebundleModuleOptions extends RebundleStrategy {
 }
 
 /**
+ * How cross-chunk dependencies are represented when chunks are emitted as
+ * separate modules in a workspace.
+ *
+ * - `change`: also record the fine-grained plan cross-reference (`dep:dep`) in
+ *   addition to the control `requires`.
+ * - `control-only`: carry the dependency solely via the control-file `requires`,
+ *   dropping the per-change plan reference. Extension install ordering deploys
+ *   all of the dependency before any of the dependent, which is strictly
+ *   stronger than the fine edge — the right mode for publishing chunks as
+ *   independent, versioned module forks.
+ */
+export type CrossChunkDepMode = 'change' | 'control-only';
+
+/**
+ * Options for materializing a rebundled workspace (one module per chunk).
+ */
+export interface RebundleWorkspaceOptions extends RebundleStrategy {
+  /** Directory to write the workspace into (packages land in `packages/<chunk>/`) */
+  outputDir: string;
+
+  /** Overwrite an existing, non-empty output directory (default: false) */
+  overwrite?: boolean;
+
+  /** Deparse pretty-printing (default: true) */
+  pretty?: boolean;
+
+  /** Function body delimiter used during deparse (default: '$EOFCODE$') */
+  functionDelimiter?: string;
+
+  /** How cross-chunk deps are represented (default: 'control-only') */
+  crossChunkDepMode?: CrossChunkDepMode;
+}
+
+/**
+ * A single emitted chunk-module within a rebundled workspace.
+ */
+export interface RebundlePackage {
+  /** Chunk/module name (also the extension name) */
+  name: string;
+
+  /** Package directory, relative to the workspace outputDir */
+  dir: string;
+
+  /** Names of other chunk-modules this one depends on */
+  dependencies: string[];
+}
+
+/**
+ * Result of materializing a rebundled workspace.
+ */
+export interface RebundleWorkspaceResult extends RebundleResult {
+  /** Directory the workspace was written to */
+  outputDir: string;
+
+  /** The emitted chunk-modules, in deploy order */
+  packages: RebundlePackage[];
+
+  /** The dep representation used */
+  crossChunkDepMode: CrossChunkDepMode;
+
+  /**
+   * Byte-identical gate: the merged concatenation of all package deploy scripts
+   * (in workspace deploy order) equals the merged original module deploy output.
+   */
+  invariant: { ok: boolean };
+}
+
+/**
  * Result of materializing a rebundled module.
  */
 export interface RebundleModuleResult extends RebundleResult {
