@@ -37,6 +37,25 @@ throw errors.ACCOUNT_EXISTS();
   JSON → GraphQL `extensions.code` → a leading ALL_CAPS token in the message
   (legacy DB `RAISE`, incl. `CODE (arg, arg)` positional args) → native
   SQLSTATE constraint mapping.
-- The seeded registry covers the public auth/limit codes, native PostgreSQL
-  constraint codes, and the pgpm CLI codes. The full constructive-db code set is
-  generated in a later phase; unregistered codes still parse and are masked.
+- The registry has two layers, merged at lookup time (curated wins):
+  - **Generated** (`src/generated/registry.generated.ts`) — every code raised via
+    `EXCEPTION`/`THROW` across constructive-db (deploy sources + generated output),
+    each with a `public`/`internal` class, HTTP hint, and default message.
+  - **Curated** (`src/registry.ts`) — refined, typed-context entries for the codes
+    that matter most (public auth/limit copy, native PostgreSQL constraint codes,
+    pgpm CLI codes). These override the generated entries.
+- Unregistered codes still `parse()` and are classified `internal` (masked).
+
+## Regenerating the full registry
+
+The generated layer is produced from a committed audit snapshot:
+
+```bash
+python3 scripts/generate-registry.py
+```
+
+It reads `scripts/db-error-inventory.json` (the constructive-db error audit) and,
+when a `constructive-io/dashboard` checkout is found (via `DASHBOARD_DIR` or a
+sibling `../dashboard`), seeds public copy from its error catalogs. Re-run the
+constructive-db audit and overwrite `scripts/db-error-inventory.json` before
+regenerating when DB error codes change. Never hand-edit the generated file.

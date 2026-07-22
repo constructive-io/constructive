@@ -1,34 +1,17 @@
-import type { EmptyContext, ErrorContext, ErrorDefinition } from './types';
+import {defineError } from './define';
+import { generatedRegistry } from './generated/registry.generated';
+import type { ErrorContext, ErrorDefinition } from './types';
+
+export { type DefinedError,defineError } from './define';
 
 /**
- * A registry entry plus a phantom type carrier for its context. The
- * contravariant `__context` field lets `ErrorsApi` recover `C` by inference
- * even when `C` appears only in optional positions of {@link ErrorDefinition}.
- * It is type-level only — never set at runtime.
- */
-export type DefinedError<C extends ErrorContext = EmptyContext> = ErrorDefinition<C> & {
-  readonly __context: (context: C) => void;
-};
-
-/**
- * Identity helper that captures each entry's context type for inference while
- * keeping the registry a plain object. `errors.MODULE_NOT_FOUND({ name })` is
- * then type-checked against the declared context.
- */
-export function defineError<C extends ErrorContext = EmptyContext>(
-  def: ErrorDefinition<C>
-): DefinedError<C> {
-  return def as DefinedError<C>;
-}
-
-/**
- * The canonical Constructive error registry.
+ * The curated Constructive error registry.
  *
- * This is the hand-seeded core (public auth/limit codes with real dashboard
- * copy, native PostgreSQL constraint codes, and the pgpm CLI codes). The full
- * 287-code set emitted by constructive-db is generated in a later phase; codes
- * absent here still `parse()` — they are simply classified `internal` (masked)
- * until registered.
+ * These entries carry refined, typed context and hand-written copy for the
+ * codes that matter most (public auth/limit codes with real dashboard copy,
+ * native PostgreSQL constraint codes, and the pgpm CLI codes). They OVERRIDE
+ * the generated entries in {@link generatedRegistry} — every constructive-db
+ * code is present via generation; these just refine a subset.
  */
 export const registry = {
   // ===========================================================================
@@ -339,7 +322,21 @@ export const registry = {
 export type Registry = typeof registry;
 export type RegistryCode = keyof Registry;
 
+/**
+ * All known definitions, keyed by code: every constructive-db code (generated)
+ * merged with the curated entries, curated winning on conflict.
+ */
+const allDefinitions: Record<string, ErrorDefinition<ErrorContext>> = {
+  ...generatedRegistry,
+  ...(registry as unknown as Record<string, ErrorDefinition<ErrorContext>>)
+};
+
 /** Look up a definition by code (from anywhere, not just typed keys). */
 export function getDefinition(code: string): ErrorDefinition<ErrorContext> | undefined {
-  return (registry as unknown as Record<string, ErrorDefinition<ErrorContext>>)[code];
+  return allDefinitions[code];
+}
+
+/** Every registered code (curated + generated). */
+export function allCodes(): string[] {
+  return Object.keys(allDefinitions);
 }

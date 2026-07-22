@@ -1,4 +1,9 @@
-import { classify, ConstructiveError, errors, format, parse, registerCatalog } from '../src';
+import { allCodes, classify, ConstructiveError, errors, format, parse, registerCatalog } from '../src';
+import {
+  GENERATED_CODE_COUNT,
+  GENERATED_CODE_META,
+  generatedRegistry
+} from '../src/generated/registry.generated';
 
 describe('parse', () => {
   it('parses a bare ALL_CAPS DB message (legacy RAISE)', () => {
@@ -107,5 +112,39 @@ describe('format / i18n', () => {
 
   it('humanizes unknown codes as a last resort', () => {
     expect(format('SOME_UNKNOWN_CODE')).toBe('Some unknown code');
+  });
+});
+
+describe('generated registry (full constructive-db audit)', () => {
+  it('collects every audited constructive-db code', () => {
+    expect(GENERATED_CODE_COUNT).toBe(287);
+    expect(Object.keys(generatedRegistry)).toHaveLength(287);
+    // curated + generated codes are all reachable
+    expect(allCodes().length).toBeGreaterThanOrEqual(287);
+  });
+
+  it('classifies a generator-only auth code as public', () => {
+    // SIGN_UP_DISABLED is emitted only by DB generators (no hand-written source)
+    expect(GENERATED_CODE_META.SIGN_UP_DISABLED.generatedOnly).toBe(true);
+    expect(classify('SIGN_UP_DISABLED')).toBe('public');
+  });
+
+  it('classifies internal invariant codes as internal (masked)', () => {
+    expect(classify('DATA_ID')).toBe('internal');
+    expect(classify('APPLY_RLS')).toBe('internal');
+    expect(classify('ALTER_TABLE_ADD_COLUMN')).toBe('internal');
+  });
+
+  it('parses a generated public code end-to-end', () => {
+    const result = parse({ message: 'API_KEY_LIMIT_REACHED', code: 'P0001' });
+    expect(result.code).toBe('API_KEY_LIMIT_REACHED');
+    expect(result.class).toBe('public');
+    expect(result.known).toBe(true);
+  });
+
+  it('exposes generated codes on the errors factory', () => {
+    const err = errors.SIGN_UP_DISABLED();
+    expect(err.code).toBe('SIGN_UP_DISABLED');
+    expect(err.isPublic).toBe(true);
   });
 });

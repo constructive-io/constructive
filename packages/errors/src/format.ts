@@ -1,5 +1,5 @@
 import { interpolate } from './interpolate';
-import { getDefinition, registry } from './registry';
+import { allCodes, getDefinition } from './registry';
 import type { ErrorContext } from './types';
 
 /** A locale catalog maps `code` → message template (with `{{var}}`). */
@@ -8,13 +8,15 @@ export type MessageCatalog = Record<string, string>;
 export const DEFAULT_LOCALE = 'en';
 
 /**
- * Built-in `en` catalog derived from the registry's string messages. Entries
- * whose message is a function are omitted (they are computed, not templated)
- * and fall back to the registry function at format time.
+ * Built-in `en` catalog derived from every registered code's string message
+ * (curated + generated). Entries whose message is a function are omitted (they
+ * are computed, not templated) and fall back to the registry function at
+ * format time.
  */
 const defaultEnCatalog: MessageCatalog = Object.fromEntries(
-  Object.values(registry)
-    .filter((def) => typeof def.message === 'string')
+  allCodes()
+    .map((code) => getDefinition(code))
+    .filter((def): def is NonNullable<typeof def> => !!def && typeof def.message === 'string')
     .map((def) => [def.code, def.message as string])
 );
 

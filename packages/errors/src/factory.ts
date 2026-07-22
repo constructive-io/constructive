@@ -1,5 +1,6 @@
 import { ConstructiveError } from './error';
 import { format } from './format';
+import { generatedRegistry } from './generated/registry.generated';
 import { registry } from './registry';
 import type { ErrorClass, ErrorContext, ErrorDefinition } from './types';
 
@@ -69,5 +70,15 @@ export function makeError<C extends ErrorContext>(
     });
 }
 
-/** The canonical, type-safe `errors.*` factory built from the registry. */
-export const errors = buildErrors(registry);
+/**
+ * The canonical `errors.*` factory.
+ *
+ * Curated codes are strongly typed (`errors.MODULE_NOT_FOUND({ name })`); every
+ * other constructive-db code is available via a generic factory through the
+ * index signature (`errors.ACCOUNT_EXISTS()`), backed by the generated
+ * registry. Curated entries override generated ones on conflict.
+ */
+export const errors = buildErrors({
+  ...generatedRegistry,
+  ...registry
+} as typeof registry) as ErrorsApi<typeof registry> & Record<string, ErrorFactory<ErrorContext>>;
