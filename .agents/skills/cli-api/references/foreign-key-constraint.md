@@ -12,8 +12,8 @@ csdk foreign-key-constraint list --where.<field>.<op> <value> --orderBy <values>
 csdk foreign-key-constraint list --limit 10 --after <cursor>
 csdk foreign-key-constraint find-first --where.<field>.<op> <value>
 csdk foreign-key-constraint get --id <UUID>
-csdk foreign-key-constraint create --fieldIds <UUID> --refFieldIds <UUID> --refTableId <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--deleteAction <String>] [--description <String>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>] [--updateAction <String>]
-csdk foreign-key-constraint update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--deleteAction <String>] [--description <String>] [--fieldIds <UUID>] [--name <String>] [--refFieldIds <UUID>] [--refTableId <UUID>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <String>] [--updateAction <String>]
+csdk foreign-key-constraint create --fieldIds <UUID> --refFieldIds <UUID> --refTableId <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--deleteAction <String>] [--deleteSetFieldIds <UUID>] [--description <String>] [--initiallyDeferred <Boolean>] [--isDeferrable <Boolean>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>] [--updateAction <String>] [--withPeriod <Boolean>]
+csdk foreign-key-constraint update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--deleteAction <String>] [--deleteSetFieldIds <UUID>] [--description <String>] [--fieldIds <UUID>] [--initiallyDeferred <Boolean>] [--isDeferrable <Boolean>] [--name <String>] [--refFieldIds <UUID>] [--refTableId <UUID>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <String>] [--updateAction <String>] [--withPeriod <Boolean>]
 csdk foreign-key-constraint delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk foreign-key-constraint list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a foreignKeyConstraint
 
 ```bash
-csdk foreign-key-constraint create --fieldIds <UUID> --refFieldIds <UUID> --refTableId <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--deleteAction <String>] [--description <String>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>] [--updateAction <String>]
+csdk foreign-key-constraint create --fieldIds <UUID> --refFieldIds <UUID> --refTableId <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--deleteAction <String>] [--deleteSetFieldIds <UUID>] [--description <String>] [--initiallyDeferred <Boolean>] [--isDeferrable <Boolean>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>] [--updateAction <String>] [--withPeriod <Boolean>]
 ```
 
 ### Get a foreignKeyConstraint by id
