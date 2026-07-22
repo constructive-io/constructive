@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.0.0...@pgpmjs/core@7.1.0) (2026-07-22)
+
+### Bug Fixes
+
+- **pgpm-core:** default emitted workspace license to CONSTRUCTIVE (not MIT), add license opt ([0889444](https://github.com/constructive-io/constructive/commit/0889444d682c7995138b256ce028d3e476d0be0e))
+
+### Features
+
+- **pgpm-core:** emit real deployable workspace via writeMinimalWorkspace/writeMinimalModule ([7d758a4](https://github.com/constructive-io/constructive/commit/7d758a459672fbc800b56b4a522c25b9d20770ef))
+- **pgpm-core:** rebundle category boundary — classifier-driven chunk seams ([af600fa](https://github.com/constructive-io/constructive/commit/af600fae84a6d946e34cdf6e30ec6e853e5d5b45))
+- **pgpm-core:** rebundleModule — per-chunk packageModule merge with byte-identical gate ([a1e18b5](https://github.com/constructive-io/constructive/commit/a1e18b50f00fce946c7b0f67fe47e66d8caaf374))
+- **pgpm-core:** rebundlePlan — dependency-aware chunk/merge primitive with byte-identical gate ([f747dea](https://github.com/constructive-io/constructive/commit/f747dea9f05f9acb41c6e650a1c12848b55303c8))
+- **pgpm-core:** rebundleWorkspace — emit chunks as separate modules with control-only cross-chunk deps ([30ffa94](https://github.com/constructive-io/constructive/commit/30ffa94191caa495e4049fd46c5b433ec46dd5c5))
+- **pgpm-core:** rebundleWorkspace initScaffold option (pgpm init boilerplate) ([d439121](https://github.com/constructive-io/constructive/commit/d4391215b22b4b025d94dff24099e55129920f22))
+
 # [7.0.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.34.0...@pgpmjs/core@7.0.0) (2026-07-21)
 
 ### Features
