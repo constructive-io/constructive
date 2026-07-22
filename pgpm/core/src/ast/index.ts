@@ -6,6 +6,7 @@
  * it back losslessly. Lives under `pgpm/core/src/ast` so it can later be lifted
  * into a standalone leaf `pgpm/ast` package as a pure file move.
  */
+export * from './parse';
 export * from './reader';
 export * from './roundtrip';
 export * from './types';
