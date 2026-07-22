@@ -16,8 +16,22 @@ export interface RebundleStrategy {
    * - 'folder' (default): start a new chunk when the folder-derived key
    *   changes (uses the same path extraction as slice's folder strategy)
    * - 'none': one chunk for the whole module, subject only to `maxChunkSize`
+   * - 'category': start a new chunk when the caller-supplied `categoryOf` key
+   *   changes — the facts/classifier-driven seam. Lets the seams follow meaning
+   *   (e.g. security, roles, admin) instead of paths. `categoryOf` is required;
+   *   for changes it returns `undefined` for, the folder key is used as a
+   *   fallback so partial classification degrades gracefully.
    */
-  boundary?: 'folder' | 'none';
+  boundary?: 'folder' | 'none' | 'category';
+
+  /**
+   * Seam key for a change under `boundary: 'category'`. Consecutive changes
+   * sharing a key merge into one chunk (same greedy, contiguity-preserving rule
+   * as the folder boundary — so the byte-identical invariant is unaffected).
+   * pgpm-core stays classifier-agnostic: callers derive the category however
+   * they like (e.g. from `classifyStatements` facts) and pass it in here.
+   */
+  categoryOf?: (changeName: string) => string | undefined;
 
   /** Depth in the change path used to derive the folder key (default: 1) */
   depth?: number;

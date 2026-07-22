@@ -20,9 +20,18 @@ import { Chunk, RebundleResult, RebundleStrategy } from './types';
  */
 function boundaryKey(changeName: string, strategy: RebundleStrategy): string {
   if (strategy.boundary === 'none') return '';
-  const depth = strategy.depth ?? 1;
-  const prefix = strategy.prefixToStrip ?? 'schemas';
-  return extractPackageFromPath(changeName, depth, prefix);
+
+  const folderKey = (): string =>
+    extractPackageFromPath(changeName, strategy.depth ?? 1, strategy.prefixToStrip ?? 'schemas');
+
+  if (strategy.boundary === 'category') {
+    // Classifier/facts-driven seam: the caller decides each change's category;
+    // fall back to the folder key for changes it doesn't classify.
+    const category = strategy.categoryOf?.(changeName);
+    return category ?? folderKey();
+  }
+
+  return folderKey();
 }
 
 /**

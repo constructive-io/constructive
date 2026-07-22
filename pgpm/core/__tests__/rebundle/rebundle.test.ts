@@ -95,6 +95,65 @@ describe('rebundlePlan', () => {
     // Members remain in contiguous source order across the split.
     expect(result.chunks.flatMap(c => c.deploy)).toEqual(CHANGES);
   });
+
+  it('groups changes by the classifier category with boundary "category"', () => {
+    // Facts-driven seam: auth-* is security, billing-* is data. The chunk names
+    // follow meaning, not the folder path ('auth'/'billing').
+    const category: Record<string, string> = {
+      'schemas/auth/schema': 'security',
+      'schemas/auth/tables/users': 'security',
+      'schemas/auth/tables/sessions': 'security',
+      'schemas/billing/schema': 'data',
+      'schemas/billing/tables/invoices': 'data',
+    };
+    const result = rebundlePlan(moduleDir, {
+      boundary: 'category',
+      categoryOf: name => category[name],
+    });
+
+    expect(result.deployOrder).toEqual(['security', 'data']);
+    expect(result.chunks.find(c => c.name === 'security')!.deploy).toEqual([
+      'schemas/auth/schema',
+      'schemas/auth/tables/users',
+      'schemas/auth/tables/sessions',
+    ]);
+    expect(result.chunks.find(c => c.name === 'data')!.dependencies).toEqual(['security']);
+    // The carve is still byte-identical to the original module.
+    expect(verifyRebundleInvariant(moduleDir, result).ok).toBe(true);
+  });
+
+  it('falls back to the folder key for changes categoryOf does not classify', () => {
+    // Only classify the billing changes; the rest fall back to their folder key.
+    const result = rebundlePlan(moduleDir, {
+      boundary: 'category',
+      categoryOf: name => (name.startsWith('schemas/billing/') ? 'billing-domain' : undefined),
+    });
+
+    expect(result.deployOrder).toEqual(['auth', 'billing-domain']);
+    expect(verifyRebundleInvariant(moduleDir, result).ok).toBe(true);
+  });
+
+  it('keeps interleaved categories contiguous (suffixed) and byte-identical', () => {
+    // A category that reappears non-contiguously must NOT merge across the gap —
+    // that would reorder statements and break the invariant. Instead each run
+    // seals into its own ordinal-suffixed chunk.
+    const category: Record<string, string> = {
+      'schemas/auth/schema': 'core',
+      'schemas/auth/tables/users': 'aux',
+      'schemas/auth/tables/sessions': 'core', // 'core' reappears after 'aux'
+      'schemas/billing/schema': 'aux', // 'aux' reappears after the second 'core'
+      'schemas/billing/tables/invoices': 'aux',
+    };
+    const result = rebundlePlan(moduleDir, {
+      boundary: 'category',
+      categoryOf: name => category[name],
+    });
+
+    // Non-contiguous reuse → suffixed runs, never a merge across the gap.
+    expect(result.chunks.map(c => c.name)).toEqual(['core', 'aux', 'core~2', 'aux~2']);
+    expect(result.chunks.flatMap(c => c.deploy)).toEqual(CHANGES);
+    expect(verifyRebundleInvariant(moduleDir, result).ok).toBe(true);
+  });
 });
 
 describe('assembleChunkSql', () => {
