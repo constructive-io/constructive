@@ -57,6 +57,23 @@ describe('cookie utilities', () => {
       expect(config.maxAge).toBe(2592000);
     });
 
+    it('uses PostgreSQL interval cookieMaxAge values', () => {
+      const authSettings: AuthSettings = {
+        cookieMaxAge: { days: 14 },
+      };
+      const config = getSessionCookieConfig(authSettings);
+      expect(config.maxAge).toBe(14 * 24 * 60 * 60);
+    });
+
+    it('uses PostgreSQL interval rememberMeDuration when rememberMe is true', () => {
+      const authSettings: AuthSettings = {
+        cookieMaxAge: { hours: 1 },
+        rememberMeDuration: { days: 30 },
+      };
+      const config = getSessionCookieConfig(authSettings, true);
+      expect(config.maxAge).toBe(30 * 24 * 60 * 60);
+    });
+
     it('uses cookieMaxAge when rememberMe is false', () => {
       const authSettings: AuthSettings = {
         cookieMaxAge: '3600',
@@ -72,6 +89,15 @@ describe('cookie utilities', () => {
       };
       const config = getSessionCookieConfig(authSettings, true);
       expect(config.maxAge).toBe(7200);
+    });
+
+    it('falls back to cookieMaxAge when rememberMeDuration is invalid', () => {
+      const authSettings: AuthSettings = {
+        cookieMaxAge: { hours: 2 },
+        rememberMeDuration: 'not-an-interval',
+      };
+      const config = getSessionCookieConfig(authSettings, true);
+      expect(config.maxAge).toBe(2 * 60 * 60);
     });
   });
 
