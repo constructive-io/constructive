@@ -10,6 +10,7 @@
  */
 export * from './apply';
 export * from './create';
+export * from './diff';
 export * from './io';
 export * from './transpile';
 export * from './types';
