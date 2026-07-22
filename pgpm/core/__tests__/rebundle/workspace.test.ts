@@ -63,7 +63,7 @@ afterEach(() => {
 });
 
 describe('rebundleWorkspace', () => {
-  it('emits one module per chunk under packages/, in deploy order', async () => {
+  it('emits one deployable module per chunk under packages/, in deploy order', async () => {
     const result = await rebundleWorkspace(sourceDir, { outputDir, overwrite: true });
 
     expect(result.packages.map(p => p.name)).toEqual(['auth', 'billing']);
@@ -74,8 +74,13 @@ describe('rebundleWorkspace', () => {
       expect(existsSync(join(dir, 'verify', `${pkg}.sql`))).toBe(true);
       expect(existsSync(join(dir, `${pkg}.control`))).toBe(true);
       expect(existsSync(join(dir, 'pgpm.plan'))).toBe(true);
+      expect(existsSync(join(dir, 'Makefile'))).toBe(true);
+      expect(existsSync(join(dir, 'package.json'))).toBe(true);
     }
-    expect(existsSync(join(outputDir, 'pgpm-workspace.json'))).toBe(true);
+    // pgpm discovers the emitted dir as a workspace via pgpm.json.
+    expect(existsSync(join(outputDir, 'pgpm.json'))).toBe(true);
+    const cfg = JSON.parse(readFileSync(join(outputDir, 'pgpm.json'), 'utf-8'));
+    expect(cfg.packages).toEqual(['packages/*']);
   });
 
   it('control-only (default): cross-chunk dep lives in control requires, not the plan', async () => {

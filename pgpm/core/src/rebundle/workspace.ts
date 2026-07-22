@@ -1,12 +1,12 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 import { Change, Tag } from '../files/types';
 import { parsePlanFile } from '../files/plan/parser';
 import { mergeSqlStatements } from '../packaging/package';
 import { resolveWithPlan } from '../resolution/resolve';
-import { generateControlContent, generatePlanContent } from '../slice/slice';
-import { mergeChunkScript, SCRIPT_DIRS } from './module';
+import { writeMinimalModule, writeMinimalWorkspace } from '../workspace/minimal';
+import { mergeChunkScript } from './module';
 import { rebundlePlan } from './rebundle';
 import {
   CrossChunkDepMode,
@@ -22,9 +22,11 @@ import {
  *
  * This is the "modular workspace" carve — the same monolith sliced into
  * independently publishable module forks (e.g. a users module, an admin module).
- * It reuses `rebundlePlan` for the chunk model, `mergeChunkScript` for the
- * per-chunk merge, and slice's `generatePlanContent`/`generateControlContent`
- * for plan and control emission.
+ * The emitted directory is a real, discoverable pgpm workspace: it reuses
+ * `writeMinimalWorkspace`/`writeMinimalModule` (the minimal deployable file set
+ * pgpm recognizes — `pgpm.json`, `pgpm.plan`, `<name>.control`, `Makefile`,
+ * `package.json`), `rebundlePlan` for the chunk model, and `mergeChunkScript`
+ * for the per-chunk merge.
  */
 export async function rebundleWorkspace(
   sourceDir: string,
@@ -57,7 +59,7 @@ export async function rebundleWorkspace(
     change: memberToChunk.get(tag.change) ?? tag.change,
   }));
 
-  mkdirSync(join(outputDir, 'packages'), { recursive: true });
+  writeMinimalWorkspace(outputDir, { packages: ['packages/*'] });
 
   const byDeployOrder = [...plan.chunks].sort(
     (a, b) => plan.deployOrder.indexOf(a.name) - plan.deployOrder.indexOf(b.name)
@@ -68,40 +70,34 @@ export async function rebundleWorkspace(
   for (const chunk of byDeployOrder) {
     const pkgRel = join('packages', chunk.name);
     const pkgDir = join(outputDir, pkgRel);
-    for (const dir of SCRIPT_DIRS) mkdirSync(join(pkgDir, dir), { recursive: true });
 
-    for (const dir of SCRIPT_DIRS) {
-      const script = await mergeChunkScript(sourceDir, chunk, dir, { pretty, functionDelimiter });
-      writeFileSync(join(pkgDir, dir, `${chunk.name}.sql`), script);
-    }
+    const scripts: Record<string, { deploy: string; revert: string; verify: string }> = {
+      [chunk.name]: {
+        deploy: await mergeChunkScript(sourceDir, chunk, 'deploy', { pretty, functionDelimiter }),
+        revert: await mergeChunkScript(sourceDir, chunk, 'revert', { pretty, functionDelimiter }),
+        verify: await mergeChunkScript(sourceDir, chunk, 'verify', { pretty, functionDelimiter }),
+      },
+    };
 
-    // Control-file requires always carry the module-level dependency; in
+    // Control `requires` always carries the module-level dependency; in
     // 'change' mode the plan additionally records the fine-grained cross-ref.
     const deps = chunk.dependencies;
-    writeFileSync(
-      join(pkgDir, `${chunk.name}.control`),
-      generateControlContent(chunk.name, new Set(deps))
-    );
-
     const planChange: Change = {
       name: chunk.name,
       dependencies: planChangeDeps(deps, crossChunkDepMode),
     };
-    const pkgTags = remappedTags.filter(t => t.change === chunk.name);
-    writeFileSync(
-      join(pkgDir, 'pgpm.plan'),
-      generatePlanContent(chunk.name, [planChange], pkgTags)
-    );
 
-    writeFileSync(
-      join(pkgDir, 'package.json'),
-      JSON.stringify({ name: chunk.name, version: '0.0.1' }, null, 2) + '\n'
-    );
+    writeMinimalModule(pkgDir, {
+      name: chunk.name,
+      changes: [planChange],
+      scripts,
+      tags: remappedTags.filter(t => t.change === chunk.name),
+      requires: deps,
+      overwrite: true,
+    });
 
     packages.push({ name: chunk.name, dir: pkgRel, dependencies: [...deps] });
   }
-
-  writeWorkspaceManifest(outputDir, plan.project, packages, plan.deployOrder);
 
   const invariant = { ok: await checkWorkspaceInvariant(sourceDir, outputDir, packages, { pretty, functionDelimiter }) };
 
@@ -117,23 +113,6 @@ export async function rebundleWorkspace(
 function planChangeDeps(deps: string[], mode: CrossChunkDepMode): string[] {
   if (mode === 'control-only') return [];
   return deps.map(dep => `${dep}:${dep}`);
-}
-
-function writeWorkspaceManifest(
-  outputDir: string,
-  project: string,
-  packages: RebundlePackage[],
-  deployOrder: string[]
-): void {
-  const manifest = {
-    project,
-    packages: packages.map(p => p.dir),
-    rebundle: {
-      deployOrder,
-      dependencies: Object.fromEntries(packages.map(p => [p.name, p.dependencies])),
-    },
-  };
-  writeFileSync(join(outputDir, 'pgpm-workspace.json'), JSON.stringify(manifest, null, 2) + '\n');
 }
 
 /**
