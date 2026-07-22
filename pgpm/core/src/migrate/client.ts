@@ -6,7 +6,7 @@ import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 
-import { Change, parsePlanFile, parsePlanFileSimple, readScript } from '../files';
+import { Change, parsePlanFile, parsePlanFileSimple, readScript } from '@pgpmjs/ast/files';
 import { resolveDependencies } from '../resolution/deps';
 import { resolveTagToChangeName } from '../resolution/resolve';
 import { cleanSql } from './clean';

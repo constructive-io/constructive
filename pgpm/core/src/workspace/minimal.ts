@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Change, Tag } from '../files/types';
+import { Change, Tag } from '@pgpmjs/ast/files/types';
 import { generatePlanContent } from '../slice/slice';
 
 const SCRIPT_DIRS = ['deploy', 'revert', 'verify'] as const;

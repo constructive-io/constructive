@@ -3,9 +3,9 @@ import { sync as glob } from 'glob';
 import { join,relative } from 'path';
 
 import { PgpmPackage } from '../core/class/pgpm';
-import { parsePlanFile } from '../files/plan/parser';
-import { scanDeployScript } from '../files/sql/header';
-import { ExtendedPlanFile } from '../files/types';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { scanDeployScript } from '@pgpmjs/ast/files/sql/header';
+import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 import { errors } from '@pgpmjs/types';
 
 /**

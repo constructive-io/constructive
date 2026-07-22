@@ -48,6 +48,7 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "@pgpmjs/ast": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",

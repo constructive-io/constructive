@@ -1,5 +1,5 @@
-import { PgpmScriptKind } from '../ast/types';
-import { parsePgpmHeader, renameInHeader, writePgpmScript } from '../files/sql/header';
+import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
+import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
 import { hashString } from '../migrate/utils/hash';
 import { renameInPlanContent } from '../refactor/rename';
 import {
