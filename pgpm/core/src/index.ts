@@ -9,6 +9,7 @@ export * from './resolution/deps';
 export * from './resolution/resolve';
 export * from './workspace/paths';
 export * from './workspace/utils';
+export * from './workspace/minimal';
 export * from './core/template-scaffold';
 export * from './core/boilerplate-types';
 export * from './core/boilerplate-scanner';

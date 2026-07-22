@@ -6,9 +6,10 @@ import { parsePlanFile } from '../files/plan/parser';
 import { mergeSqlStatements, packageModule } from '../packaging/package';
 import { generatePlanContent } from '../slice/slice';
 import { assembleChunkSql, rebundlePlan } from './rebundle';
-import { RebundleModuleOptions, RebundleModuleResult } from './types';
+import { Chunk, RebundleModuleOptions, RebundleModuleResult } from './types';
 
-const SCRIPT_DIRS = ['deploy', 'revert', 'verify'] as const;
+export const SCRIPT_DIRS = ['deploy', 'revert', 'verify'] as const;
+export type ScriptDir = (typeof SCRIPT_DIRS)[number];
 
 /**
  * Wrap a merged chunk body in a single transaction. Deploy/revert commit;
@@ -16,10 +17,29 @@ const SCRIPT_DIRS = ['deploy', 'revert', 'verify'] as const;
  * member files' own BEGIN/COMMIT were stripped during the merge, so each
  * rebundled chunk deploys as exactly one transaction.
  */
-function wrapTransaction(body: string, scriptType: (typeof SCRIPT_DIRS)[number]): string {
+function wrapTransaction(body: string, scriptType: ScriptDir): string {
   const trimmed = body.trim();
   const tail = scriptType === 'verify' ? 'ROLLBACK;' : 'COMMIT;';
   return `BEGIN;\n\n${trimmed}\n\n${tail}\n`;
+}
+
+/**
+ * Merge one chunk's member scripts (in the correct order per direction) into a
+ * single deparsed, single-transaction migration string. Shared by the
+ * single-module (`rebundleModule`) and workspace (`rebundleWorkspace`) emitters.
+ */
+export async function mergeChunkScript(
+  sourceDir: string,
+  chunk: Chunk,
+  scriptType: ScriptDir,
+  opts: { pretty?: boolean; functionDelimiter?: string } = {}
+): Promise<string> {
+  const merged = await mergeSqlStatements(assembleChunkSql(sourceDir, chunk, scriptType), {
+    stripTransactions: true,
+    pretty: opts.pretty ?? true,
+    functionDelimiter: opts.functionDelimiter ?? '$EOFCODE$',
+  });
+  return wrapTransaction(merged.sql, scriptType);
 }
 
 /**
