@@ -35,8 +35,18 @@ export interface WriteMinimalModuleOptions {
   /** package.json version (default '0.0.1') */
   version?: string;
 
+  /** package.json license (default 'CONSTRUCTIVE') */
+  license?: string;
+
   /** Overwrite an existing directory (default: false) */
   overwrite?: boolean;
+
+  /**
+   * Write a minimal `package.json` (default: true). Set `false` to preserve an
+   * existing one — e.g. when a richer package.json was already scaffolded by
+   * `pgpm init` and only the pgpm files should be written on top.
+   */
+  writePackageJson?: boolean;
 }
 
 /**
@@ -47,7 +57,17 @@ export interface WriteMinimalModuleOptions {
  * network-fetched boilerplate (README/LICENSE/jest/tests/lint configs).
  */
 export function writeMinimalModule(moduleDir: string, options: WriteMinimalModuleOptions): void {
-  const { name, changes, scripts, tags = [], requires = [], version = '0.0.1', overwrite = false } = options;
+  const {
+    name,
+    changes,
+    scripts,
+    tags = [],
+    requires = [],
+    version = '0.0.1',
+    license = 'CONSTRUCTIVE',
+    overwrite = false,
+    writePackageJson = true,
+  } = options;
 
   if (fs.existsSync(moduleDir) && fs.readdirSync(moduleDir).length > 0 && !overwrite) {
     throw new Error(`Module directory is not empty: ${moduleDir}. Pass overwrite: true to replace.`);
@@ -73,10 +93,12 @@ export function writeMinimalModule(moduleDir: string, options: WriteMinimalModul
   fs.writeFileSync(path.join(moduleDir, 'pgpm.plan'), generatePlanContent(name, changes, tags));
   fs.writeFileSync(path.join(moduleDir, `${name}.control`), generateModuleControl(name, requires, version));
   fs.writeFileSync(path.join(moduleDir, 'Makefile'), generateModuleMakefile(name, version));
-  fs.writeFileSync(
-    path.join(moduleDir, 'package.json'),
-    JSON.stringify({ name, version, description: `${name} module`, license: 'MIT' }, null, 2) + '\n'
-  );
+  if (writePackageJson) {
+    fs.writeFileSync(
+      path.join(moduleDir, 'package.json'),
+      JSON.stringify({ name, version, description: `${name} module`, license }, null, 2) + '\n'
+    );
+  }
 }
 
 export interface WriteMinimalWorkspaceOptions {
