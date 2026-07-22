@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { classify, type ErrorContext, parse } from '@constructive-io/errors';
 import { getNodeEnv } from '@pgpmjs/env';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
@@ -20,6 +21,14 @@ import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
+/**
+ * Transitional allowlist of transport/framework codes that are safe to surface
+ * but are not yet in the `@constructive-io/errors` registry (GraphQL protocol
+ * errors, plus auth codes pending registry generation in a later phase). A code
+ * is treated as public when it is classified `public` by the registry OR listed
+ * here. Once the registry is generated from constructive-db these entries move
+ * into the registry and this set shrinks to just the GraphQL protocol codes.
+ */
 const SAFE_ERROR_CODES = new Set([
   // GraphQL standard
   'GRAPHQL_VALIDATION_FAILED',
@@ -126,27 +135,67 @@ const SAFE_ERROR_CODES = new Set([
   '23P01', // exclusion_violation
 ]);
 
+/** A code is safe to surface when the registry classifies it public, or it is
+ * on the transitional transport allowlist. */
+const isPublicCode = (code: string | null | undefined): boolean =>
+  Boolean(code) && (classify(code) === 'public' || SAFE_ERROR_CODES.has(code as string));
+
 /**
- * Production-aware error masking function.
+ * Normalize any GraphQL/database error into a canonical Constructive shape.
  *
- * In development: returns errors as-is for debugging.
- * In production: returns errors with explicit codes from the SAFE_ERROR_CODES
- * allowlist as-is, but masks unexpected/database errors with a reference ID
- * and logs the original.
+ * Database errors surface through Grafast without a populated `extensions.code`
+ * (the semantic code lives in the message, and any SQLSTATE/DETAIL lives on the
+ * underlying pg error at `originalError`). We parse `originalError` first so we
+ * can recover the structured code, then fall back to the GraphQL error itself.
+ */
+const normalizeError = (
+  error: GraphQLError,
+): { code: string | null; context: ErrorContext; class: 'public' | 'internal' } => {
+  const original = (error as { originalError?: unknown }).originalError;
+  const fromOriginal = original ? parse(original) : null;
+  const parsed = fromOriginal?.code ? fromOriginal : parse(error);
+  return { code: parsed.code, context: parsed.context, class: parsed.class };
+};
+
+/**
+ * Production-aware error handling backed by `@constructive-io/errors`.
+ *
+ * 1. Enrich `extensions.code`/`class`/`context` from the parsed error so clients
+ *    always receive a machine-readable code (fixing the gap where database
+ *    errors reached clients as a bare message with empty `extensions`).
+ * 2. Surface public (registered/allowlisted) errors as-is.
+ * 3. In development, pass everything through (enriched) for debugging.
+ * 4. In production, mask internal/unknown errors behind a reference ID and log
+ *    the original.
  */
 const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError => {
-  if (getNodeEnv() === 'development') {
-    return error;
+  const { code, context, class: errorClass } = normalizeError(error);
+
+  // Lift the structured code onto extensions for every recognized error so
+  // clients always receive a machine-readable code (`extensions` is read-only
+  // on GraphQLError, so we build a formatted error rather than mutating it).
+  const extensions: Record<string, unknown> = { ...error.extensions };
+  if (code) {
+    extensions.code = code;
+    extensions.class = errorClass;
+    if (Object.keys(context).length > 0) {
+      extensions.context = context;
+    }
   }
 
-  // Only expose errors with codes on the safe allowlist.
-  // Note: grafserv strips originalError and internal extensions before
-  // serializing to the client, so returning the full error object is safe here.
-  if (error.extensions?.code && SAFE_ERROR_CODES.has(error.extensions.code as string)) {
-    return error;
+  const effectiveCode = code ?? (error.extensions?.code as string | undefined);
+  if (isPublicCode(effectiveCode) || getNodeEnv() === 'development') {
+    // Note: grafserv strips originalError and internal extensions before
+    // serializing to the client, so returning the enriched error is safe.
+    return {
+      message: error.message,
+      ...(error.locations ? { locations: error.locations } : {}),
+      ...(error.path ? { path: error.path } : {}),
+      extensions,
+    } as GraphQLFormattedError;
   }
 
-  // Mask unexpected/database errors with a reference ID
+  // Mask internal/unknown errors with a reference ID.
   const errorId = crypto.randomBytes(8).toString('hex');
   maskErrorLog.error(`[masked-error:${errorId}]`, error);
 

@@ -42,6 +42,7 @@
   ],
   "dependencies": {
     "@constructive-io/csrf": "workspace:^",
+    "@constructive-io/errors": "workspace:^",
     "@constructive-io/express-context": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",

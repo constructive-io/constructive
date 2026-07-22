@@ -1776,6 +1776,9 @@ importers:
       '@constructive-io/csrf':
         specifier: workspace:^
         version: link:../../packages/csrf/dist
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       '@constructive-io/express-context':
         specifier: workspace:^
         version: link:../../packages/express-context/dist
@@ -2517,6 +2520,19 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  packages/errors:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.11
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+    publishDirectory: dist
+
   packages/csrf:
     devDependencies:
       '@types/node':
@@ -3061,6 +3077,9 @@ importers:
 
   pgpm/types:
     dependencies:
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       pg-env:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
