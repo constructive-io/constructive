@@ -1,5 +1,5 @@
 import { PgpmModuleAst, PgpmScriptAst } from '@pgpmjs/ast/module/types';
-import { hashString } from '../migrate/utils/hash';
+import { hashString } from '@pgpmjs/ast';
 import {
   BUNDLE_FORMAT_VERSION,
   BundleChange,

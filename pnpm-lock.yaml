@@ -2845,6 +2845,17 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  pgpm/bundle:
+    dependencies:
+      '@pgpmjs/ast':
+        specifier: workspace:^
+        version: link:../ast/dist
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
@@ -2939,6 +2950,9 @@ importers:
       '@pgpmjs/ast':
         specifier: workspace:^
         version: link:../ast/dist
+      '@pgpmjs/bundle':
+        specifier: workspace:^
+        version: link:../bundle/dist
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../env/dist

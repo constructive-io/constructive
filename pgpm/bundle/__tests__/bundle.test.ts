@@ -10,7 +10,7 @@ import {
   readBundleFile,
   verifyBundle,
   writeBundleFile
-} from '../../src/bundle';
+} from '../src';
 
 let sourceDir: string;
 

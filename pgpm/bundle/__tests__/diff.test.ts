@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { bundleFromModule, diffBundles } from '../../src/bundle';
+import { bundleFromModule, diffBundles } from '../src';
 
 function buildModule(changes: Record<string, string>, order: string[]): string {
   const dir = mkdtempSync(join(tmpdir(), 'pgpm-diff-'));

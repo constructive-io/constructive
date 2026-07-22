@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@pgpmjs/ast": "workspace:^",
+    "@pgpmjs/bundle": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
