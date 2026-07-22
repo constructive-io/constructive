@@ -145,6 +145,24 @@ export const domainKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...domainKeys.details(), id] as const,
 } as const;
+export const domainEventKeys = {
+  /** All domainEvent queries */ all: ['domainevent'] as const,
+  /** List query keys */ lists: () => [...domainEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...domainEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...domainEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...domainEventKeys.details(), id] as const,
+} as const;
+export const domainVerificationKeys = {
+  /** All domainVerification queries */ all: ['domainverification'] as const,
+  /** List query keys */ lists: () => [...domainVerificationKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...domainVerificationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...domainVerificationKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...domainVerificationKeys.details(), id] as const,
+} as const;
 export const embeddingChunkKeys = {
   /** All embeddingChunk queries */ all: ['embeddingchunk'] as const,
   /** List query keys */ lists: () => [...embeddingChunkKeys.all, 'list'] as const,
@@ -162,6 +180,15 @@ export const enumKeys = {
   /** Detail query keys */ details: () => [...enumKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...enumKeys.details(), id] as const,
+} as const;
+export const exclusionConstraintKeys = {
+  /** All exclusionConstraint queries */ all: ['exclusionconstraint'] as const,
+  /** List query keys */ lists: () => [...exclusionConstraintKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...exclusionConstraintKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...exclusionConstraintKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...exclusionConstraintKeys.details(), id] as const,
 } as const;
 export const fieldKeys = {
   /** All field queries */ all: ['field'] as const,
@@ -490,8 +517,11 @@ export const queryKeys = {
   databaseTransfer: databaseTransferKeys,
   defaultPrivilege: defaultPrivilegeKeys,
   domain: domainKeys,
+  domainEvent: domainEventKeys,
+  domainVerification: domainVerificationKeys,
   embeddingChunk: embeddingChunkKeys,
   enum: enumKeys,
+  exclusionConstraint: exclusionConstraintKeys,
   field: fieldKeys,
   foreignKeyConstraint: foreignKeyConstraintKeys,
   fullTextSearch: fullTextSearchKeys,

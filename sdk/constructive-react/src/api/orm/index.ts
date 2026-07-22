@@ -19,8 +19,11 @@ import { DatabaseSettingModel } from './models/databaseSetting';
 import { DatabaseTransferModel } from './models/databaseTransfer';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { DomainModel } from './models/domain';
+import { DomainEventModel } from './models/domainEvent';
+import { DomainVerificationModel } from './models/domainVerification';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { EnumModel } from './models/enum';
+import { ExclusionConstraintModel } from './models/exclusionConstraint';
 import { FieldModel } from './models/field';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
@@ -101,8 +104,11 @@ export function createClient(config: OrmClientConfig) {
     databaseTransfer: new DatabaseTransferModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
     domain: new DomainModel(client),
+    domainEvent: new DomainEventModel(client),
+    domainVerification: new DomainVerificationModel(client),
     embeddingChunk: new EmbeddingChunkModel(client),
     enum: new EnumModel(client),
+    exclusionConstraint: new ExclusionConstraintModel(client),
     field: new FieldModel(client),
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),

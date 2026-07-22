@@ -26,15 +26,6 @@ export const dbPresetMutationKeys = {
   /** Delete dbPreset mutation key */ delete: (id: string | number) =>
     ['mutation', 'dbpreset', 'delete', id] as const,
 } as const;
-export const declaredCapacityMutationKeys = {
-  /** All declaredCapacity mutation keys */ all: ['mutation', 'declaredcapacity'] as const,
-  /** Create declaredCapacity mutation key */ create: () =>
-    ['mutation', 'declaredcapacity', 'create'] as const,
-  /** Update declaredCapacity mutation key */ update: (id: string | number) =>
-    ['mutation', 'declaredcapacity', 'update', id] as const,
-  /** Delete declaredCapacity mutation key */ delete: (id: string | number) =>
-    ['mutation', 'declaredcapacity', 'delete', id] as const,
-} as const;
 export const functionApiBindingMutationKeys = {
   /** All functionApiBinding mutation keys */ all: ['mutation', 'functionapibinding'] as const,
   /** Create functionApiBinding mutation key */ create: () =>
@@ -164,6 +155,18 @@ export const functionGraphStoreMutationKeys = {
   /** Delete functionGraphStore mutation key */ delete: (id: string | number) =>
     ['mutation', 'functiongraphstore', 'delete', id] as const,
 } as const;
+export const functionInvocationAttemptMutationKeys = {
+  /** All functionInvocationAttempt mutation keys */ all: [
+    'mutation',
+    'functioninvocationattempt',
+  ] as const,
+  /** Create functionInvocationAttempt mutation key */ create: () =>
+    ['mutation', 'functioninvocationattempt', 'create'] as const,
+  /** Update functionInvocationAttempt mutation key */ update: (id: string | number) =>
+    ['mutation', 'functioninvocationattempt', 'update', id] as const,
+  /** Delete functionInvocationAttempt mutation key */ delete: (id: string | number) =>
+    ['mutation', 'functioninvocationattempt', 'delete', id] as const,
+} as const;
 export const functionInvocationMutationKeys = {
   /** All functionInvocation mutation keys */ all: ['mutation', 'functioninvocation'] as const,
   /** Create functionInvocation mutation key */ create: () =>
@@ -257,18 +260,6 @@ export const namespaceEventMutationKeys = {
   /** Delete namespaceEvent mutation key */ delete: (id: string | number) =>
     ['mutation', 'namespaceevent', 'delete', id] as const,
 } as const;
-export const platformDeclaredCapacityMutationKeys = {
-  /** All platformDeclaredCapacity mutation keys */ all: [
-    'mutation',
-    'platformdeclaredcapacity',
-  ] as const,
-  /** Create platformDeclaredCapacity mutation key */ create: () =>
-    ['mutation', 'platformdeclaredcapacity', 'create'] as const,
-  /** Update platformDeclaredCapacity mutation key */ update: (id: string | number) =>
-    ['mutation', 'platformdeclaredcapacity', 'update', id] as const,
-  /** Delete platformDeclaredCapacity mutation key */ delete: (id: string | number) =>
-    ['mutation', 'platformdeclaredcapacity', 'delete', id] as const,
-} as const;
 export const platformFunctionApiBindingMutationKeys = {
   /** All platformFunctionApiBinding mutation keys */ all: [
     'mutation',
@@ -328,6 +319,18 @@ export const platformFunctionExecutionLogMutationKeys = {
     ['mutation', 'platformfunctionexecutionlog', 'update', id] as const,
   /** Delete platformFunctionExecutionLog mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformfunctionexecutionlog', 'delete', id] as const,
+} as const;
+export const platformFunctionInvocationAttemptMutationKeys = {
+  /** All platformFunctionInvocationAttempt mutation keys */ all: [
+    'mutation',
+    'platformfunctioninvocationattempt',
+  ] as const,
+  /** Create platformFunctionInvocationAttempt mutation key */ create: () =>
+    ['mutation', 'platformfunctioninvocationattempt', 'create'] as const,
+  /** Update platformFunctionInvocationAttempt mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformfunctioninvocationattempt', 'update', id] as const,
+  /** Delete platformFunctionInvocationAttempt mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformfunctioninvocationattempt', 'delete', id] as const,
 } as const;
 export const platformFunctionInvocationMutationKeys = {
   /** All platformFunctionInvocation mutation keys */ all: [
@@ -419,6 +422,18 @@ export const platformResourceMutationKeys = {
   /** Delete platformResource mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformresource', 'delete', id] as const,
 } as const;
+export const platformResourceDeclaredCapacityMutationKeys = {
+  /** All platformResourceDeclaredCapacity mutation keys */ all: [
+    'mutation',
+    'platformresourcedeclaredcapacity',
+  ] as const,
+  /** Create platformResourceDeclaredCapacity mutation key */ create: () =>
+    ['mutation', 'platformresourcedeclaredcapacity', 'create'] as const,
+  /** Update platformResourceDeclaredCapacity mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourcedeclaredcapacity', 'update', id] as const,
+  /** Delete platformResourceDeclaredCapacity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourcedeclaredcapacity', 'delete', id] as const,
+} as const;
 export const platformResourceDefinitionMutationKeys = {
   /** All platformResourceDefinition mutation keys */ all: [
     'mutation',
@@ -491,17 +506,17 @@ export const platformResourceUsageSummaryMutationKeys = {
   /** Delete platformResourceUsageSummary mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformresourceusagesummary', 'delete', id] as const,
 } as const;
-export const platformResourceUtilizationDailyMutationKeys = {
-  /** All platformResourceUtilizationDaily mutation keys */ all: [
+export const platformResourceUtilizationMutationKeys = {
+  /** All platformResourceUtilization mutation keys */ all: [
     'mutation',
-    'platformresourceutilizationdaily',
+    'platformresourceutilization',
   ] as const,
-  /** Create platformResourceUtilizationDaily mutation key */ create: () =>
-    ['mutation', 'platformresourceutilizationdaily', 'create'] as const,
-  /** Update platformResourceUtilizationDaily mutation key */ update: (id: string | number) =>
-    ['mutation', 'platformresourceutilizationdaily', 'update', id] as const,
-  /** Delete platformResourceUtilizationDaily mutation key */ delete: (id: string | number) =>
-    ['mutation', 'platformresourceutilizationdaily', 'delete', id] as const,
+  /** Create platformResourceUtilization mutation key */ create: () =>
+    ['mutation', 'platformresourceutilization', 'create'] as const,
+  /** Update platformResourceUtilization mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourceutilization', 'update', id] as const,
+  /** Delete platformResourceUtilization mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourceutilization', 'delete', id] as const,
 } as const;
 export const platformResourcesHealthMutationKeys = {
   /** All platformResourcesHealth mutation keys */ all: [
@@ -568,6 +583,18 @@ export const resourceMutationKeys = {
   /** Delete resource mutation key */ delete: (id: string | number) =>
     ['mutation', 'resource', 'delete', id] as const,
 } as const;
+export const resourceDeclaredCapacityMutationKeys = {
+  /** All resourceDeclaredCapacity mutation keys */ all: [
+    'mutation',
+    'resourcedeclaredcapacity',
+  ] as const,
+  /** Create resourceDeclaredCapacity mutation key */ create: () =>
+    ['mutation', 'resourcedeclaredcapacity', 'create'] as const,
+  /** Update resourceDeclaredCapacity mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourcedeclaredcapacity', 'update', id] as const,
+  /** Delete resourceDeclaredCapacity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourcedeclaredcapacity', 'delete', id] as const,
+} as const;
 export const resourceDefinitionMutationKeys = {
   /** All resourceDefinition mutation keys */ all: ['mutation', 'resourcedefinition'] as const,
   /** Create resourceDefinition mutation key */ create: () =>
@@ -622,17 +649,14 @@ export const resourceUsageSummaryMutationKeys = {
   /** Delete resourceUsageSummary mutation key */ delete: (id: string | number) =>
     ['mutation', 'resourceusagesummary', 'delete', id] as const,
 } as const;
-export const resourceUtilizationDailyMutationKeys = {
-  /** All resourceUtilizationDaily mutation keys */ all: [
-    'mutation',
-    'resourceutilizationdaily',
-  ] as const,
-  /** Create resourceUtilizationDaily mutation key */ create: () =>
-    ['mutation', 'resourceutilizationdaily', 'create'] as const,
-  /** Update resourceUtilizationDaily mutation key */ update: (id: string | number) =>
-    ['mutation', 'resourceutilizationdaily', 'update', id] as const,
-  /** Delete resourceUtilizationDaily mutation key */ delete: (id: string | number) =>
-    ['mutation', 'resourceutilizationdaily', 'delete', id] as const,
+export const resourceUtilizationMutationKeys = {
+  /** All resourceUtilization mutation keys */ all: ['mutation', 'resourceutilization'] as const,
+  /** Create resourceUtilization mutation key */ create: () =>
+    ['mutation', 'resourceutilization', 'create'] as const,
+  /** Update resourceUtilization mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourceutilization', 'update', id] as const,
+  /** Delete resourceUtilization mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourceutilization', 'delete', id] as const,
 } as const;
 export const resourcesHealthMutationKeys = {
   /** All resourcesHealth mutation keys */ all: ['mutation', 'resourceshealth'] as const,
@@ -846,7 +870,6 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   dbPreset: dbPresetMutationKeys,
-  declaredCapacity: declaredCapacityMutationKeys,
   functionApiBinding: functionApiBindingMutationKeys,
   functionDefinition: functionDefinitionMutationKeys,
   functionDeployment: functionDeploymentMutationKeys,
@@ -860,6 +883,7 @@ export const mutationKeys = {
   functionGraphObject: functionGraphObjectMutationKeys,
   functionGraphRef: functionGraphRefMutationKeys,
   functionGraphStore: functionGraphStoreMutationKeys,
+  functionInvocationAttempt: functionInvocationAttemptMutationKeys,
   functionInvocation: functionInvocationMutationKeys,
   getAllTreeNodesRecord: getAllTreeNodesRecordMutationKeys,
   infraCommit: infraCommitMutationKeys,
@@ -870,12 +894,12 @@ export const mutationKeys = {
   integrationProvider: integrationProviderMutationKeys,
   namespace: namespaceMutationKeys,
   namespaceEvent: namespaceEventMutationKeys,
-  platformDeclaredCapacity: platformDeclaredCapacityMutationKeys,
   platformFunctionApiBinding: platformFunctionApiBindingMutationKeys,
   platformFunctionDefinition: platformFunctionDefinitionMutationKeys,
   platformFunctionDeployment: platformFunctionDeploymentMutationKeys,
   platformFunctionDeploymentEvent: platformFunctionDeploymentEventMutationKeys,
   platformFunctionExecutionLog: platformFunctionExecutionLogMutationKeys,
+  platformFunctionInvocationAttempt: platformFunctionInvocationAttemptMutationKeys,
   platformFunctionInvocation: platformFunctionInvocationMutationKeys,
   platformInfraCommit: platformInfraCommitMutationKeys,
   platformInfraGetAllTreeNodesRecord: platformInfraGetAllTreeNodesRecordMutationKeys,
@@ -885,26 +909,28 @@ export const mutationKeys = {
   platformNamespace: platformNamespaceMutationKeys,
   platformNamespaceEvent: platformNamespaceEventMutationKeys,
   platformResource: platformResourceMutationKeys,
+  platformResourceDeclaredCapacity: platformResourceDeclaredCapacityMutationKeys,
   platformResourceDefinition: platformResourceDefinitionMutationKeys,
   platformResourceEvent: platformResourceEventMutationKeys,
   platformResourceInstallation: platformResourceInstallationMutationKeys,
   platformResourceStatusCheck: platformResourceStatusCheckMutationKeys,
   platformResourceUsageLog: platformResourceUsageLogMutationKeys,
   platformResourceUsageSummary: platformResourceUsageSummaryMutationKeys,
-  platformResourceUtilizationDaily: platformResourceUtilizationDailyMutationKeys,
+  platformResourceUtilization: platformResourceUtilizationMutationKeys,
   platformResourcesHealth: platformResourcesHealthMutationKeys,
   platformResourcesRequirementsState: platformResourcesRequirementsStateMutationKeys,
   platformResourcesResolvedRequirement: platformResourcesResolvedRequirementMutationKeys,
   platformWebhookEndpoint: platformWebhookEndpointMutationKeys,
   platformWebhookEvent: platformWebhookEventMutationKeys,
   resource: resourceMutationKeys,
+  resourceDeclaredCapacity: resourceDeclaredCapacityMutationKeys,
   resourceDefinition: resourceDefinitionMutationKeys,
   resourceEvent: resourceEventMutationKeys,
   resourceInstallation: resourceInstallationMutationKeys,
   resourceStatusCheck: resourceStatusCheckMutationKeys,
   resourceUsageLog: resourceUsageLogMutationKeys,
   resourceUsageSummary: resourceUsageSummaryMutationKeys,
-  resourceUtilizationDaily: resourceUtilizationDailyMutationKeys,
+  resourceUtilization: resourceUtilizationMutationKeys,
   resourcesHealth: resourcesHealthMutationKeys,
   resourcesRequirementsState: resourcesRequirementsStateMutationKeys,
   resourcesResolvedRequirement: resourcesResolvedRequirementMutationKeys,

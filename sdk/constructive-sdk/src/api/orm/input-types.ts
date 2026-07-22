@@ -362,6 +362,8 @@ export interface CheckConstraint {
   expr?: Record<string, unknown> | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -486,6 +488,60 @@ export interface Domain {
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname | null;
 }
+/** Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. */
+export interface DomainEvent {
+  /** User who triggered this event (NULL for system/automated transitions) */
+  actorId?: string | null;
+  /** Event timestamp */
+  createdAt?: string | null;
+  /** The verification challenge this event relates to, when applicable */
+  domainVerificationId?: string | null;
+  /** Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked */
+  eventType?: string | null;
+  /** Unique event identifier */
+  id: string;
+  /** The managed_domain this event belongs to */
+  managedDomainId?: string | null;
+  /** Human-readable description of the event */
+  message?: string | null;
+  /** Structured context (challenge record, cert-manager detail, error details, ...) */
+  metadata?: Record<string, unknown> | null;
+  /** Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS */
+  ownerId?: string | null;
+}
+/** One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. */
+export interface DomainVerification {
+  /** Number of times domain:verify has polled for this challenge (drives backoff / max_attempts) */
+  attempts?: number | null;
+  /** When this challenge was minted (domain:issue_challenge) */
+  createdAt?: string | null;
+  /** Last verification error (mismatch, NXDOMAIN, timeout, ...) */
+  error?: string | null;
+  /** When this challenge expires and must be reissued */
+  expiresAt?: string | null;
+  /** Unique identifier for this verification challenge */
+  id: string;
+  /** When domain:verify last polled DNS/HTTP for this challenge */
+  lastCheckedAt?: string | null;
+  /** The managed_domain this challenge proves ownership of */
+  managedDomainId?: string | null;
+  /** Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge) */
+  method?: string | null;
+  /** Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity. */
+  ownerId?: string | null;
+  /** DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01 */
+  recordName?: string | null;
+  /** DNS record type to create: TXT | CNAME | A; NULL for http_01 */
+  recordType?: string | null;
+  /** The public challenge token the user must publish (ends up in a public DNS record). NOT a secret. */
+  recordValue?: string | null;
+  /** Challenge lifecycle: pending | checking | verified | failed | expired */
+  status?: string | null;
+  /** When this row was last updated */
+  updatedAt?: string | null;
+  /** When status last became verified */
+  verifiedAt?: string | null;
+}
 export interface EmbeddingChunk {
   chunkOverlap?: number | null;
   chunkSize?: number | null;
@@ -521,6 +577,23 @@ export interface Enum {
   tags?: string[] | null;
   values?: string[] | null;
 }
+export interface ExclusionConstraint {
+  accessMethod?: string | null;
+  category?: ObjectCategory | null;
+  createdAt?: string | null;
+  databaseId?: string | null;
+  elementExpr?: Record<string, unknown> | null;
+  fieldIds?: string[] | null;
+  id: string;
+  name?: string | null;
+  operators?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  tableId?: string | null;
+  tags?: string[] | null;
+  type?: string | null;
+  updatedAt?: string | null;
+  whereClause?: Record<string, unknown> | null;
+}
 export interface Field {
   apiRequired?: boolean | null;
   category?: ObjectCategory | null;
@@ -534,6 +607,8 @@ export interface Field {
   generationExpression?: Record<string, unknown> | null;
   generationType?: string | null;
   id: string;
+  identityGeneration?: string | null;
+  identityOptions?: Record<string, unknown> | null;
   isRequired?: boolean | null;
   label?: string | null;
   max?: number | null;
@@ -551,9 +626,12 @@ export interface ForeignKeyConstraint {
   createdAt?: string | null;
   databaseId?: string | null;
   deleteAction?: string | null;
+  deleteSetFieldIds?: string[] | null;
   description?: string | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   refFieldIds?: string[] | null;
   refTableId?: string | null;
@@ -563,6 +641,7 @@ export interface ForeignKeyConstraint {
   type?: string | null;
   updateAction?: string | null;
   updatedAt?: string | null;
+  withPeriod?: boolean | null;
 }
 export interface FullTextSearch {
   createdAt?: string | null;
@@ -627,8 +706,12 @@ export interface Index {
 }
 /** One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) */
 export interface ManagedDomain {
+  /** Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy. */
+  allowPublicUsage?: boolean | null;
   /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
   annotations?: Record<string, unknown> | null;
+  /** cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error */
+  certStatus?: string | null;
   /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
   databaseId?: string | null;
   /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
@@ -639,9 +722,9 @@ export interface ManagedDomain {
   isWildcard?: boolean | null;
   /** When tls_status last became active */
   tlsReadyAt?: string | null;
-  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  /** TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed */
   tlsStatus?: string | null;
-  /** Domain ownership verification state: pending | verified | failed */
+  /** Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired */
   verificationStatus?: string | null;
   /** When verification_status last became verified */
   verifiedAt?: string | null;
@@ -695,12 +778,15 @@ export interface PrimaryKeyConstraint {
   databaseId?: string | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
   updatedAt?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 /** Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries */
 export interface PubkeySetting {
@@ -904,13 +990,19 @@ export interface Trigger {
   createdAt?: string | null;
   databaseId?: string | null;
   event?: string | null;
+  events?: string[] | null;
+  forEach?: string | null;
   functionName?: string | null;
   id: string;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
+  timing?: string | null;
+  transitionNewName?: string | null;
+  transitionOldName?: string | null;
   updatedAt?: string | null;
+  whenClause?: Record<string, unknown> | null;
 }
 export interface TriggerFunction {
   code?: string | null;
@@ -927,15 +1019,19 @@ export interface UniqueConstraint {
   description?: string | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
   updatedAt?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 export interface View {
   category?: ObjectCategory | null;
+  checkOption?: string | null;
   data?: Record<string, unknown> | null;
   databaseId?: string | null;
   filterData?: Record<string, unknown> | null;
@@ -944,6 +1040,7 @@ export interface View {
   isReadOnly?: boolean | null;
   name?: string | null;
   schemaId?: string | null;
+  securityBarrier?: boolean | null;
   securityInvoker?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -1086,6 +1183,7 @@ export interface DatabaseRelations {
   domains?: ConnectionResult<Domain>;
   embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   enums?: ConnectionResult<Enum>;
+  exclusionConstraints?: ConnectionResult<ExclusionConstraint>;
   fields?: ConnectionResult<Field>;
   foreignKeyConstraints?: ConnectionResult<ForeignKeyConstraint>;
   fullTextSearches?: ConnectionResult<FullTextSearch>;
@@ -1128,6 +1226,14 @@ export interface DomainRelations {
   site?: Site | null;
   httpRoutes?: ConnectionResult<HttpRoute>;
 }
+export interface DomainEventRelations {
+  domainVerification?: DomainVerification | null;
+  managedDomain?: ManagedDomain | null;
+}
+export interface DomainVerificationRelations {
+  managedDomain?: ManagedDomain | null;
+  domainEvents?: ConnectionResult<DomainEvent>;
+}
 export interface EmbeddingChunkRelations {
   chunksTable?: Table | null;
   database?: Database | null;
@@ -1138,6 +1244,10 @@ export interface EmbeddingChunkRelations {
 export interface EnumRelations {
   database?: Database | null;
   schema?: Schema | null;
+}
+export interface ExclusionConstraintRelations {
+  database?: Database | null;
+  table?: Table | null;
 }
 export interface FieldRelations {
   database?: Database | null;
@@ -1167,6 +1277,8 @@ export interface IndexRelations {
 }
 export interface ManagedDomainRelations {
   database?: Database | null;
+  domainEvents?: ConnectionResult<DomainEvent>;
+  domainVerifications?: ConnectionResult<DomainVerification>;
 }
 export interface NodeTypeRegistryRelations {}
 export interface PartitionRelations {
@@ -1252,6 +1364,7 @@ export interface TableRelations {
   checkConstraints?: ConnectionResult<CheckConstraint>;
   embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   embeddingChunksByChunksTableId?: ConnectionResult<EmbeddingChunk>;
+  exclusionConstraints?: ConnectionResult<ExclusionConstraint>;
   fields?: ConnectionResult<Field>;
   foreignKeyConstraints?: ConnectionResult<ForeignKeyConstraint>;
   fullTextSearches?: ConnectionResult<FullTextSearch>;
@@ -1329,8 +1442,11 @@ export type DatabaseSettingWithRelations = DatabaseSetting & DatabaseSettingRela
 export type DatabaseTransferWithRelations = DatabaseTransfer & DatabaseTransferRelations;
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
 export type DomainWithRelations = Domain & DomainRelations;
+export type DomainEventWithRelations = DomainEvent & DomainEventRelations;
+export type DomainVerificationWithRelations = DomainVerification & DomainVerificationRelations;
 export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type EnumWithRelations = Enum & EnumRelations;
+export type ExclusionConstraintWithRelations = ExclusionConstraint & ExclusionConstraintRelations;
 export type FieldWithRelations = Field & FieldRelations;
 export type ForeignKeyConstraintWithRelations = ForeignKeyConstraint &
   ForeignKeyConstraintRelations;
@@ -1497,6 +1613,8 @@ export type CheckConstraintSelect = {
   expr?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
@@ -1639,6 +1757,12 @@ export type DatabaseSelect = {
     first?: number;
     filter?: EnumFilter;
     orderBy?: EnumOrderBy[];
+  };
+  exclusionConstraints?: {
+    select: ExclusionConstraintSelect;
+    first?: number;
+    filter?: ExclusionConstraintFilter;
+    orderBy?: ExclusionConstraintOrderBy[];
   };
   fields?: {
     select: FieldSelect;
@@ -1873,6 +1997,49 @@ export type DomainSelect = {
     orderBy?: HttpRouteOrderBy[];
   };
 };
+export type DomainEventSelect = {
+  actorId?: boolean;
+  createdAt?: boolean;
+  domainVerificationId?: boolean;
+  eventType?: boolean;
+  id?: boolean;
+  managedDomainId?: boolean;
+  message?: boolean;
+  metadata?: boolean;
+  ownerId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  managedDomain?: {
+    select: ManagedDomainSelect;
+  };
+};
+export type DomainVerificationSelect = {
+  attempts?: boolean;
+  createdAt?: boolean;
+  error?: boolean;
+  expiresAt?: boolean;
+  id?: boolean;
+  lastCheckedAt?: boolean;
+  managedDomainId?: boolean;
+  method?: boolean;
+  ownerId?: boolean;
+  recordName?: boolean;
+  recordType?: boolean;
+  recordValue?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  verifiedAt?: boolean;
+  managedDomain?: {
+    select: ManagedDomainSelect;
+  };
+  domainEvents?: {
+    select: DomainEventSelect;
+    first?: number;
+    filter?: DomainEventFilter;
+    orderBy?: DomainEventOrderBy[];
+  };
+};
 export type EmbeddingChunkSelect = {
   chunkOverlap?: boolean;
   chunkSize?: boolean;
@@ -1929,6 +2096,29 @@ export type EnumSelect = {
     select: SchemaSelect;
   };
 };
+export type ExclusionConstraintSelect = {
+  accessMethod?: boolean;
+  category?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  elementExpr?: boolean;
+  fieldIds?: boolean;
+  id?: boolean;
+  name?: boolean;
+  operators?: boolean;
+  smartTags?: boolean;
+  tableId?: boolean;
+  tags?: boolean;
+  type?: boolean;
+  updatedAt?: boolean;
+  whereClause?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  table?: {
+    select: TableSelect;
+  };
+};
 export type FieldSelect = {
   apiRequired?: boolean;
   category?: boolean;
@@ -1942,6 +2132,8 @@ export type FieldSelect = {
   generationExpression?: boolean;
   generationType?: boolean;
   id?: boolean;
+  identityGeneration?: boolean;
+  identityOptions?: boolean;
   isRequired?: boolean;
   label?: boolean;
   max?: boolean;
@@ -1977,9 +2169,12 @@ export type ForeignKeyConstraintSelect = {
   createdAt?: boolean;
   databaseId?: boolean;
   deleteAction?: boolean;
+  deleteSetFieldIds?: boolean;
   description?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   refFieldIds?: boolean;
   refTableId?: boolean;
@@ -1989,6 +2184,7 @@ export type ForeignKeyConstraintSelect = {
   type?: boolean;
   updateAction?: boolean;
   updatedAt?: boolean;
+  withPeriod?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2073,7 +2269,9 @@ export type IndexSelect = {
   };
 };
 export type ManagedDomainSelect = {
+  allowPublicUsage?: boolean;
   annotations?: boolean;
+  certStatus?: boolean;
   databaseId?: boolean;
   domain?: boolean;
   id?: boolean;
@@ -2084,6 +2282,18 @@ export type ManagedDomainSelect = {
   verifiedAt?: boolean;
   database?: {
     select: DatabaseSelect;
+  };
+  domainEvents?: {
+    select: DomainEventSelect;
+    first?: number;
+    filter?: DomainEventFilter;
+    orderBy?: DomainEventOrderBy[];
+  };
+  domainVerifications?: {
+    select: DomainVerificationSelect;
+    first?: number;
+    filter?: DomainVerificationFilter;
+    orderBy?: DomainVerificationOrderBy[];
   };
 };
 export type NodeTypeRegistrySelect = {
@@ -2149,12 +2359,15 @@ export type PrimaryKeyConstraintSelect = {
   databaseId?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
   tags?: boolean;
   type?: boolean;
   updatedAt?: boolean;
+  withoutOverlaps?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2490,6 +2703,12 @@ export type TableSelect = {
     filter?: EmbeddingChunkFilter;
     orderBy?: EmbeddingChunkOrderBy[];
   };
+  exclusionConstraints?: {
+    select: ExclusionConstraintSelect;
+    first?: number;
+    filter?: ExclusionConstraintFilter;
+    orderBy?: ExclusionConstraintOrderBy[];
+  };
   fields?: {
     select: FieldSelect;
     first?: number;
@@ -2591,13 +2810,19 @@ export type TriggerSelect = {
   createdAt?: boolean;
   databaseId?: boolean;
   event?: boolean;
+  events?: boolean;
+  forEach?: boolean;
   functionName?: boolean;
   id?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
   tags?: boolean;
+  timing?: boolean;
+  transitionNewName?: boolean;
+  transitionOldName?: boolean;
   updatedAt?: boolean;
+  whenClause?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2623,12 +2848,15 @@ export type UniqueConstraintSelect = {
   description?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
   tags?: boolean;
   type?: boolean;
   updatedAt?: boolean;
+  withoutOverlaps?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2638,6 +2866,7 @@ export type UniqueConstraintSelect = {
 };
 export type ViewSelect = {
   category?: boolean;
+  checkOption?: boolean;
   data?: boolean;
   databaseId?: boolean;
   filterData?: boolean;
@@ -2646,6 +2875,7 @@ export type ViewSelect = {
   isReadOnly?: boolean;
   name?: boolean;
   schemaId?: boolean;
+  securityBarrier?: boolean;
   securityInvoker?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
@@ -2990,6 +3220,10 @@ export interface CheckConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3124,6 +3358,10 @@ export interface DatabaseFilter {
   enums?: DatabaseToManyEnumFilter;
   /** `enums` exist. */
   enumsExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: DatabaseToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: DatabaseToManyFieldFilter;
   /** `fields` exist. */
@@ -3405,6 +3643,82 @@ export interface DomainFilter {
   /** Filter by the object’s `subdomain` field. */
   subdomain?: ConstructiveInternalTypeHostnameFilter;
 }
+export interface DomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: DomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: DomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainEventFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+}
+export interface DomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: DomainVerificationToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainVerificationFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
 export interface EmbeddingChunkFilter {
   /** Checks for all expressions in this list. */
   and?: EmbeddingChunkFilter[];
@@ -3503,6 +3817,48 @@ export interface EnumFilter {
   /** Filter by the object’s `values` field. */
   values?: StringListFilter;
 }
+export interface ExclusionConstraintFilter {
+  /** Filter by the object’s `accessMethod` field. */
+  accessMethod?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `elementExpr` field. */
+  elementExpr?: JSONFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ExclusionConstraintFilter;
+  /** Filter by the object’s `operators` field. */
+  operators?: StringListFilter;
+  /** Checks for any expressions in this list. */
+  or?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `whereClause` field. */
+  whereClause?: JSONFilter;
+}
 export interface FieldFilter {
   /** Checks for all expressions in this list. */
   and?: FieldFilter[];
@@ -3532,6 +3888,10 @@ export interface FieldFilter {
   generationType?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `identityGeneration` field. */
+  identityGeneration?: StringFilter;
+  /** Filter by the object’s `identityOptions` field. */
+  identityOptions?: JSONFilter;
   /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
   /** Filter by the object’s `label` field. */
@@ -3582,12 +3942,18 @@ export interface ForeignKeyConstraintFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `deleteSetFieldIds` field. */
+  deleteSetFieldIds?: UUIDListFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3614,6 +3980,8 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withPeriod` field. */
+  withPeriod?: BooleanFilter;
 }
 export interface FullTextSearchFilter {
   /** Checks for all expressions in this list. */
@@ -3750,16 +4118,28 @@ export interface IndexFilter {
   whereClause?: JSONFilter;
 }
 export interface ManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: ManagedDomainFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: ManagedDomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: ManagedDomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isWildcard` field. */
@@ -3898,6 +4278,10 @@ export interface PrimaryKeyConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3916,6 +4300,8 @@ export interface PrimaryKeyConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 export interface PubkeySettingFilter {
   /** Checks for all expressions in this list. */
@@ -4336,6 +4722,10 @@ export interface TableFilter {
   embeddingChunksByChunksTableIdExist?: boolean;
   /** `embeddingChunks` exist. */
   embeddingChunksExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: TableToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: TableToManyFieldFilter;
   /** `fields` exist. */
@@ -4482,6 +4872,10 @@ export interface TriggerFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `events` field. */
+  events?: StringListFilter;
+  /** Filter by the object’s `forEach` field. */
+  forEach?: StringFilter;
   /** Filter by the object’s `functionName` field. */
   functionName?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -4500,8 +4894,16 @@ export interface TriggerFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `timing` field. */
+  timing?: StringFilter;
+  /** Filter by the object’s `transitionNewName` field. */
+  transitionNewName?: StringFilter;
+  /** Filter by the object’s `transitionOldName` field. */
+  transitionOldName?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `whenClause` field. */
+  whenClause?: JSONFilter;
 }
 export interface TriggerFunctionFilter {
   /** Checks for all expressions in this list. */
@@ -4542,6 +4944,10 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -4560,12 +4966,16 @@ export interface UniqueConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 export interface ViewFilter {
   /** Checks for all expressions in this list. */
   and?: ViewFilter[];
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
+  /** Filter by the object’s `checkOption` field. */
+  checkOption?: StringFilter;
   /** Filter by the object’s `data` field. */
   data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
@@ -4590,6 +5000,8 @@ export interface ViewFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `securityBarrier` field. */
+  securityBarrier?: BooleanFilter;
   /** Filter by the object’s `securityInvoker` field. */
   securityInvoker?: BooleanFilter;
   /** Filter by the object’s `smartTags` field. */
@@ -4921,6 +5333,10 @@ export type CheckConstraintOrderBy =
   | 'FIELD_IDS_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INITIALLY_DEFERRED_ASC'
+  | 'INITIALLY_DEFERRED_DESC'
+  | 'IS_DEFERRABLE_ASC'
+  | 'IS_DEFERRABLE_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
@@ -5104,6 +5520,62 @@ export type DomainOrderBy =
   | 'SITE_ID_DESC'
   | 'SUBDOMAIN_ASC'
   | 'SUBDOMAIN_DESC';
+export type DomainEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DOMAIN_VERIFICATION_ID_ASC'
+  | 'DOMAIN_VERIFICATION_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MANAGED_DOMAIN_ID_ASC'
+  | 'MANAGED_DOMAIN_ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type DomainVerificationOrderBy =
+  | 'ATTEMPTS_ASC'
+  | 'ATTEMPTS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_CHECKED_AT_ASC'
+  | 'LAST_CHECKED_AT_DESC'
+  | 'MANAGED_DOMAIN_ID_ASC'
+  | 'MANAGED_DOMAIN_ID_DESC'
+  | 'METHOD_ASC'
+  | 'METHOD_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECORD_NAME_ASC'
+  | 'RECORD_NAME_DESC'
+  | 'RECORD_TYPE_ASC'
+  | 'RECORD_TYPE_DESC'
+  | 'RECORD_VALUE_ASC'
+  | 'RECORD_VALUE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VERIFIED_AT_ASC'
+  | 'VERIFIED_AT_DESC';
 export type EmbeddingChunkOrderBy =
   | 'CHUNKING_TASK_NAME_ASC'
   | 'CHUNKING_TASK_NAME_DESC'
@@ -5174,6 +5646,40 @@ export type EnumOrderBy =
   | 'TAGS_DESC'
   | 'VALUES_ASC'
   | 'VALUES_DESC';
+export type ExclusionConstraintOrderBy =
+  | 'ACCESS_METHOD_ASC'
+  | 'ACCESS_METHOD_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ELEMENT_EXPR_ASC'
+  | 'ELEMENT_EXPR_DESC'
+  | 'FIELD_IDS_ASC'
+  | 'FIELD_IDS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OPERATORS_ASC'
+  | 'OPERATORS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SMART_TAGS_ASC'
+  | 'SMART_TAGS_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC'
+  | 'TYPE_ASC'
+  | 'TYPE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'WHERE_CLAUSE_ASC'
+  | 'WHERE_CLAUSE_DESC';
 export type FieldOrderBy =
   | 'API_REQUIRED_ASC'
   | 'API_REQUIRED_DESC'
@@ -5197,6 +5703,10 @@ export type FieldOrderBy =
   | 'GENERATION_EXPRESSION_DESC'
   | 'GENERATION_TYPE_ASC'
   | 'GENERATION_TYPE_DESC'
+  | 'IDENTITY_GENERATION_ASC'
+  | 'IDENTITY_GENERATION_DESC'
+  | 'IDENTITY_OPTIONS_ASC'
+  | 'IDENTITY_OPTIONS_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'IS_REQUIRED_ASC'
@@ -5233,12 +5743,18 @@ export type ForeignKeyConstraintOrderBy =
   | 'DATABASE_ID_DESC'
   | 'DELETE_ACTION_ASC'
   | 'DELETE_ACTION_DESC'
+  | 'DELETE_SET_FIELD_IDS_ASC'
+  | 'DELETE_SET_FIELD_IDS_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
   | 'FIELD_IDS_ASC'
   | 'FIELD_IDS_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INITIALLY_DEFERRED_ASC'
+  | 'INITIALLY_DEFERRED_DESC'
+  | 'IS_DEFERRABLE_ASC'
+  | 'IS_DEFERRABLE_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
@@ -5259,7 +5775,9 @@ export type ForeignKeyConstraintOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATE_ACTION_ASC'
-  | 'UPDATE_ACTION_DESC';
+  | 'UPDATE_ACTION_DESC'
+  | 'WITH_PERIOD_ASC'
+  | 'WITH_PERIOD_DESC';
 export type FullTextSearchOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
@@ -5365,8 +5883,12 @@ export type IndexOrderBy =
   | 'WHERE_CLAUSE_ASC'
   | 'WHERE_CLAUSE_DESC';
 export type ManagedDomainOrderBy =
+  | 'ALLOW_PUBLIC_USAGE_ASC'
+  | 'ALLOW_PUBLIC_USAGE_DESC'
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CERT_STATUS_ASC'
+  | 'CERT_STATUS_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DOMAIN_ASC'
@@ -5481,6 +6003,10 @@ export type PrimaryKeyConstraintOrderBy =
   | 'FIELD_IDS_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INITIALLY_DEFERRED_ASC'
+  | 'INITIALLY_DEFERRED_DESC'
+  | 'IS_DEFERRABLE_ASC'
+  | 'IS_DEFERRABLE_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
@@ -5495,7 +6021,9 @@ export type PrimaryKeyConstraintOrderBy =
   | 'TYPE_ASC'
   | 'TYPE_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'WITHOUT_OVERLAPS_ASC'
+  | 'WITHOUT_OVERLAPS_DESC';
 export type PubkeySettingOrderBy =
   | 'CRYPTO_NETWORK_ASC'
   | 'CRYPTO_NETWORK_DESC'
@@ -5791,8 +6319,12 @@ export type TriggerOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'EVENTS_ASC'
+  | 'EVENTS_DESC'
   | 'EVENT_ASC'
   | 'EVENT_DESC'
+  | 'FOR_EACH_ASC'
+  | 'FOR_EACH_DESC'
   | 'FUNCTION_NAME_ASC'
   | 'FUNCTION_NAME_DESC'
   | 'ID_ASC'
@@ -5808,8 +6340,16 @@ export type TriggerOrderBy =
   | 'TABLE_ID_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
+  | 'TIMING_ASC'
+  | 'TIMING_DESC'
+  | 'TRANSITION_NEW_NAME_ASC'
+  | 'TRANSITION_NEW_NAME_DESC'
+  | 'TRANSITION_OLD_NAME_ASC'
+  | 'TRANSITION_OLD_NAME_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'WHEN_CLAUSE_ASC'
+  | 'WHEN_CLAUSE_DESC';
 export type TriggerFunctionOrderBy =
   | 'CODE_ASC'
   | 'CODE_DESC'
@@ -5839,6 +6379,10 @@ export type UniqueConstraintOrderBy =
   | 'FIELD_IDS_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INITIALLY_DEFERRED_ASC'
+  | 'INITIALLY_DEFERRED_DESC'
+  | 'IS_DEFERRABLE_ASC'
+  | 'IS_DEFERRABLE_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'NATURAL'
@@ -5853,10 +6397,14 @@ export type UniqueConstraintOrderBy =
   | 'TYPE_ASC'
   | 'TYPE_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'WITHOUT_OVERLAPS_ASC'
+  | 'WITHOUT_OVERLAPS_DESC';
 export type ViewOrderBy =
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
+  | 'CHECK_OPTION_ASC'
+  | 'CHECK_OPTION_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DATA_ASC'
@@ -5876,6 +6424,8 @@ export type ViewOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
+  | 'SECURITY_BARRIER_ASC'
+  | 'SECURITY_BARRIER_DESC'
   | 'SECURITY_INVOKER_ASC'
   | 'SECURITY_INVOKER_DESC'
   | 'SMART_TAGS_ASC'
@@ -6177,6 +6727,8 @@ export interface CreateCheckConstraintInput {
     databaseId?: string;
     expr?: Record<string, unknown>;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
@@ -6189,6 +6741,8 @@ export interface CheckConstraintPatch {
   databaseId?: string | null;
   expr?: Record<string, unknown> | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -6434,6 +6988,76 @@ export interface DeleteDomainInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateDomainEventInput {
+  clientMutationId?: string;
+  domainEvent: {
+    actorId?: string;
+    domainVerificationId?: string;
+    eventType: string;
+    managedDomainId: string;
+    message?: string;
+    metadata?: Record<string, unknown>;
+    ownerId: string;
+  };
+}
+export interface DomainEventPatch {
+  actorId?: string | null;
+  domainVerificationId?: string | null;
+  eventType?: string | null;
+  managedDomainId?: string | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+  ownerId?: string | null;
+}
+export interface UpdateDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+  domainEventPatch: DomainEventPatch;
+}
+export interface DeleteDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDomainVerificationInput {
+  clientMutationId?: string;
+  domainVerification: {
+    attempts?: number;
+    error?: string;
+    expiresAt?: string;
+    lastCheckedAt?: string;
+    managedDomainId: string;
+    method?: string;
+    ownerId: string;
+    recordName?: string;
+    recordType?: string;
+    recordValue?: string;
+    status?: string;
+    verifiedAt?: string;
+  };
+}
+export interface DomainVerificationPatch {
+  attempts?: number | null;
+  error?: string | null;
+  expiresAt?: string | null;
+  lastCheckedAt?: string | null;
+  managedDomainId?: string | null;
+  method?: string | null;
+  ownerId?: string | null;
+  recordName?: string | null;
+  recordType?: string | null;
+  recordValue?: string | null;
+  status?: string | null;
+  verifiedAt?: string | null;
+}
+export interface UpdateDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+  domainVerificationPatch: DomainVerificationPatch;
+}
+export interface DeleteDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateEmbeddingChunkInput {
   clientMutationId?: string;
   embeddingChunk: {
@@ -6520,6 +7144,46 @@ export interface DeleteEnumInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateExclusionConstraintInput {
+  clientMutationId?: string;
+  exclusionConstraint: {
+    accessMethod?: string;
+    category?: ObjectCategory;
+    databaseId?: string;
+    elementExpr?: Record<string, unknown>;
+    fieldIds?: string[];
+    name?: string;
+    operators?: string[];
+    smartTags?: Record<string, unknown>;
+    tableId: string;
+    tags?: string[];
+    type?: string;
+    whereClause?: Record<string, unknown>;
+  };
+}
+export interface ExclusionConstraintPatch {
+  accessMethod?: string | null;
+  category?: ObjectCategory | null;
+  databaseId?: string | null;
+  elementExpr?: Record<string, unknown> | null;
+  fieldIds?: string[] | null;
+  name?: string | null;
+  operators?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  tableId?: string | null;
+  tags?: string[] | null;
+  type?: string | null;
+  whereClause?: Record<string, unknown> | null;
+}
+export interface UpdateExclusionConstraintInput {
+  clientMutationId?: string;
+  id: string;
+  exclusionConstraintPatch: ExclusionConstraintPatch;
+}
+export interface DeleteExclusionConstraintInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFieldInput {
   clientMutationId?: string;
   field: {
@@ -6533,6 +7197,8 @@ export interface CreateFieldInput {
     fieldOrder?: number;
     generationExpression?: Record<string, unknown>;
     generationType?: string;
+    identityGeneration?: string;
+    identityOptions?: Record<string, unknown>;
     isRequired?: boolean;
     label?: string;
     max?: number;
@@ -6556,6 +7222,8 @@ export interface FieldPatch {
   fieldOrder?: number | null;
   generationExpression?: Record<string, unknown> | null;
   generationType?: string | null;
+  identityGeneration?: string | null;
+  identityOptions?: Record<string, unknown> | null;
   isRequired?: boolean | null;
   label?: string | null;
   max?: number | null;
@@ -6582,8 +7250,11 @@ export interface CreateForeignKeyConstraintInput {
     category?: ObjectCategory;
     databaseId?: string;
     deleteAction?: string;
+    deleteSetFieldIds?: string[];
     description?: string;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     refFieldIds: string[];
     refTableId: string;
@@ -6592,14 +7263,18 @@ export interface CreateForeignKeyConstraintInput {
     tags?: string[];
     type?: string;
     updateAction?: string;
+    withPeriod?: boolean;
   };
 }
 export interface ForeignKeyConstraintPatch {
   category?: ObjectCategory | null;
   databaseId?: string | null;
   deleteAction?: string | null;
+  deleteSetFieldIds?: string[] | null;
   description?: string | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   refFieldIds?: string[] | null;
   refTableId?: string | null;
@@ -6608,6 +7283,7 @@ export interface ForeignKeyConstraintPatch {
   tags?: string[] | null;
   type?: string | null;
   updateAction?: string | null;
+  withPeriod?: boolean | null;
 }
 export interface UpdateForeignKeyConstraintInput {
   clientMutationId?: string;
@@ -6753,7 +7429,9 @@ export interface DeleteIndexInput {
 export interface CreateManagedDomainInput {
   clientMutationId?: string;
   managedDomain: {
+    allowPublicUsage?: boolean;
     annotations?: Record<string, unknown>;
+    certStatus?: string;
     databaseId: string;
     domain: ConstructiveInternalTypeHostname;
     isWildcard?: boolean;
@@ -6764,7 +7442,9 @@ export interface CreateManagedDomainInput {
   };
 }
 export interface ManagedDomainPatch {
+  allowPublicUsage?: boolean | null;
   annotations?: Record<string, unknown> | null;
+  certStatus?: string | null;
   databaseId?: string | null;
   domain?: ConstructiveInternalTypeHostname | null;
   isWildcard?: boolean | null;
@@ -6896,22 +7576,28 @@ export interface CreatePrimaryKeyConstraintInput {
     category?: ObjectCategory;
     databaseId?: string;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
     tags?: string[];
     type?: string;
+    withoutOverlaps?: boolean;
   };
 }
 export interface PrimaryKeyConstraintPatch {
   category?: ObjectCategory | null;
   databaseId?: string | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 export interface UpdatePrimaryKeyConstraintInput {
   clientMutationId?: string;
@@ -7321,22 +8007,34 @@ export interface CreateTriggerInput {
     category?: ObjectCategory;
     databaseId?: string;
     event?: string;
+    events?: string[];
+    forEach?: string;
     functionName?: string;
     name: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
     tags?: string[];
+    timing?: string;
+    transitionNewName?: string;
+    transitionOldName?: string;
+    whenClause?: Record<string, unknown>;
   };
 }
 export interface TriggerPatch {
   category?: ObjectCategory | null;
   databaseId?: string | null;
   event?: string | null;
+  events?: string[] | null;
+  forEach?: string | null;
   functionName?: string | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
+  timing?: string | null;
+  transitionNewName?: string | null;
+  transitionOldName?: string | null;
+  whenClause?: Record<string, unknown> | null;
 }
 export interface UpdateTriggerInput {
   clientMutationId?: string;
@@ -7376,11 +8074,14 @@ export interface CreateUniqueConstraintInput {
     databaseId?: string;
     description?: string;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
     tags?: string[];
     type?: string;
+    withoutOverlaps?: boolean;
   };
 }
 export interface UniqueConstraintPatch {
@@ -7388,11 +8089,14 @@ export interface UniqueConstraintPatch {
   databaseId?: string | null;
   description?: string | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 export interface UpdateUniqueConstraintInput {
   clientMutationId?: string;
@@ -7407,6 +8111,7 @@ export interface CreateViewInput {
   clientMutationId?: string;
   view: {
     category?: ObjectCategory;
+    checkOption?: string;
     data?: Record<string, unknown>;
     databaseId?: string;
     filterData?: Record<string, unknown>;
@@ -7414,6 +8119,7 @@ export interface CreateViewInput {
     isReadOnly?: boolean;
     name: string;
     schemaId: string;
+    securityBarrier?: boolean;
     securityInvoker?: boolean;
     smartTags?: Record<string, unknown>;
     tableId?: string;
@@ -7423,6 +8129,7 @@ export interface CreateViewInput {
 }
 export interface ViewPatch {
   category?: ObjectCategory | null;
+  checkOption?: string | null;
   data?: Record<string, unknown> | null;
   databaseId?: string | null;
   filterData?: Record<string, unknown> | null;
@@ -7430,6 +8137,7 @@ export interface ViewPatch {
   isReadOnly?: boolean | null;
   name?: string | null;
   schemaId?: string | null;
+  securityBarrier?: boolean | null;
   securityInvoker?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -7595,6 +8303,7 @@ export const connectionFieldsMap = {
     domains: 'Domain',
     embeddingChunks: 'EmbeddingChunk',
     enums: 'Enum',
+    exclusionConstraints: 'ExclusionConstraint',
     fields: 'Field',
     foreignKeyConstraints: 'ForeignKeyConstraint',
     fullTextSearches: 'FullTextSearch',
@@ -7624,9 +8333,16 @@ export const connectionFieldsMap = {
   Domain: {
     httpRoutes: 'HttpRoute',
   },
+  DomainVerification: {
+    domainEvents: 'DomainEvent',
+  },
   Field: {
     spatialRelations: 'SpatialRelation',
     spatialRelationsByRefFieldId: 'SpatialRelation',
+  },
+  ManagedDomain: {
+    domainEvents: 'DomainEvent',
+    domainVerifications: 'DomainVerification',
   },
   Schema: {
     apiSchemas: 'ApiSchema',
@@ -7648,6 +8364,7 @@ export const connectionFieldsMap = {
     checkConstraints: 'CheckConstraint',
     embeddingChunks: 'EmbeddingChunk',
     embeddingChunksByChunksTableId: 'EmbeddingChunk',
+    exclusionConstraints: 'ExclusionConstraint',
     fields: 'Field',
     foreignKeyConstraints: 'ForeignKeyConstraint',
     fullTextSearches: 'FullTextSearch',
@@ -8003,6 +8720,15 @@ export interface DatabaseToManyEnumFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: EnumFilter;
 }
+/** A filter to be used against many `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyExclusionConstraintFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ExclusionConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ExclusionConstraintFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ExclusionConstraintFilter;
+}
 /** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyFieldFilter {
   /** Filters to entities where every related entity matches. */
@@ -8314,6 +9040,15 @@ export interface DomainToManyHttpRouteFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: HttpRouteFilter;
 }
+/** A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainVerificationToManyDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainEventFilter;
+}
 /** A filter to be used against many `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldToManySpatialRelationFilter {
   /** Filters to entities where every related entity matches. */
@@ -8322,6 +9057,24 @@ export interface FieldToManySpatialRelationFilter {
   none?: SpatialRelationFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: SpatialRelationFilter;
+}
+/** A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainToManyDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainEventFilter;
+}
+/** A filter to be used against many `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainToManyDomainVerificationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainVerificationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainVerificationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainVerificationFilter;
 }
 /** A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’ */
 export interface ApiExposureLevelFilter {
@@ -8550,6 +9303,15 @@ export interface TableToManyEmbeddingChunkFilter {
   none?: EmbeddingChunkFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: EmbeddingChunkFilter;
+}
+/** A filter to be used against many `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyExclusionConstraintFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ExclusionConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ExclusionConstraintFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ExclusionConstraintFilter;
 }
 /** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
 export interface TableToManyFieldFilter {
@@ -8795,6 +9557,8 @@ export interface CheckConstraintInput {
   expr?: Record<string, unknown>;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
@@ -8923,6 +9687,60 @@ export interface DomainInput {
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname;
 }
+/** An input for mutations affecting `DomainEvent` */
+export interface DomainEventInput {
+  /** User who triggered this event (NULL for system/automated transitions) */
+  actorId?: string;
+  /** Event timestamp */
+  createdAt?: string;
+  /** The verification challenge this event relates to, when applicable */
+  domainVerificationId?: string;
+  /** Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked */
+  eventType: string;
+  /** Unique event identifier */
+  id?: string;
+  /** The managed_domain this event belongs to */
+  managedDomainId: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (challenge record, cert-manager detail, error details, ...) */
+  metadata?: Record<string, unknown>;
+  /** Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS */
+  ownerId: string;
+}
+/** An input for mutations affecting `DomainVerification` */
+export interface DomainVerificationInput {
+  /** Number of times domain:verify has polled for this challenge (drives backoff / max_attempts) */
+  attempts?: number;
+  /** When this challenge was minted (domain:issue_challenge) */
+  createdAt?: string;
+  /** Last verification error (mismatch, NXDOMAIN, timeout, ...) */
+  error?: string;
+  /** When this challenge expires and must be reissued */
+  expiresAt?: string;
+  /** Unique identifier for this verification challenge */
+  id?: string;
+  /** When domain:verify last polled DNS/HTTP for this challenge */
+  lastCheckedAt?: string;
+  /** The managed_domain this challenge proves ownership of */
+  managedDomainId: string;
+  /** Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge) */
+  method?: string;
+  /** Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity. */
+  ownerId: string;
+  /** DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01 */
+  recordName?: string;
+  /** DNS record type to create: TXT | CNAME | A; NULL for http_01 */
+  recordType?: string;
+  /** The public challenge token the user must publish (ends up in a public DNS record). NOT a secret. */
+  recordValue?: string;
+  /** Challenge lifecycle: pending | checking | verified | failed | expired */
+  status?: string;
+  /** When this row was last updated */
+  updatedAt?: string;
+  /** When status last became verified */
+  verifiedAt?: string;
+}
 /** An input for mutations affecting `EmbeddingChunk` */
 export interface EmbeddingChunkInput {
   chunkOverlap?: number;
@@ -8960,6 +9778,24 @@ export interface EnumInput {
   tags?: string[];
   values?: string[];
 }
+/** An input for mutations affecting `ExclusionConstraint` */
+export interface ExclusionConstraintInput {
+  accessMethod?: string;
+  category?: ObjectCategory;
+  createdAt?: string;
+  databaseId?: string;
+  elementExpr?: Record<string, unknown>;
+  fieldIds?: string[];
+  id?: string;
+  name?: string;
+  operators?: string[];
+  smartTags?: Record<string, unknown>;
+  tableId: string;
+  tags?: string[];
+  type?: string;
+  updatedAt?: string;
+  whereClause?: Record<string, unknown>;
+}
 /** An input for mutations affecting `Field` */
 export interface FieldInput {
   apiRequired?: boolean;
@@ -8974,6 +9810,8 @@ export interface FieldInput {
   generationExpression?: Record<string, unknown>;
   generationType?: string;
   id?: string;
+  identityGeneration?: string;
+  identityOptions?: Record<string, unknown>;
   isRequired?: boolean;
   label?: string;
   max?: number;
@@ -8992,9 +9830,12 @@ export interface ForeignKeyConstraintInput {
   createdAt?: string;
   databaseId?: string;
   deleteAction?: string;
+  deleteSetFieldIds?: string[];
   description?: string;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   refFieldIds: string[];
   refTableId: string;
@@ -9004,6 +9845,7 @@ export interface ForeignKeyConstraintInput {
   type?: string;
   updateAction?: string;
   updatedAt?: string;
+  withPeriod?: boolean;
 }
 /** An input for mutations affecting `FullTextSearch` */
 export interface FullTextSearchInput {
@@ -9071,8 +9913,12 @@ export interface IndexInput {
 }
 /** An input for mutations affecting `ManagedDomain` */
 export interface ManagedDomainInput {
+  /** Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy. */
+  allowPublicUsage?: boolean;
   /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
   annotations?: Record<string, unknown>;
+  /** cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error */
+  certStatus?: string;
   /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
   databaseId: string;
   /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
@@ -9083,9 +9929,9 @@ export interface ManagedDomainInput {
   isWildcard?: boolean;
   /** When tls_status last became active */
   tlsReadyAt?: string;
-  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  /** TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed */
   tlsStatus?: string;
-  /** Domain ownership verification state: pending | verified | failed */
+  /** Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired */
   verificationStatus?: string;
   /** When verification_status last became verified */
   verifiedAt?: string;
@@ -9143,12 +9989,15 @@ export interface PrimaryKeyConstraintInput {
   databaseId?: string;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
   tags?: string[];
   type?: string;
   updatedAt?: string;
+  withoutOverlaps?: boolean;
 }
 /** An input for mutations affecting `PubkeySetting` */
 export interface PubkeySettingInput {
@@ -9343,13 +10192,19 @@ export interface TriggerInput {
   createdAt?: string;
   databaseId?: string;
   event?: string;
+  events?: string[];
+  forEach?: string;
   functionName?: string;
   id?: string;
   name: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
   tags?: string[];
+  timing?: string;
+  transitionNewName?: string;
+  transitionOldName?: string;
   updatedAt?: string;
+  whenClause?: Record<string, unknown>;
 }
 /** An input for mutations affecting `TriggerFunction` */
 export interface TriggerFunctionInput {
@@ -9368,16 +10223,20 @@ export interface UniqueConstraintInput {
   description?: string;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
   tags?: string[];
   type?: string;
   updatedAt?: string;
+  withoutOverlaps?: boolean;
 }
 /** An input for mutations affecting `View` */
 export interface ViewInput {
   category?: ObjectCategory;
+  checkOption?: string;
   data?: Record<string, unknown>;
   databaseId?: string;
   filterData?: Record<string, unknown>;
@@ -9386,6 +10245,7 @@ export interface ViewInput {
   isReadOnly?: boolean;
   name: string;
   schemaId: string;
+  securityBarrier?: boolean;
   securityInvoker?: boolean;
   smartTags?: Record<string, unknown>;
   tableId?: string;
@@ -9711,6 +10571,10 @@ export interface CheckConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -9929,6 +10793,49 @@ export interface EnumFilter {
   /** Filter by the object’s `values` field. */
   values?: StringListFilter;
 }
+/** A filter to be used against `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface ExclusionConstraintFilter {
+  /** Filter by the object’s `accessMethod` field. */
+  accessMethod?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `elementExpr` field. */
+  elementExpr?: JSONFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ExclusionConstraintFilter;
+  /** Filter by the object’s `operators` field. */
+  operators?: StringListFilter;
+  /** Checks for any expressions in this list. */
+  or?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `whereClause` field. */
+  whereClause?: JSONFilter;
+}
 /** A filter to be used against `Field` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldFilter {
   /** Checks for all expressions in this list. */
@@ -9959,6 +10866,10 @@ export interface FieldFilter {
   generationType?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `identityGeneration` field. */
+  identityGeneration?: StringFilter;
+  /** Filter by the object’s `identityOptions` field. */
+  identityOptions?: JSONFilter;
   /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
   /** Filter by the object’s `label` field. */
@@ -10010,12 +10921,18 @@ export interface ForeignKeyConstraintFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `deleteSetFieldIds` field. */
+  deleteSetFieldIds?: UUIDListFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -10042,6 +10959,8 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withPeriod` field. */
+  withPeriod?: BooleanFilter;
 }
 /** A filter to be used against `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
 export interface FullTextSearchFilter {
@@ -10146,16 +11065,28 @@ export interface IndexFilter {
 }
 /** A filter to be used against `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
 export interface ManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: ManagedDomainFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: ManagedDomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: ManagedDomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isWildcard` field. */
@@ -10275,6 +11206,10 @@ export interface PrimaryKeyConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -10293,6 +11228,8 @@ export interface PrimaryKeyConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 /** A filter to be used against `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaGrantFilter {
@@ -10610,6 +11547,10 @@ export interface TableFilter {
   embeddingChunksByChunksTableIdExist?: boolean;
   /** `embeddingChunks` exist. */
   embeddingChunksExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: TableToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: TableToManyFieldFilter;
   /** `fields` exist. */
@@ -10750,6 +11691,10 @@ export interface TriggerFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `events` field. */
+  events?: StringListFilter;
+  /** Filter by the object’s `forEach` field. */
+  forEach?: StringFilter;
   /** Filter by the object’s `functionName` field. */
   functionName?: StringFilter;
   /** Filter by the object’s `id` field. */
@@ -10768,8 +11713,16 @@ export interface TriggerFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `timing` field. */
+  timing?: StringFilter;
+  /** Filter by the object’s `transitionNewName` field. */
+  transitionNewName?: StringFilter;
+  /** Filter by the object’s `transitionOldName` field. */
+  transitionOldName?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `whenClause` field. */
+  whenClause?: JSONFilter;
 }
 /** A filter to be used against `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
 export interface UniqueConstraintFilter {
@@ -10789,6 +11742,10 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -10807,6 +11764,8 @@ export interface UniqueConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 /** A filter to be used against `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface ViewGrantFilter {
@@ -10891,6 +11850,8 @@ export interface ViewFilter {
   and?: ViewFilter[];
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
+  /** Filter by the object’s `checkOption` field. */
+  checkOption?: StringFilter;
   /** Filter by the object’s `data` field. */
   data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
@@ -10915,6 +11876,8 @@ export interface ViewFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `securityBarrier` field. */
+  securityBarrier?: BooleanFilter;
   /** Filter by the object’s `securityInvoker` field. */
   securityInvoker?: BooleanFilter;
   /** Filter by the object’s `smartTags` field. */
@@ -10978,6 +11941,84 @@ export interface HttpRouteFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+}
+/** A filter to be used against `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: DomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: DomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainEventFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+}
+/** A filter to be used against `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: DomainVerificationToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainVerificationFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
 }
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
@@ -11066,6 +12107,10 @@ export interface DatabaseFilter {
   enums?: DatabaseToManyEnumFilter;
   /** `enums` exist. */
   enumsExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: DatabaseToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: DatabaseToManyFieldFilter;
   /** `fields` exist. */
@@ -12426,6 +13471,96 @@ export type DeleteDomainPayloadSelect = {
     select: DomainEdgeSelect;
   };
 };
+export interface CreateDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was created by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type CreateDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface UpdateDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was updated by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type UpdateDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface DeleteDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was deleted by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type DeleteDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface CreateDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was created by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type CreateDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
+export interface UpdateDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was updated by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type UpdateDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
+export interface DeleteDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was deleted by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type DeleteDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
 export interface CreateEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was created by this mutation. */
@@ -12514,6 +13649,51 @@ export type DeleteEnumPayloadSelect = {
   };
   enumEdge?: {
     select: EnumEdgeSelect;
+  };
+};
+export interface CreateExclusionConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ExclusionConstraint` that was created by this mutation. */
+  exclusionConstraint?: ExclusionConstraint | null;
+  exclusionConstraintEdge?: ExclusionConstraintEdge | null;
+}
+export type CreateExclusionConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+  exclusionConstraint?: {
+    select: ExclusionConstraintSelect;
+  };
+  exclusionConstraintEdge?: {
+    select: ExclusionConstraintEdgeSelect;
+  };
+};
+export interface UpdateExclusionConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ExclusionConstraint` that was updated by this mutation. */
+  exclusionConstraint?: ExclusionConstraint | null;
+  exclusionConstraintEdge?: ExclusionConstraintEdge | null;
+}
+export type UpdateExclusionConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+  exclusionConstraint?: {
+    select: ExclusionConstraintSelect;
+  };
+  exclusionConstraintEdge?: {
+    select: ExclusionConstraintEdgeSelect;
+  };
+};
+export interface DeleteExclusionConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ExclusionConstraint` that was deleted by this mutation. */
+  exclusionConstraint?: ExclusionConstraint | null;
+  exclusionConstraintEdge?: ExclusionConstraintEdge | null;
+}
+export type DeleteExclusionConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+  exclusionConstraint?: {
+    select: ExclusionConstraintSelect;
+  };
+  exclusionConstraintEdge?: {
+    select: ExclusionConstraintEdgeSelect;
   };
 };
 export interface CreateFieldPayload {
@@ -13868,6 +15048,8 @@ export type DeleteWebauthnSettingPayloadSelect = {
 };
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
+  /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
+  async: boolean;
   /** Error message from the most recent failed bootstrap attempt */
   bootstrapError?: string | null;
   /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
@@ -13901,6 +15083,7 @@ export interface DatabaseProvisionModule {
   updatedAt: string;
 }
 export type DatabaseProvisionModuleSelect = {
+  async?: boolean;
   bootstrapError?: boolean;
   bootstrapStatus?: boolean;
   bootstrapUser?: boolean;
@@ -14076,6 +15259,30 @@ export type DomainEdgeSelect = {
     select: DomainSelect;
   };
 };
+/** A `DomainEvent` edge in the connection. */
+export interface DomainEventEdge {
+  cursor?: string | null;
+  /** The `DomainEvent` at the end of the edge. */
+  node?: DomainEvent | null;
+}
+export type DomainEventEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainEventSelect;
+  };
+};
+/** A `DomainVerification` edge in the connection. */
+export interface DomainVerificationEdge {
+  cursor?: string | null;
+  /** The `DomainVerification` at the end of the edge. */
+  node?: DomainVerification | null;
+}
+export type DomainVerificationEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainVerificationSelect;
+  };
+};
 /** A `EmbeddingChunk` edge in the connection. */
 export interface EmbeddingChunkEdge {
   cursor?: string | null;
@@ -14098,6 +15305,18 @@ export type EnumEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: EnumSelect;
+  };
+};
+/** A `ExclusionConstraint` edge in the connection. */
+export interface ExclusionConstraintEdge {
+  cursor?: string | null;
+  /** The `ExclusionConstraint` at the end of the edge. */
+  node?: ExclusionConstraint | null;
+}
+export type ExclusionConstraintEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ExclusionConstraintSelect;
   };
 };
 /** A `Field` edge in the connection. */

@@ -7,7 +7,7 @@ React Query query hook for orgIsManagerOf
 ## Usage
 
 ```typescript
-useOrgIsManagerOfQuery({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: '<Int>', pUserId: '<UUID>' })
+useOrgIsManagerOfQuery({ managerId: '<UUID>', maxDepth: '<Int>', targetEntityId: '<UUID>', userId: '<UUID>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useOrgIsManagerOfQuery({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: '
 ### Use useOrgIsManagerOfQuery
 
 ```typescript
-const { data, isLoading } = useOrgIsManagerOfQuery({ pEntityId: '<UUID>', pManagerId: '<UUID>', pMaxDepth: '<Int>', pUserId: '<UUID>' });
+const { data, isLoading } = useOrgIsManagerOfQuery({ managerId: '<UUID>', maxDepth: '<Int>', targetEntityId: '<UUID>', userId: '<UUID>' });
 ```
