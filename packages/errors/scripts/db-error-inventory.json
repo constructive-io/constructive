@@ -1,0 +1,2909 @@
+{
+ "ACCOUNT_DISABLED": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "ACCOUNT_DISABLED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/utils.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 4
+ },
+ "ACCOUNT_EXISTS": {
+  "count": 14,
+  "dynamic": false,
+  "sample": "ACCOUNT_EXISTS",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/send_invite_email_before.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/send_invite_email_entity_before.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/challenge/sign_up_unique_key.sql"
+  ],
+  "n_source": 8,
+  "n_generated": 5
+ },
+ "ACCOUNT_LOCKED_EXCEED_ATTEMPTS": {
+  "count": 10,
+  "dynamic": false,
+  "sample": "ACCOUNT_LOCKED_EXCEED_ATTEMPTS",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/challenge/sign_in_request_challenge.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/new-challenge/sign_in_owned_object_request_challenge.sql"
+  ],
+  "n_source": 3,
+  "n_generated": 7
+ },
+ "ACCOUNT_NOT_FOUND": {
+  "count": 5,
+  "dynamic": false,
+  "sample": "ACCOUNT_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/send_email_otp.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_email_otp.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_magic_link.sql"
+  ],
+  "n_source": 4,
+  "n_generated": 1
+ },
+ "ALREADY_SCHEDULED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "ALREADY_SCHEDULED",
+  "source_files": [
+   "pgpm-modules/database-jobs/deploy/schemas/app_jobs/procedures/run_scheduled_job.sql",
+   "pgpm-modules/jobs/deploy/schemas/app_jobs/procedures/run_scheduled_job.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "ALTER_TABLE_ADD_COLUMN": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "ALTER_TABLE_ADD_COLUMN: generation_type must be stored or virtual, got %",
+  "source_files": [
+   "packages/ast-actions/deploy/schemas/actions_public/procedures/alter_table_add_column.sql",
+   "packages/ast/deploy/schemas/ast_helpers/procedures/helpers.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "API_KEYS_DISABLED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "API_KEYS_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 2
+ },
+ "API_KEY_LIMIT_REACHED": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "API_KEY_LIMIT_REACHED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "API_KEY_NOT_FOUND": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "API_KEY_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_api_key.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "APPLY_RLS": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "APPLY_RLS (bad privs) %",
+  "source_files": [
+   "packages/metaschema-utils/deploy/schemas/metaschema_public/procedures/apply_rls.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "APPLY_RLS_BAD_ARGS": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "APPLY_RLS_BAD_ARGS",
+  "source_files": [
+   "packages/metaschema-utils/deploy/schemas/metaschema_public/procedures/apply_rls.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "APPLY_TABLE_STEP_UP": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "APPLY_TABLE_STEP_UP: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/apply_table_step_up.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "APP_COMPONENT_NOT_VISIBLE": {
+  "count": 8,
+  "dynamic": false,
+  "sample": "APP_COMPONENT_NOT_VISIBLE",
+  "source_files": [
+   "database-modules/constructive-apps-triggers/deploy/schemas/apps_private/trigger_fns/tg_app_components_component_guard.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "APP_COMPONENT_TARGET_REQUIRED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "APP_COMPONENT_TARGET_REQUIRED",
+  "source_files": [
+   "database-modules/constructive-apps-triggers/deploy/schemas/apps_private/trigger_fns/tg_app_components_component_guard.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "APP_SCOPE_FRAMES_SCOPE_REQUIRED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "APP_SCOPE_FRAMES_SCOPE_REQUIRED: execution_scope is required (no default scope)",
+  "source_files": [
+   "pgpm-modules/app-scope/deploy/schemas/app_scope/procedures/frames.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "APP_SCOPE_LOCAL_FRAMES_DEPTH_EXCEEDED": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "APP_SCOPE_LOCAL_FRAMES_DEPTH_EXCEEDED: scope chain exceeded 32 hops from scope \"%\" (database_id=%)",
+  "source_files": [
+   "pgpm-modules/app-scope/deploy/schemas/app_scope/procedures/local_frames.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "APP_SCOPE_LOCAL_FRAMES_SCOPE_REQUIRED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "APP_SCOPE_LOCAL_FRAMES_SCOPE_REQUIRED: execution_scope is required (no default scope)",
+  "source_files": [
+   "pgpm-modules/app-scope/deploy/schemas/app_scope/procedures/local_frames.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ASSIGN_PROFILES_PERMISSION_REQUIRED": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "ASSIGN_PROFILES_PERMISSION_REQUIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "AUTHZ_COLUMN_SECURITY": {
+  "count": 8,
+  "dynamic": true,
+  "sample": "AUTHZ_COLUMN_SECURITY: rule transition requires a non-empty allowed array",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/authz_column_security.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "AUTH_METHOD_NOT_ALLOWED": {
+  "count": 8,
+  "dynamic": false,
+  "sample": "AUTH_METHOD_NOT_ALLOWED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 6
+ },
+ "BAD_CASING_FUNC": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "BAD_CASING_FUNC (%, %)",
+  "source_files": [
+   "packages/ast-actions/deploy/schemas/actions_public/procedures/inflection_field_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BAD_EXPRESSION": {
+  "count": 291,
+  "dynamic": true,
+  "sample": "BAD_EXPRESSION % (unrecognized format)",
+  "source_files": [
+   "packages/ast/deploy/schemas/deparser/procedures/deparse.sql",
+   "packages/metaschema/deploy/schemas/rls_parser/procedures/parse.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "BAD_FIELD_INPUT": {
+  "count": 8,
+  "dynamic": true,
+  "sample": "BAD_FIELD_INPUT: generation expression cannot be changed after creation",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/field/triggers/_00001_ensure_no_sql_injection.sql",
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/field/triggers/before_insert_field_trigger.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "BAD_FIELD_ORDERING_CROSS_TABLE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "BAD_FIELD_ORDERING_CROSS_TABLE",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/procedures/set_field_order.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BAD_PRIVILEGE_FOR_POLICY": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "BAD_PRIVILEGE_FOR_POLICY",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/policy/triggers/policy_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BAD_RLS_EXPRESSION": {
+  "count": 40,
+  "dynamic": true,
+  "sample": "BAD_RLS_EXPRESSION % (policy.AuthzValueExists requires ref_schema/ref_table or ref_table_id)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/rls_parser/procedures/parse.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BAD_VIEW_EXPRESSION": {
+  "count": 9,
+  "dynamic": true,
+  "sample": "BAD_VIEW_EXPRESSION % (view.ViewTableProjection)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/view_parser/procedures/parse.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BM25": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "BM25: invalid text_config \"%\", must be a valid pg_ts_config",
+  "source_files": [
+   "packages/metaschema-utils/deploy/procedures/utils.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BOOTSTRAP_DATABASE_MISSING": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "BOOTSTRAP_DATABASE_MISSING",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/database_bootstrap_owner.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BOOTSTRAP_SOURCE_MISSING": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "BOOTSTRAP_SOURCE_MISSING",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/database_bootstrap_owner.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BOOTSTRAP_TARGET_NOT_EMPTY": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "BOOTSTRAP_TARGET_NOT_EMPTY",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "BUILD_CONDITION_EXPR": {
+  "count": 9,
+  "dynamic": true,
+  "sample": "BUILD_CONDITION_EXPR: unknown condition op \"%\", expected =|!=|>|<|>=|<=|LIKE|NOT LIKE|IS NULL|IS NOT NULL|IS DISTINCT FROM",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/build_condition_expr.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CANNOT_DISCONNECT_LAST_AUTH_METHOD": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "CANNOT_DISCONNECT_LAST_AUTH_METHOD",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/disconnect_account.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "CANNOT_REVOKE_CURRENT_SESSION": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "CANNOT_REVOKE_CURRENT_SESSION",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_session.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "CAP_CHECK_TRIGGER_ARGS": {
+  "count": 5,
+  "dynamic": true,
+  "sample": "CAP_CHECK_TRIGGER_ARGS (%)",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/cap_check_trigger.sql",
+   "testing/rls-seed/deploy/schemas/rls-pets-limits-private/trigger_fns/app_limits_cap_check_tg_fn.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "CATALOG_SYNC": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "CATALOG_SYNC: catalog %.% registration has no copy_fields",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/catalog_sync_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "COMMIT_NOT_FOUND": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "COMMIT_NOT_FOUND",
+  "source_files": [
+   "packages/db-migrate/deploy/schemas/db_migrate/tables/sql_actions/triggers/update_tree.sql",
+   "pgpm-modules/object-tree/deploy/schemas/object_tree_public/procedures/set_and_commit.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "CONNECTED_ACCOUNT_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "CONNECTED_ACCOUNT_NOT_FOUND",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "CONSTRUCT_BLUEPRINT": {
+  "count": 13,
+  "dynamic": true,
+  "sample": "CONSTRUCT_BLUEPRINT: achievements entry \"%\" references entity_prefix \"%\" but no events_module found for that prefix",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/construct_blueprint/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CONST_TYPE_FIELDS_IMMUTABLE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "CONST_TYPE_FIELDS_IMMUTABLE",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/field/triggers/on_update_field_constraints.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "COPY_TEMPLATE_TO_BLUEPRINT": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "COPY_TEMPLATE_TO_BLUEPRINT: template % is private and not owned by %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/copy_template_to_blueprint/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CREDIT_CODE_EXPIRED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "CREDIT_CODE_EXPIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/credit_redemptions_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CREDIT_CODE_MAX_REDEMPTIONS_REACHED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "CREDIT_CODE_MAX_REDEMPTIONS_REACHED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/credit_redemptions_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CREDIT_CODE_NOT_FOUND": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "CREDIT_CODE_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/credit_redemptions_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CROSS_DATABASE_CHECK": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "CROSS_DATABASE_CHECK: table % not found (%)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/assert_same_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "CROSS_DATABASE_REF": {
+  "count": 5,
+  "dynamic": true,
+  "sample": "CROSS_DATABASE_REF: ref_table_id does not belong to database_id (denormalized_table_field)",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/denormalized_table_field.sql",
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/assert_same_database.sql",
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/foreign_key_constraint/triggers/on_insert_foreign_key_constraint.sql"
+  ],
+  "n_source": 4,
+  "n_generated": 0
+ },
+ "CSRF_TOKEN_REQUIRED": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "CSRF_TOKEN_REQUIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_up.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "DATABASE_FIELD_RESERVED_WORD": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "DATABASE_FIELD_RESERVED_WORD",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/field/triggers/ensure_field_not_reserved_word.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATABASE_TABLE_RESERVED_WORD": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "DATABASE_TABLE_RESERVED_WORD",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/table/triggers/_000002_ensure_table_not_reserved_word.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_BILLING_METER": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_BILLING_METER: unknown event %, expected INSERT, DELETE, or UPDATE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/billing_meter_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_COMPOSITE_FIELD": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "DATA_COMPOSITE_FIELD: source_fields is required and must be a JSON array",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_composite_field.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_DIRECT_OWNER": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_DIRECT_OWNER: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_direct_owner.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_DIRECT_OWNER_IN_ENTITY": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_DIRECT_OWNER_IN_ENTITY: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_direct_owner_in_entity.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_FORCE_CURRENT_USER": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "DATA_FORCE_CURRENT_USER: field \"%\" not found on table \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_force_current_user.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_GENERATED": {
+  "count": 11,
+  "dynamic": true,
+  "sample": "DATA_GENERATED: unknown kind %, expected expression|concat|slug|object_name|hash",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_generated.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_I18N": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "DATA_I18N: \"fields\" parameter is required and must be a non-empty array",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_i18n.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_ID": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_ID: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_id.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_IMMUTABLE_FIELDS": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "DATA_IMMUTABLE_FIELDS: fields array is required and must not be empty",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_immutable_fields.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_INFLECTION": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "DATA_INFLECTION: field \"%\" not found on table \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_inflection.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_INHERIT_FROM_PARENT": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "DATA_INHERIT_FROM_PARENT: could not resolve parent table from FK on field %. Provide parent_table in data.",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_inherit_from_parent.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_JOB_TRIGGER": {
+  "count": 19,
+  "dynamic": true,
+  "sample": "DATA_JOB_TRIGGER: \"function_target\" is not a valid option. Ledger routing is derived from the function registry and cannot be set by callers.",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/job_trigger.sql",
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_job_trigger.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "DATA_JSONB": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_JSONB: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_jsonb.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_MEMBERSHIP_BY_FIELD": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_MEMBERSHIP_BY_FIELD: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_membership_by_field.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_MEMBER_OWNER": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_MEMBER_OWNER: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_member_owner.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_OWNED_FIELDS": {
+  "count": 5,
+  "dynamic": true,
+  "sample": "DATA_OWNED_FIELDS: protected field \"%\" not found on table \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_owned_fields.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_PEOPLESTAMPS": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_PEOPLESTAMPS: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_peoplestamps.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_PUBLISHABLE": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "DATA_PUBLISHABLE: is_published_field_name must not be empty",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_publishable.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_REALTIME": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "DATA_REALTIME: unknown operation %, expected INSERT, UPDATE, or DELETE",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_realtime.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_SLUG": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "DATA_SLUG: source field \"%\" not found on table \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_slug.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_STATUS_FIELD": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "DATA_STATUS_FIELD: unsupported type \"%\" for status field, expected a scalar type (text, varchar, integer, smallint, bigint, boolean, uuid, citext)",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_status_field.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_TAGS": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_TAGS: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_tags.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DATA_TIMESTAMPS": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DATA_TIMESTAMPS: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/data_timestamps.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DB_PRESET_MODULE": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "DB_PRESET_MODULE: scope (%) does not match backing merkle_store_module % scope (%)",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/db_preset_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DELETE_FIRST": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "DELETE_FIRST",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/index/triggers/index_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_CHECK_CERT_NOT_ISSUING": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_CHECK_CERT_NOT_ISSUING: managed_domain % has cert_status % (issue a cert first)",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_check_cert.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_CHECK_CERT_UNKNOWN_DOMAIN": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_CHECK_CERT_UNKNOWN_DOMAIN: no managed_domain with id %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_check_cert.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_ISSUE_CERT_BAD_ISSUER": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_ISSUE_CERT_BAD_ISSUER: unsupported issuer_env % (expected staging|production)",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_issue_cert.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_ISSUE_CERT_NOT_VERIFIED": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_ISSUE_CERT_NOT_VERIFIED: managed_domain % is % (must be verified before issuing a cert)",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_issue_cert.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_ISSUE_CERT_UNKNOWN_DOMAIN": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_ISSUE_CERT_UNKNOWN_DOMAIN: no managed_domain with id %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_issue_cert.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_ISSUE_CHALLENGE_BAD_METHOD": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_ISSUE_CHALLENGE_BAD_METHOD: unsupported verification method %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_issue_challenge.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_ISSUE_CHALLENGE_NO_OWNER": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_ISSUE_CHALLENGE_NO_OWNER: managed_domain % has no owning entity",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_issue_challenge.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_ISSUE_CHALLENGE_UNKNOWN_DOMAIN": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_ISSUE_CHALLENGE_UNKNOWN_DOMAIN: no managed_domain with id %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_issue_challenge.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_RENEW_NOT_ACTIVE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_RENEW_NOT_ACTIVE: managed_domain % has cert_status % (only an active cert can be renewed)",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_renew.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_RENEW_UNKNOWN_DOMAIN": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_RENEW_UNKNOWN_DOMAIN: no managed_domain with id %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_renew.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_REVOKE_UNKNOWN_DOMAIN": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_REVOKE_UNKNOWN_DOMAIN: no managed_domain with id %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_revoke.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_VERIFY_BAD_METHOD": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_VERIFY_BAD_METHOD: unsupported verification method %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_verify.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "DOMAIN_VERIFY_NO_CHALLENGE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "DOMAIN_VERIFY_NO_CHALLENGE: no outstanding % challenge for managed_domain %",
+  "source_files": [
+   "pgpm-modules/services/deploy/schemas/services_private/procedures/domain_verify.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "EMAIL_NOT_VERIFIED": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "EMAIL_NOT_VERIFIED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "EMBEDDING_CHUNKS": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "EMBEDDING_CHUNKS: unknown metric %, expected cosine|l2|ip",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/embedding_chunks/triggers/embedding_chunks_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ENQUEUE_SCOPE_REQUIRED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "ENQUEUE_SCOPE_REQUIRED: scope is required (no default scope)",
+  "source_files": [
+   "pgpm-modules/function-resolution/deploy/schemas/function_resolution/procedures/enqueue.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ENTITY_NOT_FOUND": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "ENTITY_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/memberships/get_organization_id.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ENTITY_TYPE_NOT_FOUND": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "ENTITY_TYPE_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/memberships/get_organization_id.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ENTITY_TYPE_PROVISION": {
+  "count": 7,
+  "dynamic": true,
+  "sample": "ENTITY_TYPE_PROVISION: derived table name \"%\" exceeds safe length (prefix: %, key: %)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/tables/entity_type_provision/triggers/insert_entity_type_provision.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ENUM_VALUES_CANNOT_BE_REMOVED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "ENUM_VALUES_CANNOT_BE_REMOVED: PostgreSQL does not support removing enum values",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/enum/triggers/enum_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ENUM_VALUES_CANNOT_BE_REORDERED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "ENUM_VALUES_CANNOT_BE_REORDERED: existing enum values must remain in the same order",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/enum/triggers/enum_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "EVENT_REFERRAL": {
+  "count": 14,
+  "dynamic": true,
+  "sample": "EVENT_REFERRAL: invites module not found for database_id %. Ensure invites module is enabled (has_invites=true).",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/event_referral.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "EVENT_TRACKER": {
+  "count": 12,
+  "dynamic": true,
+  "sample": "EVENT_TRACKER: events module not found for database_id %. Ensure events module is enabled.",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/event_tracker.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "EXPIRED_TOKEN": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "EXPIRED_TOKEN",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/approve_device.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "EXTERNAL_MEMBERS_NOT_ALLOWED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "EXTERNAL_MEMBERS_NOT_ALLOWED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/memberships/on_external_upcreate.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FEATURE_DISABLED": {
+  "count": 7,
+  "dynamic": true,
+  "sample": "FEATURE_DISABLED (%)",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/cap_check_trigger.sql",
+   "testing/rls-seed/deploy/schemas/rls-pets-limits-private/trigger_fns/app_limits_cap_check_tg_fn.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "FIELDS_MISMATCH": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "FIELDS_MISMATCH (denormalized_table_field %[%] %[%])",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/denormalized_table_field.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FULL_TEXT_SEARCH": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "FULL_TEXT_SEARCH: invalid lang \"%\" at index %, must be a valid pg_ts_config",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/full_text_search/triggers/full_text_search_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FUNCTION_DEFINITION_INVALID_PAIR": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "FUNCTION_DEFINITION_INVALID_PAIR: function_definition_id % / definition_scope \"%\" does not resolve to task_identifier \"%\" (database_id=%)",
+  "source_files": [
+   "pgpm-modules/function-resolution/deploy/schemas/function_resolution/procedures/resolve_invocation.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FUNCTION_DEFINITION_NOT_FOUND": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "FUNCTION_DEFINITION_NOT_FOUND: no definition for task_identifier \"%\" in the scope chain starting at scope \"%\" (database_id=%)",
+  "source_files": [
+   "pgpm-modules/function-resolution/deploy/schemas/function_resolution/procedures/resolve.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FUNCTION_SCHEDULES": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "FUNCTION_SCHEDULES: function definition does not allow the cron access channel",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/function_schedule_sync_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FUNCTION_SCHEDULES_INTERVAL": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "FUNCTION_SCHEDULES_INTERVAL (min_schedule_interval)",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/function_schedule_sync_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FUNCTION_SCHEDULES_LIMIT": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "FUNCTION_SCHEDULES_LIMIT (max_schedules_per_entity)",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/function_schedule_sync_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "FUNCTION_SCHEDULE_SYNC": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "FUNCTION_SCHEDULE_SYNC: unknown event %, expected UPSERT or DELETE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/function_schedule_sync_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "GRAPH_EXECUTION_MODULE": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "GRAPH_EXECUTION_MODULE: merkle_store_module % not found (from graph_module %)",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/graph_execution_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "GRAPH_MODULE": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "GRAPH_MODULE: scope (%) does not match backing merkle_store_module % scope (%)",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/graph_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "GRAPH_VALIDATION_FAILED": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "GRAPH_VALIDATION_FAILED: graph % failed pre-execution validation: %",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/graph/graph_bodies.sql",
+   "platform-modules/constructive-compute-platform/deploy/schemas/compute_private/procedures/start_invocation_execution/procedure.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 1
+ },
+ "GROUPS_REQ_ENTITIES": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "GROUPS_REQ_ENTITIES",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/memberships_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "GUARD_STEP_UP": {
+  "count": 23,
+  "dynamic": true,
+  "sample": "GUARD_STEP_UP: user_auth_module not found for database_id % \u2014 required for require_step_up()",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/guard_step_up_trigger.sql",
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/guard_step_up.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "HIERARCHY_CYCLE_DETECTED": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "HIERARCHY_CYCLE_DETECTED: Setting % as parent of % would create a cycle",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/hierarchy/hierarchy_triggers.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "HIERARCHY_DEPTH_EXCEEDED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "HIERARCHY_DEPTH_EXCEEDED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/memberships/get_organization_id.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "HIERARCHY_INACTIVE_MEMBER": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "HIERARCHY_INACTIVE_MEMBER: Cannot add user % to hierarchy - user must be an active member of the organization first",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/hierarchy/hierarchy_triggers.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "HIERARCHY_MEMBER_IN_USE": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "HIERARCHY_MEMBER_IN_USE: Cannot deactivate user % - user must be removed from the organization hierarchy first",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/hierarchy/hierarchy_triggers.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "HOSTNAME_BINDING_SYNC": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "HOSTNAME_BINDING_SYNC: unknown event %, expected UPSERT or DELETE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/routing_bindings_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "HTTP_ROUTE_TARGET_NOT_FOUND": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "HTTP_ROUTE_TARGET_NOT_FOUND:function",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/http_routes.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "HTTP_ROUTE_TARGET_OUTSIDE_SCOPE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "HTTP_ROUTE_TARGET_OUTSIDE_SCOPE:domain_id",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/http_routes.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "IDENTITY_ACCOUNT_NOT_FOUND": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "IDENTITY_ACCOUNT_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "IDENTITY_ALREADY_LINKED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "IDENTITY_ALREADY_LINKED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/link_identity.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "IDENTITY_LINK_AVAILABLE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "IDENTITY_LINK_AVAILABLE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "IDENTITY_PROVIDER_NOT_CONFIGURED": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "IDENTITY_PROVIDER_NOT_CONFIGURED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/link_identity.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "IDENTITY_PROVIDER_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IDENTITY_PROVIDER_NOT_FOUND",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "IDENTITY_PROVIDER_QUOTA_EXCEEDED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IDENTITY_PROVIDER_QUOTA_EXCEEDED",
+  "source_files": [
+   "pgpm-modules/utils/deploy/schemas/utils/procedures/enforce_identity_providers_quota.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "IDENTITY_SIGN_IN_DISABLED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IDENTITY_SIGN_IN_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "IDENTITY_SIGN_UP_DISABLED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IDENTITY_SIGN_UP_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "IMMUTABLE_FIELD": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IMMUTABLE_FIELD",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/immutable_field_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "IMMUTABLE_PEOPLESTAMPS": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IMMUTABLE_PEOPLESTAMPS",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/table/triggers/_000002_stamps.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "IMMUTABLE_PROPS": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "IMMUTABLE_PROPS",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/policy/triggers/policy_sql_trigger.sql",
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/view/triggers/view_sql_trigger.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "IMMUTABLE_TIMESTAMPS": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "IMMUTABLE_TIMESTAMPS",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/table/triggers/_000002_stamps.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INCORRECT_PASSWORD": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INCORRECT_PASSWORD",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/set_password.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "INSERT_GRAPH_EXECUTION_MODULE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "INSERT_GRAPH_EXECUTION_MODULE: graph_module % not found",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/tables/graph_execution_module/triggers/insert_graph_execution_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVALID_ACCESS_LEVEL": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "INVALID_ACCESS_LEVEL",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "INVALID_BASE32": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "INVALID_BASE32",
+  "source_files": [
+   "pgpm-modules/base32/deploy/schemas/base32/procedures/decode.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVALID_CODE": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "INVALID_CODE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_email_otp.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_up_sms.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 1
+ },
+ "INVALID_CSRF_TOKEN": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INVALID_CSRF_TOKEN",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 2
+ },
+ "INVALID_DEFAULT_LIMIT_ID": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "INVALID_DEFAULT_LIMIT_ID",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_credits_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVALID_FUNCTION_REF": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "INVALID_FUNCTION_REF: node_type \"%\" field \"%\" references task_identifier \"%\" which is not a registered function.",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/procedures/apply_registry_defaults.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVALID_METER_ID": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "INVALID_METER_ID",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/billing/meter_credits_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVALID_MFA_CHALLENGE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INVALID_MFA_CHALLENGE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/complete_mfa_challenge.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVALID_MFA_LEVEL": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "INVALID_MFA_LEVEL",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "INVALID_NODE_EDGES": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "INVALID_NODE_EDGES: node \"%\" edges must be a JSON array, got %",
+  "source_files": [
+   "platform-modules/constructive-compute-platform/deploy/schemas/compute_public/procedures/import_graph_json/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "INVALID_NODE_NODES": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "INVALID_NODE_NODES: node \"%\" nodes must be a JSON array, got %",
+  "source_files": [
+   "platform-modules/constructive-compute-platform/deploy/schemas/compute_public/procedures/import_graph_json/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "INVALID_NODE_PROPS": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "INVALID_NODE_PROPS: node \"%\" props must be a JSON array, got %",
+  "source_files": [
+   "platform-modules/constructive-compute-platform/deploy/schemas/compute_public/procedures/import_graph_json/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "INVALID_ORGANIZATION": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INVALID_ORGANIZATION",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "INVALID_TOKEN": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "INVALID_TOKEN",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/approve_device.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_magic_link.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_up_magic_link.sql"
+  ],
+  "n_source": 3,
+  "n_generated": 0
+ },
+ "INVALID_USER": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INVALID_USER",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/send_mfa_email_code.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/send_mfa_sms_code.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "INVALID_WORKER_ID": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "INVALID_WORKER_ID",
+  "source_files": [
+   "pgpm-modules/database-jobs/deploy/schemas/app_jobs/procedures/get_job.sql",
+   "pgpm-modules/database-jobs/deploy/schemas/app_jobs/procedures/get_scheduled_job.sql",
+   "pgpm-modules/jobs/deploy/schemas/app_jobs/procedures/get_job.sql"
+  ],
+  "n_source": 4,
+  "n_generated": 0
+ },
+ "INVITE_EMAIL_NOT_FOUND": {
+  "count": 8,
+  "dynamic": false,
+  "sample": "INVITE_EMAIL_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "INVITE_LIMIT": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "INVITE_LIMIT",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "INVITE_NOT_FOUND": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "INVITE_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "INVOCATION_QUOTA_GATE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INVOCATION_QUOTA_GATE: quota_schema and quota_function are required \u2014 the generator must only build this trigger when billing is provisioned",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/invocation_quota_gate_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "INVOCATION_USAGE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "INVOCATION_USAGE: billing_schema and record_usage_fn are required \u2014 the generator must only build this trigger when billing is provisioned",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/invocation_usage_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_ENFORCE_AGGREGATE": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "LIMIT_ENFORCE_AGGREGATE: limits_module with aggregate table not found for database_id % scope \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_enforce_aggregate.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_ENFORCE_COUNTER": {
+  "count": 7,
+  "dynamic": true,
+  "sample": "LIMIT_ENFORCE_COUNTER: limits_module not found for database_id % with scope %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_enforce_counter.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_ENFORCE_FEATURE": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "LIMIT_ENFORCE_FEATURE: cap_check_trigger not configured in limits_module for scope %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_enforce_feature.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_ENFORCE_RATE": {
+  "count": 7,
+  "dynamic": true,
+  "sample": "LIMIT_ENFORCE_RATE: rate_limit_meters_module with check_rate_limit_function not found for database_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_enforce_rate.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_REACHED": {
+  "count": 12,
+  "dynamic": false,
+  "sample": "LIMIT_REACHED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_increment_trigger.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_update_trigger.sql",
+   "testing/rls-seed/deploy/schemas/rls-pets-limits-private/trigger_fns/app_limits_inc_tg.sql"
+  ],
+  "n_source": 4,
+  "n_generated": 6
+ },
+ "LIMIT_TRACK_USAGE": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "LIMIT_TRACK_USAGE: billing_module with record_usage_function not found for database_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_track_usage.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_TRIGGER_ARGS": {
+  "count": 19,
+  "dynamic": true,
+  "sample": "LIMIT_TRIGGER_ARGS (%)",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_decrement_trigger.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_increment_trigger.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_update_trigger.sql"
+  ],
+  "n_source": 6,
+  "n_generated": 9
+ },
+ "LIMIT_WARNING_AGGREGATE": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "LIMIT_WARNING_AGGREGATE: aggregate table not provisioned for database_id % scope \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_warning_aggregate.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_WARNING_COUNTER": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "LIMIT_WARNING_COUNTER: limit_warnings table not provisioned for database_id % with scope %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_warning_counter.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "LIMIT_WARNING_RATE": {
+  "count": 7,
+  "dynamic": true,
+  "sample": "LIMIT_WARNING_RATE: limit_warnings table not provisioned for database_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/limit_warning_rate.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MANAGED_DOMAIN_PUBLISH_FORBIDDEN": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "MANAGED_DOMAIN_PUBLISH_FORBIDDEN: not authorized to modify column(s): allow_public_usage",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "MEMBERSHIP_NOT_FOUND": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "MEMBERSHIP_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "MEMBERSHIP_TYPE_MUST_BE_INT": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "MEMBERSHIP_TYPE_MUST_BE_INT (got %; use entity_type for scope strings)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/rls_parser/procedures/parse.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "METER_RATE_LIMIT": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "METER_RATE_LIMIT: unknown event %, expected INSERT or UPDATE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/meter_rate_limit_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MFA_CHALLENGE_EXPIRED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "MFA_CHALLENGE_EXPIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/complete_mfa_challenge.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MFA_REQUIRED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "MFA_REQUIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/one_time_token.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/request_cross_origin_token.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "MISSING_FIXTURE_TYPE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "MISSING_FIXTURE_TYPE",
+  "source_files": [
+   "packages/ast/deploy/schemas/ast_helpers/procedures/fixtures.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MISSING_REQUIRED_FIELD": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "MISSING_REQUIRED_FIELD: node_type \"%\" requires field \"%\" but it is NULL after applying defaults.",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/procedures/apply_registry_defaults.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MISSING_RLS": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "MISSING_RLS: The following infrastructure tables have no RLS policies: %",
+  "source_files": [
+   "packages/introspection/deploy/schemas/introspection/procedures/apply_metaschema_rls.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MODULES_HASH_DUPLICATE_ENTRY": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "MODULES_HASH_DUPLICATE_ENTRY: duplicate module entries in %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/modules_hash.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MODULES_HASH_INVALID_ENTRY": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "MODULES_HASH_INVALID_ENTRY: expected string or [name, options?], got %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/modules_hash.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MODULES_HASH_INVALID_INPUT": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "MODULES_HASH_INVALID_INPUT: modules must be a jsonb array, got %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/modules_hash.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "MODULE_SECURITY": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "MODULE_SECURITY: policy entry missing $type",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/apply_module_security.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "NONEXISTENT_TYPE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "NONEXISTENT_TYPE",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/field/triggers/ensure_valid_type.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "NOT_AUTHENTICATED": {
+  "count": 32,
+  "dynamic": false,
+  "sample": "NOT_AUTHENTICATED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql"
+  ],
+  "n_source": 20,
+  "n_generated": 12
+ },
+ "NOT_FOUND": {
+  "count": 35,
+  "dynamic": true,
+  "sample": "NOT_FOUND: metaschema_public.database table not found for database_id=%",
+  "source_files": [
+   "packages/introspection/deploy/schemas/introspection/procedures/apply_metaschema_rls.sql",
+   "packages/introspection/deploy/schemas/introspection/procedures/provision_base_modules.sql",
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/user_auth_module.sql"
+  ],
+  "n_source": 14,
+  "n_generated": 0
+ },
+ "NOT_ORG_ADMIN": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "NOT_ORG_ADMIN",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "NOT_ORG_PRINCIPAL": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "NOT_ORG_PRINCIPAL",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "NOT_OWNER": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "NOT_OWNER",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "NO_PRIMARY_IDENTIFIER": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "NO_PRIMARY_IDENTIFIER",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "NULL_VALUES_DISALLOWED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "NULL_VALUES_DISALLOWED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/reset_password.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "OBJECT_NOT_FOUND": {
+  "count": 9,
+  "dynamic": true,
+  "sample": "OBJECT_NOT_FOUND: schema % not found",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/submit_invite_code_entity.sql",
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/composite_type/triggers/composite_type_sql_trigger.sql"
+  ],
+  "n_source": 5,
+  "n_generated": 2
+ },
+ "OBJECT_NO_UPDATE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "OBJECT_NO_UPDATE",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/schema_grant/triggers/schema_grant_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ORG_API_KEY_NOT_FOUND": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "ORG_API_KEY_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_org_api_key.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "OWNER_FIELD_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "OWNER_FIELD_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/spatial_relation/triggers/sync_spatial_relation_tags.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "OWNER_FIELD_NOT_IN_OWNER_TABLE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "OWNER_FIELD_NOT_IN_OWNER_TABLE",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/spatial_relation/triggers/sync_spatial_relation_tags.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PARENT_ENTITY_TYPE_NOT_FOUND": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "PARENT_ENTITY_TYPE_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/memberships/get_organization_id.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PASSWORD_INSECURE": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "PASSWORD_INSECURE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/password_check.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "PASSWORD_LEN": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "PASSWORD_LEN",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/password_check.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "PASSWORD_SIGN_IN_DISABLED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "PASSWORD_SIGN_IN_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "PASSWORD_SIGN_UP_DISABLED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "PASSWORD_SIGN_UP_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "PLATFORM_DATABASE_NOT_REGISTERED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "PLATFORM_DATABASE_NOT_REGISTERED: no metaschema_public.database row has platform = true",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/platform_database_id.sql",
+   "pgpm-modules/app-scope/deploy/schemas/app_scope/procedures/platform_database_id.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "PLATFORM_FLAG_IMMUTABLE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "PLATFORM_FLAG_IMMUTABLE: metaschema_public.database.platform cannot be changed once set",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/database/triggers/guard_platform_flag.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "POOL_BOOTSTRAP_INCOMPLETE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "POOL_BOOTSTRAP_INCOMPLETE: pool row % is missing database_id or claimed_by",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/db_pool_bootstrap_owner.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "POOL_CONFIG_NOT_FOUND": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "POOL_CONFIG_NOT_FOUND: no db_pool_config for preset %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/db_pool_warm_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "POOL_ROW_NOT_FOUND": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "POOL_ROW_NOT_FOUND: no db_pool row with id %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/db_pool_warm_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PRESET_MODULES_INVALID": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "PRESET_MODULES_INVALID: preset % definition.modules must be a jsonb array",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/db_pool_warm_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PRESET_NOT_FOUND": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "PRESET_NOT_FOUND: no active db_preset with slug %",
+  "source_files": [
+   "database-modules/constructive-infra/deploy/schemas/infra_private/procedures/db_preset_head/procedure.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/db_preset/db_preset_bodies.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 1
+ },
+ "PRIMARY_AUTH_METHOD_MISMATCH": {
+  "count": 5,
+  "dynamic": false,
+  "sample": "PRIMARY_AUTH_METHOD_MISMATCH",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 3
+ },
+ "PRIMARY_REQUIRES_VERIFIED": {
+  "count": 9,
+  "dynamic": false,
+  "sample": "PRIMARY_REQUIRES_VERIFIED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/owned/owned_object_is_primary_field.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 6
+ },
+ "PRINCIPAL_CANNOT_CREATE_API_KEY": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "PRINCIPAL_CANNOT_CREATE_API_KEY",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PRINCIPAL_CANNOT_CREATE_PRINCIPAL": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "PRINCIPAL_CANNOT_CREATE_PRINCIPAL",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_principal.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PRINCIPAL_CANNOT_DELETE_PRINCIPAL": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "PRINCIPAL_CANNOT_DELETE_PRINCIPAL",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PRINCIPAL_CANNOT_REVOKE_API_KEY": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "PRINCIPAL_CANNOT_REVOKE_API_KEY",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_api_key.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_org_api_key.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PRINCIPAL_NOT_FOUND": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "PRINCIPAL_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
+  ],
+  "n_source": 3,
+  "n_generated": 3
+ },
+ "PRINCIPAL_NOT_IN_ORG": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "PRINCIPAL_NOT_IN_ORG",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "PRINCIPAL_NOT_OWNED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "PRINCIPAL_NOT_OWNED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PROFILE_EXCEEDS_PERMISSIONS": {
+  "count": 5,
+  "dynamic": false,
+  "sample": "PROFILE_EXCEEDS_PERMISSIONS",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PROFILE_NOT_FOUND": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "PROFILE_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/invites/procedures/invite_profile_check_entity.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 2
+ },
+ "PROVISION_CHECK_CONSTRAINT": {
+  "count": 9,
+  "dynamic": true,
+  "sample": "PROVISION_CHECK_CONSTRAINT: unknown $type \"%\" for constraint \"%\" on table \"%\". Supported: CheckOneOf, CheckGreaterThan, CheckLessThan, CheckNotEqual",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/provision_check_constraint/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PROVISION_FULL_TEXT_SEARCH": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "PROVISION_FULL_TEXT_SEARCH: tsvector field \"%\" not found on table \"%\"",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/provision_full_text_search/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PROVISION_INDEX": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "PROVISION_INDEX: \"columns\" array or \"column\" string is required",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/provision_index/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PROVISION_INVALID_DATABASE_ID": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "PROVISION_INVALID_DATABASE_ID: database_id may only be pre-set for a warm pool claim owned by the requester",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/tables/database_provision_module/triggers/insert_database_provision_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PROVISION_RELATION": {
+  "count": 9,
+  "dynamic": true,
+  "sample": "PROVISION_RELATION: delete_action is required for RelationBelongsTo (e.g., r=RESTRICT, c=CASCADE, n=SET NULL)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/provision_relation/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PROVISION_TABLE": {
+  "count": 6,
+  "dynamic": true,
+  "sample": "PROVISION_TABLE: invalid index access method \"%\" for field \"%\", expected btree|gin|gist|brin|hash",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/provision_table/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "PROVISION_UNIQUE_CONSTRAINT": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "PROVISION_UNIQUE_CONSTRAINT: \"columns\" array is required for table \"%\"",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/provision_unique_constraint/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "RATE_LIMIT_EXCEEDED": {
+  "count": 4,
+  "dynamic": false,
+  "sample": "RATE_LIMIT_EXCEEDED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/meter_rate_limit_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "REF_NOT_FOUND": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "REF_NOT_FOUND",
+  "source_files": [
+   "packages/db-migrate/deploy/schemas/db_migrate/tables/sql_actions/triggers/update_tree.sql",
+   "pgpm-modules/object-tree/deploy/schemas/object_tree_public/procedures/set_and_commit.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "RELATION_PROVISION": {
+  "count": 9,
+  "dynamic": true,
+  "sample": "RELATION_PROVISION: delete_action is required for RelationBelongsTo (e.g., r=RESTRICT, c=CASCADE, n=SET NULL)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/tables/relation_provision/triggers/insert_relation_provision.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "REPO_EXISTS": {
+  "count": 10,
+  "dynamic": false,
+  "sample": "REPO_EXISTS",
+  "source_files": [
+   "database-modules/constructive-compute/deploy/schemas/compute_public/procedures/infra_init_empty_repo/procedure.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/merkle/merkle_store_bodies.sql",
+   "pgpm-modules/object-tree/deploy/schemas/object_tree_public/procedures/init_empty_repo.sql"
+  ],
+  "n_source": 5,
+  "n_generated": 4
+ },
+ "REQUEST_DATABASE_INVALID_INPUT": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "REQUEST_DATABASE_INVALID_INPUT: provide exactly one of preset_slug or modules",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/procedures/request_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "REQUEST_DATABASE_UNKNOWN_PRESET": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "REQUEST_DATABASE_UNKNOWN_PRESET: no active preset with slug %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/procedures/request_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "REQUIRES": {
+  "count": 62,
+  "dynamic": true,
+  "sample": "REQUIRES (user_settings_module or user_settings_table_id) when has_settings_extension is enabled",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/identity_providers_module.sql",
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/memberships_module.sql",
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/user_auth_module.sql"
+  ],
+  "n_source": 30,
+  "n_generated": 0
+ },
+ "REQUIRES_ONE_OWNER": {
+  "count": 7,
+  "dynamic": false,
+  "sample": "REQUIRES_ONE_OWNER",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/permissions/grants/grants.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/permissions/memberships/memberships.sql",
+   "testing/rls-seed/deploy/schemas/rls-pets-memberships-private/trigger_fns/app_owner_grants_apply_tg.sql"
+  ],
+  "n_source": 3,
+  "n_generated": 3
+ },
+ "RESOLVE_BLUEPRINT_FIELD": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "RESOLVE_BLUEPRINT_FIELD: field \"%\" not found on table % (database %)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/resolve_blueprint_field/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "RESOLVE_BLUEPRINT_TABLE": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "RESOLVE_BLUEPRINT_TABLE: table \"%\" not found in database % (not in blueprint tables and not in existing tables)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/resolve_blueprint_table/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "RESOURCE_MODULE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "RESOURCE_MODULE: merkle_store_module % not found",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/resource_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ROUTE_BINDING_SYNC": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "ROUTE_BINDING_SYNC: unknown event %, expected UPSERT or DELETE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/routing_bindings_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "ROUTE_TARGET_NOT_VISIBLE": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "ROUTE_TARGET_NOT_VISIBLE",
+  "source_files": [
+   "database-modules/constructive-routing-triggers/deploy/schemas/routing_private/trigger_fns/tg_routes_target_guard.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "ROUTE_TARGET_REQUIRED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "ROUTE_TARGET_REQUIRED",
+  "source_files": [
+   "database-modules/constructive-routing-triggers/deploy/schemas/routing_private/trigger_fns/tg_routes_target_guard.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "SEARCH_BM25": {
+  "count": 3,
+  "dynamic": true,
+  "sample": "SEARCH_BM25: field \"%\" not found on table \"%\". The field must already exist.",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_bm25.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SEARCH_FULL_TEXT": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "SEARCH_FULL_TEXT: source_fields is required and must be a non-empty array of {field, weight, lang} objects",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_full_text.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SEARCH_SPATIAL": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "SEARCH_SPATIAL: unknown geometry_type %, expected Point|LineString|Polygon|MultiPoint|MultiLineString|MultiPolygon|GeometryCollection|Geometry",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_spatial.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SEARCH_SPATIAL_AGGREGATE": {
+  "count": 11,
+  "dynamic": true,
+  "sample": "SEARCH_SPATIAL_AGGREGATE: unknown geometry_type %, expected Point|LineString|Polygon|MultiPoint|MultiLineString|MultiPolygon|GeometryCollection|Geometry",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_spatial_aggregate.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SEARCH_TRGM": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "SEARCH_TRGM: \"fields\" parameter is required and must be a JSON array",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_trgm.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SEARCH_UNIFIED": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "SEARCH_UNIFIED: trgm field \"%\" not found on table \"%\"",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_unified.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SEARCH_VECTOR": {
+  "count": 4,
+  "dynamic": true,
+  "sample": "SEARCH_VECTOR: unknown index_method %, expected hnsw|ivfflat",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/search_vector.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SECURITY": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "SECURITY: obj_table_id references a table from a different database (expected %, got %)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/rls_parser/procedures/parse.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SERVICES_API_BRIDGE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "SERVICES_API_BRIDGE: unknown event %, expected UPSERT or DELETE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/services_bridge_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SERVICES_DOMAIN_BRIDGE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "SERVICES_DOMAIN_BRIDGE: unknown event %, expected UPSERT or DELETE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/services_bridge_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SERVICES_SITE_BRIDGE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "SERVICES_SITE_BRIDGE: unknown event %, expected UPSERT or DELETE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/triggers/services_bridge_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SESSION_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "SESSION_NOT_FOUND",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "SIGN_UP_DISABLED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "SIGN_UP_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 2
+ },
+ "SINGLETON_TABLE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "SINGLETON_TABLE",
+  "source_files": [
+   "pgpm-modules/utils/deploy/schemas/utils/procedures/ensure_singleton.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SMS_SIGN_IN_DISABLED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "SMS_SIGN_IN_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 2
+ },
+ "SMS_SIGN_UP_DISABLED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "SMS_SIGN_UP_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 1
+ },
+ "SOURCE_EMAILS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "SOURCE_EMAILS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SOURCE_SECRETS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "SOURCE_SECRETS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "SOURCE_USERS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "SOURCE_USERS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "STEP_UP_REQUIRED": {
+  "count": 6,
+  "dynamic": false,
+  "sample": "STEP_UP_REQUIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 3
+ },
+ "STEP_UP_REQUIRED_PASSWORD": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "STEP_UP_REQUIRED_PASSWORD",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "STEP_UP_REQUIRED_PASSWORD_OR_MFA": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "STEP_UP_REQUIRED_PASSWORD_OR_MFA",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "SUPER_CONSTRUCTIVE_REQUIRED": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "SUPER_CONSTRUCTIVE_REQUIRED: % requires constructive.allow_super_constructive GUC",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/ensure_super_constructive.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TABLE_MODULE": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "TABLE_MODULE: table not found for table_id %",
+  "source_files": [
+   "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/table_module.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TARGET_EMAILS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TARGET_EMAILS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TARGET_FIELD_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TARGET_FIELD_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/spatial_relation/triggers/sync_spatial_relation_tags.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TARGET_FIELD_NOT_IN_TARGET_TABLE": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TARGET_FIELD_NOT_IN_TARGET_TABLE",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/spatial_relation/triggers/sync_spatial_relation_tags.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TARGET_MEMBERSHIPS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TARGET_MEMBERSHIPS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TARGET_SECRETS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TARGET_SECRETS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TARGET_USERS_NOT_FOUND": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TARGET_USERS_NOT_FOUND",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/bootstrap_owner_into_database.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "THROWN_ERROR": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "THROWN_ERROR (%)",
+  "source_files": [
+   "pgpm-modules/utils/deploy/schemas/utils/procedures/throw.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TOO_MANY_REQUESTS": {
+  "count": 21,
+  "dynamic": false,
+  "sample": "TOO_MANY_REQUESTS",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 18
+ },
+ "TOTP_ALREADY_ENABLED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TOTP_ALREADY_ENABLED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/enable_totp.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TOTP_NOT_ENABLED": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "TOTP_NOT_ENABLED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/disable_totp.sql",
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/verify_totp.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 1
+ },
+ "TOTP_SETUP_NOT_INITIATED": {
+  "count": 1,
+  "dynamic": false,
+  "sample": "TOTP_SETUP_NOT_INITIATED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/confirm_totp_setup.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "TRANSFER_NOT_ALLOWED_IN_POOLED_MODE": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "TRANSFER_NOT_ALLOWED_IN_POOLED_MODE",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/limit_transfer_function.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "UNAUTHENTICATED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "UNAUTHENTICATED: request_database requires a signed-in user",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_private/procedures/db_pool_claim.sql",
+   "packages/metaschema/deploy/schemas/metaschema_public/procedures/request_database.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "UNKNOWN_POLICY_TYPE": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "UNKNOWN_POLICY_TYPE %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/rls_parser/procedures/parse.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "UNKNOWN_VIEW_TYPE": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "UNKNOWN_VIEW_TYPE %",
+  "source_files": [
+   "packages/ast/deploy/schemas/ast_helpers/procedures/view_ast_builders.sql",
+   "packages/metaschema/deploy/schemas/view_parser/procedures/parse.sql"
+  ],
+  "n_source": 2,
+  "n_generated": 0
+ },
+ "UNSUPPORTED": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "UNSUPPORTED POLICY (%)",
+  "source_files": [
+   "packages/ast/deploy/schemas/ast_helpers/procedures/policy_ast_builders.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "UNSUPPORTED_EXPRESSION": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "UNSUPPORTED_EXPRESSION %",
+  "source_files": [
+   "packages/ast/deploy/schemas/deparser/procedures/deparse.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "UNSUPPORTED_VIEW_RULE_ACTION": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "UNSUPPORTED_VIEW_RULE_ACTION %",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/view_rule/triggers/view_rule_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "UUID": {
+  "count": 1,
+  "dynamic": true,
+  "sample": "UUID seed is NULL on table %",
+  "source_files": [
+   "pgpm-modules/uuid/deploy/schemas/uuids/procedures/trigger_set_uuid_related_field.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "VALIDATE_BLUEPRINT": {
+  "count": 179,
+  "dynamic": true,
+  "sample": "VALIDATE_BLUEPRINT: definition must contain a non-empty \"tables\" array, a non-empty \"entity_types\" array, or at least one of relations/indexes/full_text_searches/unique_constraints",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_modules_public/procedures/validate_blueprint_definition/procedure.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ },
+ "WEBAUTHN_CREDENTIAL_NOT_FOUND": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "WEBAUTHN_CREDENTIAL_NOT_FOUND",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/webauthn_auth/finish_sign_in.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "WEBAUTHN_REGISTER_CHALLENGE_NOT_FOUND_OR_EXPIRED": {
+  "count": 3,
+  "dynamic": false,
+  "sample": "WEBAUTHN_REGISTER_CHALLENGE_NOT_FOUND_OR_EXPIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/webauthn_auth/finish_registration.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "WEBAUTHN_SIGN_IN_CHALLENGE_NOT_FOUND_OR_EXPIRED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "WEBAUTHN_SIGN_IN_CHALLENGE_NOT_FOUND_OR_EXPIRED",
+  "source_files": [
+   "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/webauthn_auth/finish_sign_in.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 1
+ },
+ "WEBAUTHN_SIGN_IN_DISABLED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "WEBAUTHN_SIGN_IN_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 2
+ },
+ "WEBAUTHN_SIGN_UP_DISABLED": {
+  "count": 2,
+  "dynamic": false,
+  "sample": "WEBAUTHN_SIGN_UP_DISABLED",
+  "source_files": [],
+  "n_source": 0,
+  "n_generated": 2
+ },
+ "WITH_CHECK_NOT_ALLOWED_FOR_": {
+  "count": 2,
+  "dynamic": true,
+  "sample": "WITH_CHECK_NOT_ALLOWED_FOR_% (for INSERT, the policy node itself is the check)",
+  "source_files": [
+   "packages/metaschema/deploy/schemas/metaschema_public/tables/policy/triggers/policy_sql_trigger.sql"
+  ],
+  "n_source": 1,
+  "n_generated": 0
+ }
+}
