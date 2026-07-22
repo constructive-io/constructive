@@ -1,4 +1,4 @@
-import { PgpmModuleAst, PgpmScriptAst } from '../ast/types';
+import { PgpmModuleAst, PgpmScriptAst } from '@pgpmjs/ast/module/types';
 import { hashString } from '../migrate/utils/hash';
 import {
   BUNDLE_FORMAT_VERSION,

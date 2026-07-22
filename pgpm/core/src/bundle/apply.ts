@@ -3,7 +3,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { PgConfig } from 'pg-env';
 
-import { PgpmScriptKind } from '../ast/types';
+import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 import { PgpmMigrate, PgpmMigrateOptions } from '../migrate/client';
 import { DeployResult, VerifyResult } from '../migrate/types';
 import { materializeBundle } from './io';

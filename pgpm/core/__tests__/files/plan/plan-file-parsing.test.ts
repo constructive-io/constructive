@@ -7,8 +7,8 @@ import {
   parsePlanFile, 
   parsePlanFileSimple,
   resolveReference
-} from '../../../src/files';
-import { ExtendedPlanFile } from '../../../src/files/types';
+} from '@pgpmjs/ast/files';
+import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 
 describe('Plan Parser', () => {
   const testDir = join(__dirname, 'test-plans');

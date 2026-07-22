@@ -12,7 +12,7 @@ import { PgConfig } from 'pg-env';
 import yanse from 'yanse';
 
 import { getAvailableExtensions } from '../../extensions/extensions';
-import { generatePlan, writePlan, writePlanFile } from '../../files';
+import { generatePlan, writePlan, writePlanFile } from '@pgpmjs/ast/files';
 import {
   ExtensionInfo,
   getExtensionInfo,
@@ -20,13 +20,13 @@ import {
   getInstalledExtensions,
   parseControlFile,
   writeExtensions
-} from '../../files';
-import { generateControlFileContent, writeExtensionMakefile } from '../../files/extension/writer';
-import { getNow as getPlanTimestamp } from '../../files/plan/generator';
-import { parsePlanFile } from '../../files/plan/parser';
-import { isValidChangeName, isValidTagName, parseReference } from '../../files/plan/validators';
-import { Change, Tag } from '../../files/types';
-import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
+} from '@pgpmjs/ast/files';
+import { generateControlFileContent, writeExtensionMakefile } from '@pgpmjs/ast/files/extension/writer';
+import { getNow as getPlanTimestamp } from '@pgpmjs/ast/files/plan/generator';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { isValidChangeName, isValidTagName, parseReference } from '@pgpmjs/ast/files/plan/validators';
+import { Change, Tag } from '@pgpmjs/ast/files/types';
+import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '@pgpmjs/ast/files/types';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,

@@ -14,7 +14,7 @@ import {
   slicePlan,
   PatternStrategy
 } from '../../src/slice';
-import { ExtendedPlanFile } from '../../src/files/types';
+import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 
 describe('Slice Module', () => {
   const testDir = join(__dirname, 'test-slice');

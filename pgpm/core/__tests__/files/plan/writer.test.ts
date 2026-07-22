@@ -1,8 +1,8 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { writePgpmPlan } from '../../../src/files/plan/writer';
-import { PgpmRow } from '../../../src/files/types';
+import { writePgpmPlan } from '@pgpmjs/ast/files/plan/writer';
+import { PgpmRow } from '@pgpmjs/ast/files/types';
 
 describe('writePgpmPlan', () => {
   let tempDir: string;

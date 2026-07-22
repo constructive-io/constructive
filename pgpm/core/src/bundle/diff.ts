@@ -1,4 +1,4 @@
-import { PgpmScriptKind } from '../ast/types';
+import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 import { BundleChange, BundleScript, MigrationBundle } from './types';
 
 /** Per-script disposition between two revisions of the same change. */

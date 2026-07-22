@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { deparseModule, parseModule, readModule } from '../../src/ast';
+import { deparseModule, parseModule, readModule } from '../../src/module';
 
 let sourceDir: string;
 

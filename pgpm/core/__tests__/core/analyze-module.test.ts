@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { TestFixture } from '../../test-utils';
-import { parsePlanFile } from '../../src/files/plan/parser';
-import { writePlanFile } from '../../src/files/plan/writer';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { writePlanFile } from '@pgpmjs/ast/files/plan/writer';
 
 let fixture: TestFixture;
 

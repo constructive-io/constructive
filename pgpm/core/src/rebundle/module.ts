@@ -1,8 +1,8 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import { Change, Tag } from '../files/types';
-import { parsePlanFile } from '../files/plan/parser';
+import { Change, Tag } from '@pgpmjs/ast/files/types';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { mergeSqlStatements, packageModule } from '../packaging/package';
 import { generatePlanContent } from '../slice/slice';
 import { assembleChunkSql, rebundlePlan } from './rebundle';
