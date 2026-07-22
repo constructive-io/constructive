@@ -7,7 +7,7 @@ Execute the platformResourceInstallationsUpgrade mutation
 ## Usage
 
 ```bash
-csdk platform-resource-installations-upgrade --input.clientMutationId <String> --input.pInstallationId <UUID> --input.pParams <JSON>
+csdk platform-resource-installations-upgrade --input.clientMutationId <String> --input.newParams <JSON> --input.targetInstallationId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-resource-installations-upgrade --input.clientMutationId <String> -
 ### Run platformResourceInstallationsUpgrade
 
 ```bash
-csdk platform-resource-installations-upgrade --input.clientMutationId <String> --input.pInstallationId <UUID> --input.pParams <JSON>
+csdk platform-resource-installations-upgrade --input.clientMutationId <String> --input.newParams <JSON> --input.targetInstallationId <UUID>
 ```

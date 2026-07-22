@@ -870,10 +870,10 @@ orgIsManagerOf
 
   | Argument | Type |
   |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pMaxDepth` | Int |
-  | `pUserId` | UUID |
+  | `managerId` | UUID |
+  | `maxDepth` | Int |
+  | `targetEntityId` | UUID |
+  | `userId` | UUID |
 
 ### `useOrgPermissionsGetByMaskQuery`
 
