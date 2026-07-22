@@ -10,5 +10,6 @@
  */
 export * from './create';
 export * from './io';
+export * from './transpile';
 export * from './types';
 export * from './verify';
