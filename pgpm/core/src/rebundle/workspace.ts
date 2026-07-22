@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { basename, join } from 'path';
 
+import { DEFAULT_TEMPLATE_REPO, scaffoldTemplate } from '../core/template-scaffold';
 import { Change, Tag } from '../files/types';
 import { parsePlanFile } from '../files/plan/parser';
 import { mergeSqlStatements } from '../packaging/package';
@@ -38,6 +39,9 @@ export async function rebundleWorkspace(
     pretty = true,
     functionDelimiter = '$EOFCODE$',
     crossChunkDepMode = 'control-only',
+    initScaffold = false,
+    templateRepo = DEFAULT_TEMPLATE_REPO,
+    templateBranch,
     ...strategy
   } = options;
 
@@ -59,7 +63,21 @@ export async function rebundleWorkspace(
     change: memberToChunk.get(tag.change) ?? tag.change,
   }));
 
-  writeMinimalWorkspace(outputDir, { packages: ['packages/*'] });
+  if (initScaffold) {
+    // Lay down the full `pgpm init` workspace shell (pgpm.json, pnpm-workspace,
+    // lerna.json, tsconfig, lint/format configs, CI); the merged pgpm files are
+    // written on top per module below.
+    await scaffoldTemplate({
+      fromPath: 'workspace',
+      outputDir,
+      templateRepo,
+      branch: templateBranch,
+      answers: workspaceAnswers(outputDir),
+      noTty: true,
+    });
+  } else {
+    writeMinimalWorkspace(outputDir, { packages: ['packages/*'] });
+  }
 
   const byDeployOrder = [...plan.chunks].sort(
     (a, b) => plan.deployOrder.indexOf(a.name) - plan.deployOrder.indexOf(b.name)
@@ -70,6 +88,20 @@ export async function rebundleWorkspace(
   for (const chunk of byDeployOrder) {
     const pkgRel = join('packages', chunk.name);
     const pkgDir = join(outputDir, pkgRel);
+
+    if (initScaffold) {
+      // Scaffold the module's developer shell (package.json, jest.config.js,
+      // README, LICENSE, __tests__); writeMinimalModule overwrites the pgpm
+      // files (pgpm.plan, .control, Makefile, deploy/revert/verify) below.
+      await scaffoldTemplate({
+        fromPath: 'module',
+        outputDir: pkgDir,
+        templateRepo,
+        branch: templateBranch,
+        answers: moduleAnswers(chunk.name),
+        noTty: true,
+      });
+    }
 
     const scripts: Record<string, { deploy: string; revert: string; verify: string }> = {
       [chunk.name]: {
@@ -94,6 +126,8 @@ export async function rebundleWorkspace(
       tags: remappedTags.filter(t => t.change === chunk.name),
       requires: deps,
       overwrite: true,
+      // When scaffolded, keep the boilerplate's richer package.json.
+      writePackageJson: !initScaffold,
     });
 
     packages.push({ name: chunk.name, dir: pkgRel, dependencies: [...deps] });
@@ -113,6 +147,40 @@ export async function rebundleWorkspace(
 function planChangeDeps(deps: string[], mode: CrossChunkDepMode): string[] {
   if (mode === 'control-only') return [];
   return deps.map(dep => `${dep}:${dep}`);
+}
+
+/**
+ * Non-interactive answers for the `pgpm init` workspace template. Values are
+ * deterministic placeholders (the generated pgpm files are the real payload);
+ * the workspace name derives from the output directory.
+ */
+function workspaceAnswers(outputDir: string): Record<string, string> {
+  const name = basename(outputDir) || 'rebundled-workspace';
+  return {
+    name,
+    fullName: 'Constructive',
+    email: 'noreply@constructive.io',
+    moduleName: name,
+    username: 'constructive-io',
+    repoName: name,
+    license: 'MIT',
+  };
+}
+
+/** Non-interactive answers for the `pgpm init` module template. */
+function moduleAnswers(name: string): Record<string, string> {
+  return {
+    name,
+    moduleName: name,
+    moduleDesc: `${name} module`,
+    description: `${name} module`,
+    repoName: name,
+    fullName: 'Constructive',
+    email: 'noreply@constructive.io',
+    username: 'constructive-io',
+    access: 'public',
+    license: 'MIT',
+  };
 }
 
 /**

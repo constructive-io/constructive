@@ -124,6 +124,24 @@ export interface RebundleWorkspaceOptions extends RebundleStrategy {
 
   /** How cross-chunk deps are represented (default: 'control-only') */
   crossChunkDepMode?: CrossChunkDepMode;
+
+  /**
+   * When `true`, scaffold each emitted module (and the workspace root) from the
+   * real `pgpm init` boilerplate template (`scaffoldTemplate`) before writing
+   * the merged pgpm files on top — so the output carries the full developer
+   * shell (README/LICENSE/jest/tests, workspace `pnpm-workspace.yaml`/`lerna.json`
+   * /tsconfig/lint/CI) rather than the minimal deployable set.
+   *
+   * Defaults to `false` (the lightweight, network-free minimal writer). Setting
+   * it `true` fetches the boilerplate repo (network), matching `pgpm init`.
+   */
+  initScaffold?: boolean;
+
+  /** Template repo for `initScaffold` (defaults to the pgpm boilerplates repo) */
+  templateRepo?: string;
+
+  /** Branch/tag for the `initScaffold` template repo */
+  templateBranch?: string;
 }
 
 /**
