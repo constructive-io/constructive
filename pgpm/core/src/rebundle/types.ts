@@ -70,4 +70,38 @@ export interface RebundleResult {
 
   /** The source changes (in plan order) that were rebundled */
   sourceChanges: Change[];
+
+  /** The source module's project name (from the plan `%project` header) */
+  project: string;
+}
+
+/**
+ * Options for materializing a rebundled module to disk.
+ */
+export interface RebundleModuleOptions extends RebundleStrategy {
+  /** Directory to write the rebundled module into */
+  outputDir: string;
+
+  /** Overwrite an existing, non-empty output directory (default: false) */
+  overwrite?: boolean;
+
+  /** Deparse pretty-printing (default: true) */
+  pretty?: boolean;
+
+  /** Function body delimiter used during deparse (default: '$EOFCODE$') */
+  functionDelimiter?: string;
+}
+
+/**
+ * Result of materializing a rebundled module.
+ */
+export interface RebundleModuleResult extends RebundleResult {
+  /** Directory the rebundled module was written to */
+  outputDir: string;
+
+  /** Per-chunk merged file paths, relative to outputDir */
+  written: { chunk: string; deploy: string; revert: string; verify: string }[];
+
+  /** Byte-identical gate result: packageModule(source) === packageModule(output) */
+  invariant: { ok: boolean; sourceDiff: boolean; outputDiff: boolean };
 }

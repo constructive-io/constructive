@@ -34,8 +34,8 @@ interface WritePackageOptions extends PackageModuleOptions {
   packageDir: string;
 }
 
-const filterStatements = (stmts: RawStmt[], extension: boolean): RawStmt[] => {
-  if (!extension) return stmts;
+const filterStatements = (stmts: RawStmt[], stripTransactions: boolean): RawStmt[] => {
+  if (!stripTransactions) return stmts;
   return stmts.filter(node => {
     const stmt = node.stmt;
     return !stmt.hasOwnProperty('TransactionStmt') && 
@@ -43,9 +43,61 @@ const filterStatements = (stmts: RawStmt[], extension: boolean): RawStmt[] => {
   });
 };
 
+export interface MergeSqlOptions {
+  /** Strip `TransactionStmt`/`CreateExtensionStmt` before deparsing (extension mode) */
+  stripTransactions?: boolean;
+  /** Prepend a `\echo ... \quit` extension guard line */
+  echoExtensionName?: string;
+  pretty?: boolean;
+  functionDelimiter?: string;
+}
+
+/**
+ * Merge a concatenated SQL string into a single deparsed script.
+ *
+ * Parses the input, optionally strips transaction/extension statements, deparses
+ * with a stable function delimiter, and round-trips the result to detect any AST
+ * drift. This is the shared engine behind `packageModule` (whole-module packaging)
+ * and per-chunk rebundling — both must merge statements identically.
+ */
+export const mergeSqlStatements = async (
+  sql: string,
+  { stripTransactions = false, echoExtensionName, pretty = true, functionDelimiter = '$EOFCODE$' }: MergeSqlOptions = {}
+): Promise<{ sql: string; diff?: boolean; tree1?: string; tree2?: string }> => {
+  if (!sql?.trim()) {
+    return { sql: '' };
+  }
+
+  const parsed = await parse(sql);
+  parsed.stmts = filterStatements(parsed.stmts as any, stripTransactions);
+
+  const topLine = echoExtensionName
+    ? `\\echo Use "CREATE EXTENSION ${echoExtensionName}" to load this file. \\quit\n`
+    : '';
+
+  const finalSql = await deparse(parsed, { pretty, functionDelimiter });
+
+  const tree1 = parsed.stmts;
+  const reparsed = await parse(finalSql);
+  const tree2 = filterStatements(reparsed.stmts as any, stripTransactions);
+
+  const results: { sql: string; diff?: boolean; tree1?: string; tree2?: string } = {
+    sql: `${topLine}${finalSql}`,
+  };
+
+  const diff = JSON.stringify(cleanTree(tree1)) !== JSON.stringify(cleanTree(tree2));
+  if (diff) {
+    results.diff = true;
+    results.tree1 = JSON.stringify(cleanTree(tree1), null, 2);
+    results.tree2 = JSON.stringify(cleanTree(tree2), null, 2);
+  }
+
+  return results;
+};
+
 export const packageModule = async (
   packageDir: string,
-  { usePlan = true, extension = true, pretty = true, functionDelimiter = '$EOFCODE$', outputDiff = false }: PackageModuleOptions = {}
+  { usePlan = true, extension = true, pretty = true, functionDelimiter = '$EOFCODE$' }: PackageModuleOptions = {}
 ): Promise<{ sql: string; diff?: boolean; tree1?: string; tree2?: string }> => {
   const resolveFn = usePlan ? resolveWithPlan : resolve;
   const sql = resolveFn(packageDir);
@@ -58,40 +110,12 @@ export const packageModule = async (
   const extname = getExtensionName(packageDir);
 
   try {
-    const parsed = await parse(sql);
-    parsed.stmts = filterStatements(parsed.stmts as any, extension);
-
-    const topLine = extension
-      ? `\\echo Use "CREATE EXTENSION ${extname}" to load this file. \\quit\n`
-      : '';
-
-    const finalSql = await deparse(parsed, {
+    return await mergeSqlStatements(sql, {
+      stripTransactions: extension,
+      echoExtensionName: extension ? extname : undefined,
       pretty,
-      functionDelimiter
+      functionDelimiter,
     });
-
-    const tree1 = parsed.stmts;
-    const reparsed = await parse(finalSql);
-    const tree2 = filterStatements(reparsed.stmts as any, extension);
-
-    const results: {
-      sql: string;
-      diff?: boolean;
-      tree1?: string;
-      tree2?: string;
-    } = {
-      sql: `${topLine}${finalSql}`,
-    };
-
-    const diff =
-      JSON.stringify(cleanTree(tree1)) !== JSON.stringify(cleanTree(tree2));
-    if (diff) {
-      results.diff = true;
-      results.tree1 = JSON.stringify(cleanTree(tree1), null, 2);
-      results.tree2 = JSON.stringify(cleanTree(tree2), null, 2);
-    }
-
-    return results;
   } catch (e) {
     log.error(`❌ Failed to parse SQL for ${packageDir}`);
     console.error(e);

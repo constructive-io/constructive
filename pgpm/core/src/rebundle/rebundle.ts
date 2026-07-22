@@ -155,6 +155,7 @@ export function rebundlePlan(moduleDir: string, strategy: RebundleStrategy = {})
     deployOrder: creationOrder,
     warnings,
     sourceChanges: planResult.data.changes,
+    project: planResult.data.package,
   };
 }
 
