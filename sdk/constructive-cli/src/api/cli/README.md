@@ -40,6 +40,8 @@ csdk auth set-token <your-token>
 | `database-transfer` | databaseTransfer CRUD operations |
 | `default-privilege` | defaultPrivilege CRUD operations |
 | `domain` | domain CRUD operations |
+| `domain-event` | domainEvent CRUD operations |
+| `domain-verification` | domainVerification CRUD operations |
 | `embedding-chunk` | embeddingChunk CRUD operations |
 | `enum` | enum CRUD operations |
 | `field` | field CRUD operations |
@@ -85,7 +87,7 @@ and lifecycle settings. |
 | `reject-database-transfer` | rejectDatabaseTransfer |
 | `request-database` | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
@@ -561,6 +563,72 @@ CRUD operations for Domain records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `annotations`, `apiId`, `domain`, `labels`, `serviceId`, `siteId`, `subdomain`
 
+### `domain-event`
+
+CRUD operations for DomainEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all domainEvent records |
+| `find-first` | Find first matching domainEvent record |
+| `get` | Get a domainEvent by id |
+| `create` | Create a new domainEvent |
+| `update` | Update an existing domainEvent |
+| `delete` | Delete a domainEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `createdAt` | Datetime |
+| `domainVerificationId` | UUID |
+| `eventType` | String |
+| `id` | UUID |
+| `managedDomainId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+| `ownerId` | UUID |
+
+**Required create fields:** `eventType`, `managedDomainId`, `ownerId`
+**Optional create fields (backend defaults):** `actorId`, `domainVerificationId`, `message`, `metadata`
+
+### `domain-verification`
+
+CRUD operations for DomainVerification records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all domainVerification records |
+| `find-first` | Find first matching domainVerification record |
+| `get` | Get a domainVerification by id |
+| `create` | Create a new domainVerification |
+| `update` | Update an existing domainVerification |
+| `delete` | Delete a domainVerification |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `attempts` | Int |
+| `createdAt` | Datetime |
+| `error` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `lastCheckedAt` | Datetime |
+| `managedDomainId` | UUID |
+| `method` | String |
+| `ownerId` | UUID |
+| `recordName` | String |
+| `recordType` | String |
+| `recordValue` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `verifiedAt` | Datetime |
+
+**Required create fields:** `managedDomainId`, `ownerId`
+**Optional create fields (backend defaults):** `attempts`, `error`, `expiresAt`, `lastCheckedAt`, `method`, `recordName`, `recordType`, `recordValue`, `status`, `verifiedAt`
+
 ### `embedding-chunk`
 
 CRUD operations for EmbeddingChunk records.
@@ -859,7 +927,9 @@ CRUD operations for ManagedDomain records.
 
 | Field | Type |
 |-------|------|
+| `allowPublicUsage` | Boolean |
 | `annotations` | JSON |
+| `certStatus` | String |
 | `databaseId` | UUID |
 | `domain` | Hostname |
 | `id` | UUID |
@@ -870,7 +940,7 @@ CRUD operations for ManagedDomain records.
 | `verifiedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `domain`
-**Optional create fields (backend defaults):** `annotations`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
+**Optional create fields (backend defaults):** `allowPublicUsage`, `annotations`, `certStatus`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
 
 ### `node-type-registry`
 
@@ -1643,9 +1713,9 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `--pHost` | String |
-  | `--pMethod` | String |
-  | `--pPath` | String |
+  | `--requestHost` | String |
+  | `--requestMethod` | String |
+  | `--requestPath` | String |
 
 ### `accept-database-transfer`
 
@@ -1720,7 +1790,7 @@ rejectDatabaseTransfer
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
