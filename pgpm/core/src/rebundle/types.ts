@@ -142,6 +142,12 @@ export interface RebundleWorkspaceOptions extends RebundleStrategy {
 
   /** Branch/tag for the `initScaffold` template repo */
   templateBranch?: string;
+
+  /**
+   * License for the emitted module package.json (and the `pgpm init` answers
+   * when `initScaffold` is set). Defaults to 'CONSTRUCTIVE'.
+   */
+  license?: string;
 }
 
 /**

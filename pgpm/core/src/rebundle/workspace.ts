@@ -42,6 +42,7 @@ export async function rebundleWorkspace(
     initScaffold = false,
     templateRepo = DEFAULT_TEMPLATE_REPO,
     templateBranch,
+    license = 'CONSTRUCTIVE',
     ...strategy
   } = options;
 
@@ -72,7 +73,7 @@ export async function rebundleWorkspace(
       outputDir,
       templateRepo,
       branch: templateBranch,
-      answers: workspaceAnswers(outputDir),
+      answers: workspaceAnswers(outputDir, license),
       noTty: true,
     });
   } else {
@@ -98,7 +99,7 @@ export async function rebundleWorkspace(
         outputDir: pkgDir,
         templateRepo,
         branch: templateBranch,
-        answers: moduleAnswers(chunk.name),
+        answers: moduleAnswers(chunk.name, license),
         noTty: true,
       });
     }
@@ -125,6 +126,7 @@ export async function rebundleWorkspace(
       scripts,
       tags: remappedTags.filter(t => t.change === chunk.name),
       requires: deps,
+      license,
       overwrite: true,
       // When scaffolded, keep the boilerplate's richer package.json.
       writePackageJson: !initScaffold,
@@ -154,7 +156,7 @@ function planChangeDeps(deps: string[], mode: CrossChunkDepMode): string[] {
  * deterministic placeholders (the generated pgpm files are the real payload);
  * the workspace name derives from the output directory.
  */
-function workspaceAnswers(outputDir: string): Record<string, string> {
+function workspaceAnswers(outputDir: string, license: string): Record<string, string> {
   const name = basename(outputDir) || 'rebundled-workspace';
   return {
     name,
@@ -163,12 +165,12 @@ function workspaceAnswers(outputDir: string): Record<string, string> {
     moduleName: name,
     username: 'constructive-io',
     repoName: name,
-    license: 'MIT',
+    license,
   };
 }
 
 /** Non-interactive answers for the `pgpm init` module template. */
-function moduleAnswers(name: string): Record<string, string> {
+function moduleAnswers(name: string, license: string): Record<string, string> {
   return {
     name,
     moduleName: name,
@@ -179,7 +181,7 @@ function moduleAnswers(name: string): Record<string, string> {
     email: 'noreply@constructive.io',
     username: 'constructive-io',
     access: 'public',
-    license: 'MIT',
+    license,
   };
 }
 

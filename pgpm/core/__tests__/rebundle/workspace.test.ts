@@ -81,6 +81,10 @@ describe('rebundleWorkspace', () => {
     expect(existsSync(join(outputDir, 'pgpm.json'))).toBe(true);
     const cfg = JSON.parse(readFileSync(join(outputDir, 'pgpm.json'), 'utf-8'));
     expect(cfg.packages).toEqual(['packages/*']);
+
+    // Emitted package.json defaults to the Constructive license (not MIT).
+    const authPkg = JSON.parse(readFileSync(join(outputDir, 'packages', 'auth', 'package.json'), 'utf-8'));
+    expect(authPkg.license).toBe('CONSTRUCTIVE');
   });
 
   it('control-only (default): cross-chunk dep lives in control requires, not the plan', async () => {

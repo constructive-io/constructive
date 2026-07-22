@@ -35,6 +35,9 @@ export interface WriteMinimalModuleOptions {
   /** package.json version (default '0.0.1') */
   version?: string;
 
+  /** package.json license (default 'CONSTRUCTIVE') */
+  license?: string;
+
   /** Overwrite an existing directory (default: false) */
   overwrite?: boolean;
 
@@ -61,6 +64,7 @@ export function writeMinimalModule(moduleDir: string, options: WriteMinimalModul
     tags = [],
     requires = [],
     version = '0.0.1',
+    license = 'CONSTRUCTIVE',
     overwrite = false,
     writePackageJson = true,
   } = options;
@@ -92,7 +96,7 @@ export function writeMinimalModule(moduleDir: string, options: WriteMinimalModul
   if (writePackageJson) {
     fs.writeFileSync(
       path.join(moduleDir, 'package.json'),
-      JSON.stringify({ name, version, description: `${name} module`, license: 'MIT' }, null, 2) + '\n'
+      JSON.stringify({ name, version, description: `${name} module`, license }, null, 2) + '\n'
     );
   }
 }

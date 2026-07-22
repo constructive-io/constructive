@@ -101,9 +101,10 @@ describe('rebundleWorkspace initScaffold', () => {
     }
 
     // The scaffolded (richer) package.json is preserved, not clobbered by the
-    // minimal writer.
+    // minimal writer, and carries the Constructive license (not MIT).
     const authPkg = JSON.parse(readFileSync(join(outputDir, 'packages', 'auth', 'package.json'), 'utf-8'));
     expect(authPkg.name).toBeTruthy();
+    expect(authPkg.license).toBe('CONSTRUCTIVE');
 
     // control-only default still carries the cross-chunk dep via requires.
     const billingControl = readFileSync(join(outputDir, 'packages', 'billing', 'billing.control'), 'utf-8');
