@@ -16,6 +16,7 @@ export * from './core/boilerplate-scanner';
 
 // Export package-files functionality (now integrated into core)
 export * from './files';
+export * from './ast';
 export * from './refactor';
 export { cleanSql } from './migrate/clean';
 export { PgpmMigrate } from './migrate/client';
