@@ -1,5 +1,6 @@
 export * from './core/class/pgpm';
 export * from './slice';
+export * from './rebundle';
 export * from './extensions/extensions';
 export * from './modules/modules';
 export * from './packaging/package';
