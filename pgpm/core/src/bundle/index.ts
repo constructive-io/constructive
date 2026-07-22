@@ -8,6 +8,7 @@
  * from a module AST, transport or transform it, verify its digests, then
  * materialize it back into a deployable module.
  */
+export * from './apply';
 export * from './create';
 export * from './io';
 export * from './transpile';
