@@ -40,8 +40,11 @@ csdk auth set-token <your-token>
 | `database-transfer` | databaseTransfer CRUD operations |
 | `default-privilege` | defaultPrivilege CRUD operations |
 | `domain` | domain CRUD operations |
+| `domain-event` | domainEvent CRUD operations |
+| `domain-verification` | domainVerification CRUD operations |
 | `embedding-chunk` | embeddingChunk CRUD operations |
 | `enum` | enum CRUD operations |
+| `exclusion-constraint` | exclusionConstraint CRUD operations |
 | `field` | field CRUD operations |
 | `foreign-key-constraint` | foreignKeyConstraint CRUD operations |
 | `full-text-search` | fullTextSearch CRUD operations |
@@ -85,7 +88,7 @@ and lifecycle settings. |
 | `reject-database-transfer` | rejectDatabaseTransfer |
 | `request-database` | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
@@ -335,6 +338,8 @@ CRUD operations for CheckConstraint records.
 | `expr` | JSON |
 | `fieldIds` | UUID |
 | `id` | UUID |
+| `initiallyDeferred` | Boolean |
+| `isDeferrable` | Boolean |
 | `name` | String |
 | `smartTags` | JSON |
 | `tableId` | UUID |
@@ -343,7 +348,7 @@ CRUD operations for CheckConstraint records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `fieldIds`, `tableId`
-**Optional create fields (backend defaults):** `category`, `databaseId`, `expr`, `name`, `smartTags`, `tags`, `type`
+**Optional create fields (backend defaults):** `category`, `databaseId`, `expr`, `initiallyDeferred`, `isDeferrable`, `name`, `smartTags`, `tags`, `type`
 
 ### `composite-type`
 
@@ -561,6 +566,72 @@ CRUD operations for Domain records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `annotations`, `apiId`, `domain`, `labels`, `serviceId`, `siteId`, `subdomain`
 
+### `domain-event`
+
+CRUD operations for DomainEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all domainEvent records |
+| `find-first` | Find first matching domainEvent record |
+| `get` | Get a domainEvent by id |
+| `create` | Create a new domainEvent |
+| `update` | Update an existing domainEvent |
+| `delete` | Delete a domainEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `actorId` | UUID |
+| `createdAt` | Datetime |
+| `domainVerificationId` | UUID |
+| `eventType` | String |
+| `id` | UUID |
+| `managedDomainId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+| `ownerId` | UUID |
+
+**Required create fields:** `eventType`, `managedDomainId`, `ownerId`
+**Optional create fields (backend defaults):** `actorId`, `domainVerificationId`, `message`, `metadata`
+
+### `domain-verification`
+
+CRUD operations for DomainVerification records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all domainVerification records |
+| `find-first` | Find first matching domainVerification record |
+| `get` | Get a domainVerification by id |
+| `create` | Create a new domainVerification |
+| `update` | Update an existing domainVerification |
+| `delete` | Delete a domainVerification |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `attempts` | Int |
+| `createdAt` | Datetime |
+| `error` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `lastCheckedAt` | Datetime |
+| `managedDomainId` | UUID |
+| `method` | String |
+| `ownerId` | UUID |
+| `recordName` | String |
+| `recordType` | String |
+| `recordValue` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `verifiedAt` | Datetime |
+
+**Required create fields:** `managedDomainId`, `ownerId`
+**Optional create fields (backend defaults):** `attempts`, `error`, `expiresAt`, `lastCheckedAt`, `method`, `recordName`, `recordType`, `recordValue`, `status`, `verifiedAt`
+
 ### `embedding-chunk`
 
 CRUD operations for EmbeddingChunk records.
@@ -634,6 +705,42 @@ CRUD operations for Enum records.
 **Required create fields:** `databaseId`, `name`, `schemaId`
 **Optional create fields (backend defaults):** `category`, `description`, `label`, `smartTags`, `tags`, `values`
 
+### `exclusion-constraint`
+
+CRUD operations for ExclusionConstraint records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all exclusionConstraint records |
+| `find-first` | Find first matching exclusionConstraint record |
+| `get` | Get a exclusionConstraint by id |
+| `create` | Create a new exclusionConstraint |
+| `update` | Update an existing exclusionConstraint |
+| `delete` | Delete a exclusionConstraint |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `accessMethod` | String |
+| `category` | ObjectCategory |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `elementExpr` | JSON |
+| `fieldIds` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `operators` | String |
+| `smartTags` | JSON |
+| `tableId` | UUID |
+| `tags` | String |
+| `type` | String |
+| `updatedAt` | Datetime |
+| `whereClause` | JSON |
+
+**Required create fields:** `tableId`
+**Optional create fields (backend defaults):** `accessMethod`, `category`, `databaseId`, `elementExpr`, `fieldIds`, `name`, `operators`, `smartTags`, `tags`, `type`, `whereClause`
+
 ### `field`
 
 CRUD operations for Field records.
@@ -663,6 +770,8 @@ CRUD operations for Field records.
 | `generationExpression` | JSON |
 | `generationType` | String |
 | `id` | UUID |
+| `identityGeneration` | String |
+| `identityOptions` | JSON |
 | `isRequired` | Boolean |
 | `label` | String |
 | `max` | Float |
@@ -676,7 +785,7 @@ CRUD operations for Field records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `name`, `tableId`, `type`
-**Optional create fields (backend defaults):** `apiRequired`, `category`, `chk`, `chkExpr`, `databaseId`, `defaultValue`, `description`, `fieldOrder`, `generationExpression`, `generationType`, `isRequired`, `label`, `max`, `min`, `regexp`, `smartTags`, `tags`
+**Optional create fields (backend defaults):** `apiRequired`, `category`, `chk`, `chkExpr`, `databaseId`, `defaultValue`, `description`, `fieldOrder`, `generationExpression`, `generationType`, `identityGeneration`, `identityOptions`, `isRequired`, `label`, `max`, `min`, `regexp`, `smartTags`, `tags`
 
 ### `foreign-key-constraint`
 
@@ -699,9 +808,12 @@ CRUD operations for ForeignKeyConstraint records.
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `deleteAction` | String |
+| `deleteSetFieldIds` | UUID |
 | `description` | String |
 | `fieldIds` | UUID |
 | `id` | UUID |
+| `initiallyDeferred` | Boolean |
+| `isDeferrable` | Boolean |
 | `name` | String |
 | `refFieldIds` | UUID |
 | `refTableId` | UUID |
@@ -711,9 +823,10 @@ CRUD operations for ForeignKeyConstraint records.
 | `type` | String |
 | `updateAction` | String |
 | `updatedAt` | Datetime |
+| `withPeriod` | Boolean |
 
 **Required create fields:** `fieldIds`, `refFieldIds`, `refTableId`, `tableId`
-**Optional create fields (backend defaults):** `category`, `databaseId`, `deleteAction`, `description`, `name`, `smartTags`, `tags`, `type`, `updateAction`
+**Optional create fields (backend defaults):** `category`, `databaseId`, `deleteAction`, `deleteSetFieldIds`, `description`, `initiallyDeferred`, `isDeferrable`, `name`, `smartTags`, `tags`, `type`, `updateAction`, `withPeriod`
 
 ### `full-text-search`
 
@@ -859,7 +972,9 @@ CRUD operations for ManagedDomain records.
 
 | Field | Type |
 |-------|------|
+| `allowPublicUsage` | Boolean |
 | `annotations` | JSON |
+| `certStatus` | String |
 | `databaseId` | UUID |
 | `domain` | Hostname |
 | `id` | UUID |
@@ -870,7 +985,7 @@ CRUD operations for ManagedDomain records.
 | `verifiedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `domain`
-**Optional create fields (backend defaults):** `annotations`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
+**Optional create fields (backend defaults):** `allowPublicUsage`, `annotations`, `certStatus`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
 
 ### `node-type-registry`
 
@@ -993,15 +1108,18 @@ CRUD operations for PrimaryKeyConstraint records.
 | `databaseId` | UUID |
 | `fieldIds` | UUID |
 | `id` | UUID |
+| `initiallyDeferred` | Boolean |
+| `isDeferrable` | Boolean |
 | `name` | String |
 | `smartTags` | JSON |
 | `tableId` | UUID |
 | `tags` | String |
 | `type` | String |
 | `updatedAt` | Datetime |
+| `withoutOverlaps` | Boolean |
 
 **Required create fields:** `fieldIds`, `tableId`
-**Optional create fields (backend defaults):** `category`, `databaseId`, `name`, `smartTags`, `tags`, `type`
+**Optional create fields (backend defaults):** `category`, `databaseId`, `initiallyDeferred`, `isDeferrable`, `name`, `smartTags`, `tags`, `type`, `withoutOverlaps`
 
 ### `pubkey-setting`
 
@@ -1455,15 +1573,18 @@ CRUD operations for UniqueConstraint records.
 | `description` | String |
 | `fieldIds` | UUID |
 | `id` | UUID |
+| `initiallyDeferred` | Boolean |
+| `isDeferrable` | Boolean |
 | `name` | String |
 | `smartTags` | JSON |
 | `tableId` | UUID |
 | `tags` | String |
 | `type` | String |
 | `updatedAt` | Datetime |
+| `withoutOverlaps` | Boolean |
 
 **Required create fields:** `fieldIds`, `tableId`
-**Optional create fields (backend defaults):** `category`, `databaseId`, `description`, `name`, `smartTags`, `tags`, `type`
+**Optional create fields (backend defaults):** `category`, `databaseId`, `description`, `initiallyDeferred`, `isDeferrable`, `name`, `smartTags`, `tags`, `type`, `withoutOverlaps`
 
 ### `view`
 
@@ -1483,6 +1604,7 @@ CRUD operations for View records.
 | Field | Type |
 |-------|------|
 | `category` | ObjectCategory |
+| `checkOption` | String |
 | `data` | JSON |
 | `databaseId` | UUID |
 | `filterData` | JSON |
@@ -1491,6 +1613,7 @@ CRUD operations for View records.
 | `isReadOnly` | Boolean |
 | `name` | String |
 | `schemaId` | UUID |
+| `securityBarrier` | Boolean |
 | `securityInvoker` | Boolean |
 | `smartTags` | JSON |
 | `tableId` | UUID |
@@ -1498,7 +1621,7 @@ CRUD operations for View records.
 | `viewType` | String |
 
 **Required create fields:** `name`, `schemaId`, `viewType`
-**Optional create fields (backend defaults):** `category`, `data`, `databaseId`, `filterData`, `filterType`, `isReadOnly`, `securityInvoker`, `smartTags`, `tableId`, `tags`
+**Optional create fields (backend defaults):** `category`, `checkOption`, `data`, `databaseId`, `filterData`, `filterType`, `isReadOnly`, `securityBarrier`, `securityInvoker`, `smartTags`, `tableId`, `tags`
 
 ### `view-grant`
 
@@ -1643,9 +1766,9 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `--pHost` | String |
-  | `--pMethod` | String |
-  | `--pPath` | String |
+  | `--requestHost` | String |
+  | `--requestMethod` | String |
+  | `--requestPath` | String |
 
 ### `accept-database-transfer`
 
@@ -1720,7 +1843,7 @@ rejectDatabaseTransfer
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

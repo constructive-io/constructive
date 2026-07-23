@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 47 tables and 9 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 50 tables and 9 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 47 tables and 9 custom operations
+ORM client for the api API — provides typed CRUD operations for 50 tables and 9 custom operations
 
 ## Usage
 
@@ -51,8 +51,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [database-transfer](references/database-transfer.md)
 - [default-privilege](references/default-privilege.md)
 - [domain](references/domain.md)
+- [domain-event](references/domain-event.md)
+- [domain-verification](references/domain-verification.md)
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
+- [exclusion-constraint](references/exclusion-constraint.md)
 - [field](references/field.md)
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)

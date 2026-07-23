@@ -83,6 +83,8 @@ export interface CheckConstraint {
   expr: unknown | null;
   fieldIds: string[] | null;
   id: string | null;
+  initiallyDeferred: boolean | null;
+  isDeferrable: boolean | null;
   name: string | null;
   smartTags: unknown | null;
   tableId: string | null;
@@ -174,6 +176,34 @@ export interface Domain {
   siteId: string | null;
   subdomain: ConstructiveInternalTypeHostname | null;
 }
+export interface DomainEvent {
+  actorId: string | null;
+  createdAt: string | null;
+  domainVerificationId: string | null;
+  eventType: string | null;
+  id: string | null;
+  managedDomainId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+  ownerId: string | null;
+}
+export interface DomainVerification {
+  attempts: number | null;
+  createdAt: string | null;
+  error: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  lastCheckedAt: string | null;
+  managedDomainId: string | null;
+  method: string | null;
+  ownerId: string | null;
+  recordName: string | null;
+  recordType: string | null;
+  recordValue: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  verifiedAt: string | null;
+}
 export interface EmbeddingChunk {
   chunkOverlap: number | null;
   chunkSize: number | null;
@@ -209,6 +239,23 @@ export interface Enum {
   tags: string[] | null;
   values: string[] | null;
 }
+export interface ExclusionConstraint {
+  accessMethod: string | null;
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  elementExpr: unknown | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  name: string | null;
+  operators: string[] | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  type: string | null;
+  updatedAt: string | null;
+  whereClause: unknown | null;
+}
 export interface Field {
   apiRequired: boolean | null;
   category: ObjectCategory | null;
@@ -222,6 +269,8 @@ export interface Field {
   generationExpression: unknown | null;
   generationType: string | null;
   id: string | null;
+  identityGeneration: string | null;
+  identityOptions: unknown | null;
   isRequired: boolean | null;
   label: string | null;
   max: number | null;
@@ -239,9 +288,12 @@ export interface ForeignKeyConstraint {
   createdAt: string | null;
   databaseId: string | null;
   deleteAction: string | null;
+  deleteSetFieldIds: string[] | null;
   description: string | null;
   fieldIds: string[] | null;
   id: string | null;
+  initiallyDeferred: boolean | null;
+  isDeferrable: boolean | null;
   name: string | null;
   refFieldIds: string[] | null;
   refTableId: string | null;
@@ -251,6 +303,7 @@ export interface ForeignKeyConstraint {
   type: string | null;
   updateAction: string | null;
   updatedAt: string | null;
+  withPeriod: boolean | null;
 }
 export interface FullTextSearch {
   createdAt: string | null;
@@ -305,7 +358,9 @@ export interface Index {
   whereClause: unknown | null;
 }
 export interface ManagedDomain {
+  allowPublicUsage: boolean | null;
   annotations: unknown | null;
+  certStatus: string | null;
   databaseId: string | null;
   domain: ConstructiveInternalTypeHostname | null;
   id: string | null;
@@ -363,12 +418,15 @@ export interface PrimaryKeyConstraint {
   databaseId: string | null;
   fieldIds: string[] | null;
   id: string | null;
+  initiallyDeferred: boolean | null;
+  isDeferrable: boolean | null;
   name: string | null;
   smartTags: unknown | null;
   tableId: string | null;
   tags: string[] | null;
   type: string | null;
   updatedAt: string | null;
+  withoutOverlaps: boolean | null;
 }
 export interface PubkeySetting {
   cryptoNetwork: string | null;
@@ -543,15 +601,19 @@ export interface UniqueConstraint {
   description: string | null;
   fieldIds: string[] | null;
   id: string | null;
+  initiallyDeferred: boolean | null;
+  isDeferrable: boolean | null;
   name: string | null;
   smartTags: unknown | null;
   tableId: string | null;
   tags: string[] | null;
   type: string | null;
   updatedAt: string | null;
+  withoutOverlaps: boolean | null;
 }
 export interface View {
   category: ObjectCategory | null;
+  checkOption: string | null;
   data: unknown | null;
   databaseId: string | null;
   filterData: unknown | null;
@@ -560,6 +622,7 @@ export interface View {
   isReadOnly: boolean | null;
   name: string | null;
   schemaId: string | null;
+  securityBarrier: boolean | null;
   securityInvoker: boolean | null;
   smartTags: unknown | null;
   tableId: string | null;

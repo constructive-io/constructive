@@ -12,8 +12,8 @@ csdk primary-key-constraint list --where.<field>.<op> <value> --orderBy <values>
 csdk primary-key-constraint list --limit 10 --after <cursor>
 csdk primary-key-constraint find-first --where.<field>.<op> <value>
 csdk primary-key-constraint get --id <UUID>
-csdk primary-key-constraint create --fieldIds <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>]
-csdk primary-key-constraint update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--fieldIds <UUID>] [--name <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <String>]
+csdk primary-key-constraint create --fieldIds <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--initiallyDeferred <Boolean>] [--isDeferrable <Boolean>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>] [--withoutOverlaps <Boolean>]
+csdk primary-key-constraint update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--fieldIds <UUID>] [--initiallyDeferred <Boolean>] [--isDeferrable <Boolean>] [--name <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <String>] [--withoutOverlaps <Boolean>]
 csdk primary-key-constraint delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk primary-key-constraint list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a primaryKeyConstraint
 
 ```bash
-csdk primary-key-constraint create --fieldIds <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>]
+csdk primary-key-constraint create --fieldIds <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--initiallyDeferred <Boolean>] [--isDeferrable <Boolean>] [--name <String>] [--smartTags <JSON>] [--tags <String>] [--type <String>] [--withoutOverlaps <Boolean>]
 ```
 
 ### Get a primaryKeyConstraint by id
