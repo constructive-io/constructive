@@ -9,7 +9,15 @@ import { errors } from '@pgpmjs/types';
  * Supports both changes and tags
  */
 export function parsePlanFile(planPath: string): ParseResult<ExtendedPlanFile> {
-  const content = readFileSync(planPath, 'utf-8');
+  return parsePlanContent(readFileSync(planPath, 'utf-8'));
+}
+
+/**
+ * Parse Sqitch plan content (the text of a `pgpm.plan`) with full validation.
+ * The in-memory core of {@link parsePlanFile}, for plan text that does not
+ * live on disk (e.g. inside a migration bundle artifact).
+ */
+export function parsePlanContent(content: string): ParseResult<ExtendedPlanFile> {
   const lines = content.split('\n');
   
   let project = '';
