@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.0.2...@pgpmjs/export@1.1.0) (2026-07-23)
+
+### Features
+
+- **pgpm-export:** generic deterministic table-data export (shared data-dump helper) ([fc3a935](https://github.com/constructive-io/constructive/commit/fc3a93543ac88d4f719b83cc1268a5aae1031915))
+
 ## [1.0.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.0.1...@pgpmjs/export@1.0.2) (2026-07-23)
 
 **Note:** Version bump only for package @pgpmjs/export
