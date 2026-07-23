@@ -13,3 +13,5 @@
 export * from '@pgpmjs/bundle';
 // applyBundle stays in core: it drives PgpmMigrate (the deploy engine).
 export * from './apply';
+// applyEnvelope: schema apply + data/fixtures part replay for a BundleEnvelope.
+export * from './apply-envelope';
