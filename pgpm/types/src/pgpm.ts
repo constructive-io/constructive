@@ -132,6 +132,14 @@ export interface CDNOptions {
 }
 
 /**
+ * OAuth configuration options
+ */
+export interface OAuthOptions {
+    /** Secret key for signing OAuth state and PKCE cookies (HMAC-SHA256) */
+    stateSecret?: string;
+}
+
+/**
  * SMTP email configuration options
  */
 export interface SmtpOptions {
@@ -279,6 +287,8 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
+    /** OAuth configuration */
+    oauth?: OAuthOptions;
     /**
      * Pluggable migration backend. Undefined = built-in `pg` (server) path.
      * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved

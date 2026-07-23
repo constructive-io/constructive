@@ -155,7 +155,8 @@ describe('getEnvOptions', () => {
       PORT: '7777',
       DEPLOYMENT_FAST: 'false',
       JOBS_SUPPORT_ANY: 'false',
-      JOBS_SUPPORTED: 'alpha,beta'
+      JOBS_SUPPORTED: 'alpha,beta',
+      OAUTH_STATE_SECRET: 'test-state-secret'
     };
 
     const result = getEnvOptions(

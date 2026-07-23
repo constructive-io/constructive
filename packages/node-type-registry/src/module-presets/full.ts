@@ -63,7 +63,7 @@ export const PresetFull: ModulePreset = {
     'rate_limits_module',
     'devices_module',
     'user_credentials_module',
-    'config_secrets_module',
+    'internal_secrets_module',
     'rls_module',
     // Contact modules
     'emails_module',

@@ -1785,6 +1785,9 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
+      '@constructive-io/oauth':
+        specifier: workspace:^
+        version: link:../../packages/oauth/dist
       '@constructive-io/query-builder':
         specifier: workspace:^
         version: link:../../postgres/query-builder/dist
