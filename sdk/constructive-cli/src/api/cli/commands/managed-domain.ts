@@ -16,7 +16,9 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  allowPublicUsage: 'boolean',
   annotations: 'json',
+  certStatus: 'string',
   databaseId: 'uuid',
   domain: 'string',
   id: 'uuid',
@@ -77,7 +79,9 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      allowPublicUsage: true,
       annotations: true,
+      certStatus: true,
       databaseId: true,
       domain: true,
       id: true,
@@ -106,7 +110,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      allowPublicUsage: true,
       annotations: true,
+      certStatus: true,
       databaseId: true,
       domain: true,
       id: true,
@@ -147,7 +153,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          allowPublicUsage: true,
           annotations: true,
+          certStatus: true,
           databaseId: true,
           domain: true,
           id: true,
@@ -172,9 +180,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
+        type: 'boolean',
+        name: 'allowPublicUsage',
+        message: 'allowPublicUsage',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'annotations',
         message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'certStatus',
+        message: 'certStatus',
         required: false,
         skipPrompt: true,
       },
@@ -235,7 +257,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.managedDomain
       .create({
         data: {
+          allowPublicUsage: cleanedData.allowPublicUsage,
           annotations: cleanedData.annotations,
+          certStatus: cleanedData.certStatus,
           databaseId: cleanedData.databaseId,
           domain: cleanedData.domain,
           isWildcard: cleanedData.isWildcard,
@@ -245,7 +269,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           verifiedAt: cleanedData.verifiedAt,
         },
         select: {
+          allowPublicUsage: true,
           annotations: true,
+          certStatus: true,
           databaseId: true,
           domain: true,
           id: true,
@@ -276,9 +302,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'boolean',
+        name: 'allowPublicUsage',
+        message: 'allowPublicUsage',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'annotations',
         message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'certStatus',
+        message: 'certStatus',
         required: false,
         skipPrompt: true,
       },
@@ -339,7 +379,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          allowPublicUsage: cleanedData.allowPublicUsage,
           annotations: cleanedData.annotations,
+          certStatus: cleanedData.certStatus,
           databaseId: cleanedData.databaseId,
           domain: cleanedData.domain,
           isWildcard: cleanedData.isWildcard,
@@ -349,7 +391,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           verifiedAt: cleanedData.verifiedAt,
         },
         select: {
+          allowPublicUsage: true,
           annotations: true,
+          certStatus: true,
           databaseId: true,
           domain: true,
           id: true,

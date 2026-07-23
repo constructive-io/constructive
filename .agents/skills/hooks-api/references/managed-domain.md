@@ -7,8 +7,8 @@ One row per cert-bearing host or wildcard; tracks domain verification and TLS pr
 ## Usage
 
 ```typescript
-useManagedDomainsQuery({ selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } } })
-useManagedDomainQuery({ id: '<UUID>', selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } } })
+useManagedDomainsQuery({ selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } } })
+useManagedDomainQuery({ id: '<UUID>', selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } } })
 useCreateManagedDomainMutation({ selection: { fields: { id: true } } })
 useUpdateManagedDomainMutation({ selection: { fields: { id: true } } })
 useDeleteManagedDomainMutation({})
@@ -20,7 +20,7 @@ useDeleteManagedDomainMutation({})
 
 ```typescript
 const { data, isLoading } = useManagedDomainsQuery({
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useManagedDomainsQuery({
 const { mutate } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+mutate({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```

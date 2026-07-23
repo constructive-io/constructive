@@ -13,9 +13,9 @@ export interface ApplyRegistryDefaultsVariables {
   nodeType?: string;
 }
 export interface ResolveHttpRouteVariables {
-  pHost?: string;
-  pMethod?: string;
-  pPath?: string;
+  requestHost?: string;
+  requestMethod?: string;
+  requestPath?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -73,15 +73,15 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'pHost',
+              name: 'requestHost',
               type: 'String',
             },
             {
-              name: 'pMethod',
+              name: 'requestMethod',
               type: 'String',
             },
             {
-              name: 'pPath',
+              name: 'requestPath',
               type: 'String',
             },
           ],

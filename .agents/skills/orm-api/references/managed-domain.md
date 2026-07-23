@@ -9,8 +9,8 @@ One row per cert-bearing host or wildcard; tracks domain verification and TLS pr
 ```typescript
 db.managedDomain.findMany({ select: { id: true } }).execute()
 db.managedDomain.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.managedDomain.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute()
-db.managedDomain.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
+db.managedDomain.create({ data: { allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute()
+db.managedDomain.update({ where: { id: '<UUID>' }, data: { allowPublicUsage: '<Boolean>' }, select: { id: true } }).execute()
 db.managedDomain.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.managedDomain.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.managedDomain.findMany({
-  select: { id: true, annotations: true }
+  select: { id: true, allowPublicUsage: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.managedDomain.findMany({
 
 ```typescript
 const item = await db.managedDomain.create({
-  data: { annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' },
+  data: { allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

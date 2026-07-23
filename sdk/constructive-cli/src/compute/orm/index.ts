@@ -6,7 +6,6 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { DbPresetModel } from './models/dbPreset';
-import { DeclaredCapacityModel } from './models/declaredCapacity';
 import { FunctionApiBindingModel } from './models/functionApiBinding';
 import { FunctionDefinitionModel } from './models/functionDefinition';
 import { FunctionDeploymentModel } from './models/functionDeployment';
@@ -20,6 +19,7 @@ import { FunctionGraphExecutionOutputModel } from './models/functionGraphExecuti
 import { FunctionGraphObjectModel } from './models/functionGraphObject';
 import { FunctionGraphRefModel } from './models/functionGraphRef';
 import { FunctionGraphStoreModel } from './models/functionGraphStore';
+import { FunctionInvocationAttemptModel } from './models/functionInvocationAttempt';
 import { FunctionInvocationModel } from './models/functionInvocation';
 import { GetAllTreeNodesRecordModel } from './models/getAllTreeNodesRecord';
 import { InfraCommitModel } from './models/infraCommit';
@@ -30,12 +30,12 @@ import { InfraStoreModel } from './models/infraStore';
 import { IntegrationProviderModel } from './models/integrationProvider';
 import { NamespaceModel } from './models/namespace';
 import { NamespaceEventModel } from './models/namespaceEvent';
-import { PlatformDeclaredCapacityModel } from './models/platformDeclaredCapacity';
 import { PlatformFunctionApiBindingModel } from './models/platformFunctionApiBinding';
 import { PlatformFunctionDefinitionModel } from './models/platformFunctionDefinition';
 import { PlatformFunctionDeploymentModel } from './models/platformFunctionDeployment';
 import { PlatformFunctionDeploymentEventModel } from './models/platformFunctionDeploymentEvent';
 import { PlatformFunctionExecutionLogModel } from './models/platformFunctionExecutionLog';
+import { PlatformFunctionInvocationAttemptModel } from './models/platformFunctionInvocationAttempt';
 import { PlatformFunctionInvocationModel } from './models/platformFunctionInvocation';
 import { PlatformInfraCommitModel } from './models/platformInfraCommit';
 import { PlatformInfraGetAllTreeNodesRecordModel } from './models/platformInfraGetAllTreeNodesRecord';
@@ -45,26 +45,28 @@ import { PlatformInfraStoreModel } from './models/platformInfraStore';
 import { PlatformNamespaceModel } from './models/platformNamespace';
 import { PlatformNamespaceEventModel } from './models/platformNamespaceEvent';
 import { PlatformResourceModel } from './models/platformResource';
+import { PlatformResourceDeclaredCapacityModel } from './models/platformResourceDeclaredCapacity';
 import { PlatformResourceDefinitionModel } from './models/platformResourceDefinition';
 import { PlatformResourceEventModel } from './models/platformResourceEvent';
 import { PlatformResourceInstallationModel } from './models/platformResourceInstallation';
 import { PlatformResourceStatusCheckModel } from './models/platformResourceStatusCheck';
 import { PlatformResourceUsageLogModel } from './models/platformResourceUsageLog';
 import { PlatformResourceUsageSummaryModel } from './models/platformResourceUsageSummary';
-import { PlatformResourceUtilizationDailyModel } from './models/platformResourceUtilizationDaily';
+import { PlatformResourceUtilizationModel } from './models/platformResourceUtilization';
 import { PlatformResourcesHealthModel } from './models/platformResourcesHealth';
 import { PlatformResourcesRequirementsStateModel } from './models/platformResourcesRequirementsState';
 import { PlatformResourcesResolvedRequirementModel } from './models/platformResourcesResolvedRequirement';
 import { PlatformWebhookEndpointModel } from './models/platformWebhookEndpoint';
 import { PlatformWebhookEventModel } from './models/platformWebhookEvent';
 import { ResourceModel } from './models/resource';
+import { ResourceDeclaredCapacityModel } from './models/resourceDeclaredCapacity';
 import { ResourceDefinitionModel } from './models/resourceDefinition';
 import { ResourceEventModel } from './models/resourceEvent';
 import { ResourceInstallationModel } from './models/resourceInstallation';
 import { ResourceStatusCheckModel } from './models/resourceStatusCheck';
 import { ResourceUsageLogModel } from './models/resourceUsageLog';
 import { ResourceUsageSummaryModel } from './models/resourceUsageSummary';
-import { ResourceUtilizationDailyModel } from './models/resourceUtilizationDaily';
+import { ResourceUtilizationModel } from './models/resourceUtilization';
 import { ResourcesHealthModel } from './models/resourcesHealth';
 import { ResourcesRequirementsStateModel } from './models/resourcesRequirementsState';
 import { ResourcesResolvedRequirementModel } from './models/resourcesResolvedRequirement';
@@ -106,7 +108,6 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     dbPreset: new DbPresetModel(client),
-    declaredCapacity: new DeclaredCapacityModel(client),
     functionApiBinding: new FunctionApiBindingModel(client),
     functionDefinition: new FunctionDefinitionModel(client),
     functionDeployment: new FunctionDeploymentModel(client),
@@ -120,6 +121,7 @@ export function createClient(config: OrmClientConfig) {
     functionGraphObject: new FunctionGraphObjectModel(client),
     functionGraphRef: new FunctionGraphRefModel(client),
     functionGraphStore: new FunctionGraphStoreModel(client),
+    functionInvocationAttempt: new FunctionInvocationAttemptModel(client),
     functionInvocation: new FunctionInvocationModel(client),
     getAllTreeNodesRecord: new GetAllTreeNodesRecordModel(client),
     infraCommit: new InfraCommitModel(client),
@@ -130,12 +132,12 @@ export function createClient(config: OrmClientConfig) {
     integrationProvider: new IntegrationProviderModel(client),
     namespace: new NamespaceModel(client),
     namespaceEvent: new NamespaceEventModel(client),
-    platformDeclaredCapacity: new PlatformDeclaredCapacityModel(client),
     platformFunctionApiBinding: new PlatformFunctionApiBindingModel(client),
     platformFunctionDefinition: new PlatformFunctionDefinitionModel(client),
     platformFunctionDeployment: new PlatformFunctionDeploymentModel(client),
     platformFunctionDeploymentEvent: new PlatformFunctionDeploymentEventModel(client),
     platformFunctionExecutionLog: new PlatformFunctionExecutionLogModel(client),
+    platformFunctionInvocationAttempt: new PlatformFunctionInvocationAttemptModel(client),
     platformFunctionInvocation: new PlatformFunctionInvocationModel(client),
     platformInfraCommit: new PlatformInfraCommitModel(client),
     platformInfraGetAllTreeNodesRecord: new PlatformInfraGetAllTreeNodesRecordModel(client),
@@ -145,26 +147,28 @@ export function createClient(config: OrmClientConfig) {
     platformNamespace: new PlatformNamespaceModel(client),
     platformNamespaceEvent: new PlatformNamespaceEventModel(client),
     platformResource: new PlatformResourceModel(client),
+    platformResourceDeclaredCapacity: new PlatformResourceDeclaredCapacityModel(client),
     platformResourceDefinition: new PlatformResourceDefinitionModel(client),
     platformResourceEvent: new PlatformResourceEventModel(client),
     platformResourceInstallation: new PlatformResourceInstallationModel(client),
     platformResourceStatusCheck: new PlatformResourceStatusCheckModel(client),
     platformResourceUsageLog: new PlatformResourceUsageLogModel(client),
     platformResourceUsageSummary: new PlatformResourceUsageSummaryModel(client),
-    platformResourceUtilizationDaily: new PlatformResourceUtilizationDailyModel(client),
+    platformResourceUtilization: new PlatformResourceUtilizationModel(client),
     platformResourcesHealth: new PlatformResourcesHealthModel(client),
     platformResourcesRequirementsState: new PlatformResourcesRequirementsStateModel(client),
     platformResourcesResolvedRequirement: new PlatformResourcesResolvedRequirementModel(client),
     platformWebhookEndpoint: new PlatformWebhookEndpointModel(client),
     platformWebhookEvent: new PlatformWebhookEventModel(client),
     resource: new ResourceModel(client),
+    resourceDeclaredCapacity: new ResourceDeclaredCapacityModel(client),
     resourceDefinition: new ResourceDefinitionModel(client),
     resourceEvent: new ResourceEventModel(client),
     resourceInstallation: new ResourceInstallationModel(client),
     resourceStatusCheck: new ResourceStatusCheckModel(client),
     resourceUsageLog: new ResourceUsageLogModel(client),
     resourceUsageSummary: new ResourceUsageSummaryModel(client),
-    resourceUtilizationDaily: new ResourceUtilizationDailyModel(client),
+    resourceUtilization: new ResourceUtilizationModel(client),
     resourcesHealth: new ResourcesHealthModel(client),
     resourcesRequirementsState: new ResourcesRequirementsStateModel(client),
     resourcesResolvedRequirement: new ResourcesResolvedRequirementModel(client),

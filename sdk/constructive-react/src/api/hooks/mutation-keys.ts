@@ -137,6 +137,24 @@ export const domainMutationKeys = {
   /** Delete domain mutation key */ delete: (id: string | number) =>
     ['mutation', 'domain', 'delete', id] as const,
 } as const;
+export const domainEventMutationKeys = {
+  /** All domainEvent mutation keys */ all: ['mutation', 'domainevent'] as const,
+  /** Create domainEvent mutation key */ create: () =>
+    ['mutation', 'domainevent', 'create'] as const,
+  /** Update domainEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'domainevent', 'update', id] as const,
+  /** Delete domainEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'domainevent', 'delete', id] as const,
+} as const;
+export const domainVerificationMutationKeys = {
+  /** All domainVerification mutation keys */ all: ['mutation', 'domainverification'] as const,
+  /** Create domainVerification mutation key */ create: () =>
+    ['mutation', 'domainverification', 'create'] as const,
+  /** Update domainVerification mutation key */ update: (id: string | number) =>
+    ['mutation', 'domainverification', 'update', id] as const,
+  /** Delete domainVerification mutation key */ delete: (id: string | number) =>
+    ['mutation', 'domainverification', 'delete', id] as const,
+} as const;
 export const embeddingChunkMutationKeys = {
   /** All embeddingChunk mutation keys */ all: ['mutation', 'embeddingchunk'] as const,
   /** Create embeddingChunk mutation key */ create: () =>
@@ -153,6 +171,15 @@ export const enumMutationKeys = {
     ['mutation', 'enum', 'update', id] as const,
   /** Delete enum mutation key */ delete: (id: string | number) =>
     ['mutation', 'enum', 'delete', id] as const,
+} as const;
+export const exclusionConstraintMutationKeys = {
+  /** All exclusionConstraint mutation keys */ all: ['mutation', 'exclusionconstraint'] as const,
+  /** Create exclusionConstraint mutation key */ create: () =>
+    ['mutation', 'exclusionconstraint', 'create'] as const,
+  /** Update exclusionConstraint mutation key */ update: (id: string | number) =>
+    ['mutation', 'exclusionconstraint', 'update', id] as const,
+  /** Delete exclusionConstraint mutation key */ delete: (id: string | number) =>
+    ['mutation', 'exclusionconstraint', 'delete', id] as const,
 } as const;
 export const fieldMutationKeys = {
   /** All field mutation keys */ all: ['mutation', 'field'] as const,
@@ -486,8 +513,11 @@ export const mutationKeys = {
   databaseTransfer: databaseTransferMutationKeys,
   defaultPrivilege: defaultPrivilegeMutationKeys,
   domain: domainMutationKeys,
+  domainEvent: domainEventMutationKeys,
+  domainVerification: domainVerificationMutationKeys,
   embeddingChunk: embeddingChunkMutationKeys,
   enum: enumMutationKeys,
+  exclusionConstraint: exclusionConstraintMutationKeys,
   field: fieldMutationKeys,
   foreignKeyConstraint: foreignKeyConstraintMutationKeys,
   fullTextSearch: fullTextSearchMutationKeys,
