@@ -125,6 +125,7 @@ bundleDigest  = H( plan ‖ control ‖ [changeDigest_1 … changeDigest_n] )   
 | `verifyEnvelope(envelope)` | Recompute every envelope digest incl. the schema bundle chain |
 | `writeEnvelopeFile` / `readEnvelopeFile` | Single JSON envelope artifact |
 | `materializeEnvelope` / `envelopeFromDirectory` | Deterministic directory layout (tar-friendly) |
+| `previewEnvelopeApply` / `applyEnvelope` (`@pgpmjs/core`) | Apply an envelope into a DB: schema via `applyBundle`, then part replay |
 
 `CreateBundleOptions`: `{ createdWith?, provenance? }` (both excluded from the digest).
 
@@ -216,3 +217,11 @@ The bundle is the substrate for the schema-plane cloud functions: `exportMigrati
 (dry-run / integrity+namespace gate / atomic / timeout over `PgpmMigrate`), `diffBundles`,
 and `reconcilePlan` — extend this same artifact; check `pgpm/bundle/src/` (and
 `pgpm/core/src/bundle/apply.ts` for `applyBundle`) for the currently exported surface.
+
+`applyEnvelope` (`pgpm/core/src/bundle/apply-envelope.ts`) is the generic
+`applyMigrationBundle` primitive over the envelope: `previewEnvelopeApply` (pure — envelope
+digest gate, schema pre-flight, part replay order, layered rollback plan), then
+`applyBundle` on the schema, then each data/fixtures part's deploy SQL replayed in manifest
+order inside one transaction (part failure rolls back all part data; schema stays applied).
+Options: `dryRun`, `verifyParts`, and the `transformPartSql(sql, {kind,name,script})` seam
+for deterministic ID-remap (identity by default).
