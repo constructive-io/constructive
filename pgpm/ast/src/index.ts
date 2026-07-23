@@ -12,6 +12,8 @@
  * bundle/artifact layer build on top of it.
  */
 export * from './files';
+export * from './hash';
 export * from './module';
+export * from './plan-rename';
 export { parseAuthor } from './utils/author';
 export type { ParsedAuthor } from './utils/author';

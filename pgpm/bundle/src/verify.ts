@@ -1,4 +1,4 @@
-import { hashString } from '../migrate/utils/hash';
+import { hashString } from '@pgpmjs/ast';
 import { computeBundleDigest, computeChangeDigest } from './create';
 import { MigrationBundle } from './types';
 
