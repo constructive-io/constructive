@@ -1,5 +1,5 @@
-import { Change, Tag, ExtendedPlanFile } from '../files/types';
-import { parsePlanFile } from '../files/plan/parser';
+import { Change, Tag, ExtendedPlanFile } from '@pgpmjs/ast/files/types';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import {
   SliceConfig,
   SliceResult,

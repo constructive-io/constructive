@@ -1,4 +1,5 @@
-import { hashString } from '../migrate/utils/hash';
+import { hashString } from '@pgpmjs/ast';
+import { forEachScript } from '@pgpmjs/traverse';
 import { computeBundleDigest, computeChangeDigest } from './create';
 import { MigrationBundle } from './types';
 
@@ -44,8 +45,7 @@ export function verifyBundle(bundle: MigrationBundle): BundleIssue[] {
   }
 
   for (const change of bundle.changes) {
-    for (const script of [change.deploy, change.revert, change.verify]) {
-      if (!script) continue;
+    forEachScript(change, script => {
       if (hashString(script.sql) !== script.digest) {
         issues.push({
           kind: 'script-digest',
@@ -54,7 +54,7 @@ export function verifyBundle(bundle: MigrationBundle): BundleIssue[] {
           message: 'script digest does not match its sql'
         });
       }
-    }
+    });
     const expected = computeChangeDigest(change.name, {
       deploy: change.deploy?.digest,
       revert: change.revert?.digest,

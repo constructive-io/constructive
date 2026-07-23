@@ -1,4 +1,4 @@
-import { Change } from '../files/types';
+import { Change } from '@pgpmjs/ast/files/types';
 import { SliceWarning } from '../slice/types';
 
 /**

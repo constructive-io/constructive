@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-import { getChanges } from '../files/plan/parser';
+import { getChanges } from '@pgpmjs/ast/files/plan/parser';
 import { resolveWithPlan } from '../resolution/resolve';
 import {
   buildDependencyGraph,
@@ -10,7 +10,7 @@ import {
   detectPackageCycle,
   extractPackageFromPath,
 } from '../slice/slice';
-import { parsePlanFile } from '../files/plan/parser';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { DependencyGraph, SliceWarning } from '../slice/types';
 import { Chunk, RebundleResult, RebundleStrategy } from './types';
 

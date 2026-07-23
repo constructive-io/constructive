@@ -8,8 +8,8 @@
  * from a module AST, transport or transform it, verify its digests, then
  * materialize it back into a deployable module.
  */
-export * from './create';
-export * from './io';
-export * from './transpile';
-export * from './types';
-export * from './verify';
+// Pure artifact layer moved to @pgpmjs/bundle; re-exported here so existing
+// `@pgpmjs/core` consumers keep importing the whole bundle surface unchanged.
+export * from '@pgpmjs/bundle';
+// applyBundle stays in core: it drives PgpmMigrate (the deploy engine).
+export * from './apply';

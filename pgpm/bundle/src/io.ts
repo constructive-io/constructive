@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { readModule } from '../ast/reader';
+import { readModule } from '@pgpmjs/ast/module/reader';
 import { createBundle, CreateBundleOptions } from './create';
 import { MigrationBundle } from './types';
 

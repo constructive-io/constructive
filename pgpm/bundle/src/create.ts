@@ -1,5 +1,6 @@
-import { PgpmModuleAst, PgpmScriptAst } from '../ast/types';
-import { hashString } from '../migrate/utils/hash';
+import { PgpmModuleAst, PgpmScriptAst } from '@pgpmjs/ast/module/types';
+import { hashString } from '@pgpmjs/ast';
+import { mapScripts } from '@pgpmjs/traverse';
 import {
   BUNDLE_FORMAT_VERSION,
   BundleChange,
@@ -57,9 +58,7 @@ export function createBundle(
   options: CreateBundleOptions = {}
 ): MigrationBundle {
   const changes: BundleChange[] = module.changes.map(change => {
-    const deploy = toBundleScript(change.deploy);
-    const revert = toBundleScript(change.revert);
-    const verify = toBundleScript(change.verify);
+    const { deploy, revert, verify } = mapScripts(change, toBundleScript);
     const digest = computeChangeDigest(change.name, {
       deploy: deploy?.digest,
       revert: revert?.digest,

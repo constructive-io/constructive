@@ -1,4 +1,4 @@
-import { PgpmScriptKind } from '../ast/types';
+import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 
 /** Current bundle format version. Bumped only on breaking artifact changes. */
 export const BUNDLE_FORMAT_VERSION = '1';

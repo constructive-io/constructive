@@ -8,7 +8,7 @@ import {
   serializeScript,
   verifyModuleRoundTrip,
   writeModule
-} from '../../src/ast';
+} from '../../src/module';
 
 let sourceDir: string;
 

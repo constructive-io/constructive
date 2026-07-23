@@ -1,0 +1,46 @@
+{
+  "name": "@pgpmjs/traverse",
+  "version": "0.0.1",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Traversal primitives for the pgpm module AST / migration bundle — walk a change's deploy/revert/verify scripts",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "traverse",
+    "ast",
+    "typescript",
+    "pgpm",
+    "pgpmjs",
+    "postgresql",
+    "migrations"
+  ],
+  "devDependencies": {
+    "makage": "^0.3.0"
+  },
+  "dependencies": {
+    "@pgpmjs/ast": "workspace:^"
+  }
+}

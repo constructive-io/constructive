@@ -5,7 +5,7 @@ import { relative } from 'path';
 import { deparse } from 'pgsql-deparser';
 import { parse } from 'pgsql-parser';
 
-import { getExtensionName } from '../files';
+import { getExtensionName } from '@pgpmjs/ast/files';
 import { resolve, resolveWithPlan } from '../resolution/resolve';
 import { transformProps } from './transform';
 

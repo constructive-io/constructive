@@ -1,4 +1,4 @@
-import { Change, Tag, ExtendedPlanFile } from '../files/types';
+import { Change, Tag, ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 
 /**
  * Configuration for slicing a plan into multiple packages

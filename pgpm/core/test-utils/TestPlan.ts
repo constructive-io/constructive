@@ -1,8 +1,8 @@
 import { existsSync } from 'fs';
 import { dirname,join } from 'path';
 
-import { parsePlanFile } from '../src/files';
-import { ExtendedPlanFile, ParseResult } from '../src/files/types';
+import { parsePlanFile } from '@pgpmjs/ast/files';
+import { ExtendedPlanFile, ParseResult } from '@pgpmjs/ast/files/types';
 
 export class TestPlan {
   private fixturePath: string;

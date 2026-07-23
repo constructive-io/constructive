@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { bundleFromModule, materializeBundle, transpileBundle, verifyBundle } from '../../src/bundle';
+import { bundleFromModule, materializeBundle, transpileBundle, verifyBundle } from '../src';
 
 let sourceDir: string;
 
