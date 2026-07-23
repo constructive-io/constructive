@@ -35,8 +35,11 @@ const db = createClient({
 | `databaseTransfer` | findMany, findOne, create, update, delete |
 | `defaultPrivilege` | findMany, findOne, create, update, delete |
 | `domain` | findMany, findOne, create, update, delete |
+| `domainEvent` | findMany, findOne, create, update, delete |
+| `domainVerification` | findMany, findOne, create, update, delete |
 | `embeddingChunk` | findMany, findOne, create, update, delete |
 | `enum` | findMany, findOne, create, update, delete |
+| `exclusionConstraint` | findMany, findOne, create, update, delete |
 | `field` | findMany, findOne, create, update, delete |
 | `foreignKeyConstraint` | findMany, findOne, create, update, delete |
 | `fullTextSearch` | findMany, findOne, create, update, delete |
@@ -309,6 +312,8 @@ CRUD operations for CheckConstraint records.
 | `expr` | JSON | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
@@ -320,13 +325,13 @@ CRUD operations for CheckConstraint records.
 
 ```typescript
 // List all checkConstraint records
-const items = await db.checkConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.checkConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.checkConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.checkConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.checkConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
+const created = await db.checkConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.checkConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -601,6 +606,86 @@ const updated = await db.domain.update({ where: { id: '<UUID>' }, data: { annota
 const deleted = await db.domain.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.domainEvent`
+
+CRUD operations for DomainEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `domainVerificationId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `id` | UUID | No |
+| `managedDomainId` | UUID | Yes |
+| `message` | String | Yes |
+| `metadata` | JSON | Yes |
+| `ownerId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all domainEvent records
+const items = await db.domainEvent.findMany({ select: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } }).execute();
+
+// Get one by id
+const item = await db.domainEvent.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } }).execute();
+
+// Create
+const created = await db.domainEvent.create({ data: { actorId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>', ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.domainVerification`
+
+CRUD operations for DomainVerification records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `attempts` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `error` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `lastCheckedAt` | Datetime | Yes |
+| `managedDomainId` | UUID | Yes |
+| `method` | String | Yes |
+| `ownerId` | UUID | Yes |
+| `recordName` | String | Yes |
+| `recordType` | String | Yes |
+| `recordValue` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verifiedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all domainVerification records
+const items = await db.domainVerification.findMany({ select: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Get one by id
+const item = await db.domainVerification.findOne({ id: '<UUID>', select: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Create
+const created = await db.domainVerification.create({ data: { attempts: '<Int>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', ownerId: '<UUID>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainVerification.update({ where: { id: '<UUID>' }, data: { attempts: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainVerification.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.embeddingChunk`
 
 CRUD operations for EmbeddingChunk records.
@@ -688,6 +773,49 @@ const updated = await db.enum.update({ where: { id: '<UUID>' }, data: { category
 const deleted = await db.enum.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.exclusionConstraint`
+
+CRUD operations for ExclusionConstraint records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `accessMethod` | String | Yes |
+| `category` | ObjectCategory | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `elementExpr` | JSON | Yes |
+| `fieldIds` | UUID | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `operators` | String | Yes |
+| `smartTags` | JSON | Yes |
+| `tableId` | UUID | Yes |
+| `tags` | String | Yes |
+| `type` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `whereClause` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all exclusionConstraint records
+const items = await db.exclusionConstraint.findMany({ select: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } }).execute();
+
+// Get one by id
+const item = await db.exclusionConstraint.findOne({ id: '<UUID>', select: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } }).execute();
+
+// Create
+const created = await db.exclusionConstraint.create({ data: { accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', elementExpr: '<JSON>', fieldIds: '<UUID>', name: '<String>', operators: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', whereClause: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.exclusionConstraint.update({ where: { id: '<UUID>' }, data: { accessMethod: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.exclusionConstraint.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.field`
 
 CRUD operations for Field records.
@@ -708,6 +836,8 @@ CRUD operations for Field records.
 | `generationExpression` | JSON | Yes |
 | `generationType` | String | Yes |
 | `id` | UUID | No |
+| `identityGeneration` | String | Yes |
+| `identityOptions` | JSON | Yes |
 | `isRequired` | Boolean | Yes |
 | `label` | String | Yes |
 | `max` | Float | Yes |
@@ -724,13 +854,13 @@ CRUD operations for Field records.
 
 ```typescript
 // List all field records
-const items = await db.field.findMany({ select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.field.findMany({ select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.field.findOne({ id: '<UUID>', select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.field.findOne({ id: '<UUID>', select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.field.create({ data: { apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.field.create({ data: { apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', identityGeneration: '<String>', identityOptions: '<JSON>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.field.update({ where: { id: '<UUID>' }, data: { apiRequired: '<Boolean>' }, select: { id: true } }).execute();
@@ -751,9 +881,12 @@ CRUD operations for ForeignKeyConstraint records.
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `deleteAction` | String | Yes |
+| `deleteSetFieldIds` | UUID | Yes |
 | `description` | String | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `refFieldIds` | UUID | Yes |
 | `refTableId` | UUID | Yes |
@@ -763,18 +896,19 @@ CRUD operations for ForeignKeyConstraint records.
 | `type` | String | Yes |
 | `updateAction` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `withPeriod` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all foreignKeyConstraint records
-const items = await db.foreignKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } }).execute();
+const items = await db.foreignKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } }).execute();
 
 // Get one by id
-const item = await db.foreignKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } }).execute();
+const item = await db.foreignKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } }).execute();
 
 // Create
-const created = await db.foreignKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', description: '<String>', fieldIds: '<UUID>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>' }, select: { id: true } }).execute();
+const created = await db.foreignKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', deleteSetFieldIds: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>', withPeriod: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.foreignKeyConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -947,7 +1081,9 @@ CRUD operations for ManagedDomain records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `allowPublicUsage` | Boolean | Yes |
 | `annotations` | JSON | Yes |
+| `certStatus` | String | Yes |
 | `databaseId` | UUID | Yes |
 | `domain` | ConstructiveInternalTypeHostname | Yes |
 | `id` | UUID | No |
@@ -961,16 +1097,16 @@ CRUD operations for ManagedDomain records.
 
 ```typescript
 // List all managedDomain records
-const items = await db.managedDomain.findMany({ select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
+const items = await db.managedDomain.findMany({ select: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Get one by id
-const item = await db.managedDomain.findOne({ id: '<UUID>', select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
+const item = await db.managedDomain.findOne({ id: '<UUID>', select: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Create
-const created = await db.managedDomain.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.managedDomain.create({ data: { allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { allowPublicUsage: '<Boolean>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.managedDomain.delete({ where: { id: '<UUID>' } }).execute();
@@ -1109,24 +1245,27 @@ CRUD operations for PrimaryKeyConstraint records.
 | `databaseId` | UUID | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
 | `tags` | String | Yes |
 | `type` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `withoutOverlaps` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all primaryKeyConstraint records
-const items = await db.primaryKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.primaryKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Get one by id
-const item = await db.primaryKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.primaryKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Create
-const created = await db.primaryKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
+const created = await db.primaryKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.primaryKeyConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1604,25 +1743,31 @@ CRUD operations for Trigger records.
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `event` | String | Yes |
+| `events` | String | Yes |
+| `forEach` | String | Yes |
 | `functionName` | String | Yes |
 | `id` | UUID | No |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
 | `tags` | String | Yes |
+| `timing` | String | Yes |
+| `transitionNewName` | String | Yes |
+| `transitionOldName` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `whenClause` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
 // List all trigger records
-const items = await db.trigger.findMany({ select: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } }).execute();
+const items = await db.trigger.findMany({ select: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } }).execute();
 
 // Get one by id
-const item = await db.trigger.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } }).execute();
+const item = await db.trigger.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } }).execute();
 
 // Create
-const created = await db.trigger.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.trigger.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', events: '<String>', forEach: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', timing: '<String>', transitionNewName: '<String>', transitionOldName: '<String>', whenClause: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.trigger.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1679,24 +1824,27 @@ CRUD operations for UniqueConstraint records.
 | `description` | String | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
 | `tags` | String | Yes |
 | `type` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `withoutOverlaps` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all uniqueConstraint records
-const items = await db.uniqueConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.uniqueConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Get one by id
-const item = await db.uniqueConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.uniqueConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Create
-const created = await db.uniqueConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
+const created = await db.uniqueConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.uniqueConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1714,6 +1862,7 @@ CRUD operations for View records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `category` | ObjectCategory | Yes |
+| `checkOption` | String | Yes |
 | `data` | JSON | Yes |
 | `databaseId` | UUID | Yes |
 | `filterData` | JSON | Yes |
@@ -1722,6 +1871,7 @@ CRUD operations for View records.
 | `isReadOnly` | Boolean | Yes |
 | `name` | String | Yes |
 | `schemaId` | UUID | Yes |
+| `securityBarrier` | Boolean | Yes |
 | `securityInvoker` | Boolean | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
@@ -1732,13 +1882,13 @@ CRUD operations for View records.
 
 ```typescript
 // List all view records
-const items = await db.view.findMany({ select: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
+const items = await db.view.findMany({ select: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
 
 // Get one by id
-const item = await db.view.findOne({ id: '<UUID>', select: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
+const item = await db.view.findOne({ id: '<UUID>', select: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
 
 // Create
-const created = await db.view.create({ data: { category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' }, select: { id: true } }).execute();
+const created = await db.view.create({ data: { category: '<ObjectCategory>', checkOption: '<String>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityBarrier: '<Boolean>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.view.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1922,12 +2072,12 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `pHost` | String |
-  | `pMethod` | String |
-  | `pPath` | String |
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
 
 ```typescript
-const result = await db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' }).execute();
+const result = await db.query.resolveHttpRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
 ```
 
 ### `db.mutation.acceptDatabaseTransfer`
@@ -2012,7 +2162,7 @@ const result = await db.mutation.rejectDatabaseTransfer({ input: { transferId: '
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

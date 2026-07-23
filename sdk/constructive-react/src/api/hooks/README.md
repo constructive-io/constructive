@@ -102,6 +102,16 @@ function App() {
 | `useCreateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
 | `useUpdateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
 | `useDeleteDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useDomainEventsQuery` | Query | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useDomainEventQuery` | Query | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useCreateDomainEventMutation` | Mutation | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useUpdateDomainEventMutation` | Mutation | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useDeleteDomainEventMutation` | Mutation | Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions. |
+| `useDomainVerificationsQuery` | Query | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useDomainVerificationQuery` | Query | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useCreateDomainVerificationMutation` | Mutation | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useUpdateDomainVerificationMutation` | Mutation | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
+| `useDeleteDomainVerificationMutation` | Mutation | One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains. |
 | `useEmbeddingChunksQuery` | Query | List all embeddingChunks |
 | `useEmbeddingChunkQuery` | Query | Get one embeddingChunk |
 | `useCreateEmbeddingChunkMutation` | Mutation | Create a embeddingChunk |
@@ -112,6 +122,11 @@ function App() {
 | `useCreateEnumMutation` | Mutation | Create a enum |
 | `useUpdateEnumMutation` | Mutation | Update a enum |
 | `useDeleteEnumMutation` | Mutation | Delete a enum |
+| `useExclusionConstraintsQuery` | Query | List all exclusionConstraints |
+| `useExclusionConstraintQuery` | Query | Get one exclusionConstraint |
+| `useCreateExclusionConstraintMutation` | Mutation | Create a exclusionConstraint |
+| `useUpdateExclusionConstraintMutation` | Mutation | Update a exclusionConstraint |
+| `useDeleteExclusionConstraintMutation` | Mutation | Delete a exclusionConstraint |
 | `useFieldsQuery` | Query | List all fields |
 | `useFieldQuery` | Query | Get one field |
 | `useCreateFieldMutation` | Mutation | Create a field |
@@ -279,7 +294,7 @@ and lifecycle settings. |
 | `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
 | `useRequestDatabaseMutation` | Mutation | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
@@ -419,20 +434,20 @@ create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', database
 ```typescript
 // List all checkConstraints
 const { data, isLoading } = useCheckConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Get one checkConstraint
 const { data: item } = useCheckConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Create a checkConstraint
 const { mutate: create } = useCreateCheckConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
 ```
 
 ### CompositeType
@@ -582,6 +597,48 @@ const { mutate: create } = useCreateDomainMutation({
 create({ annotations: '<JSON>', apiId: '<UUID>', databaseId: '<UUID>', domain: '<Hostname>', labels: '<JSON>', serviceId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>' });
 ```
 
+### DomainEvent
+
+```typescript
+// List all domainEvents
+const { data, isLoading } = useDomainEventsQuery({
+  selection: { fields: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } },
+});
+
+// Get one domainEvent
+const { data: item } = useDomainEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, createdAt: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, ownerId: true } },
+});
+
+// Create a domainEvent
+const { mutate: create } = useCreateDomainEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>', ownerId: '<UUID>' });
+```
+
+### DomainVerification
+
+```typescript
+// List all domainVerifications
+const { data, isLoading } = useDomainVerificationsQuery({
+  selection: { fields: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Get one domainVerification
+const { data: item } = useDomainVerificationQuery({
+  id: '<UUID>',
+  selection: { fields: { attempts: true, createdAt: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, ownerId: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Create a domainVerification
+const { mutate: create } = useCreateDomainVerificationMutation({
+  selection: { fields: { id: true } },
+});
+create({ attempts: '<Int>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', ownerId: '<UUID>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' });
+```
+
 ### EmbeddingChunk
 
 ```typescript
@@ -624,25 +681,46 @@ const { mutate: create } = useCreateEnumMutation({
 create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', label: '<String>', name: '<String>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>', values: '<String>' });
 ```
 
+### ExclusionConstraint
+
+```typescript
+// List all exclusionConstraints
+const { data, isLoading } = useExclusionConstraintsQuery({
+  selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } },
+});
+
+// Get one exclusionConstraint
+const { data: item } = useExclusionConstraintQuery({
+  id: '<UUID>',
+  selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } },
+});
+
+// Create a exclusionConstraint
+const { mutate: create } = useCreateExclusionConstraintMutation({
+  selection: { fields: { id: true } },
+});
+create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', elementExpr: '<JSON>', fieldIds: '<UUID>', name: '<String>', operators: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', whereClause: '<JSON>' });
+```
+
 ### Field
 
 ```typescript
 // List all fields
 const { data, isLoading } = useFieldsQuery({
-  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Get one field
 const { data: item } = useFieldQuery({
   id: '<UUID>',
-  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Create a field
 const { mutate: create } = useCreateFieldMutation({
   selection: { fields: { id: true } },
 });
-create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' });
+create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', identityGeneration: '<String>', identityOptions: '<JSON>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' });
 ```
 
 ### ForeignKeyConstraint
@@ -650,20 +728,20 @@ create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', 
 ```typescript
 // List all foreignKeyConstraints
 const { data, isLoading } = useForeignKeyConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } },
 });
 
 // Get one foreignKeyConstraint
 const { data: item } = useForeignKeyConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } },
 });
 
 // Create a foreignKeyConstraint
 const { mutate: create } = useCreateForeignKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', description: '<String>', fieldIds: '<UUID>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', deleteSetFieldIds: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>', withPeriod: '<Boolean>' });
 ```
 
 ### FullTextSearch
@@ -755,20 +833,20 @@ create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<U
 ```typescript
 // List all managedDomains
 const { data, isLoading } = useManagedDomainsQuery({
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one managedDomain
 const { data: item } = useManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a managedDomain
 const { mutate: create } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### NodeTypeRegistry
@@ -839,20 +917,20 @@ create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', dis
 ```typescript
 // List all primaryKeyConstraints
 const { data, isLoading } = usePrimaryKeyConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Get one primaryKeyConstraint
 const { data: item } = usePrimaryKeyConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Create a primaryKeyConstraint
 const { mutate: create } = useCreatePrimaryKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' });
 ```
 
 ### PubkeySetting
@@ -1112,20 +1190,20 @@ create({ databaseId: '<UUID>', fieldIds: '<UUID>', granteeName: '<String>', isGr
 ```typescript
 // List all triggers
 const { data, isLoading } = useTriggersQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } },
 });
 
 // Get one trigger
 const { data: item } = useTriggerQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } },
 });
 
 // Create a trigger
 const { mutate: create } = useCreateTriggerMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', events: '<String>', forEach: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', timing: '<String>', transitionNewName: '<String>', transitionOldName: '<String>', whenClause: '<JSON>' });
 ```
 
 ### TriggerFunction
@@ -1154,20 +1232,20 @@ create({ code: '<String>', databaseId: '<UUID>', name: '<String>' });
 ```typescript
 // List all uniqueConstraints
 const { data, isLoading } = useUniqueConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Get one uniqueConstraint
 const { data: item } = useUniqueConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Create a uniqueConstraint
 const { mutate: create } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' });
 ```
 
 ### View
@@ -1175,20 +1253,20 @@ create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<Stri
 ```typescript
 // List all views
 const { data, isLoading } = useViewsQuery({
-  selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
+  selection: { fields: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
 });
 
 // Get one view
 const { data: item } = useViewQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
+  selection: { fields: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
 });
 
 // Create a view
 const { mutate: create } = useCreateViewMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' });
+create({ category: '<ObjectCategory>', checkOption: '<String>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityBarrier: '<Boolean>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' });
 ```
 
 ### ViewGrant
@@ -1298,9 +1376,9 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `pHost` | String |
-  | `pMethod` | String |
-  | `pPath` | String |
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
 
 ### `useAcceptDatabaseTransferMutation`
 
@@ -1364,7 +1442,7 @@ rejectDatabaseTransfer
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

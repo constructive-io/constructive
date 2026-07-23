@@ -7,7 +7,7 @@ Execute the resourceInstallationsUpgrade mutation
 ## Usage
 
 ```bash
-csdk resource-installations-upgrade --input.clientMutationId <String> --input.pInstallationId <UUID> --input.pParams <JSON>
+csdk resource-installations-upgrade --input.clientMutationId <String> --input.newParams <JSON> --input.targetInstallationId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resource-installations-upgrade --input.clientMutationId <String> --input.pI
 ### Run resourceInstallationsUpgrade
 
 ```bash
-csdk resource-installations-upgrade --input.clientMutationId <String> --input.pInstallationId <UUID> --input.pParams <JSON>
+csdk resource-installations-upgrade --input.clientMutationId <String> --input.newParams <JSON> --input.targetInstallationId <UUID>
 ```
