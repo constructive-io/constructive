@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.1.1...@pgpmjs/bundle@0.2.0) (2026-07-23)
+
+### Features
+
+- **pgpm-bundle:** bundle envelope — versioned shippable artifact wrapping schema + data + fixtures ([5d24374](https://github.com/constructive-io/constructive/commit/5d24374c3875604bdd8df38625593d8f47a020fd))
+
 ## [0.1.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.1.0...@pgpmjs/bundle@0.1.1) (2026-07-23)
 
 **Note:** Version bump only for package @pgpmjs/bundle
