@@ -1,3 +1,4 @@
+export * from './export-data';
 export * from './export-meta';
 export * from './export-migrations';
 export * from './export-graphql';

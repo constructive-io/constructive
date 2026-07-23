@@ -114,7 +114,28 @@ new QueryBuilder()
   .build();
 ```
 
-Helpers: `eq/neq/lt/lte/gt/gte` (comparisons), `add/sub/mul/div` (arithmetic), `isNull/isNotNull`, `and/or/not`. All accept plain values (auto-parameterized) or expressions.
+Helpers: `eq/neq/lt/lte/gt/gte` (comparisons), `add/sub/mul/div` (arithmetic), `isNull/isNotNull`, `and/or/not`, `cast` (type casts). All accept plain values (auto-parameterized) or expressions.
+
+### Type casts — `cast(operand, typeName)`
+
+`cast()` emits a `TypeCast` node. The type name accepts anything `format_type()` produces: typmods (`numeric(10,2)`), array suffix (`text[]`), multi-word SQL-standard names (`timestamp with time zone` — mapped to their `pg_catalog` aliases), and `schema.type` qualification:
+
+```typescript
+import { cast, col, lit } from '@constructive-io/query-builder';
+
+new QueryBuilder()
+  .table('apis')
+  .select([])
+  .selectExpr('raw_id', cast(col('id'), 'text'))
+  .build();
+// SELECT id::text AS raw_id FROM apis
+
+new QueryBuilder()
+  .table('apis')
+  .insert({ id: cast(lit('00000000-…'), 'uuid'), labels: cast(lit('{}'), 'text[]') })
+  .build();
+// INSERT INTO apis (id, labels) VALUES ('00000000-…'::uuid, CAST('{}' AS text[]))
+```
 
 ### INSERT
 ```typescript
