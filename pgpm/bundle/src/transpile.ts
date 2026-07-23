@@ -2,6 +2,7 @@ import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
 import { hashString } from '@pgpmjs/ast';
 import { renameInPlanContent } from '@pgpmjs/ast';
+import { mapScripts } from '@pgpmjs/traverse';
 import {
   computeBundleDigest,
   computeChangeDigest,
@@ -73,13 +74,11 @@ function buildRenames(
 }
 
 function transpileScriptSql(
-  script: BundleScript | null,
+  script: BundleScript,
   changeName: string,
   renames: Map<string, string>,
   options: TranspileBundleOptions
-): BundleScript | null {
-  if (!script) return null;
-
+): BundleScript {
   let sql = script.sql;
   if (renames.size > 0) {
     const parsed = parsePgpmHeader(sql);
@@ -114,9 +113,9 @@ export function transpileBundle(
   const changes: BundleChange[] = bundle.changes.map(change => {
     const name = renames.get(change.name) ?? change.name;
     const dependencies = change.dependencies.map(dep => renames.get(dep) ?? dep);
-    const deploy = transpileScriptSql(change.deploy, change.name, renames, options);
-    const revert = transpileScriptSql(change.revert, change.name, renames, options);
-    const verify = transpileScriptSql(change.verify, change.name, renames, options);
+    const { deploy, revert, verify } = mapScripts(change, script =>
+      transpileScriptSql(script, change.name, renames, options)
+    );
     const digest = computeChangeDigest(name, {
       deploy: deploy?.digest,
       revert: revert?.digest,
