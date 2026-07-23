@@ -128,15 +128,15 @@ describe('exportTableData', () => {
       '00000000-0000-0000-0000-00000000000b'
     ]);
     const insert = result.insert as string;
-    expect(insert).toContain('INSERT INTO "app_routing_public"."apis"');
-    expect(insert).toContain('"fixed_at"');
-    expect(insert).not.toContain('"created_at"');
-    expect(insert).not.toContain('"updated_at"');
-    expect(insert).not.toContain('"dbname"');
+    expect(insert).toContain('INSERT INTO app_routing_public.apis');
+    expect(insert).toContain('fixed_at');
+    expect(insert).not.toContain('created_at');
+    expect(insert).not.toContain('updated_at');
+    expect(insert).not.toContain('dbname');
     // alpha (lower id) sorts first
     expect(insert.indexOf("'alpha'")).toBeLessThan(insert.indexOf("'beta'"));
     expect(insert).toContain('::uuid');
-    expect(insert).toContain('::timestamp with time zone');
+    expect(insert).toContain('AS timestamp with time zone');
 
     // Deterministic: exporting twice yields identical SQL
     const again = await exportTableData(
@@ -176,7 +176,7 @@ describe('exportTableData', () => {
     });
     expect(result.rowCount).toBe(1);
     expect(result.ids).toBeNull();
-    expect(result.insert).toContain('"key"');
+    expect(result.insert).toMatch(/\bkey\b/);
   });
 });
 
@@ -202,7 +202,7 @@ describe('script assembly', () => {
     await pg.query(verifySql);
 
     // revert removes the exported rows (children deleted before parents)
-    expect(revertSql.indexOf('"api_schemas"')).toBeLessThan(revertSql.indexOf('"apis"'));
+    expect(revertSql.indexOf('api_schemas')).toBeLessThan(revertSql.indexOf('.apis'));
     await pg.query(revertSql);
     const gone = await pg.query('SELECT count(*)::int AS n FROM app_routing_public.apis');
     expect(gone.rows[0].n).toBe(0);

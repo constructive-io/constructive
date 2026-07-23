@@ -7,7 +7,20 @@
  * flow and downstream scoped-plane data exports — column introspection,
  * non-deterministic-default exclusion, and script assembly live here so
  * consumers do not re-implement them.
+ *
+ * All emitted SQL is built through @constructive-io/query-builder (pg-ast +
+ * pgsql-deparser) — no string concatenation, no manual identifier quoting.
  */
+import {
+  cast,
+  col,
+  div,
+  eq,
+  fn,
+  gte,
+  lit,
+  QueryBuilder
+} from '@constructive-io/query-builder';
 
 /**
  * Minimal query interface satisfied by pg.Pool, pg.Client, and test clients.
@@ -109,13 +122,13 @@ export interface TableDataExport {
   insert: string | null;
 }
 
-const quoteIdent = (name: string): string => `"${name.replace(/"/g, '""')}"`;
+const RAW_ID = '__raw_id';
 
 /**
  * Export a table's rows as a single deterministic INSERT statement.
- * Values are text-cast and quoted server-side (quote_nullable) and re-cast
- * to the column type in the emitted SQL; rows are ordered by id when
- * present, otherwise by all exported columns, so output is reproducible.
+ * Values are text-cast server-side, emitted as literals re-cast to the
+ * column type; rows are ordered by id when present, otherwise by all
+ * exported columns, so output is reproducible.
  */
 export const exportTableData = async (
   db: Queryable,
@@ -125,7 +138,7 @@ export const exportTableData = async (
   const excluded = new Set(options.excludeColumns ?? []);
   const allColumns = await getDataExportColumns(db, spec.schema, spec.table);
   const columns = allColumns.filter(
-    col => !excluded.has(col.name) && !isVolatileTimestampColumn(col)
+    c => !excluded.has(c.name) && !isVolatileTimestampColumn(c)
   );
 
   const base: TableDataExport = {
@@ -138,36 +151,50 @@ export const exportTableData = async (
   };
   if (columns.length === 0) return base;
 
-  const qualified = `${quoteIdent(spec.schema)}.${quoteIdent(spec.table)}`;
-  const colList = columns.map(c => quoteIdent(c.name)).join(', ');
-  const selectList = columns
-    .map(c => `quote_nullable(${quoteIdent(c.name)}::text) AS ${quoteIdent(c.name)}`)
-    .join(', ');
   const hasId = columns.some(c => c.name === 'id');
-  const orderBy = hasId ? '"id"::text' : colList;
-  const where = spec.filter
-    ? ` WHERE ${quoteIdent(spec.filter.column)} = $1`
-    : '';
-  const params = spec.filter ? [spec.filter.value] : undefined;
 
-  const rowsRes = await db.query(
-    `SELECT ${selectList}${hasId ? ', id::text AS __raw_id' : ''} FROM ${qualified}${where} ORDER BY ${orderBy}`,
-    params
-  );
+  const selectQb = new QueryBuilder()
+    .schema(spec.schema)
+    .table(spec.table)
+    .select([]);
+  for (const c of columns) {
+    selectQb.selectExpr(c.name, cast(col(c.name), 'text'));
+  }
+  if (hasId) {
+    selectQb.selectExpr(RAW_ID, cast(col('id'), 'text'));
+    selectQb.orderBy(cast(col('id'), 'text'));
+  } else {
+    for (const c of columns) {
+      selectQb.orderBy(col(c.name));
+    }
+  }
+  if (spec.filter) {
+    selectQb.where({ [spec.filter.column]: { equalTo: spec.filter.value } });
+  }
+  const { text: selectSql, values: selectValues } = selectQb.build();
+
+  const rowsRes = await db.query(selectSql, selectValues);
   if (rowsRes.rows.length === 0) return base;
 
-  const valueRows = rowsRes.rows.map((row: Record<string, string>) => {
-    const vals = columns.map(c => `${row[c.name]}::${c.type}`);
-    return `  (${vals.join(', ')})`;
-  });
-
-  const conflict = options.conflictDoNothing ? '\nON CONFLICT DO NOTHING' : '';
+  const insertQb = new QueryBuilder()
+    .schema(spec.schema)
+    .table(spec.table)
+    .insert(
+      rowsRes.rows.map((row: Record<string, string | null>) =>
+        Object.fromEntries(
+          columns.map(c => [c.name, cast(lit(row[c.name]), c.type)])
+        )
+      )
+    );
+  if (options.conflictDoNothing) {
+    insertQb.onConflict({ action: 'nothing' });
+  }
 
   return {
     ...base,
     rowCount: rowsRes.rows.length,
-    ids: hasId ? rowsRes.rows.map((r: any) => r.__raw_id) : null,
-    insert: `INSERT INTO ${qualified} (${colList}) VALUES\n${valueRows.join(',\n')}${conflict};`
+    ids: hasId ? rowsRes.rows.map((r: any) => r[RAW_ID]) : null,
+    insert: `${insertQb.build().text};`
   };
 };
 
@@ -213,15 +240,19 @@ export const buildDataRevertScript = (exports: TableDataExport[]): string => {
   const statements: string[] = [];
   for (const e of [...exports].reverse()) {
     if (e.rowCount === 0) continue;
-    const qualified = `${quoteIdent(e.schema)}.${quoteIdent(e.table)}`;
     if (!e.ids) {
       statements.push(
         `-- ${e.schema}.${e.table}: exported without an id column; rows not reverted`
       );
       continue;
     }
-    const idList = e.ids.map(id => `'${id.replace(/'/g, "''")}'`).join(', ');
-    statements.push(`DELETE FROM ${qualified} WHERE id IN (${idList});`);
+    const { text } = new QueryBuilder()
+      .schema(e.schema)
+      .table(e.table)
+      .delete()
+      .where({ id: { in: e.ids.map(id => lit(id)) } })
+      .build();
+    statements.push(`${text};`);
   }
   return wrapReplica([statements.join('\n\n')]);
 };
@@ -235,17 +266,19 @@ export const buildDataVerifyScript = (exports: TableDataExport[]): string => {
   const statements: string[] = [];
   for (const e of exports) {
     if (e.rowCount === 0) continue;
-    const qualified = `${quoteIdent(e.schema)}.${quoteIdent(e.table)}`;
+    const countCheck = e.ids ? eq : gte;
+    const qb = new QueryBuilder()
+      .schema(e.schema)
+      .table(e.table)
+      .select([])
+      .selectExpr(
+        'verified',
+        div(lit(1), cast(countCheck(fn('count', [col('*')]), lit(e.rowCount)), 'int'))
+      );
     if (e.ids) {
-      const idList = e.ids.map(id => `'${id.replace(/'/g, "''")}'`).join(', ');
-      statements.push(
-        `SELECT 1/(CASE WHEN count(*) = ${e.rowCount} THEN 1 ELSE 0 END) FROM ${qualified} WHERE id IN (${idList});`
-      );
-    } else {
-      statements.push(
-        `SELECT 1/(CASE WHEN count(*) >= ${e.rowCount} THEN 1 ELSE 0 END) FROM ${qualified};`
-      );
+      qb.where({ id: { in: e.ids.map(id => lit(id)) } });
     }
+    statements.push(`${qb.build().text};`);
   }
   return statements.join('\n\n') + '\n';
 };
