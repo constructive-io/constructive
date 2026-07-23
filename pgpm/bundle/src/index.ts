@@ -13,6 +13,7 @@
  */
 export * from './create';
 export * from './diff';
+export * from './envelope';
 export * from './io';
 export * from './reconcile';
 export * from './transpile';

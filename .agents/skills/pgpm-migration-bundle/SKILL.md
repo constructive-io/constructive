@@ -121,6 +121,10 @@ bundleDigest  = H( plan ‖ control ‖ [changeDigest_1 … changeDigest_n] )   
 | `transpileBundle(bundle, opts?)` | Rewrite into a new namespace; fresh digests + lineage |
 | `computeChangeDigest` / `computeBundleDigest` | The digest primitives |
 | `BUNDLE_FORMAT_VERSION`, `BUNDLE_FILE_NAME` | Format constants |
+| `createEnvelope(opts)` | Wrap schema bundle + data/fixtures parts into a shippable envelope |
+| `verifyEnvelope(envelope)` | Recompute every envelope digest incl. the schema bundle chain |
+| `writeEnvelopeFile` / `readEnvelopeFile` | Single JSON envelope artifact |
+| `materializeEnvelope` / `envelopeFromDirectory` | Deterministic directory layout (tar-friendly) |
 
 `CreateBundleOptions`: `{ createdWith?, provenance? }` (both excluded from the digest).
 
@@ -148,6 +152,32 @@ transpileBundle(bundle, {
 - `renameChange` is validated as a bijection over touched changes (no collisions, no
   rename onto an untouched existing change).
 - Records `provenance.sourceBundleDigest` for lineage.
+
+### `createEnvelope` — the shippable artifact container (fn #3)
+
+The **bundle envelope** wraps a schema `MigrationBundle` plus data and fixtures SQL
+parts into one versioned, content-addressed container — the artifact
+`exportMigrationBundle` emits and snapshot/fork/apply consume:
+
+```ts
+const envelope = createEnvelope({
+  version: '1.0.0',                       // caller-assigned artifact version
+  schema: bundleFromModule(moduleDir),    // required
+  data: [{ name: 'source-plane-data', deploy, revert, verify }],   // e.g. from @pgpmjs/export
+  fixtures: [{ name: 'seed-roles', deploy }],
+  provenance: { sourceDatabase, sliceSpec }   // lineage; excluded from digest
+});
+verifyEnvelope(envelope);                 // { issues: [], schemaIssues: [] }
+materializeEnvelope(envelope, outDir);    // envelope.json + schema/pgpm-bundle.json + data|fixtures/<name>/*.sql
+const back = envelopeFromDirectory(outDir);
+```
+
+- Manifest: identity (`name`, `version`), parts inventory with per-part digests, overall
+  Merkle digest (schema part digest = the bundle's own manifest digest, so the chain
+  extends down through every change/script), `provenance` (excluded from digest).
+- Data/fixtures parts are **caller-produced SQL** (e.g. `@pgpmjs/export`
+  `buildDataDeploy/Revert/VerifyScript`) — the envelope layer never generates SQL, keeping
+  the dependency direction intact.
 
 ## Common recipes
 
