@@ -1,10 +1,10 @@
 ---
 name: pgpm-migration-bundle
-description: The portable, content-addressed PGPM migration bundle artifact and the pgpm module AST it is built from. Use when asked to "export a migration bundle", "ship a schema between databases", "transpile migrations into a new namespace", "verify a migration artifact", "understand MigrationBundle / PgpmModuleAst", "read/write a pgpm module as an AST", "content-address a migration", or when working with `pgpm/core/src/bundle/*` or `pgpm/core/src/ast/*`.
-compatibility: "@pgpmjs/core >= 7.1.0, Node.js 22+"
+description: The portable, content-addressed PGPM migration bundle artifact and the pgpm module AST it is built from. Use when asked to "export a migration bundle", "ship a schema between databases", "transpile migrations into a new namespace", "verify a migration artifact", "understand MigrationBundle / PgpmModuleAst", "read/write a pgpm module as an AST", "content-address a migration", or when working with `pgpm/bundle/*`, `pgpm/ast/*`, or `pgpm/traverse/*`.
+compatibility: "@pgpmjs/ast, @pgpmjs/bundle, @pgpmjs/traverse, @pgpmjs/core >= 7.1.0, Node.js 22+"
 metadata:
   author: constructive-io
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # PGPM Migration Bundle
@@ -19,6 +19,20 @@ It is a thin **transport/artifact layer on top of** the existing PGPM file tooli
 does **not** re-implement plan/header/control parsing. The moment a bundle needs to
 deploy, it goes back through the same core path (`materializeBundle` → `readModule` /
 `PgpmMigrate`).
+
+## Package layout
+
+```
+@pgpmjs/ast       (pgpm/ast)      — pure leaf: files/* parsers+writers, module AST
+                                    (readModule/writeModule/serialize*), hashString
+@pgpmjs/traverse  (pgpm/traverse) — structural walkers over deploy/revert/verify slots
+                                    (forEachScript/mapScripts/zipScripts)
+@pgpmjs/bundle    (pgpm/bundle)   — the artifact layer: create/io/verify/transpile/diff/
+                                    reconcile, moduleFromBundle/materializeBundle
+@pgpmjs/core      (pgpm/core)     — deploy engine (PgpmMigrate) + `applyBundle` glue
+                                    (stays in core to avoid a bundle→core cycle);
+                                    re-exports ast for compatibility
+```
 
 ## Three ways to understand it
 
@@ -39,7 +53,7 @@ deploy, it goes back through the same core path (`materializeBundle` → `readMo
 
 ## The two layers
 
-### 1. `PgpmModuleAst` — the module AST (`pgpm/core/src/ast/`)
+### 1. `PgpmModuleAst` — the module AST (`@pgpmjs/ast`, `pgpm/ast/src/module/`)
 
 The typed, in-memory representation of a pgpm module. `readModule` **composes the existing
 low-level tooling** (`parsePlanFile`, `parseControlFile`, `parsePgpmHeader`, `readScript`)
@@ -48,7 +62,7 @@ reproduces the module losslessly.
 
 ```ts
 import { readModule, writeModule, serializePlan, serializeScript, verifyModuleRoundTrip }
-  from '@pgpmjs/core';
+  from '@pgpmjs/ast/module';   // also re-exported from '@pgpmjs/core'
 
 const mod = readModule('/path/to/module');   // dir  -> PgpmModuleAst  (parse)
 writeModule(mod, { outDir: '/out' });         // AST  -> dir           (deparse; lossless)
@@ -60,7 +74,7 @@ const issues = verifyModuleRoundTrip('/path/to/module'); // [] means byte-exact 
 - SQL bodies stay **text** — the literal SQL AST (pgsql-parser / pgsql-deparser) is a
   separate layer callers apply during transpile.
 
-### 2. `MigrationBundle` — the artifact (`pgpm/core/src/bundle/`)
+### 2. `MigrationBundle` — the artifact (`@pgpmjs/bundle`, `pgpm/bundle/src/`)
 
 A content-addressed, serializable snapshot of the AST.
 
@@ -101,7 +115,8 @@ bundleDigest  = H( plan ‖ control ‖ [changeDigest_1 … changeDigest_n] )   
 | `bundleFromModule(dir, opts?)` | `readModule` → `createBundle` from a directory |
 | `createBundle(moduleAst, opts?)` | Build a bundle from an AST — pure, no I/O |
 | `writeBundleFile(bundle, path)` / `readBundleFile(path)` | JSON artifact on the wire |
-| `materializeBundle(bundle, outDir)` | Bundle → real deployable pgpm module (inverse) |
+| `moduleFromBundle(bundle, dir?)` | Bundle → `PgpmModuleAst` in memory (inverse of `createBundle`) |
+| `materializeBundle(bundle, outDir)` | Bundle → real deployable pgpm module (= `moduleFromBundle` → `writeModule`) |
 | `verifyBundle(bundle): BundleIssue[]` | Recompute all digests; localize any mismatch |
 | `transpileBundle(bundle, opts?)` | Rewrite into a new namespace; fresh digests + lineage |
 | `computeChangeDigest` / `computeBundleDigest` | The digest primitives |
@@ -121,6 +136,8 @@ transpileBundle(bundle, {
   renameChange: (name) => name.replace('schemas/app/', 'schemas/tenant/'),
   // AST-level remap (schema names, FQ refs, RLS/FK targets, fn bodies) — caller supplies,
   // e.g. via constructive-db transform-schemas (pgsql-parser / pgsql-deparser):
+  // Real driver: constructive-db transform-schemas `makeSchemaTranspiler({ schemaMap })`
+  // returns { renameChange, transformScript } from one schema map:
   transformScript: (sql, ctx) => rewriteNamespace(sql, ctx),
   transformControl: (content) => content,     // control `requires` are extension deps, left alone by default
 });
@@ -167,5 +184,5 @@ The bundle is the substrate for the schema-plane cloud functions: `exportMigrati
 (3), `applyMigrationBundle` (4), `transpileMigrationBundle` (18), `applyTranspiledMigrationBundle`
 (19), and feeds drift/reconcile (9). Additional bundle operations — `applyBundle`
 (dry-run / integrity+namespace gate / atomic / timeout over `PgpmMigrate`), `diffBundles`,
-and `reconcilePlan` — extend this same artifact; check `pgpm/core/src/bundle/` for the
-currently exported surface.
+and `reconcilePlan` — extend this same artifact; check `pgpm/bundle/src/` (and
+`pgpm/core/src/bundle/apply.ts` for `applyBundle`) for the currently exported surface.
