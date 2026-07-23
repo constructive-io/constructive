@@ -7,8 +7,8 @@ React Query hooks for Trigger data operations
 ## Usage
 
 ```typescript
-useTriggersQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } } })
-useTriggerQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } } })
+useTriggersQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } } })
+useTriggerQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } } })
 useCreateTriggerMutation({ selection: { fields: { id: true } } })
 useUpdateTriggerMutation({ selection: { fields: { id: true } } })
 useDeleteTriggerMutation({})
@@ -20,7 +20,7 @@ useDeleteTriggerMutation({})
 
 ```typescript
 const { data, isLoading } = useTriggersQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEach: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, transitionNewName: true, transitionOldName: true, updatedAt: true, whenClause: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useTriggersQuery({
 const { mutate } = useCreateTriggerMutation({
   selection: { fields: { id: true } },
 });
-mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', events: '<String>', forEach: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', timing: '<String>', transitionNewName: '<String>', transitionOldName: '<String>', whenClause: '<JSON>' });
 ```

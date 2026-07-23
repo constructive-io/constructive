@@ -19,21 +19,6 @@ export interface DbPreset {
   storeId: string | null;
   updatedAt: string | null;
 }
-export interface DeclaredCapacity {
-  cpuLimitMillicores: string | null;
-  cpuRequestMillicores: string | null;
-  installationId: string | null;
-  isTransient: boolean | null;
-  kind: string | null;
-  memoryLimitBytes: string | null;
-  memoryRequestBytes: string | null;
-  namespaceId: string | null;
-  podCountMax: number | null;
-  podCountMin: number | null;
-  source: string | null;
-  sourceId: string | null;
-  storageSizeBytes: string | null;
-}
 export interface FunctionApiBinding {
   alias: string | null;
   apiId: string | null;
@@ -236,6 +221,21 @@ export interface FunctionGraphStore {
   name: string | null;
   scopeId: string | null;
 }
+export interface FunctionInvocationAttempt {
+  actorId: string | null;
+  attempt: number | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  durationMs: number | null;
+  error: string | null;
+  errorDetail: unknown | null;
+  id: string | null;
+  invocationCreatedAt: string | null;
+  invocationId: string | null;
+  startedAt: string | null;
+  success: boolean | null;
+  taskIdentifier: string | null;
+}
 export interface FunctionInvocation {
   actorId: string | null;
   apiBindingId: string | null;
@@ -338,21 +338,6 @@ export interface NamespaceEvent {
   metadata: unknown | null;
   namespaceId: string | null;
 }
-export interface PlatformDeclaredCapacity {
-  cpuLimitMillicores: string | null;
-  cpuRequestMillicores: string | null;
-  installationId: string | null;
-  isTransient: boolean | null;
-  kind: string | null;
-  memoryLimitBytes: string | null;
-  memoryRequestBytes: string | null;
-  namespaceId: string | null;
-  podCountMax: number | null;
-  podCountMin: number | null;
-  source: string | null;
-  sourceId: string | null;
-  storageSizeBytes: string | null;
-}
 export interface PlatformFunctionApiBinding {
   alias: string | null;
   apiId: string | null;
@@ -362,6 +347,7 @@ export interface PlatformFunctionApiBinding {
 }
 export interface PlatformFunctionDefinition {
   accessChannels: string[] | null;
+  billable: boolean | null;
   category: string | null;
   concurrency: number | null;
   cpuLimitMillicores: string | null;
@@ -397,6 +383,7 @@ export interface PlatformFunctionDefinition {
   runtime: string | null;
   scaleMax: number | null;
   scaleMin: number | null;
+  system: boolean | null;
   targetFunction: string | null;
   targetSchema: string | null;
   taskIdentifier: string | null;
@@ -444,6 +431,20 @@ export interface PlatformFunctionExecutionLog {
   logLevel: string | null;
   message: string | null;
   metadata: unknown | null;
+  taskIdentifier: string | null;
+}
+export interface PlatformFunctionInvocationAttempt {
+  actorId: string | null;
+  attempt: number | null;
+  createdAt: string | null;
+  durationMs: number | null;
+  error: string | null;
+  errorDetail: unknown | null;
+  id: string | null;
+  invocationCreatedAt: string | null;
+  invocationId: string | null;
+  startedAt: string | null;
+  success: boolean | null;
   taskIdentifier: string | null;
 }
 export interface PlatformFunctionInvocation {
@@ -558,6 +559,21 @@ export interface PlatformResource {
   updatedAt: string | null;
   updatedBy: string | null;
 }
+export interface PlatformResourceDeclaredCapacity {
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  installationId: string | null;
+  isTransient: boolean | null;
+  kind: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
+  namespaceId: string | null;
+  podCountMax: number | null;
+  podCountMin: number | null;
+  source: string | null;
+  sourceId: string | null;
+  storageSizeBytes: string | null;
+}
 export interface PlatformResourceDefinition {
   annotations: unknown | null;
   createdAt: string | null;
@@ -632,7 +648,7 @@ export interface PlatformResourceUsageSummary {
   runtimeSeconds: string | null;
   sampleCount: number | null;
 }
-export interface PlatformResourceUtilizationDaily {
+export interface PlatformResourceUtilization {
   avgMemoryBytes: string | null;
   cpuLimitMillicores: string | null;
   cpuPeakUtilization: string | null;
@@ -767,6 +783,21 @@ export interface Resource {
   updatedAt: string | null;
   updatedBy: string | null;
 }
+export interface ResourceDeclaredCapacity {
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  installationId: string | null;
+  isTransient: boolean | null;
+  kind: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
+  namespaceId: string | null;
+  podCountMax: number | null;
+  podCountMin: number | null;
+  source: string | null;
+  sourceId: string | null;
+  storageSizeBytes: string | null;
+}
 export interface ResourceDefinition {
   annotations: unknown | null;
   createdAt: string | null;
@@ -847,7 +878,7 @@ export interface ResourceUsageSummary {
   runtimeSeconds: string | null;
   sampleCount: number | null;
 }
-export interface ResourceUtilizationDaily {
+export interface ResourceUtilization {
   avgMemoryBytes: string | null;
   cpuLimitMillicores: string | null;
   cpuPeakUtilization: string | null;

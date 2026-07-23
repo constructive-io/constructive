@@ -7,7 +7,7 @@ React Query mutation hook for resourceInstallationsInstall
 ## Usage
 
 ```typescript
-const { mutate } = useResourceInstallationsInstallMutation(); mutate({ input: { pName: '<String>', pNamespaceId: '<UUID>', pParams: '<JSON>', pSlug: '<String>' } });
+const { mutate } = useResourceInstallationsInstallMutation(); mutate({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useResourceInstallationsInstallMutation(); mutate({ input: { 
 
 ```typescript
 const { mutate, isLoading } = useResourceInstallationsInstallMutation();
-mutate({ input: { pName: '<String>', pNamespaceId: '<UUID>', pParams: '<JSON>', pSlug: '<String>' } });
+mutate({ input: { name: '<String>', namespaceId: '<UUID>', newParams: '<JSON>', slug: '<String>' } });
 ```

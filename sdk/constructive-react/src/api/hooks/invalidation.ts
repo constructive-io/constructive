@@ -29,8 +29,11 @@ import {
   databaseTransferKeys,
   defaultPrivilegeKeys,
   domainKeys,
+  domainEventKeys,
+  domainVerificationKeys,
   embeddingChunkKeys,
   enumKeys,
+  exclusionConstraintKeys,
   fieldKeys,
   foreignKeyConstraintKeys,
   fullTextSearchKeys,
@@ -309,6 +312,40 @@ export const invalidate = {
         queryKey: domainKeys.detail(id),
       }),
   },
+  /** Invalidate domainEvent queries */ domainEvent: {
+    /** Invalidate all domainEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainEventKeys.all,
+      }),
+    /** Invalidate domainEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainEventKeys.lists(),
+      }),
+    /** Invalidate a specific domainEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: domainEventKeys.detail(id),
+      }),
+  },
+  /** Invalidate domainVerification queries */ domainVerification: {
+    /** Invalidate all domainVerification queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainVerificationKeys.all,
+      }),
+    /** Invalidate domainVerification list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: domainVerificationKeys.lists(),
+      }),
+    /** Invalidate a specific domainVerification */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: domainVerificationKeys.detail(id),
+      }),
+  },
   /** Invalidate embeddingChunk queries */ embeddingChunk: {
     /** Invalidate all embeddingChunk queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -338,6 +375,23 @@ export const invalidate = {
     /** Invalidate a specific enum */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: enumKeys.detail(id),
+      }),
+  },
+  /** Invalidate exclusionConstraint queries */ exclusionConstraint: {
+    /** Invalidate all exclusionConstraint queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: exclusionConstraintKeys.all,
+      }),
+    /** Invalidate exclusionConstraint list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: exclusionConstraintKeys.lists(),
+      }),
+    /** Invalidate a specific exclusionConstraint */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: exclusionConstraintKeys.detail(id),
       }),
   },
   /** Invalidate field queries */ field: {
@@ -944,6 +998,22 @@ export const remove = {
       queryKey: domainKeys.detail(id),
     });
   },
+  /** Remove domainEvent from cache */ domainEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: domainEventKeys.detail(id),
+    });
+  },
+  /** Remove domainVerification from cache */ domainVerification: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: domainVerificationKeys.detail(id),
+    });
+  },
   /** Remove embeddingChunk from cache */ embeddingChunk: (
     queryClient: QueryClient,
     id: string | number
@@ -955,6 +1025,14 @@ export const remove = {
   /** Remove enum from cache */ enum: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: enumKeys.detail(id),
+    });
+  },
+  /** Remove exclusionConstraint from cache */ exclusionConstraint: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: exclusionConstraintKeys.detail(id),
     });
   },
   /** Remove field from cache */ field: (queryClient: QueryClient, id: string | number) => {

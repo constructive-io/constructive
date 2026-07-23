@@ -250,7 +250,6 @@ export interface SqlAction {
   actionId?: string | null;
   actionName?: string | null;
   actorId?: string | null;
-  category?: string | null;
   content?: string | null;
   createdAt?: string | null;
   databaseId?: string | null;
@@ -300,7 +299,6 @@ export type SqlActionSelect = {
   actionId?: boolean;
   actionName?: boolean;
   actorId?: boolean;
-  category?: boolean;
   content?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
@@ -356,8 +354,6 @@ export interface SqlActionFilter {
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: SqlActionFilter[];
-  /** Filter by the object’s `category` field. */
-  category?: StringFilter;
   /** Filter by the object’s `content` field. */
   content?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -417,8 +413,6 @@ export type SqlActionOrderBy =
   | 'ACTION_NAME_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
   | 'CONTENT_ASC'
   | 'CONTENT_DESC'
   | 'CREATED_AT_ASC'
@@ -485,7 +479,6 @@ export interface CreateSqlActionInput {
     actionId: string;
     actionName?: string;
     actorId: string;
-    category?: string;
     content?: string;
     databaseId: string;
     deploy?: string;
@@ -500,7 +493,6 @@ export interface SqlActionPatch {
   actionId?: string | null;
   actionName?: string | null;
   actorId?: string | null;
-  category?: string | null;
   content?: string | null;
   databaseId?: string | null;
   deploy?: string | null;

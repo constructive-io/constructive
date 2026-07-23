@@ -16,7 +16,7 @@ export default async (
   try {
     if (argv.help || argv.h) {
       console.log(
-        "request-database - Requests a database and returns a ticket (database_provision_module row) to poll.\n\nPass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.\n\nExample usage:\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '[\"users_module\", \"emails_module\"]'::jsonb);\n\nUsage: request-database [OPTIONS]\n"
+        "request-database - Requests a database and returns a ticket (database_provision_module row) to poll.\n\nPass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.\n\nExample usage:\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '[\"users_module\", \"emails_module\"]'::jsonb);\n\nUsage: request-database [OPTIONS]\n"
       );
       process.exit(0);
     }
