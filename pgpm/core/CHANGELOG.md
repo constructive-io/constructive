@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.1.0...@pgpmjs/core@7.2.0) (2026-07-23)
+
+### Features
+
+- **pgpm-ast:** extract @pgpmjs/ast leaf package (files/\* + module AST) from core ([f324d40](https://github.com/constructive-io/constructive/commit/f324d401c88ddef800f41a76a44ac3e5d0cb107e))
+- **pgpm-bundle:** extract @pgpmjs/bundle package; applyBundle stays in core ([c05f62f](https://github.com/constructive-io/constructive/commit/c05f62f81cf4e28bc824e49e165a18e9f994d1c2))
+- **pgpm-core:** applyBundle — safety wrapper (dry-run, integrity/namespace gate, atomic, timeout) over PgpmMigrate ([1a3747e](https://github.com/constructive-io/constructive/commit/1a3747ebb64406139ed5b0d7e85920ef0c4e1523))
+- **pgpm-core:** diffBundles — digest-based structural diff of two migration bundles ([50ad4a4](https://github.com/constructive-io/constructive/commit/50ad4a48c078ee0bc19b2e11d1d939825bac25cb))
+- **pgpm-core:** migration bundle artifact — content-addressed, verifiable, provenance manifest ([6627bb2](https://github.com/constructive-io/constructive/commit/6627bb27c3a8da55d64570425ff8a790fa9819be))
+- **pgpm-core:** parseModule/deparseModule — parse()/deparse() aliases for the module AST ([b2e4c28](https://github.com/constructive-io/constructive/commit/b2e4c28857d476cd226aed5579bb93da319d3476))
+- **pgpm-core:** pgpm-ast — unified PgpmModule/Change/Script AST with lossless read/write ([bf54445](https://github.com/constructive-io/constructive/commit/bf54445fef2b701e5ad8c3fae8287916efc4fb8e))
+- **pgpm-core:** reconcilePlan — ordered revert/deploy plan between two bundle revisions ([149b596](https://github.com/constructive-io/constructive/commit/149b5964679b89cf1ebe9ddc2ae5b8448ad8e959))
+- **pgpm-core:** transpileBundle — namespace transpiler over the migration bundle ([6a024c9](https://github.com/constructive-io/constructive/commit/6a024c9da626665324ad60204db1c385d6b5a38d))
+
 # [7.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.0.0...@pgpmjs/core@7.1.0) (2026-07-22)
 
 ### Bug Fixes
