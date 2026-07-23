@@ -1,4 +1,5 @@
 import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
+import { zipScripts } from '@pgpmjs/traverse';
 import { BundleChange, BundleScript, MigrationBundle } from './types';
 
 /** Per-script disposition between two revisions of the same change. */
@@ -40,11 +41,11 @@ function scriptDiff(from: BundleScript | null, to: BundleScript | null): ScriptD
 }
 
 function changeScriptDiffs(from: BundleChange, to: BundleChange): Record<PgpmScriptKind, ScriptDiff> {
-  return {
-    deploy: scriptDiff(from.deploy, to.deploy),
-    revert: scriptDiff(from.revert, to.revert),
-    verify: scriptDiff(from.verify, to.verify)
-  };
+  const diffs = {} as Record<PgpmScriptKind, ScriptDiff>;
+  zipScripts(from, to, (kind, a, b) => {
+    diffs[kind] = scriptDiff(a, b);
+  });
+  return diffs;
 }
 
 /**

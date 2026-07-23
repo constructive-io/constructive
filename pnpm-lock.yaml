@@ -2850,6 +2850,9 @@ importers:
       '@pgpmjs/ast':
         specifier: workspace:^
         version: link:../ast/dist
+      '@pgpmjs/traverse':
+        specifier: workspace:^
+        version: link:../traverse/dist
     devDependencies:
       makage:
         specifier: ^0.3.0
@@ -3085,6 +3088,17 @@ importers:
       yanse:
         specifier: ^0.2.1
         version: 0.2.1
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
+  pgpm/traverse:
+    dependencies:
+      '@pgpmjs/ast':
+        specifier: workspace:^
+        version: link:../ast/dist
     devDependencies:
       makage:
         specifier: ^0.3.0

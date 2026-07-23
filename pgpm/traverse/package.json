@@ -1,8 +1,8 @@
 {
-  "name": "@pgpmjs/bundle",
+  "name": "@pgpmjs/traverse",
   "version": "0.0.1",
   "author": "Constructive <developers@constructive.io>",
-  "description": "PGPM migration bundle — the portable, content-addressed artifact layer (create/io/verify/transpile/diff/reconcile)",
+  "description": "Traversal primitives for the pgpm module AST / migration bundle — walk a change's deploy/revert/verify scripts",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,18 +29,18 @@
     "test:watch": "jest --watch"
   },
   "keywords": [
-    "bundle",
-    "migration",
+    "traverse",
+    "ast",
     "typescript",
     "pgpm",
     "pgpmjs",
-    "postgresql"
+    "postgresql",
+    "migrations"
   ],
   "devDependencies": {
     "makage": "^0.3.0"
   },
   "dependencies": {
-    "@pgpmjs/ast": "workspace:^",
-    "@pgpmjs/traverse": "workspace:^"
+    "@pgpmjs/ast": "workspace:^"
   }
 }
