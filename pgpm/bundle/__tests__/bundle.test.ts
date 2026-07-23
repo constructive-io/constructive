@@ -7,6 +7,7 @@ import {
   bundleFromModule,
   createBundle,
   materializeBundle,
+  moduleFromBundle,
   readBundleFile,
   verifyBundle,
   writeBundleFile
@@ -128,6 +129,20 @@ describe('bundle file IO', () => {
     const reread = readBundleFile(file);
     expect(reread).toEqual(bundle);
     expect(verifyBundle(reread)).toEqual([]);
+  });
+});
+
+describe('moduleFromBundle', () => {
+  it('hydrates the module AST losslessly (inverse of createBundle)', () => {
+    const source = readModule(sourceDir);
+    const hydrated = moduleFromBundle(bundleFromModule(sourceDir), sourceDir);
+    expect(hydrated).toEqual(source);
+  });
+
+  it('rejects a bundle whose plan does not parse', () => {
+    const bundle = bundleFromModule(sourceDir);
+    bundle.plan = '%project=x\nnot a valid line !!!\n';
+    expect(() => moduleFromBundle(bundle)).toThrow(/Failed to parse bundle plan/);
   });
 });
 
