@@ -7,7 +7,7 @@ Execute the resolveHttpRoute query
 ## Usage
 
 ```bash
-csdk resolve-http-route --pHost <String> --pMethod <String> --pPath <String>
+csdk resolve-http-route --requestHost <String> --requestMethod <String> --requestPath <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resolve-http-route --pHost <String> --pMethod <String> --pPath <String>
 ### Run resolveHttpRoute
 
 ```bash
-csdk resolve-http-route --pHost <String> --pMethod <String> --pPath <String>
+csdk resolve-http-route --requestHost <String> --requestMethod <String> --requestPath <String>
 ```

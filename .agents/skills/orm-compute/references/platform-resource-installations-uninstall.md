@@ -7,7 +7,7 @@ Execute the platformResourceInstallationsUninstall mutation
 ## Usage
 
 ```typescript
-db.mutation.platformResourceInstallationsUninstall({ input: { pInstallationId: '<UUID>' } }).execute()
+db.mutation.platformResourceInstallationsUninstall({ input: { targetInstallationId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformResourceInstallationsUninstall({ input: { pInstallationId: '
 ### Run platformResourceInstallationsUninstall
 
 ```typescript
-const result = await db.mutation.platformResourceInstallationsUninstall({ input: { pInstallationId: '<UUID>' } }).execute();
+const result = await db.mutation.platformResourceInstallationsUninstall({ input: { targetInstallationId: '<UUID>' } }).execute();
 ```

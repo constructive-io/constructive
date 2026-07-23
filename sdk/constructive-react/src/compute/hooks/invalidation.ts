@@ -16,7 +16,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   dbPresetKeys,
-  declaredCapacityKeys,
   functionApiBindingKeys,
   functionDefinitionKeys,
   functionDeploymentKeys,
@@ -30,6 +29,7 @@ import {
   functionGraphObjectKeys,
   functionGraphRefKeys,
   functionGraphStoreKeys,
+  functionInvocationAttemptKeys,
   functionInvocationKeys,
   getAllTreeNodesRecordKeys,
   infraCommitKeys,
@@ -40,12 +40,12 @@ import {
   integrationProviderKeys,
   namespaceKeys,
   namespaceEventKeys,
-  platformDeclaredCapacityKeys,
   platformFunctionApiBindingKeys,
   platformFunctionDefinitionKeys,
   platformFunctionDeploymentKeys,
   platformFunctionDeploymentEventKeys,
   platformFunctionExecutionLogKeys,
+  platformFunctionInvocationAttemptKeys,
   platformFunctionInvocationKeys,
   platformInfraCommitKeys,
   platformInfraGetAllTreeNodesRecordKeys,
@@ -55,26 +55,28 @@ import {
   platformNamespaceKeys,
   platformNamespaceEventKeys,
   platformResourceKeys,
+  platformResourceDeclaredCapacityKeys,
   platformResourceDefinitionKeys,
   platformResourceEventKeys,
   platformResourceInstallationKeys,
   platformResourceStatusCheckKeys,
   platformResourceUsageLogKeys,
   platformResourceUsageSummaryKeys,
-  platformResourceUtilizationDailyKeys,
+  platformResourceUtilizationKeys,
   platformResourcesHealthKeys,
   platformResourcesRequirementsStateKeys,
   platformResourcesResolvedRequirementKeys,
   platformWebhookEndpointKeys,
   platformWebhookEventKeys,
   resourceKeys,
+  resourceDeclaredCapacityKeys,
   resourceDefinitionKeys,
   resourceEventKeys,
   resourceInstallationKeys,
   resourceStatusCheckKeys,
   resourceUsageLogKeys,
   resourceUsageSummaryKeys,
-  resourceUtilizationDailyKeys,
+  resourceUtilizationKeys,
   resourcesHealthKeys,
   resourcesRequirementsStateKeys,
   resourcesResolvedRequirementKeys,
@@ -113,23 +115,6 @@ export const invalidate = {
     /** Invalidate a specific dbPreset */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: dbPresetKeys.detail(id),
-      }),
-  },
-  /** Invalidate declaredCapacity queries */ declaredCapacity: {
-    /** Invalidate all declaredCapacity queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: declaredCapacityKeys.all,
-      }),
-    /** Invalidate declaredCapacity list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: declaredCapacityKeys.lists(),
-      }),
-    /** Invalidate a specific declaredCapacity */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: declaredCapacityKeys.detail(id),
       }),
   },
   /** Invalidate functionApiBinding queries */ functionApiBinding: {
@@ -355,6 +340,23 @@ export const invalidate = {
         queryKey: functionGraphStoreKeys.detail(id),
       }),
   },
+  /** Invalidate functionInvocationAttempt queries */ functionInvocationAttempt: {
+    /** Invalidate all functionInvocationAttempt queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationAttemptKeys.all,
+      }),
+    /** Invalidate functionInvocationAttempt list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationAttemptKeys.lists(),
+      }),
+    /** Invalidate a specific functionInvocationAttempt */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationAttemptKeys.detail(id),
+      }),
+  },
   /** Invalidate functionInvocation queries */ functionInvocation: {
     /** Invalidate all functionInvocation queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -522,23 +524,6 @@ export const invalidate = {
         queryKey: namespaceEventKeys.detail(id),
       }),
   },
-  /** Invalidate platformDeclaredCapacity queries */ platformDeclaredCapacity: {
-    /** Invalidate all platformDeclaredCapacity queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformDeclaredCapacityKeys.all,
-      }),
-    /** Invalidate platformDeclaredCapacity list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformDeclaredCapacityKeys.lists(),
-      }),
-    /** Invalidate a specific platformDeclaredCapacity */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformDeclaredCapacityKeys.detail(id),
-      }),
-  },
   /** Invalidate platformFunctionApiBinding queries */ platformFunctionApiBinding: {
     /** Invalidate all platformFunctionApiBinding queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -624,6 +609,27 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformFunctionExecutionLogKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformFunctionInvocationAttempt queries */ platformFunctionInvocationAttempt: {
+    /** Invalidate all platformFunctionInvocationAttempt queries */ all: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionInvocationAttemptKeys.all,
+      }),
+    /** Invalidate platformFunctionInvocationAttempt list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionInvocationAttemptKeys.lists(),
+      }),
+    /** Invalidate a specific platformFunctionInvocationAttempt */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionInvocationAttemptKeys.detail(id),
       }),
   },
   /** Invalidate platformFunctionInvocation queries */ platformFunctionInvocation: {
@@ -783,6 +789,27 @@ export const invalidate = {
         queryKey: platformResourceKeys.detail(id),
       }),
   },
+  /** Invalidate platformResourceDeclaredCapacity queries */ platformResourceDeclaredCapacity: {
+    /** Invalidate all platformResourceDeclaredCapacity queries */ all: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformResourceDeclaredCapacityKeys.all,
+      }),
+    /** Invalidate platformResourceDeclaredCapacity list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformResourceDeclaredCapacityKeys.lists(),
+      }),
+    /** Invalidate a specific platformResourceDeclaredCapacity */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformResourceDeclaredCapacityKeys.detail(id),
+      }),
+  },
   /** Invalidate platformResourceDefinition queries */ platformResourceDefinition: {
     /** Invalidate all platformResourceDefinition queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -885,25 +912,21 @@ export const invalidate = {
         queryKey: platformResourceUsageSummaryKeys.detail(id),
       }),
   },
-  /** Invalidate platformResourceUtilizationDaily queries */ platformResourceUtilizationDaily: {
-    /** Invalidate all platformResourceUtilizationDaily queries */ all: (
-      queryClient: QueryClient
-    ) =>
+  /** Invalidate platformResourceUtilization queries */ platformResourceUtilization: {
+    /** Invalidate all platformResourceUtilization queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: platformResourceUtilizationDailyKeys.all,
+        queryKey: platformResourceUtilizationKeys.all,
       }),
-    /** Invalidate platformResourceUtilizationDaily list queries */ lists: (
-      queryClient: QueryClient
-    ) =>
+    /** Invalidate platformResourceUtilization list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: platformResourceUtilizationDailyKeys.lists(),
+        queryKey: platformResourceUtilizationKeys.lists(),
       }),
-    /** Invalidate a specific platformResourceUtilizationDaily */ detail: (
+    /** Invalidate a specific platformResourceUtilization */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: platformResourceUtilizationDailyKeys.detail(id),
+        queryKey: platformResourceUtilizationKeys.detail(id),
       }),
   },
   /** Invalidate platformResourcesHealth queries */ platformResourcesHealth: {
@@ -1014,6 +1037,23 @@ export const invalidate = {
         queryKey: resourceKeys.detail(id),
       }),
   },
+  /** Invalidate resourceDeclaredCapacity queries */ resourceDeclaredCapacity: {
+    /** Invalidate all resourceDeclaredCapacity queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceDeclaredCapacityKeys.all,
+      }),
+    /** Invalidate resourceDeclaredCapacity list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceDeclaredCapacityKeys.lists(),
+      }),
+    /** Invalidate a specific resourceDeclaredCapacity */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceDeclaredCapacityKeys.detail(id),
+      }),
+  },
   /** Invalidate resourceDefinition queries */ resourceDefinition: {
     /** Invalidate all resourceDefinition queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1116,21 +1156,21 @@ export const invalidate = {
         queryKey: resourceUsageSummaryKeys.detail(id),
       }),
   },
-  /** Invalidate resourceUtilizationDaily queries */ resourceUtilizationDaily: {
-    /** Invalidate all resourceUtilizationDaily queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate resourceUtilization queries */ resourceUtilization: {
+    /** Invalidate all resourceUtilization queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: resourceUtilizationDailyKeys.all,
+        queryKey: resourceUtilizationKeys.all,
       }),
-    /** Invalidate resourceUtilizationDaily list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate resourceUtilization list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: resourceUtilizationDailyKeys.lists(),
+        queryKey: resourceUtilizationKeys.lists(),
       }),
-    /** Invalidate a specific resourceUtilizationDaily */ detail: (
+    /** Invalidate a specific resourceUtilization */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: resourceUtilizationDailyKeys.detail(id),
+        queryKey: resourceUtilizationKeys.detail(id),
       }),
   },
   /** Invalidate resourcesHealth queries */ resourcesHealth: {
@@ -1234,14 +1274,6 @@ export const remove = {
   /** Remove dbPreset from cache */ dbPreset: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: dbPresetKeys.detail(id),
-    });
-  },
-  /** Remove declaredCapacity from cache */ declaredCapacity: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: declaredCapacityKeys.detail(id),
     });
   },
   /** Remove functionApiBinding from cache */ functionApiBinding: (
@@ -1348,6 +1380,14 @@ export const remove = {
       queryKey: functionGraphStoreKeys.detail(id),
     });
   },
+  /** Remove functionInvocationAttempt from cache */ functionInvocationAttempt: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionInvocationAttemptKeys.detail(id),
+    });
+  },
   /** Remove functionInvocation from cache */ functionInvocation: (
     queryClient: QueryClient,
     id: string | number
@@ -1422,14 +1462,6 @@ export const remove = {
       queryKey: namespaceEventKeys.detail(id),
     });
   },
-  /** Remove platformDeclaredCapacity from cache */ platformDeclaredCapacity: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformDeclaredCapacityKeys.detail(id),
-    });
-  },
   /** Remove platformFunctionApiBinding from cache */ platformFunctionApiBinding: (
     queryClient: QueryClient,
     id: string | number
@@ -1468,6 +1500,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformFunctionExecutionLogKeys.detail(id),
+    });
+  },
+  /** Remove platformFunctionInvocationAttempt from cache */ platformFunctionInvocationAttempt: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformFunctionInvocationAttemptKeys.detail(id),
     });
   },
   /** Remove platformFunctionInvocation from cache */ platformFunctionInvocation: (
@@ -1542,6 +1582,14 @@ export const remove = {
       queryKey: platformResourceKeys.detail(id),
     });
   },
+  /** Remove platformResourceDeclaredCapacity from cache */ platformResourceDeclaredCapacity: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformResourceDeclaredCapacityKeys.detail(id),
+    });
+  },
   /** Remove platformResourceDefinition from cache */ platformResourceDefinition: (
     queryClient: QueryClient,
     id: string | number
@@ -1590,12 +1638,12 @@ export const remove = {
       queryKey: platformResourceUsageSummaryKeys.detail(id),
     });
   },
-  /** Remove platformResourceUtilizationDaily from cache */ platformResourceUtilizationDaily: (
+  /** Remove platformResourceUtilization from cache */ platformResourceUtilization: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: platformResourceUtilizationDailyKeys.detail(id),
+      queryKey: platformResourceUtilizationKeys.detail(id),
     });
   },
   /** Remove platformResourcesHealth from cache */ platformResourcesHealth: (
@@ -1639,6 +1687,14 @@ export const remove = {
   /** Remove resource from cache */ resource: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: resourceKeys.detail(id),
+    });
+  },
+  /** Remove resourceDeclaredCapacity from cache */ resourceDeclaredCapacity: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: resourceDeclaredCapacityKeys.detail(id),
     });
   },
   /** Remove resourceDefinition from cache */ resourceDefinition: (
@@ -1689,12 +1745,12 @@ export const remove = {
       queryKey: resourceUsageSummaryKeys.detail(id),
     });
   },
-  /** Remove resourceUtilizationDaily from cache */ resourceUtilizationDaily: (
+  /** Remove resourceUtilization from cache */ resourceUtilization: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: resourceUtilizationDailyKeys.detail(id),
+      queryKey: resourceUtilizationKeys.detail(id),
     });
   },
   /** Remove resourcesHealth from cache */ resourcesHealth: (

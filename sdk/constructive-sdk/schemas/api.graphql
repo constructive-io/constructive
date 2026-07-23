@@ -1600,6 +1600,8 @@ type CheckConstraint {
   expr: JSON
   fieldIds: [UUID]!
   id: UUID!
+  initiallyDeferred: Boolean!
+  isDeferrable: Boolean!
   name: String
   smartTags: JSON
 
@@ -1667,6 +1669,12 @@ input CheckConstraintFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `initiallyDeferred` field."""
+  initiallyDeferred: BooleanFilter
+
+  """Filter by the object’s `isDeferrable` field."""
+  isDeferrable: BooleanFilter
+
   """Filter by the object’s `name` field."""
   name: StringFilter
 
@@ -1703,6 +1711,8 @@ input CheckConstraintInput {
   expr: JSON
   fieldIds: [UUID]!
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   smartTags: JSON
   tableId: UUID!
@@ -1725,6 +1735,10 @@ enum CheckConstraintOrderBy {
   FIELD_IDS_DESC
   ID_ASC
   ID_DESC
+  INITIALLY_DEFERRED_ASC
+  INITIALLY_DEFERRED_DESC
+  IS_DEFERRABLE_ASC
+  IS_DEFERRABLE_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -1752,6 +1766,8 @@ input CheckConstraintPatch {
   expr: JSON
   fieldIds: [UUID]
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   smartTags: JSON
   tableId: UUID
@@ -2924,6 +2940,41 @@ type CreateDefaultPrivilegePayload {
   query: Query
 }
 
+"""All input for the create `DomainEvent` mutation."""
+input CreateDomainEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DomainEvent` to be created by this mutation."""
+  domainEvent: DomainEventInput!
+}
+
+"""The output of our create `DomainEvent` mutation."""
+type CreateDomainEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainEvent` that was created by this mutation."""
+  domainEvent: DomainEvent
+
+  """An edge for our `DomainEvent`. May be used by Relay 1."""
+  domainEventEdge(
+    """The method to use when ordering `DomainEvent`."""
+    orderBy: [DomainEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `Domain` mutation."""
 input CreateDomainInput {
   """
@@ -2952,6 +3003,41 @@ type CreateDomainPayload {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `DomainVerification` mutation."""
+input CreateDomainVerificationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DomainVerification` to be created by this mutation."""
+  domainVerification: DomainVerificationInput!
+}
+
+"""The output of our create `DomainVerification` mutation."""
+type CreateDomainVerificationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainVerification` that was created by this mutation."""
+  domainVerification: DomainVerification
+
+  """An edge for our `DomainVerification`. May be used by Relay 1."""
+  domainVerificationEdge(
+    """The method to use when ordering `DomainVerification`."""
+    orderBy: [DomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainVerificationEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3022,6 +3108,41 @@ type CreateEnumPayload {
     """The method to use when ordering `Enum`."""
     orderBy: [EnumOrderBy!]! = [PRIMARY_KEY_ASC]
   ): EnumEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `ExclusionConstraint` mutation."""
+input CreateExclusionConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ExclusionConstraint` to be created by this mutation."""
+  exclusionConstraint: ExclusionConstraintInput!
+}
+
+"""The output of our create `ExclusionConstraint` mutation."""
+type CreateExclusionConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ExclusionConstraint` that was created by this mutation."""
+  exclusionConstraint: ExclusionConstraint
+
+  """An edge for our `ExclusionConstraint`. May be used by Relay 1."""
+  exclusionConstraintEdge(
+    """The method to use when ordering `ExclusionConstraint`."""
+    orderBy: [ExclusionConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ExclusionConstraintEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4464,6 +4585,35 @@ type Database {
     where: EnumFilter
   ): EnumConnection!
 
+  """Reads and enables pagination through a set of `ExclusionConstraint`."""
+  exclusionConstraints(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ExclusionConstraint`."""
+    orderBy: [ExclusionConstraintOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ExclusionConstraintFilter
+  ): ExclusionConstraintConnection!
+
   """Reads and enables pagination through a set of `Field`."""
   fields(
     """Read all values in the set after (below) this cursor."""
@@ -5327,6 +5477,12 @@ input DatabaseFilter {
   """`enums` exist."""
   enumsExist: Boolean
 
+  """Filter by the object’s `exclusionConstraints` relation."""
+  exclusionConstraints: DatabaseToManyExclusionConstraintFilter
+
+  """`exclusionConstraints` exist."""
+  exclusionConstraintsExist: Boolean
+
   """Filter by the object’s `fields` relation."""
   fields: DatabaseToManyFieldFilter
 
@@ -5583,6 +5739,11 @@ input DatabasePatch {
 Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
 """
 type DatabaseProvisionModule {
+  """
+  When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger
+  """
+  async: Boolean!
+
   """Error message from the most recent failed bootstrap attempt"""
   bootstrapError: String
 
@@ -6156,6 +6317,20 @@ input DatabaseToManyEnumFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: EnumFilter
+}
+
+"""
+A filter to be used against many `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’
+"""
+input DatabaseToManyExclusionConstraintFilter {
+  """Filters to entities where every related entity matches."""
+  every: ExclusionConstraintFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ExclusionConstraintFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: ExclusionConstraintFilter
 }
 
 """
@@ -7278,6 +7453,41 @@ type DeleteDefaultPrivilegePayload {
   query: Query
 }
 
+"""All input for the `deleteDomainEvent` mutation."""
+input DeleteDomainEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique event identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `DomainEvent` mutation."""
+type DeleteDomainEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainEvent` that was deleted by this mutation."""
+  domainEvent: DomainEvent
+
+  """An edge for our `DomainEvent`. May be used by Relay 1."""
+  domainEventEdge(
+    """The method to use when ordering `DomainEvent`."""
+    orderBy: [DomainEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deleteDomain` mutation."""
 input DeleteDomainInput {
   """
@@ -7306,6 +7516,41 @@ type DeleteDomainPayload {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteDomainVerification` mutation."""
+input DeleteDomainVerificationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this verification challenge"""
+  id: UUID!
+}
+
+"""The output of our delete `DomainVerification` mutation."""
+type DeleteDomainVerificationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainVerification` that was deleted by this mutation."""
+  domainVerification: DomainVerification
+
+  """An edge for our `DomainVerification`. May be used by Relay 1."""
+  domainVerificationEdge(
+    """The method to use when ordering `DomainVerification`."""
+    orderBy: [DomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainVerificationEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -7372,6 +7617,39 @@ type DeleteEnumPayload {
     """The method to use when ordering `Enum`."""
     orderBy: [EnumOrderBy!]! = [PRIMARY_KEY_ASC]
   ): EnumEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteExclusionConstraint` mutation."""
+input DeleteExclusionConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `ExclusionConstraint` mutation."""
+type DeleteExclusionConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ExclusionConstraint` that was deleted by this mutation."""
+  exclusionConstraint: ExclusionConstraint
+
+  """An edge for our `ExclusionConstraint`. May be used by Relay 1."""
+  exclusionConstraintEdge(
+    """The method to use when ordering `ExclusionConstraint`."""
+    orderBy: [ExclusionConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ExclusionConstraintEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8486,6 +8764,227 @@ type DomainEdge {
 }
 
 """
+Append-only audit trail of the domain verify->DNS->issue lifecycle, mirroring resource_events / cluster_events. One row per state transition emitted by the domain:* functions.
+"""
+type DomainEvent {
+  """User who triggered this event (NULL for system/automated transitions)"""
+  actorId: UUID
+
+  """Event timestamp"""
+  createdAt: Datetime!
+
+  """
+  Reads a single `DomainVerification` that is related to this `DomainEvent`.
+  """
+  domainVerification: DomainVerification
+
+  """The verification challenge this event relates to, when applicable"""
+  domainVerificationId: UUID
+
+  """
+  Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked
+  """
+  eventType: String!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """Reads a single `ManagedDomain` that is related to this `DomainEvent`."""
+  managedDomain: ManagedDomain
+
+  """The managed_domain this event belongs to"""
+  managedDomainId: UUID!
+
+  """Human-readable description of the event"""
+  message: String
+
+  """
+  Structured context (challenge record, cert-manager detail, error details, ...)
+  """
+  metadata: JSON!
+
+  """
+  Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS
+  """
+  ownerId: UUID!
+}
+
+"""A connection to a list of `DomainEvent` values."""
+type DomainEventConnection {
+  """
+  A list of edges which contains the `DomainEvent` and cursor to aid in pagination.
+  """
+  edges: [DomainEventEdge]!
+
+  """A list of `DomainEvent` objects."""
+  nodes: [DomainEvent]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `DomainEvent` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `DomainEvent` edge in the connection."""
+type DomainEventEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DomainEvent` at the end of the edge."""
+  node: DomainEvent
+}
+
+"""
+A filter to be used against `DomainEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input DomainEventFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [DomainEventFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `domainVerification` relation."""
+  domainVerification: DomainVerificationFilter
+
+  """A related `domainVerification` exists."""
+  domainVerificationExists: Boolean
+
+  """Filter by the object’s `domainVerificationId` field."""
+  domainVerificationId: UUIDFilter
+
+  """Filter by the object’s `eventType` field."""
+  eventType: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `managedDomain` relation."""
+  managedDomain: ManagedDomainFilter
+
+  """Filter by the object’s `managedDomainId` field."""
+  managedDomainId: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Negates the expression."""
+  not: DomainEventFilter
+
+  """Checks for any expressions in this list."""
+  or: [DomainEventFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+}
+
+"""An input for mutations affecting `DomainEvent`"""
+input DomainEventInput {
+  """User who triggered this event (NULL for system/automated transitions)"""
+  actorId: UUID
+
+  """Event timestamp"""
+  createdAt: Datetime
+
+  """The verification challenge this event relates to, when applicable"""
+  domainVerificationId: UUID
+
+  """
+  Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked
+  """
+  eventType: String!
+
+  """Unique event identifier"""
+  id: UUID
+
+  """The managed_domain this event belongs to"""
+  managedDomainId: UUID!
+
+  """Human-readable description of the event"""
+  message: String
+
+  """
+  Structured context (challenge record, cert-manager detail, error details, ...)
+  """
+  metadata: JSON
+
+  """
+  Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS
+  """
+  ownerId: UUID!
+}
+
+"""Methods to use when ordering `DomainEvent`."""
+enum DomainEventOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DOMAIN_VERIFICATION_ID_ASC
+  DOMAIN_VERIFICATION_ID_DESC
+  EVENT_TYPE_ASC
+  EVENT_TYPE_DESC
+  ID_ASC
+  ID_DESC
+  MANAGED_DOMAIN_ID_ASC
+  MANAGED_DOMAIN_ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `DomainEvent`. Fields that are set will be updated.
+"""
+input DomainEventPatch {
+  """User who triggered this event (NULL for system/automated transitions)"""
+  actorId: UUID
+
+  """Event timestamp"""
+  createdAt: Datetime
+
+  """The verification challenge this event relates to, when applicable"""
+  domainVerificationId: UUID
+
+  """
+  Lifecycle event: challenge_issued | verification_started | verified | verification_failed | verification_expired | cert_issuing | cert_active | cert_error | cert_renewed | cert_revoked
+  """
+  eventType: String
+
+  """Unique event identifier"""
+  id: UUID
+
+  """The managed_domain this event belongs to"""
+  managedDomainId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """
+  Structured context (challenge record, cert-manager detail, error details, ...)
+  """
+  metadata: JSON
+
+  """
+  Entity (e.g. org) that owns the managed_domain; scope key for AuthzEntityMembership RLS
+  """
+  ownerId: UUID
+}
+
+"""
 A filter to be used against `Domain` object types. All fields are combined with a logical ‘and.’
 """
 input DomainFilter {
@@ -8654,6 +9153,365 @@ input DomainToManyHttpRouteFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: HttpRouteFilter
+}
+
+"""
+One row per outstanding/completed ownership-verification challenge for a managed_domain. Holds the PUBLIC challenge the user must publish (e.g. a DNS TXT record value) — this is a verification token, NOT a secret. Entity-owned via owner_id and read/written through the AuthzEntityMembership scoped-module security path gated on manage_domains.
+"""
+type DomainVerification {
+  """
+  Number of times domain:verify has polled for this challenge (drives backoff / max_attempts)
+  """
+  attempts: Int!
+
+  """When this challenge was minted (domain:issue_challenge)"""
+  createdAt: Datetime!
+
+  """Reads and enables pagination through a set of `DomainEvent`."""
+  domainEvents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainEvent`."""
+    orderBy: [DomainEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainEventFilter
+  ): DomainEventConnection!
+
+  """Last verification error (mismatch, NXDOMAIN, timeout, ...)"""
+  error: String
+
+  """When this challenge expires and must be reissued"""
+  expiresAt: Datetime
+
+  """Unique identifier for this verification challenge"""
+  id: UUID!
+
+  """When domain:verify last polled DNS/HTTP for this challenge"""
+  lastCheckedAt: Datetime
+
+  """
+  Reads a single `ManagedDomain` that is related to this `DomainVerification`.
+  """
+  managedDomain: ManagedDomain
+
+  """The managed_domain this challenge proves ownership of"""
+  managedDomainId: UUID!
+
+  """
+  Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge)
+  """
+  method: String!
+
+  """
+  Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity.
+  """
+  ownerId: UUID!
+
+  """
+  DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01
+  """
+  recordName: String
+
+  """DNS record type to create: TXT | CNAME | A; NULL for http_01"""
+  recordType: String
+
+  """
+  The public challenge token the user must publish (ends up in a public DNS record). NOT a secret.
+  """
+  recordValue: String
+
+  """Challenge lifecycle: pending | checking | verified | failed | expired"""
+  status: String!
+
+  """When this row was last updated"""
+  updatedAt: Datetime!
+
+  """When status last became verified"""
+  verifiedAt: Datetime
+}
+
+"""A connection to a list of `DomainVerification` values."""
+type DomainVerificationConnection {
+  """
+  A list of edges which contains the `DomainVerification` and cursor to aid in pagination.
+  """
+  edges: [DomainVerificationEdge]!
+
+  """A list of `DomainVerification` objects."""
+  nodes: [DomainVerification]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `DomainVerification` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `DomainVerification` edge in the connection."""
+type DomainVerificationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DomainVerification` at the end of the edge."""
+  node: DomainVerification
+}
+
+"""
+A filter to be used against `DomainVerification` object types. All fields are combined with a logical ‘and.’
+"""
+input DomainVerificationFilter {
+  """Checks for all expressions in this list."""
+  and: [DomainVerificationFilter!]
+
+  """Filter by the object’s `attempts` field."""
+  attempts: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `domainEvents` relation."""
+  domainEvents: DomainVerificationToManyDomainEventFilter
+
+  """`domainEvents` exist."""
+  domainEventsExist: Boolean
+
+  """Filter by the object’s `error` field."""
+  error: StringFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `lastCheckedAt` field."""
+  lastCheckedAt: DatetimeFilter
+
+  """Filter by the object’s `managedDomain` relation."""
+  managedDomain: ManagedDomainFilter
+
+  """Filter by the object’s `managedDomainId` field."""
+  managedDomainId: UUIDFilter
+
+  """Filter by the object’s `method` field."""
+  method: StringFilter
+
+  """Negates the expression."""
+  not: DomainVerificationFilter
+
+  """Checks for any expressions in this list."""
+  or: [DomainVerificationFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `recordName` field."""
+  recordName: StringFilter
+
+  """Filter by the object’s `recordType` field."""
+  recordType: StringFilter
+
+  """Filter by the object’s `recordValue` field."""
+  recordValue: StringFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `verifiedAt` field."""
+  verifiedAt: DatetimeFilter
+}
+
+"""An input for mutations affecting `DomainVerification`"""
+input DomainVerificationInput {
+  """
+  Number of times domain:verify has polled for this challenge (drives backoff / max_attempts)
+  """
+  attempts: Int
+
+  """When this challenge was minted (domain:issue_challenge)"""
+  createdAt: Datetime
+
+  """Last verification error (mismatch, NXDOMAIN, timeout, ...)"""
+  error: String
+
+  """When this challenge expires and must be reissued"""
+  expiresAt: Datetime
+
+  """Unique identifier for this verification challenge"""
+  id: UUID
+
+  """When domain:verify last polled DNS/HTTP for this challenge"""
+  lastCheckedAt: Datetime
+
+  """The managed_domain this challenge proves ownership of"""
+  managedDomainId: UUID!
+
+  """
+  Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge)
+  """
+  method: String
+
+  """
+  Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity.
+  """
+  ownerId: UUID!
+
+  """
+  DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01
+  """
+  recordName: String
+
+  """DNS record type to create: TXT | CNAME | A; NULL for http_01"""
+  recordType: String
+
+  """
+  The public challenge token the user must publish (ends up in a public DNS record). NOT a secret.
+  """
+  recordValue: String
+
+  """Challenge lifecycle: pending | checking | verified | failed | expired"""
+  status: String
+
+  """When this row was last updated"""
+  updatedAt: Datetime
+
+  """When status last became verified"""
+  verifiedAt: Datetime
+}
+
+"""Methods to use when ordering `DomainVerification`."""
+enum DomainVerificationOrderBy {
+  ATTEMPTS_ASC
+  ATTEMPTS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ERROR_ASC
+  ERROR_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+  ID_ASC
+  ID_DESC
+  LAST_CHECKED_AT_ASC
+  LAST_CHECKED_AT_DESC
+  MANAGED_DOMAIN_ID_ASC
+  MANAGED_DOMAIN_ID_DESC
+  METHOD_ASC
+  METHOD_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  RECORD_NAME_ASC
+  RECORD_NAME_DESC
+  RECORD_TYPE_ASC
+  RECORD_TYPE_DESC
+  RECORD_VALUE_ASC
+  RECORD_VALUE_DESC
+  STATUS_ASC
+  STATUS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  VERIFIED_AT_ASC
+  VERIFIED_AT_DESC
+}
+
+"""
+Represents an update to a `DomainVerification`. Fields that are set will be updated.
+"""
+input DomainVerificationPatch {
+  """
+  Number of times domain:verify has polled for this challenge (drives backoff / max_attempts)
+  """
+  attempts: Int
+
+  """When this challenge was minted (domain:issue_challenge)"""
+  createdAt: Datetime
+
+  """Last verification error (mismatch, NXDOMAIN, timeout, ...)"""
+  error: String
+
+  """When this challenge expires and must be reissued"""
+  expiresAt: Datetime
+
+  """Unique identifier for this verification challenge"""
+  id: UUID
+
+  """When domain:verify last polled DNS/HTTP for this challenge"""
+  lastCheckedAt: Datetime
+
+  """The managed_domain this challenge proves ownership of"""
+  managedDomainId: UUID
+
+  """
+  Verification method: dns_txt_ownership (root-domain ownership TXT) | http_01 (ACME HTTP challenge) | dns_01_acme (ACME DNS challenge)
+  """
+  method: String
+
+  """
+  Entity (e.g. org) that owns this verification; scope key for AuthzEntityMembership RLS. Domain control is proven once per owning entity.
+  """
+  ownerId: UUID
+
+  """
+  DNS record name the user must create (e.g. _constructive-challenge.example.com); NULL for http_01
+  """
+  recordName: String
+
+  """DNS record type to create: TXT | CNAME | A; NULL for http_01"""
+  recordType: String
+
+  """
+  The public challenge token the user must publish (ends up in a public DNS record). NOT a secret.
+  """
+  recordValue: String
+
+  """Challenge lifecycle: pending | checking | verified | failed | expired"""
+  status: String
+
+  """When this row was last updated"""
+  updatedAt: Datetime
+
+  """When status last became verified"""
+  verifiedAt: Datetime
+}
+
+"""
+A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input DomainVerificationToManyDomainEventFilter {
+  """Filters to entities where every related entity matches."""
+  every: DomainEventFilter
+
+  """Filters to entities where no related entity matches."""
+  none: DomainEventFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: DomainEventFilter
 }
 
 type EmbeddingChunk {
@@ -9073,6 +9931,202 @@ input EnumPatch {
   values: [String]
 }
 
+type ExclusionConstraint {
+  accessMethod: String!
+  category: ObjectCategory!
+  createdAt: Datetime
+
+  """
+  Reads a single `Database` that is related to this `ExclusionConstraint`.
+  """
+  database: Database
+  databaseId: UUID!
+  elementExpr: JSON
+  fieldIds: [UUID]!
+  id: UUID!
+  name: String
+  operators: [String]!
+  smartTags: JSON
+
+  """Reads a single `Table` that is related to this `ExclusionConstraint`."""
+  table: Table
+  tableId: UUID!
+  tags: [String]!
+  type: String
+  updatedAt: Datetime
+  whereClause: JSON
+}
+
+"""A connection to a list of `ExclusionConstraint` values."""
+type ExclusionConstraintConnection {
+  """
+  A list of edges which contains the `ExclusionConstraint` and cursor to aid in pagination.
+  """
+  edges: [ExclusionConstraintEdge]!
+
+  """A list of `ExclusionConstraint` objects."""
+  nodes: [ExclusionConstraint]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ExclusionConstraint` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ExclusionConstraint` edge in the connection."""
+type ExclusionConstraintEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ExclusionConstraint` at the end of the edge."""
+  node: ExclusionConstraint
+}
+
+"""
+A filter to be used against `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’
+"""
+input ExclusionConstraintFilter {
+  """Filter by the object’s `accessMethod` field."""
+  accessMethod: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [ExclusionConstraintFilter!]
+
+  """Filter by the object’s `category` field."""
+  category: ObjectCategoryFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `elementExpr` field."""
+  elementExpr: JSONFilter
+
+  """Filter by the object’s `fieldIds` field."""
+  fieldIds: UUIDListFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: ExclusionConstraintFilter
+
+  """Filter by the object’s `operators` field."""
+  operators: StringListFilter
+
+  """Checks for any expressions in this list."""
+  or: [ExclusionConstraintFilter!]
+
+  """Filter by the object’s `smartTags` field."""
+  smartTags: JSONFilter
+
+  """Filter by the object’s `table` relation."""
+  table: TableFilter
+
+  """Filter by the object’s `tableId` field."""
+  tableId: UUIDFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Filter by the object’s `type` field."""
+  type: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `whereClause` field."""
+  whereClause: JSONFilter
+}
+
+"""An input for mutations affecting `ExclusionConstraint`"""
+input ExclusionConstraintInput {
+  accessMethod: String
+  category: ObjectCategory
+  createdAt: Datetime
+  databaseId: UUID
+  elementExpr: JSON
+  fieldIds: [UUID]
+  id: UUID
+  name: String
+  operators: [String]
+  smartTags: JSON
+  tableId: UUID!
+  tags: [String]
+  type: String
+  updatedAt: Datetime
+  whereClause: JSON
+}
+
+"""Methods to use when ordering `ExclusionConstraint`."""
+enum ExclusionConstraintOrderBy {
+  ACCESS_METHOD_ASC
+  ACCESS_METHOD_DESC
+  CATEGORY_ASC
+  CATEGORY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ELEMENT_EXPR_ASC
+  ELEMENT_EXPR_DESC
+  FIELD_IDS_ASC
+  FIELD_IDS_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  OPERATORS_ASC
+  OPERATORS_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SMART_TAGS_ASC
+  SMART_TAGS_DESC
+  TABLE_ID_ASC
+  TABLE_ID_DESC
+  TAGS_ASC
+  TAGS_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  WHERE_CLAUSE_ASC
+  WHERE_CLAUSE_DESC
+}
+
+"""
+Represents an update to a `ExclusionConstraint`. Fields that are set will be updated.
+"""
+input ExclusionConstraintPatch {
+  accessMethod: String
+  category: ObjectCategory
+  createdAt: Datetime
+  databaseId: UUID
+  elementExpr: JSON
+  fieldIds: [UUID]
+  id: UUID
+  name: String
+  operators: [String]
+  smartTags: JSON
+  tableId: UUID
+  tags: [String]
+  type: String
+  updatedAt: Datetime
+  whereClause: JSON
+}
+
 type Field {
   apiRequired: Boolean!
   category: ObjectCategory!
@@ -9089,6 +10143,8 @@ type Field {
   generationExpression: JSON
   generationType: String
   id: UUID!
+  identityGeneration: String
+  identityOptions: JSON
   isRequired: Boolean!
   label: String
   max: Float
@@ -9235,6 +10291,12 @@ input FieldFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `identityGeneration` field."""
+  identityGeneration: StringFilter
+
+  """Filter by the object’s `identityOptions` field."""
+  identityOptions: JSONFilter
+
   """Filter by the object’s `isRequired` field."""
   isRequired: BooleanFilter
 
@@ -9304,6 +10366,8 @@ input FieldInput {
   generationExpression: JSON
   generationType: String
   id: UUID
+  identityGeneration: String
+  identityOptions: JSON
   isRequired: Boolean
   label: String
   max: Float
@@ -9341,6 +10405,10 @@ enum FieldOrderBy {
   GENERATION_EXPRESSION_DESC
   GENERATION_TYPE_ASC
   GENERATION_TYPE_DESC
+  IDENTITY_GENERATION_ASC
+  IDENTITY_GENERATION_DESC
+  IDENTITY_OPTIONS_ASC
+  IDENTITY_OPTIONS_DESC
   ID_ASC
   ID_DESC
   IS_REQUIRED_ASC
@@ -9386,6 +10454,8 @@ input FieldPatch {
   generationExpression: JSON
   generationType: String
   id: UUID
+  identityGeneration: String
+  identityOptions: JSON
   isRequired: Boolean
   label: String
   max: Float
@@ -9465,9 +10535,12 @@ type ForeignKeyConstraint {
   database: Database
   databaseId: UUID!
   deleteAction: String
+  deleteSetFieldIds: [UUID]
   description: String
   fieldIds: [UUID]!
   id: UUID!
+  initiallyDeferred: Boolean!
+  isDeferrable: Boolean!
   name: String
   refFieldIds: [UUID]!
 
@@ -9483,6 +10556,7 @@ type ForeignKeyConstraint {
   type: String
   updateAction: String
   updatedAt: Datetime
+  withPeriod: Boolean!
 }
 
 """A connection to a list of `ForeignKeyConstraint` values."""
@@ -9535,6 +10609,9 @@ input ForeignKeyConstraintFilter {
   """Filter by the object’s `deleteAction` field."""
   deleteAction: StringFilter
 
+  """Filter by the object’s `deleteSetFieldIds` field."""
+  deleteSetFieldIds: UUIDListFilter
+
   """Filter by the object’s `description` field."""
   description: StringFilter
 
@@ -9543,6 +10620,12 @@ input ForeignKeyConstraintFilter {
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
+
+  """Filter by the object’s `initiallyDeferred` field."""
+  initiallyDeferred: BooleanFilter
+
+  """Filter by the object’s `isDeferrable` field."""
+  isDeferrable: BooleanFilter
 
   """Filter by the object’s `name` field."""
   name: StringFilter
@@ -9582,6 +10665,9 @@ input ForeignKeyConstraintFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `withPeriod` field."""
+  withPeriod: BooleanFilter
 }
 
 """An input for mutations affecting `ForeignKeyConstraint`"""
@@ -9590,9 +10676,12 @@ input ForeignKeyConstraintInput {
   createdAt: Datetime
   databaseId: UUID
   deleteAction: String
+  deleteSetFieldIds: [UUID]
   description: String
   fieldIds: [UUID]!
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   refFieldIds: [UUID]!
   refTableId: UUID!
@@ -9602,6 +10691,7 @@ input ForeignKeyConstraintInput {
   type: String
   updateAction: String
   updatedAt: Datetime
+  withPeriod: Boolean
 }
 
 """Methods to use when ordering `ForeignKeyConstraint`."""
@@ -9614,12 +10704,18 @@ enum ForeignKeyConstraintOrderBy {
   DATABASE_ID_DESC
   DELETE_ACTION_ASC
   DELETE_ACTION_DESC
+  DELETE_SET_FIELD_IDS_ASC
+  DELETE_SET_FIELD_IDS_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
   FIELD_IDS_ASC
   FIELD_IDS_DESC
   ID_ASC
   ID_DESC
+  INITIALLY_DEFERRED_ASC
+  INITIALLY_DEFERRED_DESC
+  IS_DEFERRABLE_ASC
+  IS_DEFERRABLE_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -9641,6 +10737,8 @@ enum ForeignKeyConstraintOrderBy {
   UPDATED_AT_DESC
   UPDATE_ACTION_ASC
   UPDATE_ACTION_DESC
+  WITH_PERIOD_ASC
+  WITH_PERIOD_DESC
 }
 
 """
@@ -9651,9 +10749,12 @@ input ForeignKeyConstraintPatch {
   createdAt: Datetime
   databaseId: UUID
   deleteAction: String
+  deleteSetFieldIds: [UUID]
   description: String
   fieldIds: [UUID]
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   refFieldIds: [UUID]
   refTableId: UUID
@@ -9663,6 +10764,7 @@ input ForeignKeyConstraintPatch {
   type: String
   updateAction: String
   updatedAt: Datetime
+  withPeriod: Boolean
 }
 
 type FullTextSearch {
@@ -10464,9 +11566,19 @@ One row per cert-bearing host or wildcard; tracks domain verification and TLS pr
 """
 type ManagedDomain {
   """
+  Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy.
+  """
+  allowPublicUsage: Boolean!
+
+  """
   Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata
   """
   annotations: JSON!
+
+  """
+  cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error
+  """
+  certStatus: String!
 
   """Reads a single `Database` that is related to this `ManagedDomain`."""
   database: Database
@@ -10481,6 +11593,64 @@ type ManagedDomain {
   """
   domain: ConstructiveInternalTypeHostname!
 
+  """Reads and enables pagination through a set of `DomainEvent`."""
+  domainEvents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainEvent`."""
+    orderBy: [DomainEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainEventFilter
+  ): DomainEventConnection!
+
+  """Reads and enables pagination through a set of `DomainVerification`."""
+  domainVerifications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainVerification`."""
+    orderBy: [DomainVerificationOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainVerificationFilter
+  ): DomainVerificationConnection!
+
   """Unique identifier for this managed domain record"""
   id: UUID!
 
@@ -10492,10 +11662,14 @@ type ManagedDomain {
   """When tls_status last became active"""
   tlsReadyAt: Datetime
 
-  """TLS/SSL provisioning state: none | provisioning | active | failed"""
+  """
+  TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed
+  """
   tlsStatus: String!
 
-  """Domain ownership verification state: pending | verified | failed"""
+  """
+  Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired
+  """
   verificationStatus: String!
 
   """When verification_status last became verified"""
@@ -10532,11 +11706,17 @@ type ManagedDomainEdge {
 A filter to be used against `ManagedDomain` object types. All fields are combined with a logical ‘and.’
 """
 input ManagedDomainFilter {
+  """Filter by the object’s `allowPublicUsage` field."""
+  allowPublicUsage: BooleanFilter
+
   """Checks for all expressions in this list."""
   and: [ManagedDomainFilter!]
 
   """Filter by the object’s `annotations` field."""
   annotations: JSONFilter
+
+  """Filter by the object’s `certStatus` field."""
+  certStatus: StringFilter
 
   """Filter by the object’s `database` relation."""
   database: DatabaseFilter
@@ -10546,6 +11726,18 @@ input ManagedDomainFilter {
 
   """Filter by the object’s `domain` field."""
   domain: ConstructiveInternalTypeHostnameFilter
+
+  """Filter by the object’s `domainEvents` relation."""
+  domainEvents: ManagedDomainToManyDomainEventFilter
+
+  """`domainEvents` exist."""
+  domainEventsExist: Boolean
+
+  """Filter by the object’s `domainVerifications` relation."""
+  domainVerifications: ManagedDomainToManyDomainVerificationFilter
+
+  """`domainVerifications` exist."""
+  domainVerificationsExist: Boolean
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -10575,9 +11767,19 @@ input ManagedDomainFilter {
 """An input for mutations affecting `ManagedDomain`"""
 input ManagedDomainInput {
   """
+  Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy.
+  """
+  allowPublicUsage: Boolean
+
+  """
   Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata
   """
   annotations: JSON
+
+  """
+  cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error
+  """
+  certStatus: String
 
   """
   Database that owns this cert-bearing host; platform wildcards are owned by the platform database
@@ -10600,10 +11802,14 @@ input ManagedDomainInput {
   """When tls_status last became active"""
   tlsReadyAt: Datetime
 
-  """TLS/SSL provisioning state: none | provisioning | active | failed"""
+  """
+  TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed
+  """
   tlsStatus: String
 
-  """Domain ownership verification state: pending | verified | failed"""
+  """
+  Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired
+  """
   verificationStatus: String
 
   """When verification_status last became verified"""
@@ -10612,8 +11818,12 @@ input ManagedDomainInput {
 
 """Methods to use when ordering `ManagedDomain`."""
 enum ManagedDomainOrderBy {
+  ALLOW_PUBLIC_USAGE_ASC
+  ALLOW_PUBLIC_USAGE_DESC
   ANNOTATIONS_ASC
   ANNOTATIONS_DESC
+  CERT_STATUS_ASC
+  CERT_STATUS_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DOMAIN_ASC
@@ -10640,9 +11850,19 @@ Represents an update to a `ManagedDomain`. Fields that are set will be updated.
 """
 input ManagedDomainPatch {
   """
+  Whether this domain is deliberately published so routes in other scopes may match and ride this row's cert. Only settable by app/platform authority via a generated AuthzColumnSecurity write-guard; backed by a generated permissive cross-scope SELECT policy.
+  """
+  allowPublicUsage: Boolean
+
+  """
   Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata
   """
   annotations: JSON
+
+  """
+  cert-manager resource lifecycle driven by the domain:issue_cert/domain:check_cert loop, tracked independently of tls_status: none | issuing | active | error
+  """
+  certStatus: String
 
   """
   Database that owns this cert-bearing host; platform wildcards are owned by the platform database
@@ -10665,14 +11885,46 @@ input ManagedDomainPatch {
   """When tls_status last became active"""
   tlsReadyAt: Datetime
 
-  """TLS/SSL provisioning state: none | provisioning | active | failed"""
+  """
+  TLS/SSL serving/reconcile state (ingress): none | provisioning | active | failed
+  """
   tlsStatus: String
 
-  """Domain ownership verification state: pending | verified | failed"""
+  """
+  Domain ownership verification state driven by the domain:issue_challenge/domain:verify loop: pending | checking | verified | failed | expired
+  """
   verificationStatus: String
 
   """When verification_status last became verified"""
   verifiedAt: Datetime
+}
+
+"""
+A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input ManagedDomainToManyDomainEventFilter {
+  """Filters to entities where every related entity matches."""
+  every: DomainEventFilter
+
+  """Filters to entities where no related entity matches."""
+  none: DomainEventFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: DomainEventFilter
+}
+
+"""
+A filter to be used against many `DomainVerification` object types. All fields are combined with a logical ‘and.’
+"""
+input ManagedDomainToManyDomainVerificationFilter {
+  """Filters to entities where every related entity matches."""
+  every: DomainVerificationFilter
+
+  """Filters to entities where no related entity matches."""
+  none: DomainVerificationFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: DomainVerificationFilter
 }
 
 """A belongs-to (forward FK) relation"""
@@ -10825,9 +12077,56 @@ type MetaRelations {
   manyToMany: [MetaManyToManyRelation!]!
 }
 
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
 """Root meta schema type"""
 type MetaSchema {
   tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
 }
 
 """Search metadata for a table"""
@@ -10897,6 +12196,9 @@ type MetaTable {
   relations: MetaRelations!
   schemaName: String!
 
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
   """Search metadata (null if no search configured)"""
   search: MetaSearch
 
@@ -10907,6 +12209,8 @@ type MetaTable {
 
 """Information about a PostgreSQL type"""
 type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
   gqlType: String!
   hasDefault: Boolean
   isArray: Boolean!
@@ -11048,6 +12352,22 @@ type Mutation {
     input: CreateDomainInput!
   ): CreateDomainPayload
 
+  """Creates a single `DomainEvent`."""
+  createDomainEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDomainEventInput!
+  ): CreateDomainEventPayload
+
+  """Creates a single `DomainVerification`."""
+  createDomainVerification(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDomainVerificationInput!
+  ): CreateDomainVerificationPayload
+
   """Creates a single `EmbeddingChunk`."""
   createEmbeddingChunk(
     """
@@ -11063,6 +12383,14 @@ type Mutation {
     """
     input: CreateEnumInput!
   ): CreateEnumPayload
+
+  """Creates a single `ExclusionConstraint`."""
+  createExclusionConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateExclusionConstraintInput!
+  ): CreateExclusionConstraintPayload
 
   """Creates a single `Field`."""
   createField(
@@ -11408,6 +12736,22 @@ type Mutation {
     input: DeleteDomainInput!
   ): DeleteDomainPayload
 
+  """Deletes a single `DomainEvent` using a unique key."""
+  deleteDomainEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDomainEventInput!
+  ): DeleteDomainEventPayload
+
+  """Deletes a single `DomainVerification` using a unique key."""
+  deleteDomainVerification(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDomainVerificationInput!
+  ): DeleteDomainVerificationPayload
+
   """Deletes a single `EmbeddingChunk` using a unique key."""
   deleteEmbeddingChunk(
     """
@@ -11423,6 +12767,14 @@ type Mutation {
     """
     input: DeleteEnumInput!
   ): DeleteEnumPayload
+
+  """Deletes a single `ExclusionConstraint` using a unique key."""
+  deleteExclusionConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteExclusionConstraintInput!
+  ): DeleteExclusionConstraintPayload
 
   """Deletes a single `Field` using a unique key."""
   deleteField(
@@ -11686,7 +13038,7 @@ type Mutation {
   """
   Requests a database and returns a ticket (database_provision_module row) to poll.
   
-  Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+  Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
   
   Example usage:
     SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
@@ -11809,6 +13161,22 @@ type Mutation {
     input: UpdateDomainInput!
   ): UpdateDomainPayload
 
+  """Updates a single `DomainEvent` using a unique key and a patch."""
+  updateDomainEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDomainEventInput!
+  ): UpdateDomainEventPayload
+
+  """Updates a single `DomainVerification` using a unique key and a patch."""
+  updateDomainVerification(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDomainVerificationInput!
+  ): UpdateDomainVerificationPayload
+
   """Updates a single `EmbeddingChunk` using a unique key and a patch."""
   updateEmbeddingChunk(
     """
@@ -11824,6 +13192,14 @@ type Mutation {
     """
     input: UpdateEnumInput!
   ): UpdateEnumPayload
+
+  """Updates a single `ExclusionConstraint` using a unique key and a patch."""
+  updateExclusionConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateExclusionConstraintInput!
+  ): UpdateExclusionConstraintPayload
 
   """Updates a single `Field` using a unique key and a patch."""
   updateField(
@@ -12659,6 +14035,8 @@ type PrimaryKeyConstraint {
   databaseId: UUID!
   fieldIds: [UUID]!
   id: UUID!
+  initiallyDeferred: Boolean!
+  isDeferrable: Boolean!
   name: String
   smartTags: JSON
 
@@ -12668,6 +14046,7 @@ type PrimaryKeyConstraint {
   tags: [String]!
   type: String
   updatedAt: Datetime
+  withoutOverlaps: Boolean!
 }
 
 """A connection to a list of `PrimaryKeyConstraint` values."""
@@ -12723,6 +14102,12 @@ input PrimaryKeyConstraintFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `initiallyDeferred` field."""
+  initiallyDeferred: BooleanFilter
+
+  """Filter by the object’s `isDeferrable` field."""
+  isDeferrable: BooleanFilter
+
   """Filter by the object’s `name` field."""
   name: StringFilter
 
@@ -12749,6 +14134,9 @@ input PrimaryKeyConstraintFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `withoutOverlaps` field."""
+  withoutOverlaps: BooleanFilter
 }
 
 """An input for mutations affecting `PrimaryKeyConstraint`"""
@@ -12758,12 +14146,15 @@ input PrimaryKeyConstraintInput {
   databaseId: UUID
   fieldIds: [UUID]!
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   smartTags: JSON
   tableId: UUID!
   tags: [String]
   type: String
   updatedAt: Datetime
+  withoutOverlaps: Boolean
 }
 
 """Methods to use when ordering `PrimaryKeyConstraint`."""
@@ -12778,6 +14169,10 @@ enum PrimaryKeyConstraintOrderBy {
   FIELD_IDS_DESC
   ID_ASC
   ID_DESC
+  INITIALLY_DEFERRED_ASC
+  INITIALLY_DEFERRED_DESC
+  IS_DEFERRABLE_ASC
+  IS_DEFERRABLE_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -12793,6 +14188,8 @@ enum PrimaryKeyConstraintOrderBy {
   TYPE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  WITHOUT_OVERLAPS_ASC
+  WITHOUT_OVERLAPS_DESC
 }
 
 """
@@ -12804,12 +14201,15 @@ input PrimaryKeyConstraintPatch {
   databaseId: UUID
   fieldIds: [UUID]
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   smartTags: JSON
   tableId: UUID
   tags: [String]
   type: String
   updatedAt: Datetime
+  withoutOverlaps: Boolean
 }
 
 input ProvisionBucketInput {
@@ -13495,6 +14895,64 @@ type Query {
     where: DefaultPrivilegeFilter
   ): DefaultPrivilegeConnection
 
+  """Reads and enables pagination through a set of `DomainEvent`."""
+  domainEvents(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainEvent`."""
+    orderBy: [DomainEventOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainEventFilter
+  ): DomainEventConnection
+
+  """Reads and enables pagination through a set of `DomainVerification`."""
+  domainVerifications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainVerification`."""
+    orderBy: [DomainVerificationOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainVerificationFilter
+  ): DomainVerificationConnection
+
   """Reads and enables pagination through a set of `Domain`."""
   domains(
     """Read all values in the set after (below) this cursor."""
@@ -13581,6 +15039,35 @@ type Query {
     """
     where: EnumFilter
   ): EnumConnection
+
+  """Reads and enables pagination through a set of `ExclusionConstraint`."""
+  exclusionConstraints(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ExclusionConstraint`."""
+    orderBy: [ExclusionConstraintOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ExclusionConstraintFilter
+  ): ExclusionConstraintConnection
 
   """Reads and enables pagination through a set of `Field`."""
   fields(
@@ -13929,7 +15416,7 @@ type Query {
     """
     where: PubkeySettingFilter
   ): PubkeySettingConnection
-  resolveHttpRoute(pHost: String, pMethod: String, pPath: String): ResolveHttpRouteRecord
+  resolveHttpRoute(requestHost: String, requestMethod: String, requestPath: String): ResolveHttpRouteRecord
 
   """Reads and enables pagination through a set of `RlsSetting`."""
   rlsSettings(
@@ -17057,6 +18544,35 @@ type Table {
     where: EmbeddingChunkFilter
   ): EmbeddingChunkConnection!
 
+  """Reads and enables pagination through a set of `ExclusionConstraint`."""
+  exclusionConstraints(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ExclusionConstraint`."""
+    orderBy: [ExclusionConstraintOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ExclusionConstraintFilter
+  ): ExclusionConstraintConnection!
+
   """Reads and enables pagination through a set of `Field`."""
   fields(
     """Read all values in the set after (below) this cursor."""
@@ -17532,6 +19048,12 @@ input TableFilter {
   """`embeddingChunks` exist."""
   embeddingChunksExist: Boolean
 
+  """Filter by the object’s `exclusionConstraints` relation."""
+  exclusionConstraints: TableToManyExclusionConstraintFilter
+
+  """`exclusionConstraints` exist."""
+  exclusionConstraintsExist: Boolean
+
   """Filter by the object’s `fields` relation."""
   fields: TableToManyFieldFilter
 
@@ -17969,6 +19491,20 @@ input TableToManyEmbeddingChunkFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: EmbeddingChunkFilter
+}
+
+"""
+A filter to be used against many `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’
+"""
+input TableToManyExclusionConstraintFilter {
+  """Filters to entities where every related entity matches."""
+  every: ExclusionConstraintFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ExclusionConstraintFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: ExclusionConstraintFilter
 }
 
 """
@@ -18535,6 +20071,8 @@ type UniqueConstraint {
   description: String
   fieldIds: [UUID]!
   id: UUID!
+  initiallyDeferred: Boolean!
+  isDeferrable: Boolean!
   name: String
   smartTags: JSON
 
@@ -18544,6 +20082,7 @@ type UniqueConstraint {
   tags: [String]!
   type: String
   updatedAt: Datetime
+  withoutOverlaps: Boolean!
 }
 
 """A connection to a list of `UniqueConstraint` values."""
@@ -18602,6 +20141,12 @@ input UniqueConstraintFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `initiallyDeferred` field."""
+  initiallyDeferred: BooleanFilter
+
+  """Filter by the object’s `isDeferrable` field."""
+  isDeferrable: BooleanFilter
+
   """Filter by the object’s `name` field."""
   name: StringFilter
 
@@ -18628,6 +20173,9 @@ input UniqueConstraintFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `withoutOverlaps` field."""
+  withoutOverlaps: BooleanFilter
 }
 
 """An input for mutations affecting `UniqueConstraint`"""
@@ -18638,12 +20186,15 @@ input UniqueConstraintInput {
   description: String
   fieldIds: [UUID]!
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   smartTags: JSON
   tableId: UUID!
   tags: [String]
   type: String
   updatedAt: Datetime
+  withoutOverlaps: Boolean
 }
 
 """Methods to use when ordering `UniqueConstraint`."""
@@ -18660,6 +20211,10 @@ enum UniqueConstraintOrderBy {
   FIELD_IDS_DESC
   ID_ASC
   ID_DESC
+  INITIALLY_DEFERRED_ASC
+  INITIALLY_DEFERRED_DESC
+  IS_DEFERRABLE_ASC
+  IS_DEFERRABLE_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -18675,6 +20230,8 @@ enum UniqueConstraintOrderBy {
   TYPE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  WITHOUT_OVERLAPS_ASC
+  WITHOUT_OVERLAPS_DESC
 }
 
 """
@@ -18687,12 +20244,15 @@ input UniqueConstraintPatch {
   description: String
   fieldIds: [UUID]
   id: UUID
+  initiallyDeferred: Boolean
+  isDeferrable: Boolean
   name: String
   smartTags: JSON
   tableId: UUID
   tags: [String]
   type: String
   updatedAt: Datetime
+  withoutOverlaps: Boolean
 }
 
 """All input for the `updateApi` mutation."""
@@ -19165,6 +20725,46 @@ type UpdateDefaultPrivilegePayload {
   query: Query
 }
 
+"""All input for the `updateDomainEvent` mutation."""
+input UpdateDomainEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DomainEvent` being updated.
+  """
+  domainEventPatch: DomainEventPatch!
+
+  """Unique event identifier"""
+  id: UUID!
+}
+
+"""The output of our update `DomainEvent` mutation."""
+type UpdateDomainEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainEvent` that was updated by this mutation."""
+  domainEvent: DomainEvent
+
+  """An edge for our `DomainEvent`. May be used by Relay 1."""
+  domainEventEdge(
+    """The method to use when ordering `DomainEvent`."""
+    orderBy: [DomainEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainEventEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updateDomain` mutation."""
 input UpdateDomainInput {
   """
@@ -19198,6 +20798,46 @@ type UpdateDomainPayload {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateDomainVerification` mutation."""
+input UpdateDomainVerificationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DomainVerification` being updated.
+  """
+  domainVerificationPatch: DomainVerificationPatch!
+
+  """Unique identifier for this verification challenge"""
+  id: UUID!
+}
+
+"""The output of our update `DomainVerification` mutation."""
+type UpdateDomainVerificationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainVerification` that was updated by this mutation."""
+  domainVerification: DomainVerification
+
+  """An edge for our `DomainVerification`. May be used by Relay 1."""
+  domainVerificationEdge(
+    """The method to use when ordering `DomainVerification`."""
+    orderBy: [DomainVerificationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainVerificationEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -19274,6 +20914,44 @@ type UpdateEnumPayload {
     """The method to use when ordering `Enum`."""
     orderBy: [EnumOrderBy!]! = [PRIMARY_KEY_ASC]
   ): EnumEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateExclusionConstraint` mutation."""
+input UpdateExclusionConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `ExclusionConstraint` being updated.
+  """
+  exclusionConstraintPatch: ExclusionConstraintPatch!
+  id: UUID!
+}
+
+"""The output of our update `ExclusionConstraint` mutation."""
+type UpdateExclusionConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ExclusionConstraint` that was updated by this mutation."""
+  exclusionConstraint: ExclusionConstraint
+
+  """An edge for our `ExclusionConstraint`. May be used by Relay 1."""
+  exclusionConstraintEdge(
+    """The method to use when ordering `ExclusionConstraint`."""
+    orderBy: [ExclusionConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ExclusionConstraintEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -20442,6 +22120,7 @@ scalar Upload
 
 type View {
   category: ObjectCategory!
+  checkOption: String
   data: JSON
 
   """Reads a single `Database` that is related to this `View`."""
@@ -20456,6 +22135,7 @@ type View {
   """Reads a single `Schema` that is related to this `View`."""
   schema: Schema
   schemaId: UUID!
+  securityBarrier: Boolean
   securityInvoker: Boolean
   smartTags: JSON
 
@@ -20589,6 +22269,9 @@ input ViewFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
+  """Filter by the object’s `checkOption` field."""
+  checkOption: StringFilter
+
   """Filter by the object’s `data` field."""
   data: JSONFilter
 
@@ -20624,6 +22307,9 @@ input ViewFilter {
 
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
+
+  """Filter by the object’s `securityBarrier` field."""
+  securityBarrier: BooleanFilter
 
   """Filter by the object’s `securityInvoker` field."""
   securityInvoker: BooleanFilter
@@ -20795,6 +22481,7 @@ input ViewGrantPatch {
 """An input for mutations affecting `View`"""
 input ViewInput {
   category: ObjectCategory
+  checkOption: String
   data: JSON
   databaseId: UUID
   filterData: JSON
@@ -20803,6 +22490,7 @@ input ViewInput {
   isReadOnly: Boolean
   name: String!
   schemaId: UUID!
+  securityBarrier: Boolean
   securityInvoker: Boolean
   smartTags: JSON
   tableId: UUID
@@ -20814,6 +22502,8 @@ input ViewInput {
 enum ViewOrderBy {
   CATEGORY_ASC
   CATEGORY_DESC
+  CHECK_OPTION_ASC
+  CHECK_OPTION_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   DATA_ASC
@@ -20833,6 +22523,8 @@ enum ViewOrderBy {
   PRIMARY_KEY_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
+  SECURITY_BARRIER_ASC
+  SECURITY_BARRIER_DESC
   SECURITY_INVOKER_ASC
   SECURITY_INVOKER_DESC
   SMART_TAGS_ASC
@@ -20848,6 +22540,7 @@ enum ViewOrderBy {
 """Represents an update to a `View`. Fields that are set will be updated."""
 input ViewPatch {
   category: ObjectCategory
+  checkOption: String
   data: JSON
   databaseId: UUID
   filterData: JSON
@@ -20856,6 +22549,7 @@ input ViewPatch {
   isReadOnly: Boolean
   name: String
   schemaId: UUID
+  securityBarrier: Boolean
   securityInvoker: Boolean
   smartTags: JSON
   tableId: UUID
