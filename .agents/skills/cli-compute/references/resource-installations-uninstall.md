@@ -7,7 +7,7 @@ Execute the resourceInstallationsUninstall mutation
 ## Usage
 
 ```bash
-csdk resource-installations-uninstall --input.clientMutationId <String> --input.pInstallationId <UUID>
+csdk resource-installations-uninstall --input.clientMutationId <String> --input.targetInstallationId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resource-installations-uninstall --input.clientMutationId <String> --input.
 ### Run resourceInstallationsUninstall
 
 ```bash
-csdk resource-installations-uninstall --input.clientMutationId <String> --input.pInstallationId <UUID>
+csdk resource-installations-uninstall --input.clientMutationId <String> --input.targetInstallationId <UUID>
 ```

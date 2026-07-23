@@ -7,7 +7,7 @@ React Query mutation hook for resourceInstallationsRollback
 ## Usage
 
 ```typescript
-const { mutate } = useResourceInstallationsRollbackMutation(); mutate({ input: { pCommitId: '<UUID>', pInstallationId: '<UUID>' } });
+const { mutate } = useResourceInstallationsRollbackMutation(); mutate({ input: { commitId: '<UUID>', targetInstallationId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useResourceInstallationsRollbackMutation(); mutate({ input: {
 
 ```typescript
 const { mutate, isLoading } = useResourceInstallationsRollbackMutation();
-mutate({ input: { pCommitId: '<UUID>', pInstallationId: '<UUID>' } });
+mutate({ input: { commitId: '<UUID>', targetInstallationId: '<UUID>' } });
 ```

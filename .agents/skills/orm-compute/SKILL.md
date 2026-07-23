@@ -1,13 +1,13 @@
 ---
 name: orm-compute
-description: ORM client for the compute API — provides typed CRUD operations for 65 tables and 29 custom operations
+description: ORM client for the compute API — provides typed CRUD operations for 67 tables and 29 custom operations
 ---
 
 # orm-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the compute API — provides typed CRUD operations for 65 tables and 29 custom operations
+ORM client for the compute API — provides typed CRUD operations for 67 tables and 29 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the compute API — provides typed CRUD operations for 65 tables 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: dbPreset, declaredCapacity, functionApiBinding, functionDefinition, functionDeployment, functionDeploymentEvent, functionExecutionLog, functionGraphCommit, ...
+// Available models: dbPreset, functionApiBinding, functionDefinition, functionDeployment, functionDeploymentEvent, functionExecutionLog, functionGraphCommit, functionGraph, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -38,7 +38,6 @@ const items = await db.dbPreset.findMany({
 See the `references/` directory for detailed per-entity API documentation:
 
 - [db-preset](references/db-preset.md)
-- [declared-capacity](references/declared-capacity.md)
 - [function-api-binding](references/function-api-binding.md)
 - [function-definition](references/function-definition.md)
 - [function-deployment](references/function-deployment.md)
@@ -52,6 +51,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [function-graph-object](references/function-graph-object.md)
 - [function-graph-ref](references/function-graph-ref.md)
 - [function-graph-store](references/function-graph-store.md)
+- [function-invocation-attempt](references/function-invocation-attempt.md)
 - [function-invocation](references/function-invocation.md)
 - [get-all-tree-nodes-record](references/get-all-tree-nodes-record.md)
 - [infra-commit](references/infra-commit.md)
@@ -62,12 +62,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [integration-provider](references/integration-provider.md)
 - [namespace](references/namespace.md)
 - [namespace-event](references/namespace-event.md)
-- [platform-declared-capacity](references/platform-declared-capacity.md)
 - [platform-function-api-binding](references/platform-function-api-binding.md)
 - [platform-function-definition](references/platform-function-definition.md)
 - [platform-function-deployment](references/platform-function-deployment.md)
 - [platform-function-deployment-event](references/platform-function-deployment-event.md)
 - [platform-function-execution-log](references/platform-function-execution-log.md)
+- [platform-function-invocation-attempt](references/platform-function-invocation-attempt.md)
 - [platform-function-invocation](references/platform-function-invocation.md)
 - [platform-infra-commit](references/platform-infra-commit.md)
 - [platform-infra-get-all-tree-nodes-record](references/platform-infra-get-all-tree-nodes-record.md)
@@ -77,26 +77,28 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-namespace](references/platform-namespace.md)
 - [platform-namespace-event](references/platform-namespace-event.md)
 - [platform-resource](references/platform-resource.md)
+- [platform-resource-declared-capacity](references/platform-resource-declared-capacity.md)
 - [platform-resource-definition](references/platform-resource-definition.md)
 - [platform-resource-event](references/platform-resource-event.md)
 - [platform-resource-installation](references/platform-resource-installation.md)
 - [platform-resource-status-check](references/platform-resource-status-check.md)
 - [platform-resource-usage-log](references/platform-resource-usage-log.md)
 - [platform-resource-usage-summary](references/platform-resource-usage-summary.md)
-- [platform-resource-utilization-daily](references/platform-resource-utilization-daily.md)
+- [platform-resource-utilization](references/platform-resource-utilization.md)
 - [platform-resources-health](references/platform-resources-health.md)
 - [platform-resources-requirements-state](references/platform-resources-requirements-state.md)
 - [platform-resources-resolved-requirement](references/platform-resources-resolved-requirement.md)
 - [platform-webhook-endpoint](references/platform-webhook-endpoint.md)
 - [platform-webhook-event](references/platform-webhook-event.md)
 - [resource](references/resource.md)
+- [resource-declared-capacity](references/resource-declared-capacity.md)
 - [resource-definition](references/resource-definition.md)
 - [resource-event](references/resource-event.md)
 - [resource-installation](references/resource-installation.md)
 - [resource-status-check](references/resource-status-check.md)
 - [resource-usage-log](references/resource-usage-log.md)
 - [resource-usage-summary](references/resource-usage-summary.md)
-- [resource-utilization-daily](references/resource-utilization-daily.md)
+- [resource-utilization](references/resource-utilization.md)
 - [resources-health](references/resources-health.md)
 - [resources-requirements-state](references/resources-requirements-state.md)
 - [resources-resolved-requirement](references/resources-resolved-requirement.md)

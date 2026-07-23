@@ -19,23 +19,23 @@ export default async (
     const answers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'pEntityId',
-        message: 'pEntityId',
+        name: 'managerId',
+        message: 'managerId',
       },
       {
         type: 'text',
-        name: 'pManagerId',
-        message: 'pManagerId',
+        name: 'maxDepth',
+        message: 'maxDepth (number)',
       },
       {
         type: 'text',
-        name: 'pMaxDepth',
-        message: 'pMaxDepth (number)',
+        name: 'targetEntityId',
+        message: 'targetEntityId',
       },
       {
         type: 'text',
-        name: 'pUserId',
-        message: 'pUserId',
+        name: 'userId',
+        message: 'userId',
       },
     ]);
     const client = getClient();
