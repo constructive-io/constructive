@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { getInstalledExtensions } from '@pgpmjs/ast/files/extension/reader';
+import { getInstalledExtensions } from '../../../src/files/extension/reader';
 
 describe('getInstalledExtensions', () => {
   let tempDir: string;

@@ -1,8 +1,8 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { writeExtensions, generateControlFileContent, upsertRequiresLine } from '@pgpmjs/ast/files/extension/writer';
-import { getInstalledExtensions } from '@pgpmjs/ast/files/extension/reader';
+import { writeExtensions, generateControlFileContent, upsertRequiresLine } from '../../../src/files/extension/writer';
+import { getInstalledExtensions } from '../../../src/files/extension/reader';
 
 describe('extension writer', () => {
   let tempDir: string;
