@@ -31,8 +31,6 @@ export interface ConstructiveGraphQLOptions {
   features?: GraphileFeatureOptions;
   /** API configuration options */
   api?: ApiOptions;
-  /** SMS provider configuration */
-  sms?: SmsOptions;
 }
 
 /**
