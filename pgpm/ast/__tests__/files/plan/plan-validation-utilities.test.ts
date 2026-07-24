@@ -3,7 +3,7 @@ import {
   isValidDependency,
   isValidTagName,
   parseReference
-} from '@pgpmjs/ast/files';
+} from '../../../src/files';
 
 describe('Validators', () => {
   describe('isValidChangeName', () => {

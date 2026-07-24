@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { basename, dirname, relative } from 'path';
+import { dirname, relative } from 'path';
 
 import { parsePlanFileSimple } from '../plan';
 import { ExtensionInfo } from './writer';
@@ -15,8 +15,20 @@ export interface Module {
  * https://www.postgresql.org/docs/current/extend-extensions.html
  */
 export function parseControlFile(filePath: string, basePath: string): Module {
-  const contents = readFileSync(filePath, 'utf-8');
-  const key = basename(filePath).split('.control')[0];
+  const { requires, version } = parseControlContent(readFileSync(filePath, 'utf-8'));
+  return {
+    path: dirname(relative(basePath, filePath)),
+    requires,
+    version,
+  };
+}
+
+/**
+ * Parse .control file content and extract its metadata. The in-memory core of
+ * {@link parseControlFile}, for control text that does not live on disk (e.g.
+ * inside a migration bundle artifact).
+ */
+export function parseControlContent(contents: string): { requires: string[]; version: string } {
   const requires = contents
     .split('\n')
     .find((line) => /^requires/.test(line))
@@ -31,11 +43,7 @@ export function parseControlFile(filePath: string, basePath: string): Module {
     .replace(/[\']*/g, '')
     .trim() || '';
 
-  return {
-    path: dirname(relative(basePath, filePath)),
-    requires,
-    version,
-  };
+  return { requires, version };
 }
 
 /**

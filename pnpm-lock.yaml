@@ -3037,6 +3037,9 @@ importers:
 
   pgpm/export:
     dependencies:
+      '@constructive-io/query-builder':
+        specifier: workspace:^
+        version: link:../../postgres/query-builder/dist
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist

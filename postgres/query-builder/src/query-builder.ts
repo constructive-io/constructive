@@ -303,6 +303,59 @@ export const sub = binOp('-');
 export const mul = binOp('*');
 export const div = binOp('/');
 
+// SQL-standard multi-word type names (as produced by format_type) mapped to
+// their pg_catalog aliases so the deparser emits them unquoted.
+const TYPE_NAME_ALIASES: Record<string, string> = {
+  'timestamp with time zone': 'timestamptz',
+  'timestamp without time zone': 'timestamp',
+  'time with time zone': 'timetz',
+  'time without time zone': 'time',
+  'character varying': 'varchar',
+  'character': 'bpchar',
+  'double precision': 'float8',
+  'bit varying': 'varbit'
+};
+
+// Parse a type name as written in SQL / returned by format_type():
+// optional (typmod,...) and [] array suffix, multi-word SQL-standard names,
+// and 'schema.type' qualification.
+function parseTypeName(typeName: string) {
+  let name = typeName.trim();
+  let isArray = false;
+  if (name.endsWith('[]')) {
+    isArray = true;
+    name = name.slice(0, -2).trim();
+  }
+  let typmods: unknown[] | undefined;
+  const modMatch = name.match(/^(.*?)\s*\((\s*\d+(?:\s*,\s*\d+)*\s*)\)$/);
+  if (modMatch) {
+    name = modMatch[1].trim();
+    typmods = modMatch[2]
+      .split(',')
+      .map((n) => nodes.aConst({ ival: ast.integer({ ival: parseInt(n.trim(), 10) }) }));
+  }
+  const lower = name.toLowerCase();
+  const names = TYPE_NAME_ALIASES[lower]
+    ? [str('pg_catalog'), str(TYPE_NAME_ALIASES[lower])]
+    : name.split('.').map((part) => str(part.trim()));
+  return ast.typeName({
+    names: names as any[],
+    typmods: typmods as any[],
+    arrayBounds: isArray ? ([nodes.integer({ ival: -1 })] as any[]) : undefined
+  });
+}
+
+// Type cast, e.g. `cast(col('id'), 'text')` -> id::text,
+// `cast(lit('a8f...'), 'uuid')` -> 'a8f...'::uuid. Array types use the
+// `type[]` suffix, e.g. `cast(lit('{}'), 'text[]')`.
+export function cast(x: Operand, typeName: string): Expr {
+  return (alloc) =>
+    nodes.typeCast({
+      arg: operandToNode(x, alloc) as any,
+      typeName: parseTypeName(typeName) as any
+    });
+}
+
 // Null tests, e.g. `isNull(col('completed_at'))`.
 export function isNull(x: Operand): Expr {
   return (alloc) =>

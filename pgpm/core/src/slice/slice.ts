@@ -1,5 +1,6 @@
 import { Change, Tag, ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { generateChangeLineContent, generateTagLineContent } from '@pgpmjs/ast/files/plan/writer';
 import {
   SliceConfig,
   SliceResult,
@@ -366,46 +367,17 @@ export function generatePlanContent(
   content += `%project=${pkgName}\n`;
   content += `%uri=${pkgName}\n\n`;
 
+  // Dependency brackets keep their original order (empty order map), matching
+  // the source plans this content is sliced from.
+  const originalOrder = new Map<string, number>();
+
   for (const entry of entries) {
-    let line = entry.name;
-
-    if (entry.dependencies && entry.dependencies.length > 0) {
-      line += ` [${entry.dependencies.join(' ')}]`;
-    }
-
-    if (entry.timestamp) {
-      line += ` ${entry.timestamp}`;
-      if (entry.planner) {
-        line += ` ${entry.planner}`;
-        if (entry.email) {
-          line += ` <${entry.email}>`;
-        }
-      }
-    }
-
-    if (entry.comment) {
-      line += ` # ${entry.comment}`;
-    }
-
-    content += line + '\n';
+    content += generateChangeLineContent(entry, originalOrder) + '\n';
 
     // Add tags associated with this change
     const changeTags = tags.filter(t => t.change === entry.name);
     for (const tag of changeTags) {
-      let tagLine = `@${tag.name}`;
-      if (tag.timestamp) {
-        tagLine += ` ${tag.timestamp}`;
-        if (tag.planner) {
-          tagLine += ` ${tag.planner}`;
-          if (tag.email) {
-            tagLine += ` <${tag.email}>`;
-          }
-        }
-      }
-      if (tag.comment) {
-        tagLine += ` # ${tag.comment}`;
-      }
-      content += tagLine + '\n';
+      content += generateTagLineContent(tag) + '\n';
     }
   }
 

@@ -8,7 +8,7 @@ import {
   scanDeployScript,
   verifyPlanMatchesHeaders,
   writePgpmScript
-} from '@pgpmjs/ast/files/sql/header';
+} from '../../src/files/sql/header';
 
 const LEGACY = `-- Deploy my-module:tables/users to pg
 -- requires: schema
