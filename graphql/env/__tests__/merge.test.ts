@@ -175,7 +175,7 @@ describe('getEnvOptions', () => {
     expect(result.sms?.provider).toBe('custom-sms-gateway');
   });
 
-  it('honors defaults, config, env, and runtime override priority for SMS', () => {
+  it('honors config, env, and runtime override priority for SMS', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-sms-'));
     writeConfig(tempDir, {
       sms: {
@@ -233,13 +233,10 @@ describe('getEnvOptions', () => {
     }
   });
 
-  it('keeps SMS provider and DevSms base URL optional while applying defaults', () => {
+  it('keeps SMS absent when it is not configured', () => {
     const result = getEnvOptions({}, process.cwd(), {});
 
-    expect(result.sms).toEqual({
-      requestTimeoutMs: 5000,
-      dryRun: false,
-    });
+    expect(result.sms).toBeUndefined();
   });
 
   it('omits an invalid SMS timeout from partial env overrides', () => {

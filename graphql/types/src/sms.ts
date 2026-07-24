@@ -22,14 +22,3 @@ export interface SmsOptions {
   /** DevSms local provider options. */
   devsms?: DevSmsOptions;
 }
-
-/**
- * Honest fallbacks for every environment (12factor-env class 1).
- *
- * These live in the domain-default layer rather than the env parser so config
- * files can override them when the corresponding env variables are absent.
- */
-export const smsDefaults: SmsOptions = {
-  requestTimeoutMs: 5000,
-  dryRun: false,
-};

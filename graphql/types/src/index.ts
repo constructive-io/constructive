@@ -33,6 +33,5 @@ export {
 // Export SMS types
 export {
   SmsOptions,
-  DevSmsOptions,
-  smsDefaults
+  DevSmsOptions
 } from './sms';

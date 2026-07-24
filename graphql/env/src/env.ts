@@ -36,9 +36,9 @@ export const getGraphQLEnvVars = (
     DEVSMS_BASE_URL,
   } = env;
 
-  // Keep this function as a partial env-override parser. Defaults are applied
-  // before config in constructiveGraphqlDefaults; injecting them here would
-  // incorrectly let an absent env var overwrite pgpm.json.
+  // Keep this function as a partial env-override parser. SMS runtime defaults
+  // belong to the consuming application; injecting them here would incorrectly
+  // let an absent env var overwrite pgpm.json or consumer-specific values.
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
   const hasSmsEnvOverrides = Boolean(
