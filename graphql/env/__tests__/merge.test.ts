@@ -5,10 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
-  fs.writeFileSync(
-    path.join(dir, 'pgpm.json'),
-    JSON.stringify(config, null, 2)
-  );
+  fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
 };
 
 describe('getEnvOptions', () => {
@@ -26,21 +23,21 @@ describe('getEnvOptions', () => {
     writeConfig(tempDir, {
       pg: {
         host: 'config-host',
-        database: 'config-db',
+        database: 'config-db'
       },
       server: {
-        port: 4000,
+        port: 4000
       },
       graphile: {
-        schema: ['config_schema'],
+        schema: ['config_schema']
       },
       features: {
-        simpleInflection: false,
+        simpleInflection: false
       },
       api: {
         enableServicesApi: false,
         isPublic: false,
-        metaSchemas: ['config_meta'],
+        metaSchemas: ['config_meta']
       },
       sms: {
         provider: 'devsms',
@@ -76,23 +73,23 @@ describe('getEnvOptions', () => {
     const result = getEnvOptions(
       {
         db: {
-          cwd: '<CWD>',
+          cwd: '<CWD>'
         },
         pg: {
-          host: 'override-host',
+          host: 'override-host'
         },
         server: {
-          port: 5000,
+          port: 5000
         },
         graphile: {
-          schema: ['override_schema'],
+          schema: ['override_schema']
         },
         features: {
-          oppositeBaseNames: false,
+          oppositeBaseNames: false
         },
         api: {
           enableServicesApi: false,
-          defaultDatabaseId: 'override_db',
+          defaultDatabaseId: 'override_db'
         },
         sms: {
           senderId: 'OverrideSender',
@@ -110,39 +107,36 @@ describe('getEnvOptions', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-replace-'));
     writeConfig(tempDir, {
       graphile: {
-        schema: ['config_schema', 'shared_schema'],
+        schema: ['config_schema', 'shared_schema']
       },
       api: {
         exposedSchemas: ['public', 'shared'],
-        metaSchemas: ['metaschema_public', 'services_public', 'config_meta'],
-      },
+        metaSchemas: ['metaschema_public', 'services_public', 'config_meta']
+      }
     });
 
     const testEnv: NodeJS.ProcessEnv = {
       GRAPHILE_SCHEMA: 'shared_schema,env_schema',
       API_EXPOSED_SCHEMAS: 'shared,env_schema',
-      API_META_SCHEMAS: 'services_public,env_meta',
+      API_META_SCHEMAS: 'services_public,env_meta'
     };
 
     const result = getEnvOptions(
       {
         graphile: {
-          schema: ['override_schema', 'shared_schema'],
+          schema: ['override_schema', 'shared_schema']
         },
         api: {
           exposedSchemas: ['public', 'override_schema'],
-          metaSchemas: ['env_meta', 'override_meta'],
-        },
+          metaSchemas: ['env_meta', 'override_meta']
+        }
       },
       tempDir,
       testEnv
     );
 
     // Arrays are replaced, not merged - overrides win completely
-    expect(result.graphile?.schema).toEqual([
-      'override_schema',
-      'shared_schema',
-    ]);
+    expect(result.graphile?.schema).toEqual(['override_schema', 'shared_schema']);
     expect(result.api?.exposedSchemas).toEqual(['public', 'override_schema']);
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
