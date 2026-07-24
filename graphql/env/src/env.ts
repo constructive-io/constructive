@@ -1,5 +1,5 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { parseEnvBoolean } from '12factor-env';
+import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
@@ -26,7 +26,26 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     CHAT_PROVIDER,
     CHAT_MODEL,
     CHAT_BASE_URL,
+
+    SMS_PROVIDER,
+    SMS_SENDER_ID,
+    SMS_REQUEST_TIMEOUT_MS,
+    SEND_SMS_DRY_RUN,
+    DEVSMS_BASE_URL,
   } = env;
+
+  // Keep this function as a partial env-override parser. SMS runtime defaults
+  // belong to the consuming application; injecting them here would incorrectly
+  // let an absent env var overwrite pgpm.json or consumer-specific values.
+  const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
+  const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
+  const hasSmsEnvOverrides = Boolean(
+    SMS_PROVIDER ||
+    SMS_SENDER_ID ||
+    smsRequestTimeoutMs !== undefined ||
+    smsDryRun !== undefined ||
+    DEVSMS_BASE_URL
+  );
 
   return {
     graphile: {
@@ -64,6 +83,21 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
             ...(CHAT_PROVIDER && { provider: CHAT_PROVIDER }),
             ...(CHAT_MODEL && { model: CHAT_MODEL }),
             ...(CHAT_BASE_URL && { baseUrl: CHAT_BASE_URL }),
+          },
+        }),
+      },
+    }),
+    ...(hasSmsEnvOverrides && {
+      sms: {
+        ...(SMS_PROVIDER && { provider: SMS_PROVIDER }),
+        ...(SMS_SENDER_ID && { senderId: SMS_SENDER_ID }),
+        ...(smsRequestTimeoutMs !== undefined && {
+          requestTimeoutMs: smsRequestTimeoutMs,
+        }),
+        ...(smsDryRun !== undefined && { dryRun: smsDryRun }),
+        ...(DEVSMS_BASE_URL && {
+          devsms: {
+            baseUrl: DEVSMS_BASE_URL,
           },
         }),
       },
