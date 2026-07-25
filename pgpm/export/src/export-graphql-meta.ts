@@ -1,7 +1,8 @@
 /**
  * GraphQL equivalent of export-meta.ts.
  * 
- * Fetches metadata from metaschema_public, services_public, and metaschema_modules_public
+ * Fetches metadata from metaschema_public, constructive_routing_public,
+ * constructive_apps_public, and metaschema_modules_public
  * via GraphQL queries instead of direct SQL, then uses the same csv-to-pg Parser to
  * generate SQL INSERT statements.
  */

@@ -13,14 +13,14 @@
  * - A running PostgreSQL instance accessible via standard PG* env vars
  */
 
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'fs';
+import { PgpmMigrate,PgpmPackage } from '@pgpmjs/core';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync,writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, relative } from 'path';
-import { getConnections, seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test';
 import type { PgConfig } from 'pg-env';
+import type { PgTestClient } from 'pgsql-test';
+import { getConnections, seed } from 'pgsql-test';
 
-import { PgpmPackage, PgpmMigrate } from '@pgpmjs/core';
 import { exportMigrations } from '../src/export-migrations';
 
 // Increase timeout for this test as it involves workspace setup and deployment
@@ -62,7 +62,8 @@ function getDirectoryStructure(dir: string, baseDir?: string): string[] {
 const SCHEMA_SHIMS_SQL = `
   CREATE SCHEMA IF NOT EXISTS metaschema_public;
   CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
-  CREATE SCHEMA IF NOT EXISTS services_public;
+  CREATE SCHEMA IF NOT EXISTS constructive_routing_public;
+  CREATE SCHEMA IF NOT EXISTS constructive_apps_public;
   CREATE SCHEMA IF NOT EXISTS db_migrate;
 
   -- metaschema_public tables
@@ -98,86 +99,108 @@ const SCHEMA_SHIMS_SQL = `
     description text
   );
 
-  -- services_public tables
-  CREATE TABLE IF NOT EXISTS services_public.domains (
+  -- constructive_routing_public tables
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.domains (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
-    site_id uuid,
-    api_id uuid,
-    domain text,
-    subdomain text
+    hostname text,
+    managed boolean,
+    is_wildcard boolean,
+    parent_hostname text,
+    verification_status text,
+    tls_status text,
+    tls_secret_name text,
+    is_published boolean,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.apis (
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.apis (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     name text,
-    dbname text,
-    is_public boolean,
+    dbname text DEFAULT current_database(),
     role_name text,
-    anon_role text
+    anon_role text,
+    is_published boolean,
+    config jsonb,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.sites (
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.sites (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
+    name text,
     title text,
     description text,
-    og_image text,
-    favicon text,
-    apple_touch_icon text,
-    logo text,
-    dbname text
+    config jsonb,
+    is_published boolean,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.api_schemas (
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_schemas (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     schema_id uuid,
-    api_id uuid
+    api_id uuid,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  -- Additional services_public tables required by exportMeta
-  CREATE TABLE IF NOT EXISTS services_public.apps (
+  -- Additional scoped tables required by exportMeta
+  CREATE TABLE IF NOT EXISTS constructive_apps_public.apps (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    name text,
+    title text,
+    description text,
+    status text,
+    config jsonb,
+    is_published boolean,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+  );
+
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_modules (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     site_id uuid,
     name text,
-    app_image text,
-    app_store_link text,
-    app_store_id text,
-    app_id_prefix text,
-    play_store_link text
+    data jsonb,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.site_modules (
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_themes (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     site_id uuid,
-    name text,
-    data jsonb
+    theme jsonb,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.site_themes (
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_metadata (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     site_id uuid,
-    theme jsonb
+    title text,
+    description text,
+    og_image text,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.api_modules (
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_modules (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     database_id uuid,
     api_id uuid,
     name text,
-    data jsonb
-  );
-
-  CREATE TABLE IF NOT EXISTS services_public.api_extensions (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    database_id uuid,
-    api_id uuid,
-    schema_name text
+    data jsonb,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
   );
 
   -- metaschema_modules_public tables (module configuration)
@@ -216,6 +239,99 @@ const SCHEMA_SHIMS_SQL = `
     forgot_password_function text,
     send_verification_email_function text,
     verify_email_function text
+  );
+
+  -- metaschema_modules_public surface modules (catalog / routing / apps planes)
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.catalog_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    public_schema_name text,
+    domains_table_name text,
+    apis_table_name text,
+    sites_table_name text,
+    apps_table_name text,
+    api_name text,
+    scope text,
+    policies jsonb
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.domain_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    private_schema_id uuid,
+    catalog_module_id uuid,
+    domains_table_name text,
+    managed_domains_table_name text,
+    scope text,
+    prefix text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.api_surface_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    catalog_module_id uuid,
+    apis_table_name text,
+    api_schemas_table_name text,
+    api_modules_table_name text,
+    api_settings_table_name text,
+    cors_settings_table_name text,
+    scope text,
+    prefix text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.site_surface_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    catalog_module_id uuid,
+    sites_table_name text,
+    site_metadata_table_name text,
+    site_modules_table_name text,
+    site_themes_table_name text,
+    scope text,
+    prefix text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.app_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    private_schema_id uuid,
+    catalog_module_id uuid,
+    apps_table_name text,
+    app_components_table_name text,
+    scope text,
+    prefix text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.route_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    private_schema_id uuid,
+    catalog_module_id uuid,
+    domain_module_id uuid,
+    routes_table_name text,
+    hostname_bindings_table_name text,
+    route_bindings_table_name text,
+    resolver_function_name text,
+    scope text,
+    prefix text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.database_settings_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    database_settings_table_name text,
+    rls_settings_table_name text,
+    pubkey_settings_table_name text,
+    webauthn_settings_table_name text,
+    scope text,
+    prefix text
   );
 
 `;
@@ -464,18 +580,40 @@ INSERT INTO metaschema_public.field (id, database_id, table_id, name, type, desc
   ('cccc0020-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0003-0000-0000-0000-000000000001', 'id', 'uuid', 'Primary key'),
   ('cccc0021-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0003-0000-0000-0000-000000000001', 'name', 'citext', 'Species name');
 
--- Meta public data
-INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role) VALUES
+-- Scoped plane data
+INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role) VALUES
   ('eeee0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'public', 'pets-db', true, 'authenticated', 'anonymous');
 
-INSERT INTO services_public.sites (id, database_id, title, description, dbname) VALUES
-  ('ffff0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'Pet Clinic', 'A pet management application', 'pets');
+INSERT INTO constructive_routing_public.sites (id, database_id, name, title, description, is_published) VALUES
+  ('ffff0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'pet-clinic', 'Pet Clinic', 'A pet management application', true);
 
-INSERT INTO services_public.domains (id, database_id, domain, subdomain) VALUES
-  ('dddd0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'localhost', 'pets');
+INSERT INTO constructive_routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published) VALUES
+  ('dddd0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'pets.localhost', false, false, true);
 
-INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VALUES
+INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id) VALUES
   ('1111aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'eeee0001-0000-0000-0000-000000000001');
+
+-- Surface module configuration
+INSERT INTO metaschema_modules_public.catalog_module (id, database_id, schema_id, public_schema_name, domains_table_name, apis_table_name, sites_table_name, apps_table_name, api_name, scope) VALUES
+  ('2222aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'constructive_catalog_public', 'domains', 'apis', 'sites', 'apps', 'public', 'platform');
+
+INSERT INTO metaschema_modules_public.domain_module (id, database_id, schema_id, catalog_module_id, domains_table_name, managed_domains_table_name, scope, prefix) VALUES
+  ('2222bbbb-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', 'domains', 'managed_domains', 'platform', '');
+
+INSERT INTO metaschema_modules_public.api_surface_module (id, database_id, schema_id, catalog_module_id, apis_table_name, api_schemas_table_name, api_modules_table_name, api_settings_table_name, cors_settings_table_name, scope, prefix) VALUES
+  ('2222cccc-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', 'apis', 'api_schemas', 'api_modules', 'api_settings', 'cors_settings', 'platform', '');
+
+INSERT INTO metaschema_modules_public.site_surface_module (id, database_id, schema_id, catalog_module_id, sites_table_name, site_metadata_table_name, site_modules_table_name, site_themes_table_name, scope, prefix) VALUES
+  ('2222dddd-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', 'sites', 'site_metadata', 'site_modules', 'site_themes', 'platform', '');
+
+INSERT INTO metaschema_modules_public.app_module (id, database_id, schema_id, catalog_module_id, apps_table_name, app_components_table_name, scope, prefix) VALUES
+  ('2222eeee-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', 'apps', 'app_components', 'platform', '');
+
+INSERT INTO metaschema_modules_public.route_module (id, database_id, schema_id, catalog_module_id, domain_module_id, routes_table_name, hostname_bindings_table_name, route_bindings_table_name, scope, prefix) VALUES
+  ('2222ffff-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', '2222aaaa-0000-0000-0000-000000000001', '2222bbbb-0000-0000-0000-000000000001', 'routes', 'hostname_bindings', 'route_bindings', 'platform', '');
+
+INSERT INTO metaschema_modules_public.database_settings_module (id, database_id, schema_id, database_settings_table_name, rls_settings_table_name, pubkey_settings_table_name, webauthn_settings_table_name, scope, prefix) VALUES
+  ('22220000-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'database_settings', 'rls_settings', 'pubkey_settings', 'webauthn_settings', 'platform', '');
 `;
   }
 
@@ -500,14 +638,14 @@ INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VAL
     expect(parseInt(fieldResult.rows[0].count)).toBeGreaterThan(0);
   });
 
-  it('should have seeded the database with services_public data', async () => {
-    const apiResult = await pg.query('SELECT COUNT(*) as count FROM services_public.apis');
+  it('should have seeded the database with constructive_routing_public data', async () => {
+    const apiResult = await pg.query('SELECT COUNT(*) as count FROM constructive_routing_public.apis');
     expect(parseInt(apiResult.rows[0].count)).toBeGreaterThan(0);
 
-    const siteResult = await pg.query('SELECT COUNT(*) as count FROM services_public.sites');
+    const siteResult = await pg.query('SELECT COUNT(*) as count FROM constructive_routing_public.sites');
     expect(parseInt(siteResult.rows[0].count)).toBeGreaterThan(0);
 
-    const domainResult = await pg.query('SELECT COUNT(*) as count FROM services_public.domains');
+    const domainResult = await pg.query('SELECT COUNT(*) as count FROM constructive_routing_public.domains');
     expect(parseInt(domainResult.rows[0].count)).toBeGreaterThan(0);
   });
 
@@ -732,10 +870,10 @@ relocatable = false
     });
 
     // Behavioral test: columnDefaults columns must be absent from the generated SQL.
-    // The apis and sites tables have dbname DEFAULT current_database(), which
-    // captures an environment-specific literal during export. columnDefaults
-    // strips the column from the INSERT so the DDL default supplies the correct
-    // value at deploy time (constructive-db commit 348a5b402e).
+    // The apis table has dbname DEFAULT current_database(), which captures an
+    // environment-specific literal during export. columnDefaults strips the
+    // column from the INSERT so the DDL default supplies the correct value at
+    // deploy time (constructive-db commit 348a5b402e).
     it('should exclude dbname from apis and sites INSERTs (columnDefaults)', () => {
       const apisSqlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy', 'migrate', 'apis.sql');
       const sitesSqlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy', 'migrate', 'sites.sql');
@@ -746,7 +884,7 @@ relocatable = false
         expect(apisContent).not.toContain('dbname');
         // But other columns should still be present
         expect(apisContent).toContain('name');
-        expect(apisContent).toContain('is_public');
+        expect(apisContent).toContain('is_published');
       }
 
       if (existsSync(sitesSqlPath)) {
@@ -756,6 +894,21 @@ relocatable = false
         // But other columns should still be present
         expect(sitesContent).toContain('title');
         expect(sitesContent).toContain('description');
+      }
+    });
+
+    it('should export the metaschema_modules_public surface module tables', () => {
+      const migrateDir = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy', 'migrate');
+      const modules = [
+        'catalog_module', 'domain_module', 'api_surface_module',
+        'site_surface_module', 'app_module', 'route_module',
+        'database_settings_module'
+      ];
+
+      for (const moduleTable of modules) {
+        const sqlPath = join(migrateDir, `${moduleTable}.sql`);
+        expect(existsSync(sqlPath)).toBe(true);
+        expect(readFileSync(sqlPath, 'utf-8')).toContain(`INSERT INTO metaschema_modules_public.${moduleTable}`);
       }
     });
   });
