@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.16.3...@constructive-io/graphql-env@3.17.0) (2026-07-25)
+
+### Features
+
+- add typed SMS configuration flow ([da90111](https://github.com/constructive-io/constructive/commit/da9011125cac9df348db4990518d66efad8684c1))
+- **server:** hard-break GraphQL runtime off services_public onto scoped routing plane ([d3059ef](https://github.com/constructive-io/constructive/commit/d3059efecb32fc128da04059688bd48ad24b74a5))
+
 ## [3.16.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.16.2...@constructive-io/graphql-env@3.16.3) (2026-07-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-env

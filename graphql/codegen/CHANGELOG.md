@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.0.4...@constructive-io/graphql-codegen@5.1.0) (2026-07-25)
+
+### Features
+
+- **codegen:** repoint introspection sources to constructive_routing_public ([4715af3](https://github.com/constructive-io/constructive/commit/4715af35c1f05b469f03a697072d8d003a616ab2))
+
 ## [5.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.0.3...@constructive-io/graphql-codegen@5.0.4) (2026-07-23)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.0.4...@constructive-io/graphql-server@5.1.0) (2026-07-25)
+
+### Features
+
+- **server:** hard-break GraphQL runtime off services_public onto scoped routing plane ([d3059ef](https://github.com/constructive-io/constructive/commit/d3059efecb32fc128da04059688bd48ad24b74a5))
+
 ## [5.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.0.3...@constructive-io/graphql-server@5.0.4) (2026-07-23)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

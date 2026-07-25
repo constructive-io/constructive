@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.2.2...@pgpmjs/core@7.3.0) (2026-07-25)
+
+### Bug Fixes
+
+- **pgpm/core:** build glob patterns with posix separators ([658b763](https://github.com/constructive-io/constructive/commit/658b763c9e4e03f18b33a30ba693a2f2eaa19836))
+- **pgpm:** windows-safe module install, posix module paths, LF checkout ([81f3a7c](https://github.com/constructive-io/constructive/commit/81f3a7c59da6364a31d046d53d4e706616ef2ead))
+
+### Features
+
+- **pgpm-core:** applyEnvelope — apply a bundle envelope (schema + data/fixtures replay) into a target DB ([4d05f93](https://github.com/constructive-io/constructive/commit/4d05f9340770836611f5e04886734af2dde1a505))
+- **pgpm:** configurable extensions install directory ([67bb658](https://github.com/constructive-io/constructive/commit/67bb6584e07afdfe0aeca5f35bf6a7586bae1172))
+
 ## [7.2.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.2.1...@pgpmjs/core@7.2.2) (2026-07-23)
 
 **Note:** Version bump only for package @pgpmjs/core

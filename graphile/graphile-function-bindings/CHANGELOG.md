@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.5](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@1.0.4...graphile-function-bindings@1.0.5) (2026-07-25)
+
+### Bug Fixes
+
+- **jobs,fn-bindings:** migrate services fixture consumers off deleted services/ seed ([05671ae](https://github.com/constructive-io/constructive/commit/05671ae4ea3b86e1da5a4a610fa54a2642e5c902))
+
 ## [1.0.4](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@1.0.3...graphile-function-bindings@1.0.4) (2026-07-23)
 
 **Note:** Version bump only for package graphile-function-bindings
