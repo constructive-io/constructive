@@ -102,7 +102,7 @@ export function buildEmbedder(config: EmbedderConfig): EmbedderFunction | null {
 /**
  * Build an embedder from an `llm_module` api_modules row.
  *
- * @param data - The llm_module data from services_public.api_modules
+ * @param data - The llm_module data from constructive_routing_public.api_modules
  * @returns An EmbedderFunction, or null if the provider is not supported
  */
 export function buildEmbedderFromModule(data: LlmModuleData): EmbedderFunction | null {

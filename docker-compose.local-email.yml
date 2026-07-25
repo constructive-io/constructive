@@ -48,8 +48,8 @@ services:
       # API configuration
       API_ENABLE_SERVICES: "true"
       API_IS_PUBLIC: "false"
-      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
-      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
+      API_EXPOSED_SCHEMAS: "metaschema_public,constructive_routing_public,constructive_auth_public"
+      API_META_SCHEMAS: "metaschema_public,constructive_catalog_public,constructive_routing_public,constructive_apps_public,metaschema_modules_public,constructive_auth_public"
       API_ANON_ROLE: "administrator"
       API_ROLE_NAME: "administrator"
     ports:

@@ -181,7 +181,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        * WHY THIS EXISTS:
        * PostGraphile v5's default `_schemaPrefix` inflector only removes the prefix
        * for the FIRST schema in the pgServices.schemas array. All other schemas get
-       * prefixed with their schema name (e.g., "services_public_api" -> "servicesPublicApi").
+       * prefixed with their schema name (e.g., "constructive_routing_public_api" -> "constructiveRoutingPublicApi").
        *
        * This is problematic for multi-schema setups where you want clean, consistent
        * naming across all schemas.

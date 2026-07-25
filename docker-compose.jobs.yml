@@ -23,11 +23,11 @@ services:
       PGDATABASE: constructive
       # Api configuration
       API_ENABLE_SERVICES: "true"
-      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
+      API_EXPOSED_SCHEMAS: "metaschema_public,constructive_routing_public,constructive_auth_public"
       # API_IS_PUBLIC=false enables header-based routing (X-Api-Name, X-Database-Id, X-Meta-Schema)
       API_IS_PUBLIC: "false"
       # Meta schemas used for schema validation and X-Meta-Schema routing
-      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
+      API_META_SCHEMAS: "metaschema_public,constructive_catalog_public,constructive_routing_public,constructive_apps_public,metaschema_modules_public,constructive_auth_public"
       API_ANON_ROLE: "administrator"
       API_ROLE_NAME: "administrator"
     ports:
@@ -58,11 +58,11 @@ services:
       PGDATABASE: constructive
       # Api configuration
       API_ENABLE_SERVICES: "false"
-      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
+      API_EXPOSED_SCHEMAS: "metaschema_public,constructive_routing_public,constructive_auth_public"
       # Public-facing server
       API_IS_PUBLIC: "true"
       # Meta schemas used for schema validation
-      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
+      API_META_SCHEMAS: "metaschema_public,constructive_catalog_public,constructive_routing_public,constructive_apps_public,metaschema_modules_public,constructive_auth_public"
       API_ANON_ROLE: "anonymous"
       API_ROLE_NAME: "authenticated"
     ports:

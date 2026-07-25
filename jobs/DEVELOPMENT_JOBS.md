@@ -349,8 +349,9 @@ To switch back to dry-run, set `SEND_VERIFICATION_LINK_DRY_RUN=true` (or delete 
 - need to run some manual migrations like:
 ```sql
  BEGIN;
-   UPDATE services_public.domains SET domain = 'localhost';
-   UPDATE services_public.apis SET dbname = 'constructive';
+   UPDATE constructive_routing_public.domains SET hostname = 'localhost';
+   UPDATE constructive_routing_public.hostname_bindings SET hostname = 'localhost';
+   UPDATE constructive_routing_public.apis SET dbname = 'constructive';
  COMMIT;
 
 ------ Some more
