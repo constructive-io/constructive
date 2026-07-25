@@ -56,7 +56,7 @@ The preset bundles all plugins listed below. You can also import each plugin ind
 - **Text mutation fields** — adds `{column}Text: String` companion fields on create/update inputs for vector columns
 - **RAG queries** — adds `ragQuery` and `embedText` root query fields; detects `@hasChunks` smart tags for chunk-aware retrieval
 - **Pluggable providers** — provider-based architecture for both embedding and chat completion (Ollama via `@agentic-kit/ollama`, extensible to OpenAI, etc.)
-- **Per-database configuration** — reads `llm_module` from `services_public.api_modules` for per-API provider config
+- **Per-database configuration** — reads `llm_module` from `constructive_routing_public.api_modules` for per-API provider config
 - **Toggleable** — each capability (`enableTextSearch`, `enableTextMutations`, `enableRag`) can be independently enabled or disabled
 - **Plugin-conditional** — fields only appear in the schema when the plugin is loaded
 

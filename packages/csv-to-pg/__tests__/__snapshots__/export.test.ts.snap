@@ -95,7 +95,7 @@ exports[`test case test case parser 1`] = `
 `;
 
 exports[`test case text fields convert empty strings to NULL when preserveEmptyStrings is false 1`] = `
-"INSERT INTO services_public.webauthn_settings (
+"INSERT INTO app_public.webauthn_settings (
   id,
   database_id,
   rp_id,
@@ -105,7 +105,7 @@ exports[`test case text fields convert empty strings to NULL when preserveEmptyS
 `;
 
 exports[`test case text fields preserve empty strings by default 1`] = `
-"INSERT INTO services_public.webauthn_settings (
+"INSERT INTO app_public.webauthn_settings (
   id,
   database_id,
   rp_id,
@@ -115,7 +115,7 @@ exports[`test case text fields preserve empty strings by default 1`] = `
 `;
 
 exports[`test case text fields with null values produce NULL 1`] = `
-"INSERT INTO services_public.webauthn_settings (
+"INSERT INTO app_public.webauthn_settings (
   id,
   database_id,
   rp_id,
