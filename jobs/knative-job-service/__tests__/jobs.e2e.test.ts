@@ -10,7 +10,7 @@ import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
 import { getConnections, seed, type PgTestClient } from 'pgsql-test';
 
 import type { KnativeJobsSvc as KnativeJobsSvcType } from '../src';
-import type { KnativeJobsSvcOptions, FunctionServiceConfig } from '../src/types';
+import type { KnativeJobsSvcOptions } from '../src/types';
 
 jest.setTimeout(120000);
 
@@ -239,6 +239,85 @@ const createMailgunFailureApp = () => {
   return app;
 };
 
+// Inline stand-ins for the send-email / send-verification-link cloud
+// functions, which have been removed from this repo (they now live in
+// constructive-db). The jobs worker reaches them over HTTP via
+// INTERNAL_GATEWAY_DEVELOPMENT_MAP, so these small apps let the e2e keep
+// exercising the worker -> function -> callback pipeline (success + failure
+// paths) without depending on the removed implementations. They mirror the
+// required-field validation the real functions performed.
+const createSendEmailApp = () => {
+  const app = createJobApp();
+
+  app.post('/', async (req: any, res: any, next: any) => {
+    try {
+      const payload = (req.body || {}) as {
+        to?: string;
+        subject?: string;
+        html?: string;
+        text?: string;
+      };
+
+      const requireField = (name: 'to' | 'subject'): string => {
+        const value = payload[name];
+        if (!value) {
+          throw new Error(`Missing required field '${name}'`);
+        }
+        return value;
+      };
+
+      requireField('to');
+      requireField('subject');
+
+      if (!payload.html && !payload.text) {
+        throw new Error("Either 'html' or 'text' must be provided");
+      }
+
+      // Dry-run in tests: validate the payload but do not send.
+      res.status(200).json({ complete: true });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return app;
+};
+
+const createSendVerificationLinkApp = () => {
+  const app = createJobApp();
+
+  app.post('/', async (req: any, res: any, next: any) => {
+    try {
+      const payload = (req.body || {}) as {
+        email_type?: string;
+        email?: string;
+        user_id?: string;
+        reset_token?: string;
+      };
+
+      const fail = (missing: string) =>
+        res.status(400).json({ error: `Missing required field: ${missing}` });
+
+      if (!payload.email_type) return fail('email_type');
+      if (!payload.email) return fail('email');
+
+      if (
+        payload.email_type === 'forgot_password' &&
+        (!payload.user_id || !payload.reset_token)
+      ) {
+        return fail('user_id_or_reset_token');
+      }
+
+      // Dry-run in tests: validate the payload but do not send.
+      res.status(200).json({ complete: true });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return app;
+};
+
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
 
@@ -346,6 +425,8 @@ describe('jobs e2e', () => {
   let pg: PgTestClient | undefined;
   let knativeJobsSvc: KnativeJobsSvcType | null = null;
   let mailgunServer: HttpServer | null = null;
+  let sendEmailServer: HttpServer | null = null;
+  let sendVerificationLinkServer: HttpServer | null = null;
   const envSnapshot: Record<string, string | undefined> = {
     NODE_ENV: process.env.NODE_ENV,
     TEST_DB: process.env.TEST_DB,
@@ -449,11 +530,6 @@ describe('jobs e2e', () => {
     if (pg.config.user) process.env.PGUSER = pg.config.user;
     if (pg.config.password) process.env.PGPASSWORD = pg.config.password;
 
-    const services: FunctionServiceConfig[] = [
-      { name: 'send-email', port: SEND_EMAIL_PORT },
-      { name: 'send-verification-link', port: SEND_VERIFICATION_LINK_PORT }
-    ];
-
     const graphqlOptions: ConstructiveOptions = {
       pg: {
         host: pg.config.host,
@@ -496,11 +572,25 @@ describe('jobs e2e', () => {
       });
     }
 
+    // Start the inline function stand-ins the worker reaches via the gateway
+    // dev map (send-email / send-verification-link now live in constructive-db).
+    sendEmailServer = await new Promise<HttpServer>((resolve, reject) => {
+      const server = createSendEmailApp().listen(SEND_EMAIL_PORT, () =>
+        resolve(server)
+      );
+      server.on('error', reject);
+    });
+    sendVerificationLinkServer = await new Promise<HttpServer>(
+      (resolve, reject) => {
+        const server = createSendVerificationLinkApp().listen(
+          SEND_VERIFICATION_LINK_PORT,
+          () => resolve(server)
+        );
+        server.on('error', reject);
+      }
+    );
+
     const knativeJobsSvcOptions: KnativeJobsSvcOptions = {
-      functions: {
-        enabled: true,
-        services
-      },
       jobs: { enabled: true }
     };
 
@@ -527,6 +617,10 @@ describe('jobs e2e', () => {
     }
     await closeHttpServer(mailgunServer);
     mailgunServer = null;
+    await closeHttpServer(sendEmailServer);
+    sendEmailServer = null;
+    await closeHttpServer(sendVerificationLinkServer);
+    sendVerificationLinkServer = null;
     if (teardown) {
       await teardown();
     }
@@ -566,15 +660,12 @@ describe('jobs e2e', () => {
 
   // NOTE: the send-verification-link success cases (invite_email /
   // forgot_password / email_verification) previously asserted the full email
-  // render, which depends on the legacy
-  // `databases { sites { domains, logo, siteThemes, siteModules } }` query
-  // shape. That shape no longer exists: routing/site data moved to the scoped
-  // `constructive_routing_public` plane (domains are hostname-keyed, `logo`
-  // moved into `config`), and this static single-tenant jobs server no longer
-  // exposes it. The cloud function is being migrated to constructive-db, so
-  // that e2e coverage moves there rather than being reworked here. The
-  // worker → function → email round-trip is still covered by the send-email
-  // cases, and the send-verification-link validation path stays covered below.
+  // render against site branding. The send-email and send-verification-link
+  // cloud functions have been removed from this repo (they now live in
+  // constructive-db), so their full render coverage moves there. Here the
+  // inline stand-ins keep the worker -> function -> callback pipeline covered:
+  // the send-email success/throw/retry paths above and the
+  // send-verification-link required-field validation path below.
   it('fails send-verification-link job when required fields are missing', async () => {
     const jobInput = {
       dbId: databaseId,

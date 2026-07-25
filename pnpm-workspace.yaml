@@ -8,5 +8,4 @@ packages:
   - 'postgres/*'
   - 'graphile/*'
   - 'jobs/*'
-  - 'functions/*'
   - 'agentic/*'

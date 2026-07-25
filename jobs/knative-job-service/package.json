@@ -62,8 +62,6 @@
     "@constructive-io/knative-job-fn": "workspace:^",
     "@constructive-io/knative-job-server": "workspace:^",
     "@constructive-io/knative-job-worker": "workspace:^",
-    "@constructive-io/send-email-fn": "workspace:^",
-    "@constructive-io/send-verification-link-fn": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "async-retry": "1.3.3",

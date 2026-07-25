@@ -70,8 +70,7 @@ React Query Hooks or Prisma-like ORM Client
 | `postgres/` | PostgreSQL utilities - introspection, testing (pgsql-test), seeding, AST, query context |
 | `packages/` | Shared utilities - CLI (`cnc`), ORM base, query builder, server utils, client |
 | `uploads/` | File streaming - S3/MinIO, ETags, content-type detection, UUID hashing |
-| `jobs/` | Knative job scheduling - worker, scheduler, service, functions |
-| `functions/` | Knative cloud functions (e.g., send-verification-link, send-email) |
+| `jobs/` | Knative job scheduling - worker, scheduler, service |
 
 ### Key Packages & CLIs
 

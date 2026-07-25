@@ -23,10 +23,9 @@ VALUES ('0b22e268-16d6-582b-950a-24e108688849', 'jobs-test')
 ON CONFLICT (id) DO NOTHING;
 
 -- NOTE: no legacy services_public site/domain/theme/module rows are seeded.
--- The send-email and mailgun paths don't read site branding. The
--- send-verification-link success cases (which did) were removed here and move
--- to constructive-db along with the cloud function's migration off the legacy
--- site query shape; its validation path is still exercised by the e2e suite.
+-- The send-email / send-verification-link cloud functions have moved to
+-- constructive-db; the e2e drives inline stand-ins that only validate their
+-- payloads, so no site-branding data is needed here.
 
 GRANT USAGE ON SCHEMA app_public TO administrator;
 GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.users TO administrator;
