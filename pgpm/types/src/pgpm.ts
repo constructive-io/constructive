@@ -2,7 +2,6 @@ import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
 
 import { PgpmDriverConfig } from './driver';
-import { JobsConfig, jobsDefaults } from './jobs';
 
 /**
  * Authentication options for test client sessions
@@ -279,8 +278,6 @@ export interface PgpmOptions {
     deployment?: DeploymentOptions;
     /** Migration and code generation options */
     migrations?: MigrationOptions;
-    /** Job system configuration */
-    jobs?: JobsConfig;
     /** Error output formatting options */
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
@@ -365,7 +362,6 @@ export const pgpmDefaults: PgpmOptions = {
       useTx: false
     }
   },
-  jobs: jobsDefaults,
   errorOutput: {
     queryHistoryLimit: 30,
     maxLength: 10000,

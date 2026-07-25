@@ -153,9 +153,7 @@ describe('getEnvOptions', () => {
       DB_CONNECTIONS_APP_PASSWORD: 'env-app-pass',
       DB_CONNECTIONS_ADMIN_USER: 'env-admin-user',
       PORT: '7777',
-      DEPLOYMENT_FAST: 'false',
-      JOBS_SUPPORT_ANY: 'false',
-      JOBS_SUPPORTED: 'alpha,beta'
+      DEPLOYMENT_FAST: 'false'
     };
 
     const result = getEnvOptions(
@@ -187,33 +185,16 @@ describe('getEnvOptions', () => {
       db: {
         extensions: ['uuid', 'postgis']
       },
-      jobs: {
-        worker: {
-          supported: ['alpha', 'beta']
-        },
-        scheduler: {
-          supported: ['beta', 'gamma']
-        }
-      },
       packages: ['testing/*', 'packages/*']
     });
 
     const testEnv: NodeJS.ProcessEnv = {
-      DB_EXTENSIONS: 'postgis,pgcrypto',
-      JOBS_SUPPORTED: 'beta,gamma,delta'
+      DB_EXTENSIONS: 'postgis,pgcrypto'
     };
 
     const overrides: PgpmOptionsWithPackages = {
       db: {
         extensions: ['uuid', 'hstore']
-      },
-      jobs: {
-        worker: {
-          supported: ['delta', 'epsilon']
-        },
-        scheduler: {
-          supported: ['gamma', 'zeta']
-        }
       },
       packages: ['testing/*', 'extensions/*']
     };
@@ -222,8 +203,6 @@ describe('getEnvOptions', () => {
 
     // Arrays are replaced, not merged - overrides win completely
     expect(result.db?.extensions).toEqual(['uuid', 'hstore']);
-    expect(result.jobs?.worker?.supported).toEqual(['delta', 'epsilon']);
-    expect(result.jobs?.scheduler?.supported).toEqual(['gamma', 'zeta']);
     expect(result.packages).toEqual(['testing/*', 'extensions/*']);
   });
 
@@ -271,9 +250,7 @@ describe('getEnvOptions', () => {
         AWS_SECRET_KEY: 'realsecret',
         CDN_ENDPOINT: 'https://s3.example.com',
         CDN_PUBLIC_URL_PREFIX: 'https://cdn.example.com',
-        BUCKET_NAME: 'prod-bucket',
-        INTERNAL_GATEWAY_URL: 'http://gateway.internal:8080',
-        INTERNAL_JOBS_CALLBACK_URL: 'http://callback.internal:12345'
+        BUCKET_NAME: 'prod-bucket'
       };
       expect(() => getEnvOptions({}, emptyCwd(), safeEnv)).not.toThrow();
     });

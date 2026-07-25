@@ -42,9 +42,7 @@ const SENSITIVE_FIELDS: SensitiveField[] = [
   { path: 'server.host', severity: 'host', envHint: 'SERVER_HOST' },
   { path: 'cdn.endpoint', severity: 'host', envHint: 'CDN_ENDPOINT' },
   { path: 'cdn.publicUrlPrefix', severity: 'host', envHint: 'CDN_PUBLIC_URL_PREFIX' },
-  { path: 'cdn.bucketName', severity: 'host', envHint: 'BUCKET_NAME' },
-  { path: 'jobs.gateway.gatewayUrl', severity: 'host', envHint: 'INTERNAL_GATEWAY_URL' },
-  { path: 'jobs.gateway.callbackUrl', severity: 'host', envHint: 'INTERNAL_JOBS_CALLBACK_URL' }
+  { path: 'cdn.bucketName', severity: 'host', envHint: 'BUCKET_NAME' }
 ];
 
 const getPath = (obj: unknown, path: string): unknown =>
