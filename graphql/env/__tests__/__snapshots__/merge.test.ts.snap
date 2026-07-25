@@ -64,6 +64,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "queryHistoryLimit": 30,
     "verbose": false,
   },
+  "extensionsDir": "extensions",
   "features": {
     "oppositeBaseNames": false,
     "postgis": false,
