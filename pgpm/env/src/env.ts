@@ -56,14 +56,6 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
 
     MIGRATIONS_CODEGEN_USE_TX,
 
-    // Jobs-related env vars
-    JOBS_SCHEMA,
-    JOBS_SUPPORT_ANY,
-    JOBS_SUPPORTED,
-    INTERNAL_GATEWAY_URL,
-    INTERNAL_JOBS_CALLBACK_URL,
-    INTERNAL_JOBS_CALLBACK_PORT,
-
     // Error output formatting env vars
     PGPM_ERROR_QUERY_HISTORY_LIMIT,
     PGPM_ERROR_MAX_LENGTH,
@@ -155,46 +147,6 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
           useTx: parseEnvBoolean(MIGRATIONS_CODEGEN_USE_TX)
         }
       }),
-    },
-    jobs: {
-      ...(JOBS_SCHEMA && {
-        schema: {
-          schema: JOBS_SCHEMA
-        }
-      }),
-      ...((JOBS_SUPPORT_ANY || JOBS_SUPPORTED) && {
-        worker: {
-          ...(JOBS_SUPPORT_ANY && {
-            supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
-          }),
-          ...(JOBS_SUPPORTED && {
-            supported: parseEnvList(JOBS_SUPPORTED)
-          })
-        },
-        scheduler: {
-          ...(JOBS_SUPPORT_ANY && {
-            supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
-          }),
-          ...(JOBS_SUPPORTED && {
-            supported: parseEnvList(JOBS_SUPPORTED)
-          })
-        }
-      }),
-      ...((INTERNAL_GATEWAY_URL ||
-        INTERNAL_JOBS_CALLBACK_URL ||
-        INTERNAL_JOBS_CALLBACK_PORT) && {
-        gateway: {
-          ...(INTERNAL_GATEWAY_URL && {
-            gatewayUrl: INTERNAL_GATEWAY_URL
-          }),
-          ...(INTERNAL_JOBS_CALLBACK_URL && {
-            callbackUrl: INTERNAL_JOBS_CALLBACK_URL
-          }),
-          ...(INTERNAL_JOBS_CALLBACK_PORT && {
-            callbackPort: parseEnvNumber(INTERNAL_JOBS_CALLBACK_PORT)
-          })
-        }
-      })
     },
     errorOutput: {
       ...(PGPM_ERROR_QUERY_HISTORY_LIMIT && { queryHistoryLimit: parseEnvNumber(PGPM_ERROR_QUERY_HISTORY_LIMIT) }),
