@@ -2077,246 +2077,6 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
-  jobs/job-pg:
-    dependencies:
-      '@constructive-io/job-utils':
-        specifier: workspace:^
-        version: link:../job-utils/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      pg:
-        specifier: 8.21.0
-        version: 8.21.0
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/job-scheduler:
-    dependencies:
-      '@constructive-io/job-pg':
-        specifier: workspace:^
-        version: link:../job-pg/dist
-      '@constructive-io/job-utils':
-        specifier: workspace:^
-        version: link:../job-utils/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      node-schedule:
-        specifier: ^2.1.1
-        version: 2.1.1
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/job-utils:
-    dependencies:
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
-      pg-cache:
-        specifier: workspace:^
-        version: link:../../postgres/pg-cache/dist
-      pg-env:
-        specifier: workspace:^
-        version: link:../../postgres/pg-env/dist
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/job-worker:
-    dependencies:
-      '@constructive-io/job-utils':
-        specifier: workspace:^
-        version: link:../job-utils/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      pg:
-        specifier: 8.21.0
-        version: 8.21.0
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/knative-job-example:
-    dependencies:
-      '@constructive-io/knative-job-fn':
-        specifier: workspace:^
-        version: link:../knative-job-fn/dist
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/knative-job-fn:
-    dependencies:
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      express:
-        specifier: 5.2.1
-        version: 5.2.1
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/knative-job-server:
-    dependencies:
-      '@constructive-io/job-pg':
-        specifier: workspace:^
-        version: link:../job-pg/dist
-      '@constructive-io/job-utils':
-        specifier: workspace:^
-        version: link:../job-utils/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      express:
-        specifier: 5.2.1
-        version: 5.2.1
-      pg:
-        specifier: 8.21.0
-        version: 8.21.0
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
-  jobs/knative-job-service:
-    dependencies:
-      '@constructive-io/job-pg':
-        specifier: workspace:^
-        version: link:../job-pg/dist
-      '@constructive-io/job-scheduler':
-        specifier: workspace:^
-        version: link:../job-scheduler/dist
-      '@constructive-io/job-utils':
-        specifier: workspace:^
-        version: link:../job-utils/dist
-      '@constructive-io/knative-job-fn':
-        specifier: workspace:^
-        version: link:../knative-job-fn/dist
-      '@constructive-io/knative-job-server':
-        specifier: workspace:^
-        version: link:../knative-job-server/dist
-      '@constructive-io/knative-job-worker':
-        specifier: workspace:^
-        version: link:../knative-job-worker/dist
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      async-retry:
-        specifier: 1.3.3
-        version: 1.3.3
-      pg:
-        specifier: 8.21.0
-        version: 8.21.0
-    devDependencies:
-      '@constructive-io/graphql-server':
-        specifier: workspace:^
-        version: link:../../graphql/server/dist
-      '@constructive-io/graphql-types':
-        specifier: workspace:^
-        version: link:../../graphql/types/dist
-      '@constructive-io/postmaster':
-        specifier: workspace:^
-        version: link:../../packages/postmaster/dist
-      '@pgpm/database-jobs':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpm/inflection':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpm/metaschema-modules':
-        specifier: ^0.21.1
-        version: 0.21.1
-      '@pgpm/metaschema-schema':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpm/services':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpm/types':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpm/verify':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpmjs/core':
-        specifier: workspace:^
-        version: link:../../pgpm/core/dist
-      '@types/supertest':
-        specifier: ^7.2.0
-        version: 7.2.0
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
-      supertest:
-        specifier: ^7.2.2
-        version: 7.2.2
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
-    publishDirectory: dist
-
-  jobs/knative-job-worker:
-    dependencies:
-      '@constructive-io/job-pg':
-        specifier: workspace:^
-        version: link:../job-pg/dist
-      '@constructive-io/job-utils':
-        specifier: workspace:^
-        version: link:../job-utils/dist
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      pg:
-        specifier: 8.21.0
-        version: 8.21.0
-    devDependencies:
-      '@pgpm/database-jobs':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpm/verify':
-        specifier: ^0.18.0
-        version: 0.18.0
-      '@pgpmjs/core':
-        specifier: workspace:^
-        version: link:../../pgpm/core/dist
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
-    publishDirectory: dist
-
   packages/12factor-env:
     dependencies:
       envalid:
@@ -2365,9 +2125,6 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../../graphql/types/dist
-      '@constructive-io/knative-job-service':
-        specifier: workspace:^
-        version: link:../../jobs/knative-job-service/dist
       '@inquirerer/utils':
         specifier: ^3.3.9
         version: 3.3.9
@@ -5227,42 +4984,6 @@ packages:
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
 
-  '@pgpm/database-jobs@0.18.0':
-    resolution: {integrity: sha512-3LX7ZQJQEMHd4POG2I2xPzMFR2X6LwvuxJAMpLhcc/I4P3EbEyEig6rPpsyDr9uabRjgUWfZDz05w6cW8X4KwA==}
-
-  '@pgpm/database-jobs@0.21.0':
-    resolution: {integrity: sha512-TN6Uddyq5PJMQ7P+dJOCl0xwyIW1Hv8PkJmRshMNljzt0OVu4Mq8YR5gNkTDveGGHdYCDyP0vhCrpty9aQld6g==}
-
-  '@pgpm/inflection@0.18.0':
-    resolution: {integrity: sha512-gHfxI6l/+cE9zY5ea6BjVjNcb9VKIavqRXGVyw16Fy0n4HgCmxF8ccZFFPq46JXfakNSk3cPTHDYvvWQaAlIPA==}
-
-  '@pgpm/inflection@0.21.0':
-    resolution: {integrity: sha512-tb1OQCQp1i5SjT04CCN27ptGQcDXidVZrDB8SJsdZZrz6Rcl0WStf4t50z5CSUebg8RJxkpiF4VNpv583RCuhQ==}
-
-  '@pgpm/metaschema-modules@0.21.1':
-    resolution: {integrity: sha512-6RTHN+PcxmTma7k7uHPZdjtN92P3kkqndXxu2acuSOpXi1sxrN5nNSNgi2r42ovl92B8MKy4r7SyF5DUlQwD1A==}
-
-  '@pgpm/metaschema-schema@0.18.0':
-    resolution: {integrity: sha512-joIBoYegI4ZQFFPW7w0HhNXMT+sXnmSytX8YBxGgi5XZqjE2aQdtZcWBIiwZa3MjqU7mYN2xlZt5gPmo/IzLMw==}
-
-  '@pgpm/metaschema-schema@0.21.0':
-    resolution: {integrity: sha512-kRfVyysGOrGcZEElcAJWaX9Xx2f5fMPtI4rmAxI11vJ0axYUcqtI+9fyp7McwqXnIHr0ShR28jvwqUGaZherJw==}
-
-  '@pgpm/services@0.18.0':
-    resolution: {integrity: sha512-YedLEVdgwkHden55uaZaO8O3HACEiIvblYmPFsQk1ivHwzw1l0KUv6WT5+idwMC/SOsexH/Xq8ckSSM84ErWtQ==}
-
-  '@pgpm/types@0.18.0':
-    resolution: {integrity: sha512-w6pfcS5HuJ2IGfyn74mGChl0nhNBIbxdu6sarlARGveZFHvBkTIPKEezA524sLKhUHda84YWuExEhCUd6N/AqQ==}
-
-  '@pgpm/types@0.21.0':
-    resolution: {integrity: sha512-F5ph4z7JWwKVcy/CmAgodEIXqXCwSgv0ESVxIV2spdl01RgNi0SdKuHqVJnjp8rbHHUtlCPRj/UlAopUSpIIOg==}
-
-  '@pgpm/verify@0.18.0':
-    resolution: {integrity: sha512-7XtY+hj9CbYb0ZhD0LJRp+TErtYS2z0FZbdkMNM7UabEwz05VLlS/lXbdtn5hksbUq6dkIxwxQ2mfFpATPpqDQ==}
-
-  '@pgpm/verify@0.21.0':
-    resolution: {integrity: sha512-z4iiwEUrUR+aIvxfu4+HefitVPLtypXdbyEkbNJ//EMsnzturo6wzxT1e60w/Xp29AzF6m5OaJ0djc6lzr9hTw==}
-
   '@pgsql/quotes@18.1.0':
     resolution: {integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==}
 
@@ -6527,9 +6248,6 @@ packages:
   asap@2.0.6:
     resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
 
-  async-retry@1.3.3:
-    resolution: {integrity: sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==}
-
   async@3.2.6:
     resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
 
@@ -6928,10 +6646,6 @@ packages:
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
-
-  cron-parser@4.9.0:
-    resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
-    engines: {node: '>=12.0.0'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -8549,9 +8263,6 @@ packages:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
 
-  long-timeout@0.1.1:
-    resolution: {integrity: sha512-BFRuQUqc7x2NWxfJBCyUrN8iYUYznzL9JROmRz1gZ6KlOIgmoD+njPVbb+VNn2nGMKggMsK79iUNErillsrx7w==}
-
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
 
@@ -8568,10 +8279,6 @@ packages:
   lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
-
-  luxon@3.7.2:
-    resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
-    engines: {node: '>=12'}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -8871,10 +8578,6 @@ packages:
 
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
-
-  node-schedule@2.1.1:
-    resolution: {integrity: sha512-OXdegQq03OmXEjt2hZP33W2YPs/E5BcFQks46+G2gAxs4gHOIVD1u7EqlYLYSKsaIpyKCK9Gbk0ta1/gjRSMRQ==}
-    engines: {node: '>=6'}
 
   nodemailer@6.10.1:
     resolution: {integrity: sha512-Z+iLaBGVaSjbIzQ4pX6XV41HrooLsQ10ZWPUehGmuantvzWoDVBnmsdUcOIDM1t+yPor5pDhVlDESgOMEGxhHA==}
@@ -9632,10 +9335,6 @@ packages:
     resolution: {integrity: sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==}
     engines: {node: '>= 4'}
 
-  retry@0.13.1:
-    resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
-    engines: {node: '>= 4'}
-
   reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
@@ -9848,9 +9547,6 @@ packages:
   sort-keys@2.0.0:
     resolution: {integrity: sha512-/dPCrG1s3ePpWm6yBbxZq5Be1dXGLyLn9Z791chDC3NFrpkVbWGzkBwPN1knaciexFXgRJ7hzdnwZ4stHSDmjg==}
     engines: {node: '>=4'}
-
-  sorted-array-functions@1.3.0:
-    resolution: {integrity: sha512-2sqgzeFlid6N4Z2fUQ1cvFmTOLRi/sEDzSQ0OKYchqgoPmQBVyM3959qYx3fpS6Esef80KjmpgPeEr028dP3OA==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -12533,58 +12229,6 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.8.0
 
-  '@pgpm/database-jobs@0.18.0':
-    dependencies:
-      '@pgpm/verify': 0.18.0
-
-  '@pgpm/database-jobs@0.21.0':
-    dependencies:
-      '@pgpm/verify': 0.21.0
-
-  '@pgpm/inflection@0.18.0':
-    dependencies:
-      '@pgpm/verify': 0.18.0
-
-  '@pgpm/inflection@0.21.0':
-    dependencies:
-      '@pgpm/verify': 0.21.0
-
-  '@pgpm/metaschema-modules@0.21.1':
-    dependencies:
-      '@pgpm/metaschema-schema': 0.21.0
-      '@pgpm/verify': 0.21.0
-
-  '@pgpm/metaschema-schema@0.18.0':
-    dependencies:
-      '@pgpm/database-jobs': 0.18.0
-      '@pgpm/inflection': 0.18.0
-      '@pgpm/types': 0.18.0
-      '@pgpm/verify': 0.18.0
-
-  '@pgpm/metaschema-schema@0.21.0':
-    dependencies:
-      '@pgpm/database-jobs': 0.21.0
-      '@pgpm/inflection': 0.21.0
-      '@pgpm/types': 0.21.0
-      '@pgpm/verify': 0.21.0
-
-  '@pgpm/services@0.18.0':
-    dependencies:
-      '@pgpm/metaschema-schema': 0.18.0
-      '@pgpm/verify': 0.18.0
-
-  '@pgpm/types@0.18.0':
-    dependencies:
-      '@pgpm/verify': 0.18.0
-
-  '@pgpm/types@0.21.0':
-    dependencies:
-      '@pgpm/verify': 0.21.0
-
-  '@pgpm/verify@0.18.0': {}
-
-  '@pgpm/verify@0.21.0': {}
-
   '@pgsql/quotes@18.1.0': {}
 
   '@pgsql/traverse@18.1.0':
@@ -13826,10 +13470,6 @@ snapshots:
 
   asap@2.0.6: {}
 
-  async-retry@1.3.3:
-    dependencies:
-      retry: 0.13.1
-
   async@3.2.6: {}
 
   asynckit@0.4.0: {}
@@ -14278,10 +13918,6 @@ snapshots:
       typescript: 5.9.3
 
   create-require@1.1.1: {}
-
-  cron-parser@4.9.0:
-    dependencies:
-      luxon: 3.7.2
 
   cross-spawn@7.0.6:
     dependencies:
@@ -16396,8 +16032,6 @@ snapshots:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
 
-  long-timeout@0.1.1: {}
-
   long@5.3.2: {}
 
   lru-cache@10.4.3: {}
@@ -16411,8 +16045,6 @@ snapshots:
   lru-cache@6.0.0:
     dependencies:
       yallist: 4.0.0
-
-  luxon@3.7.2: {}
 
   lz-string@1.5.0: {}
 
@@ -16713,12 +16345,6 @@ snapshots:
   node-machine-id@1.1.12: {}
 
   node-releases@2.0.27: {}
-
-  node-schedule@2.1.1:
-    dependencies:
-      cron-parser: 4.9.0
-      long-timeout: 0.1.1
-      sorted-array-functions: 1.3.0
 
   nodemailer@6.10.1: {}
 
@@ -17658,8 +17284,6 @@ snapshots:
 
   retry@0.12.0: {}
 
-  retry@0.13.1: {}
-
   reusify@1.1.0: {}
 
   rimraf@3.0.2:
@@ -18041,8 +17665,6 @@ snapshots:
   sort-keys@2.0.0:
     dependencies:
       is-plain-obj: 1.1.0
-
-  sorted-array-functions@1.3.0: {}
 
   source-map-js@1.2.1: {}
 
