@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { createServer, type Server as HttpServer } from 'http';
 import type { AddressInfo } from 'net';
 import supertest from 'supertest';
@@ -6,7 +6,7 @@ import { Server as GraphQLServer } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { createJobApp } from '@constructive-io/knative-job-fn';
 
-import { PgpmInit } from '@pgpmjs/core';
+import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
 import { getConnections, seed, type PgTestClient } from 'pgsql-test';
 
 import type { KnativeJobsSvc as KnativeJobsSvcType } from '../src';
@@ -264,11 +264,18 @@ let SEND_EMAIL_PORT: number;
 let SEND_VERIFICATION_LINK_PORT: number;
 let MAILGUN_FAILURE_PORT: number;
 
-// The scoped catalog/routing/apps modules and the metaschema modules are
-// declared in the workspace `pgpm.json`; deploying the workspace keeps this
-// suite in lockstep with the rest of the monorepo fixtures (requires
-// `pnpm fixtures:install`).
-const pgpmWorkspace = join(__dirname, '..', '..', '..');
+const getPgpmModulePath = (pkgName: string): string =>
+  dirname(require.resolve(`${pkgName}/pgpm.plan`));
+
+const metaSeedModules = [
+  getPgpmModulePath('@pgpm/verify'),
+  getPgpmModulePath('@pgpm/types'),
+  getPgpmModulePath('@pgpm/inflection'),
+  getPgpmModulePath('@pgpm/database-jobs'),
+  getPgpmModulePath('@pgpm/metaschema-schema'),
+  getPgpmModulePath('@pgpm/services'),
+  getPgpmModulePath('@pgpm/metaschema-modules')
+];
 
 const sql = (f: string) => join(__dirname, '..', '__fixtures__', f);
 
@@ -276,6 +283,18 @@ type SeededConnections = {
   db: PgTestClient;
   pg: PgTestClient;
   teardown: () => Promise<void>;
+};
+
+type PgConfigLike = PgTestClient['config'];
+
+const runMetaMigrations = async (config: PgConfigLike) => {
+  const migrator = new PgpmMigrate(config);
+  for (const modulePath of metaSeedModules) {
+    const result = await migrator.deploy({ modulePath, usePlan: true });
+    if (result.failed) {
+      throw new Error(`Failed to deploy ${modulePath}: ${result.failed}`);
+    }
+  }
 };
 
 const bootstrapAdminUsers = seed.fn(async ({ admin, config, connect }) => {
@@ -300,12 +319,16 @@ const bootstrapAdminUsers = seed.fn(async ({ admin, config, connect }) => {
   }
 });
 
+const deployMetaModules = seed.fn(async ({ config }) => {
+  await runMetaMigrations(config);
+});
+
 const createTestDb = async (): Promise<SeededConnections> => {
   const { db, pg, teardown } = await getConnections(
     { db: { extensions: metaDbExtensions } },
     [
       bootstrapAdminUsers,
-      seed.pgpm(pgpmWorkspace),
+      deployMetaModules,
       seed.sqlfile([sql('jobs.seed.sql')])
     ]
   );
@@ -450,7 +473,7 @@ describe('jobs e2e', () => {
           'app_public',
           'metaschema_modules_public',
           'metaschema_public',
-          'constructive_routing_public'
+          'services_public'
         ],
         anonRole: 'administrator',
         roleName: 'administrator',
@@ -515,6 +538,7 @@ describe('jobs e2e', () => {
 
   it('creates and processes a send-email job', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-email',
       payload: {
         to: 'user@example.com',
@@ -537,12 +561,9 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  // TODO(services_public hard break): `functions/send-verification-link` still
-  // queries the legacy shape `databases { sites { domains { subdomain domain } logo } }`,
-  // which does not exist under `constructive_routing_public` (hostname-keyed domains,
-  // logo lives in `sites.config`). Re-enable once the runtime/functions migration lands.
-  it.skip('creates and processes a send-verification-link job', async () => {
+  it('creates and processes a send-verification-link job', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-verification-link',
       payload: {
         email_type: 'invite_email',
@@ -566,12 +587,9 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  // TODO(services_public hard break): `functions/send-verification-link` still
-  // queries the legacy shape `databases { sites { domains { subdomain domain } logo } }`,
-  // which does not exist under `constructive_routing_public` (hostname-keyed domains,
-  // logo lives in `sites.config`). Re-enable once the runtime/functions migration lands.
-  it.skip('creates and processes a send-verification-link forgot_password job', async () => {
+  it('creates and processes a send-verification-link forgot_password job', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-verification-link',
       payload: {
         email_type: 'forgot_password',
@@ -595,12 +613,9 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  // TODO(services_public hard break): `functions/send-verification-link` still
-  // queries the legacy shape `databases { sites { domains { subdomain domain } logo } }`,
-  // which does not exist under `constructive_routing_public` (hostname-keyed domains,
-  // logo lives in `sites.config`). Re-enable once the runtime/functions migration lands.
-  it.skip('creates and processes a send-verification-link email_verification job', async () => {
+  it('creates and processes a send-verification-link email_verification job', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-verification-link',
       payload: {
         email_type: 'email_verification',
@@ -626,6 +641,7 @@ describe('jobs e2e', () => {
 
   it('fails send-verification-link job when required fields are missing', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-verification-link',
       maxAttempts: 1,
       payload: {
@@ -658,6 +674,7 @@ describe('jobs e2e', () => {
 
   it('records failed jobs when a function throws', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-email',
       maxAttempts: 1,
       payload: {
@@ -689,6 +706,7 @@ describe('jobs e2e', () => {
 
   it('retries failed jobs until max attempts is reached', async () => {
     const jobInput = {
+      dbId: databaseId,
       identifier: 'send-email',
       maxAttempts: 2,
       payload: {
@@ -730,6 +748,7 @@ describe('jobs e2e', () => {
     process.env.MAILGUN_KEY = 'invalid-mailgun-api-key';
 
     const jobInput = {
+      dbId: databaseId,
       identifier: 'mailgun-failure',
       maxAttempts: 1,
       payload: {

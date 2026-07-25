@@ -22,31 +22,27 @@ INSERT INTO metaschema_public.database (id, name)
 VALUES ('0b22e268-16d6-582b-950a-24e108688849', 'jobs-test')
 ON CONFLICT (id) DO NOTHING;
 
--- Site surface: the scoped `sites` table has no `logo`/`dbname` columns; the
--- logo lives in `config` and the database is implied by `database_id`.
-INSERT INTO constructive_routing_public.sites (id, database_id, name, title, config, is_published)
+INSERT INTO services_public.sites (id, database_id, title, logo, dbname)
 VALUES (
   '11111111-1111-1111-1111-111111111111',
   '0b22e268-16d6-582b-950a-24e108688849',
-  'jobs-test',
   'Jobs Test',
-  '{"logo":{"url":"https://example.com/logo.png","mime":"image/png"}}'::jsonb,
-  true
+  '{"url":"https://example.com/logo.png","mime":"image/png"}'::jsonb,
+  current_database()
 )
 ON CONFLICT (id) DO NOTHING;
 
--- Scoped domains are hostname-keyed; surfaces are bound through
--- routes/route_bindings, which this suite does not exercise.
-INSERT INTO constructive_routing_public.domains (id, database_id, hostname, is_published)
+INSERT INTO services_public.domains (id, database_id, site_id, domain, subdomain)
 VALUES (
   '22222222-2222-2222-2222-222222222222',
   '0b22e268-16d6-582b-950a-24e108688849',
+  '11111111-1111-1111-1111-111111111111',
   'localhost',
-  true
+  NULL
 )
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO constructive_routing_public.site_themes (id, database_id, site_id, theme)
+INSERT INTO services_public.site_themes (id, database_id, site_id, theme)
 VALUES (
   '33333333-3333-3333-3333-333333333333',
   '0b22e268-16d6-582b-950a-24e108688849',
@@ -55,7 +51,7 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO constructive_routing_public.site_modules (id, database_id, site_id, name, data)
+INSERT INTO services_public.site_modules (id, database_id, site_id, name, data)
 VALUES (
   '44444444-4444-4444-4444-444444444444',
   '0b22e268-16d6-582b-950a-24e108688849',
