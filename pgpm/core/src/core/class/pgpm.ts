@@ -37,6 +37,7 @@ import {
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
+import { globPaths, globPattern } from '../../utils/glob';
 import { parseTarget } from '../../utils/target-utils';
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
@@ -187,7 +188,7 @@ export class PgpmPackage {
   private loadAllowedDirs(): string[] {
     const globs: string[] = this.config?.packages ?? [];
     const dirs = globs.flatMap(pattern =>
-      glob.sync(path.join(this.workspacePath!, pattern))
+      globPaths(this.workspacePath!, pattern)
     );
     const resolvedDirs = dirs.map(dir => path.resolve(dir));
     // Remove duplicates by converting to Set and back to array
@@ -316,11 +317,11 @@ export class PgpmPackage {
     // nested workspaces (e.g. test fixtures) out of the module map.
     const packageDirs = [
       ...this.allowedDirs,
-      ...glob.sync(path.join(this.workspacePath, this.extensionsDir, '{*,@*/*}'))
+      ...globPaths(this.workspacePath, this.extensionsDir, '{*,@*/*}')
     ];
 
     const moduleFiles = [...new Set(
-      packageDirs.flatMap(dir => glob.sync(`${dir}/**/*.control`))
+      packageDirs.flatMap(dir => glob.sync(globPattern(dir, '**/*.control')))
     )].filter(
       (file: string) => !/node_modules/.test(file)
     ).sort((a, b) => a.localeCompare(b));
@@ -1047,7 +1048,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           stdio: 'inherit'
         });
   
-        const matches = glob.sync(`./${this.extensionsDir}/**/pgpm.plan`);
+        const matches = glob.sync(globPattern('.', this.extensionsDir, '**/pgpm.plan'));
         const installs = matches.map((conf) => {
           const fullConf = resolve(conf);
           const extDir = dirname(fullConf);

@@ -3,6 +3,7 @@ import { sync as glob } from 'glob';
 import { join,relative } from 'path';
 
 import { PgpmPackage } from '../core/class/pgpm';
+import { globPattern, toPosixPath } from '../utils/glob';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { scanDeployScript } from '@pgpmjs/ast/files/sql/header';
 import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
@@ -473,11 +474,11 @@ export const resolveDependencies = (
   const tagMappings: Record<string, string> = {};
 
   // Process SQL files and build dependency graph
-  const files = glob(`${packageDir}/deploy/**/*.sql`).sort((a, b) => a.localeCompare(b));
+  const files = glob(globPattern(packageDir, 'deploy/**/*.sql')).sort((a, b) => a.localeCompare(b));
 
   for (const file of files) {
     const data = readFileSync(file, 'utf-8');
-    const key = '/' + relative(packageDir, file);
+    const key = '/' + toPosixPath(relative(packageDir, file));
     deps[key] = [];
 
     const { requires } = scanDeployScript(data, { key, extname, makeKey });
