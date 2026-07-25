@@ -9,7 +9,11 @@ Install Command:
 
   pgpm install [package]...
 
-  Install pgpm modules into the workspace extensions/ directory.
+  Install pgpm modules into the workspace extensions directory (default: extensions/).
+
+  The install directory is configurable: --extensions-dir wins, then the
+  PGPM_EXTENSIONS_DIR env var, then the \`extensionsDir\` field in the workspace
+  pgpm.json, then the \`extensions\` default.
 
   Inside a module, installing without arguments installs any missing modules
   listed in the module's .control file, and explicit installs are recorded in
@@ -26,6 +30,7 @@ Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
   --force                 Reinstall modules even if already installed
+  --extensions-dir <dir>  Directory (relative to workspace root) to install into (default: extensions)
   -W, --workspace-root    Install at the workspace root (pgpm.json dependencies)
 
 Examples:
@@ -35,6 +40,8 @@ Examples:
   pgpm install @pgpm/base32                    Install single package
   pgpm install @pgpm/base32@latest             Install the latest published version
   pgpm install @pgpm/base32 @pgpm/utils        Install multiple packages
+  pgpm install --extensions-dir extensions-test @pgpm/base32
+                                               Install into extensions-test/ instead of extensions/
 `;
 
 export default async (
@@ -49,7 +56,8 @@ export default async (
   }
   const { cwd = process.cwd() } = argv;
 
-  const project = new PgpmPackage(cwd);
+  const extensionsDir = (argv['extensions-dir'] ?? argv.extensionsDir) as string | undefined;
+  const project = new PgpmPackage(cwd, { extensionsDir });
   const force = Boolean(argv.force);
   const workspaceRoot = Boolean(argv.W || argv['workspace-root'] || argv.workspaceRoot);
 

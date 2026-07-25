@@ -1,6 +1,6 @@
-import { loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
+import { getExtensionsDir, loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
+import { DEFAULT_EXTENSIONS_DIR,errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
@@ -44,10 +44,16 @@ import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL
 const logger = new Logger('pgpm');
 
 /**
- * Directory name for workspace extensions.
- * Extensions are installed globally in the workspace's extensions/ directory.
+ * Options accepted by the {@link PgpmPackage} constructor.
  */
-const EXTENSIONS_DIR = 'extensions';
+export interface PgpmPackageOptions {
+  /**
+   * Directory (relative to the workspace root) where pgpm modules are installed.
+   * Takes precedence over `PGPM_EXTENSIONS_DIR` and the `extensionsDir` config
+   * field. Defaults to `extensions`.
+   */
+  extensionsDir?: string;
+}
 
 function sortObjectByKey<T extends Record<string, any>>(obj: T): T {
   return Object.fromEntries(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))) as T;
@@ -126,11 +132,19 @@ export class PgpmPackage {
   public config?: PgpmWorkspaceConfig;
   public allowedDirs: string[] = [];
   public allowedParentDirs: string[] = [];
+  /**
+   * Directory name (relative to the workspace root) where pgpm modules are installed.
+   * Resolved from the constructor option, `PGPM_EXTENSIONS_DIR`, the `extensionsDir`
+   * config field, then the `extensions` default.
+   */
+  public extensionsDir: string = DEFAULT_EXTENSIONS_DIR;
 
+  private readonly options: PgpmPackageOptions;
   private _moduleMap?: ModuleMap;
   private _moduleInfo?: ExtensionInfo;
 
-  constructor(cwd: string = process.cwd()) {
+  constructor(cwd: string = process.cwd(), options: PgpmPackageOptions = {}) {
+    this.options = options;
     this.resetCwd(cwd);
   }
 
@@ -138,12 +152,24 @@ export class PgpmPackage {
     this.cwd = cwd;
     this.workspacePath = resolvePgpmPath(this.cwd);
     this.modulePath = this.resolveSqitchPath();
+    this.extensionsDir = getExtensionsDir(
+      this.options.extensionsDir,
+      this.workspacePath ?? this.cwd
+    );
 
     if (this.workspacePath) {
       this.config = this.loadConfigSync();
       this.allowedDirs = this.loadAllowedDirs();
       this.allowedParentDirs = this.loadAllowedParentDirs();
     }
+  }
+
+  /**
+   * Absolute path of the workspace directory where pgpm modules are installed.
+   */
+  getExtensionsPath(): string {
+    this.ensureWorkspace();
+    return path.join(this.workspacePath!, this.extensionsDir);
   }
 
   private resolveSqitchPath(): string | undefined {
@@ -268,7 +294,7 @@ export class PgpmPackage {
     const results: PgpmPackage[] = [];
 
     for (const dir of dirs) {
-      const proj = new PgpmPackage(dir);
+      const proj = new PgpmPackage(dir, this.options);
       if (proj.isInModule()) {
         results.push(proj);
       }
@@ -290,7 +316,7 @@ export class PgpmPackage {
     // nested workspaces (e.g. test fixtures) out of the module map.
     const packageDirs = [
       ...this.allowedDirs,
-      ...glob.sync(path.join(this.workspacePath, EXTENSIONS_DIR, '{*,@*/*}'))
+      ...glob.sync(path.join(this.workspacePath, this.extensionsDir, '{*,@*/*}'))
     ];
 
     const moduleFiles = [...new Set(
@@ -358,7 +384,7 @@ export class PgpmPackage {
     }
     
     const modulePath = path.resolve(this.workspacePath!, modules[name].path);
-    return new PgpmPackage(modulePath);
+    return new PgpmPackage(modulePath, this.options);
   }
 
   // ──────────────── Module-scoped ────────────────
@@ -992,7 +1018,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const inModule = this.isInModule();
     const originalDir = process.cwd();
-    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    const skitchExtDir = this.getExtensionsPath();
 
     let pkgJsonPath: string | undefined;
     let pkgData: Record<string, any> | undefined;
@@ -1017,11 +1043,11 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   
       try {
         process.chdir(tempDir);
-        execSync(`npm install ${pkgstr} --production --prefix ./extensions`, {
+        execSync(`npm install ${pkgstr} --production --prefix ./${this.extensionsDir}`, {
           stdio: 'inherit'
         });
   
-        const matches = glob.sync('./extensions/**/pgpm.plan');
+        const matches = glob.sync(`./${this.extensionsDir}/**/pgpm.plan`);
         const installs = matches.map((conf) => {
           const fullConf = resolve(conf);
           const extDir = dirname(fullConf);
@@ -1213,7 +1239,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
     const dependencies = pkgData.dependencies || {};
-    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    const skitchExtDir = this.getExtensionsPath();
 
     const installed: string[] = [];
     const installedVersions: Record<string, string> = {};
@@ -1241,7 +1267,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   getWorkspaceInstalledModules(): string[] {
     this.ensureWorkspace();
 
-    const extensionsDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    const extensionsDir = this.getExtensionsPath();
     
     if (!fs.existsSync(extensionsDir)) {
       return [];

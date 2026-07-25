@@ -47,6 +47,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "queryHistoryLimit": 30,
     "verbose": false,
   },
+  "extensionsDir": "extensions",
   "jobs": {
     "gateway": {
       "callbackPort": 12345,

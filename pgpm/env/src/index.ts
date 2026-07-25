@@ -11,6 +11,6 @@ export {
   resolveWorkspaceByType
 } from './config';
 export { getEnvVars, getNodeEnv, parseEnvBoolean, parseEnvList, parseEnvNumber } from './env';
-export { getConnEnvOptions, getDeploymentEnvOptions,getEnvOptions } from './merge';
+export { getConnEnvOptions, getDeploymentEnvOptions,getEnvOptions, getExtensionsDir } from './merge';
 export { replaceArrays,walkUp } from './utils';
 export type { DeploymentOptions,PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';
