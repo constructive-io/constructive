@@ -96,7 +96,7 @@ export function buildChatCompleter(config: ChatConfig): ChatFunction | null {
 /**
  * Build a chat completer from an `llm_module` api_modules row.
  *
- * @param data - The llm_module data from services_public.api_modules
+ * @param data - The llm_module data from constructive_routing_public.api_modules
  * @returns A ChatFunction, or null if the chat provider is not configured
  */
 export function buildChatCompleterFromModule(data: LlmModuleData): ChatFunction | null {

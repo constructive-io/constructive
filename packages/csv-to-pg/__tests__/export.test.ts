@@ -278,7 +278,7 @@ it('empty array fields emit empty array literal', async () => {
 
 it('text fields preserve empty strings by default', async () => {
   const parser = new Parser({
-    schema: 'services_public',
+    schema: 'app_public',
     singleStmts: true,
     table: 'webauthn_settings',
     fields: {
@@ -305,7 +305,7 @@ it('text fields preserve empty strings by default', async () => {
 
 it('text fields convert empty strings to NULL when preserveEmptyStrings is false', async () => {
   const parser = new Parser({
-    schema: 'services_public',
+    schema: 'app_public',
     singleStmts: true,
     table: 'webauthn_settings',
     preserveEmptyStrings: false,
@@ -333,7 +333,7 @@ it('text fields convert empty strings to NULL when preserveEmptyStrings is false
 
 it('text fields with null values produce NULL', async () => {
   const parser = new Parser({
-    schema: 'services_public',
+    schema: 'app_public',
     singleStmts: true,
     table: 'webauthn_settings',
     fields: {

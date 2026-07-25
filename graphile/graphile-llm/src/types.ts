@@ -103,7 +103,7 @@ export interface ChatConfig {
 // ─── LLM Module Types ───────────────────────────────────────────────────────
 
 /**
- * The shape of the `llm_module` data stored in `services_public.api_modules`.
+ * The shape of the `llm_module` data stored in `constructive_routing_public.api_modules`.
  *
  * This is the per-database configuration that controls which LLM provider
  * and models are available for that API.
