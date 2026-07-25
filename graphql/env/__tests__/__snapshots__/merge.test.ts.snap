@@ -6,7 +6,6 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "anonRole": "env_anon",
     "defaultDatabaseId": "override_db",
     "enableScopedRouting": false,
-    "enableServicesApi": false,
     "exposedSchemas": [
       "public",
       "app",

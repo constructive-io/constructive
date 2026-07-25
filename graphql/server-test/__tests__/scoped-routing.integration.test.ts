@@ -6,7 +6,7 @@
  *   @constructive-db/routing → constructive_routing_public
  *   @constructive-db/apps    → constructive_apps_public
  * seeded from `__fixtures__/seed/scoped/*` for the same "simple-pets" tenant
- * that `__fixtures__/seed/services/test-data.sql` models on services_public.
+ * that the retired legacy fixture used to model.
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=scoped-routing.integration
@@ -76,7 +76,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
       {
         schemas,
         authRole: 'anonymous',
-        server: { api: { enableServicesApi: false, isPublic: false } }
+        server: { api: { enableScopedRouting: false, isPublic: false } }
       },
       scopedSeedAdapters()
     ));
@@ -154,10 +154,9 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 });
 
 /**
- * End-to-end scoped plane: the request is resolved by
- * constructive_routing_public.resolve_route() (enableScopedRouting), and the
- * legacy services_public domain lookup is only the fallback — the scoped seed
- * has no services_public rows, so a successful request proves the scoped path.
+ * End-to-end scoped plane: the request is resolved solely by
+ * constructive_routing_public.resolve_route() (enableScopedRouting). There is
+ * no legacy fallback, so a successful request proves the scoped path.
  */
 describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
   let request: supertest.Agent;
@@ -176,7 +175,6 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
         authRole: 'anonymous',
         server: {
           api: {
-            enableServicesApi: true,
             enableScopedRouting: true,
             scopedRoutingSchema: 'constructive_routing_public',
             isPublic: true,
@@ -208,8 +206,8 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
   // TODO: connection (list) queries currently fail for EVERY server integration
   // scenario on main — `{ animals { nodes { ... } } }` throws
   // `TypeError: Cannot read properties of undefined (reading 'items')` inside
-  // grafast's ConnectionStep, including the legacy simple-seed/services
-  // scenarios in server.integration.test.ts. Unskip once that regression is
+  // grafast's ConnectionStep, including the scenarios in
+  // server.integration.test.ts. Unskip once that regression is
   // fixed; scoped resolution itself already works (see the mutation above).
   it.skip('should query all animals', async () => {
     const res = await postGraphQL({

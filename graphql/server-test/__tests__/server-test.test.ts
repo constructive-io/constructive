@@ -1,9 +1,9 @@
 import path from 'path';
+import type { PgTestClient } from 'pgsql-test/test-client';
+import type supertest from 'supertest';
 
 import { getConnections, seed, snapshot } from '../src';
-import type { PgTestClient } from 'pgsql-test/test-client';
-import type { ServerInfo, GraphQLQueryFn } from '../src/types';
-import type supertest from 'supertest';
+import type { GraphQLQueryFn,ServerInfo } from '../src/types';
 
 const sql = (file: string) => path.join(__dirname, '..', 'sql', file);
 
@@ -23,7 +23,7 @@ describe('graphql-server-test', () => {
           authRole: 'anonymous',
           server: {
             api: {
-              enableServicesApi: false
+              enableScopedRouting: false
             }
           }
         },
@@ -114,7 +114,7 @@ describe('graphql-server-test', () => {
           authRole: 'authenticated',
           server: {
             api: {
-              enableServicesApi: false
+              enableScopedRouting: false
             }
           }
         },
