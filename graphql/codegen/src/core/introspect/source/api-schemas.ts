@@ -2,59 +2,59 @@
  * API Schemas Resolution
  *
  * Utilities for resolving PostgreSQL schema names from API names
- * by querying the services_public.api_schemas table.
+ * by querying the constructive_routing_public.api_schemas table.
  */
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
 /**
- * Result of validating services schema requirements
+ * Result of validating routing schema requirements
  */
-export interface ServicesSchemaValidation {
+export interface RoutingSchemaValidation {
   valid: boolean;
   error?: string;
 }
 
 /**
- * Validate that the required services schemas exist in the database
+ * Validate that the required routing schemas exist in the database
  *
  * Checks for:
- * - services_public schema with apis and api_schemas tables
+ * - constructive_routing_public schema with apis and api_schemas tables
  * - metaschema_public schema with schema table
  *
  * @param pool - Database connection pool
  * @returns Validation result
  */
-export async function validateServicesSchemas(
+export async function validateRoutingSchemas(
   pool: Pool,
-): Promise<ServicesSchemaValidation> {
+): Promise<RoutingSchemaValidation> {
   try {
-    // Check for services_public.apis table
+    // Check for constructive_routing_public.apis table
     const apisCheck = await pool.query(`
       SELECT 1 FROM information_schema.tables 
-      WHERE table_schema = 'services_public' 
+      WHERE table_schema = 'constructive_routing_public' 
       AND table_name = 'apis'
     `);
     if (apisCheck.rows.length === 0) {
       return {
         valid: false,
         error:
-          'services_public.apis table not found. The database must have the services schema deployed.',
+          'constructive_routing_public.apis table not found. The database must have the routing schema deployed.',
       };
     }
 
-    // Check for services_public.api_schemas table
+    // Check for constructive_routing_public.api_schemas table
     const apiSchemasCheck = await pool.query(`
       SELECT 1 FROM information_schema.tables 
-      WHERE table_schema = 'services_public' 
+      WHERE table_schema = 'constructive_routing_public' 
       AND table_name = 'api_schemas'
     `);
     if (apiSchemasCheck.rows.length === 0) {
       return {
         valid: false,
         error:
-          'services_public.api_schemas table not found. The database must have the services schema deployed.',
+          'constructive_routing_public.api_schemas table not found. The database must have the routing schema deployed.',
       };
     }
 
@@ -76,15 +76,15 @@ export async function validateServicesSchemas(
   } catch (err) {
     return {
       valid: false,
-      error: `Failed to validate services schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      error: `Failed to validate routing schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
     };
   }
 }
 
 /**
- * Resolve schema names from API names by querying services_public.api_schemas
+ * Resolve schema names from API names by querying constructive_routing_public.api_schemas
  *
- * Joins services_public.apis, services_public.api_schemas, and metaschema_public.schema
+ * Joins constructive_routing_public.apis, constructive_routing_public.api_schemas, and metaschema_public.schema
  * to get the actual PostgreSQL schema names for the given API names.
  *
  * @param pool - Database connection pool
@@ -97,7 +97,7 @@ export async function resolveApiSchemas(
   apiNames: string[],
 ): Promise<string[]> {
   // First validate that the required schemas exist
-  const validation = await validateServicesSchemas(pool);
+  const validation = await validateRoutingSchemas(pool);
   if (!validation.valid) {
     throw new Error(validation.error);
   }
@@ -106,8 +106,8 @@ export async function resolveApiSchemas(
   const result = await pool.query<{ schema_name: string }>(
     `
     SELECT DISTINCT ms.schema_name
-    FROM services_public.api_schemas as_tbl
-    JOIN services_public.apis api ON api.id = as_tbl.api_id
+    FROM constructive_routing_public.api_schemas as_tbl
+    JOIN constructive_routing_public.apis api ON api.id = as_tbl.api_id
     JOIN metaschema_public.schema ms ON ms.id = as_tbl.schema_id
     WHERE api.name = ANY($1)
     ORDER BY ms.schema_name
@@ -118,7 +118,7 @@ export async function resolveApiSchemas(
   if (result.rows.length === 0) {
     throw new Error(
       `No schemas found for API names: ${apiNames.join(', ')}. ` +
-        'Ensure the APIs exist and have schemas assigned in services_public.api_schemas.',
+        'Ensure the APIs exist and have schemas assigned in constructive_routing_public.api_schemas.',
     );
   }
 

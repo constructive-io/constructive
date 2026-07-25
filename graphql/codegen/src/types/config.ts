@@ -122,7 +122,7 @@ export interface DbConfig {
 
   /**
    * API names to resolve schemas from
-   * Queries services_public.api_schemas to automatically determine schemas
+   * Queries constructive_routing_public.api_schemas to automatically determine schemas
    * Mutually exclusive with `schemas`
    * @example ['my_api']
    */
