@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings
+API surfaces exposed by this scope; publication makes a surface bindable from other scopes
 
 ## Usage
 
 ```typescript
-useApisQuery({ selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } } })
-useApiQuery({ id: '<UUID>', selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } } })
+useApisQuery({ selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } } })
+useApiQuery({ id: '<UUID>', selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } } })
 useCreateApiMutation({ selection: { fields: { id: true } } })
 useUpdateApiMutation({ selection: { fields: { id: true } } })
 useDeleteApiMutation({})
@@ -20,7 +20,7 @@ useDeleteApiMutation({})
 
 ```typescript
 const { data, isLoading } = useApisQuery({
-  selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useApisQuery({
 const { mutate } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' });
+mutate({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```

@@ -12,7 +12,7 @@ csdk graph-execution-module list --where.<field>.<op> <value> --orderBy <values>
 csdk graph-execution-module list --limit 10 --after <cursor>
 csdk graph-execution-module find-first --where.<field>.<op> <value>
 csdk graph-execution-module get --id <UUID>
-csdk graph-execution-module create --databaseId <UUID> --graphModuleId <UUID> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--executionsTableId <UUID>] [--executionsTableName <String>] [--nodeStatesTableId <UUID>] [--nodeStatesTableName <String>] [--outputsTableId <UUID>] [--outputsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
+csdk graph-execution-module create --databaseId <UUID> --graphModuleId <UUID> --scope <String> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--executionsTableId <UUID>] [--executionsTableName <String>] [--nodeStatesTableId <UUID>] [--nodeStatesTableName <String>] [--outputsTableId <UUID>] [--outputsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>]
 csdk graph-execution-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--executionsTableId <UUID>] [--executionsTableName <String>] [--graphModuleId <UUID>] [--nodeStatesTableId <UUID>] [--nodeStatesTableName <String>] [--outputsTableId <UUID>] [--outputsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
 csdk graph-execution-module delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk graph-execution-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a graphExecutionModule
 
 ```bash
-csdk graph-execution-module create --databaseId <UUID> --graphModuleId <UUID> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--executionsTableId <UUID>] [--executionsTableName <String>] [--nodeStatesTableId <UUID>] [--nodeStatesTableName <String>] [--outputsTableId <UUID>] [--outputsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
+csdk graph-execution-module create --databaseId <UUID> --graphModuleId <UUID> --scope <String> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--executionsTableId <UUID>] [--executionsTableName <String>] [--nodeStatesTableId <UUID>] [--nodeStatesTableName <String>] [--outputsTableId <UUID>] [--outputsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>]
 ```
 
 ### Get a graphExecutionModule by id

@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-SEO and social sharing metadata for a site: page title, description, and Open Graph image
+SEO and social sharing metadata for a site surface
 
 ## Usage
 

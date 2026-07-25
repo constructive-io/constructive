@@ -557,8 +557,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'scope',
         message: 'scope',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
@@ -942,7 +941,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'scope',
         message: 'scope',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',

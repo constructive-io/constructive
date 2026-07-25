@@ -124,27 +124,6 @@ export interface OrgAdminGrant {
   isGrant: boolean | null;
   updatedAt: string | null;
 }
-export interface OrgChartEdge {
-  childId: string | null;
-  createdAt: string | null;
-  entityId: string | null;
-  id: string | null;
-  parentId: string | null;
-  positionLevel: number | null;
-  positionTitle: string | null;
-  updatedAt: string | null;
-}
-export interface OrgChartEdgeGrant {
-  childId: string | null;
-  createdAt: string | null;
-  entityId: string | null;
-  grantorId: string | null;
-  id: string | null;
-  isGrant: boolean | null;
-  parentId: string | null;
-  positionLevel: number | null;
-  positionTitle: string | null;
-}
 export interface OrgClaimedInvite {
   createdAt: string | null;
   data: unknown | null;
@@ -153,14 +132,6 @@ export interface OrgClaimedInvite {
   receiverId: string | null;
   senderId: string | null;
   updatedAt: string | null;
-}
-export interface OrgGetManagersRecord {
-  depth: number | null;
-  userId: string | null;
-}
-export interface OrgGetSubordinatesRecord {
-  depth: number | null;
-  userId: string | null;
 }
 export interface OrgGrant {
   actorId: string | null;

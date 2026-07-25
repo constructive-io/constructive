@@ -308,8 +308,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'scope',
         message: 'scope',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -477,7 +476,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'scope',
         message: 'scope',
         required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

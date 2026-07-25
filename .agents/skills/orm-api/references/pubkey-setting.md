@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries
+Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
 
 ## Usage
 

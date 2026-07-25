@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries
+Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
 
 ## Usage
 

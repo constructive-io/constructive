@@ -17,9 +17,11 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   apiId: 'uuid',
+  createdAt: 'string',
   databaseId: 'uuid',
   id: 'uuid',
   schemaId: 'uuid',
+  updatedAt: 'string',
 };
 const usage =
   '\napi-schema <command>\n\nCommands:\n  list                  List apiSchema records\n  find-first            Find first matching apiSchema record\n  get                   Get a apiSchema by ID\n  create                Create a new apiSchema\n  update                Update an existing apiSchema\n  delete                Delete a apiSchema\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,9 +75,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       apiId: true,
+      createdAt: true,
       databaseId: true,
       id: true,
       schemaId: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy> & {
@@ -97,9 +101,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       apiId: true,
+      createdAt: true,
       databaseId: true,
       id: true,
       schemaId: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy> & {
@@ -133,9 +139,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           apiId: true,
+          createdAt: true,
           databaseId: true,
           id: true,
           schemaId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -182,9 +190,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           apiId: true,
+          createdAt: true,
           databaseId: true,
           id: true,
           schemaId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -240,9 +250,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           apiId: true,
+          createdAt: true,
           databaseId: true,
           id: true,
           schemaId: true,
+          updatedAt: true,
         },
       })
       .execute();

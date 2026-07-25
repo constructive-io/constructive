@@ -2,15 +2,15 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings
+API surfaces exposed by this scope; publication makes a surface bindable from other scopes
 
 ## Usage
 
 ```typescript
 db.api.findMany({ select: { id: true } }).execute()
 db.api.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.api.create({ data: { annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute()
-db.api.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
+db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute()
+db.api.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute()
 db.api.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.api.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.api.findMany({
-  select: { id: true, annotations: true }
+  select: { id: true, anonRole: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.api.findMany({
 
 ```typescript
 const item = await db.api.create({
-  data: { annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' },
+  data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' },
   select: { id: true }
 }).execute();
 ```

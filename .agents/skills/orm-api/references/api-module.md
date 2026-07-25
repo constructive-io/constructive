@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server
+Server-side module configuration for an API surface; stores module name and JSON settings
 
 ## Usage
 

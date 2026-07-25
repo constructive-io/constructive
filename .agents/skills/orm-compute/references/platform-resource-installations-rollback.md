@@ -7,7 +7,7 @@ Execute the platformResourceInstallationsRollback mutation
 ## Usage
 
 ```typescript
-db.mutation.platformResourceInstallationsRollback({ input: { pCommitId: '<UUID>', pInstallationId: '<UUID>' } }).execute()
+db.mutation.platformResourceInstallationsRollback({ input: { commitId: '<UUID>', targetInstallationId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformResourceInstallationsRollback({ input: { pCommitId: '<UUID>'
 ### Run platformResourceInstallationsRollback
 
 ```typescript
-const result = await db.mutation.platformResourceInstallationsRollback({ input: { pCommitId: '<UUID>', pInstallationId: '<UUID>' } }).execute();
+const result = await db.mutation.platformResourceInstallationsRollback({ input: { commitId: '<UUID>', targetInstallationId: '<UUID>' } }).execute();
 ```

@@ -7,7 +7,7 @@ React Query mutation hook for platformResourceInstallationsUninstall
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformResourceInstallationsUninstallMutation(); mutate({ input: { pInstallationId: '<UUID>' } });
+const { mutate } = usePlatformResourceInstallationsUninstallMutation(); mutate({ input: { targetInstallationId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformResourceInstallationsUninstallMutation(); mutate({
 
 ```typescript
 const { mutate, isLoading } = usePlatformResourceInstallationsUninstallMutation();
-mutate({ input: { pInstallationId: '<UUID>' } });
+mutate({ input: { targetInstallationId: '<UUID>' } });
 ```

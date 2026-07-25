@@ -25,7 +25,6 @@ const db = createClient({
 | `apiModule` | findMany, findOne, create, update, delete |
 | `apiSchema` | findMany, findOne, create, update, delete |
 | `apiSetting` | findMany, findOne, create, update, delete |
-| `app` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
 | `checkConstraint` | findMany, findOne, create, update, delete |
 | `compositeType` | findMany, findOne, create, update, delete |
@@ -35,21 +34,40 @@ const db = createClient({
 | `databaseTransfer` | findMany, findOne, create, update, delete |
 | `defaultPrivilege` | findMany, findOne, create, update, delete |
 | `domain` | findMany, findOne, create, update, delete |
+| `domainEvent` | findMany, findOne, create, update, delete |
+| `domainVerification` | findMany, findOne, create, update, delete |
 | `embeddingChunk` | findMany, findOne, create, update, delete |
 | `enum` | findMany, findOne, create, update, delete |
+| `exclusionConstraint` | findMany, findOne, create, update, delete |
 | `field` | findMany, findOne, create, update, delete |
 | `foreignKeyConstraint` | findMany, findOne, create, update, delete |
 | `fullTextSearch` | findMany, findOne, create, update, delete |
 | `function` | findMany, findOne, create, update, delete |
+| `hostnameBinding` | findMany, findOne, create, update, delete |
 | `httpRoute` | findMany, findOne, create, update, delete |
 | `index` | findMany, findOne, create, update, delete |
 | `managedDomain` | findMany, findOne, create, update, delete |
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `partition` | findMany, findOne, create, update, delete |
+| `platformApi` | findMany, findOne, create, update, delete |
+| `platformApiModule` | findMany, findOne, create, update, delete |
+| `platformApiSchema` | findMany, findOne, create, update, delete |
+| `platformApiSetting` | findMany, findOne, create, update, delete |
+| `platformCorsSetting` | findMany, findOne, create, update, delete |
+| `platformDomain` | findMany, findOne, create, update, delete |
+| `platformDomainEvent` | findMany, findOne, create, update, delete |
+| `platformDomainVerification` | findMany, findOne, create, update, delete |
+| `platformManagedDomain` | findMany, findOne, create, update, delete |
+| `platformSite` | findMany, findOne, create, update, delete |
+| `platformSiteMetadatum` | findMany, findOne, create, update, delete |
+| `platformSiteModule` | findMany, findOne, create, update, delete |
+| `platformSiteTheme` | findMany, findOne, create, update, delete |
 | `policy` | findMany, findOne, create, update, delete |
 | `primaryKeyConstraint` | findMany, findOne, create, update, delete |
 | `pubkeySetting` | findMany, findOne, create, update, delete |
 | `rlsSetting` | findMany, findOne, create, update, delete |
+| `routeBinding` | findMany, findOne, create, update, delete |
+| `route` | findMany, findOne, create, update, delete |
 | `schema` | findMany, findOne, create, update, delete |
 | `schemaGrant` | findMany, findOne, create, update, delete |
 | `site` | findMany, findOne, create, update, delete |
@@ -79,30 +97,31 @@ CRUD operations for Api records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `annotations` | JSON | Yes |
 | `anonRole` | String | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `dbname` | String | Yes |
 | `id` | UUID | No |
-| `isPublic` | Boolean | Yes |
-| `labels` | JSON | Yes |
+| `isPublished` | Boolean | Yes |
 | `name` | String | Yes |
 | `roleName` | String | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all api records
-const items = await db.api.findMany({ select: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } }).execute();
+const items = await db.api.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.api.findOne({ id: '<UUID>', select: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } }).execute();
+const item = await db.api.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.api.create({ data: { annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+const created = await db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.api.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.api.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.api.delete({ where: { id: '<UUID>' } }).execute();
@@ -117,19 +136,21 @@ CRUD operations for ApiModule records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
 | `data` | JSON | Yes |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `name` | String | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all apiModule records
-const items = await db.apiModule.findMany({ select: { apiId: true, data: true, databaseId: true, id: true, name: true } }).execute();
+const items = await db.apiModule.findMany({ select: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.apiModule.findOne({ id: '<UUID>', select: { apiId: true, data: true, databaseId: true, id: true, name: true } }).execute();
+const item = await db.apiModule.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.apiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' }, select: { id: true } }).execute();
@@ -150,18 +171,20 @@ CRUD operations for ApiSchema records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `schemaId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all apiSchema records
-const items = await db.apiSchema.findMany({ select: { apiId: true, databaseId: true, id: true, schemaId: true } }).execute();
+const items = await db.apiSchema.findMany({ select: { apiId: true, createdAt: true, databaseId: true, id: true, schemaId: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.apiSchema.findOne({ id: '<UUID>', select: { apiId: true, databaseId: true, id: true, schemaId: true } }).execute();
+const item = await db.apiSchema.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, databaseId: true, id: true, schemaId: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.apiSchema.create({ data: { apiId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>' }, select: { id: true } }).execute();
@@ -182,6 +205,7 @@ CRUD operations for ApiSetting records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `enableAggregates` | Boolean | Yes |
 | `enableBulk` | Boolean | Yes |
@@ -197,15 +221,16 @@ CRUD operations for ApiSetting records.
 | `enableSearch` | Boolean | Yes |
 | `id` | UUID | No |
 | `options` | JSON | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all apiSetting records
-const items = await db.apiSetting.findMany({ select: { apiId: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true } }).execute();
+const items = await db.apiSetting.findMany({ select: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.apiSetting.findOne({ id: '<UUID>', select: { apiId: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true } }).execute();
+const item = await db.apiSetting.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.apiSetting.create({ data: { apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
@@ -215,43 +240,6 @@ const updated = await db.apiSetting.update({ where: { id: '<UUID>' }, data: { ap
 
 // Delete
 const deleted = await db.apiSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.app`
-
-CRUD operations for App records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `appIdPrefix` | String | Yes |
-| `appImage` | ConstructiveInternalTypeImage | Yes |
-| `appStoreId` | String | Yes |
-| `appStoreLink` | ConstructiveInternalTypeUrl | Yes |
-| `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `playStoreLink` | ConstructiveInternalTypeUrl | Yes |
-| `siteId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all app records
-const items = await db.app.findMany({ select: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } }).execute();
-
-// Get one by id
-const item = await db.app.findOne({ id: '<UUID>', select: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } }).execute();
-
-// Create
-const created = await db.app.create({ data: { appIdPrefix: '<String>', appImage: '<Image>', appStoreId: '<String>', appStoreLink: '<Url>', databaseId: '<UUID>', name: '<String>', playStoreLink: '<Url>', siteId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.app.update({ where: { id: '<UUID>' }, data: { appIdPrefix: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.app.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.astMigration`
@@ -309,6 +297,8 @@ CRUD operations for CheckConstraint records.
 | `expr` | JSON | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
@@ -320,13 +310,13 @@ CRUD operations for CheckConstraint records.
 
 ```typescript
 // List all checkConstraint records
-const items = await db.checkConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.checkConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.checkConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.checkConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.checkConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
+const created = await db.checkConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.checkConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -383,17 +373,19 @@ CRUD operations for CorsSetting records.
 |-------|------|----------|
 | `allowedOrigins` | String | Yes |
 | `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all corsSetting records
-const items = await db.corsSetting.findMany({ select: { allowedOrigins: true, apiId: true, databaseId: true, id: true } }).execute();
+const items = await db.corsSetting.findMany({ select: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.corsSetting.findOne({ id: '<UUID>', select: { allowedOrigins: true, apiId: true, databaseId: true, id: true } }).execute();
+const item = await db.corsSetting.findOne({ id: '<UUID>', select: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.corsSetting.create({ data: { allowedOrigins: '<String>', apiId: '<UUID>', databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -451,6 +443,7 @@ CRUD operations for DatabaseSetting records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `annotations` | JSON | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `enableAggregates` | Boolean | Yes |
 | `enableBulk` | Boolean | Yes |
@@ -467,15 +460,16 @@ CRUD operations for DatabaseSetting records.
 | `id` | UUID | No |
 | `labels` | JSON | Yes |
 | `options` | JSON | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all databaseSetting records
-const items = await db.databaseSetting.findMany({ select: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } }).execute();
+const items = await db.databaseSetting.findMany({ select: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.databaseSetting.findOne({ id: '<UUID>', select: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } }).execute();
+const item = await db.databaseSetting.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.databaseSetting.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', labels: '<JSON>', options: '<JSON>' }, select: { id: true } }).execute();
@@ -572,33 +566,122 @@ CRUD operations for Domain records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `annotations` | JSON | Yes |
-| `apiId` | UUID | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `domain` | ConstructiveInternalTypeHostname | Yes |
+| `hostname` | String | Yes |
 | `id` | UUID | No |
-| `labels` | JSON | Yes |
-| `serviceId` | UUID | Yes |
-| `siteId` | UUID | Yes |
-| `subdomain` | ConstructiveInternalTypeHostname | Yes |
+| `isPublished` | Boolean | Yes |
+| `isWildcard` | Boolean | Yes |
+| `managed` | Boolean | Yes |
+| `parentHostname` | String | Yes |
+| `tlsReadyAt` | Datetime | Yes |
+| `tlsSecretName` | String | Yes |
+| `tlsStatus` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verificationStatus` | String | Yes |
+| `verifiedAt` | Datetime | Yes |
 
 **Operations:**
 
 ```typescript
 // List all domain records
-const items = await db.domain.findMany({ select: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } }).execute();
+const items = await db.domain.findMany({ select: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Get one by id
-const item = await db.domain.findOne({ id: '<UUID>', select: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } }).execute();
+const item = await db.domain.findOne({ id: '<UUID>', select: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Create
-const created = await db.domain.create({ data: { annotations: '<JSON>', apiId: '<UUID>', databaseId: '<UUID>', domain: '<Hostname>', labels: '<JSON>', serviceId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>' }, select: { id: true } }).execute();
+const created = await db.domain.create({ data: { config: '<JSON>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.domain.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.domain.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.domain.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.domainEvent`
+
+CRUD operations for DomainEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `domainId` | UUID | Yes |
+| `domainVerificationId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `id` | UUID | No |
+| `managedDomainId` | UUID | Yes |
+| `message` | String | Yes |
+| `metadata` | JSON | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all domainEvent records
+const items = await db.domainEvent.findMany({ select: { actorId: true, createdAt: true, databaseId: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.domainEvent.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, databaseId: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.domainEvent.create({ data: { actorId: '<UUID>', databaseId: '<UUID>', domainId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.domainVerification`
+
+CRUD operations for DomainVerification records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `attempts` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `domainId` | UUID | Yes |
+| `error` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `lastCheckedAt` | Datetime | Yes |
+| `managedDomainId` | UUID | Yes |
+| `method` | String | Yes |
+| `recordName` | String | Yes |
+| `recordType` | String | Yes |
+| `recordValue` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verifiedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all domainVerification records
+const items = await db.domainVerification.findMany({ select: { attempts: true, createdAt: true, databaseId: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Get one by id
+const item = await db.domainVerification.findOne({ id: '<UUID>', select: { attempts: true, createdAt: true, databaseId: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Create
+const created = await db.domainVerification.create({ data: { attempts: '<Int>', databaseId: '<UUID>', domainId: '<UUID>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainVerification.update({ where: { id: '<UUID>' }, data: { attempts: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainVerification.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.embeddingChunk`
@@ -688,6 +771,49 @@ const updated = await db.enum.update({ where: { id: '<UUID>' }, data: { category
 const deleted = await db.enum.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.exclusionConstraint`
+
+CRUD operations for ExclusionConstraint records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `accessMethod` | String | Yes |
+| `category` | ObjectCategory | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `elementExpr` | JSON | Yes |
+| `fieldIds` | UUID | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `operators` | String | Yes |
+| `smartTags` | JSON | Yes |
+| `tableId` | UUID | Yes |
+| `tags` | String | Yes |
+| `type` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `whereClause` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all exclusionConstraint records
+const items = await db.exclusionConstraint.findMany({ select: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } }).execute();
+
+// Get one by id
+const item = await db.exclusionConstraint.findOne({ id: '<UUID>', select: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } }).execute();
+
+// Create
+const created = await db.exclusionConstraint.create({ data: { accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', elementExpr: '<JSON>', fieldIds: '<UUID>', name: '<String>', operators: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', whereClause: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.exclusionConstraint.update({ where: { id: '<UUID>' }, data: { accessMethod: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.exclusionConstraint.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.field`
 
 CRUD operations for Field records.
@@ -708,6 +834,8 @@ CRUD operations for Field records.
 | `generationExpression` | JSON | Yes |
 | `generationType` | String | Yes |
 | `id` | UUID | No |
+| `identityGeneration` | String | Yes |
+| `identityOptions` | JSON | Yes |
 | `isRequired` | Boolean | Yes |
 | `label` | String | Yes |
 | `max` | Float | Yes |
@@ -724,13 +852,13 @@ CRUD operations for Field records.
 
 ```typescript
 // List all field records
-const items = await db.field.findMany({ select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.field.findMany({ select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.field.findOne({ id: '<UUID>', select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.field.findOne({ id: '<UUID>', select: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.field.create({ data: { apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.field.create({ data: { apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', identityGeneration: '<String>', identityOptions: '<JSON>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.field.update({ where: { id: '<UUID>' }, data: { apiRequired: '<Boolean>' }, select: { id: true } }).execute();
@@ -751,9 +879,12 @@ CRUD operations for ForeignKeyConstraint records.
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `deleteAction` | String | Yes |
+| `deleteSetFieldIds` | UUID | Yes |
 | `description` | String | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `refFieldIds` | UUID | Yes |
 | `refTableId` | UUID | Yes |
@@ -763,18 +894,19 @@ CRUD operations for ForeignKeyConstraint records.
 | `type` | String | Yes |
 | `updateAction` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `withPeriod` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all foreignKeyConstraint records
-const items = await db.foreignKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } }).execute();
+const items = await db.foreignKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } }).execute();
 
 // Get one by id
-const item = await db.foreignKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } }).execute();
+const item = await db.foreignKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } }).execute();
 
 // Create
-const created = await db.foreignKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', description: '<String>', fieldIds: '<UUID>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>' }, select: { id: true } }).execute();
+const created = await db.foreignKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', deleteSetFieldIds: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>', withPeriod: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.foreignKeyConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -851,6 +983,44 @@ const updated = await db.function.update({ where: { id: '<UUID>' }, data: { data
 
 // Delete
 const deleted = await db.function.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.hostnameBinding`
+
+CRUD operations for HostnameBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `domainId` | UUID | Yes |
+| `hostname` | String | Yes |
+| `id` | UUID | No |
+| `isWildcard` | Boolean | Yes |
+| `managed` | Boolean | Yes |
+| `parentHostname` | String | Yes |
+| `tlsSecretName` | String | Yes |
+| `tlsStatus` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verificationStatus` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all hostnameBinding records
+const items = await db.hostnameBinding.findMany({ select: { domainId: true, hostname: true, id: true, isWildcard: true, managed: true, parentHostname: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true } }).execute();
+
+// Get one by id
+const item = await db.hostnameBinding.findOne({ id: '<UUID>', select: { domainId: true, hostname: true, id: true, isWildcard: true, managed: true, parentHostname: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true } }).execute();
+
+// Create
+const created = await db.hostnameBinding.create({ data: { domainId: '<UUID>', hostname: '<String>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.hostnameBinding.update({ where: { id: '<UUID>' }, data: { domainId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.hostnameBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.httpRoute`
@@ -947,13 +1117,17 @@ CRUD operations for ManagedDomain records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `allowPublicUsage` | Boolean | Yes |
 | `annotations` | JSON | Yes |
+| `certStatus` | String | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `domain` | ConstructiveInternalTypeHostname | Yes |
+| `domain` | String | Yes |
 | `id` | UUID | No |
 | `isWildcard` | Boolean | Yes |
 | `tlsReadyAt` | Datetime | Yes |
 | `tlsStatus` | String | Yes |
+| `updatedAt` | Datetime | No |
 | `verificationStatus` | String | Yes |
 | `verifiedAt` | Datetime | Yes |
 
@@ -961,16 +1135,16 @@ CRUD operations for ManagedDomain records.
 
 ```typescript
 // List all managedDomain records
-const items = await db.managedDomain.findMany({ select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
+const items = await db.managedDomain.findMany({ select: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Get one by id
-const item = await db.managedDomain.findOne({ id: '<UUID>', select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
+const item = await db.managedDomain.findOne({ id: '<UUID>', select: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Create
-const created = await db.managedDomain.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.managedDomain.create({ data: { allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { allowPublicUsage: '<Boolean>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.managedDomain.delete({ where: { id: '<UUID>' } }).execute();
@@ -1052,6 +1226,489 @@ const updated = await db.partition.update({ where: { id: '<UUID>' }, data: { dat
 const deleted = await db.partition.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformApi`
+
+CRUD operations for PlatformApi records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `anonRole` | String | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `dbname` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
+| `roleName` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformApi records
+const items = await db.platformApi.findMany({ select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformApi.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformApi.create({ data: { anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformApi.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformApi.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformApiModule`
+
+CRUD operations for PlatformApiModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformApiModule records
+const items = await db.platformApiModule.findMany({ select: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformApiModule.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformApiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', name: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformApiModule.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformApiModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformApiSchema`
+
+CRUD operations for PlatformApiSchema records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `schemaId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformApiSchema records
+const items = await db.platformApiSchema.findMany({ select: { apiId: true, createdAt: true, id: true, schemaId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformApiSchema.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, id: true, schemaId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformApiSchema.create({ data: { apiId: '<UUID>', schemaId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformApiSchema.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformApiSchema.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformApiSetting`
+
+CRUD operations for PlatformApiSetting records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `enableAggregates` | Boolean | Yes |
+| `enableBulk` | Boolean | Yes |
+| `enableConnectionFilter` | Boolean | Yes |
+| `enableDirectUploads` | Boolean | Yes |
+| `enableI18N` | Boolean | Yes |
+| `enableLlm` | Boolean | Yes |
+| `enableLtree` | Boolean | Yes |
+| `enableManyToMany` | Boolean | Yes |
+| `enablePostgis` | Boolean | Yes |
+| `enablePresignedUploads` | Boolean | Yes |
+| `enableRealtime` | Boolean | Yes |
+| `enableSearch` | Boolean | Yes |
+| `id` | UUID | No |
+| `options` | JSON | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformApiSetting records
+const items = await db.platformApiSetting.findMany({ select: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformApiSetting.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformApiSetting.create({ data: { apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformApiSetting.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformApiSetting.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformCorsSetting`
+
+CRUD operations for PlatformCorsSetting records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `allowedOrigins` | String | Yes |
+| `apiId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformCorsSetting records
+const items = await db.platformCorsSetting.findMany({ select: { allowedOrigins: true, apiId: true, createdAt: true, id: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformCorsSetting.findOne({ id: '<UUID>', select: { allowedOrigins: true, apiId: true, createdAt: true, id: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformCorsSetting.create({ data: { allowedOrigins: '<String>', apiId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformCorsSetting.update({ where: { id: '<UUID>' }, data: { allowedOrigins: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformCorsSetting.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformDomain`
+
+CRUD operations for PlatformDomain records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `hostname` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `isWildcard` | Boolean | Yes |
+| `managed` | Boolean | Yes |
+| `parentHostname` | String | Yes |
+| `tlsReadyAt` | Datetime | Yes |
+| `tlsSecretName` | String | Yes |
+| `tlsStatus` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verificationStatus` | String | Yes |
+| `verifiedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformDomain records
+const items = await db.platformDomain.findMany({ select: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformDomain.findOne({ id: '<UUID>', select: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
+
+// Create
+const created = await db.platformDomain.create({ data: { config: '<JSON>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformDomain.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformDomain.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformDomainEvent`
+
+CRUD operations for PlatformDomainEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `actorId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `domainId` | UUID | Yes |
+| `domainVerificationId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `id` | UUID | No |
+| `managedDomainId` | UUID | Yes |
+| `message` | String | Yes |
+| `metadata` | JSON | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformDomainEvent records
+const items = await db.platformDomainEvent.findMany({ select: { actorId: true, createdAt: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformDomainEvent.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformDomainEvent.create({ data: { actorId: '<UUID>', domainId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformDomainEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformDomainEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformDomainVerification`
+
+CRUD operations for PlatformDomainVerification records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `attempts` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `domainId` | UUID | Yes |
+| `error` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `lastCheckedAt` | Datetime | Yes |
+| `managedDomainId` | UUID | Yes |
+| `method` | String | Yes |
+| `recordName` | String | Yes |
+| `recordType` | String | Yes |
+| `recordValue` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verifiedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformDomainVerification records
+const items = await db.platformDomainVerification.findMany({ select: { attempts: true, createdAt: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformDomainVerification.findOne({ id: '<UUID>', select: { attempts: true, createdAt: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } }).execute();
+
+// Create
+const created = await db.platformDomainVerification.create({ data: { attempts: '<Int>', domainId: '<UUID>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformDomainVerification.update({ where: { id: '<UUID>' }, data: { attempts: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformDomainVerification.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformManagedDomain`
+
+CRUD operations for PlatformManagedDomain records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `allowPublicUsage` | Boolean | Yes |
+| `annotations` | JSON | Yes |
+| `certStatus` | String | Yes |
+| `createdAt` | Datetime | No |
+| `domain` | String | Yes |
+| `id` | UUID | No |
+| `isWildcard` | Boolean | Yes |
+| `tlsReadyAt` | Datetime | Yes |
+| `tlsStatus` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `verificationStatus` | String | Yes |
+| `verifiedAt` | Datetime | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformManagedDomain records
+const items = await db.platformManagedDomain.findMany({ select: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformManagedDomain.findOne({ id: '<UUID>', select: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } }).execute();
+
+// Create
+const created = await db.platformManagedDomain.create({ data: { allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformManagedDomain.update({ where: { id: '<UUID>' }, data: { allowPublicUsage: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformManagedDomain.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformSite`
+
+CRUD operations for PlatformSite records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
+| `title` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformSite records
+const items = await db.platformSite.findMany({ select: { config: true, createdAt: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformSite.findOne({ id: '<UUID>', select: { config: true, createdAt: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformSite.create({ data: { config: '<JSON>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformSite.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformSite.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformSiteMetadatum`
+
+CRUD operations for PlatformSiteMetadatum records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `ogImage` | ConstructiveInternalTypeImage | Yes |
+| `siteId` | UUID | Yes |
+| `title` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformSiteMetadatum records
+const items = await db.platformSiteMetadatum.findMany({ select: { createdAt: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformSiteMetadatum.findOne({ id: '<UUID>', select: { createdAt: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformSiteMetadatum.create({ data: { description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformSiteMetadatum.update({ where: { id: '<UUID>' }, data: { description: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformSiteMetadatum.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformSiteModule`
+
+CRUD operations for PlatformSiteModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `siteId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformSiteModule records
+const items = await db.platformSiteModule.findMany({ select: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformSiteModule.findOne({ id: '<UUID>', select: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformSiteModule.create({ data: { data: '<JSON>', name: '<String>', siteId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformSiteModule.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformSiteModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformSiteTheme`
+
+CRUD operations for PlatformSiteTheme records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `siteId` | UUID | Yes |
+| `theme` | JSON | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformSiteTheme records
+const items = await db.platformSiteTheme.findMany({ select: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformSiteTheme.findOne({ id: '<UUID>', select: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformSiteTheme.create({ data: { siteId: '<UUID>', theme: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformSiteTheme.update({ where: { id: '<UUID>' }, data: { siteId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformSiteTheme.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.policy`
 
 CRUD operations for Policy records.
@@ -1109,24 +1766,27 @@ CRUD operations for PrimaryKeyConstraint records.
 | `databaseId` | UUID | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
 | `tags` | String | Yes |
 | `type` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `withoutOverlaps` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all primaryKeyConstraint records
-const items = await db.primaryKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.primaryKeyConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Get one by id
-const item = await db.primaryKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.primaryKeyConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Create
-const created = await db.primaryKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
+const created = await db.primaryKeyConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.primaryKeyConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1143,6 +1803,7 @@ CRUD operations for PubkeySetting records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `createdAt` | Datetime | No |
 | `cryptoNetwork` | String | Yes |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
@@ -1151,16 +1812,17 @@ CRUD operations for PubkeySetting records.
 | `signInRequestChallengeFunctionId` | UUID | Yes |
 | `signInWithChallengeFunctionId` | UUID | Yes |
 | `signUpWithKeyFunctionId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
 | `userField` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all pubkeySetting records
-const items = await db.pubkeySetting.findMany({ select: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } }).execute();
+const items = await db.pubkeySetting.findMany({ select: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } }).execute();
 
 // Get one by id
-const item = await db.pubkeySetting.findOne({ id: '<UUID>', select: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } }).execute();
+const item = await db.pubkeySetting.findOne({ id: '<UUID>', select: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } }).execute();
 
 // Create
 const created = await db.pubkeySetting.create({ data: { cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>', signUpWithKeyFunctionId: '<UUID>', userField: '<String>' }, select: { id: true } }).execute();
@@ -1183,6 +1845,7 @@ CRUD operations for RlsSetting records.
 | `authenticateFunctionId` | UUID | Yes |
 | `authenticateSchemaId` | UUID | Yes |
 | `authenticateStrictFunctionId` | UUID | Yes |
+| `createdAt` | Datetime | No |
 | `currentIpAddressFunctionId` | UUID | Yes |
 | `currentRoleFunctionId` | UUID | Yes |
 | `currentRoleIdFunctionId` | UUID | Yes |
@@ -1190,15 +1853,16 @@ CRUD operations for RlsSetting records.
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `roleSchemaId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all rlsSetting records
-const items = await db.rlsSetting.findMany({ select: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } }).execute();
+const items = await db.rlsSetting.findMany({ select: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, createdAt: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.rlsSetting.findOne({ id: '<UUID>', select: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } }).execute();
+const item = await db.rlsSetting.findOne({ id: '<UUID>', select: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, createdAt: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.rlsSetting.create({ data: { authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', databaseId: '<UUID>', roleSchemaId: '<UUID>' }, select: { id: true } }).execute();
@@ -1208,6 +1872,85 @@ const updated = await db.rlsSetting.update({ where: { id: '<UUID>' }, data: { au
 
 // Delete
 const deleted = await db.rlsSetting.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.routeBinding`
+
+CRUD operations for RouteBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `domainId` | UUID | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `method` | String | Yes |
+| `path` | String | Yes |
+| `priority` | Int | Yes |
+| `targetApiId` | UUID | Yes |
+| `targetFunctionId` | UUID | Yes |
+| `targetSiteId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all routeBinding records
+const items = await db.routeBinding.findMany({ select: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.routeBinding.findOne({ id: '<UUID>', select: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.routeBinding.create({ data: { domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetFunctionId: '<UUID>', targetSiteId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.routeBinding.update({ where: { id: '<UUID>' }, data: { domainId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.routeBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.route`
+
+CRUD operations for Route records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `domainId` | UUID | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `method` | String | Yes |
+| `path` | String | Yes |
+| `priority` | Int | Yes |
+| `targetApiId` | UUID | Yes |
+| `targetFunctionId` | UUID | Yes |
+| `targetSiteId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all route records
+const items = await db.route.findMany({ select: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.route.findOne({ id: '<UUID>', select: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.route.create({ data: { config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetFunctionId: '<UUID>', targetSiteId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.route.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.route.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.schema`
@@ -1293,32 +2036,30 @@ CRUD operations for Site records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `annotations` | JSON | Yes |
-| `appleTouchIcon` | ConstructiveInternalTypeImage | Yes |
+| `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `dbname` | String | Yes |
 | `description` | String | Yes |
-| `favicon` | ConstructiveInternalTypeAttachment | Yes |
 | `id` | UUID | No |
-| `labels` | JSON | Yes |
-| `logo` | ConstructiveInternalTypeImage | Yes |
-| `ogImage` | ConstructiveInternalTypeImage | Yes |
+| `isPublished` | Boolean | Yes |
+| `name` | String | Yes |
 | `title` | String | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all site records
-const items = await db.site.findMany({ select: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } }).execute();
+const items = await db.site.findMany({ select: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.site.findOne({ id: '<UUID>', select: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } }).execute();
+const item = await db.site.findOne({ id: '<UUID>', select: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.site.create({ data: { annotations: '<JSON>', appleTouchIcon: '<Image>', databaseId: '<UUID>', dbname: '<String>', description: '<String>', favicon: '<Attachment>', labels: '<JSON>', logo: '<Image>', ogImage: '<Image>', title: '<String>' }, select: { id: true } }).execute();
+const created = await db.site.create({ data: { config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.site.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.site.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.site.delete({ where: { id: '<UUID>' } }).execute();
@@ -1332,21 +2073,23 @@ CRUD operations for SiteMetadatum records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `description` | String | Yes |
 | `id` | UUID | No |
 | `ogImage` | ConstructiveInternalTypeImage | Yes |
 | `siteId` | UUID | Yes |
 | `title` | String | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all siteMetadatum records
-const items = await db.siteMetadatum.findMany({ select: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } }).execute();
+const items = await db.siteMetadatum.findMany({ select: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.siteMetadatum.findOne({ id: '<UUID>', select: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } }).execute();
+const item = await db.siteMetadatum.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.siteMetadatum.create({ data: { databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' }, select: { id: true } }).execute();
@@ -1366,20 +2109,22 @@ CRUD operations for SiteModule records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `createdAt` | Datetime | No |
 | `data` | JSON | Yes |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `name` | String | Yes |
 | `siteId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all siteModule records
-const items = await db.siteModule.findMany({ select: { data: true, databaseId: true, id: true, name: true, siteId: true } }).execute();
+const items = await db.siteModule.findMany({ select: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.siteModule.findOne({ id: '<UUID>', select: { data: true, databaseId: true, id: true, name: true, siteId: true } }).execute();
+const item = await db.siteModule.findOne({ id: '<UUID>', select: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.siteModule.create({ data: { data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>' }, select: { id: true } }).execute();
@@ -1399,19 +2144,21 @@ CRUD operations for SiteTheme records.
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `siteId` | UUID | Yes |
 | `theme` | JSON | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all siteTheme records
-const items = await db.siteTheme.findMany({ select: { databaseId: true, id: true, siteId: true, theme: true } }).execute();
+const items = await db.siteTheme.findMany({ select: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.siteTheme.findOne({ id: '<UUID>', select: { databaseId: true, id: true, siteId: true, theme: true } }).execute();
+const item = await db.siteTheme.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.siteTheme.create({ data: { databaseId: '<UUID>', siteId: '<UUID>', theme: '<JSON>' }, select: { id: true } }).execute();
@@ -1679,24 +2426,27 @@ CRUD operations for UniqueConstraint records.
 | `description` | String | Yes |
 | `fieldIds` | UUID | Yes |
 | `id` | UUID | No |
+| `initiallyDeferred` | Boolean | Yes |
+| `isDeferrable` | Boolean | Yes |
 | `name` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
 | `tags` | String | Yes |
 | `type` | String | Yes |
 | `updatedAt` | Datetime | No |
+| `withoutOverlaps` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all uniqueConstraint records
-const items = await db.uniqueConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const items = await db.uniqueConstraint.findMany({ select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Get one by id
-const item = await db.uniqueConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } }).execute();
+const item = await db.uniqueConstraint.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } }).execute();
 
 // Create
-const created = await db.uniqueConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute();
+const created = await db.uniqueConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.uniqueConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1714,6 +2464,7 @@ CRUD operations for View records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `category` | ObjectCategory | Yes |
+| `checkOption` | String | Yes |
 | `data` | JSON | Yes |
 | `databaseId` | UUID | Yes |
 | `filterData` | JSON | Yes |
@@ -1722,6 +2473,7 @@ CRUD operations for View records.
 | `isReadOnly` | Boolean | Yes |
 | `name` | String | Yes |
 | `schemaId` | UUID | Yes |
+| `securityBarrier` | Boolean | Yes |
 | `securityInvoker` | Boolean | Yes |
 | `smartTags` | JSON | Yes |
 | `tableId` | UUID | Yes |
@@ -1732,13 +2484,13 @@ CRUD operations for View records.
 
 ```typescript
 // List all view records
-const items = await db.view.findMany({ select: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
+const items = await db.view.findMany({ select: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
 
 // Get one by id
-const item = await db.view.findOne({ id: '<UUID>', select: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
+const item = await db.view.findOne({ id: '<UUID>', select: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } }).execute();
 
 // Create
-const created = await db.view.create({ data: { category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' }, select: { id: true } }).execute();
+const created = await db.view.create({ data: { category: '<ObjectCategory>', checkOption: '<String>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityBarrier: '<Boolean>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.view.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
@@ -1859,6 +2611,7 @@ CRUD operations for WebauthnSetting records.
 |-------|------|----------|
 | `attestationType` | String | Yes |
 | `challengeExpirySeconds` | BigInt | Yes |
+| `createdAt` | Datetime | No |
 | `credentialsSchemaId` | UUID | Yes |
 | `credentialsTableId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
@@ -1874,16 +2627,17 @@ CRUD operations for WebauthnSetting records.
 | `sessionSecretsTableId` | UUID | Yes |
 | `sessionsSchemaId` | UUID | Yes |
 | `sessionsTableId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
 | `userFieldId` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all webauthnSetting records
-const items = await db.webauthnSetting.findMany({ select: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } }).execute();
+const items = await db.webauthnSetting.findMany({ select: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } }).execute();
 
 // Get one by id
-const item = await db.webauthnSetting.findOne({ id: '<UUID>', select: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } }).execute();
+const item = await db.webauthnSetting.findOne({ id: '<UUID>', select: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } }).execute();
 
 // Create
 const created = await db.webauthnSetting.create({ data: { attestationType: '<String>', challengeExpirySeconds: '<BigInt>', credentialsSchemaId: '<UUID>', credentialsTableId: '<UUID>', databaseId: '<UUID>', originAllowlist: '<String>', requireUserVerification: '<Boolean>', residentKey: '<String>', rpId: '<String>', rpName: '<String>', schemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionSecretsSchemaId: '<UUID>', sessionSecretsTableId: '<UUID>', sessionsSchemaId: '<UUID>', sessionsTableId: '<UUID>', userFieldId: '<UUID>' }, select: { id: true } }).execute();
@@ -1922,12 +2676,29 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `pHost` | String |
-  | `pMethod` | String |
-  | `pPath` | String |
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
 
 ```typescript
-const result = await db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' }).execute();
+const result = await db.query.resolveHttpRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
+```
+
+### `db.query.resolveRoute`
+
+resolveRoute
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
+
+```typescript
+const result = await db.query.resolveRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
 ```
 
 ### `db.mutation.acceptDatabaseTransfer`
@@ -2012,7 +2783,7 @@ const result = await db.mutation.rejectDatabaseTransfer({ input: { transferId: '
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

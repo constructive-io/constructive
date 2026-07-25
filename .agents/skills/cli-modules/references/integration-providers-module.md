@@ -12,7 +12,7 @@ csdk integration-providers-module list --where.<field>.<op> <value> --orderBy <v
 csdk integration-providers-module list --limit 10 --after <cursor>
 csdk integration-providers-module find-first --where.<field>.<op> <value>
 csdk integration-providers-module get --id <UUID>
-csdk integration-providers-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--tableId <UUID>] [--tableName <String>]
+csdk integration-providers-module create --databaseId <UUID> --scope <String> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk integration-providers-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--tableId <UUID>] [--tableName <String>]
 csdk integration-providers-module delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk integration-providers-module list --where.id.equalTo <value> --orderBy ID_A
 ### Create a integrationProvidersModule
 
 ```bash
-csdk integration-providers-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--tableId <UUID>] [--tableName <String>]
+csdk integration-providers-module create --databaseId <UUID> --scope <String> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a integrationProvidersModule by id

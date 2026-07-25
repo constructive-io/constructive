@@ -16,10 +16,12 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
   databaseId: 'uuid',
   id: 'uuid',
   siteId: 'uuid',
   theme: 'json',
+  updatedAt: 'string',
 };
 const usage =
   '\nsite-theme <command>\n\nCommands:\n  list                  List siteTheme records\n  find-first            Find first matching siteTheme record\n  get                   Get a siteTheme by ID\n  create                Create a new siteTheme\n  update                Update an existing siteTheme\n  delete                Delete a siteTheme\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -72,10 +74,12 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       databaseId: true,
       id: true,
       siteId: true,
       theme: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy> & {
@@ -96,10 +100,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       databaseId: true,
       id: true,
       siteId: true,
       theme: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy> & {
@@ -132,10 +138,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
           databaseId: true,
           id: true,
           siteId: true,
           theme: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -181,10 +189,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           theme: cleanedData.theme,
         },
         select: {
+          createdAt: true,
           databaseId: true,
           id: true,
           siteId: true,
           theme: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -239,10 +249,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           theme: cleanedData.theme,
         },
         select: {
+          createdAt: true,
           databaseId: true,
           id: true,
           siteId: true,
           theme: true,
+          updatedAt: true,
         },
       })
       .execute();

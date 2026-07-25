@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
+  createdAt: 'string',
   databaseId: 'uuid',
   enableAggregates: 'boolean',
   enableBulk: 'boolean',
@@ -33,6 +34,7 @@ const fieldSchema: FieldSchema = {
   id: 'uuid',
   labels: 'json',
   options: 'json',
+  updatedAt: 'string',
 };
 const usage =
   '\ndatabase-setting <command>\n\nCommands:\n  list                  List databaseSetting records\n  find-first            Find first matching databaseSetting record\n  get                   Get a databaseSetting by ID\n  create                Create a new databaseSetting\n  update                Update an existing databaseSetting\n  delete                Delete a databaseSetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -86,6 +88,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       annotations: true,
+      createdAt: true,
       databaseId: true,
       enableAggregates: true,
       enableBulk: true,
@@ -102,6 +105,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       id: true,
       labels: true,
       options: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<DatabaseSettingSelect, DatabaseSettingFilter, DatabaseSettingOrderBy> & {
@@ -123,6 +127,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       annotations: true,
+      createdAt: true,
       databaseId: true,
       enableAggregates: true,
       enableBulk: true,
@@ -139,6 +144,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       labels: true,
       options: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<DatabaseSettingSelect, DatabaseSettingFilter, DatabaseSettingOrderBy> & {
@@ -172,6 +178,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           annotations: true,
+          createdAt: true,
           databaseId: true,
           enableAggregates: true,
           enableBulk: true,
@@ -188,6 +195,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           id: true,
           labels: true,
           options: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -343,6 +351,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           annotations: true,
+          createdAt: true,
           databaseId: true,
           enableAggregates: true,
           enableBulk: true,
@@ -359,6 +368,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           id: true,
           labels: true,
           options: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -520,6 +530,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           annotations: true,
+          createdAt: true,
           databaseId: true,
           enableAggregates: true,
           enableBulk: true,
@@ -536,6 +547,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: true,
           labels: true,
           options: true,
+          updatedAt: true,
         },
       })
       .execute();

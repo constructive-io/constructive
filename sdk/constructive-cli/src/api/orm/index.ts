@@ -9,7 +9,6 @@ import { ApiModel } from './models/api';
 import { ApiModuleModel } from './models/apiModule';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
-import { AppModel } from './models/app';
 import { AstMigrationModel } from './models/astMigration';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { CompositeTypeModel } from './models/compositeType';
@@ -19,21 +18,40 @@ import { DatabaseSettingModel } from './models/databaseSetting';
 import { DatabaseTransferModel } from './models/databaseTransfer';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { DomainModel } from './models/domain';
+import { DomainEventModel } from './models/domainEvent';
+import { DomainVerificationModel } from './models/domainVerification';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { EnumModel } from './models/enum';
+import { ExclusionConstraintModel } from './models/exclusionConstraint';
 import { FieldModel } from './models/field';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { FunctionModel } from './models/function';
+import { HostnameBindingModel } from './models/hostnameBinding';
 import { HttpRouteModel } from './models/httpRoute';
 import { IndexModel } from './models/index';
 import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { PartitionModel } from './models/partition';
+import { PlatformApiModel } from './models/platformApi';
+import { PlatformApiModuleModel } from './models/platformApiModule';
+import { PlatformApiSchemaModel } from './models/platformApiSchema';
+import { PlatformApiSettingModel } from './models/platformApiSetting';
+import { PlatformCorsSettingModel } from './models/platformCorsSetting';
+import { PlatformDomainModel } from './models/platformDomain';
+import { PlatformDomainEventModel } from './models/platformDomainEvent';
+import { PlatformDomainVerificationModel } from './models/platformDomainVerification';
+import { PlatformManagedDomainModel } from './models/platformManagedDomain';
+import { PlatformSiteModel } from './models/platformSite';
+import { PlatformSiteMetadatumModel } from './models/platformSiteMetadatum';
+import { PlatformSiteModuleModel } from './models/platformSiteModule';
+import { PlatformSiteThemeModel } from './models/platformSiteTheme';
 import { PolicyModel } from './models/policy';
 import { PrimaryKeyConstraintModel } from './models/primaryKeyConstraint';
 import { PubkeySettingModel } from './models/pubkeySetting';
 import { RlsSettingModel } from './models/rlsSetting';
+import { RouteBindingModel } from './models/routeBinding';
+import { RouteModel } from './models/route';
 import { SchemaModel } from './models/schema';
 import { SchemaGrantModel } from './models/schemaGrant';
 import { SiteModel } from './models/site';
@@ -91,7 +109,6 @@ export function createClient(config: OrmClientConfig) {
     apiModule: new ApiModuleModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
-    app: new AppModel(client),
     astMigration: new AstMigrationModel(client),
     checkConstraint: new CheckConstraintModel(client),
     compositeType: new CompositeTypeModel(client),
@@ -101,21 +118,40 @@ export function createClient(config: OrmClientConfig) {
     databaseTransfer: new DatabaseTransferModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
     domain: new DomainModel(client),
+    domainEvent: new DomainEventModel(client),
+    domainVerification: new DomainVerificationModel(client),
     embeddingChunk: new EmbeddingChunkModel(client),
     enum: new EnumModel(client),
+    exclusionConstraint: new ExclusionConstraintModel(client),
     field: new FieldModel(client),
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
     function: new FunctionModel(client),
+    hostnameBinding: new HostnameBindingModel(client),
     httpRoute: new HttpRouteModel(client),
     index: new IndexModel(client),
     managedDomain: new ManagedDomainModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     partition: new PartitionModel(client),
+    platformApi: new PlatformApiModel(client),
+    platformApiModule: new PlatformApiModuleModel(client),
+    platformApiSchema: new PlatformApiSchemaModel(client),
+    platformApiSetting: new PlatformApiSettingModel(client),
+    platformCorsSetting: new PlatformCorsSettingModel(client),
+    platformDomain: new PlatformDomainModel(client),
+    platformDomainEvent: new PlatformDomainEventModel(client),
+    platformDomainVerification: new PlatformDomainVerificationModel(client),
+    platformManagedDomain: new PlatformManagedDomainModel(client),
+    platformSite: new PlatformSiteModel(client),
+    platformSiteMetadatum: new PlatformSiteMetadatumModel(client),
+    platformSiteModule: new PlatformSiteModuleModel(client),
+    platformSiteTheme: new PlatformSiteThemeModel(client),
     policy: new PolicyModel(client),
     primaryKeyConstraint: new PrimaryKeyConstraintModel(client),
     pubkeySetting: new PubkeySettingModel(client),
     rlsSetting: new RlsSettingModel(client),
+    routeBinding: new RouteBindingModel(client),
+    route: new RouteModel(client),
     schema: new SchemaModel(client),
     schemaGrant: new SchemaGrantModel(client),
     site: new SiteModel(client),

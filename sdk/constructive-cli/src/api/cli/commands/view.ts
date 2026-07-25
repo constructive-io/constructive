@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   category: 'string',
+  checkOption: 'string',
   data: 'json',
   databaseId: 'uuid',
   filterData: 'json',
@@ -25,6 +26,7 @@ const fieldSchema: FieldSchema = {
   isReadOnly: 'boolean',
   name: 'string',
   schemaId: 'uuid',
+  securityBarrier: 'boolean',
   securityInvoker: 'boolean',
   smartTags: 'json',
   tableId: 'uuid',
@@ -83,6 +85,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       category: true,
+      checkOption: true,
       data: true,
       databaseId: true,
       filterData: true,
@@ -91,6 +94,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isReadOnly: true,
       name: true,
       schemaId: true,
+      securityBarrier: true,
       securityInvoker: true,
       smartTags: true,
       tableId: true,
@@ -117,6 +121,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       category: true,
+      checkOption: true,
       data: true,
       databaseId: true,
       filterData: true,
@@ -125,6 +130,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isReadOnly: true,
       name: true,
       schemaId: true,
+      securityBarrier: true,
       securityInvoker: true,
       smartTags: true,
       tableId: true,
@@ -163,6 +169,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           category: true,
+          checkOption: true,
           data: true,
           databaseId: true,
           filterData: true,
@@ -171,6 +178,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           isReadOnly: true,
           name: true,
           schemaId: true,
+          securityBarrier: true,
           securityInvoker: true,
           smartTags: true,
           tableId: true,
@@ -195,6 +203,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'category',
         message: 'category',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'checkOption',
+        message: 'checkOption',
         required: false,
         skipPrompt: true,
       },
@@ -244,6 +259,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'securityBarrier',
+        message: 'securityBarrier',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -287,6 +309,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           category: cleanedData.category,
+          checkOption: cleanedData.checkOption,
           data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           filterData: cleanedData.filterData,
@@ -294,6 +317,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: cleanedData.isReadOnly,
           name: cleanedData.name,
           schemaId: cleanedData.schemaId,
+          securityBarrier: cleanedData.securityBarrier,
           securityInvoker: cleanedData.securityInvoker,
           smartTags: cleanedData.smartTags,
           tableId: cleanedData.tableId,
@@ -302,6 +326,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           category: true,
+          checkOption: true,
           data: true,
           databaseId: true,
           filterData: true,
@@ -310,6 +335,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: true,
           name: true,
           schemaId: true,
+          securityBarrier: true,
           securityInvoker: true,
           smartTags: true,
           tableId: true,
@@ -340,6 +366,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'category',
         message: 'category',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'checkOption',
+        message: 'checkOption',
         required: false,
         skipPrompt: true,
       },
@@ -389,6 +422,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+      },
+      {
+        type: 'boolean',
+        name: 'securityBarrier',
+        message: 'securityBarrier',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -435,6 +475,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           category: cleanedData.category,
+          checkOption: cleanedData.checkOption,
           data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           filterData: cleanedData.filterData,
@@ -442,6 +483,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: cleanedData.isReadOnly,
           name: cleanedData.name,
           schemaId: cleanedData.schemaId,
+          securityBarrier: cleanedData.securityBarrier,
           securityInvoker: cleanedData.securityInvoker,
           smartTags: cleanedData.smartTags,
           tableId: cleanedData.tableId,
@@ -450,6 +492,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           category: true,
+          checkOption: true,
           data: true,
           databaseId: true,
           filterData: true,
@@ -458,6 +501,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: true,
           name: true,
           schemaId: true,
+          securityBarrier: true,
           securityInvoker: true,
           smartTags: true,
           tableId: true,

@@ -12,7 +12,7 @@ csdk http-route-module list --where.<field>.<op> <value> --orderBy <values>
 csdk http-route-module list --limit 10 --after <cursor>
 csdk http-route-module find-first --where.<field>.<op> <value>
 csdk http-route-module get --id <UUID>
-csdk http-route-module create --databaseId <UUID> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--httpRoutesTableId <UUID>] [--httpRoutesTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--resolverFunctionName <String>] [--resourceModuleId <UUID>] [--schemaId <UUID>] [--scope <String>] [--storageModuleId <UUID>]
+csdk http-route-module create --databaseId <UUID> --scope <String> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--httpRoutesTableId <UUID>] [--httpRoutesTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--resolverFunctionName <String>] [--resourceModuleId <UUID>] [--schemaId <UUID>] [--storageModuleId <UUID>]
 csdk http-route-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--httpRoutesTableId <UUID>] [--httpRoutesTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--resolverFunctionName <String>] [--resourceModuleId <UUID>] [--schemaId <UUID>] [--scope <String>] [--storageModuleId <UUID>]
 csdk http-route-module delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk http-route-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a httpRouteModule
 
 ```bash
-csdk http-route-module create --databaseId <UUID> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--httpRoutesTableId <UUID>] [--httpRoutesTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--resolverFunctionName <String>] [--resourceModuleId <UUID>] [--schemaId <UUID>] [--scope <String>] [--storageModuleId <UUID>]
+csdk http-route-module create --databaseId <UUID> --scope <String> [--apiName <String>] [--defaultPermissions <String>] [--entityField <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--httpRoutesTableId <UUID>] [--httpRoutesTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--resolverFunctionName <String>] [--resourceModuleId <UUID>] [--schemaId <UUID>] [--storageModuleId <UUID>]
 ```
 
 ### Get a httpRouteModule by id

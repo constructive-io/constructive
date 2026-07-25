@@ -16,12 +16,14 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
   databaseId: 'uuid',
   description: 'string',
   id: 'uuid',
   ogImage: 'string',
   siteId: 'uuid',
   title: 'string',
+  updatedAt: 'string',
 };
 const usage =
   '\nsite-metadatum <command>\n\nCommands:\n  list                  List siteMetadatum records\n  find-first            Find first matching siteMetadatum record\n  get                   Get a siteMetadatum by ID\n  create                Create a new siteMetadatum\n  update                Update an existing siteMetadatum\n  delete                Delete a siteMetadatum\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -74,12 +76,14 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       databaseId: true,
       description: true,
       id: true,
       ogImage: true,
       siteId: true,
       title: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<SiteMetadatumSelect, SiteMetadatumFilter, SiteMetadatumOrderBy> & {
@@ -100,12 +104,14 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       databaseId: true,
       description: true,
       id: true,
       ogImage: true,
       siteId: true,
       title: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<SiteMetadatumSelect, SiteMetadatumFilter, SiteMetadatumOrderBy> & {
@@ -138,12 +144,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
           databaseId: true,
           description: true,
           id: true,
           ogImage: true,
           siteId: true,
           title: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -209,12 +217,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           title: cleanedData.title,
         },
         select: {
+          createdAt: true,
           databaseId: true,
           description: true,
           id: true,
           ogImage: true,
           siteId: true,
           title: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -286,12 +296,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           title: cleanedData.title,
         },
         select: {
+          createdAt: true,
           databaseId: true,
           description: true,
           id: true,
           ogImage: true,
           siteId: true,
           title: true,
+          updatedAt: true,
         },
       })
       .execute();

@@ -21,18 +21,18 @@ export default async (
     const answers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'pHost',
-        message: 'pHost',
+        name: 'requestHost',
+        message: 'requestHost',
       },
       {
         type: 'text',
-        name: 'pMethod',
-        message: 'pMethod',
+        name: 'requestMethod',
+        message: 'requestMethod',
       },
       {
         type: 'text',
-        name: 'pPath',
-        message: 'pPath',
+        name: 'requestPath',
+        message: 'requestPath',
       },
     ]);
     const client = getClient();

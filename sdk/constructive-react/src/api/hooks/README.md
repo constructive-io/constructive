@@ -32,31 +32,26 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
-| `useApisQuery` | Query | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
-| `useApiQuery` | Query | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
-| `useCreateApiMutation` | Mutation | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
-| `useUpdateApiMutation` | Mutation | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
-| `useDeleteApiMutation` | Mutation | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
-| `useApiModulesQuery` | Query | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
-| `useApiModuleQuery` | Query | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
-| `useCreateApiModuleMutation` | Mutation | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
-| `useUpdateApiModuleMutation` | Mutation | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
-| `useDeleteApiModuleMutation` | Mutation | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
-| `useApiSchemasQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
-| `useApiSchemaQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
-| `useCreateApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
-| `useUpdateApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
-| `useDeleteApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
-| `useApiSettingsQuery` | Query | Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default |
-| `useApiSettingQuery` | Query | Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default |
-| `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default |
-| `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default |
-| `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default |
-| `useAppsQuery` | Query | Mobile and native app configuration linked to a site, including store links and identifiers |
-| `useAppQuery` | Query | Mobile and native app configuration linked to a site, including store links and identifiers |
-| `useCreateAppMutation` | Mutation | Mobile and native app configuration linked to a site, including store links and identifiers |
-| `useUpdateAppMutation` | Mutation | Mobile and native app configuration linked to a site, including store links and identifiers |
-| `useDeleteAppMutation` | Mutation | Mobile and native app configuration linked to a site, including store links and identifiers |
+| `useApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeleteApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useApiModulesQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useApiModuleQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useCreateApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useUpdateApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useDeleteApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
+| `useApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
+| `useCreateApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
+| `useUpdateApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
+| `useDeleteApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
+| `useApiSettingsQuery` | Query | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useApiSettingQuery` | Query | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
@@ -72,21 +67,21 @@ function App() {
 | `useCreateCompositeTypeMutation` | Mutation | Create a compositeType |
 | `useUpdateCompositeTypeMutation` | Mutation | Update a compositeType |
 | `useDeleteCompositeTypeMutation` | Mutation | Delete a compositeType |
-| `useCorsSettingsQuery` | Query | Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries |
-| `useCorsSettingQuery` | Query | Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries |
-| `useCreateCorsSettingMutation` | Mutation | Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries |
-| `useUpdateCorsSettingMutation` | Mutation | Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries |
-| `useDeleteCorsSettingMutation` | Mutation | Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries |
+| `useCorsSettingsQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useCorsSettingQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useCreateCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useUpdateCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useDeleteCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
 | `useDatabasesQuery` | Query | List all databases |
 | `useDatabaseQuery` | Query | Get one database |
 | `useCreateDatabaseMutation` | Mutation | Create a database |
 | `useUpdateDatabaseMutation` | Mutation | Update a database |
 | `useDeleteDatabaseMutation` | Mutation | Delete a database |
-| `useDatabaseSettingsQuery` | Query | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
-| `useDatabaseSettingQuery` | Query | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
-| `useCreateDatabaseSettingMutation` | Mutation | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
-| `useUpdateDatabaseSettingMutation` | Mutation | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
-| `useDeleteDatabaseSettingMutation` | Mutation | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
+| `useDatabaseSettingsQuery` | Query | Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope |
+| `useDatabaseSettingQuery` | Query | Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope |
+| `useCreateDatabaseSettingMutation` | Mutation | Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope |
+| `useUpdateDatabaseSettingMutation` | Mutation | Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope |
+| `useDeleteDatabaseSettingMutation` | Mutation | Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope |
 | `useDatabaseTransfersQuery` | Query | List all databaseTransfers |
 | `useDatabaseTransferQuery` | Query | Get one databaseTransfer |
 | `useCreateDatabaseTransferMutation` | Mutation | Create a databaseTransfer |
@@ -97,11 +92,21 @@ function App() {
 | `useCreateDefaultPrivilegeMutation` | Mutation | Create a defaultPrivilege |
 | `useUpdateDefaultPrivilegeMutation` | Mutation | Update a defaultPrivilege |
 | `useDeleteDefaultPrivilegeMutation` | Mutation | Delete a defaultPrivilege |
-| `useDomainsQuery` | Query | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
-| `useDomainQuery` | Query | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
-| `useCreateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
-| `useUpdateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
-| `useDeleteDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useDomainsQuery` | Query | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useDomainQuery` | Query | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useCreateDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useUpdateDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useDeleteDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useDomainEventsQuery` | Query | Audit trail of domain lifecycle events |
+| `useDomainEventQuery` | Query | Audit trail of domain lifecycle events |
+| `useCreateDomainEventMutation` | Mutation | Audit trail of domain lifecycle events |
+| `useUpdateDomainEventMutation` | Mutation | Audit trail of domain lifecycle events |
+| `useDeleteDomainEventMutation` | Mutation | Audit trail of domain lifecycle events |
+| `useDomainVerificationsQuery` | Query | Ownership verification challenges issued for a domain |
+| `useDomainVerificationQuery` | Query | Ownership verification challenges issued for a domain |
+| `useCreateDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `useUpdateDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `useDeleteDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
 | `useEmbeddingChunksQuery` | Query | List all embeddingChunks |
 | `useEmbeddingChunkQuery` | Query | Get one embeddingChunk |
 | `useCreateEmbeddingChunkMutation` | Mutation | Create a embeddingChunk |
@@ -112,6 +117,11 @@ function App() {
 | `useCreateEnumMutation` | Mutation | Create a enum |
 | `useUpdateEnumMutation` | Mutation | Update a enum |
 | `useDeleteEnumMutation` | Mutation | Delete a enum |
+| `useExclusionConstraintsQuery` | Query | List all exclusionConstraints |
+| `useExclusionConstraintQuery` | Query | Get one exclusionConstraint |
+| `useCreateExclusionConstraintMutation` | Mutation | Create a exclusionConstraint |
+| `useUpdateExclusionConstraintMutation` | Mutation | Update a exclusionConstraint |
+| `useDeleteExclusionConstraintMutation` | Mutation | Delete a exclusionConstraint |
 | `useFieldsQuery` | Query | List all fields |
 | `useFieldQuery` | Query | Get one field |
 | `useCreateFieldMutation` | Mutation | Create a field |
@@ -132,6 +142,11 @@ function App() {
 | `useCreateFunctionMutation` | Mutation | Create a function |
 | `useUpdateFunctionMutation` | Mutation | Update a function |
 | `useDeleteFunctionMutation` | Mutation | Delete a function |
+| `useHostnameBindingsQuery` | Query | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
+| `useHostnameBindingQuery` | Query | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
+| `useCreateHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
+| `useUpdateHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
+| `useDeleteHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useHttpRoutesQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
 | `useHttpRouteQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
 | `useCreateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
@@ -142,11 +157,11 @@ function App() {
 | `useCreateIndexMutation` | Mutation | Create a index |
 | `useUpdateIndexMutation` | Mutation | Update a index |
 | `useDeleteIndexMutation` | Mutation | Delete a index |
-| `useManagedDomainsQuery` | Query | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
-| `useManagedDomainQuery` | Query | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
-| `useCreateManagedDomainMutation` | Mutation | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
-| `useUpdateManagedDomainMutation` | Mutation | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
-| `useDeleteManagedDomainMutation` | Mutation | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
+| `useManagedDomainsQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useManagedDomainQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useCreateManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useUpdateManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useDeleteManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `useNodeTypeRegistriesQuery` | Query | List all nodeTypeRegistries |
 | `useNodeTypeRegistryQuery` | Query | Get one nodeTypeRegistry |
 | `useCreateNodeTypeRegistryMutation` | Mutation | Create a nodeTypeRegistry |
@@ -157,6 +172,71 @@ function App() {
 | `useCreatePartitionMutation` | Mutation | Create a partition |
 | `useUpdatePartitionMutation` | Mutation | Update a partition |
 | `useDeletePartitionMutation` | Mutation | Delete a partition |
+| `usePlatformApisQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformApiQuery` | Query | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeletePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformApiModulesQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `usePlatformApiModuleQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useCreatePlatformApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useUpdatePlatformApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `useDeletePlatformApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
+| `usePlatformApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
+| `usePlatformApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
+| `useCreatePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
+| `useUpdatePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
+| `useDeletePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
+| `usePlatformApiSettingsQuery` | Query | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `usePlatformApiSettingQuery` | Query | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useCreatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useUpdatePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `useDeletePlatformApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
+| `usePlatformCorsSettingsQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `usePlatformCorsSettingQuery` | Query | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useCreatePlatformCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useUpdatePlatformCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `useDeletePlatformCorsSettingMutation` | Mutation | Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default |
+| `usePlatformDomainsQuery` | Query | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `usePlatformDomainQuery` | Query | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useCreatePlatformDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useUpdatePlatformDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `useDeletePlatformDomainMutation` | Mutation | Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog |
+| `usePlatformDomainEventsQuery` | Query | Audit trail of domain lifecycle events |
+| `usePlatformDomainEventQuery` | Query | Audit trail of domain lifecycle events |
+| `useCreatePlatformDomainEventMutation` | Mutation | Audit trail of domain lifecycle events |
+| `useUpdatePlatformDomainEventMutation` | Mutation | Audit trail of domain lifecycle events |
+| `useDeletePlatformDomainEventMutation` | Mutation | Audit trail of domain lifecycle events |
+| `usePlatformDomainVerificationsQuery` | Query | Ownership verification challenges issued for a domain |
+| `usePlatformDomainVerificationQuery` | Query | Ownership verification challenges issued for a domain |
+| `useCreatePlatformDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `useUpdatePlatformDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `useDeletePlatformDomainVerificationMutation` | Mutation | Ownership verification challenges issued for a domain |
+| `usePlatformManagedDomainsQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `usePlatformManagedDomainQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useCreatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useUpdatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `useDeletePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
+| `usePlatformSitesQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformSiteQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreatePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdatePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeletePlatformSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `usePlatformSiteMetadataQuery` | Query | SEO and social sharing metadata for a site surface |
+| `usePlatformSiteMetadatumQuery` | Query | SEO and social sharing metadata for a site surface |
+| `useCreatePlatformSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
+| `useUpdatePlatformSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
+| `useDeletePlatformSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
+| `usePlatformSiteModulesQuery` | Query | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `usePlatformSiteModuleQuery` | Query | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useCreatePlatformSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useUpdatePlatformSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useDeletePlatformSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `usePlatformSiteThemesQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
+| `usePlatformSiteThemeQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
+| `useCreatePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
+| `useUpdatePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
+| `useDeletePlatformSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
 | `usePoliciesQuery` | Query | List all policies |
 | `usePolicyQuery` | Query | Get one policy |
 | `useCreatePolicyMutation` | Mutation | Create a policy |
@@ -167,16 +247,26 @@ function App() {
 | `useCreatePrimaryKeyConstraintMutation` | Mutation | Create a primaryKeyConstraint |
 | `useUpdatePrimaryKeyConstraintMutation` | Mutation | Update a primaryKeyConstraint |
 | `useDeletePrimaryKeyConstraintMutation` | Mutation | Delete a primaryKeyConstraint |
-| `usePubkeySettingsQuery` | Query | Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries |
-| `usePubkeySettingQuery` | Query | Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries |
-| `useCreatePubkeySettingMutation` | Mutation | Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries |
-| `useUpdatePubkeySettingMutation` | Mutation | Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries |
-| `useDeletePubkeySettingMutation` | Mutation | Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries |
-| `useRlsSettingsQuery` | Query | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
-| `useRlsSettingQuery` | Query | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
-| `useCreateRlsSettingMutation` | Mutation | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
-| `useUpdateRlsSettingMutation` | Mutation | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
-| `useDeleteRlsSettingMutation` | Mutation | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
+| `usePubkeySettingsQuery` | Query | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `usePubkeySettingQuery` | Query | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `useCreatePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `useUpdatePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `useDeletePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `useRlsSettingsQuery` | Query | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
+| `useRlsSettingQuery` | Query | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
+| `useCreateRlsSettingMutation` | Mutation | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
+| `useUpdateRlsSettingMutation` | Mutation | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
+| `useDeleteRlsSettingMutation` | Mutation | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
+| `useRouteBindingsQuery` | Query | Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver |
+| `useRouteBindingQuery` | Query | Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver |
+| `useCreateRouteBindingMutation` | Mutation | Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver |
+| `useUpdateRouteBindingMutation` | Mutation | Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver |
+| `useDeleteRouteBindingMutation` | Mutation | Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver |
+| `useRoutesQuery` | Query | Routes binding a domain hostname and path to a typed catalog target |
+| `useRouteQuery` | Query | Routes binding a domain hostname and path to a typed catalog target |
+| `useCreateRouteMutation` | Mutation | Routes binding a domain hostname and path to a typed catalog target |
+| `useUpdateRouteMutation` | Mutation | Routes binding a domain hostname and path to a typed catalog target |
+| `useDeleteRouteMutation` | Mutation | Routes binding a domain hostname and path to a typed catalog target |
 | `useSchemasQuery` | Query | List all schemas |
 | `useSchemaQuery` | Query | Get one schema |
 | `useCreateSchemaMutation` | Mutation | Create a schema |
@@ -187,26 +277,26 @@ function App() {
 | `useCreateSchemaGrantMutation` | Mutation | Create a schemaGrant |
 | `useUpdateSchemaGrantMutation` | Mutation | Update a schemaGrant |
 | `useDeleteSchemaGrantMutation` | Mutation | Delete a schemaGrant |
-| `useSitesQuery` | Query | Top-level site configuration: branding assets, title, and description for a deployed application |
-| `useSiteQuery` | Query | Top-level site configuration: branding assets, title, and description for a deployed application |
-| `useCreateSiteMutation` | Mutation | Top-level site configuration: branding assets, title, and description for a deployed application |
-| `useUpdateSiteMutation` | Mutation | Top-level site configuration: branding assets, title, and description for a deployed application |
-| `useDeleteSiteMutation` | Mutation | Top-level site configuration: branding assets, title, and description for a deployed application |
-| `useSiteMetadataQuery` | Query | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
-| `useSiteMetadatumQuery` | Query | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
-| `useCreateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
-| `useUpdateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
-| `useDeleteSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
-| `useSiteModulesQuery` | Query | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
-| `useSiteModuleQuery` | Query | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
-| `useCreateSiteModuleMutation` | Mutation | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
-| `useUpdateSiteModuleMutation` | Mutation | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
-| `useDeleteSiteModuleMutation` | Mutation | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
-| `useSiteThemesQuery` | Query | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
-| `useSiteThemeQuery` | Query | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
-| `useCreateSiteThemeMutation` | Mutation | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
-| `useUpdateSiteThemeMutation` | Mutation | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
-| `useDeleteSiteThemeMutation` | Mutation | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
+| `useSitesQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useSiteQuery` | Query | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useCreateSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useUpdateSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useDeleteSiteMutation` | Mutation | Site surfaces exposed by this scope; publication makes a surface bindable from other scopes |
+| `useSiteMetadataQuery` | Query | SEO and social sharing metadata for a site surface |
+| `useSiteMetadatumQuery` | Query | SEO and social sharing metadata for a site surface |
+| `useCreateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
+| `useUpdateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
+| `useDeleteSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site surface |
+| `useSiteModulesQuery` | Query | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useSiteModuleQuery` | Query | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useCreateSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useUpdateSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useDeleteSiteModuleMutation` | Mutation | Frontend module configuration for a site surface; stores module name and JSON settings |
+| `useSiteThemesQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
+| `useSiteThemeQuery` | Query | Theme (colors, fonts, design tokens) for a site surface |
+| `useCreateSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
+| `useUpdateSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
+| `useDeleteSiteThemeMutation` | Mutation | Theme (colors, fonts, design tokens) for a site surface |
 | `useSpatialRelationsQuery` | Query | List all spatialRelations |
 | `useSpatialRelationQuery` | Query | Get one spatialRelation |
 | `useCreateSpatialRelationMutation` | Mutation | Create a spatialRelation |
@@ -262,13 +352,14 @@ function App() {
 | `useCreateViewTableMutation` | Mutation | Junction table linking views to their joined tables for referential integrity |
 | `useUpdateViewTableMutation` | Mutation | Junction table linking views to their joined tables for referential integrity |
 | `useDeleteViewTableMutation` | Mutation | Junction table linking views to their joined tables for referential integrity |
-| `useWebauthnSettingsQuery` | Query | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useWebauthnSettingQuery` | Query | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useCreateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useUpdateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useDeleteWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
+| `useWebauthnSettingsQuery` | Query | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
+| `useWebauthnSettingQuery` | Query | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
+| `useCreateWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
+| `useUpdateWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
+| `useDeleteWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
 | `useResolveHttpRouteQuery` | Query | resolveHttpRoute |
+| `useResolveRouteQuery` | Query | resolveRoute |
 | `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useApplyRlsMutation` | Mutation | applyRls |
 | `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
@@ -279,7 +370,7 @@ and lifecycle settings. |
 | `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
 | `useRequestDatabaseMutation` | Mutation | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
@@ -293,20 +384,20 @@ Example usage:
 ```typescript
 // List all apis
 const { data, isLoading } = useApisQuery({
-  selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 
 // Get one api
 const { data: item } = useApiQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, anonRole: true, databaseId: true, dbname: true, id: true, isPublic: true, labels: true, name: true, roleName: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 
 // Create a api
 const { mutate: create } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbname: '<String>', isPublic: '<Boolean>', labels: '<JSON>', name: '<String>', roleName: '<String>' });
+create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### ApiModule
@@ -314,13 +405,13 @@ create({ annotations: '<JSON>', anonRole: '<String>', databaseId: '<UUID>', dbna
 ```typescript
 // List all apiModules
 const { data, isLoading } = useApiModulesQuery({
-  selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } },
+  selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } },
 });
 
 // Get one apiModule
 const { data: item } = useApiModuleQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } },
+  selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } },
 });
 
 // Create a apiModule
@@ -335,13 +426,13 @@ create({ apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>'
 ```typescript
 // List all apiSchemas
 const { data, isLoading } = useApiSchemasQuery({
-  selection: { fields: { apiId: true, databaseId: true, id: true, schemaId: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, id: true, schemaId: true, updatedAt: true } },
 });
 
 // Get one apiSchema
 const { data: item } = useApiSchemaQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, databaseId: true, id: true, schemaId: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, id: true, schemaId: true, updatedAt: true } },
 });
 
 // Create a apiSchema
@@ -356,13 +447,13 @@ create({ apiId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>' });
 ```typescript
 // List all apiSettings
 const { data, isLoading } = useApiSettingsQuery({
-  selection: { fields: { apiId: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
 });
 
 // Get one apiSetting
 const { data: item } = useApiSettingQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
 });
 
 // Create a apiSetting
@@ -370,27 +461,6 @@ const { mutate: create } = useCreateApiSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>' });
-```
-
-### App
-
-```typescript
-// List all apps
-const { data, isLoading } = useAppsQuery({
-  selection: { fields: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } },
-});
-
-// Get one app
-const { data: item } = useAppQuery({
-  id: '<UUID>',
-  selection: { fields: { appIdPrefix: true, appImage: true, appStoreId: true, appStoreLink: true, databaseId: true, id: true, name: true, playStoreLink: true, siteId: true } },
-});
-
-// Create a app
-const { mutate: create } = useCreateAppMutation({
-  selection: { fields: { id: true } },
-});
-create({ appIdPrefix: '<String>', appImage: '<Image>', appStoreId: '<String>', appStoreLink: '<Url>', databaseId: '<UUID>', name: '<String>', playStoreLink: '<Url>', siteId: '<UUID>' });
 ```
 
 ### AstMigration
@@ -419,20 +489,20 @@ create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', database
 ```typescript
 // List all checkConstraints
 const { data, isLoading } = useCheckConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Get one checkConstraint
 const { data: item } = useCheckConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Create a checkConstraint
 const { mutate: create } = useCreateCheckConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
 ```
 
 ### CompositeType
@@ -461,13 +531,13 @@ create({ attributes: '<JSON>', category: '<ObjectCategory>', databaseId: '<UUID>
 ```typescript
 // List all corsSettings
 const { data, isLoading } = useCorsSettingsQuery({
-  selection: { fields: { allowedOrigins: true, apiId: true, databaseId: true, id: true } },
+  selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
 });
 
 // Get one corsSetting
 const { data: item } = useCorsSettingQuery({
   id: '<UUID>',
-  selection: { fields: { allowedOrigins: true, apiId: true, databaseId: true, id: true } },
+  selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
 });
 
 // Create a corsSetting
@@ -503,13 +573,13 @@ create({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>',
 ```typescript
 // List all databaseSettings
 const { data, isLoading } = useDatabaseSettingsQuery({
-  selection: { fields: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } },
 });
 
 // Get one databaseSetting
 const { data: item } = useDatabaseSettingQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } },
 });
 
 // Create a databaseSetting
@@ -566,20 +636,62 @@ create({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', ob
 ```typescript
 // List all domains
 const { data, isLoading } = useDomainsQuery({
-  selection: { fields: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one domain
 const { data: item } = useDomainQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a domain
 const { mutate: create } = useCreateDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', apiId: '<UUID>', databaseId: '<UUID>', domain: '<Hostname>', labels: '<JSON>', serviceId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>' });
+create({ config: '<JSON>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+```
+
+### DomainEvent
+
+```typescript
+// List all domainEvents
+const { data, isLoading } = useDomainEventsQuery({
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } },
+});
+
+// Get one domainEvent
+const { data: item } = useDomainEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } },
+});
+
+// Create a domainEvent
+const { mutate: create } = useCreateDomainEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', databaseId: '<UUID>', domainId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>' });
+```
+
+### DomainVerification
+
+```typescript
+// List all domainVerifications
+const { data, isLoading } = useDomainVerificationsQuery({
+  selection: { fields: { attempts: true, createdAt: true, databaseId: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Get one domainVerification
+const { data: item } = useDomainVerificationQuery({
+  id: '<UUID>',
+  selection: { fields: { attempts: true, createdAt: true, databaseId: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Create a domainVerification
+const { mutate: create } = useCreateDomainVerificationMutation({
+  selection: { fields: { id: true } },
+});
+create({ attempts: '<Int>', databaseId: '<UUID>', domainId: '<UUID>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### EmbeddingChunk
@@ -624,25 +736,46 @@ const { mutate: create } = useCreateEnumMutation({
 create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', label: '<String>', name: '<String>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>', values: '<String>' });
 ```
 
+### ExclusionConstraint
+
+```typescript
+// List all exclusionConstraints
+const { data, isLoading } = useExclusionConstraintsQuery({
+  selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } },
+});
+
+// Get one exclusionConstraint
+const { data: item } = useExclusionConstraintQuery({
+  id: '<UUID>',
+  selection: { fields: { accessMethod: true, category: true, createdAt: true, databaseId: true, elementExpr: true, fieldIds: true, id: true, name: true, operators: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, whereClause: true } },
+});
+
+// Create a exclusionConstraint
+const { mutate: create } = useCreateExclusionConstraintMutation({
+  selection: { fields: { id: true } },
+});
+create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', elementExpr: '<JSON>', fieldIds: '<UUID>', name: '<String>', operators: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', whereClause: '<JSON>' });
+```
+
 ### Field
 
 ```typescript
 // List all fields
 const { data, isLoading } = useFieldsQuery({
-  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Get one field
 const { data: item } = useFieldQuery({
   id: '<UUID>',
-  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { apiRequired: true, category: true, chk: true, chkExpr: true, createdAt: true, databaseId: true, defaultValue: true, description: true, fieldOrder: true, generationExpression: true, generationType: true, id: true, identityGeneration: true, identityOptions: true, isRequired: true, label: true, max: true, min: true, name: true, regexp: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 
 // Create a field
 const { mutate: create } = useCreateFieldMutation({
   selection: { fields: { id: true } },
 });
-create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' });
+create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', chkExpr: '<JSON>', databaseId: '<UUID>', defaultValue: '<JSON>', description: '<String>', fieldOrder: '<Int>', generationExpression: '<JSON>', generationType: '<String>', identityGeneration: '<String>', identityOptions: '<JSON>', isRequired: '<Boolean>', label: '<String>', max: '<Float>', min: '<Float>', name: '<String>', regexp: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<JSON>' });
 ```
 
 ### ForeignKeyConstraint
@@ -650,20 +783,20 @@ create({ apiRequired: '<Boolean>', category: '<ObjectCategory>', chk: '<JSON>', 
 ```typescript
 // List all foreignKeyConstraints
 const { data, isLoading } = useForeignKeyConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } },
 });
 
 // Get one foreignKeyConstraint
 const { data: item } = useForeignKeyConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, description: true, fieldIds: true, id: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, deleteAction: true, deleteSetFieldIds: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, refFieldIds: true, refTableId: true, smartTags: true, tableId: true, tags: true, type: true, updateAction: true, updatedAt: true, withPeriod: true } },
 });
 
 // Create a foreignKeyConstraint
 const { mutate: create } = useCreateForeignKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', description: '<String>', fieldIds: '<UUID>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', deleteAction: '<String>', deleteSetFieldIds: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', refFieldIds: '<UUID>', refTableId: '<UUID>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', updateAction: '<String>', withPeriod: '<Boolean>' });
 ```
 
 ### FullTextSearch
@@ -706,6 +839,27 @@ const { mutate: create } = useCreateFunctionMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' });
+```
+
+### HostnameBinding
+
+```typescript
+// List all hostnameBindings
+const { data, isLoading } = useHostnameBindingsQuery({
+  selection: { fields: { domainId: true, hostname: true, id: true, isWildcard: true, managed: true, parentHostname: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true } },
+});
+
+// Get one hostnameBinding
+const { data: item } = useHostnameBindingQuery({
+  id: '<UUID>',
+  selection: { fields: { domainId: true, hostname: true, id: true, isWildcard: true, managed: true, parentHostname: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true } },
+});
+
+// Create a hostnameBinding
+const { mutate: create } = useCreateHostnameBindingMutation({
+  selection: { fields: { id: true } },
+});
+create({ domainId: '<UUID>', hostname: '<String>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>' });
 ```
 
 ### HttpRoute
@@ -755,20 +909,20 @@ create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<U
 ```typescript
 // List all managedDomains
 const { data, isLoading } = useManagedDomainsQuery({
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one managedDomain
 const { data: item } = useManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a managedDomain
 const { mutate: create } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### NodeTypeRegistry
@@ -813,6 +967,279 @@ const { mutate: create } = useCreatePartitionMutation({
 create({ databaseId: '<UUID>', interval: '<String>', isParented: '<Boolean>', namingPattern: '<String>', partitionKeyId: '<UUID>', premake: '<Int>', retention: '<String>', retentionKeepTable: '<Boolean>', strategy: '<String>', tableId: '<UUID>' });
 ```
 
+### PlatformApi
+
+```typescript
+// List all platformApis
+const { data, isLoading } = usePlatformApisQuery({
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Get one platformApi
+const { data: item } = usePlatformApiQuery({
+  id: '<UUID>',
+  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+});
+
+// Create a platformApi
+const { mutate: create } = useCreatePlatformApiMutation({
+  selection: { fields: { id: true } },
+});
+create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+```
+
+### PlatformApiModule
+
+```typescript
+// List all platformApiModules
+const { data, isLoading } = usePlatformApiModulesQuery({
+  selection: { fields: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } },
+});
+
+// Get one platformApiModule
+const { data: item } = usePlatformApiModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } },
+});
+
+// Create a platformApiModule
+const { mutate: create } = useCreatePlatformApiModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiId: '<UUID>', data: '<JSON>', name: '<String>' });
+```
+
+### PlatformApiSchema
+
+```typescript
+// List all platformApiSchemas
+const { data, isLoading } = usePlatformApiSchemasQuery({
+  selection: { fields: { apiId: true, createdAt: true, id: true, schemaId: true, updatedAt: true } },
+});
+
+// Get one platformApiSchema
+const { data: item } = usePlatformApiSchemaQuery({
+  id: '<UUID>',
+  selection: { fields: { apiId: true, createdAt: true, id: true, schemaId: true, updatedAt: true } },
+});
+
+// Create a platformApiSchema
+const { mutate: create } = useCreatePlatformApiSchemaMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiId: '<UUID>', schemaId: '<UUID>' });
+```
+
+### PlatformApiSetting
+
+```typescript
+// List all platformApiSettings
+const { data, isLoading } = usePlatformApiSettingsQuery({
+  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
+});
+
+// Get one platformApiSetting
+const { data: item } = usePlatformApiSettingQuery({
+  id: '<UUID>',
+  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, options: true, updatedAt: true } },
+});
+
+// Create a platformApiSetting
+const { mutate: create } = useCreatePlatformApiSettingMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>' });
+```
+
+### PlatformCorsSetting
+
+```typescript
+// List all platformCorsSettings
+const { data, isLoading } = usePlatformCorsSettingsQuery({
+  selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, id: true, updatedAt: true } },
+});
+
+// Get one platformCorsSetting
+const { data: item } = usePlatformCorsSettingQuery({
+  id: '<UUID>',
+  selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, id: true, updatedAt: true } },
+});
+
+// Create a platformCorsSetting
+const { mutate: create } = useCreatePlatformCorsSettingMutation({
+  selection: { fields: { id: true } },
+});
+create({ allowedOrigins: '<String>', apiId: '<UUID>' });
+```
+
+### PlatformDomain
+
+```typescript
+// List all platformDomains
+const { data, isLoading } = usePlatformDomainsQuery({
+  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+});
+
+// Get one platformDomain
+const { data: item } = usePlatformDomainQuery({
+  id: '<UUID>',
+  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+});
+
+// Create a platformDomain
+const { mutate: create } = useCreatePlatformDomainMutation({
+  selection: { fields: { id: true } },
+});
+create({ config: '<JSON>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+```
+
+### PlatformDomainEvent
+
+```typescript
+// List all platformDomainEvents
+const { data, isLoading } = usePlatformDomainEventsQuery({
+  selection: { fields: { actorId: true, createdAt: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } },
+});
+
+// Get one platformDomainEvent
+const { data: item } = usePlatformDomainEventQuery({
+  id: '<UUID>',
+  selection: { fields: { actorId: true, createdAt: true, domainId: true, domainVerificationId: true, eventType: true, id: true, managedDomainId: true, message: true, metadata: true, updatedAt: true } },
+});
+
+// Create a platformDomainEvent
+const { mutate: create } = useCreatePlatformDomainEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ actorId: '<UUID>', domainId: '<UUID>', domainVerificationId: '<UUID>', eventType: '<String>', managedDomainId: '<UUID>', message: '<String>', metadata: '<JSON>' });
+```
+
+### PlatformDomainVerification
+
+```typescript
+// List all platformDomainVerifications
+const { data, isLoading } = usePlatformDomainVerificationsQuery({
+  selection: { fields: { attempts: true, createdAt: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Get one platformDomainVerification
+const { data: item } = usePlatformDomainVerificationQuery({
+  id: '<UUID>',
+  selection: { fields: { attempts: true, createdAt: true, domainId: true, error: true, expiresAt: true, id: true, lastCheckedAt: true, managedDomainId: true, method: true, recordName: true, recordType: true, recordValue: true, status: true, updatedAt: true, verifiedAt: true } },
+});
+
+// Create a platformDomainVerification
+const { mutate: create } = useCreatePlatformDomainVerificationMutation({
+  selection: { fields: { id: true } },
+});
+create({ attempts: '<Int>', domainId: '<UUID>', error: '<String>', expiresAt: '<Datetime>', lastCheckedAt: '<Datetime>', managedDomainId: '<UUID>', method: '<String>', recordName: '<String>', recordType: '<String>', recordValue: '<String>', status: '<String>', verifiedAt: '<Datetime>' });
+```
+
+### PlatformManagedDomain
+
+```typescript
+// List all platformManagedDomains
+const { data, isLoading } = usePlatformManagedDomainsQuery({
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+});
+
+// Get one platformManagedDomain
+const { data: item } = usePlatformManagedDomainQuery({
+  id: '<UUID>',
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+});
+
+// Create a platformManagedDomain
+const { mutate: create } = useCreatePlatformManagedDomainMutation({
+  selection: { fields: { id: true } },
+});
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+```
+
+### PlatformSite
+
+```typescript
+// List all platformSites
+const { data, isLoading } = usePlatformSitesQuery({
+  selection: { fields: { config: true, createdAt: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
+});
+
+// Get one platformSite
+const { data: item } = usePlatformSiteQuery({
+  id: '<UUID>',
+  selection: { fields: { config: true, createdAt: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
+});
+
+// Create a platformSite
+const { mutate: create } = useCreatePlatformSiteMutation({
+  selection: { fields: { id: true } },
+});
+create({ config: '<JSON>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' });
+```
+
+### PlatformSiteMetadatum
+
+```typescript
+// List all platformSiteMetadata
+const { data, isLoading } = usePlatformSiteMetadataQuery({
+  selection: { fields: { createdAt: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
+});
+
+// Get one platformSiteMetadatum
+const { data: item } = usePlatformSiteMetadatumQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
+});
+
+// Create a platformSiteMetadatum
+const { mutate: create } = useCreatePlatformSiteMetadatumMutation({
+  selection: { fields: { id: true } },
+});
+create({ description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' });
+```
+
+### PlatformSiteModule
+
+```typescript
+// List all platformSiteModules
+const { data, isLoading } = usePlatformSiteModulesQuery({
+  selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } },
+});
+
+// Get one platformSiteModule
+const { data: item } = usePlatformSiteModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, data: true, id: true, name: true, siteId: true, updatedAt: true } },
+});
+
+// Create a platformSiteModule
+const { mutate: create } = useCreatePlatformSiteModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ data: '<JSON>', name: '<String>', siteId: '<UUID>' });
+```
+
+### PlatformSiteTheme
+
+```typescript
+// List all platformSiteThemes
+const { data, isLoading } = usePlatformSiteThemesQuery({
+  selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } },
+});
+
+// Get one platformSiteTheme
+const { data: item } = usePlatformSiteThemeQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, siteId: true, theme: true, updatedAt: true } },
+});
+
+// Create a platformSiteTheme
+const { mutate: create } = useCreatePlatformSiteThemeMutation({
+  selection: { fields: { id: true } },
+});
+create({ siteId: '<UUID>', theme: '<JSON>' });
+```
+
 ### Policy
 
 ```typescript
@@ -839,20 +1266,20 @@ create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', dis
 ```typescript
 // List all primaryKeyConstraints
 const { data, isLoading } = usePrimaryKeyConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Get one primaryKeyConstraint
 const { data: item } = usePrimaryKeyConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Create a primaryKeyConstraint
 const { mutate: create } = useCreatePrimaryKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' });
 ```
 
 ### PubkeySetting
@@ -860,13 +1287,13 @@ create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>',
 ```typescript
 // List all pubkeySettings
 const { data, isLoading } = usePubkeySettingsQuery({
-  selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } },
+  selection: { fields: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } },
 });
 
 // Get one pubkeySetting
 const { data: item } = usePubkeySettingQuery({
   id: '<UUID>',
-  selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } },
+  selection: { fields: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } },
 });
 
 // Create a pubkeySetting
@@ -881,13 +1308,13 @@ create({ cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', si
 ```typescript
 // List all rlsSettings
 const { data, isLoading } = useRlsSettingsQuery({
-  selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } },
+  selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, createdAt: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true, updatedAt: true } },
 });
 
 // Get one rlsSetting
 const { data: item } = useRlsSettingQuery({
   id: '<UUID>',
-  selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true } },
+  selection: { fields: { authenticateFunctionId: true, authenticateSchemaId: true, authenticateStrictFunctionId: true, createdAt: true, currentIpAddressFunctionId: true, currentRoleFunctionId: true, currentRoleIdFunctionId: true, currentUserAgentFunctionId: true, databaseId: true, id: true, roleSchemaId: true, updatedAt: true } },
 });
 
 // Create a rlsSetting
@@ -895,6 +1322,48 @@ const { mutate: create } = useCreateRlsSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', databaseId: '<UUID>', roleSchemaId: '<UUID>' });
+```
+
+### RouteBinding
+
+```typescript
+// List all routeBindings
+const { data, isLoading } = useRouteBindingsQuery({
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+});
+
+// Get one routeBinding
+const { data: item } = useRouteBindingQuery({
+  id: '<UUID>',
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+});
+
+// Create a routeBinding
+const { mutate: create } = useCreateRouteBindingMutation({
+  selection: { fields: { id: true } },
+});
+create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetFunctionId: '<UUID>', targetSiteId: '<UUID>' });
+```
+
+### Route
+
+```typescript
+// List all routes
+const { data, isLoading } = useRoutesQuery({
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+});
+
+// Get one route
+const { data: item } = useRouteQuery({
+  id: '<UUID>',
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetFunctionId: true, targetSiteId: true, updatedAt: true } },
+});
+
+// Create a route
+const { mutate: create } = useCreateRouteMutation({
+  selection: { fields: { id: true } },
+});
+create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetFunctionId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Schema
@@ -944,20 +1413,20 @@ create({ databaseId: '<UUID>', granteeName: '<String>', schemaId: '<UUID>' });
 ```typescript
 // List all sites
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
 });
 
 // Get one site
 const { data: item } = useSiteQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
 });
 
 // Create a site
 const { mutate: create } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', appleTouchIcon: '<Image>', databaseId: '<UUID>', dbname: '<String>', description: '<String>', favicon: '<Attachment>', labels: '<JSON>', logo: '<Image>', ogImage: '<Image>', title: '<String>' });
+create({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' });
 ```
 
 ### SiteMetadatum
@@ -965,13 +1434,13 @@ create({ annotations: '<JSON>', appleTouchIcon: '<Image>', databaseId: '<UUID>',
 ```typescript
 // List all siteMetadata
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } },
+  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
 });
 
 // Get one siteMetadatum
 const { data: item } = useSiteMetadatumQuery({
   id: '<UUID>',
-  selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } },
+  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
 });
 
 // Create a siteMetadatum
@@ -986,13 +1455,13 @@ create({ databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', site
 ```typescript
 // List all siteModules
 const { data, isLoading } = useSiteModulesQuery({
-  selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } },
 });
 
 // Get one siteModule
 const { data: item } = useSiteModuleQuery({
   id: '<UUID>',
-  selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } },
 });
 
 // Create a siteModule
@@ -1007,13 +1476,13 @@ create({ data: '<JSON>', databaseId: '<UUID>', name: '<String>', siteId: '<UUID>
 ```typescript
 // List all siteThemes
 const { data, isLoading } = useSiteThemesQuery({
-  selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } },
 });
 
 // Get one siteTheme
 const { data: item } = useSiteThemeQuery({
   id: '<UUID>',
-  selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } },
 });
 
 // Create a siteTheme
@@ -1154,20 +1623,20 @@ create({ code: '<String>', databaseId: '<UUID>', name: '<String>' });
 ```typescript
 // List all uniqueConstraints
 const { data, isLoading } = useUniqueConstraintsQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Get one uniqueConstraint
 const { data: item } = useUniqueConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, description: true, fieldIds: true, id: true, initiallyDeferred: true, isDeferrable: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true, withoutOverlaps: true } },
 });
 
 // Create a uniqueConstraint
 const { mutate: create } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
+create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', initiallyDeferred: '<Boolean>', isDeferrable: '<Boolean>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>', withoutOverlaps: '<Boolean>' });
 ```
 
 ### View
@@ -1175,20 +1644,20 @@ create({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<Stri
 ```typescript
 // List all views
 const { data, isLoading } = useViewsQuery({
-  selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
+  selection: { fields: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
 });
 
 // Get one view
 const { data: item } = useViewQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
+  selection: { fields: { category: true, checkOption: true, data: true, databaseId: true, filterData: true, filterType: true, id: true, isReadOnly: true, name: true, schemaId: true, securityBarrier: true, securityInvoker: true, smartTags: true, tableId: true, tags: true, viewType: true } },
 });
 
 // Create a view
 const { mutate: create } = useCreateViewMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' });
+create({ category: '<ObjectCategory>', checkOption: '<String>', data: '<JSON>', databaseId: '<UUID>', filterData: '<JSON>', filterType: '<String>', isReadOnly: '<Boolean>', name: '<String>', schemaId: '<UUID>', securityBarrier: '<Boolean>', securityInvoker: '<Boolean>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', viewType: '<String>' });
 ```
 
 ### ViewGrant
@@ -1259,13 +1728,13 @@ create({ databaseId: '<UUID>', joinOrder: '<Int>', tableId: '<UUID>', viewId: '<
 ```typescript
 // List all webauthnSettings
 const { data, isLoading } = useWebauthnSettingsQuery({
-  selection: { fields: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } },
+  selection: { fields: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } },
 });
 
 // Get one webauthnSetting
 const { data: item } = useWebauthnSettingQuery({
   id: '<UUID>',
-  selection: { fields: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } },
+  selection: { fields: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } },
 });
 
 // Create a webauthnSetting
@@ -1298,9 +1767,22 @@ resolveHttpRoute
 
   | Argument | Type |
   |----------|------|
-  | `pHost` | String |
-  | `pMethod` | String |
-  | `pPath` | String |
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
+
+### `useResolveRouteQuery`
+
+resolveRoute
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `requestHost` | String |
+  | `requestMethod` | String |
+  | `requestPath` | String |
 
 ### `useAcceptDatabaseTransferMutation`
 
@@ -1364,7 +1846,7 @@ rejectDatabaseTransfer
 
 Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
   SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');

@@ -16,6 +16,7 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
   cryptoNetwork: 'string',
   databaseId: 'uuid',
   id: 'uuid',
@@ -24,6 +25,7 @@ const fieldSchema: FieldSchema = {
   signInRequestChallengeFunctionId: 'uuid',
   signInWithChallengeFunctionId: 'uuid',
   signUpWithKeyFunctionId: 'uuid',
+  updatedAt: 'string',
   userField: 'string',
 };
 const usage =
@@ -77,6 +79,7 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       cryptoNetwork: true,
       databaseId: true,
       id: true,
@@ -85,6 +88,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       signInRequestChallengeFunctionId: true,
       signInWithChallengeFunctionId: true,
       signUpWithKeyFunctionId: true,
+      updatedAt: true,
       userField: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -106,6 +110,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
       cryptoNetwork: true,
       databaseId: true,
       id: true,
@@ -114,6 +119,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       signInRequestChallengeFunctionId: true,
       signInWithChallengeFunctionId: true,
       signUpWithKeyFunctionId: true,
+      updatedAt: true,
       userField: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -147,6 +153,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
           cryptoNetwork: true,
           databaseId: true,
           id: true,
@@ -155,6 +162,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           signInRequestChallengeFunctionId: true,
           signInWithChallengeFunctionId: true,
           signUpWithKeyFunctionId: true,
+          updatedAt: true,
           userField: true,
         },
       })
@@ -246,6 +254,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           userField: cleanedData.userField,
         },
         select: {
+          createdAt: true,
           cryptoNetwork: true,
           databaseId: true,
           id: true,
@@ -254,6 +263,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           signInRequestChallengeFunctionId: true,
           signInWithChallengeFunctionId: true,
           signUpWithKeyFunctionId: true,
+          updatedAt: true,
           userField: true,
         },
       })
@@ -351,6 +361,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           userField: cleanedData.userField,
         },
         select: {
+          createdAt: true,
           cryptoNetwork: true,
           databaseId: true,
           id: true,
@@ -359,6 +370,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           signInRequestChallengeFunctionId: true,
           signInWithChallengeFunctionId: true,
           signUpWithKeyFunctionId: true,
+          updatedAt: true,
           userField: true,
         },
       })

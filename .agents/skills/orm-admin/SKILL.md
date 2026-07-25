@@ -1,13 +1,13 @@
 ---
 name: orm-admin
-description: ORM client for the admin API — provides typed CRUD operations for 30 tables and 12 custom operations
+description: ORM client for the admin API — provides typed CRUD operations for 26 tables and 11 custom operations
 ---
 
 # orm-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the admin API — provides typed CRUD operations for 30 tables and 12 custom operations
+ORM client for the admin API — provides typed CRUD operations for 26 tables and 11 custom operations
 
 ## Usage
 
@@ -50,11 +50,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-permission-default-permission](references/app-permission-default-permission.md)
 - [membership-type](references/membership-type.md)
 - [org-admin-grant](references/org-admin-grant.md)
-- [org-chart-edge](references/org-chart-edge.md)
-- [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
-- [org-get-managers-record](references/org-get-managers-record.md)
-- [org-get-subordinates-record](references/org-get-subordinates-record.md)
 - [org-grant](references/org-grant.md)
 - [org-invite](references/org-invite.md)
 - [org-member](references/org-member.md)
@@ -71,7 +67,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-permissions-get-mask](references/app-permissions-get-mask.md)
 - [app-permissions-get-mask-by-names](references/app-permissions-get-mask-by-names.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
-- [org-is-manager-of](references/org-is-manager-of.md)
 - [org-permissions-get-by-mask](references/org-permissions-get-by-mask.md)
 - [org-permissions-get-mask](references/org-permissions-get-mask.md)
 - [org-permissions-get-mask-by-names](references/org-permissions-get-mask-by-names.md)

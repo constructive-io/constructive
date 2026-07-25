@@ -139,24 +139,6 @@ export const orgAdminGrantKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgAdminGrantKeys.details(), id] as const,
 } as const;
-export const orgChartEdgeKeys = {
-  /** All orgChartEdge queries */ all: ['orgchartedge'] as const,
-  /** List query keys */ lists: () => [...orgChartEdgeKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgChartEdgeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgChartEdgeKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgChartEdgeKeys.details(), id] as const,
-} as const;
-export const orgChartEdgeGrantKeys = {
-  /** All orgChartEdgeGrant queries */ all: ['orgchartedgegrant'] as const,
-  /** List query keys */ lists: () => [...orgChartEdgeGrantKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgChartEdgeGrantKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgChartEdgeGrantKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgChartEdgeGrantKeys.details(), id] as const,
-} as const;
 export const orgClaimedInviteKeys = {
   /** All orgClaimedInvite queries */ all: ['orgclaimedinvite'] as const,
   /** List query keys */ lists: () => [...orgClaimedInviteKeys.all, 'list'] as const,
@@ -165,24 +147,6 @@ export const orgClaimedInviteKeys = {
   /** Detail query keys */ details: () => [...orgClaimedInviteKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgClaimedInviteKeys.details(), id] as const,
-} as const;
-export const orgGetManagersRecordKeys = {
-  /** All orgGetManagersRecord queries */ all: ['orggetmanagersrecord'] as const,
-  /** List query keys */ lists: () => [...orgGetManagersRecordKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgGetManagersRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgGetManagersRecordKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgGetManagersRecordKeys.details(), id] as const,
-} as const;
-export const orgGetSubordinatesRecordKeys = {
-  /** All orgGetSubordinatesRecord queries */ all: ['orggetsubordinatesrecord'] as const,
-  /** List query keys */ lists: () => [...orgGetSubordinatesRecordKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgGetSubordinatesRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgGetSubordinatesRecordKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgGetSubordinatesRecordKeys.details(), id] as const,
 } as const;
 export const orgGrantKeys = {
   /** All orgGrant queries */ all: ['orggrant'] as const,
@@ -311,8 +275,6 @@ export const customQueryKeys = {
   /** Query key for appPermissionsGetPaddedMask */ appPermissionsGetPaddedMask: (
     variables?: object
   ) => ['appPermissionsGetPaddedMask', variables] as const,
-  /** Query key for orgIsManagerOf */ orgIsManagerOf: (variables?: object) =>
-    ['orgIsManagerOf', variables] as const,
   /** Query key for orgPermissionsGetByMask */ orgPermissionsGetByMask: (variables?: object) =>
     ['orgPermissionsGetByMask', variables] as const,
   /** Query key for orgPermissionsGetMask */ orgPermissionsGetMask: (variables?: object) =>
@@ -360,11 +322,7 @@ export const queryKeys = {
   appPermissionDefaultPermission: appPermissionDefaultPermissionKeys,
   membershipType: membershipTypeKeys,
   orgAdminGrant: orgAdminGrantKeys,
-  orgChartEdge: orgChartEdgeKeys,
-  orgChartEdgeGrant: orgChartEdgeGrantKeys,
   orgClaimedInvite: orgClaimedInviteKeys,
-  orgGetManagersRecord: orgGetManagersRecordKeys,
-  orgGetSubordinatesRecord: orgGetSubordinatesRecordKeys,
   orgGrant: orgGrantKeys,
   orgInvite: orgInviteKeys,
   orgMember: orgMemberKeys,

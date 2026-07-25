@@ -7,7 +7,7 @@ Execute the platformResourceInstallationsUninstall mutation
 ## Usage
 
 ```bash
-csdk platform-resource-installations-uninstall --input.clientMutationId <String> --input.pInstallationId <UUID>
+csdk platform-resource-installations-uninstall --input.clientMutationId <String> --input.targetInstallationId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-resource-installations-uninstall --input.clientMutationId <String>
 ### Run platformResourceInstallationsUninstall
 
 ```bash
-csdk platform-resource-installations-uninstall --input.clientMutationId <String> --input.pInstallationId <UUID>
+csdk platform-resource-installations-uninstall --input.clientMutationId <String> --input.targetInstallationId <UUID>
 ```
