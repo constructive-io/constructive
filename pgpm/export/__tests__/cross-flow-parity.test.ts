@@ -20,7 +20,7 @@ import { toCamelCase } from 'inflekt';
 import { exportMeta } from '../src/export-meta';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
 import { GraphQLClient } from '../src/graphql-client';
-import { META_TABLE_CONFIG, FieldType } from '../src/export-utils';
+import { META_TABLE_CONFIG } from '../src/export-utils';
 import { getGraphQLQueryName, getGraphQLTypeName, GraphQLTypeInfo } from '../src/graphql-naming';
 import { lookupByPgUdt } from '../src/type-map';
 
@@ -47,6 +47,8 @@ const INDEX_ID = 'd0000001-0000-0000-0000-000000000001';
 const POLICY_ID = 'd1000001-0000-0000-0000-000000000001';
 const CORS_SETTINGS_ID = 'd2000001-0000-0000-0000-000000000001';
 const USER_AUTH_MODULE_ID = 'd3000001-0000-0000-0000-000000000001';
+const CATALOG_MODULE_ID = 'd4000001-0000-0000-0000-000000000001';
+const ROUTE_MODULE_ID = 'd5000001-0000-0000-0000-000000000001';
 
 // =============================================================================
 // Helper: build a mock GraphQLClient that reads from the real database
@@ -310,7 +312,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
         // Create schemas and tables
         await pg.query(`
           CREATE SCHEMA IF NOT EXISTS metaschema_public;
-          CREATE SCHEMA IF NOT EXISTS services_public;
+          CREATE SCHEMA IF NOT EXISTS constructive_routing_public;
           CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
 
           -- metaschema_public tables
@@ -344,34 +346,37 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             description text
           );
 
-          -- services_public tables
-          CREATE TABLE services_public.domains (
+          -- constructive_routing_public tables
+          CREATE TABLE constructive_routing_public.domains (
             id uuid PRIMARY KEY,
             database_id uuid,
-            site_id uuid,
-            api_id uuid,
-            domain text,
-            subdomain text
+            hostname text,
+            managed boolean,
+            is_wildcard boolean,
+            parent_hostname text,
+            verification_status text,
+            tls_status text,
+            is_published boolean
           );
-          CREATE TABLE services_public.sites (
-            id uuid PRIMARY KEY,
-            database_id uuid,
-            title text,
-            description text,
-            og_image text,
-            favicon text,
-            apple_touch_icon text,
-            logo text
-          );
-          CREATE TABLE services_public.apis (
+          CREATE TABLE constructive_routing_public.sites (
             id uuid PRIMARY KEY,
             database_id uuid,
             name text,
-            is_public boolean,
-            role_name text,
-            anon_role text
+            title text,
+            description text,
+            config jsonb,
+            is_published boolean
           );
-          CREATE TABLE services_public.api_schemas (
+          CREATE TABLE constructive_routing_public.apis (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            name text,
+            is_published boolean,
+            role_name text,
+            anon_role text,
+            config jsonb
+          );
+          CREATE TABLE constructive_routing_public.api_schemas (
             id uuid PRIMARY KEY,
             database_id uuid,
             schema_id uuid,
@@ -403,13 +408,35 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             force_enabled boolean,
             priority int4
           );
-          CREATE TABLE services_public.cors_settings (
+          CREATE TABLE constructive_routing_public.cors_settings (
             id uuid PRIMARY KEY,
             database_id uuid,
             api_id uuid,
-            allowed_origins text[],
-            allow_credentials boolean,
-            max_age int4
+            allowed_origins text[]
+          );
+          CREATE TABLE metaschema_modules_public.catalog_module (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            schema_id uuid,
+            public_schema_name text,
+            domains_table_name text,
+            apis_table_name text,
+            sites_table_name text,
+            apps_table_name text,
+            scope text,
+            policies jsonb
+          );
+          CREATE TABLE metaschema_modules_public.route_module (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            schema_id uuid,
+            catalog_module_id uuid,
+            domain_module_id uuid,
+            routes_table_name text,
+            hostname_bindings_table_name text,
+            route_bindings_table_name text,
+            scope text,
+            prefix text
           );
           CREATE TABLE metaschema_modules_public.user_auth_module (
             id uuid PRIMARY KEY,
@@ -452,22 +479,22 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
         `, [FIELD_ID_1, DATABASE_ID, TABLE_ID_USERS, FIELD_ID_2, FIELD_ID_3, TABLE_ID_POSTS]);
 
         await pg.query(`
-          INSERT INTO services_public.apis (id, database_id, name, is_public, role_name, anon_role)
+          INSERT INTO constructive_routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
           VALUES ($1, $2, 'public-api', true, 'authenticated', 'anonymous')
         `, [API_ID, DATABASE_ID]);
 
         await pg.query(`
-          INSERT INTO services_public.sites (id, database_id, title, description)
-          VALUES ($1, $2, 'Test App', 'A test application')
+          INSERT INTO constructive_routing_public.sites (id, database_id, name, title, description)
+          VALUES ($1, $2, 'test-app', 'Test App', 'A test application')
         `, [SITE_ID, DATABASE_ID]);
 
         await pg.query(`
-          INSERT INTO services_public.domains (id, database_id, domain, subdomain)
-          VALUES ($1, $2, 'example.com', 'app')
+          INSERT INTO constructive_routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published)
+          VALUES ($1, $2, 'app.example.com', false, false, true)
         `, [DOMAIN_ID, DATABASE_ID]);
 
         await pg.query(`
-          INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
+          INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id)
           VALUES ($1, $2, $3, $4)
         `, [API_SCHEMA_ID, DATABASE_ID, SCHEMA_ID_PUB, API_ID]);
 
@@ -486,9 +513,20 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
         // cors_settings table — tests text[] columns
         await pg.query(`
-          INSERT INTO services_public.cors_settings (id, database_id, api_id, allowed_origins, allow_credentials, max_age)
-          VALUES ($1, $2, $3, ARRAY['http://localhost:3000', 'https://example.com']::text[], true, 3600)
+          INSERT INTO constructive_routing_public.cors_settings (id, database_id, api_id, allowed_origins)
+          VALUES ($1, $2, $3, ARRAY['http://localhost:3000', 'https://example.com']::text[])
         `, [CORS_SETTINGS_ID, DATABASE_ID, API_ID]);
+
+        // surface module config tables (catalog / routing planes)
+        await pg.query(`
+          INSERT INTO metaschema_modules_public.catalog_module (id, database_id, schema_id, public_schema_name, domains_table_name, apis_table_name, sites_table_name, apps_table_name, scope, policies)
+          VALUES ($1, $2, $3, 'constructive_catalog_public', 'domains', 'apis', 'sites', 'apps', 'platform', '{"select": "public"}'::jsonb)
+        `, [CATALOG_MODULE_ID, DATABASE_ID, SCHEMA_ID_PUB]);
+
+        await pg.query(`
+          INSERT INTO metaschema_modules_public.route_module (id, database_id, schema_id, catalog_module_id, routes_table_name, hostname_bindings_table_name, route_bindings_table_name, scope, prefix)
+          VALUES ($1, $2, $3, $4, 'routes', 'hostname_bindings', 'route_bindings', 'platform', '')
+        `, [ROUTE_MODULE_ID, DATABASE_ID, SCHEMA_ID_PUB, CATALOG_MODULE_ID]);
 
         // user_auth_module — tests the renamed field from PR #1172
         await pg.query(`
@@ -591,7 +629,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
     expect(sqlResult['field']).toContain(FIELD_ID_3);
   });
 
-  it('SQL output for services tables should contain seeded data', async () => {
+  it('SQL output for routing tables should contain seeded data', async () => {
     const sqlResult = await exportMeta({
       opts: { pg: dbConfig },
       dbname: dbConfig.database,

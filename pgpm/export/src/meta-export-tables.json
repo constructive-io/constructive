@@ -18,22 +18,22 @@
     },
     {
       "key": "apis",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "apis"
     },
     {
       "key": "database_settings",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "database_settings"
     },
     {
       "key": "managed_domains",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "managed_domains"
     },
     {
       "key": "sites",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "sites"
     },
     {
@@ -78,47 +78,47 @@
     },
     {
       "key": "api_modules",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "api_modules"
     },
     {
       "key": "api_schemas",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "api_schemas"
     },
     {
       "key": "api_settings",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "api_settings"
     },
     {
       "key": "apps",
-      "schema": "services_public",
+      "schema": "constructive_apps_public",
       "table": "apps"
     },
     {
       "key": "cors_settings",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "cors_settings"
     },
     {
       "key": "domains",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "domains"
     },
     {
       "key": "site_metadata",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "site_metadata"
     },
     {
       "key": "site_modules",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "site_modules"
     },
     {
       "key": "site_themes",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "site_themes"
     },
     {
@@ -178,17 +178,17 @@
     },
     {
       "key": "http_routes",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "http_routes"
     },
     {
       "key": "pubkey_settings",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "pubkey_settings"
     },
     {
       "key": "rls_settings",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "rls_settings"
     },
     {
@@ -205,6 +205,11 @@
       "key": "billing_provider_module",
       "schema": "metaschema_modules_public",
       "table": "billing_provider_module"
+    },
+    {
+      "key": "catalog_module",
+      "schema": "metaschema_modules_public",
+      "table": "catalog_module"
     },
     {
       "key": "compute_log_module",
@@ -230,6 +235,11 @@
       "key": "crypto_auth_module",
       "schema": "metaschema_modules_public",
       "table": "crypto_auth_module"
+    },
+    {
+      "key": "database_settings_module",
+      "schema": "metaschema_modules_public",
+      "table": "database_settings_module"
     },
     {
       "key": "db_usage_module",
@@ -473,8 +483,18 @@
     },
     {
       "key": "webauthn_settings",
-      "schema": "services_public",
+      "schema": "constructive_routing_public",
       "table": "webauthn_settings"
+    },
+    {
+      "key": "api_surface_module",
+      "schema": "metaschema_modules_public",
+      "table": "api_surface_module"
+    },
+    {
+      "key": "app_module",
+      "schema": "metaschema_modules_public",
+      "table": "app_module"
     },
     {
       "key": "db_preset_module",
@@ -485,6 +505,11 @@
       "key": "denormalized_table_field",
       "schema": "metaschema_modules_public",
       "table": "denormalized_table_field"
+    },
+    {
+      "key": "domain_module",
+      "schema": "metaschema_modules_public",
+      "table": "domain_module"
     },
     {
       "key": "function_deployment_module",
@@ -507,6 +532,11 @@
       "table": "resource_module"
     },
     {
+      "key": "site_surface_module",
+      "schema": "metaschema_modules_public",
+      "table": "site_surface_module"
+    },
+    {
       "key": "webhook_module",
       "schema": "metaschema_modules_public",
       "table": "webhook_module"
@@ -520,9 +550,82 @@
       "key": "http_route_module",
       "schema": "metaschema_modules_public",
       "table": "http_route_module"
+    },
+    {
+      "key": "route_module",
+      "schema": "metaschema_modules_public",
+      "table": "route_module"
     }
   ],
   "timestampDefaultColumns": {
+    "constructive_apps_public.apps": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.api_modules": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.api_schemas": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.api_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.apis": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.cors_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.database_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.domains": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.http_routes": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.managed_domains": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.pubkey_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.rls_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.site_metadata": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.site_modules": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.site_themes": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.sites": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.webauthn_settings": [
+      "created_at",
+      "updated_at"
+    ],
     "metaschema_modules_public.db_preset_module": [
       "created_at"
     ],
@@ -603,10 +706,6 @@
       "updated_at"
     ],
     "metaschema_public.unique_constraint": [
-      "created_at",
-      "updated_at"
-    ],
-    "services_public.http_routes": [
       "created_at",
       "updated_at"
     ]

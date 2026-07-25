@@ -7,11 +7,10 @@
  */
 
 import {
+  buildFieldsFragment,
   getGraphQLQueryName,
   graphqlRowToPostgresRow,
-  intervalToPostgres,
-  buildFieldsFragment
-} from '../src/graphql-naming';
+  intervalToPostgres} from '../src/graphql-naming';
 
 describe('getGraphQLQueryName', () => {
   it('should convert simple table names to pluralized camelCase', () => {
@@ -34,7 +33,7 @@ describe('getGraphQLQueryName', () => {
     expect(getGraphQLQueryName('full_text_search')).toBe('fullTextSearches');
   });
 
-  it('should convert services_public table names', () => {
+  it('should convert scoped routing/apps table names', () => {
     expect(getGraphQLQueryName('domains')).toBe('domains');
     expect(getGraphQLQueryName('sites')).toBe('sites');
     expect(getGraphQLQueryName('apis')).toBe('apis');
