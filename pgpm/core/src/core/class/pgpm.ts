@@ -37,7 +37,8 @@ import {
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
-import { globPaths, globPattern } from '../../utils/glob';
+import { movePath } from '../../utils/fs';
+import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
 import { parseTarget } from '../../utils/target-utils';
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
@@ -1052,7 +1053,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         const installs = matches.map((conf) => {
           const fullConf = resolve(conf);
           const extDir = dirname(fullConf);
-          const parts = extDir.split('node_modules/');
+          const parts = toPosixPath(extDir).split('node_modules/');
           const relativeDir = parts[parts.length - 1];
           const dstDir = path.join(skitchExtDir, relativeDir);
           return { src: extDir, dst: dstDir, pkg: relativeDir };
@@ -1060,7 +1061,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
         // Sort deepest paths first so nested node_modules deps are
         // extracted before their parent directories are moved.
-        installs.sort((a, b) => b.src.split('/').length - a.src.split('/').length);
+        installs.sort((a, b) => toPosixPath(b.src).split('/').length - toPosixPath(a.src).split('/').length);
 
         for (const { src, dst, pkg } of installs) {
           if (fs.existsSync(dst)) {
@@ -1068,7 +1069,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           }
   
           fs.mkdirSync(path.dirname(dst), { recursive: true });
-          execSync(`mv "${src}" "${dst}"`);
+          movePath(src, dst);
           logger.success(`✔ installed ${pkg}`);
   
           const pkgJsonFile = path.join(dst, 'package.json');
@@ -1087,8 +1088,9 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         }
   
       } finally {
-        fs.rmSync(tempDir, { recursive: true, force: true });
+        // chdir out first: Windows locks the process working directory
         process.chdir(originalDir);
+        fs.rmSync(tempDir, { recursive: true, force: true });
       }
     }
   
@@ -2023,7 +2025,8 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       const expected = `${info.extname}.control`;
       if (base !== expected) issues.push({ code: 'control_filename_mismatch', message: `Control filename ${base} != ${expected}`, file: controlPath });
     }
-    return { ok: issues.length === 0, name: info.extname, path: modPath, issues };
+    const reported = issues.map(issue => ({ ...issue, file: toPosixPath(issue.file) }));
+    return { ok: reported.length === 0, name: info.extname, path: toPosixPath(modPath), issues: reported };
   }
 
   renameModule(newName: string, opts?: RenameOptions): { changed: string[]; warnings: string[] } {

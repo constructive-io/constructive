@@ -23,10 +23,12 @@ describe('publishToDist()', () => {
   it('copies all required folders and files to dist/', () => {
     mod.publishToDist();
 
-    const structure = glob.sync('**/*', {
-      cwd: distDir,
-      nodir: true
-    });
+    const structure = glob
+      .sync('**/*', {
+        cwd: distDir,
+        nodir: true
+      })
+      .map(p => p.replace(/\\/g, '/'));
 
     expect(structure.sort()).toMatchSnapshot();
   });
