@@ -3,6 +3,9 @@
     "testing/*"
   ],
   "dependencies": {
+    "@constructive-db/apps": "1.0.1",
+    "@constructive-db/catalog": "1.0.1",
+    "@constructive-db/routing": "1.0.1",
     "@pgpm/database-jobs": "0.33.0",
     "@pgpm/function-resolution": "0.33.0",
     "@pgpm/jwt-claims": "0.33.0",
