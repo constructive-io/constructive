@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-import { getConnEnvOptions, getEnvOptions } from '../src/merge';
+import { getConnEnvOptions, getEnvOptions, getExtensionsDir } from '../src/merge';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
@@ -277,5 +277,41 @@ describe('getEnvOptions', () => {
       };
       expect(() => getEnvOptions({}, emptyCwd(), safeEnv)).not.toThrow();
     });
+  });
+});
+
+describe('getExtensionsDir', () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-extdir-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it('defaults to extensions', () => {
+    writeConfig(tempDir, {});
+    expect(getExtensionsDir(undefined, tempDir, {})).toBe('extensions');
+  });
+
+  it('reads extensionsDir from the config file', () => {
+    writeConfig(tempDir, { extensionsDir: 'extensions-config' });
+    expect(getExtensionsDir(undefined, tempDir, {})).toBe('extensions-config');
+  });
+
+  it('prefers PGPM_EXTENSIONS_DIR over the config file', () => {
+    writeConfig(tempDir, { extensionsDir: 'extensions-config' });
+    expect(
+      getExtensionsDir(undefined, tempDir, { PGPM_EXTENSIONS_DIR: 'extensions-env' })
+    ).toBe('extensions-env');
+  });
+
+  it('prefers an explicit override over env and config', () => {
+    writeConfig(tempDir, { extensionsDir: 'extensions-config' });
+    expect(
+      getExtensionsDir('extensions-opt', tempDir, { PGPM_EXTENSIONS_DIR: 'extensions-env' })
+    ).toBe('extensions-opt');
   });
 });

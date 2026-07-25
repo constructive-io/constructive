@@ -16,3 +16,5 @@ graphql/server/*.heapsnapshot
 
 # Ephemeral pgpm modules installed by `pnpm fixtures:install` (pgpm install)
 /extensions/
+# Alternate install dirs configured via `extensionsDir` / PGPM_EXTENSIONS_DIR
+/extensions-*/

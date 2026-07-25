@@ -1,4 +1,4 @@
-import { DeploymentOptions,pgpmDefaults, PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';
+import { DEFAULT_EXTENSIONS_DIR,DeploymentOptions,pgpmDefaults, PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
 
 import { assertProductionEnvOptions } from './assert';
@@ -65,6 +65,22 @@ export const getConnEnvOptions = (overrides: Partial<PgTestConnectionOptions> = 
       }
     }
   };
+};
+
+/**
+ * Resolve the workspace directory where pgpm modules are installed.
+ *
+ * Precedence: explicit override -> `PGPM_EXTENSIONS_DIR` env var ->
+ * `extensionsDir` in the pgpm config file (pgpm.json / pgpm.config.js) ->
+ * the `extensions` default.
+ */
+export const getExtensionsDir = (
+  override?: string,
+  cwd: string = process.cwd(),
+  env: NodeJS.ProcessEnv = process.env
+): string => {
+  if (override) return override;
+  return getEnvOptions({}, cwd, env).extensionsDir ?? DEFAULT_EXTENSIONS_DIR;
 };
 
 export const getDeploymentEnvOptions = (overrides: Partial<DeploymentOptions> = {}, cwd: string = process.cwd()): DeploymentOptions => {

@@ -16,6 +16,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       DB_PREFIX,
       DB_EXTENSIONS,
       DB_CWD,
+      PGPM_EXTENSIONS_DIR,
       DB_CONNECTION_USER,
       DB_CONNECTION_PASSWORD,
       DB_CONNECTION_ROLE,
@@ -87,6 +88,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
   } = env;
 
   return {
+    ...(PGPM_EXTENSIONS_DIR && { extensionsDir: PGPM_EXTENSIONS_DIR }),
     db: {
       ...(PGROOTDATABASE && { rootDb: PGROOTDATABASE }),
       ...(PGTEMPLATE && { template: PGTEMPLATE }),
