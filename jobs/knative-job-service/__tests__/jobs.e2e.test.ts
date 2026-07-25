@@ -564,94 +564,17 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  // TODO: the send-verification-link cloud function still runs the legacy
+  // NOTE: the send-verification-link success cases (invite_email /
+  // forgot_password / email_verification) previously asserted the full email
+  // render, which depends on the legacy
   // `databases { sites { domains, logo, siteThemes, siteModules } }` query
-  // shape, which no longer exists now that routing/site data lives in the
-  // scoped `constructive_routing_public` plane (domains are hostname-keyed and
-  // `logo` moved into `config`). These success cases need that site branding,
-  // so they're skipped until the function is migrated. Cloud functions are
-  // moving to constructive-db. The send-email / mailgun paths (which don't
-  // read sites) and the validation-failure case below stay green.
-  it.skip('creates and processes a send-verification-link job', async () => {
-    const jobInput = {
-      dbId: databaseId,
-      identifier: 'send-verification-link',
-      payload: {
-        email_type: 'invite_email',
-        email: 'user@example.com',
-        invite_token: 'invite123',
-        sender_id: '00000000-0000-0000-0000-000000000000'
-      }
-    };
-
-    const response = await sendGraphql(graphqlClient, addJobMutation, {
-      input: jobInput
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.body?.errors).toBeUndefined();
-
-    const jobId = response.body?.data?.addJob?.result?.id;
-
-    expect(jobId).toBeTruthy();
-
-    await waitForJobCompletion(graphqlClient, jobId);
-  });
-
-  // TODO: skipped — see the send-verification-link note above (legacy site query shape).
-  it.skip('creates and processes a send-verification-link forgot_password job', async () => {
-    const jobInput = {
-      dbId: databaseId,
-      identifier: 'send-verification-link',
-      payload: {
-        email_type: 'forgot_password',
-        email: 'user@example.com',
-        user_id: '00000000-0000-0000-0000-000000000000',
-        reset_token: 'reset-token-123'
-      }
-    };
-
-    const response = await sendGraphql(graphqlClient, addJobMutation, {
-      input: jobInput
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.body?.errors).toBeUndefined();
-
-    const jobId = response.body?.data?.addJob?.result?.id;
-
-    expect(jobId).toBeTruthy();
-
-    await waitForJobCompletion(graphqlClient, jobId);
-  });
-
-  // TODO: skipped — see the send-verification-link note above (legacy site query shape).
-  it.skip('creates and processes a send-verification-link email_verification job', async () => {
-    const jobInput = {
-      dbId: databaseId,
-      identifier: 'send-verification-link',
-      payload: {
-        email_type: 'email_verification',
-        email: 'user@example.com',
-        email_id: '55555555-5555-5555-5555-555555555555',
-        verification_token: 'verify-token-123'
-      }
-    };
-
-    const response = await sendGraphql(graphqlClient, addJobMutation, {
-      input: jobInput
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.body?.errors).toBeUndefined();
-
-    const jobId = response.body?.data?.addJob?.result?.id;
-
-    expect(jobId).toBeTruthy();
-
-    await waitForJobCompletion(graphqlClient, jobId);
-  });
-
+  // shape. That shape no longer exists: routing/site data moved to the scoped
+  // `constructive_routing_public` plane (domains are hostname-keyed, `logo`
+  // moved into `config`), and this static single-tenant jobs server no longer
+  // exposes it. The cloud function is being migrated to constructive-db, so
+  // that e2e coverage moves there rather than being reworked here. The
+  // worker → function → email round-trip is still covered by the send-email
+  // cases, and the send-verification-link validation path stays covered below.
   it('fails send-verification-link job when required fields are missing', async () => {
     const jobInput = {
       dbId: databaseId,
