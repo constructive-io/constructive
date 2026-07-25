@@ -26,10 +26,12 @@ describe('installModule()', () => {
             'extensions/@pgpm-testing/base32'
     );
 
-    const files = glob.sync('**/*', {
-      cwd: extDir,
-      nodir: true
-    });
+    const files = glob
+      .sync('**/*', {
+        cwd: extDir,
+        nodir: true
+      })
+      .map(f => f.replace(/\\/g, '/'));
 
     expect(files.sort()).toMatchSnapshot();
     expect(fs.existsSync(path.join(extDir, 'pgpm.plan'))).toBe(true);

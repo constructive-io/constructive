@@ -17,7 +17,9 @@ export interface Module {
 export function parseControlFile(filePath: string, basePath: string): Module {
   const { requires, version } = parseControlContent(readFileSync(filePath, 'utf-8'));
   return {
-    path: dirname(relative(basePath, filePath)),
+    // posix separators: this path is a portable identifier recorded in
+    // pgpm.json and plan metadata, not a filesystem path
+    path: dirname(relative(basePath, filePath)).replace(/\\/g, '/'),
     requires,
     version,
   };
