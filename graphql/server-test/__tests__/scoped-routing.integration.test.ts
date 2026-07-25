@@ -209,6 +209,14 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.animals.nodes).toHaveLength(5);
+    // The 5 seeded animals must resolve through the scoped plane. (The
+    // mutation test above adds ScopedHamster to the same database, so assert
+    // the seeded set is present rather than an exact count.)
+    const names = res.body.data.animals.nodes.map(
+      (n: { name: string }) => n.name
+    );
+    expect(names).toEqual(
+      expect.arrayContaining(['Buddy', 'Max', 'Whiskers', 'Mittens', 'Tweety'])
+    );
   });
 });
