@@ -8,16 +8,18 @@
  *   parseDomains → requestId → API resolver → auth → createContextMiddleware
  *
  * Uses the shared seed fixtures from __fixtures__/seed/ (repo root-level)
- * for the full metaschema + services + app-schemas stack.
+ * for the full metaschema + scoped routing plane + app-schemas stack.
+ * Host routing resolves through constructive_routing_public.resolve_route.
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=express-context.integration
  */
 
 import path from 'path';
+import type supertest from 'supertest';
+
 import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
-import type supertest from 'supertest';
 
 jest.setTimeout(30000);
 
@@ -27,18 +29,21 @@ const shared = (...segments: string[]) =>
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
-  'services_public',
+  'constructive_catalog_public',
+  'constructive_routing_public',
+  'constructive_apps_public',
   'metaschema_public',
-  'metaschema_modules_public',
+  'metaschema_modules_public'
 ];
 
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
     shared('app-schemas', 'simple-pets', 'schema.sql'),
-    shared('services', 'test-data.sql'),
-    shared('app-schemas', 'simple-pets', 'test-data.sql'),
-  ]),
+    shared('scoped', 'resolver.sql'),
+    shared('scoped', 'test-data.sql'),
+    shared('app-schemas', 'simple-pets', 'test-data.sql')
+  ])
 ];
 
 let server: ServerInfo;
@@ -52,11 +57,11 @@ beforeAll(async () => {
       authRole: 'anonymous',
       server: {
         api: {
-          enableServicesApi: true,
+          enableScopedRouting: true,
           isPublic: true,
-          metaSchemas,
-        },
-      },
+          metaSchemas
+        }
+      }
     },
     seedAdapters
   ));
@@ -84,8 +89,8 @@ describe('express-context middleware (req.constructive)', () => {
     });
 
     it('populates req.constructive for secondary domain (private.test)', async () => {
-      // The private API (is_public=false) maps to private.test.constructive.io.
-      // When the server resolves it through the services API with isPublic=false,
+      // The private API (is_published=false) maps to private.test.constructive.io.
+      // When the server resolves it through the scoped plane with isPublic=false,
       // req.constructive should be populated. However, with isPublic=true the
       // only domain that resolves is the public one (app.test.constructive.io).
       // Verify that an unknown subdomain returns 404 when no match is found.
@@ -150,7 +155,7 @@ describe('express-context middleware (req.constructive)', () => {
       expect(res.body.data.animals.nodes).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ name: 'Buddy', species: 'Dog' }),
-          expect.objectContaining({ name: 'Whiskers', species: 'Cat' }),
+          expect.objectContaining({ name: 'Whiskers', species: 'Cat' })
         ])
       );
     });
@@ -180,13 +185,13 @@ describe('express-context middleware (req.constructive)', () => {
         .post('/graphql')
         .set('Host', 'app.test.constructive.io')
         .send({
-          query: `{ animals(orderBy: NAME_ASC) { nodes { name species } } }`,
+          query: `{ animals(orderBy: NAME_ASC) { nodes { name species } } }`
         });
 
       expect(res.status).toBe(200);
       expect(res.body.data.animals.nodes[0]).toEqual({
         name: 'Buddy',
-        species: 'Dog',
+        species: 'Dog'
       });
     });
   });

@@ -6,11 +6,11 @@
  * a LoaderRegistry and pass it to createContextMiddleware().
  *
  * Built-in loaders cover the standard Constructive modules:
- *   - rlsModule       (services_public.rls_settings)
- *   - corsOrigins     (services_public.cors_settings)
- *   - databaseSettings(services_public.database_settings)
- *   - pubkeyChallengeSettings (services_public.pubkey_settings)
- *   - webauthnSettings(services_public.webauthn_settings)
+ *   - rlsModule       (constructive_routing_public.rls_settings)
+ *   - corsOrigins     (constructive_routing_public.cors_settings)
+ *   - databaseSettings(constructive_routing_public.database_settings)
+ *   - pubkeyChallengeSettings (constructive_routing_public.pubkey_settings)
+ *   - webauthnSettings(constructive_routing_public.webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
@@ -38,33 +38,33 @@ export type { LoaderRegistry } from './registry';
 export { createLoaderRegistry } from './registry';
 
 // Built-in loaders
-export { rlsLoader } from './rls';
-export { corsLoader } from './cors';
-export { databaseSettingsLoader } from './database-settings';
-export { pubkeyLoader } from './pubkey';
-export { webauthnLoader } from './webauthn';
+export { agentChatLoader } from './agent-chat';
 export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
-export { inferenceLogLoader } from './inference-log';
-export { agentChatLoader } from './agent-chat';
-export { llmLoader } from './llm';
 export { computeLoader } from './compute';
+export { corsLoader } from './cors';
+export { databaseSettingsLoader } from './database-settings';
+export { inferenceLogLoader } from './inference-log';
+export { llmLoader } from './llm';
+export { pubkeyLoader } from './pubkey';
+export { rlsLoader } from './rls';
+export { webauthnLoader } from './webauthn';
 
 /**
  * Convenience: create a registry pre-loaded with all built-in loaders.
  */
-import { createLoaderRegistry } from './registry';
-import { rlsLoader } from './rls';
-import { corsLoader } from './cors';
-import { databaseSettingsLoader } from './database-settings';
-import { pubkeyLoader } from './pubkey';
-import { webauthnLoader } from './webauthn';
+import { agentChatLoader } from './agent-chat';
 import { authSettingsLoader } from './auth-settings';
 import { billingLoader } from './billing';
-import { inferenceLogLoader } from './inference-log';
-import { agentChatLoader } from './agent-chat';
-import { llmLoader } from './llm';
 import { computeLoader } from './compute';
+import { corsLoader } from './cors';
+import { databaseSettingsLoader } from './database-settings';
+import { inferenceLogLoader } from './inference-log';
+import { llmLoader } from './llm';
+import { pubkeyLoader } from './pubkey';
+import { createLoaderRegistry } from './registry';
+import { rlsLoader } from './rls';
+import { webauthnLoader } from './webauthn';
 
 export function createDefaultRegistry() {
   const registry = createLoaderRegistry();

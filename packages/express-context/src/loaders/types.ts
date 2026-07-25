@@ -2,7 +2,7 @@
  * Module Loader Types
  *
  * A ModuleLoader is a per-database cached lookup that resolves config
- * from the services DB or tenant DB. Each loader owns its own LRU cache
+ * from the routing DB or tenant DB. Each loader owns its own LRU cache
  * keyed by databaseId, with independent TTL and eviction.
  *
  * Loaders are registered in a LoaderRegistry and resolved in parallel
@@ -18,8 +18,8 @@ import type { Pool } from 'pg';
  * database tier it needs.
  */
 export interface LoaderContext {
-  /** Services database pool (for services_public.* lookups) */
-  servicesPool: Pool;
+  /** Routing/configuration database pool (for constructive_routing_public.* lookups) */
+  routingPool: Pool;
   /** Tenant database pool (for metaschema_modules_public.* lookups) */
   tenantPool: Pool;
   /** UUID of the database being resolved */

@@ -28,8 +28,6 @@ export interface GraphileFeatureOptions {
  * Configuration options for the Constructive API
  */
 export interface ApiOptions {
-  /** Whether to enable the services API (domain/subdomain routing via services_public) */
-  enableServicesApi?: boolean;
   /** Database schemas to expose through the API */
   exposedSchemas?: string[];
   /** Anonymous role name for unauthenticated requests */
@@ -43,9 +41,10 @@ export interface ApiOptions {
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
   /**
-   * Enable scoped-routing resolution via <schema>.resolve_route() before the
-   * legacy services_public domain lookup. Additive: when the resolver returns
-   * no match (or is not installed), resolution falls back to the legacy path.
+   * Resolve incoming requests through the scoped-routing plane via
+   * <schema>.resolve_route() (host → tenant/api/db/role). This is the sole
+   * host-routing path. When disabled the server runs in static single-tenant
+   * mode and exposes `exposedSchemas` directly with no route resolution.
    */
   enableScopedRouting?: boolean;
   /** Schema containing the compiled resolve_route() resolver */
@@ -58,7 +57,7 @@ export interface ApiOptions {
 export const graphileDefaults: GraphileOptions = {
   schema: [],
   extends: [],
-  preset: {},
+  preset: {}
 };
 
 /**
@@ -67,24 +66,22 @@ export const graphileDefaults: GraphileOptions = {
 export const graphileFeatureDefaults: GraphileFeatureOptions = {
   simpleInflection: true,
   oppositeBaseNames: true,
-  postgis: true,
+  postgis: true
 };
 
 /**
  * Default API configuration values
  */
 export const apiDefaults: ApiOptions = {
-  enableServicesApi: true,
   exposedSchemas: [],
   anonRole: 'administrator',
   roleName: 'administrator',
-  defaultDatabaseId: 'hard-coded',
   isPublic: true,
   metaSchemas: [
-    'services_public',
+    'constructive_routing_public',
     'metaschema_public',
-    'metaschema_modules_public',
+    'metaschema_modules_public'
   ],
-  enableScopedRouting: false,
-  scopedRoutingSchema: 'constructive_routing_public',
+  enableScopedRouting: true,
+  scopedRoutingSchema: 'constructive_routing_public'
 };

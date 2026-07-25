@@ -1,8 +1,9 @@
-import { getEnvOptions } from '../src/merge';
-import { getGraphQLEnvVars } from '../src/env';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+
+import { getGraphQLEnvVars } from '../src/env';
+import { getEnvOptions } from '../src/merge';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
@@ -35,7 +36,7 @@ describe('getEnvOptions', () => {
         simpleInflection: false
       },
       api: {
-        enableServicesApi: false,
+        enableScopedRouting: false,
         isPublic: false,
         metaSchemas: ['config_meta']
       },
@@ -45,9 +46,9 @@ describe('getEnvOptions', () => {
         requestTimeoutMs: 3000,
         dryRun: false,
         devsms: {
-          baseUrl: 'http://config-devsms:4000',
-        },
-      },
+          baseUrl: 'http://config-devsms:4000'
+        }
+      }
     });
 
     const testEnv: NodeJS.ProcessEnv = {
@@ -56,7 +57,7 @@ describe('getEnvOptions', () => {
       GRAPHILE_SCHEMA: 'env_schema_a,env_schema_b',
       FEATURES_SIMPLE_INFLECTION: 'true',
       FEATURES_POSTGIS: 'false',
-      API_ENABLE_SERVICES: 'true',
+      API_ENABLE_SCOPED_ROUTING: 'true',
       API_IS_PUBLIC: 'true',
       API_EXPOSED_SCHEMAS: 'public,app',
       API_META_SCHEMAS: 'env_meta1,env_meta2',
@@ -67,7 +68,7 @@ describe('getEnvOptions', () => {
       SMS_SENDER_ID: 'EnvSender',
       SMS_REQUEST_TIMEOUT_MS: '4000',
       SEND_SMS_DRY_RUN: 'true',
-      DEVSMS_BASE_URL: 'http://env-devsms:4000',
+      DEVSMS_BASE_URL: 'http://env-devsms:4000'
     };
 
     const result = getEnvOptions(
@@ -88,13 +89,13 @@ describe('getEnvOptions', () => {
           oppositeBaseNames: false
         },
         api: {
-          enableServicesApi: false,
+          enableScopedRouting: false,
           defaultDatabaseId: 'override_db'
         },
         sms: {
           senderId: 'OverrideSender',
-          requestTimeoutMs: 9000,
-        },
+          requestTimeoutMs: 9000
+        }
       },
       tempDir,
       testEnv
@@ -111,14 +112,14 @@ describe('getEnvOptions', () => {
       },
       api: {
         exposedSchemas: ['public', 'shared'],
-        metaSchemas: ['metaschema_public', 'services_public', 'config_meta']
+        metaSchemas: ['metaschema_public', 'constructive_routing_public', 'config_meta']
       }
     });
 
     const testEnv: NodeJS.ProcessEnv = {
       GRAPHILE_SCHEMA: 'shared_schema,env_schema',
       API_EXPOSED_SCHEMAS: 'shared,env_schema',
-      API_META_SCHEMAS: 'services_public,env_meta'
+      API_META_SCHEMAS: 'constructive_routing_public,env_meta'
     };
 
     const result = getEnvOptions(
@@ -147,7 +148,7 @@ describe('getEnvOptions', () => {
       SMS_SENDER_ID: 'LocalSender',
       SMS_REQUEST_TIMEOUT_MS: '2500',
       SEND_SMS_DRY_RUN: 'true',
-      DEVSMS_BASE_URL: 'http://localhost:4000',
+      DEVSMS_BASE_URL: 'http://localhost:4000'
     });
 
     expect(result.sms).toEqual({
@@ -156,14 +157,14 @@ describe('getEnvOptions', () => {
       requestTimeoutMs: 2500,
       dryRun: true,
       devsms: {
-        baseUrl: 'http://localhost:4000',
-      },
+        baseUrl: 'http://localhost:4000'
+      }
     });
   });
 
   it('accepts custom SMS provider names', () => {
     const result = getGraphQLEnvVars({
-      SMS_PROVIDER: 'custom-sms-gateway',
+      SMS_PROVIDER: 'custom-sms-gateway'
     });
 
     expect(result.sms?.provider).toBe('custom-sms-gateway');
@@ -178,22 +179,22 @@ describe('getEnvOptions', () => {
         requestTimeoutMs: 3000,
         dryRun: false,
         devsms: {
-          baseUrl: 'http://config-devsms:4000',
-        },
-      },
+          baseUrl: 'http://config-devsms:4000'
+        }
+      }
     });
 
     const result = getEnvOptions(
       {
         sms: {
-          requestTimeoutMs: 9000,
-        },
+          requestTimeoutMs: 9000
+        }
       },
       tempDir,
       {
         SMS_SENDER_ID: 'EnvSender',
         SEND_SMS_DRY_RUN: 'true',
-        DEVSMS_BASE_URL: 'http://env-devsms:4000',
+        DEVSMS_BASE_URL: 'http://env-devsms:4000'
       }
     );
 
@@ -203,8 +204,8 @@ describe('getEnvOptions', () => {
       requestTimeoutMs: 9000,
       dryRun: true,
       devsms: {
-        baseUrl: 'http://env-devsms:4000',
-      },
+        baseUrl: 'http://env-devsms:4000'
+      }
     });
   });
 
@@ -214,7 +215,7 @@ describe('getEnvOptions', () => {
 
     try {
       const result = getEnvOptions({}, process.cwd(), {
-        SMS_PROVIDER: 'devsms',
+        SMS_PROVIDER: 'devsms'
       });
 
       expect(result.sms?.provider).toBe('devsms');
@@ -235,7 +236,7 @@ describe('getEnvOptions', () => {
 
   it('omits an invalid SMS timeout from partial env overrides', () => {
     const result = getGraphQLEnvVars({
-      SMS_REQUEST_TIMEOUT_MS: '5s',
+      SMS_REQUEST_TIMEOUT_MS: '5s'
     });
 
     expect(result.sms).toBeUndefined();
@@ -248,17 +249,17 @@ describe('getEnvOptions', () => {
     writeConfig(tempDir, {
       sms: {
         requestTimeoutMs: 3000,
-        dryRun: true,
-      },
+        dryRun: true
+      }
     });
 
     const result = getEnvOptions({}, tempDir, {
-      SMS_REQUEST_TIMEOUT_MS: '5s',
+      SMS_REQUEST_TIMEOUT_MS: '5s'
     });
 
     expect(result.sms).toEqual({
       requestTimeoutMs: 3000,
-      dryRun: true,
+      dryRun: true
     });
   });
 });

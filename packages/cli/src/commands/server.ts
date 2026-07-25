@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { GraphQLServer as server } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import { GraphQLServer as server } from '@constructive-io/graphql-server';
 import { CLIOptions, Inquirerer, OptionValue,Question } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
@@ -21,7 +21,7 @@ Options:
   --simpleInflection      Use simple inflection (default: true)
   --oppositeBaseNames     Use opposite base names (default: false)
   --postgis               Enable PostGIS extension (default: true)
-  --servicesApi           Enable Services API (default: true)
+  --scopedRouting         Enable scoped routing (default: true)
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
@@ -57,8 +57,8 @@ const questions: Question[] = [
     useDefault: true
   },
   {
-    name: 'servicesApi',
-    message: 'Enable Services API?',
+    name: 'scopedRouting',
+    message: 'Enable scoped routing?',
     type: 'confirm',
     required: false,
     default: true,
@@ -68,7 +68,7 @@ const questions: Question[] = [
     name: 'origin',
     message: 'CORS origin (exact URL or *)',
     type: 'text',
-    required: false,
+    required: false
     // no default to avoid accidentally opening up CORS; pass explicitly or via env
   },
   {
@@ -125,7 +125,7 @@ export default async (
     port,
     postgis,
     simpleInflection,
-    servicesApi,
+    scopedRouting,
     origin
   } = await prompter.prompt(argv, questions);
 
@@ -144,7 +144,7 @@ export default async (
   let selectedSchemas: string[] = [];
   let authRole: string | undefined;
   let roleName: string | undefined;
-  if (!servicesApi) {
+  if (!scopedRouting) {
     const db = await getPgPool({ database: selectedDb });
     const result = await db.query(`
       SELECT nspname 
@@ -197,8 +197,8 @@ export default async (
       postgis
     },
     api: {
-      enableServicesApi: servicesApi,
-      ...(servicesApi === false && { exposedSchemas: selectedSchemas, authRole, roleName })
+      enableScopedRouting: scopedRouting,
+      ...(scopedRouting === false && { exposedSchemas: selectedSchemas, authRole, roleName })
     },
     server: {
       port,
@@ -213,7 +213,7 @@ export default async (
 
   // Debug: Log API routing configuration
   const apiOpts = (options as any).api || {};
-  log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, enableServicesApi=${apiOpts.enableServicesApi}`);
+  log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, enableScopedRouting=${apiOpts.enableScopedRouting}`);
   if (apiOpts.isPublic === false) {
     log.debug(`   Header-based routing enabled (X-Api-Name, X-Database-Id, X-Meta-Schema)`);
   }

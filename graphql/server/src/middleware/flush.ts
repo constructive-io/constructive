@@ -1,10 +1,11 @@
+import './types'; // for Request type
+
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
-import './types'; // for Request type
 
 const log = new Logger('flush');
 
@@ -44,8 +45,8 @@ export const flushService = async (
   }
 
   const svc = await pgPool.query(
-    `SELECT *
-     FROM services_public.domains
+    `SELECT hostname
+     FROM constructive_routing_public.domains
      WHERE database_id = $1`,
     [databaseId]
   );
@@ -53,12 +54,7 @@ export const flushService = async (
   if (svc.rowCount === 0) return;
 
   for (const row of svc.rows) {
-    let key: string | undefined;
-    if (row.domain && !row.subdomain) {
-      key = row.domain;
-    } else if (row.domain && row.subdomain) {
-      key = `${row.subdomain}.${row.domain}`;
-    }
+    const key: string | undefined = row.hostname || undefined;
     if (key) {
       graphileCache.delete(key);
       svcCache.delete(key);

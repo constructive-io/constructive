@@ -1,7 +1,7 @@
-import type { Server } from 'http';
+import type { ApiOptions,GraphileOptions } from '@constructive-io/graphql-types';
 import type { DocumentNode, GraphQLError } from 'graphql';
+import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { GraphileOptions, ApiOptions } from '@constructive-io/graphql-types';
 import type supertest from 'supertest';
 
 /**
@@ -23,7 +23,7 @@ export interface ServerOptions {
    *   server: {
    *     port: 5555,
    *     api: {
-   *       enableServicesApi: false,
+   *       enableScopedRouting: false,
    *       isPublic: false,
    *       defaultDatabaseId: 'my-database'
    *     }

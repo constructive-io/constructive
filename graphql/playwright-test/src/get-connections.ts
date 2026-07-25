@@ -1,24 +1,17 @@
+import { getEnvOptions } from '@constructive-io/graphql-env';
+import {
+  type GraphQLQueryOptions,
+  type GraphQLResponse,
+  GraphQLTest} from '@constructive-io/graphql-test';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
-import type { PgTestClient } from 'pgsql-test/test-client';
-import { getEnvOptions } from '@constructive-io/graphql-env';
-
-import {
-  GraphQLTest,
-  type GetConnectionsInput,
-  type GraphQLQueryFn,
-  type GraphQLQueryFnObj,
-  type GraphQLQueryOptions,
-  type GraphQLResponse
-} from '@constructive-io/graphql-test';
 
 import { createTestServer } from './server';
 import type {
   GetConnectionsWithServerInput,
-  GetConnectionsWithServerResult,
-  GetConnectionsWithServerObjectResult
-} from './types';
+  GetConnectionsWithServerObjectResult,
+  GetConnectionsWithServerResult} from './types';
 
 /**
  * Core unwrapping utility - throws on GraphQL errors
@@ -48,15 +41,15 @@ const createConnectionsWithServerBase = async (
   const gqlContext = GraphQLTest(input, conn);
   await gqlContext.setup();
 
-  // Build options for the HTTP server with enableServicesApi: false
+  // Build options for the HTTP server in static mode (scoped routing off)
   const serverOpts = getEnvOptions({
     pg: pg.config,
     api: {
-      enableServicesApi: false,
+      enableScopedRouting: false,
       exposedSchemas: input.schemas,
       defaultDatabaseId: 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
-    },
+    }
   });
 
   // Start the HTTP server

@@ -1,16 +1,16 @@
 jest.mock('pg-cache', () => ({
-  getPgPool: jest.fn(),
+  getPgPool: jest.fn()
 }));
 
 jest.mock('@constructive-io/express-context', () => ({
   createDefaultRegistry: jest.fn(() => ({
-    resolve: jest.fn().mockResolvedValue(undefined),
-  })),
+    resolve: jest.fn().mockResolvedValue(undefined)
+  }))
 }));
 
+import { svcCache } from '@pgpmjs/server-utils';
 import type { Request } from 'express';
 import type { Pool } from 'pg';
-import { svcCache } from '@pgpmjs/server-utils';
 import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
@@ -20,24 +20,25 @@ const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 
 const createRequest = (headers: Record<string, string>): Request => {
   const normalized = new Map(
-    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
+    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value])
   );
 
   return {
     protocol: 'http',
     originalUrl: '/graphql',
-    get: jest.fn((name: string) => normalized.get(name.toLowerCase())),
+    get: jest.fn((name: string) => normalized.get(name.toLowerCase()))
   } as unknown as Request;
 };
 
 const createPrivateOptions = (): ApiOptions => ({
   pg: {
-    database: 'constructive',
+    database: 'constructive'
   },
   api: {
     isPublic: false,
-    metaSchemas: ['metaschema_public'],
-  },
+    enableScopedRouting: true,
+    metaSchemas: ['metaschema_public']
+  }
 } as unknown as ApiOptions);
 
 describe('api middleware routing priority', () => {
@@ -55,7 +56,7 @@ describe('api middleware routing priority', () => {
       host: 'admin.localhost',
       'X-Database-Id': 'db-123',
       'X-Api-Name': 'customer-api',
-      'X-Schemata': 'services_public',
+      'X-Schemata': 'app_public'
     });
 
     expect(getSvcKey(createPrivateOptions(), req)).toBe('api:db-123:customer-api');
@@ -66,8 +67,8 @@ describe('api middleware routing priority', () => {
       if (Array.isArray(params[0])) {
         return {
           rows: (params[0] as string[]).map((schemaName) => ({
-            schema_name: schemaName,
-          })),
+            schema_name: schemaName
+          }))
         };
       }
 
@@ -80,8 +81,8 @@ describe('api middleware routing priority', () => {
             role_name: 'api_role',
             anon_role: 'api_anon',
             is_public: false,
-            schemas: ['api_public'],
-          }],
+            schemas: ['api_public']
+          }]
         };
       }
 
@@ -94,7 +95,7 @@ describe('api middleware routing priority', () => {
       host: 'admin.localhost',
       'X-Database-Id': 'db-123',
       'X-Api-Name': 'customer-api',
-      'X-Schemata': 'services_public',
+      'X-Schemata': 'app_public'
     });
 
     const result = await getApiConfig(createPrivateOptions(), req);
@@ -107,11 +108,11 @@ describe('api middleware routing priority', () => {
       roleName: 'api_role',
       schema: ['api_public'],
       databaseId: 'db-123',
-      isPublic: false,
+      isPublic: false
     });
     expect(svcCache.get('api:db-123:customer-api')).toBe(result);
     expect(query.mock.calls).toEqual(expect.arrayContaining([
-      [expect.stringContaining('FROM services_public.apis'), ['db-123', 'customer-api', false]],
+      [expect.stringContaining('FROM constructive_routing_public.apis'), ['db-123', 'customer-api', false]]
     ]));
   });
 });

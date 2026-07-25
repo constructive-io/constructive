@@ -7,8 +7,8 @@
  */
 
 import type { DatabaseSettings } from '../types';
-import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
+import type { LoaderContext, ModuleLoader } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
@@ -26,8 +26,8 @@ const DATABASE_SETTINGS_SQL = `
     COALESCE(aps.enable_realtime, ds.enable_realtime) AS resolved_enable_realtime,
     COALESCE(aps.enable_bulk, ds.enable_bulk) AS resolved_enable_bulk,
     COALESCE(aps.enable_i18n, ds.enable_i18n) AS resolved_enable_i18n
-  FROM services_public.database_settings ds
-  LEFT JOIN services_public.api_settings aps ON ds.database_id = aps.database_id AND aps.api_id = $2
+  FROM constructive_routing_public.database_settings ds
+  LEFT JOIN constructive_routing_public.api_settings aps ON ds.database_id = aps.database_id AND aps.api_id = $2
   WHERE ds.database_id = $1
   LIMIT 1
 `;
@@ -55,11 +55,11 @@ export const databaseSettingsLoader: ModuleLoader<DatabaseSettings> = createModu
   name: 'databaseSettings',
   ttlMs: 5 * 60_000,
   async resolve(ctx: LoaderContext) {
-    const { servicesPool, databaseId, apiId } = ctx;
+    const { routingPool, databaseId, apiId } = ctx;
 
-    const result = await servicesPool.query<DatabaseSettingsRow>(
+    const result = await routingPool.query<DatabaseSettingsRow>(
       DATABASE_SETTINGS_SQL,
-      [databaseId, apiId ?? null],
+      [databaseId, apiId ?? null]
     );
     const row = result.rows[0];
     if (!row) return undefined;
@@ -76,7 +76,7 @@ export const databaseSettingsLoader: ModuleLoader<DatabaseSettings> = createModu
       enableLlm: row.resolved_enable_llm,
       enableRealtime: row.resolved_enable_realtime,
       enableBulk: row.resolved_enable_bulk,
-      enableI18n: row.resolved_enable_i18n,
+      enableI18n: row.resolved_enable_i18n
     };
-  },
+  }
 });
