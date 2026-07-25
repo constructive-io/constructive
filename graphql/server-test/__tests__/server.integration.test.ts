@@ -8,12 +8,6 @@
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=server.integration
- *
- * NOTE: connection (list) queries — `{ animals { nodes { ... } } }` — currently
- * fail for EVERY server integration scenario on main with
- * `TypeError: Cannot read properties of undefined (reading 'items')` inside
- * grafast's ConnectionStep. Those assertions are kept `it.skip` with a TODO;
- * live assertions use mutations / single-record paths like the scoped test.
  */
 
 import path from 'path';
@@ -158,8 +152,7 @@ describe.each(scenarios)('$name', (scenario) => {
   });
 
   describe('Query Tests', () => {
-    // TODO: unskip once the grafast ConnectionStep regression is fixed.
-    it.skip('should query all animals', async () => {
+    it('should query all animals', async () => {
       const res = await postGraphQL({
         query: '{ animals { nodes { name species } } }'
       });
@@ -168,8 +161,7 @@ describe.each(scenarios)('$name', (scenario) => {
       expect(res.body.data.animals.nodes).toHaveLength(5);
     });
 
-    // TODO: unskip once the grafast ConnectionStep regression is fixed.
-    it.skip('should query animals with filter', async () => {
+    it('should query animals with filter', async () => {
       const res = await postGraphQL({
         query: `{ animals { nodes { name species } } }`
       });
@@ -181,8 +173,7 @@ describe.each(scenarios)('$name', (scenario) => {
       expect(dogs).toHaveLength(2);
     });
 
-    // TODO: unskip once the grafast ConnectionStep regression is fixed.
-    it.skip('should query with variables', async () => {
+    it('should query with variables', async () => {
       const res = await postGraphQL({
         query: `query GetAnimals($first: Int!) {
           animals(first: $first) { nodes { name species } }
@@ -254,10 +245,7 @@ describe.each(scenarios)('$name', (scenario) => {
  *
  * enableScopedRouting: true, isPublic: false
  * Headers: X-Database-Id + X-Meta-Schema: true
- * Queries target meta-schema tables (databases, schemas, tables, fields, apis).
- * These are all connection queries, so they hit the grafast ConnectionStep
- * regression and are kept it.skip; resolution of the meta-schema mode itself
- * is covered by the middleware unit tests and the error-path suite below.
+ * Queries target meta-schema tables (databases, schemas, tables, apis).
  */
 describe('scoped private via X-Meta-Schema', () => {
   let server: ServerInfo;
@@ -298,8 +286,7 @@ describe('scoped private via X-Meta-Schema', () => {
     teardowns.push(teardown);
   });
 
-  // TODO: unskip once the grafast ConnectionStep regression is fixed.
-  it.skip('should query all databases', async () => {
+  it('should query all databases', async () => {
     const res = await postGraphQL({
       query: '{ databases { nodes { name } } }'
     });
@@ -309,8 +296,7 @@ describe('scoped private via X-Meta-Schema', () => {
     expect(res.body.data.databases.nodes.length).toBeGreaterThanOrEqual(1);
   });
 
-  // TODO: unskip once the grafast ConnectionStep regression is fixed.
-  it.skip('should query schemas', async () => {
+  it('should query schemas', async () => {
     const res = await postGraphQL({
       query: '{ schemas { nodes { name schemaName isPublic } } }'
     });
@@ -319,8 +305,7 @@ describe('scoped private via X-Meta-Schema', () => {
     expect(res.body.data.schemas.nodes).toBeInstanceOf(Array);
   });
 
-  // TODO: unskip once the grafast ConnectionStep regression is fixed.
-  it.skip('should query tables', async () => {
+  it('should query tables', async () => {
     const res = await postGraphQL({
       query: '{ tables { nodes { name } } }'
     });
@@ -329,8 +314,7 @@ describe('scoped private via X-Meta-Schema', () => {
     expect(res.body.data.tables.nodes).toBeInstanceOf(Array);
   });
 
-  // TODO: unskip once the grafast ConnectionStep regression is fixed.
-  it.skip('should query apis', async () => {
+  it('should query apis', async () => {
     const res = await postGraphQL({
       query: '{ apis { nodes { name isPublished databaseId } } }'
     });

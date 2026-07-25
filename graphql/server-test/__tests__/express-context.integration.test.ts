@@ -141,8 +141,7 @@ describe('express-context middleware (req.constructive)', () => {
   });
 
   describe('withPgClient via pg-query-context', () => {
-    // TODO: unskip once the grafast ConnectionStep regression is fixed.
-    it.skip('executes RLS-scoped queries through the GraphQL endpoint', async () => {
+    it('executes RLS-scoped queries through the GraphQL endpoint', async () => {
       // This tests the full chain: domain resolution → pgSettings →
       // PostGraphile's withPgClient (which uses the same pgSettings pattern
       // as express-context) → query execution with proper role context
@@ -161,8 +160,7 @@ describe('express-context middleware (req.constructive)', () => {
       );
     });
 
-    // TODO: unskip once the grafast ConnectionStep regression is fixed.
-    it.skip('applies anonymous role pgSettings via domain resolution', async () => {
+    it('applies anonymous role pgSettings via domain resolution', async () => {
       // Anonymous role should be able to read but not access private schemas.
       // Verify the pgSettings role is applied correctly through the middleware chain.
       const res = await request
@@ -176,8 +174,7 @@ describe('express-context middleware (req.constructive)', () => {
   });
 
   describe('full middleware chain verification', () => {
-    // TODO: unskip once the grafast ConnectionStep regression is fixed.
-    it.skip('pgSettings carry database_id into the GraphQL context', async () => {
+    it('pgSettings carry database_id into the GraphQL context', async () => {
       // This test proves the full chain works:
       // 1. parseDomains extracts domain/subdomain from Host
       // 2. API middleware resolves the API (sets req.api with databaseId)

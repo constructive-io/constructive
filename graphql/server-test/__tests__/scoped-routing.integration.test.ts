@@ -203,13 +203,7 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
     expect(createRes.body.data.createAnimal.animal.name).toBe('ScopedHamster');
   });
 
-  // TODO: connection (list) queries currently fail for EVERY server integration
-  // scenario on main — `{ animals { nodes { ... } } }` throws
-  // `TypeError: Cannot read properties of undefined (reading 'items')` inside
-  // grafast's ConnectionStep, including the scenarios in
-  // server.integration.test.ts. Unskip once that regression is
-  // fixed; scoped resolution itself already works (see the mutation above).
-  it.skip('should query all animals', async () => {
+  it('should query all animals', async () => {
     const res = await postGraphQL({
       query: '{ animals { nodes { name species } } }'
     });
