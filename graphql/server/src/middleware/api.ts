@@ -1,12 +1,13 @@
-import { getNodeEnv } from '@pgpmjs/env';
-import { Logger } from '@pgpmjs/logger';
-import { svcCache } from '@pgpmjs/server-utils';
-import { parseUrl } from '@constructive-io/url-domains';
+import './types';
+
 import {
   createDefaultRegistry,
   LoaderContext,
-  LoaderRegistry,
+  LoaderRegistry
 } from '@constructive-io/express-context';
+import { parseUrl } from '@constructive-io/url-domains';
+import { Logger } from '@pgpmjs/logger';
+import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
@@ -15,7 +16,6 @@ import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
 import { resolveRoute, routeToApiStructure } from './routing';
-import './types';
 
 const log = new Logger('api');
 
@@ -29,65 +29,25 @@ const defaultRegistry: LoaderRegistry = createDefaultRegistry();
 // SQL Queries (API resolution only — module queries now live in loaders)
 // =============================================================================
 
-const DOMAIN_LOOKUP_SQL = `
+// Private-header X-Api-Name lookup against the scoped routing plane.
+// `is_published` is the routing-plane analog of the legacy `is_public` column.
+const SCOPED_API_NAME_LOOKUP_SQL = `
   SELECT 
     a.id as api_id,
     a.database_id,
     a.dbname,
     a.role_name,
     a.anon_role,
-    a.is_public,
+    a.is_published as is_public,
     COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
-  FROM services_public.domains d
-  JOIN services_public.apis a ON d.api_id = a.id
-  LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
-  LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
-  WHERE d.domain = $1 
-    AND (($2::text IS NULL AND d.subdomain IS NULL) OR d.subdomain = $2)
-    AND a.is_public = $3
-  GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_public
-  LIMIT 1
-`;
-
-const API_NAME_LOOKUP_SQL = `
-  SELECT 
-    a.id as api_id,
-    a.database_id,
-    a.dbname,
-    a.role_name,
-    a.anon_role,
-    a.is_public,
-    COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
-  FROM services_public.apis a
-  LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
+  FROM constructive_routing_public.apis a
+  LEFT JOIN constructive_routing_public.api_schemas aps ON a.id = aps.api_id
   LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
   WHERE a.database_id = $1 
     AND a.name = $2
-    AND a.is_public = $3
-  GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_public
+    AND a.is_published = $3
+  GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_published
   LIMIT 1
-`;
-
-const API_LIST_SQL = `
-  SELECT 
-    a.id,
-    a.database_id,
-    a.name,
-    a.dbname,
-    a.role_name,
-    a.anon_role,
-    a.is_public,
-    COALESCE(
-      json_agg(
-        json_build_object('domain', d.domain, 'subdomain', d.subdomain)
-      ) FILTER (WHERE d.domain IS NOT NULL),
-      '[]'
-    ) as domains
-  FROM services_public.apis a
-  LEFT JOIN services_public.domains d ON a.id = d.api_id
-  WHERE a.is_public = $1
-  GROUP BY a.id, a.database_id, a.name, a.dbname, a.role_name, a.anon_role, a.is_public
-  LIMIT 100
 `;
 
 // =============================================================================
@@ -104,17 +64,6 @@ interface ApiRow {
   schemas: string[];
 }
 
-interface ApiListRow {
-  id: string;
-  database_id: string;
-  name: string;
-  dbname: string;
-  role_name: string;
-  anon_role: string;
-  is_public: boolean;
-  domains: Array<{ domain: string; subdomain: string | null }>;
-}
-
 interface ResolveContext {
   opts: ApiOptions;
   pool: Pool;
@@ -126,13 +75,13 @@ interface ResolveContext {
 }
 
 type ResolutionMode = 
-  | 'services-disabled'
+  | 'static'
   | 'schemata-header'
   | 'api-name-header'
   | 'meta-schema-header'
-  | 'domain-lookup';
+  | 'scoped-route';
 
-type PrivateHeaderMode = Exclude<ResolutionMode, 'services-disabled' | 'domain-lookup'>;
+type PrivateHeaderMode = Exclude<ResolutionMode, 'static' | 'scoped-route'>;
 
 interface RoutingHeaders {
   schemata?: string;
@@ -159,15 +108,15 @@ interface ResolvedModuleSettings {
  * This is used to resolve per-database module settings via the loader registry.
  */
 const buildLoaderContext = (
-  servicesPool: Pool,
+  routingPool: Pool,
   opts: ApiOptions,
-  row: ApiRow,
+  row: ApiRow
 ): LoaderContext => ({
-  servicesPool,
+  routingPool,
   tenantPool: getPgPool({ ...opts.pg, database: row.dbname }),
   databaseId: row.database_id,
   apiId: row.api_id,
-  dbname: row.dbname,
+  dbname: row.dbname
 });
 
 /**
@@ -176,7 +125,7 @@ const buildLoaderContext = (
  */
 const resolveModuleSettings = async (
   registry: LoaderRegistry,
-  ctx: LoaderContext,
+  ctx: LoaderContext
 ): Promise<ResolvedModuleSettings> => {
   const [
     rlsModule,
@@ -184,14 +133,14 @@ const resolveModuleSettings = async (
     corsOrigins,
     databaseSettings,
     pubkeyChallengeSettings,
-    webauthnSettings,
+    webauthnSettings
   ] = await Promise.all([
     registry.resolve<RlsModule>('rlsModule', ctx),
     registry.resolve<AuthSettings>('authSettings', ctx),
     registry.resolve<string[]>('corsOrigins', ctx),
     registry.resolve<DatabaseSettings>('databaseSettings', ctx),
     registry.resolve<PubkeyChallengeSettings>('pubkeyChallengeSettings', ctx),
-    registry.resolve<WebauthnSettings>('webauthnSettings', ctx),
+    registry.resolve<WebauthnSettings>('webauthnSettings', ctx)
   ]);
 
   return {
@@ -200,7 +149,7 @@ const resolveModuleSettings = async (
     corsOrigins,
     databaseSettings,
     pubkeyChallengeSettings,
-    webauthnSettings,
+    webauthnSettings
   };
 };
 
@@ -225,7 +174,7 @@ const getRoutingHeaders = (req: Request): RoutingHeaders => ({
   schemata: req.get('X-Schemata'),
   apiName: req.get('X-Api-Name'),
   metaSchema: req.get('X-Meta-Schema'),
-  databaseId: req.get('X-Database-Id'),
+  databaseId: req.get('X-Database-Id')
 });
 
 const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } => {
@@ -233,7 +182,7 @@ const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } =
   const parsed = parseUrl(fullUrl);
   return {
     domain: parsed.domain ?? '',
-    subdomains: parsed.subdomains ?? [],
+    subdomains: parsed.subdomains ?? []
   };
 };
 
@@ -277,7 +226,7 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleS
   corsOrigins: settings.corsOrigins,
   databaseSettings: settings.databaseSettings,
   pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
-  webauthnSettings: settings.webauthnSettings,
+  webauthnSettings: settings.webauthnSettings
 });
 
 const createAdminStructure = (
@@ -292,7 +241,7 @@ const createAdminStructure = (
   apiModules: [],
   domains: [],
   databaseId,
-  isPublic: false,
+  isPublic: false
 });
 
 // =============================================================================
@@ -307,29 +256,14 @@ const validateSchemata = async (pool: Pool, schemas: string[]): Promise<string[]
   return result.rows.map((row: { schema_name: string }) => row.schema_name);
 };
 
-const queryByDomain = async (
-  pool: Pool,
-  domain: string,
-  subdomain: string | null,
-  isPublic: boolean
-): Promise<ApiRow | null> => {
-  const result = await pool.query<ApiRow>(DOMAIN_LOOKUP_SQL, [domain, subdomain, isPublic]);
-  return result.rows[0] ?? null;
-};
-
 const queryByApiName = async (
   pool: Pool,
   databaseId: string,
   name: string,
   isPublic: boolean
 ): Promise<ApiRow | null> => {
-  const result = await pool.query<ApiRow>(API_NAME_LOOKUP_SQL, [databaseId, name, isPublic]);
+  const result = await pool.query<ApiRow>(SCOPED_API_NAME_LOOKUP_SQL, [databaseId, name, isPublic]);
   return result.rows[0] ?? null;
-};
-
-const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]> => {
-  const result = await pool.query<ApiListRow>(API_LIST_SQL, [isPublic]);
-  return result.rows;
 };
 
 // =============================================================================
@@ -338,15 +272,17 @@ const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]
 
 const determineMode = (ctx: ResolveContext): ResolutionMode => {
   const { opts, headers } = ctx;
-  
-  if (opts.api?.enableServicesApi === false) return 'services-disabled';
+
+  // Static single-tenant mode: scoped routing off — expose configured schemas
+  // directly with no route resolution.
+  if (!opts.api?.enableScopedRouting) return 'static';
   if (opts.api?.isPublic === false) {
-    return getPrivateHeaderMode(headers) ?? 'domain-lookup';
+    return getPrivateHeaderMode(headers) ?? 'scoped-route';
   }
-  return 'domain-lookup';
+  return 'scoped-route';
 };
 
-const resolveServicesDisabled = (ctx: ResolveContext): ApiStructure => {
+const resolveStatic = (ctx: ResolveContext): ApiStructure => {
   const { opts } = ctx;
   return {
     dbname: opts.pg?.database ?? '',
@@ -356,7 +292,7 @@ const resolveServicesDisabled = (ctx: ResolveContext): ApiStructure => {
     apiModules: [],
     domains: [],
     databaseId: opts.api?.defaultDatabaseId,
-    isPublic: false,
+    isPublic: false
   };
 };
 
@@ -402,12 +338,12 @@ const resolveMetaSchemaHeader = (
 };
 
 /**
- * Scoped routing plane resolution (additive, host-only): one indexed
- * resolve_route() call against the compiled hostname/route bindings.
- * Path/method routing belongs to Traefik/Ingress — the server only maps
- * host → tenant/api/db/role. Returns null (fall back to the legacy
- * services_public lookup) when disabled, unmatched, resolver not installed,
- * or the target is not an api surface.
+ * Scoped routing plane resolution (host-only): one indexed resolve_route()
+ * call against the compiled hostname/route bindings. Path/method routing
+ * belongs to Traefik/Ingress — the server only maps host → tenant/api/db/role.
+ * This is the sole host resolver. Returns null (→ 404) when disabled,
+ * unmatched, the resolver is not installed, or the target is not an api
+ * surface. There is no legacy fallback.
  */
 const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
   const { opts, pool, host } = ctx;
@@ -431,7 +367,7 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
     role_name: structure.roleName,
     anon_role: structure.anonRole,
     is_public: structure.isPublic ?? false,
-    schemas: structure.schema,
+    schemas: structure.schema
   });
   const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
   return {
@@ -441,76 +377,7 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
     corsOrigins: settings.corsOrigins,
     databaseSettings: settings.databaseSettings,
     pubkeyChallengeSettings: settings.pubkeyChallengeSettings,
-    webauthnSettings: settings.webauthnSettings,
-  };
-};
-
-const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
-  const { opts, pool, domain, subdomain } = ctx;
-  const isPublic = opts.api?.isPublic ?? false;
-
-  log.debug(`[domain-lookup] domain=${domain} subdomain=${subdomain} isPublic=${isPublic}`);
-  
-  const row = await queryByDomain(pool, domain, subdomain, isPublic);
-  
-  if (!row) {
-    log.debug(`[domain-lookup] No API found for domain=${domain} subdomain=${subdomain}`);
-    return null;
-  }
-
-  const loaderCtx = buildLoaderContext(pool, opts, row);
-  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
-  log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${settings.rlsModule ? 'found' : 'none'}, authSettings: ${settings.authSettings ? 'found' : 'none'}`);
-  return toApiStructure(row, opts, settings);
-};
-
-const buildDevFallbackError = async (
-  ctx: ResolveContext,
-  req: Request
-): Promise<ApiError | null> => {
-  if (getNodeEnv() !== 'development') return null;
-
-  const isPublic = ctx.opts.api?.isPublic ?? false;
-  const apis = await queryApiList(ctx.pool, isPublic);
-  if (!apis.length) return null;
-
-  const host = req.get('host') || '';
-  const portMatch = host.match(/:(\d+)$/);
-  const port = portMatch ? portMatch[1] : '';
-
-  const apiCards = apis.map((api) => {
-    const domains = api.domains.length
-      ? api.domains.map((d) => {
-          const hostname = d.subdomain ? `${d.subdomain}.${d.domain}` : d.domain;
-          const url = port ? `http://${hostname}:${port}/graphiql` : `http://${hostname}/graphiql`;
-          return `<a href="${url}" style="color:#01A1FF;text-decoration:none;font-weight:500" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${hostname}</a>`;
-        }).join('<span style="color:#D4DCEA;margin:0 4px">·</span>')
-      : '<span style="color:#8E9398;font-style:italic;font-size:11px">no domains</span>';
-
-    const badge = api.is_public
-      ? '<span style="color:#01A1FF;font-size:10px;font-weight:500">public</span>'
-      : '<span style="color:#8E9398;font-size:10px">private</span>';
-
-    return `
-      <div style="background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04);border:1px solid #E8ECF0;display:flex;align-items:center;gap:12px;transition:background 0.15s" onmouseover="this.style.background='#FAFBFC'" onmouseout="this.style.background='#fff'">
-        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:13px">
-          <span style="font-weight:600;color:#232323;white-space:nowrap">${api.name}</span>
-          <span style="color:#D4DCEA">→</span>
-          ${domains}
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <span style="color:#8E9398;font-size:11px;font-family:'SF Mono',Monaco,monospace">${api.dbname}</span>
-          ${badge}
-        </div>
-      </div>`;
-  }).join('');
-
-  return {
-    errorHtml: `
-      <div style="text-align:left;max-width:600px;margin:0 auto">
-        <p style="color:#8E9398;font-size:11px;margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px">Available APIs</p>
-        ${apiCards}
-      </div>`,
+    webauthnSettings: settings.webauthnSettings
   };
 };
 
@@ -544,7 +411,7 @@ export const getApiConfig = async (
     subdomain,
     cacheKey,
     headers: getRoutingHeaders(req),
-    host: req.get('host') || '',
+    host: req.get('host') || ''
   };
 
   // Validate schemas upfront for modes that need them
@@ -570,32 +437,25 @@ export const getApiConfig = async (
   let result: ApiConfigResult;
 
   switch (mode) {
-    case 'services-disabled':
-      result = resolveServicesDisabled(ctx);
-      break;
+  case 'static':
+    result = resolveStatic(ctx);
+    break;
 
-    case 'schemata-header':
-      result = await resolveSchemataHeader(ctx, validatedSchemas);
-      break;
+  case 'schemata-header':
+    result = await resolveSchemataHeader(ctx, validatedSchemas);
+    break;
 
-    case 'api-name-header':
-      result = await resolveApiNameHeader(ctx);
-      break;
+  case 'api-name-header':
+    result = await resolveApiNameHeader(ctx);
+    break;
 
-    case 'meta-schema-header':
-      result = resolveMetaSchemaHeader(ctx, validatedSchemas);
-      break;
+  case 'meta-schema-header':
+    result = resolveMetaSchemaHeader(ctx, validatedSchemas);
+    break;
 
-    case 'domain-lookup':
-      result = await resolveScopedRoute(ctx);
-      if (!result) {
-        result = await resolveDomainLookup(ctx);
-      }
-      if (!result && apiOpts.isPublic) {
-        const fallback = await buildDevFallbackError(ctx, req);
-        if (fallback) return fallback;
-      }
-      break;
+  case 'scoped-route':
+    result = await resolveScopedRoute(ctx);
+    break;
   }
 
   // Cache successful results
@@ -614,19 +474,20 @@ export const createApiMiddleware = (opts: ApiOptions) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 
-    // Fast path: services disabled
-    if (opts.api?.enableServicesApi === false) {
-      req.api = resolveServicesDisabled({
+    // Fast path: static single-tenant mode (scoped routing disabled) — no
+    // route resolution, expose the configured schemas directly.
+    if (!opts.api?.enableScopedRouting) {
+      req.api = resolveStatic({
         opts,
         pool: null as unknown as Pool,
         domain: '',
         subdomain: null,
-        cacheKey: 'meta-api-off',
+        cacheKey: 'static',
         headers: {},
-        host: '',
+        host: ''
       });
       req.databaseId = req.api.databaseId;
-      req.svc_key = 'meta-api-off';
+      req.svc_key = 'static';
       return next();
     }
 

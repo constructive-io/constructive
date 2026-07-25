@@ -1,16 +1,16 @@
 jest.mock('pg-cache', () => ({
-  getPgPool: jest.fn(),
+  getPgPool: jest.fn()
 }));
 
 jest.mock('@constructive-io/express-context', () => ({
   createDefaultRegistry: jest.fn(() => ({
-    resolve: jest.fn().mockResolvedValue(undefined),
-  })),
+    resolve: jest.fn().mockResolvedValue(undefined)
+  }))
 }));
 
+import { svcCache } from '@pgpmjs/server-utils';
 import type { Request } from 'express';
 import type { Pool } from 'pg';
-import { svcCache } from '@pgpmjs/server-utils';
 import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
@@ -39,12 +39,12 @@ const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => 
     role_name: 'api_role',
     anon_role: 'api_anon',
     is_public: true,
-    schemas: ['app_public'],
+    schemas: ['app_public']
   },
   verification_status: 'verified',
   tls_status: 'ready',
   tls_secret_name: 'tls-api-example-com',
-  ...overrides,
+  ...overrides
 });
 
 const noMatchRoute = (): ResolvedRoute =>
@@ -109,7 +109,7 @@ describe('routeToApiStructure', () => {
         roleName: 'api_role',
         anonRole: 'api_anon',
         schema: ['app_public'],
-        isPublic: true,
+        isPublic: true
       })
     );
   });
@@ -126,14 +126,14 @@ describe('routeToApiStructure', () => {
 describe('getApiConfig with scoped routing enabled', () => {
   const createRequest = (headers: Record<string, string>): Request => {
     const normalized = new Map(
-      Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
+      Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value])
     );
     return {
       protocol: 'http',
       originalUrl: '/graphql',
       path: '/graphql',
       method: 'POST',
-      get: jest.fn((name: string) => normalized.get(name.toLowerCase())),
+      get: jest.fn((name: string) => normalized.get(name.toLowerCase()))
     } as unknown as Request;
   };
 
@@ -142,8 +142,8 @@ describe('getApiConfig with scoped routing enabled', () => {
     api: {
       isPublic: true,
       metaSchemas: ['metaschema_public'],
-      enableScopedRouting,
-    },
+      enableScopedRouting
+    }
   } as unknown as ApiOptions);
 
   beforeEach(() => {
@@ -156,14 +156,14 @@ describe('getApiConfig with scoped routing enabled', () => {
   });
 
   const schemaValidationRows = (params: unknown[]) => ({
-    rows: (params[0] as string[]).map((schemaName) => ({ schema_name: schemaName })),
+    rows: (params[0] as string[]).map((schemaName) => ({ schema_name: schemaName }))
   });
 
-  it('resolves via resolve_route (host only) before the legacy domain lookup', async () => {
+  it('resolves via resolve_route (host only) as the sole resolver', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('resolve_route')) return { rows: [matchedRoute()] };
-      throw new Error(`unexpected legacy query: ${sql}`);
+      throw new Error(`unexpected query: ${sql}`);
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
@@ -176,30 +176,18 @@ describe('getApiConfig with scoped routing enabled', () => {
     );
   });
 
-  it('falls back to the legacy domain lookup when resolve_route has no match', async () => {
+  it('returns null (no fallback) when resolve_route has no match', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('resolve_route')) return { rows: [noMatchRoute()] };
-      if (sql.includes('services_public.domains')) {
-        return {
-          rows: [{
-            api_id: 'legacy-api',
-            database_id: 'db-legacy',
-            dbname: 'legacy_db',
-            role_name: 'authenticated',
-            anon_role: 'anon',
-            is_public: true,
-            schemas: ['app_public'],
-          }],
-        };
-      }
-      return { rows: [] };
+      throw new Error(`unexpected query (no legacy fallback): ${sql}`);
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    const result = await getApiConfig(createOptions(true), createRequest({ host: 'legacy.example.com' }));
+    const result = await getApiConfig(createOptions(true), createRequest({ host: 'nomatch.example.com' }));
 
-    expect(result).toEqual(expect.objectContaining({ apiId: 'legacy-api', dbname: 'legacy_db' }));
+    expect(result).toBeFalsy();
+    expect(query.mock.calls.some(([sql]) => String(sql).includes('services_public'))).toBe(false);
   });
 
   it('does not call resolve_route when scoped routing is disabled', async () => {

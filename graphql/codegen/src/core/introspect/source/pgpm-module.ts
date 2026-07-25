@@ -16,7 +16,7 @@ import { deployPgpm } from 'pgsql-seed';
 import { buildSchemaSDL } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
-import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';
+import { resolveApiSchemas, validateRoutingSchemas } from './api-schemas';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 
@@ -38,7 +38,7 @@ export interface PgpmModulePathOptions {
 
   /**
    * API names to resolve schemas from
-   * Queries services_public.api_schemas to get schema names
+   * Queries constructive_routing_public.api_schemas to get schema names
    * Mutually exclusive with schemas
    */
   apiNames?: string[];
@@ -73,7 +73,7 @@ export interface PgpmWorkspaceOptions {
 
   /**
    * API names to resolve schemas from
-   * Queries services_public.api_schemas to get schema names
+   * Queries constructive_routing_public.api_schemas to get schema names
    * Mutually exclusive with schemas
    */
   apiNames?: string[];
@@ -180,7 +180,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         // For PGPM mode, validate services schemas AFTER migration
         const pool = getPgPool(dbConfig);
         try {
-          const validation = await validateServicesSchemas(pool);
+          const validation = await validateRoutingSchemas(pool);
           if (!validation.valid) {
             throw new SchemaSourceError(validation.error!, this.describe());
           }

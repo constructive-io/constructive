@@ -11,7 +11,7 @@
 -- plus one binding on the "public" API (28199444-da40-40b1-8a4c-53edbf91c738)
 -- that must not be exposed on the "app" API.
 --
--- Depends on: services/setup.sql, services/test-data.sql, compute/setup.sql
+-- Depends on: scoped/test-data.sql, compute/setup.sql
 
 SET session_replication_role TO replica;
 

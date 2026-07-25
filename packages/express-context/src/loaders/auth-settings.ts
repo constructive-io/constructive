@@ -7,12 +7,12 @@
  *   2. Query the discovered <schema>.<table> in the tenant DB
  *
  * This is the pattern for any module whose config lives in the tenant
- * database rather than the services database.
+ * database rather than the routing database.
  */
 
 import type { AuthSettings } from '../types';
-import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
+import type { LoaderContext, ModuleLoader } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
@@ -62,14 +62,14 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
 
     // Step 1: Discover schema + table from sessions_module
     const discovery = await tenantPool.query<{ schema_name: string; table_name: string }>(
-      AUTH_SETTINGS_DISCOVERY_SQL,
+      AUTH_SETTINGS_DISCOVERY_SQL
     );
     const resolved = discovery.rows[0];
     if (!resolved) return undefined;
 
     // Step 2: Query the actual auth settings table
     const result = await tenantPool.query<AuthSettingsRow>(
-      buildAuthSettingsQuery(resolved.schema_name, resolved.table_name),
+      buildAuthSettingsQuery(resolved.schema_name, resolved.table_name)
     );
     const row = result.rows[0];
     if (!row) return undefined;
@@ -83,7 +83,7 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
       cookiePath: row.cookie_path,
       rememberMeDuration: row.remember_me_duration,
       enableCaptcha: row.enable_captcha,
-      captchaSiteKey: row.captcha_site_key,
+      captchaSiteKey: row.captcha_site_key
     };
-  },
+  }
 });

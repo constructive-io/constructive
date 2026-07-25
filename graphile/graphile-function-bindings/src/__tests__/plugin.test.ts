@@ -2,7 +2,7 @@
  * Integration tests for the function bindings plugin.
  *
  * Uses graphile-test with a real PostgreSQL database seeded with the shared
- * compute fixtures (__fixtures__/seed/{services,compute}) to verify:
+ * compute fixtures (__fixtures__/seed/{scoped,compute}) to verify:
  * - one mutation per graphql-enabled binding for the configured api
  * - graphql-disabled bindings and other-api bindings are not exposed
  * - payload_args-derived and JSON-Schema-derived input types
@@ -16,7 +16,7 @@ import { join } from 'path';
 
 import { createFunctionBindingsPlugin } from '../plugin';
 
-// The "app" API from the shared services fixture
+// The "app" API from the shared scoped routing fixture
 const API_ID = '6c9997a4-591b-4cb3-9313-4ef45d6f134e';
 
 const sharedSeedRoot = join(__dirname, '..', '..', '..', '..', '__fixtures__', 'seed');
@@ -28,7 +28,7 @@ const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
     shared('compute', 'setup.sql'),
-    shared('services', 'test-data.sql'),
+    shared('scoped', 'test-data.sql'),
     shared('compute', 'test-data.sql')
   ])
 ];

@@ -181,7 +181,8 @@ The `server.api` option provides full control over the GraphQL server configurat
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `enableServicesApi` | `boolean` | package default | Enable domain/subdomain routing via services_public |
+| `enableScopedRouting` | `boolean` | package default | Resolve host routing through the scoped plane (`constructive_routing_public.resolve_route`); disable for static single-tenant mode |
+| `scopedRoutingSchema` | `string` | `constructive_routing_public` | Schema that owns `resolve_route()` and the routing tables |
 | `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
 | `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
 | `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
@@ -198,12 +199,12 @@ const { query } = await getConnections({
   authRole: 'anonymous'
 });
 
-// Disabling Services API for testing (bypasses domain routing)
+// Static single-tenant mode for testing (bypasses host route resolution)
 const { query } = await getConnections({
   schemas: ['app_public'],
   server: {
     api: {
-      enableServicesApi: false
+      enableScopedRouting: false
     }
   }
 });
@@ -216,10 +217,10 @@ const { query } = await getConnections({
     port: 5555,
     host: 'localhost',
     api: {
-      enableServicesApi: false,
+      enableScopedRouting: false,
       isPublic: false,
       defaultDatabaseId: 'my-test-db',
-      metaSchemas: ['services_public', 'metaschema_public']
+      metaSchemas: ['constructive_routing_public', 'metaschema_public']
     }
   }
 });

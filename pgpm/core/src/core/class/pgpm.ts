@@ -37,6 +37,8 @@ import {
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
+import { movePath } from '../../utils/fs';
+import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
 import { parseTarget } from '../../utils/target-utils';
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
@@ -187,7 +189,7 @@ export class PgpmPackage {
   private loadAllowedDirs(): string[] {
     const globs: string[] = this.config?.packages ?? [];
     const dirs = globs.flatMap(pattern =>
-      glob.sync(path.join(this.workspacePath!, pattern))
+      globPaths(this.workspacePath!, pattern)
     );
     const resolvedDirs = dirs.map(dir => path.resolve(dir));
     // Remove duplicates by converting to Set and back to array
@@ -316,11 +318,11 @@ export class PgpmPackage {
     // nested workspaces (e.g. test fixtures) out of the module map.
     const packageDirs = [
       ...this.allowedDirs,
-      ...glob.sync(path.join(this.workspacePath, this.extensionsDir, '{*,@*/*}'))
+      ...globPaths(this.workspacePath, this.extensionsDir, '{*,@*/*}')
     ];
 
     const moduleFiles = [...new Set(
-      packageDirs.flatMap(dir => glob.sync(`${dir}/**/*.control`))
+      packageDirs.flatMap(dir => glob.sync(globPattern(dir, '**/*.control')))
     )].filter(
       (file: string) => !/node_modules/.test(file)
     ).sort((a, b) => a.localeCompare(b));
@@ -1047,11 +1049,11 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           stdio: 'inherit'
         });
   
-        const matches = glob.sync(`./${this.extensionsDir}/**/pgpm.plan`);
+        const matches = glob.sync(globPattern('.', this.extensionsDir, '**/pgpm.plan'));
         const installs = matches.map((conf) => {
           const fullConf = resolve(conf);
           const extDir = dirname(fullConf);
-          const parts = extDir.split('node_modules/');
+          const parts = toPosixPath(extDir).split('node_modules/');
           const relativeDir = parts[parts.length - 1];
           const dstDir = path.join(skitchExtDir, relativeDir);
           return { src: extDir, dst: dstDir, pkg: relativeDir };
@@ -1059,7 +1061,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
         // Sort deepest paths first so nested node_modules deps are
         // extracted before their parent directories are moved.
-        installs.sort((a, b) => b.src.split('/').length - a.src.split('/').length);
+        installs.sort((a, b) => toPosixPath(b.src).split('/').length - toPosixPath(a.src).split('/').length);
 
         for (const { src, dst, pkg } of installs) {
           if (fs.existsSync(dst)) {
@@ -1067,7 +1069,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           }
   
           fs.mkdirSync(path.dirname(dst), { recursive: true });
-          execSync(`mv "${src}" "${dst}"`);
+          movePath(src, dst);
           logger.success(`✔ installed ${pkg}`);
   
           const pkgJsonFile = path.join(dst, 'package.json');
@@ -1086,8 +1088,9 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         }
   
       } finally {
-        fs.rmSync(tempDir, { recursive: true, force: true });
+        // chdir out first: Windows locks the process working directory
         process.chdir(originalDir);
+        fs.rmSync(tempDir, { recursive: true, force: true });
       }
     }
   
@@ -2022,7 +2025,8 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       const expected = `${info.extname}.control`;
       if (base !== expected) issues.push({ code: 'control_filename_mismatch', message: `Control filename ${base} != ${expected}`, file: controlPath });
     }
-    return { ok: issues.length === 0, name: info.extname, path: modPath, issues };
+    const reported = issues.map(issue => ({ ...issue, file: toPosixPath(issue.file) }));
+    return { ok: reported.length === 0, name: info.extname, path: toPosixPath(modPath), issues: reported };
   }
 
   renameModule(newName: string, opts?: RenameOptions): { changed: string[]; warnings: string[] } {

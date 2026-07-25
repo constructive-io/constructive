@@ -14,9 +14,10 @@
  */
 
 import path from 'path';
+import type supertest from 'supertest';
+
 import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
-import type supertest from 'supertest';
 
 jest.setTimeout(60000);
 
@@ -46,16 +47,16 @@ describe('Unified Search — server integration', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          api: { enableServicesApi: false, isPublic: false },
-        },
+          api: { enableScopedRouting: false, isPublic: false }
+        }
       },
       [
         seed.sqlfile([
           shared('base', 'setup.sql'),
           sql('search-seed', 'extensions.sql'),
           sql('search-seed', 'schema.sql'),
-          sql('search-seed', 'test-data.sql'),
-        ]),
+          sql('search-seed', 'test-data.sql')
+        ])
       ]
     ));
 
@@ -65,7 +66,7 @@ describe('Unified Search — server integration', () => {
         __type(name: "Article") {
           fields { name }
         }
-      }`,
+      }`
     });
     const fieldNames =
       introspection.body.data?.__type?.fields?.map(
@@ -86,7 +87,7 @@ describe('Unified Search — server integration', () => {
 
   it('should query all articles', async () => {
     const res = await postGraphQL({
-      query: '{ articles { nodes { id title body } } }',
+      query: '{ articles { nodes { id title body } } }'
     });
 
     expect(res.status).toBe(200);
@@ -105,7 +106,7 @@ describe('Unified Search — server integration', () => {
           articles(where: { tsvTsv: "machine learning" }) {
             nodes { title tsvRank }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -131,7 +132,7 @@ describe('Unified Search — server integration', () => {
           articles(first: 1) {
             nodes { title tsvRank }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -148,7 +149,7 @@ describe('Unified Search — server integration', () => {
           ) {
             nodes { title tsvRank }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -175,7 +176,7 @@ describe('Unified Search — server integration', () => {
           articles(where: { trgmTitle: { value: "machin lerning", threshold: 0.1 } }) {
             nodes { title titleTrgmSimilarity }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -198,7 +199,7 @@ describe('Unified Search — server integration', () => {
           articles(where: { trgmBody: { value: "neural networks", threshold: 0.1 } }) {
             nodes { title bodyTrgmSimilarity }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -222,7 +223,7 @@ describe('Unified Search — server integration', () => {
           ) {
             nodes { title titleTrgmSimilarity }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -254,7 +255,7 @@ describe('Unified Search — server integration', () => {
           articles(where: { vectorEmbedding: { vector: [0.1, 0.9, 0.3], distance: 1.0 } }) {
             nodes { title embeddingVectorDistance }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -285,7 +286,7 @@ describe('Unified Search — server integration', () => {
           ) {
             nodes { title embeddingVectorDistance }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -312,7 +313,7 @@ describe('Unified Search — server integration', () => {
           articles(where: { tsvTsv: "machine learning" }) {
             nodes { title searchScore }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -334,7 +335,7 @@ describe('Unified Search — server integration', () => {
           articles(first: 1) {
             nodes { title searchScore }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -342,13 +343,13 @@ describe('Unified Search — server integration', () => {
       expect(res.body.data.articles.nodes[0].searchScore).toBeNull();
     });
 
-        it('should filter via unifiedSearch composite filter', async () => {
-          const res = await postGraphQL({
-            query: `{
+    it('should filter via unifiedSearch composite filter', async () => {
+      const res = await postGraphQL({
+        query: `{
               articles(where: { unifiedSearch: "vector databases" }) {
             nodes { title tsvRank searchScore }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -371,7 +372,7 @@ describe('Unified Search — server integration', () => {
           ) {
             nodes { title searchScore }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -412,7 +413,7 @@ describe('Unified Search — server integration', () => {
               searchScore
             }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -454,7 +455,7 @@ describe('Unified Search — server integration', () => {
               searchScore
             }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -476,10 +477,10 @@ describe('Unified Search — server integration', () => {
   // Mega Query v2 — unifiedSearch composite + orderBy SEARCH_SCORE_DESC
   // ===========================================================================
 
-    describe('Mega Query v2 — unifiedSearch composite', () => {
-      it('should use unifiedSearch + SEARCH_SCORE_DESC', async () => {
-        const res = await postGraphQL({
-          query: `{
+  describe('Mega Query v2 — unifiedSearch composite', () => {
+    it('should use unifiedSearch + SEARCH_SCORE_DESC', async () => {
+      const res = await postGraphQL({
+        query: `{
             articles(
               where: { unifiedSearch: "machine learning" }
             orderBy: SEARCH_SCORE_DESC
@@ -492,7 +493,7 @@ describe('Unified Search — server integration', () => {
               searchScore
             }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -543,7 +544,7 @@ describe('Unified Search — server integration', () => {
               searchScore
             }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -572,7 +573,7 @@ describe('Unified Search — server integration', () => {
           __type(name: "Article") {
             fields { name type { name kind ofType { name } } }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -608,7 +609,7 @@ describe('Unified Search — server integration', () => {
           __type(name: "ArticleFilter") {
             inputFields { name type { name kind ofType { name } } }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);
@@ -639,7 +640,7 @@ describe('Unified Search — server integration', () => {
           __type(name: "ArticleOrderBy") {
             enumValues { name }
           }
-        }`,
+        }`
       });
 
       expect(res.status).toBe(200);

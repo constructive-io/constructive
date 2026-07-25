@@ -42,17 +42,14 @@ jest.mock('../src/export-graphql-meta', () => ({
   exportGraphQLMeta: jest.fn()
 }));
 
-import { PgpmPackage, PgpmMigrate } from '@pgpmjs/core';
-import { createClient } from '@pgpmjs/migrate-client';
-import { exportGraphQL } from '../src/export-graphql';
-import { exportMigrations } from '../src/export-migrations';
-import { exportMeta } from '../src/export-meta';
-import { GraphQLClient } from '../src/graphql-client';
-import { exportGraphQLMeta } from '../src/export-graphql-meta';
+import { PgpmMigrate,PgpmPackage } from '@pgpmjs/core';
 import { toCamelCase } from 'inflekt';
 import { getConnections, seed } from 'pgsql-test';
 
-import type { PgpmPackage as PgpmPackageType } from '@pgpmjs/core';
+import { exportGraphQL } from '../src/export-graphql';
+import { exportGraphQLMeta } from '../src/export-graphql-meta';
+import { exportMeta } from '../src/export-meta';
+import { exportMigrations } from '../src/export-migrations';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -100,7 +97,8 @@ const pgRowToCamel = (row: Record<string, unknown>): Record<string, unknown> => 
 const SCHEMA_SHIMS_SQL = `
   CREATE SCHEMA IF NOT EXISTS metaschema_public;
   CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
-  CREATE SCHEMA IF NOT EXISTS services_public;
+  CREATE SCHEMA IF NOT EXISTS constructive_routing_public;
+  CREATE SCHEMA IF NOT EXISTS constructive_apps_public;
   CREATE SCHEMA IF NOT EXISTS db_migrate;
 
   CREATE TABLE IF NOT EXISTS metaschema_public.database (
@@ -119,38 +117,48 @@ const SCHEMA_SHIMS_SQL = `
     table_id uuid REFERENCES metaschema_public.table(id), name text, type text, description text
   );
 
-  CREATE TABLE IF NOT EXISTS services_public.domains (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, api_id uuid, domain text, subdomain text
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.domains (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, hostname text, managed boolean,
+    is_wildcard boolean, parent_hostname text, verification_status text, tls_status text,
+    tls_secret_name text, is_published boolean,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.apis (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text, dbname text,
-    is_public boolean, role_name text, anon_role text
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.apis (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text,
+    dbname text DEFAULT current_database(), role_name text, anon_role text,
+    is_published boolean, config jsonb,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.sites (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, title text, description text,
-    og_image text, favicon text, apple_touch_icon text, logo text, dbname text
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.sites (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text, title text,
+    description text, config jsonb, is_published boolean,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.api_schemas (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, schema_id uuid, api_id uuid
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_schemas (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, schema_id uuid, api_id uuid,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.apps (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, name text,
-    app_image text, app_store_link text, app_store_id text, app_id_prefix text, play_store_link text
+  CREATE TABLE IF NOT EXISTS constructive_apps_public.apps (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text, title text,
+    description text, status text, config jsonb, is_published boolean,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.site_modules (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, name text, data jsonb
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_modules (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, name text, data jsonb,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.site_themes (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, theme jsonb
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_themes (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, theme jsonb,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.site_metadata (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, key text, value text
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.site_metadata (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, site_id uuid, title text,
+    description text, og_image text,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
-  CREATE TABLE IF NOT EXISTS services_public.api_modules (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, api_id uuid, name text, data jsonb
-  );
-  CREATE TABLE IF NOT EXISTS services_public.api_extensions (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, api_id uuid, schema_name text
+  CREATE TABLE IF NOT EXISTS constructive_routing_public.api_modules (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, api_id uuid, name text, data jsonb,
+    created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
   );
 
   CREATE TABLE IF NOT EXISTS db_migrate.sql_actions (
@@ -178,16 +186,16 @@ const SEED_SQL = `
     ('cccc0002-0000-0000-0000-000000000001', '${DATABASE_ID}', 'bbbb0001-0000-0000-0000-000000000001', 'name', 'text', 'Owner name'),
     ('cccc0003-0000-0000-0000-000000000001', '${DATABASE_ID}', 'bbbb0001-0000-0000-0000-000000000001', 'email', 'text', 'Contact email');
 
-  INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role) VALUES
+  INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role) VALUES
     ('eeee0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'public', 'pets-db', true, 'authenticated', 'anonymous');
 
-  INSERT INTO services_public.sites (id, database_id, title, description, dbname) VALUES
-    ('ffff0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'Pet Clinic', 'A pet management application', '${DATABASE_NAME}');
+  INSERT INTO constructive_routing_public.sites (id, database_id, name, title, description, is_published) VALUES
+    ('ffff0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'pet-clinic', 'Pet Clinic', 'A pet management application', true);
 
-  INSERT INTO services_public.domains (id, database_id, domain, subdomain) VALUES
-    ('dddd0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'localhost', 'pets');
+  INSERT INTO constructive_routing_public.domains (id, database_id, hostname, managed, is_wildcard, is_published) VALUES
+    ('dddd0001-0000-0000-0000-000000000001', '${DATABASE_ID}', 'pets.localhost', false, false, true);
 
-  INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VALUES
+  INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id) VALUES
     ('1111aaaa-0000-0000-0000-000000000001', '${DATABASE_ID}', 'aaaa0001-0000-0000-0000-000000000001', 'eeee0001-0000-0000-0000-000000000001');
 
   INSERT INTO db_migrate.sql_actions (name, database_id, deploy, deps, content, revert, verify) VALUES

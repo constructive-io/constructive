@@ -1,154 +1,27 @@
-import jobServerFactory from '@constructive-io/knative-job-server';
-import Worker from '@constructive-io/knative-job-worker';
-import Scheduler from '@constructive-io/job-scheduler';
 import poolManager from '@constructive-io/job-pg';
+import Scheduler from '@constructive-io/job-scheduler';
 import {
   getJobPgConfig,
+  getJobsCallbackPort,
   getJobSchema,
   getJobSupported,
-  getJobsCallbackPort,
   getSchedulerHostname,
   getWorkerHostname
 } from '@constructive-io/job-utils';
-import { parseEnvBoolean, parseEnvList } from '@pgpmjs/env';
+import jobServerFactory from '@constructive-io/knative-job-server';
+import Worker from '@constructive-io/knative-job-worker';
+import { parseEnvBoolean } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import retry from 'async-retry';
-import { Client } from 'pg';
-import { createRequire } from 'module';
 import type { Server as HttpServer } from 'http';
+import { Client } from 'pg';
 
 import {
   KnativeJobsSvcOptions,
-  KnativeJobsSvcResult,
-  FunctionName,
-  FunctionServiceConfig,
-  FunctionsOptions,
-  StartedFunction
+  KnativeJobsSvcResult
 } from './types';
 
-type FunctionRegistryEntry = {
-  moduleName: string;
-  defaultPort: number;
-};
-
-const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {
-  'send-email': {
-    moduleName: '@constructive-io/send-email-fn',
-    defaultPort: 8081
-  },
-  'send-verification-link': {
-    moduleName: '@constructive-io/send-verification-link-fn',
-    defaultPort: 8082
-  }
-};
-
 const log = new Logger('knative-job-service');
-const requireFn = createRequire(__filename);
-
-const resolveFunctionEntry = (name: FunctionName): FunctionRegistryEntry => {
-  const entry = functionRegistry[name];
-  if (!entry) {
-    throw new Error(`Unknown function "${name}".`);
-  }
-  return entry;
-};
-
-const loadFunctionApp = (moduleName: string) => {
-  const knativeModuleId = requireFn.resolve('@constructive-io/knative-job-fn');
-  delete requireFn.cache[knativeModuleId];
-
-  const moduleId = requireFn.resolve(moduleName);
-  delete requireFn.cache[moduleId];
-
-  const mod = requireFn(moduleName) as { default?: { listen: (port: number, cb?: () => void) => unknown } };
-  const app = mod.default ?? mod;
-
-  if (!app || typeof (app as { listen?: unknown }).listen !== 'function') {
-    throw new Error(`Function module "${moduleName}" does not export a listenable app.`);
-  }
-
-  return app as { listen: (port: number, cb?: () => void) => unknown };
-};
-
-const shouldEnableFunctions = (options?: FunctionsOptions): boolean => {
-  if (!options) return false;
-  if (typeof options.enabled === 'boolean') return options.enabled;
-  return Boolean(options.services?.length);
-};
-
-const normalizeFunctionServices = (
-  options?: FunctionsOptions
-): FunctionServiceConfig[] => {
-  if (!shouldEnableFunctions(options)) return [];
-
-  if (!options?.services?.length) {
-    return Object.keys(functionRegistry).map((name) => ({
-      name: name as FunctionName
-    }));
-  }
-
-  return options.services;
-};
-
-const resolveFunctionPort = (service: FunctionServiceConfig): number => {
-  const entry = resolveFunctionEntry(service.name);
-  return service.port ?? entry.defaultPort;
-};
-
-const ensureUniquePorts = (services: FunctionServiceConfig[]) => {
-  const usedPorts = new Set<number>();
-  for (const service of services) {
-    const port = resolveFunctionPort(service);
-    if (usedPorts.has(port)) {
-      throw new Error(`Function port ${port} is assigned more than once.`);
-    }
-    usedPorts.add(port);
-  }
-};
-
-const startFunction = async (
-  service: FunctionServiceConfig,
-  functionServers: Map<FunctionName, HttpServer>
-): Promise<StartedFunction> => {
-  const entry = resolveFunctionEntry(service.name);
-  const port = resolveFunctionPort(service);
-  const app = loadFunctionApp(entry.moduleName);
-
-  await new Promise<void>((resolve, reject) => {
-    const server = app.listen(port, () => {
-      log.info(`function:${service.name} listening on ${port}`);
-      resolve();
-    }) as HttpServer & { on?: (event: string, cb: (err: Error) => void) => void };
-
-    if (server?.on) {
-      server.on('error', (err) => {
-        log.error(`function:${service.name} failed to start`, err);
-        reject(err);
-      });
-    }
-
-    functionServers.set(service.name, server);
-  });
-
-  return { name: service.name, port };
-};
-
-const startFunctions = async (
-  options: FunctionsOptions | undefined,
-  functionServers: Map<FunctionName, HttpServer>
-): Promise<StartedFunction[]> => {
-  const services = normalizeFunctionServices(options);
-  if (!services.length) return [];
-
-  ensureUniquePorts(services);
-
-  const started: StartedFunction[] = [];
-  for (const service of services) {
-    started.push(await startFunction(service, functionServers));
-  }
-
-  return started;
-};
 
 type JobRunner = {
   listen: () => void;
@@ -199,10 +72,8 @@ export class KnativeJobsSvc {
   private options: KnativeJobsSvcOptions;
   private started = false;
   private result: KnativeJobsSvcResult = {
-    functions: [],
     jobs: false
   };
-  private functionServers = new Map<FunctionName, HttpServer>();
   private jobsHttpServer?: HttpServer;
   private worker?: JobRunner;
   private scheduler?: JobRunner;
@@ -216,17 +87,8 @@ export class KnativeJobsSvc {
     if (this.started) return this.result;
     this.started = true;
     this.result = {
-      functions: [],
       jobs: false
     };
-
-    if (shouldEnableFunctions(this.options.functions)) {
-      log.info('starting functions');
-      this.result.functions = await startFunctions(
-        this.options.functions,
-        this.functionServers
-      );
-    }
 
     if (this.options.jobs?.enabled) {
       log.info('starting jobs service');
@@ -257,11 +119,6 @@ export class KnativeJobsSvc {
       await this.jobsPoolManager.close();
       this.jobsPoolManager = undefined;
     }
-
-    for (const server of this.functionServers.values()) {
-      await closeServer(server);
-    }
-    this.functionServers.clear();
   }
 
   private async startJobs(): Promise<void> {
@@ -289,67 +146,10 @@ export class KnativeJobsSvc {
   }
 }
 
-const parsePortMap = (value?: string): Record<string, number> => {
-  if (!value) return {};
-
-  const trimmed = value.trim();
-  if (!trimmed) return {};
-
-  if (trimmed.startsWith('{')) {
-    try {
-      const parsed = JSON.parse(trimmed) as Record<string, number>;
-      return Object.entries(parsed).reduce<Record<string, number>>((acc, [key, port]) => {
-        const portNumber = Number(port);
-        if (Number.isFinite(portNumber)) {
-          acc[key] = portNumber;
-        }
-        return acc;
-      }, {});
-    } catch {
-      return {};
-    }
-  }
-
-  return trimmed.split(',').reduce<Record<string, number>>((acc, pair) => {
-    const [rawName, rawPort] = pair.split(/[:=]/).map((item) => item.trim());
-    const port = Number(rawPort);
-    if (rawName && Number.isFinite(port)) {
-      acc[rawName] = port;
-    }
-    return acc;
-  }, {});
-};
-
-const buildFunctionsOptionsFromEnv = (): KnativeJobsSvcOptions['functions'] => {
-  const rawFunctions = (process.env.CONSTRUCTIVE_FUNCTIONS || '').trim();
-  if (!rawFunctions) return undefined;
-
-  const portMap = parsePortMap(process.env.CONSTRUCTIVE_FUNCTION_PORTS);
-  const normalized = rawFunctions.toLowerCase();
-
-  if (normalized === 'all' || normalized === '*') {
-    return { enabled: true };
-  }
-
-  const names = (parseEnvList(rawFunctions) ?? []) as FunctionName[];
-  if (!names.length) return undefined;
-
-  const services: FunctionServiceConfig[] = names.map((name) => ({
-    name,
-    port: portMap[name]
-  }));
-
-  return {
-    enabled: true,
-    services
-  };
-};
-
 export const buildKnativeJobsSvcOptionsFromEnv = (): KnativeJobsSvcOptions => ({
   jobs: {
     enabled: parseEnvBoolean(process.env.CONSTRUCTIVE_JOBS_ENABLED) ?? true
-  },
-  functions: buildFunctionsOptionsFromEnv()
+  }
 });
 
 export const startKnativeJobsSvcFromEnv = async (): Promise<KnativeJobsSvcResult> => {
@@ -437,9 +237,7 @@ export const bootJobs = async (): Promise<void> => {
     workerHostname: getWorkerHostname(),
     schedulerHostname: getSchedulerHostname(),
     supportedTasks: getJobSupported(),
-    jobsEnabled: options.jobs?.enabled ?? true,
-    functionsEnabled: shouldEnableFunctions(options.functions),
-    functions: normalizeFunctionServices(options.functions).map(s => s.name)
+    jobsEnabled: options.jobs?.enabled ?? true
   });
 
   if (options.jobs?.enabled === false) {

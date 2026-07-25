@@ -15,7 +15,7 @@ This document describes the **current** jobs setup using:
 
 - PostgreSQL + `pgpm-database-jobs` (`app_jobs.*`)
 - `@constructive-io/knative-job-service` + `@constructive-io/knative-job-worker`
-- Knative functions (example: `send-email`)
+- Knative functions (deployed separately, e.g. in constructive-db)
 
 ---
 
@@ -97,41 +97,18 @@ From `jobs/knative-job-service/src/env.ts`:
 
 ---
 
-## 3. Example function: `send-verification-link`
+## 3. Cloud functions (moved to constructive-db)
 
-The `functions/send-verification-link` package is a **Knative function** that sends verification links for:
+The email cloud functions (e.g. `send-email`, `send-verification-link`) used to
+live in this repo under `functions/`. They have been **moved to constructive-db**
+and are deployed separately.
 
-- **invite_email** - User invitations
-- **forgot_password** - Password reset emails
-- **email_verification** - Email verification links
-
-### How it works
-
-1. Receives job payload with email type and parameters
-2. Queries GraphQL API (via `private.localhost` host routing) for:
-   - `GetDatabaseInfo` - Site configuration (domains, logo, theme, legal terms)
-   - `GetUser` - Sender info for invite emails
-3. Generates HTML email using MJML templates
-4. Sends via Mailgun (or logs in dry-run mode)
-
-### Required env vars (send-verification-link)
-
-```yaml
-# GraphQL endpoints (admin server with host-based routing)
-GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
-META_GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
-GRAPHQL_HOST_HEADER: "private.localhost"
-META_GRAPHQL_HOST_HEADER: "private.localhost"
-
-# Mailgun configuration
-MAILGUN_API_KEY: "your-api-key"
-MAILGUN_DOMAIN: "mg.example.com"
-MAILGUN_FROM: "no-reply@mg.example.com"
-MAILGUN_REPLY: "support@example.com"
-
-# Dry run mode (no actual emails sent)
-SEND_VERIFICATION_LINK_DRY_RUN: "true"
-```
+The jobs worker is agnostic to where a function runs. For each job it `POST`s the
+payload to the function URL resolved from `INTERNAL_GATEWAY_DEVELOPMENT_MAP`
+(task identifier -> URL) or `INTERNAL_GATEWAY_URL`. A function receives the job
+payload as JSON and must return `{ complete: true }` on success, or a non-2xx
+response to fail the job (the worker records the error and retries up to
+`max_attempts`).
 
 ---
 
@@ -152,8 +129,10 @@ docker-compose -f docker-compose.jobs.yml up --build
 | Service | Port | Description |
 |---------|------|-------------|
 | `constructive-admin-server` | 3001 | GraphQL API with `API_IS_PUBLIC=false` |
-| `send-verification-link` | 8082 | Verification link function |
 | `knative-job-service` | 8080 | Job worker + callback server |
+
+The email cloud functions are deployed separately (constructive-db); point the
+worker at them via `INTERNAL_GATEWAY_URL` / `INTERNAL_GATEWAY_DEVELOPMENT_MAP`.
 
 ### Test GraphQL access
 
@@ -254,9 +233,6 @@ docker exec -it postgres \
 ### Watch the logs
 
 ```bash
-# Watch send-verification-link function logs
-docker logs -f send-verification-link
-
 # Watch job service logs
 docker logs -f knative-job-service
 ```
@@ -265,10 +241,9 @@ docker logs -f knative-job-service
 
 1. `app_jobs.add_job` inserts into `app_jobs.jobs` and fires `NOTIFY "jobs:insert"`
 2. `knative-job-worker` receives notification, picks up the job
-3. Worker `POST`s payload to `http://send-verification-link:8080/`
-4. `send-verification-link` queries GraphQL for site/user info
-5. Generates email HTML and sends (or logs in dry-run mode)
-6. Returns `{ complete: true }` and job is marked complete
+3. Worker `POST`s payload to the function URL (resolved from the gateway map)
+4. The function processes the payload (e.g. renders and sends an email)
+5. Returns `{ complete: true }` and job is marked complete
 
 You can inspect the queue directly:
 

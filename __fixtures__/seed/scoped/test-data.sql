@@ -1,15 +1,13 @@
 -- Shared fixture: metaschema + scoped catalog/routing/apps test data
 --
--- Scoped-plane equivalent of `services/test-data.sql`: it models the SAME
--- "simple-pets" tenant (same database id, same APIs, same domains, same
--- api -> schema linkage) but expressed as rows in the new schema-only modules
+-- Scoped routing plane test data: models the "simple-pets" tenant as rows in
+-- the schema-only modules
 --   - @constructive-db/catalog  -> constructive_catalog_public
 --   - @constructive-db/routing  -> constructive_routing_public
 --   - @constructive-db/apps     -> constructive_apps_public
--- instead of services_public.
 --
--- The metaschema block below is identical to `services/test-data.sql` so this
--- file can be composed standalone (routing.api_schemas.schema_id FKs
+-- The metaschema block below seeds metaschema_public directly so this file can
+-- be composed standalone (routing.api_schemas.schema_id FKs
 -- metaschema_public.schema).
 --
 -- `constructive_routing_public.{hostname_bindings,route_bindings}` are the
@@ -167,7 +165,7 @@ VALUES
   ('a2e6098f-2c11-4f2a-b481-c19175bc62ef', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'auth', current_database(), 'authenticated', 'anonymous', true)
 ON CONFLICT (id) DO NOTHING;
 
--- API -> schema linkage (mirrors services_public.api_schemas)
+-- API -> schema linkage
 INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id)
 VALUES
   -- app API schemas (public + pets_public)

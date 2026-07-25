@@ -21,11 +21,18 @@ exports[`Export Flow E2E Export to second workspace should match snapshot for se
 [
   "migrate/",
   "migrate/api_schemas.sql",
+  "migrate/api_surface_module.sql",
   "migrate/apis.sql",
+  "migrate/app_module.sql",
+  "migrate/catalog_module.sql",
   "migrate/database.sql",
+  "migrate/database_settings_module.sql",
+  "migrate/domain_module.sql",
   "migrate/domains.sql",
   "migrate/field.sql",
+  "migrate/route_module.sql",
   "migrate/schema.sql",
+  "migrate/site_surface_module.sql",
   "migrate/sites.sql",
   "migrate/table.sql",
 ]

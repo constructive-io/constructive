@@ -13,7 +13,7 @@ import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {
   createDatabasePool,
   resolveApiSchemas,
-  validateServicesSchemas,
+  validateRoutingSchemas,
 } from './api-schemas';
 import type { MetaTableInfo, SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
@@ -34,7 +34,7 @@ export interface DatabaseSchemaSourceOptions {
 
   /**
    * API names to resolve schemas from
-   * Queries services_public.api_schemas to get schema names
+   * Queries constructive_routing_public.api_schemas to get schema names
    * Mutually exclusive with schemas
    */
   apiNames?: string[];
@@ -62,7 +62,7 @@ export class DatabaseSchemaSource implements SchemaSource {
       // Validate services schemas exist at the beginning for database mode
       const pool = createDatabasePool(database);
       try {
-        const validation = await validateServicesSchemas(pool);
+        const validation = await validateRoutingSchemas(pool);
         if (!validation.valid) {
           throw new SchemaSourceError(validation.error!, this.describe());
         }

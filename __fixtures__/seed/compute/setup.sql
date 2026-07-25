@@ -13,7 +13,7 @@
 -- on the invocation and that binding points at the invocation's
 -- `function_definition_id`.
 --
--- Depends on: seed.pgpm('@pgpm/metaschema-modules'), services/grants.sql
+-- Depends on: seed.pgpm('@pgpm/metaschema-modules') (roles + metaschema tables)
 
 -- =====================================================
 -- COMPUTE SCHEMA + GENERATED TABLES

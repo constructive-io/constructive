@@ -1,16 +1,16 @@
 import {
+  cors,
   createApiMiddleware,
   createAuthenticateMiddleware,
-  cors,
   graphile
 } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import express from 'express';
-import { Server as HttpServer, createServer } from 'http';
+import { createServer,Server as HttpServer } from 'http';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
-import type { ServerInfo, PlaywrightServerOptions } from './types';
+import type { PlaywrightServerOptions,ServerInfo } from './types';
 
 /**
  * Find an available port starting from the given port
@@ -37,7 +37,7 @@ const findAvailablePort = async (startPort: number): Promise<number> => {
  * Create a test server for Playwright testing
  * 
  * This creates an Express server with the Constructive GraphQL middleware
- * configured with enableServicesApi: false to bypass domain routing.
+ * configured with enableScopedRouting: false (static mode) to bypass routing.
  */
 export const createTestServer = async (
   opts: ConstructiveOptions,
@@ -49,7 +49,7 @@ export const createTestServer = async (
 
   const app = express();
 
-  // Create middleware with enableServicesApi: false to bypass domain routing
+  // Create middleware in static mode (enableScopedRouting: false) to bypass routing
   const api = createApiMiddleware(opts);
   const authenticate = createAuthenticateMiddleware(opts);
 

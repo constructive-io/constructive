@@ -20,7 +20,7 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "scripts": {
-    "copy": "npm run copy:pkg; npm run copy:sql",
+    "copy": "npm run copy:pkg && npm run copy:sql",
     "copy:pkg": "makage assets",
     "copy:sql": "copyfiles -f src/migrate/sql/* dist/migrate/sql && copyfiles -f src/migrate/sql/* dist/esm/migrate/sql",
     "clean": "makage clean",

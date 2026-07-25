@@ -94,12 +94,6 @@ pnpm test:watch          # watch mode
 
 For testing patterns and frameworks, see the **constructive-testing** skill.
 
-## Local Email Services
-
-Start Mailpit, Admin GraphQL, send-email-link, and job-service for local email testing.
-
-See [local-email-services.md](./references/local-email-services.md) for Docker Compose setup, port reference, and troubleshooting.
-
 ## Monorepo Layout
 
 | Directory | Contents |
