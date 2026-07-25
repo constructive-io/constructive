@@ -239,13 +239,7 @@ describe('function bindings plugin', () => {
     expect(rows[0].payload).toEqual({ to: 'a@b.c', subject: 'hi' });
   });
 
-  // TODO: unskip once the preexisting grafast ConnectionStep regression is
-  // fixed. Reading the nested `invocation` relation off the mutation payload
-  // hits `Cannot read properties of undefined (reading 'items')` inside
-  // grafast — the same bug that fails `{ x { nodes … } }` connection queries
-  // on a clean main. The `invocationId`/insert behaviour is already asserted
-  // live by the two mutation tests above.
-  it.skip('returns the created invocation via the FunctionInvocation type', async () => {
+  it('returns the created invocation via the FunctionInvocation type', async () => {
     const result = await query<{
       resize: {
         invocationId: string;
