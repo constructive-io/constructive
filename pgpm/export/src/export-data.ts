@@ -92,6 +92,99 @@ export const getDataExportColumns = async (
 export const isVolatileTimestampColumn = (column: DataExportColumn): boolean =>
   column.volatileDefault && /^timestamp/.test(column.type);
 
+/**
+ * A column described by metadata (its name, SQL type, and default expression
+ * text) rather than by a live physical table. Fed to getMetadataExportColumns
+ * so metadata-only planes (tables that exist as schema metadata but are not
+ * physically deployed at export time) get the same volatility classification
+ * as physical tables.
+ */
+export interface MetadataExportColumn {
+  /** Column name. */
+  name: string;
+  /** SQL type, e.g. 'timestamptz', 'text', 'uuid' — must resolve in the DB. */
+  type: string;
+  /** The column's default expression text, if any (e.g. 'now()'). */
+  columnDefault: string | null;
+}
+
+/**
+ * Classify columns described by metadata instead of a live physical table.
+ *
+ * Metadata-only planes describe their tables as schema metadata but are not
+ * physically deployed when the export runs, so pg_attrdef-based introspection
+ * cannot see them. This builds an ephemeral temp table from the supplied
+ * descriptions and runs the exact same provolatile-based classification that
+ * getDataExportColumns uses for physical tables — one shared code path — so
+ * volatile-default detection (isVolatileTimestampColumn, etc.) behaves
+ * identically for both.
+ *
+ * Results preserve the input order and names. Each column's type must be a
+ * type resolvable in the connected database; each non-null default must be a
+ * valid default expression for that type. `db` must be a single session
+ * (client), not a pool: the classification runs inside a transaction (or a
+ * savepoint when the caller is already in one) that is always rolled back, so
+ * the temp table never survives — not even on failure — and nothing is ever
+ * committed.
+ */
+export const getMetadataExportColumns = async (
+  db: Queryable,
+  columns: MetadataExportColumn[]
+): Promise<DataExportColumn[]> => {
+  if (columns.length === 0) return [];
+
+  const tempTable = 'pgpm_metadata_export_columns';
+  // Synthetic column identifiers keep the DDL immune to reserved words and
+  // duplicate names; results map back to the caller's columns by ordinal.
+  const columnDefs = columns
+    .map((c, i) => {
+      const def =
+        c.columnDefault != null && c.columnDefault !== ''
+          ? ` DEFAULT ${c.columnDefault}`
+          : '';
+      return `c${i} ${c.type}${def}`;
+    })
+    .join(', ');
+
+  // Savepoint when already inside a caller transaction, otherwise our own
+  // transaction. Either way the work is rolled back below, so the temp table
+  // name is deterministic and can never collide or leak.
+  let usedSavepoint = true;
+  try {
+    await db.query(`SAVEPOINT ${tempTable}`);
+  } catch {
+    usedSavepoint = false;
+    await db.query('BEGIN');
+  }
+  try {
+    await db.query(`CREATE TEMP TABLE ${tempTable} (${columnDefs})`);
+    const tempSchemaRes = await db.query(
+      `SELECT nspname FROM pg_namespace WHERE oid = pg_my_temp_schema()`
+    );
+    const tempSchema = tempSchemaRes.rows[0]?.nspname as string;
+    const introspected = await getDataExportColumns(db, tempSchema, tempTable);
+
+    // getDataExportColumns orders by attnum, matching the c0..cN creation
+    // order, so results align with the input columns by index.
+    return columns.map((c, i) => {
+      const found = introspected[i];
+      return {
+        name: c.name,
+        type: found ? found.type : c.type,
+        columnDefault: c.columnDefault ?? null,
+        volatileDefault: found ? found.volatileDefault : false
+      };
+    });
+  } finally {
+    if (usedSavepoint) {
+      await db.query(`ROLLBACK TO SAVEPOINT ${tempTable}`);
+      await db.query(`RELEASE SAVEPOINT ${tempTable}`);
+    } else {
+      await db.query('ROLLBACK');
+    }
+  }
+};
+
 export interface DataExportTableSpec {
   schema: string;
   table: string;
