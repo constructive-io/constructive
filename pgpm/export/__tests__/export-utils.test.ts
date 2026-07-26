@@ -146,7 +146,8 @@ describe('Shared constants', () => {
   it('SERVICE_REQUIRED_EXTENSIONS should include metaschema dependencies', () => {
     expect(SERVICE_REQUIRED_EXTENSIONS).toContain('plpgsql');
     expect(SERVICE_REQUIRED_EXTENSIONS).toContain('metaschema-schema');
-    expect(SERVICE_REQUIRED_EXTENSIONS).toContain('services');
+    expect(SERVICE_REQUIRED_EXTENSIONS).toContain('metaschema-modules');
+    expect(SERVICE_REQUIRED_EXTENSIONS).not.toContain('services');
   });
 
   it('META_COMMON_HEADER should set session_replication_role', () => {

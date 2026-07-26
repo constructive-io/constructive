@@ -15,7 +15,6 @@ export const PGPM_MODULE_MAP: Record<string, string> = {
   'pgpm-function-resolution': '@pgpm/function-resolution',
   'metaschema-modules': '@pgpm/metaschema-modules',
   'metaschema-schema': '@pgpm/metaschema-schema',
-  'services': '@pgpm/services',
   'pgpm-inflection': '@pgpm/inflection',
   'pgpm-jwt-claims': '@pgpm/jwt-claims',
   'pgpm-stamps': '@pgpm/stamps',
