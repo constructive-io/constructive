@@ -38,9 +38,13 @@ pnpm test -- --testNamePattern="test name pattern"
 Lerna with independent versioning and conventional commits. Publishing only from `main` branch:
 
 ```bash
+pnpm install         # Required after pulling: new packages need their own node_modules
+pnpm build           # Required: prepack compiles against sibling dist/ folders
 npx lerna version    # Bump versions
-npx lerna publish    # Publish to npm
+npx lerna publish    # Publish to npm (use `from-package` to resume a failed publish)
 ```
+
+See [PUBLISH.md](./PUBLISH.md) for prepack troubleshooting.
 
 ## Project Architecture
 
