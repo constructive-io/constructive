@@ -1605,6 +1605,9 @@ importers:
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist
+      '@constructive-io/graphql-server':
+        specifier: workspace:^
+        version: link:../server/dist
       '@constructive-io/graphql-test':
         specifier: workspace:^
         version: link:../test/dist
@@ -7532,9 +7535,9 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       '@dataplan/pg': ^1.0.0-rc.7
-      grafast: 1.0.2
-      graphile-build: 5.0.2
-      graphile-config: 1.0.1
+      grafast: ^1.0.0-rc.8
+      graphile-build: ^5.0.0-rc.5
+      graphile-config: ^1.0.0-rc.5
       graphql: 16.13.0
       pg: ^8.7.1
       pg-sql2: ^5.0.0-rc.4
@@ -7547,8 +7550,8 @@ packages:
     resolution: {integrity: sha512-ELhDDZ2Y3ZWmF+ZziEd9ytMxFnmBoCX4/1My2Jhifr1FUD9IzWFhzH2qAWKmTvDrIy7b6jc4SV23lWmTbiD3ZA==}
     engines: {node: '>=22'}
     peerDependencies:
-      grafast: 1.0.2
-      graphile-config: 1.0.1
+      grafast: ^1.0.0-rc.8
+      graphile-config: ^1.0.0-rc.5
       graphql: 16.13.0
 
   graphile-config@1.0.1:

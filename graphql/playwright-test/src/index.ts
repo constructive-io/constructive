@@ -14,7 +14,7 @@ export {
 export * from './types';
 
 // Export server utilities
-export { createTestServer, getTestPool } from './server';
+export { createScopedTestServer, createTestServer, getTestPool } from './server';
 
 // Export connection functions with server support
 export {

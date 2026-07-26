@@ -1,5 +1,6 @@
 import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';
+import type { ApiOptions } from '@constructive-io/graphql-types';
 import type { GetConnectionsInput, GraphQLQueryFn, GraphQLQueryFnObj } from '@constructive-io/graphql-test';
 
 /**
@@ -10,6 +11,21 @@ export interface PlaywrightServerOptions {
   port?: number;
   /** Host to bind the server to (defaults to localhost) */
   host?: string;
+  /**
+   * Which server to run this suite against:
+   * - `false` (default): the single-tenant `@constructive-io/graphql-dev-server`
+   *   (pure PostGraphile, no routing, no database id) exposing the configured
+   *   schemas directly. Best for UI/local suites that don't need routing.
+   * - `true`: the production `@constructive-io/graphql-server`, which resolves
+   *   every request through the scoped-routing plane. Suites must seed real
+   *   routing/database records so `resolve_route()` returns a real database id.
+   */
+  scopedRouting?: boolean;
+  /**
+   * API configuration forwarded to the production scoped server (e.g.
+   * `metaSchemas`, `isPublic`). Only used when `scopedRouting` is `true`.
+   */
+  api?: Partial<ApiOptions>;
 }
 
 /**
