@@ -52,6 +52,24 @@ export interface ConstructivePresetOptions {
   enableI18n?: boolean;
 }
 
+/**
+ * grafast / @dataplan/pg require Node >= 22 (they call Promise.withResolvers()
+ * in their execution paths). On older Node versions there is no fail-fast:
+ * every connection (list) query fails at runtime with
+ * `TypeError: Cannot read properties of undefined (reading 'items')` inside
+ * grafast's ConnectionStep while mutations keep working. Guard here so any
+ * schema built from the Constructive preset fails loudly instead.
+ */
+function assertSupportedNodeVersion(): void {
+  if (typeof (Promise as { withResolvers?: unknown }).withResolvers !== 'function') {
+    throw new Error(
+      `graphile-settings requires Node.js >= 22 (found ${process.version}): ` +
+        'grafast/@dataplan/pg depend on Promise.withResolvers(). On older Node versions ' +
+        "connection (list) queries fail at runtime with \"Cannot read properties of undefined (reading 'items')\"."
+    );
+  }
+}
+
 const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableAggregates: false,
   enablePostgis: true,
@@ -125,6 +143,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
 export function createConstructivePreset(
   options?: ConstructivePresetOptions
 ): GraphileConfig.Preset {
+  assertSupportedNodeVersion();
   const opts = { ...DEFAULTS, ...options };
 
   // ----- extends array -----

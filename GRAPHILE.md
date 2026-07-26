@@ -275,6 +275,23 @@ All Graphile RC dependencies are pinned to **exact versions** (no `^` or `~` pre
 
 **Important:** Having different versions of `grafast` (or other singleton graphile packages) installed in the same workspace causes runtime errors like `Preset attempted to register version 'X' of 'grafast', but version 'Y' is already registered`. This is why **all** packages must use the same pinned versions.
 
+### Node Version Requirement
+
+`grafast` and `@dataplan/pg` (1.0.x and later) declare `engines.node >= 22` and use
+`Promise.withResolvers()` (unavailable before Node 22) in their query execution
+paths. Running on Node 20 or older does **not** fail fast — instead every
+list/connection query (`{ things { nodes { ... } } }`) fails at runtime with:
+
+```
+TypeError: Cannot read properties of undefined (reading 'items')
+    at grafast/src/steps/connection.ts (ConnectionStep.execute)
+```
+
+while mutations and single-record lookups keep working, which makes it look
+like a grafast `ConnectionStep` bug. If you see this error, check
+`node --version` first: it must be >= 22 (see the repo root `engines` field and
+`.nvmrc`). CI runs Node 22.
+
 ### Upgrading Graphile RC Versions
 
 When upgrading to a new Graphile RC set:
