@@ -1,23 +1,23 @@
 -- Shared fixture: metaschema + scoped catalog/routing/apps test data
 --
 -- Scoped routing plane test data: models the "simple-pets" tenant as rows in
--- the schema-only modules
---   - @constructive-db/catalog  -> constructive_catalog_public
---   - @constructive-db/routing  -> constructive_routing_public
---   - @constructive-db/apps     -> constructive_apps_public
+-- the published modules
+--   - @constructive-db/catalog           -> constructive_catalog_public
+--   - @constructive-db/routing           -> constructive_routing_public
+--   - @constructive-db/apps              -> constructive_apps_public
+--   - @constructive-db/routing-functions -> resolve_route() + binding-sync triggers
 --
 -- The metaschema block below seeds metaschema_public directly so this file can
 -- be composed standalone (routing.api_schemas.schema_id FKs
 -- metaschema_public.schema).
 --
 -- `constructive_routing_public.{hostname_bindings,route_bindings}` are the
--- compiled indexes read by resolve_route(). In production they are maintained
--- by domain/route sync triggers, which the schema-only modules do not ship, so
--- this fixture writes both the source rows (domains/routes) and the compiled
--- rows explicitly.
+-- compiled indexes read by resolve_route(). They are maintained by the
+-- binding-sync triggers shipped in @constructive-db/routing-functions, so this
+-- fixture writes only the source rows (domains/routes) with triggers enabled.
 --
 -- NOTE: does NOT include app-level schemas/tables or row data.
---       Compose with app-schemas/* seeds and `scoped/resolver.sql` for that.
+--       Compose with app-schemas/* seeds for that.
 
 SET session_replication_role TO replica;
 
@@ -177,7 +177,11 @@ VALUES
   ('71181146-890e-4991-9da7-3dddf87d9e05', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba6f21-0193-43f4-3bdb-61b4b956b6b6', 'e257c53d-6ba6-40de-b679-61b37188a316')
 ON CONFLICT (id) DO NOTHING;
 
--- Routing-side domains (source rows for the compiled hostname index)
+-- Routing-side domains (source rows for the compiled hostname index).
+-- Triggers are re-enabled so the binding-sync triggers from
+-- @constructive-db/routing-functions compile hostname_bindings/route_bindings.
+SET session_replication_role TO DEFAULT;
+
 INSERT INTO constructive_routing_public.domains
   (id, database_id, hostname, managed, is_wildcard, parent_hostname, verification_status, tls_status, tls_secret_name, is_published)
 VALUES
@@ -193,21 +197,7 @@ VALUES
   ('91181146-890e-4991-9da7-3dddf87d9e02', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '51181146-890e-4991-9da7-3dddf87d9e79', 'e257c53d-6ba6-40de-b679-61b37188a316', '/', NULL, 0, true)
 ON CONFLICT (id) DO NOTHING;
 
--- Compiled hostname index (normally maintained by domain sync triggers)
-INSERT INTO constructive_routing_public.hostname_bindings
-  (id, hostname, domain_id, is_wildcard, parent_hostname, managed, verification_status, tls_status, tls_secret_name)
-VALUES
-  ('a1181146-890e-4991-9da7-3dddf87d9e01', 'app.test.constructive.io', '41181146-890e-4991-9da7-3dddf87d9e78', false, NULL, false, 'verified', 'ready', NULL),
-  ('a1181146-890e-4991-9da7-3dddf87d9e02', 'private.test.constructive.io', '51181146-890e-4991-9da7-3dddf87d9e79', false, NULL, false, 'verified', 'ready', NULL)
-ON CONFLICT (id) DO NOTHING;
-
--- Compiled route precedence index (normally maintained by route sync triggers)
-INSERT INTO constructive_routing_public.route_bindings
-  (id, domain_id, target_api_id, target_site_id, target_function_id, path, method, priority, is_active)
-VALUES
-  ('b1181146-890e-4991-9da7-3dddf87d9e01', '41181146-890e-4991-9da7-3dddf87d9e78', '6c9997a4-591b-4cb3-9313-4ef45d6f134e', NULL, NULL, '/', NULL, 0, true),
-  ('b1181146-890e-4991-9da7-3dddf87d9e02', '51181146-890e-4991-9da7-3dddf87d9e79', 'e257c53d-6ba6-40de-b679-61b37188a316', NULL, NULL, '/', NULL, 0, true)
-ON CONFLICT (id) DO NOTHING;
+SET session_replication_role TO replica;
 
 -- =====================================================
 -- APPS DATA (constructive_apps_public)

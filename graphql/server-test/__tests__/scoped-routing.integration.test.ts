@@ -55,7 +55,6 @@ const scopedSeedAdapters = () => [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
     shared('app-schemas', 'simple-pets', 'schema.sql'),
-    shared('scoped', 'resolver.sql'),
     shared('scoped', 'test-data.sql'),
     shared('app-schemas', 'simple-pets', 'test-data.sql')
   ])
@@ -93,6 +92,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
     expect(rows.map((r) => r.nspname)).toEqual([
       'constructive_apps_public',
       'constructive_catalog_public',
+      'constructive_routing_private',
       'constructive_routing_public'
     ]);
   });
