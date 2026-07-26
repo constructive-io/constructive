@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
@@ -54,9 +55,9 @@ export const getConnections = async (
       // Apply convenience properties (these take precedence)
       exposedSchemas: input.schemas,
       // Static single-tenant mode requires an explicit database id (there is
-      // no default database). Tests run against an isolated database, so use a
-      // stable explicit id unless the caller supplied one.
-      databaseId: input.server?.api?.databaseId ?? 'test-database',
+      // no default database). Each isolated test database gets a fresh UUID
+      // unless the caller supplied one.
+      databaseId: input.server?.api?.databaseId ?? randomUUID(),
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
     graphile: input.graphile

@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import {
   type GraphQLQueryOptions,
@@ -48,8 +50,8 @@ const createConnectionsWithServerBase = async (
       enableScopedRouting: false,
       exposedSchemas: input.schemas,
       // Static single-tenant mode requires an explicit database id (there is
-      // no default database); the isolated test database uses a stable id.
-      databaseId: 'test-database',
+      // no default database); each isolated test database gets a fresh UUID.
+      databaseId: randomUUID(),
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     }
   });

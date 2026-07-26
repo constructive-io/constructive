@@ -186,7 +186,7 @@ The `server.api` option provides full control over the GraphQL server configurat
 | `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
 | `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
 | `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
-| `databaseId` | `string` | `test-database` | Explicit tenant database id for static mode (no default database; requests without one are rejected) |
+| `databaseId` | `string (UUID)` | fresh UUID per test database | Explicit tenant database id for static mode (no default database; requests without one are rejected) |
 | `isPublic` | `boolean` | package default | Whether the API is publicly accessible |
 | `metaSchemas` | `string[]` | package default | Schemas containing metadata tables |
 
