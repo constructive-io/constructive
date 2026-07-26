@@ -160,6 +160,21 @@ const resolveModuleSettings = async (
 const isApiError = (result: ApiConfigResult): result is ApiError =>
   !!result && typeof (result as ApiError).errorHtml === 'string';
 
+/**
+ * Every resolved API surface must carry a database id — there is no default
+ * database. A resolved structure without one is a misconfiguration; fail loud
+ * rather than silently proceeding with an undefined tenant.
+ */
+const assertDatabaseId = (result: ApiStructure): void => {
+  if (!result.databaseId) {
+    const error = new Error(
+      'No database id resolved for this request. A database id is required; there is no default database.'
+    ) as Error & { code?: string };
+    error.code = 'NO_DATABASE_ID';
+    throw error;
+  }
+};
+
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value.split(',').map((s) => s.trim()).filter(Boolean);
 
@@ -291,7 +306,7 @@ const resolveStatic = (ctx: ResolveContext): ApiStructure => {
     schema: opts.api?.exposedSchemas ?? [],
     apiModules: [],
     domains: [],
-    databaseId: opts.api?.defaultDatabaseId,
+    databaseId: opts.api?.databaseId,
     isPublic: false
   };
 };
@@ -460,6 +475,7 @@ export const getApiConfig = async (
 
   // Cache successful results
   if (result && !isApiError(result)) {
+    assertDatabaseId(result);
     svcCache.set(cacheKey, result);
   }
 
@@ -474,24 +490,27 @@ export const createApiMiddleware = (opts: ApiOptions) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 
-    // Fast path: static single-tenant mode (scoped routing disabled) — no
-    // route resolution, expose the configured schemas directly.
-    if (!opts.api?.enableScopedRouting) {
-      req.api = resolveStatic({
-        opts,
-        pool: null as unknown as Pool,
-        domain: '',
-        subdomain: null,
-        cacheKey: 'static',
-        headers: {},
-        host: ''
-      });
-      req.databaseId = req.api.databaseId;
-      req.svc_key = 'static';
-      return next();
-    }
-
     try {
+      // Fast path: static single-tenant mode (scoped routing disabled) — no
+      // route resolution, expose the configured schemas directly. A database
+      // id is still required; assertDatabaseId throws when it is absent.
+      if (!opts.api?.enableScopedRouting) {
+        const staticApi = resolveStatic({
+          opts,
+          pool: null as unknown as Pool,
+          domain: '',
+          subdomain: null,
+          cacheKey: 'static',
+          headers: {},
+          host: ''
+        });
+        assertDatabaseId(staticApi);
+        req.api = staticApi;
+        req.databaseId = staticApi.databaseId;
+        req.svc_key = 'static';
+        return next();
+      }
+
       const apiConfig = await getApiConfig(opts, req);
 
       if (isApiError(apiConfig)) {
@@ -513,6 +532,12 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       if (err.code === 'NO_VALID_SCHEMAS') {
         res.status(404).send(errorPage404Message(err.message));
+        return;
+      }
+
+      if (err.code === 'NO_DATABASE_ID') {
+        log.error('[api-middleware] no database id resolved:', err.message);
+        res.status(500).send(errorPage50x);
         return;
       }
 

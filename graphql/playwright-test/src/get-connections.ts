@@ -47,7 +47,9 @@ const createConnectionsWithServerBase = async (
     api: {
       enableScopedRouting: false,
       exposedSchemas: input.schemas,
-      defaultDatabaseId: 'test-database',
+      // Static single-tenant mode requires an explicit database id (there is
+      // no default database); the isolated test database uses a stable id.
+      databaseId: 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     }
   });

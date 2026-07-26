@@ -56,7 +56,7 @@ This starts the server with env defaults from `@constructive-io/graphql-env`.
 
 ## What it does
 
-Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostGraphile into a single GraphQL endpoint. It serves `/graphql` and `/graphiql`, injects per-request `pgSettings`, and flushes cached schemas on demand or via database notifications. When meta API is enabled, it resolves API config (schemas, roles, modules) from the meta schema using the request host and enforces `api.isPublic`, with optional header overrides in private mode; when meta API is disabled, it serves the fixed schemas and roles from `api.exposedSchemas`, `api.anonRole`, `api.roleName`, and `api.defaultDatabaseId`.
+Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostGraphile into a single GraphQL endpoint. It serves `/graphql` and `/graphiql`, injects per-request `pgSettings`, and flushes cached schemas on demand or via database notifications. When meta API is enabled, it resolves API config (schemas, roles, modules) from the meta schema using the request host and enforces `api.isPublic`, with optional header overrides in private mode; when meta API is disabled, it serves the fixed schemas and roles from `api.exposedSchemas`, `api.anonRole`, and `api.roleName`.
 
 ## Key Features
 
@@ -113,7 +113,7 @@ When `API_ENABLE_SCOPED_ROUTING=true` (default):
 When `API_ENABLE_SCOPED_ROUTING=false` (static single-tenant mode):
 
 - The server skips route resolution and serves the fixed schemas in `API_EXPOSED_SCHEMAS`.
-- Roles and database IDs come from `API_ANON_ROLE`, `API_ROLE_NAME`, and `API_DEFAULT_DATABASE_ID`.
+- Roles come from `API_ANON_ROLE` and `API_ROLE_NAME`. A request still requires a resolved database id; there is no default database, so a request with no database id is rejected.
 
 ## Configuration
 
@@ -137,7 +137,6 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `API_META_SCHEMAS`             | Meta schemas to query                 | `constructive_routing_public,metaschema_public,metaschema_modules_public` |
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
-| `API_DEFAULT_DATABASE_ID`      | Default database ID                   | unset                                                         |
 | `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |
 | `GRAPHQL_DEBUG_SAMPLER_ENABLED` | Enables periodic NDJSON sampling when observability is on | `true`                                   |
 | `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds | `10000`                                                       |

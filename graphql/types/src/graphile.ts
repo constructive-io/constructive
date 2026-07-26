@@ -34,8 +34,12 @@ export interface ApiOptions {
   anonRole?: string;
   /** Default role name for authenticated requests */
   roleName?: string;
-  /** Default database identifier to use */
-  defaultDatabaseId?: string;
+  /**
+   * Explicit tenant database id for static single-tenant mode. There is no
+   * default database and this is never populated from env; a request that
+   * resolves without a database id is rejected.
+   */
+  databaseId?: string;
   /** Whether the API is publicly accessible */
   isPublic?: boolean;
   /** Schemas containing metadata tables */

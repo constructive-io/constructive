@@ -198,7 +198,12 @@ describe('getApiConfig with scoped routing enabled', () => {
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    await getApiConfig(createOptions(false), createRequest({ host: 'api.example.com' }));
+    // Static single-tenant mode never calls resolve_route. It also has no
+    // database id, and there is no default database, so resolution fails loud
+    // rather than silently proceeding with an undefined tenant.
+    await expect(
+      getApiConfig(createOptions(false), createRequest({ host: 'api.example.com' }))
+    ).rejects.toThrow(/database id/i);
 
     expect(query.mock.calls.some(([sql]) => String(sql).includes('resolve_route'))).toBe(false);
   });
