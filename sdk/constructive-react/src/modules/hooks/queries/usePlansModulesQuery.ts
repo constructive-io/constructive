@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { plansModuleKeys } from "../query-keys";
-import type { PlansModuleSelect, PlansModuleWithRelations, PlansModuleFilter, PlansModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlansModuleSelect, PlansModuleWithRelations, PlansModuleFilter, PlansModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { plansModuleKeys } from '../query-keys';
+import type {
+  PlansModuleSelect,
+  PlansModuleWithRelations,
+  PlansModuleFilter,
+  PlansModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlansModuleSelect,
+  PlansModuleWithRelations,
+  PlansModuleFilter,
+  PlansModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const plansModulesQueryKey = plansModuleKeys.list;
 /**
  * Query hook for fetching PlansModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlansModulesQuery({
@@ -30,33 +45,47 @@ export const plansModulesQueryKey = plansModuleKeys.list;
  * });
  * ```
  */
-export function usePlansModulesQuery<S extends PlansModuleSelect, TData = {
-  plansModules: ConnectionResult<InferSelectResult<PlansModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlansModuleFilter, PlansModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
-} & Omit<UseQueryOptions<{
-  plansModules: ConnectionResult<InferSelectResult<PlansModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlansModulesQuery(params: {
-  selection: ListSelectionConfig<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlansModulesQuery<
+  S extends PlansModuleSelect,
+  TData = {
+    plansModules: ConnectionResult<InferSelectResult<PlansModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PlansModuleFilter, PlansModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        plansModules: ConnectionResult<InferSelectResult<PlansModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlansModulesQuery(
+  params: {
+    selection: ListSelectionConfig<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: plansModuleKeys.list(args),
     queryFn: () => getClient().plansModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch PlansModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlansModulesQuery({
@@ -70,35 +99,47 @@ export function usePlansModulesQuery(params: {
 export async function fetchPlansModulesQuery<S extends PlansModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlansModuleFilter, PlansModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
+  } & Omit<ListSelectionConfig<S, PlansModuleFilter, PlansModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
 }): Promise<{
   plansModules: ConnectionResult<InferSelectResult<PlansModuleWithRelations, S>>;
 }>;
 export async function fetchPlansModulesQuery(params: {
   selection: ListSelectionConfig<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>(
+    params.selection
+  );
   return getClient().plansModule.findMany(args).unwrap();
 }
 /**
  * Prefetch PlansModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlansModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlansModulesQuery<S extends PlansModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlansModuleFilter, PlansModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
-}): Promise<void>;
-export async function prefetchPlansModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>(params.selection);
+export async function prefetchPlansModulesQuery<S extends PlansModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PlansModuleFilter, PlansModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlansModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<PlansModuleSelect, PlansModuleFilter, PlansModuleOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: plansModuleKeys.list(args),
-    queryFn: () => getClient().plansModule.findMany(args).unwrap()
+    queryFn: () => getClient().plansModule.findMany(args).unwrap(),
   });
 }

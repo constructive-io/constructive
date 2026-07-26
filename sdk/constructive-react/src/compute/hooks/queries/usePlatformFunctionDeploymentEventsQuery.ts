@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformFunctionDeploymentEventKeys } from "../query-keys";
-import type { PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventWithRelations, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventWithRelations, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformFunctionDeploymentEventKeys } from '../query-keys';
+import type {
+  PlatformFunctionDeploymentEventSelect,
+  PlatformFunctionDeploymentEventWithRelations,
+  PlatformFunctionDeploymentEventFilter,
+  PlatformFunctionDeploymentEventOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformFunctionDeploymentEventSelect,
+  PlatformFunctionDeploymentEventWithRelations,
+  PlatformFunctionDeploymentEventFilter,
+  PlatformFunctionDeploymentEventOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionDeploymentEventsQueryKey = platformFunctionDeploymentEventKeys.list;
 /**
  * Deployment lifecycle events — audit log of provisioning, scaling, and failure events
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionDeploymentEventsQuery({
@@ -30,33 +45,64 @@ export const platformFunctionDeploymentEventsQueryKey = platformFunctionDeployme
  * });
  * ```
  */
-export function usePlatformFunctionDeploymentEventsQuery<S extends PlatformFunctionDeploymentEventSelect, TData = {
-  platformFunctionDeploymentEvents: ConnectionResult<InferSelectResult<PlatformFunctionDeploymentEventWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentEventSelect>;
-} & Omit<UseQueryOptions<{
-  platformFunctionDeploymentEvents: ConnectionResult<InferSelectResult<PlatformFunctionDeploymentEventWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformFunctionDeploymentEventsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformFunctionDeploymentEventsQuery<
+  S extends PlatformFunctionDeploymentEventSelect,
+  TData = {
+    platformFunctionDeploymentEvents: ConnectionResult<
+      InferSelectResult<PlatformFunctionDeploymentEventWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<
+        S,
+        PlatformFunctionDeploymentEventFilter,
+        PlatformFunctionDeploymentEventOrderBy
+      >,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentEventSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformFunctionDeploymentEvents: ConnectionResult<
+          InferSelectResult<PlatformFunctionDeploymentEventWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformFunctionDeploymentEventsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionDeploymentEventSelect,
+      PlatformFunctionDeploymentEventFilter,
+      PlatformFunctionDeploymentEventOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformFunctionDeploymentEventSelect,
+    PlatformFunctionDeploymentEventFilter,
+    PlatformFunctionDeploymentEventOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionDeploymentEventKeys.list(args),
     queryFn: () => getClient().platformFunctionDeploymentEvent.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Deployment lifecycle events — audit log of provisioning, scaling, and failure events
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionDeploymentEventsQuery({
@@ -67,38 +113,82 @@ export function usePlatformFunctionDeploymentEventsQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformFunctionDeploymentEventsQuery<S extends PlatformFunctionDeploymentEventSelect>(params: {
+export async function fetchPlatformFunctionDeploymentEventsQuery<
+  S extends PlatformFunctionDeploymentEventSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentEventSelect>;
+  } & Omit<
+    ListSelectionConfig<
+      S,
+      PlatformFunctionDeploymentEventFilter,
+      PlatformFunctionDeploymentEventOrderBy
+    >,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentEventSelect>;
 }): Promise<{
-  platformFunctionDeploymentEvents: ConnectionResult<InferSelectResult<PlatformFunctionDeploymentEventWithRelations, S>>;
+  platformFunctionDeploymentEvents: ConnectionResult<
+    InferSelectResult<PlatformFunctionDeploymentEventWithRelations, S>
+  >;
 }>;
 export async function fetchPlatformFunctionDeploymentEventsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformFunctionDeploymentEventSelect,
+    PlatformFunctionDeploymentEventFilter,
+    PlatformFunctionDeploymentEventOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformFunctionDeploymentEventSelect,
+    PlatformFunctionDeploymentEventFilter,
+    PlatformFunctionDeploymentEventOrderBy
+  >(params.selection);
   return getClient().platformFunctionDeploymentEvent.findMany(args).unwrap();
 }
 /**
  * Deployment lifecycle events — audit log of provisioning, scaling, and failure events
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformFunctionDeploymentEventsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformFunctionDeploymentEventsQuery<S extends PlatformFunctionDeploymentEventSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentEventSelect>;
-}): Promise<void>;
-export async function prefetchPlatformFunctionDeploymentEventsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformFunctionDeploymentEventSelect, PlatformFunctionDeploymentEventFilter, PlatformFunctionDeploymentEventOrderBy>(params.selection);
+export async function prefetchPlatformFunctionDeploymentEventsQuery<
+  S extends PlatformFunctionDeploymentEventSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<
+        S,
+        PlatformFunctionDeploymentEventFilter,
+        PlatformFunctionDeploymentEventOrderBy
+      >,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentEventSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformFunctionDeploymentEventsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionDeploymentEventSelect,
+      PlatformFunctionDeploymentEventFilter,
+      PlatformFunctionDeploymentEventOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformFunctionDeploymentEventSelect,
+    PlatformFunctionDeploymentEventFilter,
+    PlatformFunctionDeploymentEventOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionDeploymentEventKeys.list(args),
-    queryFn: () => getClient().platformFunctionDeploymentEvent.findMany(args).unwrap()
+    queryFn: () => getClient().platformFunctionDeploymentEvent.findMany(args).unwrap(),
   });
 }

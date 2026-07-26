@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { appLimitDefaultKeys } from "../query-keys";
-import type { AppLimitDefaultSelect, AppLimitDefaultWithRelations, AppLimitDefaultFilter, AppLimitDefaultOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppLimitDefaultSelect, AppLimitDefaultWithRelations, AppLimitDefaultFilter, AppLimitDefaultOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { appLimitDefaultKeys } from '../query-keys';
+import type {
+  AppLimitDefaultSelect,
+  AppLimitDefaultWithRelations,
+  AppLimitDefaultFilter,
+  AppLimitDefaultOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AppLimitDefaultSelect,
+  AppLimitDefaultWithRelations,
+  AppLimitDefaultFilter,
+  AppLimitDefaultOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appLimitDefaultsQueryKey = appLimitDefaultKeys.list;
 /**
  * Default maximum values for each named limit, applied when no per-actor override exists
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppLimitDefaultsQuery({
@@ -30,33 +45,53 @@ export const appLimitDefaultsQueryKey = appLimitDefaultKeys.list;
  * });
  * ```
  */
-export function useAppLimitDefaultsQuery<S extends AppLimitDefaultSelect, TData = {
-  appLimitDefaults: ConnectionResult<InferSelectResult<AppLimitDefaultWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitDefaultSelect>;
-} & Omit<UseQueryOptions<{
-  appLimitDefaults: ConnectionResult<InferSelectResult<AppLimitDefaultWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppLimitDefaultsQuery(params: {
-  selection: ListSelectionConfig<AppLimitDefaultSelect, AppLimitDefaultFilter, AppLimitDefaultOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AppLimitDefaultSelect, AppLimitDefaultFilter, AppLimitDefaultOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAppLimitDefaultsQuery<
+  S extends AppLimitDefaultSelect,
+  TData = {
+    appLimitDefaults: ConnectionResult<InferSelectResult<AppLimitDefaultWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppLimitDefaultSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appLimitDefaults: ConnectionResult<InferSelectResult<AppLimitDefaultWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppLimitDefaultsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      AppLimitDefaultSelect,
+      AppLimitDefaultFilter,
+      AppLimitDefaultOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    AppLimitDefaultSelect,
+    AppLimitDefaultFilter,
+    AppLimitDefaultOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appLimitDefaultKeys.list(args),
     queryFn: () => getClient().appLimitDefault.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Default maximum values for each named limit, applied when no per-actor override exists
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppLimitDefaultsQuery({
@@ -70,35 +105,59 @@ export function useAppLimitDefaultsQuery(params: {
 export async function fetchAppLimitDefaultsQuery<S extends AppLimitDefaultSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitDefaultSelect>;
+  } & Omit<ListSelectionConfig<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AppLimitDefaultSelect>;
 }): Promise<{
   appLimitDefaults: ConnectionResult<InferSelectResult<AppLimitDefaultWithRelations, S>>;
 }>;
 export async function fetchAppLimitDefaultsQuery(params: {
-  selection: ListSelectionConfig<AppLimitDefaultSelect, AppLimitDefaultFilter, AppLimitDefaultOrderBy>;
+  selection: ListSelectionConfig<
+    AppLimitDefaultSelect,
+    AppLimitDefaultFilter,
+    AppLimitDefaultOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<AppLimitDefaultSelect, AppLimitDefaultFilter, AppLimitDefaultOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    AppLimitDefaultSelect,
+    AppLimitDefaultFilter,
+    AppLimitDefaultOrderBy
+  >(params.selection);
   return getClient().appLimitDefault.findMany(args).unwrap();
 }
 /**
  * Default maximum values for each named limit, applied when no per-actor override exists
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppLimitDefaultsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppLimitDefaultsQuery<S extends AppLimitDefaultSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitDefaultSelect>;
-}): Promise<void>;
-export async function prefetchAppLimitDefaultsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AppLimitDefaultSelect, AppLimitDefaultFilter, AppLimitDefaultOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AppLimitDefaultSelect, AppLimitDefaultFilter, AppLimitDefaultOrderBy>(params.selection);
+export async function prefetchAppLimitDefaultsQuery<S extends AppLimitDefaultSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppLimitDefaultSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppLimitDefaultsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      AppLimitDefaultSelect,
+      AppLimitDefaultFilter,
+      AppLimitDefaultOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    AppLimitDefaultSelect,
+    AppLimitDefaultFilter,
+    AppLimitDefaultOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appLimitDefaultKeys.list(args),
-    queryFn: () => getClient().appLimitDefault.findMany(args).unwrap()
+    queryFn: () => getClient().appLimitDefault.findMany(args).unwrap(),
   });
 }

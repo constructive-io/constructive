@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteKeys } from "../query-keys";
-import { platformSiteMutationKeys } from "../mutation-keys";
-import type { PlatformSiteSelect, PlatformSiteWithRelations, CreatePlatformSiteInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteSelect, PlatformSiteWithRelations, CreatePlatformSiteInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteKeys } from '../query-keys';
+import { platformSiteMutationKeys } from '../mutation-keys';
+import type {
+  PlatformSiteSelect,
+  PlatformSiteWithRelations,
+  CreatePlatformSiteInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformSiteSelect,
+  PlatformSiteWithRelations,
+  CreatePlatformSiteInput,
+} from '../../orm/input-types';
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreatePlatformSiteMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreatePlatformSiteMutation<S extends PlatformSiteSelect>(params: {
-  selection: ({
-    fields: S & PlatformSiteSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteSelect>);
-} & Omit<UseMutationOptions<{
-  createPlatformSite: {
-    platformSite: InferSelectResult<PlatformSiteWithRelations, S>;
-  };
-}, Error, CreatePlatformSiteInput["platformSite"]>, "mutationFn">): UseMutationResult<{
-  createPlatformSite: {
-    platformSite: InferSelectResult<PlatformSiteWithRelations, S>;
-  };
-}, Error, CreatePlatformSiteInput["platformSite"]>;
-export function useCreatePlatformSiteMutation(params: {
-  selection: SelectionConfig<PlatformSiteSelect>;
-} & Omit<UseMutationOptions<any, Error, CreatePlatformSiteInput["platformSite"]>, "mutationFn">) {
+export function useCreatePlatformSiteMutation<S extends PlatformSiteSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformSiteSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createPlatformSite: {
+          platformSite: InferSelectResult<PlatformSiteWithRelations, S>;
+        };
+      },
+      Error,
+      CreatePlatformSiteInput['platformSite']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createPlatformSite: {
+      platformSite: InferSelectResult<PlatformSiteWithRelations, S>;
+    };
+  },
+  Error,
+  CreatePlatformSiteInput['platformSite']
+>;
+export function useCreatePlatformSiteMutation(
+  params: {
+    selection: SelectionConfig<PlatformSiteSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreatePlatformSiteInput['platformSite']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<PlatformSiteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformSiteMutationKeys.create(),
-    mutationFn: (data: CreatePlatformSiteInput["platformSite"]) => getClient().platformSite.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreatePlatformSiteInput['platformSite']) =>
+      getClient()
+        .platformSite.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: platformSiteKeys.lists()
+        queryKey: platformSiteKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

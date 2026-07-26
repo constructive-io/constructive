@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionInvocationModuleKeys } from "../query-keys";
-import { functionInvocationModuleMutationKeys } from "../mutation-keys";
-import type { FunctionInvocationModuleSelect, FunctionInvocationModuleWithRelations, CreateFunctionInvocationModuleInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionInvocationModuleSelect, FunctionInvocationModuleWithRelations, CreateFunctionInvocationModuleInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionInvocationModuleKeys } from '../query-keys';
+import { functionInvocationModuleMutationKeys } from '../mutation-keys';
+import type {
+  FunctionInvocationModuleSelect,
+  FunctionInvocationModuleWithRelations,
+  CreateFunctionInvocationModuleInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionInvocationModuleSelect,
+  FunctionInvocationModuleWithRelations,
+  CreateFunctionInvocationModuleInput,
+} from '../../orm/input-types';
 /**
  * Mutation hook for creating a FunctionInvocationModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateFunctionInvocationModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateFunctionInvocationModuleMutation<S extends FunctionInvocationModuleSelect>(params: {
-  selection: ({
-    fields: S & FunctionInvocationModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>);
-} & Omit<UseMutationOptions<{
-  createFunctionInvocationModule: {
-    functionInvocationModule: InferSelectResult<FunctionInvocationModuleWithRelations, S>;
-  };
-}, Error, CreateFunctionInvocationModuleInput["functionInvocationModule"]>, "mutationFn">): UseMutationResult<{
-  createFunctionInvocationModule: {
-    functionInvocationModule: InferSelectResult<FunctionInvocationModuleWithRelations, S>;
-  };
-}, Error, CreateFunctionInvocationModuleInput["functionInvocationModule"]>;
-export function useCreateFunctionInvocationModuleMutation(params: {
-  selection: SelectionConfig<FunctionInvocationModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateFunctionInvocationModuleInput["functionInvocationModule"]>, "mutationFn">) {
+export function useCreateFunctionInvocationModuleMutation<S extends FunctionInvocationModuleSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionInvocationModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createFunctionInvocationModule: {
+          functionInvocationModule: InferSelectResult<FunctionInvocationModuleWithRelations, S>;
+        };
+      },
+      Error,
+      CreateFunctionInvocationModuleInput['functionInvocationModule']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createFunctionInvocationModule: {
+      functionInvocationModule: InferSelectResult<FunctionInvocationModuleWithRelations, S>;
+    };
+  },
+  Error,
+  CreateFunctionInvocationModuleInput['functionInvocationModule']
+>;
+export function useCreateFunctionInvocationModuleMutation(
+  params: {
+    selection: SelectionConfig<FunctionInvocationModuleSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateFunctionInvocationModuleInput['functionInvocationModule']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionInvocationModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionInvocationModuleMutationKeys.create(),
-    mutationFn: (data: CreateFunctionInvocationModuleInput["functionInvocationModule"]) => getClient().functionInvocationModule.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateFunctionInvocationModuleInput['functionInvocationModule']) =>
+      getClient()
+        .functionInvocationModule.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: functionInvocationModuleKeys.lists()
+        queryKey: functionInvocationModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

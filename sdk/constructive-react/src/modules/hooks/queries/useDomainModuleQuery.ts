@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { domainModuleKeys } from "../query-keys";
-import type { DomainModuleSelect, DomainModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainModuleSelect, DomainModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { domainModuleKeys } from '../query-keys';
+import type { DomainModuleSelect, DomainModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DomainModuleSelect, DomainModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const domainModuleQueryKey = domainModuleKeys.detail;
 /**
  * Query hook for fetching a single DomainModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDomainModuleQuery({
@@ -26,38 +26,52 @@ export const domainModuleQueryKey = domainModuleKeys.detail;
  * });
  * ```
  */
-export function useDomainModuleQuery<S extends DomainModuleSelect, TData = {
-  domainModule: InferSelectResult<DomainModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
-} & Omit<UseQueryOptions<{
-  domainModule: InferSelectResult<DomainModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDomainModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<DomainModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDomainModuleQuery<
+  S extends DomainModuleSelect,
+  TData = {
+    domainModule: InferSelectResult<DomainModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        domainModule: InferSelectResult<DomainModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDomainModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DomainModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DomainModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: domainModuleKeys.detail(params.id),
-    queryFn: () => getClient().domainModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .domainModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single DomainModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDomainModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchDomainModuleQuery(params: {
   selection: SelectionConfig<DomainModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DomainModuleSelect>(params.selection);
-  return getClient().domainModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .domainModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single DomainModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDomainModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDomainModuleQuery<S extends DomainModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
-}): Promise<void>;
-export async function prefetchDomainModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DomainModuleSelect>;
-}): Promise<void> {
+export async function prefetchDomainModuleQuery<S extends DomainModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDomainModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DomainModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DomainModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: domainModuleKeys.detail(params.id),
-    queryFn: () => getClient().domainModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .domainModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

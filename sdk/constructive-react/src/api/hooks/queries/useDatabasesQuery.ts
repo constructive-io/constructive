@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { databaseKeys } from "../query-keys";
-import type { DatabaseSelect, DatabaseWithRelations, DatabaseFilter, DatabaseOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DatabaseSelect, DatabaseWithRelations, DatabaseFilter, DatabaseOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { databaseKeys } from '../query-keys';
+import type {
+  DatabaseSelect,
+  DatabaseWithRelations,
+  DatabaseFilter,
+  DatabaseOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DatabaseSelect,
+  DatabaseWithRelations,
+  DatabaseFilter,
+  DatabaseOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const databasesQueryKey = databaseKeys.list;
 /**
  * Query hook for fetching Database list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDatabasesQuery({
@@ -30,33 +45,47 @@ export const databasesQueryKey = databaseKeys.list;
  * });
  * ```
  */
-export function useDatabasesQuery<S extends DatabaseSelect, TData = {
-  databases: ConnectionResult<InferSelectResult<DatabaseWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DatabaseFilter, DatabaseOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
-} & Omit<UseQueryOptions<{
-  databases: ConnectionResult<InferSelectResult<DatabaseWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDatabasesQuery(params: {
-  selection: ListSelectionConfig<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useDatabasesQuery<
+  S extends DatabaseSelect,
+  TData = {
+    databases: ConnectionResult<InferSelectResult<DatabaseWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DatabaseFilter, DatabaseOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DatabaseSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        databases: ConnectionResult<InferSelectResult<DatabaseWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDatabasesQuery(
+  params: {
+    selection: ListSelectionConfig<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: databaseKeys.list(args),
     queryFn: () => getClient().database.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch Database list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDatabasesQuery({
@@ -70,35 +99,47 @@ export function useDatabasesQuery(params: {
 export async function fetchDatabasesQuery<S extends DatabaseSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DatabaseFilter, DatabaseOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
+  } & Omit<ListSelectionConfig<S, DatabaseFilter, DatabaseOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DatabaseSelect>;
 }): Promise<{
   databases: ConnectionResult<InferSelectResult<DatabaseWithRelations, S>>;
 }>;
 export async function fetchDatabasesQuery(params: {
   selection: ListSelectionConfig<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>;
 }) {
-  const args = buildListSelectionArgs<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>(params.selection);
+  const args = buildListSelectionArgs<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>(
+    params.selection
+  );
   return getClient().database.findMany(args).unwrap();
 }
 /**
  * Prefetch Database list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDatabasesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDatabasesQuery<S extends DatabaseSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DatabaseFilter, DatabaseOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
-}): Promise<void>;
-export async function prefetchDatabasesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>(params.selection);
+export async function prefetchDatabasesQuery<S extends DatabaseSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DatabaseFilter, DatabaseOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DatabaseSelect>;
+  }
+): Promise<void>;
+export async function prefetchDatabasesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<DatabaseSelect, DatabaseFilter, DatabaseOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: databaseKeys.list(args),
-    queryFn: () => getClient().database.findMany(args).unwrap()
+    queryFn: () => getClient().database.findMany(args).unwrap(),
   });
 }

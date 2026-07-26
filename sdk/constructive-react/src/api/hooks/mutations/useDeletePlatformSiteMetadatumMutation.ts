@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteMetadatumKeys } from "../query-keys";
-import { platformSiteMetadatumMutationKeys } from "../mutation-keys";
-import type { PlatformSiteMetadatumSelect, PlatformSiteMetadatumWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteMetadatumSelect, PlatformSiteMetadatumWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteMetadatumKeys } from '../query-keys';
+import { platformSiteMetadatumMutationKeys } from '../mutation-keys';
+import type {
+  PlatformSiteMetadatumSelect,
+  PlatformSiteMetadatumWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformSiteMetadatumSelect,
+  PlatformSiteMetadatumWithRelations,
+} from '../../orm/input-types';
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformSiteMetadatumMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformSiteMetadatumMutation<S extends PlatformSiteMetadatumSelect>(params: {
-  selection: ({
-    fields: S & PlatformSiteMetadatumSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>);
-} & Omit<UseMutationOptions<{
-  deletePlatformSiteMetadatum: {
-    platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePlatformSiteMetadatum: {
-    platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeletePlatformSiteMetadatumMutation(params: {
-  selection: SelectionConfig<PlatformSiteMetadatumSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeletePlatformSiteMetadatumMutation<S extends PlatformSiteMetadatumSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformSiteMetadatumSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deletePlatformSiteMetadatum: {
+          platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deletePlatformSiteMetadatum: {
+      platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeletePlatformSiteMetadatumMutation(
+  params: {
+    selection: SelectionConfig<PlatformSiteMetadatumSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformSiteMetadatumSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformSiteMetadatumMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().platformSiteMetadatum.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .platformSiteMetadatum.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformSiteMetadatumKeys.detail(variables.id)
+        queryKey: platformSiteMetadatumKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformSiteMetadatumKeys.lists()
+        queryKey: platformSiteMetadatumKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

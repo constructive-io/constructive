@@ -4,20 +4,25 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { userKeys } from "../query-keys";
-import type { UserSelect, UserWithRelations, UserFilter, UserOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { UserSelect, UserWithRelations, UserFilter, UserOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { userKeys } from '../query-keys';
+import type { UserSelect, UserWithRelations, UserFilter, UserOrderBy } from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type { UserSelect, UserWithRelations, UserFilter, UserOrderBy } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const usersQueryKey = userKeys.list;
 /**
  * Query hook for fetching User list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useUsersQuery({
@@ -30,33 +35,45 @@ export const usersQueryKey = userKeys.list;
  * });
  * ```
  */
-export function useUsersQuery<S extends UserSelect, TData = {
-  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UserOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
-} & Omit<UseQueryOptions<{
-  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useUsersQuery(params: {
-  selection: ListSelectionConfig<UserSelect, UserFilter, UserOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useUsersQuery<
+  S extends UserSelect,
+  TData = {
+    users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, UserFilter, UserOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, UserSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useUsersQuery(
+  params: {
+    selection: ListSelectionConfig<UserSelect, UserFilter, UserOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<UserSelect, UserFilter, UserOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: userKeys.list(args),
     queryFn: () => getClient().user.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch User list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchUsersQuery({
@@ -70,7 +87,8 @@ export function useUsersQuery(params: {
 export async function fetchUsersQuery<S extends UserSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UserOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UserOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<{
   users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
 }>;
@@ -82,23 +100,30 @@ export async function fetchUsersQuery(params: {
 }
 /**
  * Prefetch User list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchUsersQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UserOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
-}): Promise<void>;
-export async function prefetchUsersQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<UserSelect, UserFilter, UserOrderBy>;
-}): Promise<void> {
+export async function prefetchUsersQuery<S extends UserSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, UserFilter, UserOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, UserSelect>;
+  }
+): Promise<void>;
+export async function prefetchUsersQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<UserSelect, UserFilter, UserOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<UserSelect, UserFilter, UserOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userKeys.list(args),
-    queryFn: () => getClient().user.findMany(args).unwrap()
+    queryFn: () => getClient().user.findMany(args).unwrap(),
   });
 }

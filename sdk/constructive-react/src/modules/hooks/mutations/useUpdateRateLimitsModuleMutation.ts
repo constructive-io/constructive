@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { rateLimitsModuleKeys } from "../query-keys";
-import { rateLimitsModuleMutationKeys } from "../mutation-keys";
-import type { RateLimitsModuleSelect, RateLimitsModuleWithRelations, RateLimitsModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RateLimitsModuleSelect, RateLimitsModuleWithRelations, RateLimitsModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { rateLimitsModuleKeys } from '../query-keys';
+import { rateLimitsModuleMutationKeys } from '../mutation-keys';
+import type {
+  RateLimitsModuleSelect,
+  RateLimitsModuleWithRelations,
+  RateLimitsModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  RateLimitsModuleSelect,
+  RateLimitsModuleWithRelations,
+  RateLimitsModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a RateLimitsModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateRateLimitsModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', rateLimitsModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateRateLimitsModuleMutation<S extends RateLimitsModuleSelect>(params: {
-  selection: ({
-    fields: S & RateLimitsModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateRateLimitsModule: {
-    rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  rateLimitsModulePatch: RateLimitsModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateRateLimitsModule: {
-    rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  rateLimitsModulePatch: RateLimitsModulePatch;
-}>;
-export function useUpdateRateLimitsModuleMutation(params: {
-  selection: SelectionConfig<RateLimitsModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  rateLimitsModulePatch: RateLimitsModulePatch;
-}>, "mutationFn">) {
+export function useUpdateRateLimitsModuleMutation<S extends RateLimitsModuleSelect>(
+  params: {
+    selection: {
+      fields: S & RateLimitsModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateRateLimitsModule: {
+          rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        rateLimitsModulePatch: RateLimitsModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateRateLimitsModule: {
+      rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    rateLimitsModulePatch: RateLimitsModulePatch;
+  }
+>;
+export function useUpdateRateLimitsModuleMutation(
+  params: {
+    selection: SelectionConfig<RateLimitsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        rateLimitsModulePatch: RateLimitsModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<RateLimitsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: rateLimitsModuleMutationKeys.all,
     mutationFn: ({
       id,
-      rateLimitsModulePatch
+      rateLimitsModulePatch,
     }: {
       id: string;
       rateLimitsModulePatch: RateLimitsModulePatch;
-    }) => getClient().rateLimitsModule.update({
-      where: {
-        id
-      },
-      data: rateLimitsModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .rateLimitsModule.update({
+          where: {
+            id,
+          },
+          data: rateLimitsModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: rateLimitsModuleKeys.detail(variables.id)
+        queryKey: rateLimitsModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: rateLimitsModuleKeys.lists()
+        queryKey: rateLimitsModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

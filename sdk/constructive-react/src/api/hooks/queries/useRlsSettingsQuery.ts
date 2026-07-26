@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { rlsSettingKeys } from "../query-keys";
-import type { RlsSettingSelect, RlsSettingWithRelations, RlsSettingFilter, RlsSettingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { RlsSettingSelect, RlsSettingWithRelations, RlsSettingFilter, RlsSettingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { rlsSettingKeys } from '../query-keys';
+import type {
+  RlsSettingSelect,
+  RlsSettingWithRelations,
+  RlsSettingFilter,
+  RlsSettingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  RlsSettingSelect,
+  RlsSettingWithRelations,
+  RlsSettingFilter,
+  RlsSettingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const rlsSettingsQueryKey = rlsSettingKeys.list;
 /**
  * RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRlsSettingsQuery({
@@ -30,33 +45,47 @@ export const rlsSettingsQueryKey = rlsSettingKeys.list;
  * });
  * ```
  */
-export function useRlsSettingsQuery<S extends RlsSettingSelect, TData = {
-  rlsSettings: ConnectionResult<InferSelectResult<RlsSettingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RlsSettingFilter, RlsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
-} & Omit<UseQueryOptions<{
-  rlsSettings: ConnectionResult<InferSelectResult<RlsSettingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRlsSettingsQuery(params: {
-  selection: ListSelectionConfig<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useRlsSettingsQuery<
+  S extends RlsSettingSelect,
+  TData = {
+    rlsSettings: ConnectionResult<InferSelectResult<RlsSettingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RlsSettingFilter, RlsSettingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        rlsSettings: ConnectionResult<InferSelectResult<RlsSettingWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRlsSettingsQuery(
+  params: {
+    selection: ListSelectionConfig<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: rlsSettingKeys.list(args),
     queryFn: () => getClient().rlsSetting.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRlsSettingsQuery({
@@ -70,35 +99,47 @@ export function useRlsSettingsQuery(params: {
 export async function fetchRlsSettingsQuery<S extends RlsSettingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RlsSettingFilter, RlsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
+  } & Omit<ListSelectionConfig<S, RlsSettingFilter, RlsSettingOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
 }): Promise<{
   rlsSettings: ConnectionResult<InferSelectResult<RlsSettingWithRelations, S>>;
 }>;
 export async function fetchRlsSettingsQuery(params: {
   selection: ListSelectionConfig<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>;
 }) {
-  const args = buildListSelectionArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>(
+    params.selection
+  );
   return getClient().rlsSetting.findMany(args).unwrap();
 }
 /**
  * RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
- * 
+ *
  * @example
  * ```ts
  * await prefetchRlsSettingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRlsSettingsQuery<S extends RlsSettingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RlsSettingFilter, RlsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
-}): Promise<void>;
-export async function prefetchRlsSettingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>(params.selection);
+export async function prefetchRlsSettingsQuery<S extends RlsSettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RlsSettingFilter, RlsSettingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchRlsSettingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: rlsSettingKeys.list(args),
-    queryFn: () => getClient().rlsSetting.findMany(args).unwrap()
+    queryFn: () => getClient().rlsSetting.findMany(args).unwrap(),
   });
 }

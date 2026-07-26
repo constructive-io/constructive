@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { agentResourceChunkKeys } from "../query-keys";
-import type { AgentResourceChunkSelect, AgentResourceChunkWithRelations, AgentResourceChunkFilter, AgentResourceChunkOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentResourceChunkSelect, AgentResourceChunkWithRelations, AgentResourceChunkFilter, AgentResourceChunkOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { agentResourceChunkKeys } from '../query-keys';
+import type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+  AgentResourceChunkFilter,
+  AgentResourceChunkOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+  AgentResourceChunkFilter,
+  AgentResourceChunkOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentResourceChunksQueryKey = agentResourceChunkKeys.list;
 /**
  * Query hook for fetching AgentResourceChunk list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentResourceChunksQuery({
@@ -30,33 +45,58 @@ export const agentResourceChunksQueryKey = agentResourceChunkKeys.list;
  * });
  * ```
  */
-export function useAgentResourceChunksQuery<S extends AgentResourceChunkSelect, TData = {
-  agentResourceChunks: ConnectionResult<InferSelectResult<AgentResourceChunkWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AgentResourceChunkFilter, AgentResourceChunkOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
-} & Omit<UseQueryOptions<{
-  agentResourceChunks: ConnectionResult<InferSelectResult<AgentResourceChunkWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentResourceChunksQuery(params: {
-  selection: ListSelectionConfig<AgentResourceChunkSelect, AgentResourceChunkFilter, AgentResourceChunkOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AgentResourceChunkSelect, AgentResourceChunkFilter, AgentResourceChunkOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAgentResourceChunksQuery<
+  S extends AgentResourceChunkSelect,
+  TData = {
+    agentResourceChunks: ConnectionResult<InferSelectResult<AgentResourceChunkWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, AgentResourceChunkFilter, AgentResourceChunkOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentResourceChunks: ConnectionResult<
+          InferSelectResult<AgentResourceChunkWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentResourceChunksQuery(
+  params: {
+    selection: ListSelectionConfig<
+      AgentResourceChunkSelect,
+      AgentResourceChunkFilter,
+      AgentResourceChunkOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    AgentResourceChunkSelect,
+    AgentResourceChunkFilter,
+    AgentResourceChunkOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentResourceChunkKeys.list(args),
     queryFn: () => getClient().agentResourceChunk.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch AgentResourceChunk list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentResourceChunksQuery({
@@ -70,35 +110,62 @@ export function useAgentResourceChunksQuery(params: {
 export async function fetchAgentResourceChunksQuery<S extends AgentResourceChunkSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AgentResourceChunkFilter, AgentResourceChunkOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  } & Omit<ListSelectionConfig<S, AgentResourceChunkFilter, AgentResourceChunkOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
 }): Promise<{
   agentResourceChunks: ConnectionResult<InferSelectResult<AgentResourceChunkWithRelations, S>>;
 }>;
 export async function fetchAgentResourceChunksQuery(params: {
-  selection: ListSelectionConfig<AgentResourceChunkSelect, AgentResourceChunkFilter, AgentResourceChunkOrderBy>;
+  selection: ListSelectionConfig<
+    AgentResourceChunkSelect,
+    AgentResourceChunkFilter,
+    AgentResourceChunkOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<AgentResourceChunkSelect, AgentResourceChunkFilter, AgentResourceChunkOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    AgentResourceChunkSelect,
+    AgentResourceChunkFilter,
+    AgentResourceChunkOrderBy
+  >(params.selection);
   return getClient().agentResourceChunk.findMany(args).unwrap();
 }
 /**
  * Prefetch AgentResourceChunk list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentResourceChunksQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAgentResourceChunksQuery<S extends AgentResourceChunkSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AgentResourceChunkFilter, AgentResourceChunkOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
-}): Promise<void>;
-export async function prefetchAgentResourceChunksQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AgentResourceChunkSelect, AgentResourceChunkFilter, AgentResourceChunkOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AgentResourceChunkSelect, AgentResourceChunkFilter, AgentResourceChunkOrderBy>(params.selection);
+export async function prefetchAgentResourceChunksQuery<S extends AgentResourceChunkSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, AgentResourceChunkFilter, AgentResourceChunkOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentResourceChunksQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      AgentResourceChunkSelect,
+      AgentResourceChunkFilter,
+      AgentResourceChunkOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    AgentResourceChunkSelect,
+    AgentResourceChunkFilter,
+    AgentResourceChunkOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentResourceChunkKeys.list(args),
-    queryFn: () => getClient().agentResourceChunk.findMany(args).unwrap()
+    queryFn: () => getClient().agentResourceChunk.findMany(args).unwrap(),
   });
 }

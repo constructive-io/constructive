@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { dbPoolConfigKeys } from "../query-keys";
-import type { DbPoolConfigSelect, DbPoolConfigWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DbPoolConfigSelect, DbPoolConfigWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { dbPoolConfigKeys } from '../query-keys';
+import type { DbPoolConfigSelect, DbPoolConfigWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DbPoolConfigSelect, DbPoolConfigWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const dbPoolConfigQueryKey = dbPoolConfigKeys.detail;
 /**
  * Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDbPoolConfigQuery({
@@ -26,38 +26,52 @@ export const dbPoolConfigQueryKey = dbPoolConfigKeys.detail;
  * });
  * ```
  */
-export function useDbPoolConfigQuery<S extends DbPoolConfigSelect, TData = {
-  dbPoolConfig: InferSelectResult<DbPoolConfigWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
-} & Omit<UseQueryOptions<{
-  dbPoolConfig: InferSelectResult<DbPoolConfigWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDbPoolConfigQuery(params: {
-  id: string;
-  selection: SelectionConfig<DbPoolConfigSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDbPoolConfigQuery<
+  S extends DbPoolConfigSelect,
+  TData = {
+    dbPoolConfig: InferSelectResult<DbPoolConfigWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        dbPoolConfig: InferSelectResult<DbPoolConfigWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDbPoolConfigQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DbPoolConfigSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DbPoolConfigSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: dbPoolConfigKeys.detail(params.id),
-    queryFn: () => getClient().dbPoolConfig.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .dbPoolConfig.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDbPoolConfigQuery({
@@ -79,35 +93,46 @@ export async function fetchDbPoolConfigQuery(params: {
   selection: SelectionConfig<DbPoolConfigSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DbPoolConfigSelect>(params.selection);
-  return getClient().dbPoolConfig.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .dbPoolConfig.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases.
- * 
+ *
  * @example
  * ```ts
  * await prefetchDbPoolConfigQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDbPoolConfigQuery<S extends DbPoolConfigSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
-}): Promise<void>;
-export async function prefetchDbPoolConfigQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DbPoolConfigSelect>;
-}): Promise<void> {
+export async function prefetchDbPoolConfigQuery<S extends DbPoolConfigSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
+  }
+): Promise<void>;
+export async function prefetchDbPoolConfigQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DbPoolConfigSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DbPoolConfigSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: dbPoolConfigKeys.detail(params.id),
-    queryFn: () => getClient().dbPoolConfig.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .dbPoolConfig.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

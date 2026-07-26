@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { domainVerificationKeys } from "../query-keys";
-import type { DomainVerificationSelect, DomainVerificationWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainVerificationSelect, DomainVerificationWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { domainVerificationKeys } from '../query-keys';
+import type {
+  DomainVerificationSelect,
+  DomainVerificationWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  DomainVerificationSelect,
+  DomainVerificationWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const domainVerificationQueryKey = domainVerificationKeys.detail;
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDomainVerificationQuery({
@@ -26,38 +32,52 @@ export const domainVerificationQueryKey = domainVerificationKeys.detail;
  * });
  * ```
  */
-export function useDomainVerificationQuery<S extends DomainVerificationSelect, TData = {
-  domainVerification: InferSelectResult<DomainVerificationWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
-} & Omit<UseQueryOptions<{
-  domainVerification: InferSelectResult<DomainVerificationWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDomainVerificationQuery(params: {
-  id: string;
-  selection: SelectionConfig<DomainVerificationSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDomainVerificationQuery<
+  S extends DomainVerificationSelect,
+  TData = {
+    domainVerification: InferSelectResult<DomainVerificationWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        domainVerification: InferSelectResult<DomainVerificationWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDomainVerificationQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DomainVerificationSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DomainVerificationSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: domainVerificationKeys.detail(params.id),
-    queryFn: () => getClient().domainVerification.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .domainVerification.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDomainVerificationQuery({
@@ -79,35 +99,46 @@ export async function fetchDomainVerificationQuery(params: {
   selection: SelectionConfig<DomainVerificationSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DomainVerificationSelect>(params.selection);
-  return getClient().domainVerification.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .domainVerification.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```ts
  * await prefetchDomainVerificationQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDomainVerificationQuery<S extends DomainVerificationSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
-}): Promise<void>;
-export async function prefetchDomainVerificationQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DomainVerificationSelect>;
-}): Promise<void> {
+export async function prefetchDomainVerificationQuery<S extends DomainVerificationSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
+  }
+): Promise<void>;
+export async function prefetchDomainVerificationQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DomainVerificationSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DomainVerificationSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: domainVerificationKeys.detail(params.id),
-    queryFn: () => getClient().domainVerification.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .domainVerification.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

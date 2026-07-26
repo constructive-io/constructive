@@ -55,16 +55,13 @@ export class FetchAdapter implements GraphQLAdapter {
   constructor(
     private endpoint: string,
     headers?: Record<string, string>,
-    fetchFn?: typeof globalThis.fetch,
+    fetchFn?: typeof globalThis.fetch
   ) {
     this.headers = headers ?? {};
     this.fetchFn = (fetchFn ?? createFetch()).bind(globalThis);
   }
 
-  async execute<T>(
-    document: string,
-    variables?: Record<string, unknown>,
-  ): Promise<QueryResult<T>> {
+  async execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>> {
     const response = await this.fetchFn(this.endpoint, {
       method: 'POST',
       headers: {
@@ -82,9 +79,7 @@ export class FetchAdapter implements GraphQLAdapter {
       return {
         ok: false,
         data: null,
-        errors: [
-          { message: `HTTP ${response.status}: ${response.statusText}` },
-        ],
+        errors: [{ message: `HTTP ${response.status}: ${response.statusText}` }],
       };
     }
 
@@ -150,7 +145,7 @@ export interface OrmClientConfig {
 export class GraphQLRequestError extends Error {
   constructor(
     public readonly errors: GraphQLError[],
-    public readonly data: unknown = null,
+    public readonly data: unknown = null
   ) {
     const messages = errors.map((e) => e.message).join('; ');
     super(`GraphQL Error: ${messages}`);
@@ -166,15 +161,9 @@ export class OrmClient {
     if (config.adapter) {
       this.adapter = config.adapter;
     } else if (config.endpoint) {
-      this.adapter = new FetchAdapter(
-        config.endpoint,
-        config.headers,
-        config.fetch,
-      );
+      this.adapter = new FetchAdapter(config.endpoint, config.headers, config.fetch);
     } else {
-      throw new Error(
-        'OrmClientConfig requires either an endpoint or a custom adapter',
-      );
+      throw new Error('OrmClientConfig requires either an endpoint or a custom adapter');
     }
 
     if (config.realtime) {
@@ -182,10 +171,7 @@ export class OrmClient {
     }
   }
 
-  async execute<T>(
-    document: string,
-    variables?: Record<string, unknown>,
-  ): Promise<QueryResult<T>> {
+  async execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>> {
     return this.adapter.execute<T>(document, variables);
   }
 
@@ -202,19 +188,14 @@ export class OrmClient {
       onEvent: (event: SubscriptionEvent<T>) => void;
       onError?: (error: Error) => void;
       onComplete?: () => void;
-    },
+    }
   ): Unsubscribe {
     if (!this.realtimeManager) {
       throw new Error(
-        'Realtime not configured. Pass a `realtime` option to createClient() to enable subscriptions.',
+        'Realtime not configured. Pass a `realtime` option to createClient() to enable subscriptions.'
       );
     }
-    return this.realtimeManager.subscribe<T>(
-      meta,
-      document,
-      variables,
-      options,
-    );
+    return this.realtimeManager.subscribe<T>(meta, document, variables, options);
   }
 
   /**
@@ -241,9 +222,7 @@ export class OrmClient {
   }
 
   /** Register a listener for WebSocket connection state changes */
-  onConnectionStateChange(
-    listener: ConnectionStateListener,
-  ): Unsubscribe {
+  onConnectionStateChange(listener: ConnectionStateListener): Unsubscribe {
     if (!this.realtimeManager) return () => {};
     return this.realtimeManager.onConnectionStateChange(listener);
   }

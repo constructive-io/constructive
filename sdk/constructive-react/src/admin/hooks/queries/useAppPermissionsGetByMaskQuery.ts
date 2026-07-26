@@ -4,58 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { customQueryKeys } from "../query-keys";
-import type { AppPermissionsGetByMaskVariables } from "../../orm/query";
-import type { AppPermissionConnection } from "../../orm/input-types";
-export type { AppPermissionsGetByMaskVariables } from "../../orm/query";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { customQueryKeys } from '../query-keys';
+import type { AppPermissionsGetByMaskVariables } from '../../orm/query';
+import type { AppPermissionConnection } from '../../orm/input-types';
+export type { AppPermissionsGetByMaskVariables } from '../../orm/query';
 /** Query key factory - re-exported from query-keys.ts */
 export const appPermissionsGetByMaskQueryKey = customQueryKeys.appPermissionsGetByMask;
 /**
  * Reads and enables pagination through a set of `AppPermission`.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppPermissionsGetByMaskQuery({ variables: { after, first, mask, offset } });
- * 
+ *
  * if (data?.appPermissionsGetByMask) {
  *   console.log(data.appPermissionsGetByMask);
  * }
  * ```
  */
-export function useAppPermissionsGetByMaskQuery<TData = {
-  appPermissionsGetByMask: AppPermissionConnection | null;
-}>(params?: {
-  variables?: AppPermissionsGetByMaskVariables;
-} & Omit<UseQueryOptions<{
-  appPermissionsGetByMask: AppPermissionConnection | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppPermissionsGetByMaskQuery<TData = {
-  appPermissionsGetByMask: AppPermissionConnection | null;
-}>(params?: {
-  variables?: AppPermissionsGetByMaskVariables;
-} & Omit<UseQueryOptions<{
-  appPermissionsGetByMask: AppPermissionConnection | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
+export function useAppPermissionsGetByMaskQuery<
+  TData = {
+    appPermissionsGetByMask: AppPermissionConnection | null;
+  },
+>(
+  params?: {
+    variables?: AppPermissionsGetByMaskVariables;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appPermissionsGetByMask: AppPermissionConnection | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppPermissionsGetByMaskQuery<
+  TData = {
+    appPermissionsGetByMask: AppPermissionConnection | null;
+  },
+>(
+  params?: {
+    variables?: AppPermissionsGetByMaskVariables;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appPermissionsGetByMask: AppPermissionConnection | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const {
-    variables: _variables,
-    ...queryOptions
-  } = params ?? {};
+  const { variables: _variables, ...queryOptions } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: appPermissionsGetByMaskQueryKey(variables),
     queryFn: () => getClient().query.appPermissionsGetByMask(variables).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch appPermissionsGetByMask without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppPermissionsGetByMaskQuery({ variables: { after, first, mask, offset } });
@@ -69,18 +88,21 @@ export async function fetchAppPermissionsGetByMaskQuery(params?: {
 }
 /**
  * Prefetch appPermissionsGetByMask for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppPermissionsGetByMaskQuery(queryClient, { variables: { after, first, mask, offset } });
  * ```
  */
-export async function prefetchAppPermissionsGetByMaskQuery(queryClient: QueryClient, params?: {
-  variables?: AppPermissionsGetByMaskVariables;
-}): Promise<void> {
+export async function prefetchAppPermissionsGetByMaskQuery(
+  queryClient: QueryClient,
+  params?: {
+    variables?: AppPermissionsGetByMaskVariables;
+  }
+): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: appPermissionsGetByMaskQueryKey(variables),
-    queryFn: () => getClient().query.appPermissionsGetByMask(variables).unwrap()
+    queryFn: () => getClient().query.appPermissionsGetByMask(variables).unwrap(),
   });
 }

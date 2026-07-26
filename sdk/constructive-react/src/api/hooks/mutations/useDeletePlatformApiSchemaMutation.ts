@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformApiSchemaKeys } from "../query-keys";
-import { platformApiSchemaMutationKeys } from "../mutation-keys";
-import type { PlatformApiSchemaSelect, PlatformApiSchemaWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiSchemaSelect, PlatformApiSchemaWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApiSchemaKeys } from '../query-keys';
+import { platformApiSchemaMutationKeys } from '../mutation-keys';
+import type {
+  PlatformApiSchemaSelect,
+  PlatformApiSchemaWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformApiSchemaSelect,
+  PlatformApiSchemaWithRelations,
+} from '../../orm/input-types';
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformApiSchemaMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformApiSchemaMutation<S extends PlatformApiSchemaSelect>(params: {
-  selection: ({
-    fields: S & PlatformApiSchemaSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>);
-} & Omit<UseMutationOptions<{
-  deletePlatformApiSchema: {
-    platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePlatformApiSchema: {
-    platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeletePlatformApiSchemaMutation(params: {
-  selection: SelectionConfig<PlatformApiSchemaSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeletePlatformApiSchemaMutation<S extends PlatformApiSchemaSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformApiSchemaSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deletePlatformApiSchema: {
+          platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deletePlatformApiSchema: {
+      platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeletePlatformApiSchemaMutation(
+  params: {
+    selection: SelectionConfig<PlatformApiSchemaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformApiSchemaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformApiSchemaMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().platformApiSchema.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .platformApiSchema.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformApiSchemaKeys.detail(variables.id)
+        queryKey: platformApiSchemaKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformApiSchemaKeys.lists()
+        queryKey: platformApiSchemaKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

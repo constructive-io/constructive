@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { webhookEndpointKeys } from "../query-keys";
-import type { WebhookEndpointSelect, WebhookEndpointWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { WebhookEndpointSelect, WebhookEndpointWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { webhookEndpointKeys } from '../query-keys';
+import type { WebhookEndpointSelect, WebhookEndpointWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { WebhookEndpointSelect, WebhookEndpointWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const webhookEndpointQueryKey = webhookEndpointKeys.detail;
 /**
  * Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useWebhookEndpointQuery({
@@ -26,38 +26,52 @@ export const webhookEndpointQueryKey = webhookEndpointKeys.detail;
  * });
  * ```
  */
-export function useWebhookEndpointQuery<S extends WebhookEndpointSelect, TData = {
-  webhookEndpoint: InferSelectResult<WebhookEndpointWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, WebhookEndpointSelect>;
-} & Omit<UseQueryOptions<{
-  webhookEndpoint: InferSelectResult<WebhookEndpointWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useWebhookEndpointQuery(params: {
-  id: string;
-  selection: SelectionConfig<WebhookEndpointSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useWebhookEndpointQuery<
+  S extends WebhookEndpointSelect,
+  TData = {
+    webhookEndpoint: InferSelectResult<WebhookEndpointWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, WebhookEndpointSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        webhookEndpoint: InferSelectResult<WebhookEndpointWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useWebhookEndpointQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<WebhookEndpointSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<WebhookEndpointSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: webhookEndpointKeys.detail(params.id),
-    queryFn: () => getClient().webhookEndpoint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .webhookEndpoint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchWebhookEndpointQuery({
@@ -79,35 +93,46 @@ export async function fetchWebhookEndpointQuery(params: {
   selection: SelectionConfig<WebhookEndpointSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<WebhookEndpointSelect>(params.selection);
-  return getClient().webhookEndpoint.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .webhookEndpoint.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
- * 
+ *
  * @example
  * ```ts
  * await prefetchWebhookEndpointQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchWebhookEndpointQuery<S extends WebhookEndpointSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, WebhookEndpointSelect>;
-}): Promise<void>;
-export async function prefetchWebhookEndpointQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<WebhookEndpointSelect>;
-}): Promise<void> {
+export async function prefetchWebhookEndpointQuery<S extends WebhookEndpointSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, WebhookEndpointSelect>;
+  }
+): Promise<void>;
+export async function prefetchWebhookEndpointQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<WebhookEndpointSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<WebhookEndpointSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: webhookEndpointKeys.detail(params.id),
-    queryFn: () => getClient().webhookEndpoint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .webhookEndpoint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

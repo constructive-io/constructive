@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { orgLimitCapsDefaultKeys } from "../query-keys";
-import type { OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultWithRelations, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultWithRelations, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { orgLimitCapsDefaultKeys } from '../query-keys';
+import type {
+  OrgLimitCapsDefaultSelect,
+  OrgLimitCapsDefaultWithRelations,
+  OrgLimitCapsDefaultFilter,
+  OrgLimitCapsDefaultOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  OrgLimitCapsDefaultSelect,
+  OrgLimitCapsDefaultWithRelations,
+  OrgLimitCapsDefaultFilter,
+  OrgLimitCapsDefaultOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitCapsDefaultsQueryKey = orgLimitCapsDefaultKeys.list;
 /**
  * Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitCapsDefaultsQuery({
@@ -30,33 +45,58 @@ export const orgLimitCapsDefaultsQueryKey = orgLimitCapsDefaultKeys.list;
  * });
  * ```
  */
-export function useOrgLimitCapsDefaultsQuery<S extends OrgLimitCapsDefaultSelect, TData = {
-  orgLimitCapsDefaults: ConnectionResult<InferSelectResult<OrgLimitCapsDefaultWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitCapsDefaultSelect>;
-} & Omit<UseQueryOptions<{
-  orgLimitCapsDefaults: ConnectionResult<InferSelectResult<OrgLimitCapsDefaultWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgLimitCapsDefaultsQuery(params: {
-  selection: ListSelectionConfig<OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useOrgLimitCapsDefaultsQuery<
+  S extends OrgLimitCapsDefaultSelect,
+  TData = {
+    orgLimitCapsDefaults: ConnectionResult<InferSelectResult<OrgLimitCapsDefaultWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, OrgLimitCapsDefaultSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgLimitCapsDefaults: ConnectionResult<
+          InferSelectResult<OrgLimitCapsDefaultWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgLimitCapsDefaultsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      OrgLimitCapsDefaultSelect,
+      OrgLimitCapsDefaultFilter,
+      OrgLimitCapsDefaultOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    OrgLimitCapsDefaultSelect,
+    OrgLimitCapsDefaultFilter,
+    OrgLimitCapsDefaultOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitCapsDefaultKeys.list(args),
     queryFn: () => getClient().orgLimitCapsDefault.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgLimitCapsDefaultsQuery({
@@ -70,35 +110,65 @@ export function useOrgLimitCapsDefaultsQuery(params: {
 export async function fetchOrgLimitCapsDefaultsQuery<S extends OrgLimitCapsDefaultSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitCapsDefaultSelect>;
+  } & Omit<
+    ListSelectionConfig<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, OrgLimitCapsDefaultSelect>;
 }): Promise<{
   orgLimitCapsDefaults: ConnectionResult<InferSelectResult<OrgLimitCapsDefaultWithRelations, S>>;
 }>;
 export async function fetchOrgLimitCapsDefaultsQuery(params: {
-  selection: ListSelectionConfig<OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>;
+  selection: ListSelectionConfig<
+    OrgLimitCapsDefaultSelect,
+    OrgLimitCapsDefaultFilter,
+    OrgLimitCapsDefaultOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    OrgLimitCapsDefaultSelect,
+    OrgLimitCapsDefaultFilter,
+    OrgLimitCapsDefaultOrderBy
+  >(params.selection);
   return getClient().orgLimitCapsDefault.findMany(args).unwrap();
 }
 /**
  * Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers.
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgLimitCapsDefaultsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgLimitCapsDefaultsQuery<S extends OrgLimitCapsDefaultSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitCapsDefaultSelect>;
-}): Promise<void>;
-export async function prefetchOrgLimitCapsDefaultsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<OrgLimitCapsDefaultSelect, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>(params.selection);
+export async function prefetchOrgLimitCapsDefaultsQuery<S extends OrgLimitCapsDefaultSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, OrgLimitCapsDefaultSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgLimitCapsDefaultsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      OrgLimitCapsDefaultSelect,
+      OrgLimitCapsDefaultFilter,
+      OrgLimitCapsDefaultOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    OrgLimitCapsDefaultSelect,
+    OrgLimitCapsDefaultFilter,
+    OrgLimitCapsDefaultOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitCapsDefaultKeys.list(args),
-    queryFn: () => getClient().orgLimitCapsDefault.findMany(args).unwrap()
+    queryFn: () => getClient().orgLimitCapsDefault.findMany(args).unwrap(),
   });
 }

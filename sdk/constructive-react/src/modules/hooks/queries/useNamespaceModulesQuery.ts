@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { namespaceModuleKeys } from "../query-keys";
-import type { NamespaceModuleSelect, NamespaceModuleWithRelations, NamespaceModuleFilter, NamespaceModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { NamespaceModuleSelect, NamespaceModuleWithRelations, NamespaceModuleFilter, NamespaceModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { namespaceModuleKeys } from '../query-keys';
+import type {
+  NamespaceModuleSelect,
+  NamespaceModuleWithRelations,
+  NamespaceModuleFilter,
+  NamespaceModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  NamespaceModuleSelect,
+  NamespaceModuleWithRelations,
+  NamespaceModuleFilter,
+  NamespaceModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const namespaceModulesQueryKey = namespaceModuleKeys.list;
 /**
  * Query hook for fetching NamespaceModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useNamespaceModulesQuery({
@@ -30,33 +45,53 @@ export const namespaceModulesQueryKey = namespaceModuleKeys.list;
  * });
  * ```
  */
-export function useNamespaceModulesQuery<S extends NamespaceModuleSelect, TData = {
-  namespaceModules: ConnectionResult<InferSelectResult<NamespaceModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, NamespaceModuleFilter, NamespaceModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
-} & Omit<UseQueryOptions<{
-  namespaceModules: ConnectionResult<InferSelectResult<NamespaceModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useNamespaceModulesQuery(params: {
-  selection: ListSelectionConfig<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useNamespaceModulesQuery<
+  S extends NamespaceModuleSelect,
+  TData = {
+    namespaceModules: ConnectionResult<InferSelectResult<NamespaceModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, NamespaceModuleFilter, NamespaceModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        namespaceModules: ConnectionResult<InferSelectResult<NamespaceModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useNamespaceModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      NamespaceModuleSelect,
+      NamespaceModuleFilter,
+      NamespaceModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    NamespaceModuleSelect,
+    NamespaceModuleFilter,
+    NamespaceModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: namespaceModuleKeys.list(args),
     queryFn: () => getClient().namespaceModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch NamespaceModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchNamespaceModulesQuery({
@@ -70,35 +105,59 @@ export function useNamespaceModulesQuery(params: {
 export async function fetchNamespaceModulesQuery<S extends NamespaceModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, NamespaceModuleFilter, NamespaceModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
+  } & Omit<ListSelectionConfig<S, NamespaceModuleFilter, NamespaceModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
 }): Promise<{
   namespaceModules: ConnectionResult<InferSelectResult<NamespaceModuleWithRelations, S>>;
 }>;
 export async function fetchNamespaceModulesQuery(params: {
-  selection: ListSelectionConfig<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy>;
+  selection: ListSelectionConfig<
+    NamespaceModuleSelect,
+    NamespaceModuleFilter,
+    NamespaceModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    NamespaceModuleSelect,
+    NamespaceModuleFilter,
+    NamespaceModuleOrderBy
+  >(params.selection);
   return getClient().namespaceModule.findMany(args).unwrap();
 }
 /**
  * Prefetch NamespaceModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchNamespaceModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchNamespaceModulesQuery<S extends NamespaceModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, NamespaceModuleFilter, NamespaceModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
-}): Promise<void>;
-export async function prefetchNamespaceModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy>(params.selection);
+export async function prefetchNamespaceModulesQuery<S extends NamespaceModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, NamespaceModuleFilter, NamespaceModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchNamespaceModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      NamespaceModuleSelect,
+      NamespaceModuleFilter,
+      NamespaceModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    NamespaceModuleSelect,
+    NamespaceModuleFilter,
+    NamespaceModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: namespaceModuleKeys.list(args),
-    queryFn: () => getClient().namespaceModule.findMany(args).unwrap()
+    queryFn: () => getClient().namespaceModule.findMany(args).unwrap(),
   });
 }

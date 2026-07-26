@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { orgApiKeyListKeys } from "../query-keys";
-import type { OrgApiKeyListSelect, OrgApiKeyListWithRelations, OrgApiKeyListFilter, OrgApiKeyListOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgApiKeyListSelect, OrgApiKeyListWithRelations, OrgApiKeyListFilter, OrgApiKeyListOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { orgApiKeyListKeys } from '../query-keys';
+import type {
+  OrgApiKeyListSelect,
+  OrgApiKeyListWithRelations,
+  OrgApiKeyListFilter,
+  OrgApiKeyListOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  OrgApiKeyListSelect,
+  OrgApiKeyListWithRelations,
+  OrgApiKeyListFilter,
+  OrgApiKeyListOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgApiKeyListsQueryKey = orgApiKeyListKeys.list;
 /**
  * Query hook for fetching OrgApiKeyList list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgApiKeyListsQuery({
@@ -30,33 +45,49 @@ export const orgApiKeyListsQueryKey = orgApiKeyListKeys.list;
  * });
  * ```
  */
-export function useOrgApiKeyListsQuery<S extends OrgApiKeyListSelect, TData = {
-  orgApiKeyLists: ConnectionResult<InferSelectResult<OrgApiKeyListWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgApiKeyListFilter, OrgApiKeyListOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
-} & Omit<UseQueryOptions<{
-  orgApiKeyLists: ConnectionResult<InferSelectResult<OrgApiKeyListWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgApiKeyListsQuery(params: {
-  selection: ListSelectionConfig<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useOrgApiKeyListsQuery<
+  S extends OrgApiKeyListSelect,
+  TData = {
+    orgApiKeyLists: ConnectionResult<InferSelectResult<OrgApiKeyListWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgApiKeyListFilter, OrgApiKeyListOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgApiKeyLists: ConnectionResult<InferSelectResult<OrgApiKeyListWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgApiKeyListsQuery(
+  params: {
+    selection: ListSelectionConfig<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    OrgApiKeyListSelect,
+    OrgApiKeyListFilter,
+    OrgApiKeyListOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgApiKeyListKeys.list(args),
     queryFn: () => getClient().orgApiKeyList.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch OrgApiKeyList list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgApiKeyListsQuery({
@@ -70,35 +101,51 @@ export function useOrgApiKeyListsQuery(params: {
 export async function fetchOrgApiKeyListsQuery<S extends OrgApiKeyListSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgApiKeyListFilter, OrgApiKeyListOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
+  } & Omit<ListSelectionConfig<S, OrgApiKeyListFilter, OrgApiKeyListOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
 }): Promise<{
   orgApiKeyLists: ConnectionResult<InferSelectResult<OrgApiKeyListWithRelations, S>>;
 }>;
 export async function fetchOrgApiKeyListsQuery(params: {
   selection: ListSelectionConfig<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>;
 }) {
-  const args = buildListSelectionArgs<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    OrgApiKeyListSelect,
+    OrgApiKeyListFilter,
+    OrgApiKeyListOrderBy
+  >(params.selection);
   return getClient().orgApiKeyList.findMany(args).unwrap();
 }
 /**
  * Prefetch OrgApiKeyList list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgApiKeyListsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgApiKeyListsQuery<S extends OrgApiKeyListSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgApiKeyListFilter, OrgApiKeyListOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
-}): Promise<void>;
-export async function prefetchOrgApiKeyListsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>(params.selection);
+export async function prefetchOrgApiKeyListsQuery<S extends OrgApiKeyListSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgApiKeyListFilter, OrgApiKeyListOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgApiKeyListsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<OrgApiKeyListSelect, OrgApiKeyListFilter, OrgApiKeyListOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    OrgApiKeyListSelect,
+    OrgApiKeyListFilter,
+    OrgApiKeyListOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgApiKeyListKeys.list(args),
-    queryFn: () => getClient().orgApiKeyList.findMany(args).unwrap()
+    queryFn: () => getClient().orgApiKeyList.findMany(args).unwrap(),
   });
 }

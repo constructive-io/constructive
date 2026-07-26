@@ -4,25 +4,232 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type { DbPreset, Namespace, NamespaceEvent, PlatformInfraCommit, PlatformInfraGetAllTreeNodesRecord, PlatformInfraObject, PlatformInfraRef, PlatformInfraStore, PlatformNamespace, PlatformNamespaceEvent, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
+import type {
+  DbPreset,
+  Namespace,
+  NamespaceEvent,
+  PlatformInfraCommit,
+  PlatformInfraGetAllTreeNodesRecord,
+  PlatformInfraObject,
+  PlatformInfraRef,
+  PlatformInfraStore,
+  PlatformNamespace,
+  PlatformNamespaceEvent,
+  BigFloatFilter,
+  BigIntFilter,
+  BitStringFilter,
+  BooleanFilter,
+  DateFilter,
+  DatetimeFilter,
+  FloatFilter,
+  FullTextFilter,
+  IntFilter,
+  IntListFilter,
+  InternetAddressFilter,
+  JSONFilter,
+  StringFilter,
+  StringListFilter,
+  UUIDFilter,
+  UUIDListFilter,
+  VectorFilter,
+} from './types';
 /** Methods to use when ordering `DbPreset`. */
-export type DbPresetOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEFINITION_ASC" | "DEFINITION_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "MODULES_HASH_ASC" | "MODULES_HASH_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DbPresetOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'MODULES_HASH_ASC'
+  | 'MODULES_HASH_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `NamespaceEvent`. */
-export type NamespaceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type NamespaceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `Namespace`. */
-export type NamespaceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_MANAGED_ASC" | "IS_MANAGED_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "NAMESPACE_NAME_ASC" | "NAMESPACE_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type NamespaceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformInfraCommit`. */
-export type PlatformInfraCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
+export type PlatformInfraCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
 /** Methods to use when ordering `PlatformInfraObject`. */
-export type PlatformInfraObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type PlatformInfraObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
 /** Methods to use when ordering `PlatformInfraRef`. */
-export type PlatformInfraRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
+export type PlatformInfraRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
 /** Methods to use when ordering `PlatformInfraStore`. */
-export type PlatformInfraStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type PlatformInfraStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
 /** Methods to use when ordering `PlatformNamespaceEvent`. */
-export type PlatformNamespaceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type PlatformNamespaceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `PlatformNamespace`. */
-export type PlatformNamespaceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_MANAGED_ASC" | "IS_MANAGED_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "NAMESPACE_NAME_ASC" | "NAMESPACE_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformNamespaceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export interface CreateDbPresetInput {
   clientMutationId?: string;
   /** The `DbPreset` to be created by this mutation. */

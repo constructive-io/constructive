@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformCorsSettingKeys } from "../query-keys";
-import { platformCorsSettingMutationKeys } from "../mutation-keys";
-import type { PlatformCorsSettingSelect, PlatformCorsSettingWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformCorsSettingSelect, PlatformCorsSettingWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformCorsSettingKeys } from '../query-keys';
+import { platformCorsSettingMutationKeys } from '../mutation-keys';
+import type {
+  PlatformCorsSettingSelect,
+  PlatformCorsSettingWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformCorsSettingSelect,
+  PlatformCorsSettingWithRelations,
+} from '../../orm/input-types';
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformCorsSettingMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformCorsSettingMutation<S extends PlatformCorsSettingSelect>(params: {
-  selection: ({
-    fields: S & PlatformCorsSettingSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>);
-} & Omit<UseMutationOptions<{
-  deletePlatformCorsSetting: {
-    platformCorsSetting: InferSelectResult<PlatformCorsSettingWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePlatformCorsSetting: {
-    platformCorsSetting: InferSelectResult<PlatformCorsSettingWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeletePlatformCorsSettingMutation(params: {
-  selection: SelectionConfig<PlatformCorsSettingSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeletePlatformCorsSettingMutation<S extends PlatformCorsSettingSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformCorsSettingSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deletePlatformCorsSetting: {
+          platformCorsSetting: InferSelectResult<PlatformCorsSettingWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deletePlatformCorsSetting: {
+      platformCorsSetting: InferSelectResult<PlatformCorsSettingWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeletePlatformCorsSettingMutation(
+  params: {
+    selection: SelectionConfig<PlatformCorsSettingSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformCorsSettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformCorsSettingMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().platformCorsSetting.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .platformCorsSetting.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformCorsSettingKeys.detail(variables.id)
+        queryKey: platformCorsSettingKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformCorsSettingKeys.lists()
+        queryKey: platformCorsSettingKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

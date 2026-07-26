@@ -4,20 +4,36 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformResourcesResolvedRequirementKeys } from "../query-keys";
-import type { PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementWithRelations, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementWithRelations, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformResourcesResolvedRequirementKeys } from '../query-keys';
+import type {
+  PlatformResourcesResolvedRequirementSelect,
+  PlatformResourcesResolvedRequirementWithRelations,
+  PlatformResourcesResolvedRequirementFilter,
+  PlatformResourcesResolvedRequirementOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformResourcesResolvedRequirementSelect,
+  PlatformResourcesResolvedRequirementWithRelations,
+  PlatformResourcesResolvedRequirementFilter,
+  PlatformResourcesResolvedRequirementOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
-export const platformResourcesResolvedRequirementsQueryKey = platformResourcesResolvedRequirementKeys.list;
+export const platformResourcesResolvedRequirementsQueryKey =
+  platformResourcesResolvedRequirementKeys.list;
 /**
  * Query hook for fetching PlatformResourcesResolvedRequirement list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourcesResolvedRequirementsQuery({
@@ -30,33 +46,64 @@ export const platformResourcesResolvedRequirementsQueryKey = platformResourcesRe
  * });
  * ```
  */
-export function usePlatformResourcesResolvedRequirementsQuery<S extends PlatformResourcesResolvedRequirementSelect, TData = {
-  platformResourcesResolvedRequirements: ConnectionResult<InferSelectResult<PlatformResourcesResolvedRequirementWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourcesResolvedRequirementSelect>;
-} & Omit<UseQueryOptions<{
-  platformResourcesResolvedRequirements: ConnectionResult<InferSelectResult<PlatformResourcesResolvedRequirementWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformResourcesResolvedRequirementsQuery(params: {
-  selection: ListSelectionConfig<PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformResourcesResolvedRequirementsQuery<
+  S extends PlatformResourcesResolvedRequirementSelect,
+  TData = {
+    platformResourcesResolvedRequirements: ConnectionResult<
+      InferSelectResult<PlatformResourcesResolvedRequirementWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<
+        S,
+        PlatformResourcesResolvedRequirementFilter,
+        PlatformResourcesResolvedRequirementOrderBy
+      >,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformResourcesResolvedRequirementSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformResourcesResolvedRequirements: ConnectionResult<
+          InferSelectResult<PlatformResourcesResolvedRequirementWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformResourcesResolvedRequirementsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformResourcesResolvedRequirementSelect,
+      PlatformResourcesResolvedRequirementFilter,
+      PlatformResourcesResolvedRequirementOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformResourcesResolvedRequirementSelect,
+    PlatformResourcesResolvedRequirementFilter,
+    PlatformResourcesResolvedRequirementOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourcesResolvedRequirementKeys.list(args),
     queryFn: () => getClient().platformResourcesResolvedRequirement.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch PlatformResourcesResolvedRequirement list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformResourcesResolvedRequirementsQuery({
@@ -67,38 +114,82 @@ export function usePlatformResourcesResolvedRequirementsQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformResourcesResolvedRequirementsQuery<S extends PlatformResourcesResolvedRequirementSelect>(params: {
+export async function fetchPlatformResourcesResolvedRequirementsQuery<
+  S extends PlatformResourcesResolvedRequirementSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourcesResolvedRequirementSelect>;
+  } & Omit<
+    ListSelectionConfig<
+      S,
+      PlatformResourcesResolvedRequirementFilter,
+      PlatformResourcesResolvedRequirementOrderBy
+    >,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformResourcesResolvedRequirementSelect>;
 }): Promise<{
-  platformResourcesResolvedRequirements: ConnectionResult<InferSelectResult<PlatformResourcesResolvedRequirementWithRelations, S>>;
+  platformResourcesResolvedRequirements: ConnectionResult<
+    InferSelectResult<PlatformResourcesResolvedRequirementWithRelations, S>
+  >;
 }>;
 export async function fetchPlatformResourcesResolvedRequirementsQuery(params: {
-  selection: ListSelectionConfig<PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformResourcesResolvedRequirementSelect,
+    PlatformResourcesResolvedRequirementFilter,
+    PlatformResourcesResolvedRequirementOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformResourcesResolvedRequirementSelect,
+    PlatformResourcesResolvedRequirementFilter,
+    PlatformResourcesResolvedRequirementOrderBy
+  >(params.selection);
   return getClient().platformResourcesResolvedRequirement.findMany(args).unwrap();
 }
 /**
  * Prefetch PlatformResourcesResolvedRequirement list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformResourcesResolvedRequirementsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformResourcesResolvedRequirementsQuery<S extends PlatformResourcesResolvedRequirementSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourcesResolvedRequirementSelect>;
-}): Promise<void>;
-export async function prefetchPlatformResourcesResolvedRequirementsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformResourcesResolvedRequirementSelect, PlatformResourcesResolvedRequirementFilter, PlatformResourcesResolvedRequirementOrderBy>(params.selection);
+export async function prefetchPlatformResourcesResolvedRequirementsQuery<
+  S extends PlatformResourcesResolvedRequirementSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<
+        S,
+        PlatformResourcesResolvedRequirementFilter,
+        PlatformResourcesResolvedRequirementOrderBy
+      >,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformResourcesResolvedRequirementSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformResourcesResolvedRequirementsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformResourcesResolvedRequirementSelect,
+      PlatformResourcesResolvedRequirementFilter,
+      PlatformResourcesResolvedRequirementOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformResourcesResolvedRequirementSelect,
+    PlatformResourcesResolvedRequirementFilter,
+    PlatformResourcesResolvedRequirementOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourcesResolvedRequirementKeys.list(args),
-    queryFn: () => getClient().platformResourcesResolvedRequirement.findMany(args).unwrap()
+    queryFn: () => getClient().platformResourcesResolvedRequirement.findMany(args).unwrap(),
   });
 }

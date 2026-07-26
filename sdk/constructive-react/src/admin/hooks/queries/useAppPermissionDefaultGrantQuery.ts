@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appPermissionDefaultGrantKeys } from "../query-keys";
-import type { AppPermissionDefaultGrantSelect, AppPermissionDefaultGrantWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppPermissionDefaultGrantSelect, AppPermissionDefaultGrantWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appPermissionDefaultGrantKeys } from '../query-keys';
+import type {
+  AppPermissionDefaultGrantSelect,
+  AppPermissionDefaultGrantWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AppPermissionDefaultGrantSelect,
+  AppPermissionDefaultGrantWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appPermissionDefaultGrantQueryKey = appPermissionDefaultGrantKeys.detail;
 /**
  * Audit log of permission additions and removals from the defaults bitmask
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppPermissionDefaultGrantQuery({
@@ -26,38 +32,55 @@ export const appPermissionDefaultGrantQueryKey = appPermissionDefaultGrantKeys.d
  * });
  * ```
  */
-export function useAppPermissionDefaultGrantQuery<S extends AppPermissionDefaultGrantSelect, TData = {
-  appPermissionDefaultGrant: InferSelectResult<AppPermissionDefaultGrantWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppPermissionDefaultGrantSelect>;
-} & Omit<UseQueryOptions<{
-  appPermissionDefaultGrant: InferSelectResult<AppPermissionDefaultGrantWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppPermissionDefaultGrantQuery(params: {
-  id: string;
-  selection: SelectionConfig<AppPermissionDefaultGrantSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAppPermissionDefaultGrantQuery<
+  S extends AppPermissionDefaultGrantSelect,
+  TData = {
+    appPermissionDefaultGrant: InferSelectResult<AppPermissionDefaultGrantWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppPermissionDefaultGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appPermissionDefaultGrant: InferSelectResult<
+          AppPermissionDefaultGrantWithRelations,
+          S
+        > | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppPermissionDefaultGrantQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AppPermissionDefaultGrantSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AppPermissionDefaultGrantSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appPermissionDefaultGrantKeys.detail(params.id),
-    queryFn: () => getClient().appPermissionDefaultGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .appPermissionDefaultGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Audit log of permission additions and removals from the defaults bitmask
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppPermissionDefaultGrantQuery({
@@ -66,7 +89,9 @@ export function useAppPermissionDefaultGrantQuery(params: {
  * });
  * ```
  */
-export async function fetchAppPermissionDefaultGrantQuery<S extends AppPermissionDefaultGrantSelect>(params: {
+export async function fetchAppPermissionDefaultGrantQuery<
+  S extends AppPermissionDefaultGrantSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +104,48 @@ export async function fetchAppPermissionDefaultGrantQuery(params: {
   selection: SelectionConfig<AppPermissionDefaultGrantSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppPermissionDefaultGrantSelect>(params.selection);
-  return getClient().appPermissionDefaultGrant.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .appPermissionDefaultGrant.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Audit log of permission additions and removals from the defaults bitmask
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppPermissionDefaultGrantQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppPermissionDefaultGrantQuery<S extends AppPermissionDefaultGrantSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppPermissionDefaultGrantSelect>;
-}): Promise<void>;
-export async function prefetchAppPermissionDefaultGrantQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AppPermissionDefaultGrantSelect>;
-}): Promise<void> {
+export async function prefetchAppPermissionDefaultGrantQuery<
+  S extends AppPermissionDefaultGrantSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppPermissionDefaultGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppPermissionDefaultGrantQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AppPermissionDefaultGrantSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AppPermissionDefaultGrantSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appPermissionDefaultGrantKeys.detail(params.id),
-    queryFn: () => getClient().appPermissionDefaultGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .appPermissionDefaultGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

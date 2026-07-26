@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionDeploymentKeys } from "../query-keys";
-import type { FunctionDeploymentSelect, FunctionDeploymentWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionDeploymentSelect, FunctionDeploymentWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionDeploymentKeys } from '../query-keys';
+import type {
+  FunctionDeploymentSelect,
+  FunctionDeploymentWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionDeploymentSelect,
+  FunctionDeploymentWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionDeploymentQueryKey = functionDeploymentKeys.detail;
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionDeploymentQuery({
@@ -26,38 +32,52 @@ export const functionDeploymentQueryKey = functionDeploymentKeys.detail;
  * });
  * ```
  */
-export function useFunctionDeploymentQuery<S extends FunctionDeploymentSelect, TData = {
-  functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionDeploymentSelect>;
-} & Omit<UseQueryOptions<{
-  functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionDeploymentQuery(params: {
-  id: string;
-  selection: SelectionConfig<FunctionDeploymentSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useFunctionDeploymentQuery<
+  S extends FunctionDeploymentSelect,
+  TData = {
+    functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionDeploymentSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionDeploymentQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionDeploymentSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<FunctionDeploymentSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionDeploymentKeys.detail(params.id),
-    queryFn: () => getClient().functionDeployment.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .functionDeployment.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionDeploymentQuery({
@@ -79,35 +99,46 @@ export async function fetchFunctionDeploymentQuery(params: {
   selection: SelectionConfig<FunctionDeploymentSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionDeploymentSelect>(params.selection);
-  return getClient().functionDeployment.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .functionDeployment.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionDeploymentQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionDeploymentQuery<S extends FunctionDeploymentSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionDeploymentSelect>;
-}): Promise<void>;
-export async function prefetchFunctionDeploymentQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<FunctionDeploymentSelect>;
-}): Promise<void> {
+export async function prefetchFunctionDeploymentQuery<S extends FunctionDeploymentSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionDeploymentSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionDeploymentQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionDeploymentSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<FunctionDeploymentSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionDeploymentKeys.detail(params.id),
-    queryFn: () => getClient().functionDeployment.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .functionDeployment.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

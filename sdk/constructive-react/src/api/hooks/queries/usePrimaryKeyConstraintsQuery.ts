@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { primaryKeyConstraintKeys } from "../query-keys";
-import type { PrimaryKeyConstraintSelect, PrimaryKeyConstraintWithRelations, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PrimaryKeyConstraintSelect, PrimaryKeyConstraintWithRelations, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { primaryKeyConstraintKeys } from '../query-keys';
+import type {
+  PrimaryKeyConstraintSelect,
+  PrimaryKeyConstraintWithRelations,
+  PrimaryKeyConstraintFilter,
+  PrimaryKeyConstraintOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PrimaryKeyConstraintSelect,
+  PrimaryKeyConstraintWithRelations,
+  PrimaryKeyConstraintFilter,
+  PrimaryKeyConstraintOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const primaryKeyConstraintsQueryKey = primaryKeyConstraintKeys.list;
 /**
  * Query hook for fetching PrimaryKeyConstraint list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePrimaryKeyConstraintsQuery({
@@ -30,33 +45,60 @@ export const primaryKeyConstraintsQueryKey = primaryKeyConstraintKeys.list;
  * });
  * ```
  */
-export function usePrimaryKeyConstraintsQuery<S extends PrimaryKeyConstraintSelect, TData = {
-  primaryKeyConstraints: ConnectionResult<InferSelectResult<PrimaryKeyConstraintWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrimaryKeyConstraintSelect>;
-} & Omit<UseQueryOptions<{
-  primaryKeyConstraints: ConnectionResult<InferSelectResult<PrimaryKeyConstraintWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePrimaryKeyConstraintsQuery(params: {
-  selection: ListSelectionConfig<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePrimaryKeyConstraintsQuery<
+  S extends PrimaryKeyConstraintSelect,
+  TData = {
+    primaryKeyConstraints: ConnectionResult<
+      InferSelectResult<PrimaryKeyConstraintWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PrimaryKeyConstraintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        primaryKeyConstraints: ConnectionResult<
+          InferSelectResult<PrimaryKeyConstraintWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePrimaryKeyConstraintsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PrimaryKeyConstraintSelect,
+      PrimaryKeyConstraintFilter,
+      PrimaryKeyConstraintOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PrimaryKeyConstraintSelect,
+    PrimaryKeyConstraintFilter,
+    PrimaryKeyConstraintOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: primaryKeyConstraintKeys.list(args),
     queryFn: () => getClient().primaryKeyConstraint.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch PrimaryKeyConstraint list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPrimaryKeyConstraintsQuery({
@@ -67,38 +109,70 @@ export function usePrimaryKeyConstraintsQuery(params: {
  * });
  * ```
  */
-export async function fetchPrimaryKeyConstraintsQuery<S extends PrimaryKeyConstraintSelect>(params: {
+export async function fetchPrimaryKeyConstraintsQuery<
+  S extends PrimaryKeyConstraintSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrimaryKeyConstraintSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PrimaryKeyConstraintSelect>;
 }): Promise<{
   primaryKeyConstraints: ConnectionResult<InferSelectResult<PrimaryKeyConstraintWithRelations, S>>;
 }>;
 export async function fetchPrimaryKeyConstraintsQuery(params: {
-  selection: ListSelectionConfig<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>;
+  selection: ListSelectionConfig<
+    PrimaryKeyConstraintSelect,
+    PrimaryKeyConstraintFilter,
+    PrimaryKeyConstraintOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PrimaryKeyConstraintSelect,
+    PrimaryKeyConstraintFilter,
+    PrimaryKeyConstraintOrderBy
+  >(params.selection);
   return getClient().primaryKeyConstraint.findMany(args).unwrap();
 }
 /**
  * Prefetch PrimaryKeyConstraint list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchPrimaryKeyConstraintsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPrimaryKeyConstraintsQuery<S extends PrimaryKeyConstraintSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrimaryKeyConstraintSelect>;
-}): Promise<void>;
-export async function prefetchPrimaryKeyConstraintsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>(params.selection);
+export async function prefetchPrimaryKeyConstraintsQuery<S extends PrimaryKeyConstraintSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PrimaryKeyConstraintSelect>;
+  }
+): Promise<void>;
+export async function prefetchPrimaryKeyConstraintsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PrimaryKeyConstraintSelect,
+      PrimaryKeyConstraintFilter,
+      PrimaryKeyConstraintOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PrimaryKeyConstraintSelect,
+    PrimaryKeyConstraintFilter,
+    PrimaryKeyConstraintOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: primaryKeyConstraintKeys.list(args),
-    queryFn: () => getClient().primaryKeyConstraint.findMany(args).unwrap()
+    queryFn: () => getClient().primaryKeyConstraint.findMany(args).unwrap(),
   });
 }

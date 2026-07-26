@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appInviteKeys } from "../query-keys";
-import type { AppInviteSelect, AppInviteWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppInviteSelect, AppInviteWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appInviteKeys } from '../query-keys';
+import type { AppInviteSelect, AppInviteWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AppInviteSelect, AppInviteWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appInviteQueryKey = appInviteKeys.detail;
 /**
  * Invitation records sent to prospective members via email, with token-based redemption and expiration
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppInviteQuery({
@@ -26,38 +26,52 @@ export const appInviteQueryKey = appInviteKeys.detail;
  * });
  * ```
  */
-export function useAppInviteQuery<S extends AppInviteSelect, TData = {
-  appInvite: InferSelectResult<AppInviteWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
-} & Omit<UseQueryOptions<{
-  appInvite: InferSelectResult<AppInviteWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppInviteQuery(params: {
-  id: string;
-  selection: SelectionConfig<AppInviteSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAppInviteQuery<
+  S extends AppInviteSelect,
+  TData = {
+    appInvite: InferSelectResult<AppInviteWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appInvite: InferSelectResult<AppInviteWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppInviteQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AppInviteSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AppInviteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appInviteKeys.detail(params.id),
-    queryFn: () => getClient().appInvite.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .appInvite.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Invitation records sent to prospective members via email, with token-based redemption and expiration
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppInviteQuery({
@@ -79,35 +93,46 @@ export async function fetchAppInviteQuery(params: {
   selection: SelectionConfig<AppInviteSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppInviteSelect>(params.selection);
-  return getClient().appInvite.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .appInvite.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Invitation records sent to prospective members via email, with token-based redemption and expiration
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppInviteQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppInviteQuery<S extends AppInviteSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
-}): Promise<void>;
-export async function prefetchAppInviteQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AppInviteSelect>;
-}): Promise<void> {
+export async function prefetchAppInviteQuery<S extends AppInviteSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppInviteQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AppInviteSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AppInviteSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appInviteKeys.detail(params.id),
-    queryFn: () => getClient().appInvite.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .appInvite.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

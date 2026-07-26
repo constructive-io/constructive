@@ -44,11 +44,7 @@ export interface UpdateArgs<TSelect, TWhere, TData> {
   select?: TSelect;
 }
 
-export type FindOneArgs<
-  TSelect,
-  TIdName extends string = 'id',
-  TId = string,
-> = {
+export type FindOneArgs<TSelect, TIdName extends string = 'id', TId = string> = {
   select?: TSelect;
 } & Record<TIdName, TId>;
 
@@ -106,11 +102,7 @@ type DecrementDepth = {
  * NOTE: Depth is intentionally capped to avoid circular-instantiation issues
  * in very large cyclic schemas.
  */
-export type DeepExact<
-  T,
-  Shape,
-  Depth extends DepthLevel = 10,
-> = Depth extends 0
+export type DeepExact<T, Shape, Depth extends DepthLevel = 10> = Depth extends 0
   ? T extends Shape
     ? T
     : never
@@ -124,11 +116,7 @@ export type DeepExact<
                 }
                 ? DeepExact<
                     Omit<T[K], 'select'> & {
-                      select: DeepExact<
-                        NS,
-                        NonNullable<ShapeNS>,
-                        DecrementDepth[Depth]
-                      >;
+                      select: DeepExact<NS, NonNullable<ShapeNS>, DecrementDepth[Depth]>;
                     },
                     Extract<Shape[K], { select?: unknown }>,
                     DecrementDepth[Depth]
@@ -153,9 +141,7 @@ export type StrictSelect<S, Shape> = S extends DeepExact<S, Shape> ? {} : never;
  * Uses a shallower recursion depth to keep editor autocomplete responsive
  * in large schemas while still validating common nested-select mistakes.
  */
-export type HookStrictSelect<S, Shape> = S extends DeepExact<S, Shape, 5>
-  ? {}
-  : never;
+export type HookStrictSelect<S, Shape> = S extends DeepExact<S, Shape, 5> ? {} : never;
 
 /**
  * Infer result type from select configuration

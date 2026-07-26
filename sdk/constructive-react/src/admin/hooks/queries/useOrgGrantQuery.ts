@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgGrantKeys } from "../query-keys";
-import type { OrgGrantSelect, OrgGrantWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgGrantSelect, OrgGrantWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgGrantKeys } from '../query-keys';
+import type { OrgGrantSelect, OrgGrantWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgGrantSelect, OrgGrantWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgGrantQueryKey = orgGrantKeys.detail;
 /**
  * Records of individual permission grants and revocations for members via bitmask
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgGrantQuery({
@@ -26,38 +26,52 @@ export const orgGrantQueryKey = orgGrantKeys.detail;
  * });
  * ```
  */
-export function useOrgGrantQuery<S extends OrgGrantSelect, TData = {
-  orgGrant: InferSelectResult<OrgGrantWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgGrantSelect>;
-} & Omit<UseQueryOptions<{
-  orgGrant: InferSelectResult<OrgGrantWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgGrantQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgGrantSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgGrantQuery<
+  S extends OrgGrantSelect,
+  TData = {
+    orgGrant: InferSelectResult<OrgGrantWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgGrant: InferSelectResult<OrgGrantWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgGrantQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgGrantSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgGrantSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgGrantKeys.detail(params.id),
-    queryFn: () => getClient().orgGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Records of individual permission grants and revocations for members via bitmask
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgGrantQuery({
@@ -79,35 +93,46 @@ export async function fetchOrgGrantQuery(params: {
   selection: SelectionConfig<OrgGrantSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgGrantSelect>(params.selection);
-  return getClient().orgGrant.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgGrant.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Records of individual permission grants and revocations for members via bitmask
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgGrantQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgGrantQuery<S extends OrgGrantSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgGrantSelect>;
-}): Promise<void>;
-export async function prefetchOrgGrantQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgGrantSelect>;
-}): Promise<void> {
+export async function prefetchOrgGrantQuery<S extends OrgGrantSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgGrantQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgGrantSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgGrantSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgGrantKeys.detail(params.id),
-    queryFn: () => getClient().orgGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

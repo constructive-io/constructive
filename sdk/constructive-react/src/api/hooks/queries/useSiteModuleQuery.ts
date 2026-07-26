@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { siteModuleKeys } from "../query-keys";
-import type { SiteModuleSelect, SiteModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { SiteModuleSelect, SiteModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { siteModuleKeys } from '../query-keys';
+import type { SiteModuleSelect, SiteModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { SiteModuleSelect, SiteModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const siteModuleQueryKey = siteModuleKeys.detail;
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSiteModuleQuery({
@@ -26,38 +26,52 @@ export const siteModuleQueryKey = siteModuleKeys.detail;
  * });
  * ```
  */
-export function useSiteModuleQuery<S extends SiteModuleSelect, TData = {
-  siteModule: InferSelectResult<SiteModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SiteModuleSelect>;
-} & Omit<UseQueryOptions<{
-  siteModule: InferSelectResult<SiteModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSiteModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<SiteModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSiteModuleQuery<
+  S extends SiteModuleSelect,
+  TData = {
+    siteModule: InferSelectResult<SiteModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SiteModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        siteModule: InferSelectResult<SiteModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSiteModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<SiteModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<SiteModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: siteModuleKeys.detail(params.id),
-    queryFn: () => getClient().siteModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .siteModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSiteModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchSiteModuleQuery(params: {
   selection: SelectionConfig<SiteModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SiteModuleSelect>(params.selection);
-  return getClient().siteModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .siteModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```ts
  * await prefetchSiteModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSiteModuleQuery<S extends SiteModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SiteModuleSelect>;
-}): Promise<void>;
-export async function prefetchSiteModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<SiteModuleSelect>;
-}): Promise<void> {
+export async function prefetchSiteModuleQuery<S extends SiteModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SiteModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchSiteModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<SiteModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<SiteModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: siteModuleKeys.detail(params.id),
-    queryFn: () => getClient().siteModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .siteModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

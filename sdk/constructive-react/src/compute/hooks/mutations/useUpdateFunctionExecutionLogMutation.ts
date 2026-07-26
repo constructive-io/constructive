@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionExecutionLogKeys } from "../query-keys";
-import { functionExecutionLogMutationKeys } from "../mutation-keys";
-import type { FunctionExecutionLogSelect, FunctionExecutionLogWithRelations, FunctionExecutionLogPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionExecutionLogSelect, FunctionExecutionLogWithRelations, FunctionExecutionLogPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionExecutionLogKeys } from '../query-keys';
+import { functionExecutionLogMutationKeys } from '../mutation-keys';
+import type {
+  FunctionExecutionLogSelect,
+  FunctionExecutionLogWithRelations,
+  FunctionExecutionLogPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionExecutionLogSelect,
+  FunctionExecutionLogWithRelations,
+  FunctionExecutionLogPatch,
+} from '../../orm/input-types';
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionExecutionLogMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', functionExecutionLogPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionExecutionLogMutation<S extends FunctionExecutionLogSelect>(params: {
-  selection: ({
-    fields: S & FunctionExecutionLogSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>);
-} & Omit<UseMutationOptions<{
-  updateFunctionExecutionLog: {
-    functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  functionExecutionLogPatch: FunctionExecutionLogPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateFunctionExecutionLog: {
-    functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  functionExecutionLogPatch: FunctionExecutionLogPatch;
-}>;
-export function useUpdateFunctionExecutionLogMutation(params: {
-  selection: SelectionConfig<FunctionExecutionLogSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  functionExecutionLogPatch: FunctionExecutionLogPatch;
-}>, "mutationFn">) {
+export function useUpdateFunctionExecutionLogMutation<S extends FunctionExecutionLogSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionExecutionLogSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateFunctionExecutionLog: {
+          functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        functionExecutionLogPatch: FunctionExecutionLogPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateFunctionExecutionLog: {
+      functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    functionExecutionLogPatch: FunctionExecutionLogPatch;
+  }
+>;
+export function useUpdateFunctionExecutionLogMutation(
+  params: {
+    selection: SelectionConfig<FunctionExecutionLogSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        functionExecutionLogPatch: FunctionExecutionLogPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionExecutionLogSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdateFunctionExecutionLogMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      functionExecutionLogPatch
+      functionExecutionLogPatch,
     }: {
       id: string;
       createdAt: string;
       functionExecutionLogPatch: FunctionExecutionLogPatch;
-    }) => getClient().functionExecutionLog.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: functionExecutionLogPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .functionExecutionLog.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: functionExecutionLogPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionExecutionLogKeys.detail(variables.id)
+        queryKey: functionExecutionLogKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionExecutionLogKeys.lists()
+        queryKey: functionExecutionLogKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

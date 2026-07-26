@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformDomainEventKeys } from "../query-keys";
-import { platformDomainEventMutationKeys } from "../mutation-keys";
-import type { PlatformDomainEventSelect, PlatformDomainEventWithRelations, PlatformDomainEventPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformDomainEventSelect, PlatformDomainEventWithRelations, PlatformDomainEventPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformDomainEventKeys } from '../query-keys';
+import { platformDomainEventMutationKeys } from '../mutation-keys';
+import type {
+  PlatformDomainEventSelect,
+  PlatformDomainEventWithRelations,
+  PlatformDomainEventPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformDomainEventSelect,
+  PlatformDomainEventWithRelations,
+  PlatformDomainEventPatch,
+} from '../../orm/input-types';
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformDomainEventMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformDomainEventPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformDomainEventMutation<S extends PlatformDomainEventSelect>(params: {
-  selection: ({
-    fields: S & PlatformDomainEventSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformDomainEvent: {
-    platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformDomainEventPatch: PlatformDomainEventPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformDomainEvent: {
-    platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformDomainEventPatch: PlatformDomainEventPatch;
-}>;
-export function useUpdatePlatformDomainEventMutation(params: {
-  selection: SelectionConfig<PlatformDomainEventSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  platformDomainEventPatch: PlatformDomainEventPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformDomainEventMutation<S extends PlatformDomainEventSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformDomainEventSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformDomainEvent: {
+          platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        platformDomainEventPatch: PlatformDomainEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformDomainEvent: {
+      platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    platformDomainEventPatch: PlatformDomainEventPatch;
+  }
+>;
+export function useUpdatePlatformDomainEventMutation(
+  params: {
+    selection: SelectionConfig<PlatformDomainEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        platformDomainEventPatch: PlatformDomainEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformDomainEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformDomainEventMutationKeys.all,
     mutationFn: ({
       id,
-      platformDomainEventPatch
+      platformDomainEventPatch,
     }: {
       id: string;
       platformDomainEventPatch: PlatformDomainEventPatch;
-    }) => getClient().platformDomainEvent.update({
-      where: {
-        id
-      },
-      data: platformDomainEventPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformDomainEvent.update({
+          where: {
+            id,
+          },
+          data: platformDomainEventPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformDomainEventKeys.detail(variables.id)
+        queryKey: platformDomainEventKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformDomainEventKeys.lists()
+        queryKey: platformDomainEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

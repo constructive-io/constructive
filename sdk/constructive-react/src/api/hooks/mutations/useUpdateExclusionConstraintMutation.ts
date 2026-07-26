@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { exclusionConstraintKeys } from "../query-keys";
-import { exclusionConstraintMutationKeys } from "../mutation-keys";
-import type { ExclusionConstraintSelect, ExclusionConstraintWithRelations, ExclusionConstraintPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ExclusionConstraintSelect, ExclusionConstraintWithRelations, ExclusionConstraintPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { exclusionConstraintKeys } from '../query-keys';
+import { exclusionConstraintMutationKeys } from '../mutation-keys';
+import type {
+  ExclusionConstraintSelect,
+  ExclusionConstraintWithRelations,
+  ExclusionConstraintPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ExclusionConstraintSelect,
+  ExclusionConstraintWithRelations,
+  ExclusionConstraintPatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a ExclusionConstraint
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateExclusionConstraintMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', exclusionConstraintPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateExclusionConstraintMutation<S extends ExclusionConstraintSelect>(params: {
-  selection: ({
-    fields: S & ExclusionConstraintSelect;
-  } & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>);
-} & Omit<UseMutationOptions<{
-  updateExclusionConstraint: {
-    exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  exclusionConstraintPatch: ExclusionConstraintPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateExclusionConstraint: {
-    exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  exclusionConstraintPatch: ExclusionConstraintPatch;
-}>;
-export function useUpdateExclusionConstraintMutation(params: {
-  selection: SelectionConfig<ExclusionConstraintSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  exclusionConstraintPatch: ExclusionConstraintPatch;
-}>, "mutationFn">) {
+export function useUpdateExclusionConstraintMutation<S extends ExclusionConstraintSelect>(
+  params: {
+    selection: {
+      fields: S & ExclusionConstraintSelect;
+    } & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateExclusionConstraint: {
+          exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        exclusionConstraintPatch: ExclusionConstraintPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateExclusionConstraint: {
+      exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    exclusionConstraintPatch: ExclusionConstraintPatch;
+  }
+>;
+export function useUpdateExclusionConstraintMutation(
+  params: {
+    selection: SelectionConfig<ExclusionConstraintSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        exclusionConstraintPatch: ExclusionConstraintPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<ExclusionConstraintSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: exclusionConstraintMutationKeys.all,
     mutationFn: ({
       id,
-      exclusionConstraintPatch
+      exclusionConstraintPatch,
     }: {
       id: string;
       exclusionConstraintPatch: ExclusionConstraintPatch;
-    }) => getClient().exclusionConstraint.update({
-      where: {
-        id
-      },
-      data: exclusionConstraintPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .exclusionConstraint.update({
+          where: {
+            id,
+          },
+          data: exclusionConstraintPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: exclusionConstraintKeys.detail(variables.id)
+        queryKey: exclusionConstraintKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: exclusionConstraintKeys.lists()
+        queryKey: exclusionConstraintKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

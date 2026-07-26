@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgLimitEventKeys } from "../query-keys";
-import { orgLimitEventMutationKeys } from "../mutation-keys";
-import type { OrgLimitEventSelect, OrgLimitEventWithRelations, OrgLimitEventPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitEventSelect, OrgLimitEventWithRelations, OrgLimitEventPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgLimitEventKeys } from '../query-keys';
+import { orgLimitEventMutationKeys } from '../mutation-keys';
+import type {
+  OrgLimitEventSelect,
+  OrgLimitEventWithRelations,
+  OrgLimitEventPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  OrgLimitEventSelect,
+  OrgLimitEventWithRelations,
+  OrgLimitEventPatch,
+} from '../../orm/input-types';
 /**
  * Append-only log of limit events for historical reporting and audit
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateOrgLimitEventMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', orgLimitEventPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateOrgLimitEventMutation<S extends OrgLimitEventSelect>(params: {
-  selection: ({
-    fields: S & OrgLimitEventSelect;
-  } & HookStrictSelect<NoInfer<S>, OrgLimitEventSelect>);
-} & Omit<UseMutationOptions<{
-  updateOrgLimitEvent: {
-    orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  orgLimitEventPatch: OrgLimitEventPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateOrgLimitEvent: {
-    orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  orgLimitEventPatch: OrgLimitEventPatch;
-}>;
-export function useUpdateOrgLimitEventMutation(params: {
-  selection: SelectionConfig<OrgLimitEventSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  orgLimitEventPatch: OrgLimitEventPatch;
-}>, "mutationFn">) {
+export function useUpdateOrgLimitEventMutation<S extends OrgLimitEventSelect>(
+  params: {
+    selection: {
+      fields: S & OrgLimitEventSelect;
+    } & HookStrictSelect<NoInfer<S>, OrgLimitEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateOrgLimitEvent: {
+          orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        orgLimitEventPatch: OrgLimitEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateOrgLimitEvent: {
+      orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    orgLimitEventPatch: OrgLimitEventPatch;
+  }
+>;
+export function useUpdateOrgLimitEventMutation(
+  params: {
+    selection: SelectionConfig<OrgLimitEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        orgLimitEventPatch: OrgLimitEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<OrgLimitEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdateOrgLimitEventMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      orgLimitEventPatch
+      orgLimitEventPatch,
     }: {
       id: string;
       createdAt: string;
       orgLimitEventPatch: OrgLimitEventPatch;
-    }) => getClient().orgLimitEvent.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: orgLimitEventPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .orgLimitEvent.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: orgLimitEventPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: orgLimitEventKeys.detail(variables.id)
+        queryKey: orgLimitEventKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: orgLimitEventKeys.lists()
+        queryKey: orgLimitEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

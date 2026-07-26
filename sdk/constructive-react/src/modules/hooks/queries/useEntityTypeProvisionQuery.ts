@@ -11,15 +11,21 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { entityTypeProvisionKeys } from "../query-keys";
-import type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { entityTypeProvisionKeys } from '../query-keys';
+import type {
+  EntityTypeProvisionSelect,
+  EntityTypeProvisionWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  EntityTypeProvisionSelect,
+  EntityTypeProvisionWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const entityTypeProvisionQueryKey = entityTypeProvisionKeys.detail;
 /**
@@ -40,33 +46,47 @@ export const entityTypeProvisionQueryKey = entityTypeProvisionKeys.detail;
  * });
  * ```
  */
-export function useEntityTypeProvisionQuery<S extends EntityTypeProvisionSelect, TData = {
-  entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
-} & Omit<UseQueryOptions<{
-  entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useEntityTypeProvisionQuery(params: {
-  id: string;
-  selection: SelectionConfig<EntityTypeProvisionSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useEntityTypeProvisionQuery<
+  S extends EntityTypeProvisionSelect,
+  TData = {
+    entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useEntityTypeProvisionQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<EntityTypeProvisionSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<EntityTypeProvisionSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: entityTypeProvisionKeys.detail(params.id),
-    queryFn: () => getClient().entityTypeProvision.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .entityTypeProvision.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
@@ -100,10 +120,12 @@ export async function fetchEntityTypeProvisionQuery(params: {
   selection: SelectionConfig<EntityTypeProvisionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<EntityTypeProvisionSelect>(params.selection);
-  return getClient().entityTypeProvision.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .entityTypeProvision.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
@@ -120,22 +142,31 @@ export async function fetchEntityTypeProvisionQuery(params: {
  * await prefetchEntityTypeProvisionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchEntityTypeProvisionQuery<S extends EntityTypeProvisionSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
-}): Promise<void>;
-export async function prefetchEntityTypeProvisionQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<EntityTypeProvisionSelect>;
-}): Promise<void> {
+export async function prefetchEntityTypeProvisionQuery<S extends EntityTypeProvisionSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
+  }
+): Promise<void>;
+export async function prefetchEntityTypeProvisionQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<EntityTypeProvisionSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<EntityTypeProvisionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: entityTypeProvisionKeys.detail(params.id),
-    queryFn: () => getClient().entityTypeProvision.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .entityTypeProvision.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

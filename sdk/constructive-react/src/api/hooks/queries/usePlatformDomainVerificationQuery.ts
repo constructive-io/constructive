@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformDomainVerificationKeys } from "../query-keys";
-import type { PlatformDomainVerificationSelect, PlatformDomainVerificationWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformDomainVerificationSelect, PlatformDomainVerificationWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformDomainVerificationKeys } from '../query-keys';
+import type {
+  PlatformDomainVerificationSelect,
+  PlatformDomainVerificationWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformDomainVerificationSelect,
+  PlatformDomainVerificationWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformDomainVerificationQueryKey = platformDomainVerificationKeys.detail;
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformDomainVerificationQuery({
@@ -26,38 +32,58 @@ export const platformDomainVerificationQueryKey = platformDomainVerificationKeys
  * });
  * ```
  */
-export function usePlatformDomainVerificationQuery<S extends PlatformDomainVerificationSelect, TData = {
-  platformDomainVerification: InferSelectResult<PlatformDomainVerificationWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainVerificationSelect>;
-} & Omit<UseQueryOptions<{
-  platformDomainVerification: InferSelectResult<PlatformDomainVerificationWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformDomainVerificationQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformDomainVerificationSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformDomainVerificationQuery<
+  S extends PlatformDomainVerificationSelect,
+  TData = {
+    platformDomainVerification: InferSelectResult<
+      PlatformDomainVerificationWithRelations,
+      S
+    > | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainVerificationSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformDomainVerification: InferSelectResult<
+          PlatformDomainVerificationWithRelations,
+          S
+        > | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformDomainVerificationQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformDomainVerificationSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformDomainVerificationSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformDomainVerificationKeys.detail(params.id),
-    queryFn: () => getClient().platformDomainVerification.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformDomainVerification.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformDomainVerificationQuery({
@@ -66,7 +92,9 @@ export function usePlatformDomainVerificationQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformDomainVerificationQuery<S extends PlatformDomainVerificationSelect>(params: {
+export async function fetchPlatformDomainVerificationQuery<
+  S extends PlatformDomainVerificationSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +107,48 @@ export async function fetchPlatformDomainVerificationQuery(params: {
   selection: SelectionConfig<PlatformDomainVerificationSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformDomainVerificationSelect>(params.selection);
-  return getClient().platformDomainVerification.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformDomainVerification.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformDomainVerificationQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformDomainVerificationQuery<S extends PlatformDomainVerificationSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainVerificationSelect>;
-}): Promise<void>;
-export async function prefetchPlatformDomainVerificationQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformDomainVerificationSelect>;
-}): Promise<void> {
+export async function prefetchPlatformDomainVerificationQuery<
+  S extends PlatformDomainVerificationSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainVerificationSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformDomainVerificationQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformDomainVerificationSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformDomainVerificationSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformDomainVerificationKeys.detail(params.id),
-    queryFn: () => getClient().platformDomainVerification.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformDomainVerification.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

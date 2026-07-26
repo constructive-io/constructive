@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { managedDomainKeys } from "../query-keys";
-import { managedDomainMutationKeys } from "../mutation-keys";
-import type { ManagedDomainSelect, ManagedDomainWithRelations, CreateManagedDomainInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ManagedDomainSelect, ManagedDomainWithRelations, CreateManagedDomainInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { managedDomainKeys } from '../query-keys';
+import { managedDomainMutationKeys } from '../mutation-keys';
+import type {
+  ManagedDomainSelect,
+  ManagedDomainWithRelations,
+  CreateManagedDomainInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ManagedDomainSelect,
+  ManagedDomainWithRelations,
+  CreateManagedDomainInput,
+} from '../../orm/input-types';
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateManagedDomainMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateManagedDomainMutation<S extends ManagedDomainSelect>(params: {
-  selection: ({
-    fields: S & ManagedDomainSelect;
-  } & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>);
-} & Omit<UseMutationOptions<{
-  createManagedDomain: {
-    managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
-  };
-}, Error, CreateManagedDomainInput["managedDomain"]>, "mutationFn">): UseMutationResult<{
-  createManagedDomain: {
-    managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
-  };
-}, Error, CreateManagedDomainInput["managedDomain"]>;
-export function useCreateManagedDomainMutation(params: {
-  selection: SelectionConfig<ManagedDomainSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateManagedDomainInput["managedDomain"]>, "mutationFn">) {
+export function useCreateManagedDomainMutation<S extends ManagedDomainSelect>(
+  params: {
+    selection: {
+      fields: S & ManagedDomainSelect;
+    } & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createManagedDomain: {
+          managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
+        };
+      },
+      Error,
+      CreateManagedDomainInput['managedDomain']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createManagedDomain: {
+      managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
+    };
+  },
+  Error,
+  CreateManagedDomainInput['managedDomain']
+>;
+export function useCreateManagedDomainMutation(
+  params: {
+    selection: SelectionConfig<ManagedDomainSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateManagedDomainInput['managedDomain']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<ManagedDomainSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: managedDomainMutationKeys.create(),
-    mutationFn: (data: CreateManagedDomainInput["managedDomain"]) => getClient().managedDomain.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateManagedDomainInput['managedDomain']) =>
+      getClient()
+        .managedDomain.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: managedDomainKeys.lists()
+        queryKey: managedDomainKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

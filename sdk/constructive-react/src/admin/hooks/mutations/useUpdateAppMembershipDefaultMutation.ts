@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appMembershipDefaultKeys } from "../query-keys";
-import { appMembershipDefaultMutationKeys } from "../mutation-keys";
-import type { AppMembershipDefaultSelect, AppMembershipDefaultWithRelations, AppMembershipDefaultPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppMembershipDefaultSelect, AppMembershipDefaultWithRelations, AppMembershipDefaultPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appMembershipDefaultKeys } from '../query-keys';
+import { appMembershipDefaultMutationKeys } from '../mutation-keys';
+import type {
+  AppMembershipDefaultSelect,
+  AppMembershipDefaultWithRelations,
+  AppMembershipDefaultPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AppMembershipDefaultSelect,
+  AppMembershipDefaultWithRelations,
+  AppMembershipDefaultPatch,
+} from '../../orm/input-types';
 /**
  * Default membership settings per entity, controlling initial approval and verification state for new members
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAppMembershipDefaultMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', appMembershipDefaultPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAppMembershipDefaultMutation<S extends AppMembershipDefaultSelect>(params: {
-  selection: ({
-    fields: S & AppMembershipDefaultSelect;
-  } & HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>);
-} & Omit<UseMutationOptions<{
-  updateAppMembershipDefault: {
-    appMembershipDefault: InferSelectResult<AppMembershipDefaultWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  appMembershipDefaultPatch: AppMembershipDefaultPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateAppMembershipDefault: {
-    appMembershipDefault: InferSelectResult<AppMembershipDefaultWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  appMembershipDefaultPatch: AppMembershipDefaultPatch;
-}>;
-export function useUpdateAppMembershipDefaultMutation(params: {
-  selection: SelectionConfig<AppMembershipDefaultSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  appMembershipDefaultPatch: AppMembershipDefaultPatch;
-}>, "mutationFn">) {
+export function useUpdateAppMembershipDefaultMutation<S extends AppMembershipDefaultSelect>(
+  params: {
+    selection: {
+      fields: S & AppMembershipDefaultSelect;
+    } & HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateAppMembershipDefault: {
+          appMembershipDefault: InferSelectResult<AppMembershipDefaultWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        appMembershipDefaultPatch: AppMembershipDefaultPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateAppMembershipDefault: {
+      appMembershipDefault: InferSelectResult<AppMembershipDefaultWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    appMembershipDefaultPatch: AppMembershipDefaultPatch;
+  }
+>;
+export function useUpdateAppMembershipDefaultMutation(
+  params: {
+    selection: SelectionConfig<AppMembershipDefaultSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        appMembershipDefaultPatch: AppMembershipDefaultPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AppMembershipDefaultSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: appMembershipDefaultMutationKeys.all,
     mutationFn: ({
       id,
-      appMembershipDefaultPatch
+      appMembershipDefaultPatch,
     }: {
       id: string;
       appMembershipDefaultPatch: AppMembershipDefaultPatch;
-    }) => getClient().appMembershipDefault.update({
-      where: {
-        id
-      },
-      data: appMembershipDefaultPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .appMembershipDefault.update({
+          where: {
+            id,
+          },
+          data: appMembershipDefaultPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: appMembershipDefaultKeys.detail(variables.id)
+        queryKey: appMembershipDefaultKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: appMembershipDefaultKeys.lists()
+        queryKey: appMembershipDefaultKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

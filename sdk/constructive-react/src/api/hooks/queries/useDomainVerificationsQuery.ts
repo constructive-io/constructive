@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { domainVerificationKeys } from "../query-keys";
-import type { DomainVerificationSelect, DomainVerificationWithRelations, DomainVerificationFilter, DomainVerificationOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainVerificationSelect, DomainVerificationWithRelations, DomainVerificationFilter, DomainVerificationOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { domainVerificationKeys } from '../query-keys';
+import type {
+  DomainVerificationSelect,
+  DomainVerificationWithRelations,
+  DomainVerificationFilter,
+  DomainVerificationOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DomainVerificationSelect,
+  DomainVerificationWithRelations,
+  DomainVerificationFilter,
+  DomainVerificationOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const domainVerificationsQueryKey = domainVerificationKeys.list;
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDomainVerificationsQuery({
@@ -30,33 +45,58 @@ export const domainVerificationsQueryKey = domainVerificationKeys.list;
  * });
  * ```
  */
-export function useDomainVerificationsQuery<S extends DomainVerificationSelect, TData = {
-  domainVerifications: ConnectionResult<InferSelectResult<DomainVerificationWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DomainVerificationFilter, DomainVerificationOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
-} & Omit<UseQueryOptions<{
-  domainVerifications: ConnectionResult<InferSelectResult<DomainVerificationWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDomainVerificationsQuery(params: {
-  selection: ListSelectionConfig<DomainVerificationSelect, DomainVerificationFilter, DomainVerificationOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<DomainVerificationSelect, DomainVerificationFilter, DomainVerificationOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useDomainVerificationsQuery<
+  S extends DomainVerificationSelect,
+  TData = {
+    domainVerifications: ConnectionResult<InferSelectResult<DomainVerificationWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, DomainVerificationFilter, DomainVerificationOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        domainVerifications: ConnectionResult<
+          InferSelectResult<DomainVerificationWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDomainVerificationsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      DomainVerificationSelect,
+      DomainVerificationFilter,
+      DomainVerificationOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    DomainVerificationSelect,
+    DomainVerificationFilter,
+    DomainVerificationOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: domainVerificationKeys.list(args),
     queryFn: () => getClient().domainVerification.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDomainVerificationsQuery({
@@ -70,35 +110,62 @@ export function useDomainVerificationsQuery(params: {
 export async function fetchDomainVerificationsQuery<S extends DomainVerificationSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DomainVerificationFilter, DomainVerificationOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
+  } & Omit<ListSelectionConfig<S, DomainVerificationFilter, DomainVerificationOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
 }): Promise<{
   domainVerifications: ConnectionResult<InferSelectResult<DomainVerificationWithRelations, S>>;
 }>;
 export async function fetchDomainVerificationsQuery(params: {
-  selection: ListSelectionConfig<DomainVerificationSelect, DomainVerificationFilter, DomainVerificationOrderBy>;
+  selection: ListSelectionConfig<
+    DomainVerificationSelect,
+    DomainVerificationFilter,
+    DomainVerificationOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<DomainVerificationSelect, DomainVerificationFilter, DomainVerificationOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    DomainVerificationSelect,
+    DomainVerificationFilter,
+    DomainVerificationOrderBy
+  >(params.selection);
   return getClient().domainVerification.findMany(args).unwrap();
 }
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```ts
  * await prefetchDomainVerificationsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDomainVerificationsQuery<S extends DomainVerificationSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DomainVerificationFilter, DomainVerificationOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
-}): Promise<void>;
-export async function prefetchDomainVerificationsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DomainVerificationSelect, DomainVerificationFilter, DomainVerificationOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<DomainVerificationSelect, DomainVerificationFilter, DomainVerificationOrderBy>(params.selection);
+export async function prefetchDomainVerificationsQuery<S extends DomainVerificationSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, DomainVerificationFilter, DomainVerificationOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, DomainVerificationSelect>;
+  }
+): Promise<void>;
+export async function prefetchDomainVerificationsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      DomainVerificationSelect,
+      DomainVerificationFilter,
+      DomainVerificationOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    DomainVerificationSelect,
+    DomainVerificationFilter,
+    DomainVerificationOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: domainVerificationKeys.list(args),
-    queryFn: () => getClient().domainVerification.findMany(args).unwrap()
+    queryFn: () => getClient().domainVerification.findMany(args).unwrap(),
   });
 }

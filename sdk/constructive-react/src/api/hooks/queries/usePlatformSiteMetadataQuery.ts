@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformSiteMetadatumKeys } from "../query-keys";
-import type { PlatformSiteMetadatumSelect, PlatformSiteMetadatumWithRelations, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteMetadatumSelect, PlatformSiteMetadatumWithRelations, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformSiteMetadatumKeys } from '../query-keys';
+import type {
+  PlatformSiteMetadatumSelect,
+  PlatformSiteMetadatumWithRelations,
+  PlatformSiteMetadatumFilter,
+  PlatformSiteMetadatumOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformSiteMetadatumSelect,
+  PlatformSiteMetadatumWithRelations,
+  PlatformSiteMetadatumFilter,
+  PlatformSiteMetadatumOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformSiteMetadataQueryKey = platformSiteMetadatumKeys.list;
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformSiteMetadataQuery({
@@ -30,33 +45,60 @@ export const platformSiteMetadataQueryKey = platformSiteMetadatumKeys.list;
  * });
  * ```
  */
-export function usePlatformSiteMetadataQuery<S extends PlatformSiteMetadatumSelect, TData = {
-  platformSiteMetadata: ConnectionResult<InferSelectResult<PlatformSiteMetadatumWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
-} & Omit<UseQueryOptions<{
-  platformSiteMetadata: ConnectionResult<InferSelectResult<PlatformSiteMetadatumWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformSiteMetadataQuery(params: {
-  selection: ListSelectionConfig<PlatformSiteMetadatumSelect, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformSiteMetadatumSelect, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformSiteMetadataQuery<
+  S extends PlatformSiteMetadatumSelect,
+  TData = {
+    platformSiteMetadata: ConnectionResult<
+      InferSelectResult<PlatformSiteMetadatumWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformSiteMetadata: ConnectionResult<
+          InferSelectResult<PlatformSiteMetadatumWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformSiteMetadataQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformSiteMetadatumSelect,
+      PlatformSiteMetadatumFilter,
+      PlatformSiteMetadatumOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformSiteMetadatumSelect,
+    PlatformSiteMetadatumFilter,
+    PlatformSiteMetadatumOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformSiteMetadatumKeys.list(args),
     queryFn: () => getClient().platformSiteMetadatum.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformSiteMetadataQuery({
@@ -67,38 +109,70 @@ export function usePlatformSiteMetadataQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformSiteMetadataQuery<S extends PlatformSiteMetadatumSelect>(params: {
+export async function fetchPlatformSiteMetadataQuery<
+  S extends PlatformSiteMetadatumSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
 }): Promise<{
   platformSiteMetadata: ConnectionResult<InferSelectResult<PlatformSiteMetadatumWithRelations, S>>;
 }>;
 export async function fetchPlatformSiteMetadataQuery(params: {
-  selection: ListSelectionConfig<PlatformSiteMetadatumSelect, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformSiteMetadatumSelect,
+    PlatformSiteMetadatumFilter,
+    PlatformSiteMetadatumOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformSiteMetadatumSelect, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformSiteMetadatumSelect,
+    PlatformSiteMetadatumFilter,
+    PlatformSiteMetadatumOrderBy
+  >(params.selection);
   return getClient().platformSiteMetadatum.findMany(args).unwrap();
 }
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformSiteMetadataQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformSiteMetadataQuery<S extends PlatformSiteMetadatumSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
-}): Promise<void>;
-export async function prefetchPlatformSiteMetadataQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformSiteMetadatumSelect, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformSiteMetadatumSelect, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>(params.selection);
+export async function prefetchPlatformSiteMetadataQuery<S extends PlatformSiteMetadatumSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformSiteMetadatumFilter, PlatformSiteMetadatumOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformSiteMetadataQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformSiteMetadatumSelect,
+      PlatformSiteMetadatumFilter,
+      PlatformSiteMetadatumOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformSiteMetadatumSelect,
+    PlatformSiteMetadatumFilter,
+    PlatformSiteMetadatumOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformSiteMetadatumKeys.list(args),
-    queryFn: () => getClient().platformSiteMetadatum.findMany(args).unwrap()
+    queryFn: () => getClient().platformSiteMetadatum.findMany(args).unwrap(),
   });
 }

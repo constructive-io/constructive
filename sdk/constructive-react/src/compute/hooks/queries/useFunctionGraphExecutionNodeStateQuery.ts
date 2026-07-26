@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionGraphExecutionNodeStateKeys } from "../query-keys";
-import type { FunctionGraphExecutionNodeStateSelect, FunctionGraphExecutionNodeStateWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphExecutionNodeStateSelect, FunctionGraphExecutionNodeStateWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionGraphExecutionNodeStateKeys } from '../query-keys';
+import type {
+  FunctionGraphExecutionNodeStateSelect,
+  FunctionGraphExecutionNodeStateWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionGraphExecutionNodeStateSelect,
+  FunctionGraphExecutionNodeStateWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphExecutionNodeStateQueryKey = functionGraphExecutionNodeStateKeys.detail;
 /**
  * Per-node execution state — tracks individual node lifecycle for debugging
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphExecutionNodeStateQuery({
@@ -26,38 +32,58 @@ export const functionGraphExecutionNodeStateQueryKey = functionGraphExecutionNod
  * });
  * ```
  */
-export function useFunctionGraphExecutionNodeStateQuery<S extends FunctionGraphExecutionNodeStateSelect, TData = {
-  functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
-} & Omit<UseQueryOptions<{
-  functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionGraphExecutionNodeStateQuery(params: {
-  id: string;
-  selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useFunctionGraphExecutionNodeStateQuery<
+  S extends FunctionGraphExecutionNodeStateSelect,
+  TData = {
+    functionGraphExecutionNodeState: InferSelectResult<
+      FunctionGraphExecutionNodeStateWithRelations,
+      S
+    > | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionGraphExecutionNodeState: InferSelectResult<
+          FunctionGraphExecutionNodeStateWithRelations,
+          S
+        > | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionGraphExecutionNodeStateQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<FunctionGraphExecutionNodeStateSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphExecutionNodeStateKeys.detail(params.id),
-    queryFn: () => getClient().functionGraphExecutionNodeState.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .functionGraphExecutionNodeState.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Per-node execution state — tracks individual node lifecycle for debugging
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionGraphExecutionNodeStateQuery({
@@ -66,48 +92,66 @@ export function useFunctionGraphExecutionNodeStateQuery(params: {
  * });
  * ```
  */
-export async function fetchFunctionGraphExecutionNodeStateQuery<S extends FunctionGraphExecutionNodeStateSelect>(params: {
+export async function fetchFunctionGraphExecutionNodeStateQuery<
+  S extends FunctionGraphExecutionNodeStateSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
   } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
 }): Promise<{
-  functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S> | null;
+  functionGraphExecutionNodeState: InferSelectResult<
+    FunctionGraphExecutionNodeStateWithRelations,
+    S
+  > | null;
 }>;
 export async function fetchFunctionGraphExecutionNodeStateQuery(params: {
   id: string;
   selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionGraphExecutionNodeStateSelect>(params.selection);
-  return getClient().functionGraphExecutionNodeState.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .functionGraphExecutionNodeState.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Per-node execution state — tracks individual node lifecycle for debugging
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionGraphExecutionNodeStateQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionGraphExecutionNodeStateQuery<S extends FunctionGraphExecutionNodeStateSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
-}): Promise<void>;
-export async function prefetchFunctionGraphExecutionNodeStateQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
-}): Promise<void> {
+export async function prefetchFunctionGraphExecutionNodeStateQuery<
+  S extends FunctionGraphExecutionNodeStateSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionGraphExecutionNodeStateQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<FunctionGraphExecutionNodeStateSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphExecutionNodeStateKeys.detail(params.id),
-    queryFn: () => getClient().functionGraphExecutionNodeState.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .functionGraphExecutionNodeState.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

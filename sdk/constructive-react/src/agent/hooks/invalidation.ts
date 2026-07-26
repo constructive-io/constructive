@@ -13,8 +13,18 @@
 // - Remove helpers for delete operations
 // ============================================================================
 
-import type { QueryClient } from "@tanstack/react-query";
-import { agentKeys, agentMessageKeys, agentPersonaKeys, agentPlanKeys, agentPromptKeys, agentResourceChunkKeys, agentResourceKeys, agentTaskKeys, agentThreadKeys } from "./query-keys";
+import type { QueryClient } from '@tanstack/react-query';
+import {
+  agentKeys,
+  agentMessageKeys,
+  agentPersonaKeys,
+  agentPlanKeys,
+  agentPromptKeys,
+  agentResourceChunkKeys,
+  agentResourceKeys,
+  agentTaskKeys,
+  agentThreadKeys,
+} from './query-keys';
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -35,105 +45,156 @@ import { agentKeys, agentMessageKeys, agentPersonaKeys, agentPlanKeys, agentProm
  * ```
  */
 export const invalidate = {
-  /** Invalidate agent queries */agent: {
-    /** Invalidate all agent queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentKeys.all
-    }),
-    /** Invalidate agent list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentKeys.lists()
-    }),
-    /** Invalidate a specific agent */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentKeys.detail(id)
-    })
+  /** Invalidate agent queries */ agent: {
+    /** Invalidate all agent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentKeys.all,
+      }),
+    /** Invalidate agent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentKeys.lists(),
+      }),
+    /** Invalidate a specific agent */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: agentKeys.detail(id),
+      }),
   },
-  /** Invalidate agentMessage queries */agentMessage: {
-    /** Invalidate all agentMessage queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentMessageKeys.all
-    }),
-    /** Invalidate agentMessage list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentMessageKeys.lists()
-    }),
-    /** Invalidate a specific agentMessage */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentMessageKeys.detail(id)
-    })
+  /** Invalidate agentMessage queries */ agentMessage: {
+    /** Invalidate all agentMessage queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentMessageKeys.all,
+      }),
+    /** Invalidate agentMessage list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentMessageKeys.lists(),
+      }),
+    /** Invalidate a specific agentMessage */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentMessageKeys.detail(id),
+      }),
   },
-  /** Invalidate agentPersona queries */agentPersona: {
-    /** Invalidate all agentPersona queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentPersonaKeys.all
-    }),
-    /** Invalidate agentPersona list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentPersonaKeys.lists()
-    }),
-    /** Invalidate a specific agentPersona */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentPersonaKeys.detail(id)
-    })
+  /** Invalidate agentPersona queries */ agentPersona: {
+    /** Invalidate all agentPersona queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPersonaKeys.all,
+      }),
+    /** Invalidate agentPersona list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPersonaKeys.lists(),
+      }),
+    /** Invalidate a specific agentPersona */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPersonaKeys.detail(id),
+      }),
   },
-  /** Invalidate agentPlan queries */agentPlan: {
-    /** Invalidate all agentPlan queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentPlanKeys.all
-    }),
-    /** Invalidate agentPlan list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentPlanKeys.lists()
-    }),
-    /** Invalidate a specific agentPlan */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentPlanKeys.detail(id)
-    })
+  /** Invalidate agentPlan queries */ agentPlan: {
+    /** Invalidate all agentPlan queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPlanKeys.all,
+      }),
+    /** Invalidate agentPlan list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPlanKeys.lists(),
+      }),
+    /** Invalidate a specific agentPlan */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPlanKeys.detail(id),
+      }),
   },
-  /** Invalidate agentPrompt queries */agentPrompt: {
-    /** Invalidate all agentPrompt queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentPromptKeys.all
-    }),
-    /** Invalidate agentPrompt list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentPromptKeys.lists()
-    }),
-    /** Invalidate a specific agentPrompt */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentPromptKeys.detail(id)
-    })
+  /** Invalidate agentPrompt queries */ agentPrompt: {
+    /** Invalidate all agentPrompt queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPromptKeys.all,
+      }),
+    /** Invalidate agentPrompt list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPromptKeys.lists(),
+      }),
+    /** Invalidate a specific agentPrompt */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentPromptKeys.detail(id),
+      }),
   },
-  /** Invalidate agentResourceChunk queries */agentResourceChunk: {
-    /** Invalidate all agentResourceChunk queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentResourceChunkKeys.all
-    }),
-    /** Invalidate agentResourceChunk list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentResourceChunkKeys.lists()
-    }),
-    /** Invalidate a specific agentResourceChunk */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentResourceChunkKeys.detail(id)
-    })
+  /** Invalidate agentResourceChunk queries */ agentResourceChunk: {
+    /** Invalidate all agentResourceChunk queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentResourceChunkKeys.all,
+      }),
+    /** Invalidate agentResourceChunk list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentResourceChunkKeys.lists(),
+      }),
+    /** Invalidate a specific agentResourceChunk */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentResourceChunkKeys.detail(id),
+      }),
   },
-  /** Invalidate agentResource queries */agentResource: {
-    /** Invalidate all agentResource queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentResourceKeys.all
-    }),
-    /** Invalidate agentResource list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentResourceKeys.lists()
-    }),
-    /** Invalidate a specific agentResource */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentResourceKeys.detail(id)
-    })
+  /** Invalidate agentResource queries */ agentResource: {
+    /** Invalidate all agentResource queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentResourceKeys.all,
+      }),
+    /** Invalidate agentResource list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentResourceKeys.lists(),
+      }),
+    /** Invalidate a specific agentResource */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentResourceKeys.detail(id),
+      }),
   },
-  /** Invalidate agentTask queries */agentTask: {
-    /** Invalidate all agentTask queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentTaskKeys.all
-    }),
-    /** Invalidate agentTask list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentTaskKeys.lists()
-    }),
-    /** Invalidate a specific agentTask */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentTaskKeys.detail(id)
-    })
+  /** Invalidate agentTask queries */ agentTask: {
+    /** Invalidate all agentTask queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentTaskKeys.all,
+      }),
+    /** Invalidate agentTask list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentTaskKeys.lists(),
+      }),
+    /** Invalidate a specific agentTask */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentTaskKeys.detail(id),
+      }),
   },
-  /** Invalidate agentThread queries */agentThread: {
-    /** Invalidate all agentThread queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentThreadKeys.all
-    }),
-    /** Invalidate agentThread list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: agentThreadKeys.lists()
-    }),
-    /** Invalidate a specific agentThread */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: agentThreadKeys.detail(id)
-    })
-  }
+  /** Invalidate agentThread queries */ agentThread: {
+    /** Invalidate all agentThread queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentThreadKeys.all,
+      }),
+    /** Invalidate agentThread list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentThreadKeys.lists(),
+      }),
+    /** Invalidate a specific agentThread */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentThreadKeys.detail(id),
+      }),
+  },
 } as const;
 /**
 
@@ -147,49 +208,67 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove agent from cache */agent: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agent from cache */ agent: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: agentKeys.detail(id)
+      queryKey: agentKeys.detail(id),
     });
   },
-  /** Remove agentMessage from cache */agentMessage: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentMessage from cache */ agentMessage: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: agentMessageKeys.detail(id)
+      queryKey: agentMessageKeys.detail(id),
     });
   },
-  /** Remove agentPersona from cache */agentPersona: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentPersona from cache */ agentPersona: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: agentPersonaKeys.detail(id)
+      queryKey: agentPersonaKeys.detail(id),
     });
   },
-  /** Remove agentPlan from cache */agentPlan: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentPlan from cache */ agentPlan: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: agentPlanKeys.detail(id)
+      queryKey: agentPlanKeys.detail(id),
     });
   },
-  /** Remove agentPrompt from cache */agentPrompt: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentPrompt from cache */ agentPrompt: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: agentPromptKeys.detail(id)
+      queryKey: agentPromptKeys.detail(id),
     });
   },
-  /** Remove agentResourceChunk from cache */agentResourceChunk: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentResourceChunk from cache */ agentResourceChunk: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: agentResourceChunkKeys.detail(id)
+      queryKey: agentResourceChunkKeys.detail(id),
     });
   },
-  /** Remove agentResource from cache */agentResource: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentResource from cache */ agentResource: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: agentResourceKeys.detail(id)
+      queryKey: agentResourceKeys.detail(id),
     });
   },
-  /** Remove agentTask from cache */agentTask: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentTask from cache */ agentTask: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: agentTaskKeys.detail(id)
+      queryKey: agentTaskKeys.detail(id),
     });
   },
-  /** Remove agentThread from cache */agentThread: (queryClient: QueryClient, id: string | number) => {
+  /** Remove agentThread from cache */ agentThread: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: agentThreadKeys.detail(id)
+      queryKey: agentThreadKeys.detail(id),
     });
-  }
+  },
 } as const;

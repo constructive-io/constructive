@@ -4,20 +4,25 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { siteKeys } from "../query-keys";
-import type { SiteSelect, SiteWithRelations, SiteFilter, SiteOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { SiteSelect, SiteWithRelations, SiteFilter, SiteOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { siteKeys } from '../query-keys';
+import type { SiteSelect, SiteWithRelations, SiteFilter, SiteOrderBy } from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type { SiteSelect, SiteWithRelations, SiteFilter, SiteOrderBy } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const sitesQueryKey = siteKeys.list;
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSitesQuery({
@@ -30,33 +35,45 @@ export const sitesQueryKey = siteKeys.list;
  * });
  * ```
  */
-export function useSitesQuery<S extends SiteSelect, TData = {
-  sites: ConnectionResult<InferSelectResult<SiteWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SiteFilter, SiteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SiteSelect>;
-} & Omit<UseQueryOptions<{
-  sites: ConnectionResult<InferSelectResult<SiteWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSitesQuery(params: {
-  selection: ListSelectionConfig<SiteSelect, SiteFilter, SiteOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSitesQuery<
+  S extends SiteSelect,
+  TData = {
+    sites: ConnectionResult<InferSelectResult<SiteWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SiteFilter, SiteOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SiteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        sites: ConnectionResult<InferSelectResult<SiteWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSitesQuery(
+  params: {
+    selection: ListSelectionConfig<SiteSelect, SiteFilter, SiteOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<SiteSelect, SiteFilter, SiteOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: siteKeys.list(args),
     queryFn: () => getClient().site.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSitesQuery({
@@ -70,7 +87,8 @@ export function useSitesQuery(params: {
 export async function fetchSitesQuery<S extends SiteSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, SiteFilter, SiteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SiteSelect>;
+  } & Omit<ListSelectionConfig<S, SiteFilter, SiteOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, SiteSelect>;
 }): Promise<{
   sites: ConnectionResult<InferSelectResult<SiteWithRelations, S>>;
 }>;
@@ -82,23 +100,30 @@ export async function fetchSitesQuery(params: {
 }
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```ts
  * await prefetchSitesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchSitesQuery<S extends SiteSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SiteFilter, SiteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SiteSelect>;
-}): Promise<void>;
-export async function prefetchSitesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<SiteSelect, SiteFilter, SiteOrderBy>;
-}): Promise<void> {
+export async function prefetchSitesQuery<S extends SiteSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SiteFilter, SiteOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SiteSelect>;
+  }
+): Promise<void>;
+export async function prefetchSitesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<SiteSelect, SiteFilter, SiteOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<SiteSelect, SiteFilter, SiteOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: siteKeys.list(args),
-    queryFn: () => getClient().site.findMany(args).unwrap()
+    queryFn: () => getClient().site.findMany(args).unwrap(),
   });
 }

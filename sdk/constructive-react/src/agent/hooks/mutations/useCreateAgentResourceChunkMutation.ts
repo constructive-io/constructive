@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentResourceChunkKeys } from "../query-keys";
-import { agentResourceChunkMutationKeys } from "../mutation-keys";
-import type { AgentResourceChunkSelect, AgentResourceChunkWithRelations, CreateAgentResourceChunkInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentResourceChunkSelect, AgentResourceChunkWithRelations, CreateAgentResourceChunkInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentResourceChunkKeys } from '../query-keys';
+import { agentResourceChunkMutationKeys } from '../mutation-keys';
+import type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+  CreateAgentResourceChunkInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+  CreateAgentResourceChunkInput,
+} from '../../orm/input-types';
 /**
  * Mutation hook for creating a AgentResourceChunk
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateAgentResourceChunkMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateAgentResourceChunkMutation<S extends AgentResourceChunkSelect>(params: {
-  selection: ({
-    fields: S & AgentResourceChunkSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>);
-} & Omit<UseMutationOptions<{
-  createAgentResourceChunk: {
-    agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
-  };
-}, Error, CreateAgentResourceChunkInput["agentResourceChunk"]>, "mutationFn">): UseMutationResult<{
-  createAgentResourceChunk: {
-    agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
-  };
-}, Error, CreateAgentResourceChunkInput["agentResourceChunk"]>;
-export function useCreateAgentResourceChunkMutation(params: {
-  selection: SelectionConfig<AgentResourceChunkSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateAgentResourceChunkInput["agentResourceChunk"]>, "mutationFn">) {
+export function useCreateAgentResourceChunkMutation<S extends AgentResourceChunkSelect>(
+  params: {
+    selection: {
+      fields: S & AgentResourceChunkSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createAgentResourceChunk: {
+          agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
+        };
+      },
+      Error,
+      CreateAgentResourceChunkInput['agentResourceChunk']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createAgentResourceChunk: {
+      agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
+    };
+  },
+  Error,
+  CreateAgentResourceChunkInput['agentResourceChunk']
+>;
+export function useCreateAgentResourceChunkMutation(
+  params: {
+    selection: SelectionConfig<AgentResourceChunkSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateAgentResourceChunkInput['agentResourceChunk']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AgentResourceChunkSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentResourceChunkMutationKeys.create(),
-    mutationFn: (data: CreateAgentResourceChunkInput["agentResourceChunk"]) => getClient().agentResourceChunk.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateAgentResourceChunkInput['agentResourceChunk']) =>
+      getClient()
+        .agentResourceChunk.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: agentResourceChunkKeys.lists()
+        queryKey: agentResourceChunkKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

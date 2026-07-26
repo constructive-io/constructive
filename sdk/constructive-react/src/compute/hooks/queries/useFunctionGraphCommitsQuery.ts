@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { functionGraphCommitKeys } from "../query-keys";
-import type { FunctionGraphCommitSelect, FunctionGraphCommitWithRelations, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphCommitSelect, FunctionGraphCommitWithRelations, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { functionGraphCommitKeys } from '../query-keys';
+import type {
+  FunctionGraphCommitSelect,
+  FunctionGraphCommitWithRelations,
+  FunctionGraphCommitFilter,
+  FunctionGraphCommitOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  FunctionGraphCommitSelect,
+  FunctionGraphCommitWithRelations,
+  FunctionGraphCommitFilter,
+  FunctionGraphCommitOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphCommitsQueryKey = functionGraphCommitKeys.list;
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphCommitsQuery({
@@ -30,33 +45,58 @@ export const functionGraphCommitsQueryKey = functionGraphCommitKeys.list;
  * });
  * ```
  */
-export function useFunctionGraphCommitsQuery<S extends FunctionGraphCommitSelect, TData = {
-  functionGraphCommits: ConnectionResult<InferSelectResult<FunctionGraphCommitWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
-} & Omit<UseQueryOptions<{
-  functionGraphCommits: ConnectionResult<InferSelectResult<FunctionGraphCommitWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionGraphCommitsQuery(params: {
-  selection: ListSelectionConfig<FunctionGraphCommitSelect, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<FunctionGraphCommitSelect, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useFunctionGraphCommitsQuery<
+  S extends FunctionGraphCommitSelect,
+  TData = {
+    functionGraphCommits: ConnectionResult<InferSelectResult<FunctionGraphCommitWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionGraphCommits: ConnectionResult<
+          InferSelectResult<FunctionGraphCommitWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionGraphCommitsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      FunctionGraphCommitSelect,
+      FunctionGraphCommitFilter,
+      FunctionGraphCommitOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    FunctionGraphCommitSelect,
+    FunctionGraphCommitFilter,
+    FunctionGraphCommitOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphCommitKeys.list(args),
     queryFn: () => getClient().functionGraphCommit.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionGraphCommitsQuery({
@@ -70,35 +110,65 @@ export function useFunctionGraphCommitsQuery(params: {
 export async function fetchFunctionGraphCommitsQuery<S extends FunctionGraphCommitSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
+  } & Omit<
+    ListSelectionConfig<S, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
 }): Promise<{
   functionGraphCommits: ConnectionResult<InferSelectResult<FunctionGraphCommitWithRelations, S>>;
 }>;
 export async function fetchFunctionGraphCommitsQuery(params: {
-  selection: ListSelectionConfig<FunctionGraphCommitSelect, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>;
+  selection: ListSelectionConfig<
+    FunctionGraphCommitSelect,
+    FunctionGraphCommitFilter,
+    FunctionGraphCommitOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<FunctionGraphCommitSelect, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    FunctionGraphCommitSelect,
+    FunctionGraphCommitFilter,
+    FunctionGraphCommitOrderBy
+  >(params.selection);
   return getClient().functionGraphCommit.findMany(args).unwrap();
 }
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionGraphCommitsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchFunctionGraphCommitsQuery<S extends FunctionGraphCommitSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
-}): Promise<void>;
-export async function prefetchFunctionGraphCommitsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<FunctionGraphCommitSelect, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<FunctionGraphCommitSelect, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>(params.selection);
+export async function prefetchFunctionGraphCommitsQuery<S extends FunctionGraphCommitSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionGraphCommitFilter, FunctionGraphCommitOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionGraphCommitsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      FunctionGraphCommitSelect,
+      FunctionGraphCommitFilter,
+      FunctionGraphCommitOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    FunctionGraphCommitSelect,
+    FunctionGraphCommitFilter,
+    FunctionGraphCommitOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphCommitKeys.list(args),
-    queryFn: () => getClient().functionGraphCommit.findMany(args).unwrap()
+    queryFn: () => getClient().functionGraphCommit.findMany(args).unwrap(),
   });
 }

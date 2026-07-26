@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { defaultIdsModuleKeys } from "../query-keys";
-import type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { defaultIdsModuleKeys } from '../query-keys';
+import type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const defaultIdsModuleQueryKey = defaultIdsModuleKeys.detail;
 /**
  * Query hook for fetching a single DefaultIdsModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDefaultIdsModuleQuery({
@@ -26,38 +26,52 @@ export const defaultIdsModuleQueryKey = defaultIdsModuleKeys.detail;
  * });
  * ```
  */
-export function useDefaultIdsModuleQuery<S extends DefaultIdsModuleSelect, TData = {
-  defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDefaultIdsModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<DefaultIdsModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDefaultIdsModuleQuery<
+  S extends DefaultIdsModuleSelect,
+  TData = {
+    defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDefaultIdsModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DefaultIdsModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DefaultIdsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: defaultIdsModuleKeys.detail(params.id),
-    queryFn: () => getClient().defaultIdsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .defaultIdsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single DefaultIdsModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDefaultIdsModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchDefaultIdsModuleQuery(params: {
   selection: SelectionConfig<DefaultIdsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DefaultIdsModuleSelect>(params.selection);
-  return getClient().defaultIdsModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .defaultIdsModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single DefaultIdsModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDefaultIdsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDefaultIdsModuleQuery<S extends DefaultIdsModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
-}): Promise<void>;
-export async function prefetchDefaultIdsModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DefaultIdsModuleSelect>;
-}): Promise<void> {
+export async function prefetchDefaultIdsModuleQuery<S extends DefaultIdsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDefaultIdsModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DefaultIdsModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DefaultIdsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: defaultIdsModuleKeys.detail(params.id),
-    queryFn: () => getClient().defaultIdsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .defaultIdsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

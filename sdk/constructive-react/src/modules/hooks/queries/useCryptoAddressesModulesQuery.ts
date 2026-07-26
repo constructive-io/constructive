@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { cryptoAddressesModuleKeys } from "../query-keys";
-import type { CryptoAddressesModuleSelect, CryptoAddressesModuleWithRelations, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { CryptoAddressesModuleSelect, CryptoAddressesModuleWithRelations, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { cryptoAddressesModuleKeys } from '../query-keys';
+import type {
+  CryptoAddressesModuleSelect,
+  CryptoAddressesModuleWithRelations,
+  CryptoAddressesModuleFilter,
+  CryptoAddressesModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  CryptoAddressesModuleSelect,
+  CryptoAddressesModuleWithRelations,
+  CryptoAddressesModuleFilter,
+  CryptoAddressesModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const cryptoAddressesModulesQueryKey = cryptoAddressesModuleKeys.list;
 /**
  * Query hook for fetching CryptoAddressesModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCryptoAddressesModulesQuery({
@@ -30,33 +45,60 @@ export const cryptoAddressesModulesQueryKey = cryptoAddressesModuleKeys.list;
  * });
  * ```
  */
-export function useCryptoAddressesModulesQuery<S extends CryptoAddressesModuleSelect, TData = {
-  cryptoAddressesModules: ConnectionResult<InferSelectResult<CryptoAddressesModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
-} & Omit<UseQueryOptions<{
-  cryptoAddressesModules: ConnectionResult<InferSelectResult<CryptoAddressesModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCryptoAddressesModulesQuery(params: {
-  selection: ListSelectionConfig<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useCryptoAddressesModulesQuery<
+  S extends CryptoAddressesModuleSelect,
+  TData = {
+    cryptoAddressesModules: ConnectionResult<
+      InferSelectResult<CryptoAddressesModuleWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        cryptoAddressesModules: ConnectionResult<
+          InferSelectResult<CryptoAddressesModuleWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCryptoAddressesModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      CryptoAddressesModuleSelect,
+      CryptoAddressesModuleFilter,
+      CryptoAddressesModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    CryptoAddressesModuleSelect,
+    CryptoAddressesModuleFilter,
+    CryptoAddressesModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: cryptoAddressesModuleKeys.list(args),
     queryFn: () => getClient().cryptoAddressesModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch CryptoAddressesModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCryptoAddressesModulesQuery({
@@ -67,38 +109,72 @@ export function useCryptoAddressesModulesQuery(params: {
  * });
  * ```
  */
-export async function fetchCryptoAddressesModulesQuery<S extends CryptoAddressesModuleSelect>(params: {
+export async function fetchCryptoAddressesModulesQuery<
+  S extends CryptoAddressesModuleSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
+  } & Omit<
+    ListSelectionConfig<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
 }): Promise<{
-  cryptoAddressesModules: ConnectionResult<InferSelectResult<CryptoAddressesModuleWithRelations, S>>;
+  cryptoAddressesModules: ConnectionResult<
+    InferSelectResult<CryptoAddressesModuleWithRelations, S>
+  >;
 }>;
 export async function fetchCryptoAddressesModulesQuery(params: {
-  selection: ListSelectionConfig<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>;
+  selection: ListSelectionConfig<
+    CryptoAddressesModuleSelect,
+    CryptoAddressesModuleFilter,
+    CryptoAddressesModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    CryptoAddressesModuleSelect,
+    CryptoAddressesModuleFilter,
+    CryptoAddressesModuleOrderBy
+  >(params.selection);
   return getClient().cryptoAddressesModule.findMany(args).unwrap();
 }
 /**
  * Prefetch CryptoAddressesModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchCryptoAddressesModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchCryptoAddressesModulesQuery<S extends CryptoAddressesModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
-}): Promise<void>;
-export async function prefetchCryptoAddressesModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>(params.selection);
+export async function prefetchCryptoAddressesModulesQuery<S extends CryptoAddressesModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchCryptoAddressesModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      CryptoAddressesModuleSelect,
+      CryptoAddressesModuleFilter,
+      CryptoAddressesModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    CryptoAddressesModuleSelect,
+    CryptoAddressesModuleFilter,
+    CryptoAddressesModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: cryptoAddressesModuleKeys.list(args),
-    queryFn: () => getClient().cryptoAddressesModule.findMany(args).unwrap()
+    queryFn: () => getClient().cryptoAddressesModule.findMany(args).unwrap(),
   });
 }

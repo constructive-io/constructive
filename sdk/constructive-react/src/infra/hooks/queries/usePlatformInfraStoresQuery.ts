@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformInfraStoreKeys } from "../query-keys";
-import type { PlatformInfraStoreSelect, PlatformInfraStoreWithRelations, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformInfraStoreSelect, PlatformInfraStoreWithRelations, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformInfraStoreKeys } from '../query-keys';
+import type {
+  PlatformInfraStoreSelect,
+  PlatformInfraStoreWithRelations,
+  PlatformInfraStoreFilter,
+  PlatformInfraStoreOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformInfraStoreSelect,
+  PlatformInfraStoreWithRelations,
+  PlatformInfraStoreFilter,
+  PlatformInfraStoreOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformInfraStoresQueryKey = platformInfraStoreKeys.list;
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformInfraStoresQuery({
@@ -30,33 +45,58 @@ export const platformInfraStoresQueryKey = platformInfraStoreKeys.list;
  * });
  * ```
  */
-export function usePlatformInfraStoresQuery<S extends PlatformInfraStoreSelect, TData = {
-  platformInfraStores: ConnectionResult<InferSelectResult<PlatformInfraStoreWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraStoreSelect>;
-} & Omit<UseQueryOptions<{
-  platformInfraStores: ConnectionResult<InferSelectResult<PlatformInfraStoreWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformInfraStoresQuery(params: {
-  selection: ListSelectionConfig<PlatformInfraStoreSelect, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformInfraStoreSelect, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformInfraStoresQuery<
+  S extends PlatformInfraStoreSelect,
+  TData = {
+    platformInfraStores: ConnectionResult<InferSelectResult<PlatformInfraStoreWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformInfraStoreSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformInfraStores: ConnectionResult<
+          InferSelectResult<PlatformInfraStoreWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformInfraStoresQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformInfraStoreSelect,
+      PlatformInfraStoreFilter,
+      PlatformInfraStoreOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformInfraStoreSelect,
+    PlatformInfraStoreFilter,
+    PlatformInfraStoreOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformInfraStoreKeys.list(args),
     queryFn: () => getClient().platformInfraStore.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformInfraStoresQuery({
@@ -70,35 +110,62 @@ export function usePlatformInfraStoresQuery(params: {
 export async function fetchPlatformInfraStoresQuery<S extends PlatformInfraStoreSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraStoreSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PlatformInfraStoreSelect>;
 }): Promise<{
   platformInfraStores: ConnectionResult<InferSelectResult<PlatformInfraStoreWithRelations, S>>;
 }>;
 export async function fetchPlatformInfraStoresQuery(params: {
-  selection: ListSelectionConfig<PlatformInfraStoreSelect, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformInfraStoreSelect,
+    PlatformInfraStoreFilter,
+    PlatformInfraStoreOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformInfraStoreSelect, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformInfraStoreSelect,
+    PlatformInfraStoreFilter,
+    PlatformInfraStoreOrderBy
+  >(params.selection);
   return getClient().platformInfraStore.findMany(args).unwrap();
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformInfraStoresQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformInfraStoresQuery<S extends PlatformInfraStoreSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraStoreSelect>;
-}): Promise<void>;
-export async function prefetchPlatformInfraStoresQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformInfraStoreSelect, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformInfraStoreSelect, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>(params.selection);
+export async function prefetchPlatformInfraStoresQuery<S extends PlatformInfraStoreSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformInfraStoreFilter, PlatformInfraStoreOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformInfraStoreSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformInfraStoresQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformInfraStoreSelect,
+      PlatformInfraStoreFilter,
+      PlatformInfraStoreOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformInfraStoreSelect,
+    PlatformInfraStoreFilter,
+    PlatformInfraStoreOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformInfraStoreKeys.list(args),
-    queryFn: () => getClient().platformInfraStore.findMany(args).unwrap()
+    queryFn: () => getClient().platformInfraStore.findMany(args).unwrap(),
   });
 }

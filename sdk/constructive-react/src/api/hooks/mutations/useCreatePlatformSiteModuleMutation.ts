@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteModuleKeys } from "../query-keys";
-import { platformSiteModuleMutationKeys } from "../mutation-keys";
-import type { PlatformSiteModuleSelect, PlatformSiteModuleWithRelations, CreatePlatformSiteModuleInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteModuleSelect, PlatformSiteModuleWithRelations, CreatePlatformSiteModuleInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteModuleKeys } from '../query-keys';
+import { platformSiteModuleMutationKeys } from '../mutation-keys';
+import type {
+  PlatformSiteModuleSelect,
+  PlatformSiteModuleWithRelations,
+  CreatePlatformSiteModuleInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformSiteModuleSelect,
+  PlatformSiteModuleWithRelations,
+  CreatePlatformSiteModuleInput,
+} from '../../orm/input-types';
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreatePlatformSiteModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreatePlatformSiteModuleMutation<S extends PlatformSiteModuleSelect>(params: {
-  selection: ({
-    fields: S & PlatformSiteModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>);
-} & Omit<UseMutationOptions<{
-  createPlatformSiteModule: {
-    platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
-  };
-}, Error, CreatePlatformSiteModuleInput["platformSiteModule"]>, "mutationFn">): UseMutationResult<{
-  createPlatformSiteModule: {
-    platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
-  };
-}, Error, CreatePlatformSiteModuleInput["platformSiteModule"]>;
-export function useCreatePlatformSiteModuleMutation(params: {
-  selection: SelectionConfig<PlatformSiteModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, CreatePlatformSiteModuleInput["platformSiteModule"]>, "mutationFn">) {
+export function useCreatePlatformSiteModuleMutation<S extends PlatformSiteModuleSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformSiteModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createPlatformSiteModule: {
+          platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
+        };
+      },
+      Error,
+      CreatePlatformSiteModuleInput['platformSiteModule']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createPlatformSiteModule: {
+      platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
+    };
+  },
+  Error,
+  CreatePlatformSiteModuleInput['platformSiteModule']
+>;
+export function useCreatePlatformSiteModuleMutation(
+  params: {
+    selection: SelectionConfig<PlatformSiteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreatePlatformSiteModuleInput['platformSiteModule']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformSiteModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformSiteModuleMutationKeys.create(),
-    mutationFn: (data: CreatePlatformSiteModuleInput["platformSiteModule"]) => getClient().platformSiteModule.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreatePlatformSiteModuleInput['platformSiteModule']) =>
+      getClient()
+        .platformSiteModule.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: platformSiteModuleKeys.lists()
+        queryKey: platformSiteModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,83 +4,107 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { plansModuleKeys } from "../query-keys";
-import { plansModuleMutationKeys } from "../mutation-keys";
-import type { PlansModuleSelect, PlansModuleWithRelations, PlansModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlansModuleSelect, PlansModuleWithRelations, PlansModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { plansModuleKeys } from '../query-keys';
+import { plansModuleMutationKeys } from '../mutation-keys';
+import type {
+  PlansModuleSelect,
+  PlansModuleWithRelations,
+  PlansModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlansModuleSelect,
+  PlansModuleWithRelations,
+  PlansModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a PlansModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlansModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', plansModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlansModuleMutation<S extends PlansModuleSelect>(params: {
-  selection: ({
-    fields: S & PlansModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, PlansModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlansModule: {
-    plansModule: InferSelectResult<PlansModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  plansModulePatch: PlansModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlansModule: {
-    plansModule: InferSelectResult<PlansModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  plansModulePatch: PlansModulePatch;
-}>;
-export function useUpdatePlansModuleMutation(params: {
-  selection: SelectionConfig<PlansModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  plansModulePatch: PlansModulePatch;
-}>, "mutationFn">) {
+export function useUpdatePlansModuleMutation<S extends PlansModuleSelect>(
+  params: {
+    selection: {
+      fields: S & PlansModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlansModule: {
+          plansModule: InferSelectResult<PlansModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        plansModulePatch: PlansModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlansModule: {
+      plansModule: InferSelectResult<PlansModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    plansModulePatch: PlansModulePatch;
+  }
+>;
+export function useUpdatePlansModuleMutation(
+  params: {
+    selection: SelectionConfig<PlansModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        plansModulePatch: PlansModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlansModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: plansModuleMutationKeys.all,
-    mutationFn: ({
-      id,
-      plansModulePatch
-    }: {
-      id: string;
-      plansModulePatch: PlansModulePatch;
-    }) => getClient().plansModule.update({
-      where: {
-        id
-      },
-      data: plansModulePatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, plansModulePatch }: { id: string; plansModulePatch: PlansModulePatch }) =>
+      getClient()
+        .plansModule.update({
+          where: {
+            id,
+          },
+          data: plansModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.detail(variables.id)
+        queryKey: plansModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.lists()
+        queryKey: plansModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

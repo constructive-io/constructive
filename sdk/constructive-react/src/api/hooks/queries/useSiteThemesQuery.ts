@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { siteThemeKeys } from "../query-keys";
-import type { SiteThemeSelect, SiteThemeWithRelations, SiteThemeFilter, SiteThemeOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { SiteThemeSelect, SiteThemeWithRelations, SiteThemeFilter, SiteThemeOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { siteThemeKeys } from '../query-keys';
+import type {
+  SiteThemeSelect,
+  SiteThemeWithRelations,
+  SiteThemeFilter,
+  SiteThemeOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  SiteThemeSelect,
+  SiteThemeWithRelations,
+  SiteThemeFilter,
+  SiteThemeOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const siteThemesQueryKey = siteThemeKeys.list;
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSiteThemesQuery({
@@ -30,33 +45,47 @@ export const siteThemesQueryKey = siteThemeKeys.list;
  * });
  * ```
  */
-export function useSiteThemesQuery<S extends SiteThemeSelect, TData = {
-  siteThemes: ConnectionResult<InferSelectResult<SiteThemeWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SiteThemeFilter, SiteThemeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
-} & Omit<UseQueryOptions<{
-  siteThemes: ConnectionResult<InferSelectResult<SiteThemeWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSiteThemesQuery(params: {
-  selection: ListSelectionConfig<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useSiteThemesQuery<
+  S extends SiteThemeSelect,
+  TData = {
+    siteThemes: ConnectionResult<InferSelectResult<SiteThemeWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SiteThemeFilter, SiteThemeOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        siteThemes: ConnectionResult<InferSelectResult<SiteThemeWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSiteThemesQuery(
+  params: {
+    selection: ListSelectionConfig<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: siteThemeKeys.list(args),
     queryFn: () => getClient().siteTheme.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSiteThemesQuery({
@@ -70,35 +99,47 @@ export function useSiteThemesQuery(params: {
 export async function fetchSiteThemesQuery<S extends SiteThemeSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, SiteThemeFilter, SiteThemeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
+  } & Omit<ListSelectionConfig<S, SiteThemeFilter, SiteThemeOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
 }): Promise<{
   siteThemes: ConnectionResult<InferSelectResult<SiteThemeWithRelations, S>>;
 }>;
 export async function fetchSiteThemesQuery(params: {
   selection: ListSelectionConfig<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>;
 }) {
-  const args = buildListSelectionArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>(params.selection);
+  const args = buildListSelectionArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>(
+    params.selection
+  );
   return getClient().siteTheme.findMany(args).unwrap();
 }
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```ts
  * await prefetchSiteThemesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchSiteThemesQuery<S extends SiteThemeSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SiteThemeFilter, SiteThemeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
-}): Promise<void>;
-export async function prefetchSiteThemesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>(params.selection);
+export async function prefetchSiteThemesQuery<S extends SiteThemeSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SiteThemeFilter, SiteThemeOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
+  }
+): Promise<void>;
+export async function prefetchSiteThemesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<SiteThemeSelect, SiteThemeFilter, SiteThemeOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: siteThemeKeys.list(args),
-    queryFn: () => getClient().siteTheme.findMany(args).unwrap()
+    queryFn: () => getClient().siteTheme.findMany(args).unwrap(),
   });
 }

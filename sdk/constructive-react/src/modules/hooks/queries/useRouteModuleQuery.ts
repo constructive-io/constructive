@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { routeModuleKeys } from "../query-keys";
-import type { RouteModuleSelect, RouteModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RouteModuleSelect, RouteModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { routeModuleKeys } from '../query-keys';
+import type { RouteModuleSelect, RouteModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { RouteModuleSelect, RouteModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const routeModuleQueryKey = routeModuleKeys.detail;
 /**
  * Query hook for fetching a single RouteModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRouteModuleQuery({
@@ -26,38 +26,52 @@ export const routeModuleQueryKey = routeModuleKeys.detail;
  * });
  * ```
  */
-export function useRouteModuleQuery<S extends RouteModuleSelect, TData = {
-  routeModule: InferSelectResult<RouteModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
-} & Omit<UseQueryOptions<{
-  routeModule: InferSelectResult<RouteModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRouteModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<RouteModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useRouteModuleQuery<
+  S extends RouteModuleSelect,
+  TData = {
+    routeModule: InferSelectResult<RouteModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        routeModule: InferSelectResult<RouteModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRouteModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<RouteModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<RouteModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: routeModuleKeys.detail(params.id),
-    queryFn: () => getClient().routeModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .routeModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single RouteModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRouteModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchRouteModuleQuery(params: {
   selection: SelectionConfig<RouteModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RouteModuleSelect>(params.selection);
-  return getClient().routeModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .routeModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single RouteModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchRouteModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRouteModuleQuery<S extends RouteModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
-}): Promise<void>;
-export async function prefetchRouteModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<RouteModuleSelect>;
-}): Promise<void> {
+export async function prefetchRouteModuleQuery<S extends RouteModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchRouteModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<RouteModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<RouteModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: routeModuleKeys.detail(params.id),
-    queryFn: () => getClient().routeModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .routeModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

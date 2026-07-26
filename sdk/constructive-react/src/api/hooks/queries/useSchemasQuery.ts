@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { schemaKeys } from "../query-keys";
-import type { SchemaSelect, SchemaWithRelations, SchemaFilter, SchemaOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { SchemaSelect, SchemaWithRelations, SchemaFilter, SchemaOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { schemaKeys } from '../query-keys';
+import type {
+  SchemaSelect,
+  SchemaWithRelations,
+  SchemaFilter,
+  SchemaOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  SchemaSelect,
+  SchemaWithRelations,
+  SchemaFilter,
+  SchemaOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const schemasQueryKey = schemaKeys.list;
 /**
  * Query hook for fetching Schema list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSchemasQuery({
@@ -30,33 +45,45 @@ export const schemasQueryKey = schemaKeys.list;
  * });
  * ```
  */
-export function useSchemasQuery<S extends SchemaSelect, TData = {
-  schemas: ConnectionResult<InferSelectResult<SchemaWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SchemaFilter, SchemaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SchemaSelect>;
-} & Omit<UseQueryOptions<{
-  schemas: ConnectionResult<InferSelectResult<SchemaWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSchemasQuery(params: {
-  selection: ListSelectionConfig<SchemaSelect, SchemaFilter, SchemaOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSchemasQuery<
+  S extends SchemaSelect,
+  TData = {
+    schemas: ConnectionResult<InferSelectResult<SchemaWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SchemaFilter, SchemaOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SchemaSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        schemas: ConnectionResult<InferSelectResult<SchemaWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSchemasQuery(
+  params: {
+    selection: ListSelectionConfig<SchemaSelect, SchemaFilter, SchemaOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<SchemaSelect, SchemaFilter, SchemaOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: schemaKeys.list(args),
     queryFn: () => getClient().schema.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch Schema list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSchemasQuery({
@@ -70,7 +97,8 @@ export function useSchemasQuery(params: {
 export async function fetchSchemasQuery<S extends SchemaSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, SchemaFilter, SchemaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SchemaSelect>;
+  } & Omit<ListSelectionConfig<S, SchemaFilter, SchemaOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, SchemaSelect>;
 }): Promise<{
   schemas: ConnectionResult<InferSelectResult<SchemaWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchSchemasQuery(params: {
 }
 /**
  * Prefetch Schema list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchSchemasQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchSchemasQuery<S extends SchemaSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SchemaFilter, SchemaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SchemaSelect>;
-}): Promise<void>;
-export async function prefetchSchemasQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<SchemaSelect, SchemaFilter, SchemaOrderBy>;
-}): Promise<void> {
+export async function prefetchSchemasQuery<S extends SchemaSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SchemaFilter, SchemaOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SchemaSelect>;
+  }
+): Promise<void>;
+export async function prefetchSchemasQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<SchemaSelect, SchemaFilter, SchemaOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<SchemaSelect, SchemaFilter, SchemaOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: schemaKeys.list(args),
-    queryFn: () => getClient().schema.findMany(args).unwrap()
+    queryFn: () => getClient().schema.findMany(args).unwrap(),
   });
 }

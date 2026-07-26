@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { userStateModuleKeys } from "../query-keys";
-import type { UserStateModuleSelect, UserStateModuleWithRelations, UserStateModuleFilter, UserStateModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { UserStateModuleSelect, UserStateModuleWithRelations, UserStateModuleFilter, UserStateModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { userStateModuleKeys } from '../query-keys';
+import type {
+  UserStateModuleSelect,
+  UserStateModuleWithRelations,
+  UserStateModuleFilter,
+  UserStateModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  UserStateModuleSelect,
+  UserStateModuleWithRelations,
+  UserStateModuleFilter,
+  UserStateModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const userStateModulesQueryKey = userStateModuleKeys.list;
 /**
  * Query hook for fetching UserStateModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useUserStateModulesQuery({
@@ -30,33 +45,53 @@ export const userStateModulesQueryKey = userStateModuleKeys.list;
  * });
  * ```
  */
-export function useUserStateModulesQuery<S extends UserStateModuleSelect, TData = {
-  userStateModules: ConnectionResult<InferSelectResult<UserStateModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UserStateModuleFilter, UserStateModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
-} & Omit<UseQueryOptions<{
-  userStateModules: ConnectionResult<InferSelectResult<UserStateModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useUserStateModulesQuery(params: {
-  selection: ListSelectionConfig<UserStateModuleSelect, UserStateModuleFilter, UserStateModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<UserStateModuleSelect, UserStateModuleFilter, UserStateModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useUserStateModulesQuery<
+  S extends UserStateModuleSelect,
+  TData = {
+    userStateModules: ConnectionResult<InferSelectResult<UserStateModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, UserStateModuleFilter, UserStateModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        userStateModules: ConnectionResult<InferSelectResult<UserStateModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useUserStateModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      UserStateModuleSelect,
+      UserStateModuleFilter,
+      UserStateModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    UserStateModuleSelect,
+    UserStateModuleFilter,
+    UserStateModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: userStateModuleKeys.list(args),
     queryFn: () => getClient().userStateModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch UserStateModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchUserStateModulesQuery({
@@ -70,35 +105,59 @@ export function useUserStateModulesQuery(params: {
 export async function fetchUserStateModulesQuery<S extends UserStateModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserStateModuleFilter, UserStateModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
+  } & Omit<ListSelectionConfig<S, UserStateModuleFilter, UserStateModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
 }): Promise<{
   userStateModules: ConnectionResult<InferSelectResult<UserStateModuleWithRelations, S>>;
 }>;
 export async function fetchUserStateModulesQuery(params: {
-  selection: ListSelectionConfig<UserStateModuleSelect, UserStateModuleFilter, UserStateModuleOrderBy>;
+  selection: ListSelectionConfig<
+    UserStateModuleSelect,
+    UserStateModuleFilter,
+    UserStateModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<UserStateModuleSelect, UserStateModuleFilter, UserStateModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    UserStateModuleSelect,
+    UserStateModuleFilter,
+    UserStateModuleOrderBy
+  >(params.selection);
   return getClient().userStateModule.findMany(args).unwrap();
 }
 /**
  * Prefetch UserStateModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchUserStateModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchUserStateModulesQuery<S extends UserStateModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UserStateModuleFilter, UserStateModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
-}): Promise<void>;
-export async function prefetchUserStateModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<UserStateModuleSelect, UserStateModuleFilter, UserStateModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<UserStateModuleSelect, UserStateModuleFilter, UserStateModuleOrderBy>(params.selection);
+export async function prefetchUserStateModulesQuery<S extends UserStateModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, UserStateModuleFilter, UserStateModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchUserStateModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      UserStateModuleSelect,
+      UserStateModuleFilter,
+      UserStateModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    UserStateModuleSelect,
+    UserStateModuleFilter,
+    UserStateModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userStateModuleKeys.list(args),
-    queryFn: () => getClient().userStateModule.findMany(args).unwrap()
+    queryFn: () => getClient().userStateModule.findMany(args).unwrap(),
   });
 }

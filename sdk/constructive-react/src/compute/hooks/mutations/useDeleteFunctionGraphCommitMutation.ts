@@ -4,83 +4,105 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionGraphCommitKeys } from "../query-keys";
-import { functionGraphCommitMutationKeys } from "../mutation-keys";
-import type { FunctionGraphCommitSelect, FunctionGraphCommitWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphCommitSelect, FunctionGraphCommitWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionGraphCommitKeys } from '../query-keys';
+import { functionGraphCommitMutationKeys } from '../mutation-keys';
+import type {
+  FunctionGraphCommitSelect,
+  FunctionGraphCommitWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionGraphCommitSelect,
+  FunctionGraphCommitWithRelations,
+} from '../../orm/input-types';
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteFunctionGraphCommitMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteFunctionGraphCommitMutation<S extends FunctionGraphCommitSelect>(params: {
-  selection: ({
-    fields: S & FunctionGraphCommitSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>);
-} & Omit<UseMutationOptions<{
-  deleteFunctionGraphCommit: {
-    functionGraphCommit: InferSelectResult<FunctionGraphCommitWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  scopeId: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteFunctionGraphCommit: {
-    functionGraphCommit: InferSelectResult<FunctionGraphCommitWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  scopeId: string;
-}>;
-export function useDeleteFunctionGraphCommitMutation(params: {
-  selection: SelectionConfig<FunctionGraphCommitSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  scopeId: string;
-}>, "mutationFn">) {
+export function useDeleteFunctionGraphCommitMutation<S extends FunctionGraphCommitSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionGraphCommitSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphCommitSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteFunctionGraphCommit: {
+          functionGraphCommit: InferSelectResult<FunctionGraphCommitWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        scopeId: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteFunctionGraphCommit: {
+      functionGraphCommit: InferSelectResult<FunctionGraphCommitWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    scopeId: string;
+  }
+>;
+export function useDeleteFunctionGraphCommitMutation(
+  params: {
+    selection: SelectionConfig<FunctionGraphCommitSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        scopeId: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionGraphCommitSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionGraphCommitMutationKeys.all,
-    mutationFn: ({
-      id,
-      scopeId
-    }: {
-      id: string;
-      scopeId: string;
-    }) => getClient().functionGraphCommit.delete({
-      where: {
-        id,
-        scopeId
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, scopeId }: { id: string; scopeId: string }) =>
+      getClient()
+        .functionGraphCommit.delete({
+          where: {
+            id,
+            scopeId,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: functionGraphCommitKeys.detail(variables.id)
+        queryKey: functionGraphCommitKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionGraphCommitKeys.lists()
+        queryKey: functionGraphCommitKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

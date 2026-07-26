@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { domainEventKeys } from "../query-keys";
-import type { DomainEventSelect, DomainEventWithRelations, DomainEventFilter, DomainEventOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainEventSelect, DomainEventWithRelations, DomainEventFilter, DomainEventOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { domainEventKeys } from '../query-keys';
+import type {
+  DomainEventSelect,
+  DomainEventWithRelations,
+  DomainEventFilter,
+  DomainEventOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DomainEventSelect,
+  DomainEventWithRelations,
+  DomainEventFilter,
+  DomainEventOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const domainEventsQueryKey = domainEventKeys.list;
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDomainEventsQuery({
@@ -30,33 +45,47 @@ export const domainEventsQueryKey = domainEventKeys.list;
  * });
  * ```
  */
-export function useDomainEventsQuery<S extends DomainEventSelect, TData = {
-  domainEvents: ConnectionResult<InferSelectResult<DomainEventWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DomainEventFilter, DomainEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
-} & Omit<UseQueryOptions<{
-  domainEvents: ConnectionResult<InferSelectResult<DomainEventWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDomainEventsQuery(params: {
-  selection: ListSelectionConfig<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useDomainEventsQuery<
+  S extends DomainEventSelect,
+  TData = {
+    domainEvents: ConnectionResult<InferSelectResult<DomainEventWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DomainEventFilter, DomainEventOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DomainEventSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        domainEvents: ConnectionResult<InferSelectResult<DomainEventWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDomainEventsQuery(
+  params: {
+    selection: ListSelectionConfig<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: domainEventKeys.list(args),
     queryFn: () => getClient().domainEvent.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDomainEventsQuery({
@@ -70,35 +99,47 @@ export function useDomainEventsQuery(params: {
 export async function fetchDomainEventsQuery<S extends DomainEventSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DomainEventFilter, DomainEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
+  } & Omit<ListSelectionConfig<S, DomainEventFilter, DomainEventOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DomainEventSelect>;
 }): Promise<{
   domainEvents: ConnectionResult<InferSelectResult<DomainEventWithRelations, S>>;
 }>;
 export async function fetchDomainEventsQuery(params: {
   selection: ListSelectionConfig<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>;
 }) {
-  const args = buildListSelectionArgs<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>(params.selection);
+  const args = buildListSelectionArgs<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>(
+    params.selection
+  );
   return getClient().domainEvent.findMany(args).unwrap();
 }
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```ts
  * await prefetchDomainEventsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDomainEventsQuery<S extends DomainEventSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DomainEventFilter, DomainEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
-}): Promise<void>;
-export async function prefetchDomainEventsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>(params.selection);
+export async function prefetchDomainEventsQuery<S extends DomainEventSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DomainEventFilter, DomainEventOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DomainEventSelect>;
+  }
+): Promise<void>;
+export async function prefetchDomainEventsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<DomainEventSelect, DomainEventFilter, DomainEventOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: domainEventKeys.list(args),
-    queryFn: () => getClient().domainEvent.findMany(args).unwrap()
+    queryFn: () => getClient().domainEvent.findMany(args).unwrap(),
   });
 }

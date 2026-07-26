@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformApiSettingKeys } from "../query-keys";
-import type { PlatformApiSettingSelect, PlatformApiSettingWithRelations, PlatformApiSettingFilter, PlatformApiSettingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiSettingSelect, PlatformApiSettingWithRelations, PlatformApiSettingFilter, PlatformApiSettingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformApiSettingKeys } from '../query-keys';
+import type {
+  PlatformApiSettingSelect,
+  PlatformApiSettingWithRelations,
+  PlatformApiSettingFilter,
+  PlatformApiSettingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformApiSettingSelect,
+  PlatformApiSettingWithRelations,
+  PlatformApiSettingFilter,
+  PlatformApiSettingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformApiSettingsQueryKey = platformApiSettingKeys.list;
 /**
  * Per-API feature flag overrides; NULL columns inherit from database_settings
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformApiSettingsQuery({
@@ -30,33 +45,58 @@ export const platformApiSettingsQueryKey = platformApiSettingKeys.list;
  * });
  * ```
  */
-export function usePlatformApiSettingsQuery<S extends PlatformApiSettingSelect, TData = {
-  platformApiSettings: ConnectionResult<InferSelectResult<PlatformApiSettingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformApiSettingFilter, PlatformApiSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformApiSettingSelect>;
-} & Omit<UseQueryOptions<{
-  platformApiSettings: ConnectionResult<InferSelectResult<PlatformApiSettingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformApiSettingsQuery(params: {
-  selection: ListSelectionConfig<PlatformApiSettingSelect, PlatformApiSettingFilter, PlatformApiSettingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformApiSettingSelect, PlatformApiSettingFilter, PlatformApiSettingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformApiSettingsQuery<
+  S extends PlatformApiSettingSelect,
+  TData = {
+    platformApiSettings: ConnectionResult<InferSelectResult<PlatformApiSettingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformApiSettingFilter, PlatformApiSettingOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformApiSettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformApiSettings: ConnectionResult<
+          InferSelectResult<PlatformApiSettingWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformApiSettingsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformApiSettingSelect,
+      PlatformApiSettingFilter,
+      PlatformApiSettingOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformApiSettingSelect,
+    PlatformApiSettingFilter,
+    PlatformApiSettingOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformApiSettingKeys.list(args),
     queryFn: () => getClient().platformApiSetting.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Per-API feature flag overrides; NULL columns inherit from database_settings
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformApiSettingsQuery({
@@ -70,35 +110,62 @@ export function usePlatformApiSettingsQuery(params: {
 export async function fetchPlatformApiSettingsQuery<S extends PlatformApiSettingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformApiSettingFilter, PlatformApiSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformApiSettingSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformApiSettingFilter, PlatformApiSettingOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PlatformApiSettingSelect>;
 }): Promise<{
   platformApiSettings: ConnectionResult<InferSelectResult<PlatformApiSettingWithRelations, S>>;
 }>;
 export async function fetchPlatformApiSettingsQuery(params: {
-  selection: ListSelectionConfig<PlatformApiSettingSelect, PlatformApiSettingFilter, PlatformApiSettingOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformApiSettingSelect,
+    PlatformApiSettingFilter,
+    PlatformApiSettingOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformApiSettingSelect, PlatformApiSettingFilter, PlatformApiSettingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformApiSettingSelect,
+    PlatformApiSettingFilter,
+    PlatformApiSettingOrderBy
+  >(params.selection);
   return getClient().platformApiSetting.findMany(args).unwrap();
 }
 /**
  * Per-API feature flag overrides; NULL columns inherit from database_settings
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformApiSettingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformApiSettingsQuery<S extends PlatformApiSettingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformApiSettingFilter, PlatformApiSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformApiSettingSelect>;
-}): Promise<void>;
-export async function prefetchPlatformApiSettingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformApiSettingSelect, PlatformApiSettingFilter, PlatformApiSettingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformApiSettingSelect, PlatformApiSettingFilter, PlatformApiSettingOrderBy>(params.selection);
+export async function prefetchPlatformApiSettingsQuery<S extends PlatformApiSettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformApiSettingFilter, PlatformApiSettingOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformApiSettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformApiSettingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformApiSettingSelect,
+      PlatformApiSettingFilter,
+      PlatformApiSettingOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformApiSettingSelect,
+    PlatformApiSettingFilter,
+    PlatformApiSettingOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformApiSettingKeys.list(args),
-    queryFn: () => getClient().platformApiSetting.findMany(args).unwrap()
+    queryFn: () => getClient().platformApiSetting.findMany(args).unwrap(),
   });
 }

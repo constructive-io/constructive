@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { pubkeySettingKeys } from "../query-keys";
-import { pubkeySettingMutationKeys } from "../mutation-keys";
-import type { PubkeySettingSelect, PubkeySettingWithRelations, CreatePubkeySettingInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PubkeySettingSelect, PubkeySettingWithRelations, CreatePubkeySettingInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { pubkeySettingKeys } from '../query-keys';
+import { pubkeySettingMutationKeys } from '../mutation-keys';
+import type {
+  PubkeySettingSelect,
+  PubkeySettingWithRelations,
+  CreatePubkeySettingInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PubkeySettingSelect,
+  PubkeySettingWithRelations,
+  CreatePubkeySettingInput,
+} from '../../orm/input-types';
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreatePubkeySettingMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreatePubkeySettingMutation<S extends PubkeySettingSelect>(params: {
-  selection: ({
-    fields: S & PubkeySettingSelect;
-  } & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>);
-} & Omit<UseMutationOptions<{
-  createPubkeySetting: {
-    pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S>;
-  };
-}, Error, CreatePubkeySettingInput["pubkeySetting"]>, "mutationFn">): UseMutationResult<{
-  createPubkeySetting: {
-    pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S>;
-  };
-}, Error, CreatePubkeySettingInput["pubkeySetting"]>;
-export function useCreatePubkeySettingMutation(params: {
-  selection: SelectionConfig<PubkeySettingSelect>;
-} & Omit<UseMutationOptions<any, Error, CreatePubkeySettingInput["pubkeySetting"]>, "mutationFn">) {
+export function useCreatePubkeySettingMutation<S extends PubkeySettingSelect>(
+  params: {
+    selection: {
+      fields: S & PubkeySettingSelect;
+    } & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createPubkeySetting: {
+          pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S>;
+        };
+      },
+      Error,
+      CreatePubkeySettingInput['pubkeySetting']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createPubkeySetting: {
+      pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S>;
+    };
+  },
+  Error,
+  CreatePubkeySettingInput['pubkeySetting']
+>;
+export function useCreatePubkeySettingMutation(
+  params: {
+    selection: SelectionConfig<PubkeySettingSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreatePubkeySettingInput['pubkeySetting']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<PubkeySettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: pubkeySettingMutationKeys.create(),
-    mutationFn: (data: CreatePubkeySettingInput["pubkeySetting"]) => getClient().pubkeySetting.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreatePubkeySettingInput['pubkeySetting']) =>
+      getClient()
+        .pubkeySetting.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: pubkeySettingKeys.lists()
+        queryKey: pubkeySettingKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

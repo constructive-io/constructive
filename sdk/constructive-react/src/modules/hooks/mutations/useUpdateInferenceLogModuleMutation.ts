@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { inferenceLogModuleKeys } from "../query-keys";
-import { inferenceLogModuleMutationKeys } from "../mutation-keys";
-import type { InferenceLogModuleSelect, InferenceLogModuleWithRelations, InferenceLogModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { InferenceLogModuleSelect, InferenceLogModuleWithRelations, InferenceLogModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { inferenceLogModuleKeys } from '../query-keys';
+import { inferenceLogModuleMutationKeys } from '../mutation-keys';
+import type {
+  InferenceLogModuleSelect,
+  InferenceLogModuleWithRelations,
+  InferenceLogModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  InferenceLogModuleSelect,
+  InferenceLogModuleWithRelations,
+  InferenceLogModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a InferenceLogModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateInferenceLogModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', inferenceLogModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateInferenceLogModuleMutation<S extends InferenceLogModuleSelect>(params: {
-  selection: ({
-    fields: S & InferenceLogModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, InferenceLogModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateInferenceLogModule: {
-    inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  inferenceLogModulePatch: InferenceLogModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateInferenceLogModule: {
-    inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  inferenceLogModulePatch: InferenceLogModulePatch;
-}>;
-export function useUpdateInferenceLogModuleMutation(params: {
-  selection: SelectionConfig<InferenceLogModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  inferenceLogModulePatch: InferenceLogModulePatch;
-}>, "mutationFn">) {
+export function useUpdateInferenceLogModuleMutation<S extends InferenceLogModuleSelect>(
+  params: {
+    selection: {
+      fields: S & InferenceLogModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, InferenceLogModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateInferenceLogModule: {
+          inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        inferenceLogModulePatch: InferenceLogModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateInferenceLogModule: {
+      inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    inferenceLogModulePatch: InferenceLogModulePatch;
+  }
+>;
+export function useUpdateInferenceLogModuleMutation(
+  params: {
+    selection: SelectionConfig<InferenceLogModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        inferenceLogModulePatch: InferenceLogModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<InferenceLogModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: inferenceLogModuleMutationKeys.all,
     mutationFn: ({
       id,
-      inferenceLogModulePatch
+      inferenceLogModulePatch,
     }: {
       id: string;
       inferenceLogModulePatch: InferenceLogModulePatch;
-    }) => getClient().inferenceLogModule.update({
-      where: {
-        id
-      },
-      data: inferenceLogModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .inferenceLogModule.update({
+          where: {
+            id,
+          },
+          data: inferenceLogModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: inferenceLogModuleKeys.detail(variables.id)
+        queryKey: inferenceLogModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: inferenceLogModuleKeys.lists()
+        queryKey: inferenceLogModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

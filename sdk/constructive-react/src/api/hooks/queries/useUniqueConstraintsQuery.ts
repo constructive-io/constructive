@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { uniqueConstraintKeys } from "../query-keys";
-import type { UniqueConstraintSelect, UniqueConstraintWithRelations, UniqueConstraintFilter, UniqueConstraintOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { UniqueConstraintSelect, UniqueConstraintWithRelations, UniqueConstraintFilter, UniqueConstraintOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { uniqueConstraintKeys } from '../query-keys';
+import type {
+  UniqueConstraintSelect,
+  UniqueConstraintWithRelations,
+  UniqueConstraintFilter,
+  UniqueConstraintOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  UniqueConstraintSelect,
+  UniqueConstraintWithRelations,
+  UniqueConstraintFilter,
+  UniqueConstraintOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const uniqueConstraintsQueryKey = uniqueConstraintKeys.list;
 /**
  * Query hook for fetching UniqueConstraint list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useUniqueConstraintsQuery({
@@ -30,33 +45,53 @@ export const uniqueConstraintsQueryKey = uniqueConstraintKeys.list;
  * });
  * ```
  */
-export function useUniqueConstraintsQuery<S extends UniqueConstraintSelect, TData = {
-  uniqueConstraints: ConnectionResult<InferSelectResult<UniqueConstraintWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UniqueConstraintFilter, UniqueConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
-} & Omit<UseQueryOptions<{
-  uniqueConstraints: ConnectionResult<InferSelectResult<UniqueConstraintWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useUniqueConstraintsQuery(params: {
-  selection: ListSelectionConfig<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useUniqueConstraintsQuery<
+  S extends UniqueConstraintSelect,
+  TData = {
+    uniqueConstraints: ConnectionResult<InferSelectResult<UniqueConstraintWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, UniqueConstraintFilter, UniqueConstraintOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        uniqueConstraints: ConnectionResult<InferSelectResult<UniqueConstraintWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useUniqueConstraintsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      UniqueConstraintSelect,
+      UniqueConstraintFilter,
+      UniqueConstraintOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    UniqueConstraintSelect,
+    UniqueConstraintFilter,
+    UniqueConstraintOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: uniqueConstraintKeys.list(args),
     queryFn: () => getClient().uniqueConstraint.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch UniqueConstraint list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchUniqueConstraintsQuery({
@@ -70,35 +105,59 @@ export function useUniqueConstraintsQuery(params: {
 export async function fetchUniqueConstraintsQuery<S extends UniqueConstraintSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UniqueConstraintFilter, UniqueConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
+  } & Omit<ListSelectionConfig<S, UniqueConstraintFilter, UniqueConstraintOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
 }): Promise<{
   uniqueConstraints: ConnectionResult<InferSelectResult<UniqueConstraintWithRelations, S>>;
 }>;
 export async function fetchUniqueConstraintsQuery(params: {
-  selection: ListSelectionConfig<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy>;
+  selection: ListSelectionConfig<
+    UniqueConstraintSelect,
+    UniqueConstraintFilter,
+    UniqueConstraintOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    UniqueConstraintSelect,
+    UniqueConstraintFilter,
+    UniqueConstraintOrderBy
+  >(params.selection);
   return getClient().uniqueConstraint.findMany(args).unwrap();
 }
 /**
  * Prefetch UniqueConstraint list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchUniqueConstraintsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchUniqueConstraintsQuery<S extends UniqueConstraintSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UniqueConstraintFilter, UniqueConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
-}): Promise<void>;
-export async function prefetchUniqueConstraintsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy>(params.selection);
+export async function prefetchUniqueConstraintsQuery<S extends UniqueConstraintSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, UniqueConstraintFilter, UniqueConstraintOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
+  }
+): Promise<void>;
+export async function prefetchUniqueConstraintsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      UniqueConstraintSelect,
+      UniqueConstraintFilter,
+      UniqueConstraintOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    UniqueConstraintSelect,
+    UniqueConstraintFilter,
+    UniqueConstraintOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: uniqueConstraintKeys.list(args),
-    queryFn: () => getClient().uniqueConstraint.findMany(args).unwrap()
+    queryFn: () => getClient().uniqueConstraint.findMany(args).unwrap(),
   });
 }

@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteThemeKeys } from "../query-keys";
-import { platformSiteThemeMutationKeys } from "../mutation-keys";
-import type { PlatformSiteThemeSelect, PlatformSiteThemeWithRelations, CreatePlatformSiteThemeInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteThemeSelect, PlatformSiteThemeWithRelations, CreatePlatformSiteThemeInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteThemeKeys } from '../query-keys';
+import { platformSiteThemeMutationKeys } from '../mutation-keys';
+import type {
+  PlatformSiteThemeSelect,
+  PlatformSiteThemeWithRelations,
+  CreatePlatformSiteThemeInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformSiteThemeSelect,
+  PlatformSiteThemeWithRelations,
+  CreatePlatformSiteThemeInput,
+} from '../../orm/input-types';
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreatePlatformSiteThemeMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreatePlatformSiteThemeMutation<S extends PlatformSiteThemeSelect>(params: {
-  selection: ({
-    fields: S & PlatformSiteThemeSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteThemeSelect>);
-} & Omit<UseMutationOptions<{
-  createPlatformSiteTheme: {
-    platformSiteTheme: InferSelectResult<PlatformSiteThemeWithRelations, S>;
-  };
-}, Error, CreatePlatformSiteThemeInput["platformSiteTheme"]>, "mutationFn">): UseMutationResult<{
-  createPlatformSiteTheme: {
-    platformSiteTheme: InferSelectResult<PlatformSiteThemeWithRelations, S>;
-  };
-}, Error, CreatePlatformSiteThemeInput["platformSiteTheme"]>;
-export function useCreatePlatformSiteThemeMutation(params: {
-  selection: SelectionConfig<PlatformSiteThemeSelect>;
-} & Omit<UseMutationOptions<any, Error, CreatePlatformSiteThemeInput["platformSiteTheme"]>, "mutationFn">) {
+export function useCreatePlatformSiteThemeMutation<S extends PlatformSiteThemeSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformSiteThemeSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteThemeSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createPlatformSiteTheme: {
+          platformSiteTheme: InferSelectResult<PlatformSiteThemeWithRelations, S>;
+        };
+      },
+      Error,
+      CreatePlatformSiteThemeInput['platformSiteTheme']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createPlatformSiteTheme: {
+      platformSiteTheme: InferSelectResult<PlatformSiteThemeWithRelations, S>;
+    };
+  },
+  Error,
+  CreatePlatformSiteThemeInput['platformSiteTheme']
+>;
+export function useCreatePlatformSiteThemeMutation(
+  params: {
+    selection: SelectionConfig<PlatformSiteThemeSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreatePlatformSiteThemeInput['platformSiteTheme']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformSiteThemeSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformSiteThemeMutationKeys.create(),
-    mutationFn: (data: CreatePlatformSiteThemeInput["platformSiteTheme"]) => getClient().platformSiteTheme.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreatePlatformSiteThemeInput['platformSiteTheme']) =>
+      getClient()
+        .platformSiteTheme.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: platformSiteThemeKeys.lists()
+        queryKey: platformSiteThemeKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

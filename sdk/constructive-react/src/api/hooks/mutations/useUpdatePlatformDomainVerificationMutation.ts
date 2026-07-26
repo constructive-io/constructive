@@ -4,83 +4,115 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformDomainVerificationKeys } from "../query-keys";
-import { platformDomainVerificationMutationKeys } from "../mutation-keys";
-import type { PlatformDomainVerificationSelect, PlatformDomainVerificationWithRelations, PlatformDomainVerificationPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformDomainVerificationSelect, PlatformDomainVerificationWithRelations, PlatformDomainVerificationPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformDomainVerificationKeys } from '../query-keys';
+import { platformDomainVerificationMutationKeys } from '../mutation-keys';
+import type {
+  PlatformDomainVerificationSelect,
+  PlatformDomainVerificationWithRelations,
+  PlatformDomainVerificationPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformDomainVerificationSelect,
+  PlatformDomainVerificationWithRelations,
+  PlatformDomainVerificationPatch,
+} from '../../orm/input-types';
 /**
  * Ownership verification challenges issued for a domain
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformDomainVerificationMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformDomainVerificationPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformDomainVerificationMutation<S extends PlatformDomainVerificationSelect>(params: {
-  selection: ({
-    fields: S & PlatformDomainVerificationSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainVerificationSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformDomainVerification: {
-    platformDomainVerification: InferSelectResult<PlatformDomainVerificationWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformDomainVerificationPatch: PlatformDomainVerificationPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformDomainVerification: {
-    platformDomainVerification: InferSelectResult<PlatformDomainVerificationWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformDomainVerificationPatch: PlatformDomainVerificationPatch;
-}>;
-export function useUpdatePlatformDomainVerificationMutation(params: {
-  selection: SelectionConfig<PlatformDomainVerificationSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  platformDomainVerificationPatch: PlatformDomainVerificationPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformDomainVerificationMutation<
+  S extends PlatformDomainVerificationSelect,
+>(
+  params: {
+    selection: {
+      fields: S & PlatformDomainVerificationSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainVerificationSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformDomainVerification: {
+          platformDomainVerification: InferSelectResult<PlatformDomainVerificationWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        platformDomainVerificationPatch: PlatformDomainVerificationPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformDomainVerification: {
+      platformDomainVerification: InferSelectResult<PlatformDomainVerificationWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    platformDomainVerificationPatch: PlatformDomainVerificationPatch;
+  }
+>;
+export function useUpdatePlatformDomainVerificationMutation(
+  params: {
+    selection: SelectionConfig<PlatformDomainVerificationSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        platformDomainVerificationPatch: PlatformDomainVerificationPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformDomainVerificationSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformDomainVerificationMutationKeys.all,
     mutationFn: ({
       id,
-      platformDomainVerificationPatch
+      platformDomainVerificationPatch,
     }: {
       id: string;
       platformDomainVerificationPatch: PlatformDomainVerificationPatch;
-    }) => getClient().platformDomainVerification.update({
-      where: {
-        id
-      },
-      data: platformDomainVerificationPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformDomainVerification.update({
+          where: {
+            id,
+          },
+          data: platformDomainVerificationPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformDomainVerificationKeys.detail(variables.id)
+        queryKey: platformDomainVerificationKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformDomainVerificationKeys.lists()
+        queryKey: platformDomainVerificationKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

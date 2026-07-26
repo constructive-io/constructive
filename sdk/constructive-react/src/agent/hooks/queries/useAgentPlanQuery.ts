@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentPlanKeys } from "../query-keys";
-import type { AgentPlanSelect, AgentPlanWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentPlanSelect, AgentPlanWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentPlanKeys } from '../query-keys';
+import type { AgentPlanSelect, AgentPlanWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentPlanSelect, AgentPlanWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentPlanQueryKey = agentPlanKeys.detail;
 /**
  * Workflow plan attached to an agent thread with ordered tasks and optional approval gates
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentPlanQuery({
@@ -26,38 +26,52 @@ export const agentPlanQueryKey = agentPlanKeys.detail;
  * });
  * ```
  */
-export function useAgentPlanQuery<S extends AgentPlanSelect, TData = {
-  agentPlan: InferSelectResult<AgentPlanWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentPlanSelect>;
-} & Omit<UseQueryOptions<{
-  agentPlan: InferSelectResult<AgentPlanWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentPlanQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentPlanSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentPlanQuery<
+  S extends AgentPlanSelect,
+  TData = {
+    agentPlan: InferSelectResult<AgentPlanWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentPlanSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentPlan: InferSelectResult<AgentPlanWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentPlanQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentPlanSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentPlanSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentPlanKeys.detail(params.id),
-    queryFn: () => getClient().agentPlan.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agentPlan.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Workflow plan attached to an agent thread with ordered tasks and optional approval gates
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentPlanQuery({
@@ -79,35 +93,46 @@ export async function fetchAgentPlanQuery(params: {
   selection: SelectionConfig<AgentPlanSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentPlanSelect>(params.selection);
-  return getClient().agentPlan.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agentPlan.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Workflow plan attached to an agent thread with ordered tasks and optional approval gates
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentPlanQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentPlanQuery<S extends AgentPlanSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentPlanSelect>;
-}): Promise<void>;
-export async function prefetchAgentPlanQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentPlanSelect>;
-}): Promise<void> {
+export async function prefetchAgentPlanQuery<S extends AgentPlanSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentPlanSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentPlanQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentPlanSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentPlanSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentPlanKeys.detail(params.id),
-    queryFn: () => getClient().agentPlan.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agentPlan.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

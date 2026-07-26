@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { httpRouteModuleKeys } from "../query-keys";
-import { httpRouteModuleMutationKeys } from "../mutation-keys";
-import type { HttpRouteModuleSelect, HttpRouteModuleWithRelations, HttpRouteModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { HttpRouteModuleSelect, HttpRouteModuleWithRelations, HttpRouteModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { httpRouteModuleKeys } from '../query-keys';
+import { httpRouteModuleMutationKeys } from '../mutation-keys';
+import type {
+  HttpRouteModuleSelect,
+  HttpRouteModuleWithRelations,
+  HttpRouteModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  HttpRouteModuleSelect,
+  HttpRouteModuleWithRelations,
+  HttpRouteModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a HttpRouteModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateHttpRouteModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', httpRouteModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateHttpRouteModuleMutation<S extends HttpRouteModuleSelect>(params: {
-  selection: ({
-    fields: S & HttpRouteModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, HttpRouteModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateHttpRouteModule: {
-    httpRouteModule: InferSelectResult<HttpRouteModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  httpRouteModulePatch: HttpRouteModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateHttpRouteModule: {
-    httpRouteModule: InferSelectResult<HttpRouteModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  httpRouteModulePatch: HttpRouteModulePatch;
-}>;
-export function useUpdateHttpRouteModuleMutation(params: {
-  selection: SelectionConfig<HttpRouteModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  httpRouteModulePatch: HttpRouteModulePatch;
-}>, "mutationFn">) {
+export function useUpdateHttpRouteModuleMutation<S extends HttpRouteModuleSelect>(
+  params: {
+    selection: {
+      fields: S & HttpRouteModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, HttpRouteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateHttpRouteModule: {
+          httpRouteModule: InferSelectResult<HttpRouteModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        httpRouteModulePatch: HttpRouteModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateHttpRouteModule: {
+      httpRouteModule: InferSelectResult<HttpRouteModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    httpRouteModulePatch: HttpRouteModulePatch;
+  }
+>;
+export function useUpdateHttpRouteModuleMutation(
+  params: {
+    selection: SelectionConfig<HttpRouteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        httpRouteModulePatch: HttpRouteModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<HttpRouteModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: httpRouteModuleMutationKeys.all,
     mutationFn: ({
       id,
-      httpRouteModulePatch
+      httpRouteModulePatch,
     }: {
       id: string;
       httpRouteModulePatch: HttpRouteModulePatch;
-    }) => getClient().httpRouteModule.update({
-      where: {
-        id
-      },
-      data: httpRouteModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .httpRouteModule.update({
+          where: {
+            id,
+          },
+          data: httpRouteModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: httpRouteModuleKeys.detail(variables.id)
+        queryKey: httpRouteModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: httpRouteModuleKeys.lists()
+        queryKey: httpRouteModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

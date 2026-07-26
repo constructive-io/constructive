@@ -4,83 +4,107 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentPersonaKeys } from "../query-keys";
-import { agentPersonaMutationKeys } from "../mutation-keys";
-import type { AgentPersonaSelect, AgentPersonaWithRelations, AgentPersonaPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentPersonaSelect, AgentPersonaWithRelations, AgentPersonaPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentPersonaKeys } from '../query-keys';
+import { agentPersonaMutationKeys } from '../mutation-keys';
+import type {
+  AgentPersonaSelect,
+  AgentPersonaWithRelations,
+  AgentPersonaPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AgentPersonaSelect,
+  AgentPersonaWithRelations,
+  AgentPersonaPatch,
+} from '../../orm/input-types';
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAgentPersonaMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', agentPersonaPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAgentPersonaMutation<S extends AgentPersonaSelect>(params: {
-  selection: ({
-    fields: S & AgentPersonaSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>);
-} & Omit<UseMutationOptions<{
-  updateAgentPersona: {
-    agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  agentPersonaPatch: AgentPersonaPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateAgentPersona: {
-    agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  agentPersonaPatch: AgentPersonaPatch;
-}>;
-export function useUpdateAgentPersonaMutation(params: {
-  selection: SelectionConfig<AgentPersonaSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  agentPersonaPatch: AgentPersonaPatch;
-}>, "mutationFn">) {
+export function useUpdateAgentPersonaMutation<S extends AgentPersonaSelect>(
+  params: {
+    selection: {
+      fields: S & AgentPersonaSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateAgentPersona: {
+          agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        agentPersonaPatch: AgentPersonaPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateAgentPersona: {
+      agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    agentPersonaPatch: AgentPersonaPatch;
+  }
+>;
+export function useUpdateAgentPersonaMutation(
+  params: {
+    selection: SelectionConfig<AgentPersonaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        agentPersonaPatch: AgentPersonaPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AgentPersonaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentPersonaMutationKeys.all,
-    mutationFn: ({
-      id,
-      agentPersonaPatch
-    }: {
-      id: string;
-      agentPersonaPatch: AgentPersonaPatch;
-    }) => getClient().agentPersona.update({
-      where: {
-        id
-      },
-      data: agentPersonaPatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, agentPersonaPatch }: { id: string; agentPersonaPatch: AgentPersonaPatch }) =>
+      getClient()
+        .agentPersona.update({
+          where: {
+            id,
+          },
+          data: agentPersonaPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: agentPersonaKeys.detail(variables.id)
+        queryKey: agentPersonaKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: agentPersonaKeys.lists()
+        queryKey: agentPersonaKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

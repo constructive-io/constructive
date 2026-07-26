@@ -4,83 +4,99 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgLimitEventKeys } from "../query-keys";
-import { orgLimitEventMutationKeys } from "../mutation-keys";
-import type { OrgLimitEventSelect, OrgLimitEventWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitEventSelect, OrgLimitEventWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgLimitEventKeys } from '../query-keys';
+import { orgLimitEventMutationKeys } from '../mutation-keys';
+import type { OrgLimitEventSelect, OrgLimitEventWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgLimitEventSelect, OrgLimitEventWithRelations } from '../../orm/input-types';
 /**
  * Append-only log of limit events for historical reporting and audit
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteOrgLimitEventMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteOrgLimitEventMutation<S extends OrgLimitEventSelect>(params: {
-  selection: ({
-    fields: S & OrgLimitEventSelect;
-  } & HookStrictSelect<NoInfer<S>, OrgLimitEventSelect>);
-} & Omit<UseMutationOptions<{
-  deleteOrgLimitEvent: {
-    orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteOrgLimitEvent: {
-    orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-}>;
-export function useDeleteOrgLimitEventMutation(params: {
-  selection: SelectionConfig<OrgLimitEventSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-}>, "mutationFn">) {
+export function useDeleteOrgLimitEventMutation<S extends OrgLimitEventSelect>(
+  params: {
+    selection: {
+      fields: S & OrgLimitEventSelect;
+    } & HookStrictSelect<NoInfer<S>, OrgLimitEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteOrgLimitEvent: {
+          orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteOrgLimitEvent: {
+      orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+  }
+>;
+export function useDeleteOrgLimitEventMutation(
+  params: {
+    selection: SelectionConfig<OrgLimitEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<OrgLimitEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: orgLimitEventMutationKeys.all,
-    mutationFn: ({
-      id,
-      createdAt
-    }: {
-      id: string;
-      createdAt: string;
-    }) => getClient().orgLimitEvent.delete({
-      where: {
-        id,
-        createdAt
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, createdAt }: { id: string; createdAt: string }) =>
+      getClient()
+        .orgLimitEvent.delete({
+          where: {
+            id,
+            createdAt,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: orgLimitEventKeys.detail(variables.id)
+        queryKey: orgLimitEventKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: orgLimitEventKeys.lists()
+        queryKey: orgLimitEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

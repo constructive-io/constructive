@@ -4,61 +4,96 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformFunctionInvocationAttemptKeys } from "../query-keys";
-import { platformFunctionInvocationAttemptMutationKeys } from "../mutation-keys";
-import type { PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptWithRelations, PlatformFunctionInvocationAttemptPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptWithRelations, PlatformFunctionInvocationAttemptPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformFunctionInvocationAttemptKeys } from '../query-keys';
+import { platformFunctionInvocationAttemptMutationKeys } from '../mutation-keys';
+import type {
+  PlatformFunctionInvocationAttemptSelect,
+  PlatformFunctionInvocationAttemptWithRelations,
+  PlatformFunctionInvocationAttemptPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformFunctionInvocationAttemptSelect,
+  PlatformFunctionInvocationAttemptWithRelations,
+  PlatformFunctionInvocationAttemptPatch,
+} from '../../orm/input-types';
 /**
  * Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformFunctionInvocationAttemptMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformFunctionInvocationAttemptPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformFunctionInvocationAttemptMutation<S extends PlatformFunctionInvocationAttemptSelect>(params: {
-  selection: ({
-    fields: S & PlatformFunctionInvocationAttemptSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformFunctionInvocationAttempt: {
-    platformFunctionInvocationAttempt: InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformFunctionInvocationAttempt: {
-    platformFunctionInvocationAttempt: InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
-}>;
-export function useUpdatePlatformFunctionInvocationAttemptMutation(params: {
-  selection: SelectionConfig<PlatformFunctionInvocationAttemptSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformFunctionInvocationAttemptMutation<
+  S extends PlatformFunctionInvocationAttemptSelect,
+>(
+  params: {
+    selection: {
+      fields: S & PlatformFunctionInvocationAttemptSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformFunctionInvocationAttempt: {
+          platformFunctionInvocationAttempt: InferSelectResult<
+            PlatformFunctionInvocationAttemptWithRelations,
+            S
+          >;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformFunctionInvocationAttempt: {
+      platformFunctionInvocationAttempt: InferSelectResult<
+        PlatformFunctionInvocationAttemptWithRelations,
+        S
+      >;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
+  }
+>;
+export function useUpdatePlatformFunctionInvocationAttemptMutation(
+  params: {
+    selection: SelectionConfig<PlatformFunctionInvocationAttemptSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformFunctionInvocationAttemptSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +101,30 @@ export function useUpdatePlatformFunctionInvocationAttemptMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      platformFunctionInvocationAttemptPatch
+      platformFunctionInvocationAttemptPatch,
     }: {
       id: string;
       createdAt: string;
       platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
-    }) => getClient().platformFunctionInvocationAttempt.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: platformFunctionInvocationAttemptPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformFunctionInvocationAttempt.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: platformFunctionInvocationAttemptPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformFunctionInvocationAttemptKeys.detail(variables.id)
+        queryKey: platformFunctionInvocationAttemptKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformFunctionInvocationAttemptKeys.lists()
+        queryKey: platformFunctionInvocationAttemptKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { principalScopeOverrideKeys } from "../query-keys";
-import type { PrincipalScopeOverrideSelect, PrincipalScopeOverrideWithRelations, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PrincipalScopeOverrideSelect, PrincipalScopeOverrideWithRelations, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { principalScopeOverrideKeys } from '../query-keys';
+import type {
+  PrincipalScopeOverrideSelect,
+  PrincipalScopeOverrideWithRelations,
+  PrincipalScopeOverrideFilter,
+  PrincipalScopeOverrideOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PrincipalScopeOverrideSelect,
+  PrincipalScopeOverrideWithRelations,
+  PrincipalScopeOverrideFilter,
+  PrincipalScopeOverrideOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const principalScopeOverridesQueryKey = principalScopeOverrideKeys.list;
 /**
  * Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePrincipalScopeOverridesQuery({
@@ -30,33 +45,60 @@ export const principalScopeOverridesQueryKey = principalScopeOverrideKeys.list;
  * });
  * ```
  */
-export function usePrincipalScopeOverridesQuery<S extends PrincipalScopeOverrideSelect, TData = {
-  principalScopeOverrides: ConnectionResult<InferSelectResult<PrincipalScopeOverrideWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalScopeOverrideSelect>;
-} & Omit<UseQueryOptions<{
-  principalScopeOverrides: ConnectionResult<InferSelectResult<PrincipalScopeOverrideWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePrincipalScopeOverridesQuery(params: {
-  selection: ListSelectionConfig<PrincipalScopeOverrideSelect, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PrincipalScopeOverrideSelect, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePrincipalScopeOverridesQuery<
+  S extends PrincipalScopeOverrideSelect,
+  TData = {
+    principalScopeOverrides: ConnectionResult<
+      InferSelectResult<PrincipalScopeOverrideWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PrincipalScopeOverrideSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        principalScopeOverrides: ConnectionResult<
+          InferSelectResult<PrincipalScopeOverrideWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePrincipalScopeOverridesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PrincipalScopeOverrideSelect,
+      PrincipalScopeOverrideFilter,
+      PrincipalScopeOverrideOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PrincipalScopeOverrideSelect,
+    PrincipalScopeOverrideFilter,
+    PrincipalScopeOverrideOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: principalScopeOverrideKeys.list(args),
     queryFn: () => getClient().principalScopeOverride.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPrincipalScopeOverridesQuery({
@@ -67,38 +109,72 @@ export function usePrincipalScopeOverridesQuery(params: {
  * });
  * ```
  */
-export async function fetchPrincipalScopeOverridesQuery<S extends PrincipalScopeOverrideSelect>(params: {
+export async function fetchPrincipalScopeOverridesQuery<
+  S extends PrincipalScopeOverrideSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalScopeOverrideSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PrincipalScopeOverrideSelect>;
 }): Promise<{
-  principalScopeOverrides: ConnectionResult<InferSelectResult<PrincipalScopeOverrideWithRelations, S>>;
+  principalScopeOverrides: ConnectionResult<
+    InferSelectResult<PrincipalScopeOverrideWithRelations, S>
+  >;
 }>;
 export async function fetchPrincipalScopeOverridesQuery(params: {
-  selection: ListSelectionConfig<PrincipalScopeOverrideSelect, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>;
+  selection: ListSelectionConfig<
+    PrincipalScopeOverrideSelect,
+    PrincipalScopeOverrideFilter,
+    PrincipalScopeOverrideOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PrincipalScopeOverrideSelect, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PrincipalScopeOverrideSelect,
+    PrincipalScopeOverrideFilter,
+    PrincipalScopeOverrideOrderBy
+  >(params.selection);
   return getClient().principalScopeOverride.findMany(args).unwrap();
 }
 /**
  * Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions.
- * 
+ *
  * @example
  * ```ts
  * await prefetchPrincipalScopeOverridesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPrincipalScopeOverridesQuery<S extends PrincipalScopeOverrideSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalScopeOverrideSelect>;
-}): Promise<void>;
-export async function prefetchPrincipalScopeOverridesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PrincipalScopeOverrideSelect, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PrincipalScopeOverrideSelect, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>(params.selection);
+export async function prefetchPrincipalScopeOverridesQuery<S extends PrincipalScopeOverrideSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PrincipalScopeOverrideFilter, PrincipalScopeOverrideOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PrincipalScopeOverrideSelect>;
+  }
+): Promise<void>;
+export async function prefetchPrincipalScopeOverridesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PrincipalScopeOverrideSelect,
+      PrincipalScopeOverrideFilter,
+      PrincipalScopeOverrideOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PrincipalScopeOverrideSelect,
+    PrincipalScopeOverrideFilter,
+    PrincipalScopeOverrideOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: principalScopeOverrideKeys.list(args),
-    queryFn: () => getClient().principalScopeOverride.findMany(args).unwrap()
+    queryFn: () => getClient().principalScopeOverride.findMany(args).unwrap(),
   });
 }

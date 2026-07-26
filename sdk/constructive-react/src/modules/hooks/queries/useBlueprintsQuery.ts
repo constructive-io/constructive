@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { blueprintKeys } from "../query-keys";
-import type { BlueprintSelect, BlueprintWithRelations, BlueprintFilter, BlueprintOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { BlueprintSelect, BlueprintWithRelations, BlueprintFilter, BlueprintOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { blueprintKeys } from '../query-keys';
+import type {
+  BlueprintSelect,
+  BlueprintWithRelations,
+  BlueprintFilter,
+  BlueprintOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  BlueprintSelect,
+  BlueprintWithRelations,
+  BlueprintFilter,
+  BlueprintOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const blueprintsQueryKey = blueprintKeys.list;
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useBlueprintsQuery({
@@ -30,33 +45,47 @@ export const blueprintsQueryKey = blueprintKeys.list;
  * });
  * ```
  */
-export function useBlueprintsQuery<S extends BlueprintSelect, TData = {
-  blueprints: ConnectionResult<InferSelectResult<BlueprintWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, BlueprintFilter, BlueprintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
-} & Omit<UseQueryOptions<{
-  blueprints: ConnectionResult<InferSelectResult<BlueprintWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useBlueprintsQuery(params: {
-  selection: ListSelectionConfig<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useBlueprintsQuery<
+  S extends BlueprintSelect,
+  TData = {
+    blueprints: ConnectionResult<InferSelectResult<BlueprintWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, BlueprintFilter, BlueprintOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, BlueprintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        blueprints: ConnectionResult<InferSelectResult<BlueprintWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useBlueprintsQuery(
+  params: {
+    selection: ListSelectionConfig<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: blueprintKeys.list(args),
     queryFn: () => getClient().blueprint.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchBlueprintsQuery({
@@ -70,35 +99,47 @@ export function useBlueprintsQuery(params: {
 export async function fetchBlueprintsQuery<S extends BlueprintSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, BlueprintFilter, BlueprintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
+  } & Omit<ListSelectionConfig<S, BlueprintFilter, BlueprintOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, BlueprintSelect>;
 }): Promise<{
   blueprints: ConnectionResult<InferSelectResult<BlueprintWithRelations, S>>;
 }>;
 export async function fetchBlueprintsQuery(params: {
   selection: ListSelectionConfig<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>;
 }) {
-  const args = buildListSelectionArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>(params.selection);
+  const args = buildListSelectionArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>(
+    params.selection
+  );
   return getClient().blueprint.findMany(args).unwrap();
 }
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```ts
  * await prefetchBlueprintsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchBlueprintsQuery<S extends BlueprintSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, BlueprintFilter, BlueprintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
-}): Promise<void>;
-export async function prefetchBlueprintsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>(params.selection);
+export async function prefetchBlueprintsQuery<S extends BlueprintSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, BlueprintFilter, BlueprintOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, BlueprintSelect>;
+  }
+): Promise<void>;
+export async function prefetchBlueprintsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: blueprintKeys.list(args),
-    queryFn: () => getClient().blueprint.findMany(args).unwrap()
+    queryFn: () => getClient().blueprint.findMany(args).unwrap(),
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { userStateModuleKeys } from "../query-keys";
-import type { UserStateModuleSelect, UserStateModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { UserStateModuleSelect, UserStateModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { userStateModuleKeys } from '../query-keys';
+import type { UserStateModuleSelect, UserStateModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { UserStateModuleSelect, UserStateModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const userStateModuleQueryKey = userStateModuleKeys.detail;
 /**
  * Query hook for fetching a single UserStateModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useUserStateModuleQuery({
@@ -26,38 +26,52 @@ export const userStateModuleQueryKey = userStateModuleKeys.detail;
  * });
  * ```
  */
-export function useUserStateModuleQuery<S extends UserStateModuleSelect, TData = {
-  userStateModule: InferSelectResult<UserStateModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
-} & Omit<UseQueryOptions<{
-  userStateModule: InferSelectResult<UserStateModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useUserStateModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<UserStateModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useUserStateModuleQuery<
+  S extends UserStateModuleSelect,
+  TData = {
+    userStateModule: InferSelectResult<UserStateModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        userStateModule: InferSelectResult<UserStateModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useUserStateModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<UserStateModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<UserStateModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: userStateModuleKeys.detail(params.id),
-    queryFn: () => getClient().userStateModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .userStateModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single UserStateModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchUserStateModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchUserStateModuleQuery(params: {
   selection: SelectionConfig<UserStateModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<UserStateModuleSelect>(params.selection);
-  return getClient().userStateModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .userStateModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single UserStateModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchUserStateModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchUserStateModuleQuery<S extends UserStateModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
-}): Promise<void>;
-export async function prefetchUserStateModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<UserStateModuleSelect>;
-}): Promise<void> {
+export async function prefetchUserStateModuleQuery<S extends UserStateModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, UserStateModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchUserStateModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<UserStateModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<UserStateModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userStateModuleKeys.detail(params.id),
-    queryFn: () => getClient().userStateModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .userStateModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

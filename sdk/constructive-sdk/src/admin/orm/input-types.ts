@@ -702,12 +702,16 @@ export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteR
 export type AppGrantWithRelations = AppGrant & AppGrantRelations;
 export type AppInviteWithRelations = AppInvite & AppInviteRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
-export type AppMembershipDefaultWithRelations = AppMembershipDefault & AppMembershipDefaultRelations;
+export type AppMembershipDefaultWithRelations = AppMembershipDefault &
+  AppMembershipDefaultRelations;
 export type AppOwnerGrantWithRelations = AppOwnerGrant & AppOwnerGrantRelations;
 export type AppPermissionWithRelations = AppPermission & AppPermissionRelations;
-export type AppPermissionDefaultWithRelations = AppPermissionDefault & AppPermissionDefaultRelations;
-export type AppPermissionDefaultGrantWithRelations = AppPermissionDefaultGrant & AppPermissionDefaultGrantRelations;
-export type AppPermissionDefaultPermissionWithRelations = AppPermissionDefaultPermission & AppPermissionDefaultPermissionRelations;
+export type AppPermissionDefaultWithRelations = AppPermissionDefault &
+  AppPermissionDefaultRelations;
+export type AppPermissionDefaultGrantWithRelations = AppPermissionDefaultGrant &
+  AppPermissionDefaultGrantRelations;
+export type AppPermissionDefaultPermissionWithRelations = AppPermissionDefaultPermission &
+  AppPermissionDefaultPermissionRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type OrgAdminGrantWithRelations = OrgAdminGrant & OrgAdminGrantRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
@@ -716,13 +720,18 @@ export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgMemberWithRelations = OrgMember & OrgMemberRelations;
 export type OrgMemberProfileWithRelations = OrgMemberProfile & OrgMemberProfileRelations;
 export type OrgMembershipWithRelations = OrgMembership & OrgMembershipRelations;
-export type OrgMembershipDefaultWithRelations = OrgMembershipDefault & OrgMembershipDefaultRelations;
-export type OrgMembershipSettingWithRelations = OrgMembershipSetting & OrgMembershipSettingRelations;
+export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
+  OrgMembershipDefaultRelations;
+export type OrgMembershipSettingWithRelations = OrgMembershipSetting &
+  OrgMembershipSettingRelations;
 export type OrgOwnerGrantWithRelations = OrgOwnerGrant & OrgOwnerGrantRelations;
 export type OrgPermissionWithRelations = OrgPermission & OrgPermissionRelations;
-export type OrgPermissionDefaultWithRelations = OrgPermissionDefault & OrgPermissionDefaultRelations;
-export type OrgPermissionDefaultGrantWithRelations = OrgPermissionDefaultGrant & OrgPermissionDefaultGrantRelations;
-export type OrgPermissionDefaultPermissionWithRelations = OrgPermissionDefaultPermission & OrgPermissionDefaultPermissionRelations;
+export type OrgPermissionDefaultWithRelations = OrgPermissionDefault &
+  OrgPermissionDefaultRelations;
+export type OrgPermissionDefaultGrantWithRelations = OrgPermissionDefaultGrant &
+  OrgPermissionDefaultGrantRelations;
+export type OrgPermissionDefaultPermissionWithRelations = OrgPermissionDefaultPermission &
+  OrgPermissionDefaultPermissionRelations;
 // ============ Entity Select Types ============
 export type AppAdminGrantSelect = {
   actorId?: boolean;
@@ -1668,32 +1677,524 @@ export interface OrgPermissionDefaultPermissionFilter {
   updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
-export type AppAdminGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type AppClaimedInviteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type AppGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type AppInviteOrderBy = "CHANNEL_ASC" | "CHANNEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_COUNT_ASC" | "INVITE_COUNT_DESC" | "INVITE_LIMIT_ASC" | "INVITE_LIMIT_DESC" | "INVITE_TOKEN_ASC" | "INVITE_TOKEN_DESC" | "INVITE_VALID_ASC" | "INVITE_VALID_DESC" | "MULTIPLE_ASC" | "MULTIPLE_DESC" | "NATURAL" | "PHONE_ASC" | "PHONE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type AppMembershipOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "GRANTED_ASC" | "GRANTED_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_BANNED_ASC" | "IS_BANNED_DESC" | "IS_DISABLED_ASC" | "IS_DISABLED_DESC" | "IS_OWNER_ASC" | "IS_OWNER_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type AppMembershipDefaultOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ID_ASC" | "ID_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type AppOwnerGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type AppPermissionOrderBy = "BITNUM_ASC" | "BITNUM_DESC" | "BITSTR_ASC" | "BITSTR_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type AppPermissionDefaultOrderBy = "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type AppPermissionDefaultGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type AppPermissionDefaultPermissionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type MembershipTypeOrderBy = "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "HAS_USERS_TABLE_ENTRY_ASC" | "HAS_USERS_TABLE_ENTRY_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARENT_MEMBERSHIP_TYPE_ASC" | "PARENT_MEMBERSHIP_TYPE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
-export type OrgAdminGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgClaimedInviteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgInviteOrderBy = "CHANNEL_ASC" | "CHANNEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_COUNT_ASC" | "INVITE_COUNT_DESC" | "INVITE_LIMIT_ASC" | "INVITE_LIMIT_DESC" | "INVITE_TOKEN_ASC" | "INVITE_TOKEN_DESC" | "INVITE_VALID_ASC" | "INVITE_VALID_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "MULTIPLE_ASC" | "MULTIPLE_DESC" | "NATURAL" | "PHONE_ASC" | "PHONE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgMemberOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type OrgMemberProfileOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "BIO_ASC" | "BIO_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MEMBERSHIP_ID_ASC" | "MEMBERSHIP_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_PICTURE_ASC" | "PROFILE_PICTURE_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgMembershipOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTED_ASC" | "GRANTED_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_BANNED_ASC" | "IS_BANNED_DESC" | "IS_DISABLED_ASC" | "IS_DISABLED_DESC" | "IS_EXTERNAL_ASC" | "IS_EXTERNAL_DESC" | "IS_OWNER_ASC" | "IS_OWNER_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type OrgMembershipDefaultOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type OrgMembershipSettingOrderBy = "ALLOW_EXTERNAL_MEMBERS_ASC" | "ALLOW_EXTERNAL_MEMBERS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "CREATE_CHILD_CASCADE_ADMINS_ASC" | "CREATE_CHILD_CASCADE_ADMINS_DESC" | "CREATE_CHILD_CASCADE_MEMBERS_ASC" | "CREATE_CHILD_CASCADE_MEMBERS_DESC" | "CREATE_CHILD_CASCADE_OWNERS_ASC" | "CREATE_CHILD_CASCADE_OWNERS_DESC" | "DELETE_MEMBER_CASCADE_CHILDREN_ASC" | "DELETE_MEMBER_CASCADE_CHILDREN_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_PROFILE_ASSIGNMENT_MODE_ASC" | "INVITE_PROFILE_ASSIGNMENT_MODE_DESC" | "LIMIT_ALLOCATION_MODE_ASC" | "LIMIT_ALLOCATION_MODE_DESC" | "NATURAL" | "POPULATE_MEMBER_EMAIL_ASC" | "POPULATE_MEMBER_EMAIL_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type OrgOwnerGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgPermissionOrderBy = "BITNUM_ASC" | "BITNUM_DESC" | "BITSTR_ASC" | "BITSTR_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type OrgPermissionDefaultOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type OrgPermissionDefaultGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type OrgPermissionDefaultPermissionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppAdminGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppClaimedInviteOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppInviteOrderBy =
+  | 'CHANNEL_ASC'
+  | 'CHANNEL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVITE_COUNT_ASC'
+  | 'INVITE_COUNT_DESC'
+  | 'INVITE_LIMIT_ASC'
+  | 'INVITE_LIMIT_DESC'
+  | 'INVITE_TOKEN_ASC'
+  | 'INVITE_TOKEN_DESC'
+  | 'INVITE_VALID_ASC'
+  | 'INVITE_VALID_DESC'
+  | 'MULTIPLE_ASC'
+  | 'MULTIPLE_DESC'
+  | 'NATURAL'
+  | 'PHONE_ASC'
+  | 'PHONE_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROFILE_ID_ASC'
+  | 'PROFILE_ID_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppMembershipOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'GRANTED_ASC'
+  | 'GRANTED_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_ADMIN_ASC'
+  | 'IS_ADMIN_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_BANNED_ASC'
+  | 'IS_BANNED_DESC'
+  | 'IS_DISABLED_ASC'
+  | 'IS_DISABLED_DESC'
+  | 'IS_OWNER_ASC'
+  | 'IS_OWNER_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'NATURAL'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROFILE_ID_ASC'
+  | 'PROFILE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type AppMembershipDefaultOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type AppOwnerGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppPermissionOrderBy =
+  | 'BITNUM_ASC'
+  | 'BITNUM_DESC'
+  | 'BITSTR_ASC'
+  | 'BITSTR_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type AppPermissionDefaultOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type AppPermissionDefaultGrantOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PERMISSION_ID_ASC'
+  | 'PERMISSION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppPermissionDefaultPermissionOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PERMISSION_ID_ASC'
+  | 'PERMISSION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type MembershipTypeOrderBy =
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'HAS_USERS_TABLE_ENTRY_ASC'
+  | 'HAS_USERS_TABLE_ENTRY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PARENT_MEMBERSHIP_TYPE_ASC'
+  | 'PARENT_MEMBERSHIP_TYPE_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC';
+export type OrgAdminGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgClaimedInviteOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgInviteOrderBy =
+  | 'CHANNEL_ASC'
+  | 'CHANNEL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVITE_COUNT_ASC'
+  | 'INVITE_COUNT_DESC'
+  | 'INVITE_LIMIT_ASC'
+  | 'INVITE_LIMIT_DESC'
+  | 'INVITE_TOKEN_ASC'
+  | 'INVITE_TOKEN_DESC'
+  | 'INVITE_VALID_ASC'
+  | 'INVITE_VALID_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
+  | 'MULTIPLE_ASC'
+  | 'MULTIPLE_DESC'
+  | 'NATURAL'
+  | 'PHONE_ASC'
+  | 'PHONE_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROFILE_ID_ASC'
+  | 'PROFILE_ID_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgMemberOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ADMIN_ASC'
+  | 'IS_ADMIN_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type OrgMemberProfileOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'BIO_ASC'
+  | 'BIO_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MEMBERSHIP_ID_ASC'
+  | 'MEMBERSHIP_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROFILE_PICTURE_ASC'
+  | 'PROFILE_PICTURE_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgMembershipOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'GRANTED_ASC'
+  | 'GRANTED_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_ADMIN_ASC'
+  | 'IS_ADMIN_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_BANNED_ASC'
+  | 'IS_BANNED_DESC'
+  | 'IS_DISABLED_ASC'
+  | 'IS_DISABLED_DESC'
+  | 'IS_EXTERNAL_ASC'
+  | 'IS_EXTERNAL_DESC'
+  | 'IS_OWNER_ASC'
+  | 'IS_OWNER_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
+  | 'NATURAL'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROFILE_ID_ASC'
+  | 'PROFILE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type OrgMembershipDefaultOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type OrgMembershipSettingOrderBy =
+  | 'ALLOW_EXTERNAL_MEMBERS_ASC'
+  | 'ALLOW_EXTERNAL_MEMBERS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATE_CHILD_CASCADE_ADMINS_ASC'
+  | 'CREATE_CHILD_CASCADE_ADMINS_DESC'
+  | 'CREATE_CHILD_CASCADE_MEMBERS_ASC'
+  | 'CREATE_CHILD_CASCADE_MEMBERS_DESC'
+  | 'CREATE_CHILD_CASCADE_OWNERS_ASC'
+  | 'CREATE_CHILD_CASCADE_OWNERS_DESC'
+  | 'DELETE_MEMBER_CASCADE_CHILDREN_ASC'
+  | 'DELETE_MEMBER_CASCADE_CHILDREN_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVITE_PROFILE_ASSIGNMENT_MODE_ASC'
+  | 'INVITE_PROFILE_ASSIGNMENT_MODE_DESC'
+  | 'LIMIT_ALLOCATION_MODE_ASC'
+  | 'LIMIT_ALLOCATION_MODE_DESC'
+  | 'NATURAL'
+  | 'POPULATE_MEMBER_EMAIL_ASC'
+  | 'POPULATE_MEMBER_EMAIL_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type OrgOwnerGrantOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgPermissionOrderBy =
+  | 'BITNUM_ASC'
+  | 'BITNUM_DESC'
+  | 'BITSTR_ASC'
+  | 'BITSTR_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type OrgPermissionDefaultOrderBy =
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type OrgPermissionDefaultGrantOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PERMISSION_ID_ASC'
+  | 'PERMISSION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type OrgPermissionDefaultPermissionOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PERMISSION_ID_ASC'
+  | 'PERMISSION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 // ============ CRUD Input Types ============
 export interface CreateAppAdminGrantInput {
   clientMutationId?: string;
@@ -2396,13 +2897,13 @@ export interface DeleteOrgPermissionDefaultPermissionInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  "AppPermission": {
-    "appPermissionDefaultGrantsByPermissionId": "AppPermissionDefaultGrant"
+  AppPermission: {
+    appPermissionDefaultGrantsByPermissionId: 'AppPermissionDefaultGrant',
   },
-  "OrgPermission": {
-    "orgPermissionDefaultGrantsByPermissionId": "OrgPermissionDefaultGrant",
-    "orgPermissionDefaultPermissionsByPermissionId": "OrgPermissionDefaultPermission"
-  }
+  OrgPermission: {
+    orgPermissionDefaultGrantsByPermissionId: 'OrgPermissionDefaultGrant',
+    orgPermissionDefaultPermissionsByPermissionId: 'OrgPermissionDefaultPermission',
+  },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface ProvisionBucketInput {

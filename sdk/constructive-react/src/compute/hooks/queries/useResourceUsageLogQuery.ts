@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { resourceUsageLogKeys } from "../query-keys";
-import type { ResourceUsageLogSelect, ResourceUsageLogWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ResourceUsageLogSelect, ResourceUsageLogWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { resourceUsageLogKeys } from '../query-keys';
+import type { ResourceUsageLogSelect, ResourceUsageLogWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { ResourceUsageLogSelect, ResourceUsageLogWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const resourceUsageLogQueryKey = resourceUsageLogKeys.detail;
 /**
  * Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useResourceUsageLogQuery({
@@ -26,38 +26,52 @@ export const resourceUsageLogQueryKey = resourceUsageLogKeys.detail;
  * });
  * ```
  */
-export function useResourceUsageLogQuery<S extends ResourceUsageLogSelect, TData = {
-  resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ResourceUsageLogSelect>;
-} & Omit<UseQueryOptions<{
-  resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useResourceUsageLogQuery(params: {
-  id: string;
-  selection: SelectionConfig<ResourceUsageLogSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useResourceUsageLogQuery<
+  S extends ResourceUsageLogSelect,
+  TData = {
+    resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ResourceUsageLogSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useResourceUsageLogQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<ResourceUsageLogSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<ResourceUsageLogSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourceUsageLogKeys.detail(params.id),
-    queryFn: () => getClient().resourceUsageLog.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .resourceUsageLog.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchResourceUsageLogQuery({
@@ -79,35 +93,46 @@ export async function fetchResourceUsageLogQuery(params: {
   selection: SelectionConfig<ResourceUsageLogSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ResourceUsageLogSelect>(params.selection);
-  return getClient().resourceUsageLog.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .resourceUsageLog.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus)
- * 
+ *
  * @example
  * ```ts
  * await prefetchResourceUsageLogQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchResourceUsageLogQuery<S extends ResourceUsageLogSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ResourceUsageLogSelect>;
-}): Promise<void>;
-export async function prefetchResourceUsageLogQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<ResourceUsageLogSelect>;
-}): Promise<void> {
+export async function prefetchResourceUsageLogQuery<S extends ResourceUsageLogSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ResourceUsageLogSelect>;
+  }
+): Promise<void>;
+export async function prefetchResourceUsageLogQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<ResourceUsageLogSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<ResourceUsageLogSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourceUsageLogKeys.detail(params.id),
-    queryFn: () => getClient().resourceUsageLog.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .resourceUsageLog.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

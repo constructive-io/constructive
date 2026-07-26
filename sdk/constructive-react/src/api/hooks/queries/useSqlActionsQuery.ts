@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { sqlActionKeys } from "../query-keys";
-import type { SqlActionSelect, SqlActionWithRelations, SqlActionFilter, SqlActionOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { SqlActionSelect, SqlActionWithRelations, SqlActionFilter, SqlActionOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { sqlActionKeys } from '../query-keys';
+import type {
+  SqlActionSelect,
+  SqlActionWithRelations,
+  SqlActionFilter,
+  SqlActionOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  SqlActionSelect,
+  SqlActionWithRelations,
+  SqlActionFilter,
+  SqlActionOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const sqlActionsQueryKey = sqlActionKeys.list;
 /**
  * Query hook for fetching SqlAction list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSqlActionsQuery({
@@ -30,33 +45,47 @@ export const sqlActionsQueryKey = sqlActionKeys.list;
  * });
  * ```
  */
-export function useSqlActionsQuery<S extends SqlActionSelect, TData = {
-  sqlActions: ConnectionResult<InferSelectResult<SqlActionWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SqlActionFilter, SqlActionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SqlActionSelect>;
-} & Omit<UseQueryOptions<{
-  sqlActions: ConnectionResult<InferSelectResult<SqlActionWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSqlActionsQuery(params: {
-  selection: ListSelectionConfig<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useSqlActionsQuery<
+  S extends SqlActionSelect,
+  TData = {
+    sqlActions: ConnectionResult<InferSelectResult<SqlActionWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SqlActionFilter, SqlActionOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SqlActionSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        sqlActions: ConnectionResult<InferSelectResult<SqlActionWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSqlActionsQuery(
+  params: {
+    selection: ListSelectionConfig<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: sqlActionKeys.list(args),
     queryFn: () => getClient().sqlAction.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch SqlAction list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSqlActionsQuery({
@@ -70,35 +99,47 @@ export function useSqlActionsQuery(params: {
 export async function fetchSqlActionsQuery<S extends SqlActionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, SqlActionFilter, SqlActionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SqlActionSelect>;
+  } & Omit<ListSelectionConfig<S, SqlActionFilter, SqlActionOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, SqlActionSelect>;
 }): Promise<{
   sqlActions: ConnectionResult<InferSelectResult<SqlActionWithRelations, S>>;
 }>;
 export async function fetchSqlActionsQuery(params: {
   selection: ListSelectionConfig<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>;
 }) {
-  const args = buildListSelectionArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>(params.selection);
+  const args = buildListSelectionArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>(
+    params.selection
+  );
   return getClient().sqlAction.findMany(args).unwrap();
 }
 /**
  * Prefetch SqlAction list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchSqlActionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchSqlActionsQuery<S extends SqlActionSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SqlActionFilter, SqlActionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SqlActionSelect>;
-}): Promise<void>;
-export async function prefetchSqlActionsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>(params.selection);
+export async function prefetchSqlActionsQuery<S extends SqlActionSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SqlActionFilter, SqlActionOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SqlActionSelect>;
+  }
+): Promise<void>;
+export async function prefetchSqlActionsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: sqlActionKeys.list(args),
-    queryFn: () => getClient().sqlAction.findMany(args).unwrap()
+    queryFn: () => getClient().sqlAction.findMany(args).unwrap(),
   });
 }

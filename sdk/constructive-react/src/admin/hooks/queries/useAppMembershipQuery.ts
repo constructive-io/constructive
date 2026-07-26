@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appMembershipKeys } from "../query-keys";
-import type { AppMembershipSelect, AppMembershipWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppMembershipSelect, AppMembershipWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appMembershipKeys } from '../query-keys';
+import type { AppMembershipSelect, AppMembershipWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AppMembershipSelect, AppMembershipWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appMembershipQueryKey = appMembershipKeys.detail;
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppMembershipQuery({
@@ -26,38 +26,52 @@ export const appMembershipQueryKey = appMembershipKeys.detail;
  * });
  * ```
  */
-export function useAppMembershipQuery<S extends AppMembershipSelect, TData = {
-  appMembership: InferSelectResult<AppMembershipWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
-} & Omit<UseQueryOptions<{
-  appMembership: InferSelectResult<AppMembershipWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppMembershipQuery(params: {
-  id: string;
-  selection: SelectionConfig<AppMembershipSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAppMembershipQuery<
+  S extends AppMembershipSelect,
+  TData = {
+    appMembership: InferSelectResult<AppMembershipWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appMembership: InferSelectResult<AppMembershipWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppMembershipQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AppMembershipSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AppMembershipSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appMembershipKeys.detail(params.id),
-    queryFn: () => getClient().appMembership.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .appMembership.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppMembershipQuery({
@@ -79,35 +93,46 @@ export async function fetchAppMembershipQuery(params: {
   selection: SelectionConfig<AppMembershipSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppMembershipSelect>(params.selection);
-  return getClient().appMembership.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .appMembership.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppMembershipQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppMembershipQuery<S extends AppMembershipSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
-}): Promise<void>;
-export async function prefetchAppMembershipQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AppMembershipSelect>;
-}): Promise<void> {
+export async function prefetchAppMembershipQuery<S extends AppMembershipSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppMembershipQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AppMembershipSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AppMembershipSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appMembershipKeys.detail(params.id),
-    queryFn: () => getClient().appMembership.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .appMembership.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

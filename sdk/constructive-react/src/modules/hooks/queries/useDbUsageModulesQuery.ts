@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { dbUsageModuleKeys } from "../query-keys";
-import type { DbUsageModuleSelect, DbUsageModuleWithRelations, DbUsageModuleFilter, DbUsageModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DbUsageModuleSelect, DbUsageModuleWithRelations, DbUsageModuleFilter, DbUsageModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { dbUsageModuleKeys } from '../query-keys';
+import type {
+  DbUsageModuleSelect,
+  DbUsageModuleWithRelations,
+  DbUsageModuleFilter,
+  DbUsageModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DbUsageModuleSelect,
+  DbUsageModuleWithRelations,
+  DbUsageModuleFilter,
+  DbUsageModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const dbUsageModulesQueryKey = dbUsageModuleKeys.list;
 /**
  * Query hook for fetching DbUsageModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDbUsageModulesQuery({
@@ -30,33 +45,49 @@ export const dbUsageModulesQueryKey = dbUsageModuleKeys.list;
  * });
  * ```
  */
-export function useDbUsageModulesQuery<S extends DbUsageModuleSelect, TData = {
-  dbUsageModules: ConnectionResult<InferSelectResult<DbUsageModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DbUsageModuleFilter, DbUsageModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
-} & Omit<UseQueryOptions<{
-  dbUsageModules: ConnectionResult<InferSelectResult<DbUsageModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDbUsageModulesQuery(params: {
-  selection: ListSelectionConfig<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useDbUsageModulesQuery<
+  S extends DbUsageModuleSelect,
+  TData = {
+    dbUsageModules: ConnectionResult<InferSelectResult<DbUsageModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DbUsageModuleFilter, DbUsageModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        dbUsageModules: ConnectionResult<InferSelectResult<DbUsageModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDbUsageModulesQuery(
+  params: {
+    selection: ListSelectionConfig<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    DbUsageModuleSelect,
+    DbUsageModuleFilter,
+    DbUsageModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: dbUsageModuleKeys.list(args),
     queryFn: () => getClient().dbUsageModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch DbUsageModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDbUsageModulesQuery({
@@ -70,35 +101,51 @@ export function useDbUsageModulesQuery(params: {
 export async function fetchDbUsageModulesQuery<S extends DbUsageModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DbUsageModuleFilter, DbUsageModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
+  } & Omit<ListSelectionConfig<S, DbUsageModuleFilter, DbUsageModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
 }): Promise<{
   dbUsageModules: ConnectionResult<InferSelectResult<DbUsageModuleWithRelations, S>>;
 }>;
 export async function fetchDbUsageModulesQuery(params: {
   selection: ListSelectionConfig<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    DbUsageModuleSelect,
+    DbUsageModuleFilter,
+    DbUsageModuleOrderBy
+  >(params.selection);
   return getClient().dbUsageModule.findMany(args).unwrap();
 }
 /**
  * Prefetch DbUsageModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDbUsageModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDbUsageModulesQuery<S extends DbUsageModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DbUsageModuleFilter, DbUsageModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
-}): Promise<void>;
-export async function prefetchDbUsageModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>(params.selection);
+export async function prefetchDbUsageModulesQuery<S extends DbUsageModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DbUsageModuleFilter, DbUsageModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDbUsageModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<DbUsageModuleSelect, DbUsageModuleFilter, DbUsageModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    DbUsageModuleSelect,
+    DbUsageModuleFilter,
+    DbUsageModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: dbUsageModuleKeys.list(args),
-    queryFn: () => getClient().dbUsageModule.findMany(args).unwrap()
+    queryFn: () => getClient().dbUsageModule.findMany(args).unwrap(),
   });
 }

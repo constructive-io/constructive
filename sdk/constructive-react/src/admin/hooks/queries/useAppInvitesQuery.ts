@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { appInviteKeys } from "../query-keys";
-import type { AppInviteSelect, AppInviteWithRelations, AppInviteFilter, AppInviteOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppInviteSelect, AppInviteWithRelations, AppInviteFilter, AppInviteOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { appInviteKeys } from '../query-keys';
+import type {
+  AppInviteSelect,
+  AppInviteWithRelations,
+  AppInviteFilter,
+  AppInviteOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AppInviteSelect,
+  AppInviteWithRelations,
+  AppInviteFilter,
+  AppInviteOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appInvitesQueryKey = appInviteKeys.list;
 /**
  * Invitation records sent to prospective members via email, with token-based redemption and expiration
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppInvitesQuery({
@@ -30,33 +45,47 @@ export const appInvitesQueryKey = appInviteKeys.list;
  * });
  * ```
  */
-export function useAppInvitesQuery<S extends AppInviteSelect, TData = {
-  appInvites: ConnectionResult<InferSelectResult<AppInviteWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppInviteFilter, AppInviteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
-} & Omit<UseQueryOptions<{
-  appInvites: ConnectionResult<InferSelectResult<AppInviteWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppInvitesQuery(params: {
-  selection: ListSelectionConfig<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAppInvitesQuery<
+  S extends AppInviteSelect,
+  TData = {
+    appInvites: ConnectionResult<InferSelectResult<AppInviteWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppInviteFilter, AppInviteOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppInviteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appInvites: ConnectionResult<InferSelectResult<AppInviteWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppInvitesQuery(
+  params: {
+    selection: ListSelectionConfig<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appInviteKeys.list(args),
     queryFn: () => getClient().appInvite.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Invitation records sent to prospective members via email, with token-based redemption and expiration
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppInvitesQuery({
@@ -70,35 +99,47 @@ export function useAppInvitesQuery(params: {
 export async function fetchAppInvitesQuery<S extends AppInviteSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppInviteFilter, AppInviteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
+  } & Omit<ListSelectionConfig<S, AppInviteFilter, AppInviteOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AppInviteSelect>;
 }): Promise<{
   appInvites: ConnectionResult<InferSelectResult<AppInviteWithRelations, S>>;
 }>;
 export async function fetchAppInvitesQuery(params: {
   selection: ListSelectionConfig<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>(params.selection);
+  const args = buildListSelectionArgs<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>(
+    params.selection
+  );
   return getClient().appInvite.findMany(args).unwrap();
 }
 /**
  * Invitation records sent to prospective members via email, with token-based redemption and expiration
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppInvitesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppInvitesQuery<S extends AppInviteSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppInviteFilter, AppInviteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppInviteSelect>;
-}): Promise<void>;
-export async function prefetchAppInvitesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>(params.selection);
+export async function prefetchAppInvitesQuery<S extends AppInviteSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppInviteFilter, AppInviteOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppInviteSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppInvitesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<AppInviteSelect, AppInviteFilter, AppInviteOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: appInviteKeys.list(args),
-    queryFn: () => getClient().appInvite.findMany(args).unwrap()
+    queryFn: () => getClient().appInvite.findMany(args).unwrap(),
   });
 }

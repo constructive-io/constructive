@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { managedDomainKeys } from "../query-keys";
-import { managedDomainMutationKeys } from "../mutation-keys";
-import type { ManagedDomainSelect, ManagedDomainWithRelations, ManagedDomainPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ManagedDomainSelect, ManagedDomainWithRelations, ManagedDomainPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { managedDomainKeys } from '../query-keys';
+import { managedDomainMutationKeys } from '../mutation-keys';
+import type {
+  ManagedDomainSelect,
+  ManagedDomainWithRelations,
+  ManagedDomainPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ManagedDomainSelect,
+  ManagedDomainWithRelations,
+  ManagedDomainPatch,
+} from '../../orm/input-types';
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateManagedDomainMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', managedDomainPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateManagedDomainMutation<S extends ManagedDomainSelect>(params: {
-  selection: ({
-    fields: S & ManagedDomainSelect;
-  } & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>);
-} & Omit<UseMutationOptions<{
-  updateManagedDomain: {
-    managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  managedDomainPatch: ManagedDomainPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateManagedDomain: {
-    managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  managedDomainPatch: ManagedDomainPatch;
-}>;
-export function useUpdateManagedDomainMutation(params: {
-  selection: SelectionConfig<ManagedDomainSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  managedDomainPatch: ManagedDomainPatch;
-}>, "mutationFn">) {
+export function useUpdateManagedDomainMutation<S extends ManagedDomainSelect>(
+  params: {
+    selection: {
+      fields: S & ManagedDomainSelect;
+    } & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateManagedDomain: {
+          managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        managedDomainPatch: ManagedDomainPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateManagedDomain: {
+      managedDomain: InferSelectResult<ManagedDomainWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    managedDomainPatch: ManagedDomainPatch;
+  }
+>;
+export function useUpdateManagedDomainMutation(
+  params: {
+    selection: SelectionConfig<ManagedDomainSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        managedDomainPatch: ManagedDomainPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<ManagedDomainSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: managedDomainMutationKeys.all,
     mutationFn: ({
       id,
-      managedDomainPatch
+      managedDomainPatch,
     }: {
       id: string;
       managedDomainPatch: ManagedDomainPatch;
-    }) => getClient().managedDomain.update({
-      where: {
-        id
-      },
-      data: managedDomainPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .managedDomain.update({
+          where: {
+            id,
+          },
+          data: managedDomainPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: managedDomainKeys.detail(variables.id)
+        queryKey: managedDomainKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: managedDomainKeys.lists()
+        queryKey: managedDomainKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }
