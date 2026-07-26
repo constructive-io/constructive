@@ -123,7 +123,6 @@ export const routeToApiStructure = (
     anonRole: config.anon_role || 'anon',
     roleName: config.role_name || 'authenticated',
     schema: config.schemas,
-    apiModules: [],
     domains: [],
     databaseId: config.database_id,
     isPublic: config.is_public ?? (opts.api?.isPublic ?? false)

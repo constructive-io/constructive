@@ -1,7 +1,7 @@
 /**
  * LlmModulePlugin
  *
- * Detects and loads the `llm_module` configuration from `constructive_routing_public.api_modules`.
+ * Detects and loads the `llm_module` configuration from `metaschema_modules_public.llm_module`.
  * Makes the resolved embedder and chat completer available to other plugins
  * via the build context.
  *
