@@ -4,13 +4,11 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
 {
   "api": {
     "anonRole": "env_anon",
-    "defaultDatabaseId": "override_db",
-    "enableScopedRouting": false,
     "exposedSchemas": [
       "public",
       "app",
     ],
-    "isPublic": true,
+    "isPublic": false,
     "metaSchemas": [
       "env_meta1",
       "env_meta2",

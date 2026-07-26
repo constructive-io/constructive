@@ -137,12 +137,11 @@ describe('getApiConfig with scoped routing enabled', () => {
     } as unknown as Request;
   };
 
-  const createOptions = (enableScopedRouting: boolean): ApiOptions => ({
+  const createOptions = (): ApiOptions => ({
     pg: { database: 'constructive' },
     api: {
       isPublic: true,
-      metaSchemas: ['metaschema_public'],
-      enableScopedRouting
+      metaSchemas: ['metaschema_public']
     }
   } as unknown as ApiOptions);
 
@@ -167,7 +166,7 @@ describe('getApiConfig with scoped routing enabled', () => {
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    const result = await getApiConfig(createOptions(true), createRequest({ host: 'api.example.com' }));
+    const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
     expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'tenant_db' }));
     expect(query).toHaveBeenCalledWith(
@@ -184,22 +183,32 @@ describe('getApiConfig with scoped routing enabled', () => {
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    const result = await getApiConfig(createOptions(true), createRequest({ host: 'nomatch.example.com' }));
+    const result = await getApiConfig(createOptions(), createRequest({ host: 'nomatch.example.com' }));
 
     expect(result).toBeFalsy();
     expect(query.mock.calls.some(([sql]) => String(sql).includes('services_public'))).toBe(false);
   });
 
-  it('does not call resolve_route when scoped routing is disabled', async () => {
+  it('throws NO_DATABASE_ID when a route resolves without a database id (no default database)', async () => {
+    const routeWithoutDbId = matchedRoute({
+      resolved_config: {
+        api_id: 'api-1',
+        dbname: 'tenant_db',
+        role_name: 'api_role',
+        anon_role: 'api_anon',
+        is_public: true,
+        schemas: ['app_public']
+      }
+    });
     const query = jest.fn(async (sql: string, params: unknown[]) => {
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
-      if (sql.includes('resolve_route')) throw new Error('resolve_route should not be called');
-      return { rows: [] };
+      if (sql.includes('resolve_route')) return { rows: [routeWithoutDbId] };
+      throw new Error(`unexpected query: ${sql}`);
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    await getApiConfig(createOptions(false), createRequest({ host: 'api.example.com' }));
-
-    expect(query.mock.calls.some(([sql]) => String(sql).includes('resolve_route'))).toBe(false);
+    await expect(
+      getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }))
+    ).rejects.toMatchObject({ code: 'NO_DATABASE_ID' });
   });
 });

@@ -59,8 +59,8 @@ beforeAll(async () => {
       schemas,
       authRole: 'anonymous',
       server: {
+        scopedRouting: true,
         api: {
-          enableScopedRouting: true,
           isPublic: true,
           metaSchemas
         }

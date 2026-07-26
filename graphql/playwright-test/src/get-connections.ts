@@ -7,7 +7,7 @@ import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
 
-import { createTestServer } from './server';
+import { createScopedTestServer, createTestServer } from './server';
 import type {
   GetConnectionsWithServerInput,
   GetConnectionsWithServerObjectResult,
@@ -41,19 +41,25 @@ const createConnectionsWithServerBase = async (
   const gqlContext = GraphQLTest(input, conn);
   await gqlContext.setup();
 
-  // Build options for the HTTP server in static mode (scoped routing off)
+  // Build options for the HTTP server. Merge any user-provided server.api
+  // options (used by the production scoped server) with the convenience
+  // properties (schemas, authRole).
   const serverOpts = getEnvOptions({
     pg: pg.config,
     api: {
-      enableScopedRouting: false,
+      ...input.server?.api,
       exposedSchemas: input.schemas,
-      defaultDatabaseId: 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     }
   });
 
-  // Start the HTTP server
-  const server = await createTestServer(serverOpts, input.server);
+  // Start the HTTP server. Suites default to the single-tenant dev server;
+  // suites exercising the real routing plane opt into the production
+  // scoped-routing server with `server.scopedRouting: true`.
+  const scopedRouting = input.server?.scopedRouting ?? false;
+  const server = scopedRouting
+    ? await createScopedTestServer(serverOpts, input.server)
+    : await createTestServer(serverOpts, input.server);
 
   // Combined teardown function
   const teardown = async () => {

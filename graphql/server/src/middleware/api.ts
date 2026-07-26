@@ -75,13 +75,12 @@ interface ResolveContext {
 }
 
 type ResolutionMode = 
-  | 'static'
   | 'schemata-header'
   | 'api-name-header'
   | 'meta-schema-header'
   | 'scoped-route';
 
-type PrivateHeaderMode = Exclude<ResolutionMode, 'static' | 'scoped-route'>;
+type PrivateHeaderMode = Exclude<ResolutionMode, 'scoped-route'>;
 
 interface RoutingHeaders {
   schemata?: string;
@@ -159,6 +158,21 @@ const resolveModuleSettings = async (
 
 const isApiError = (result: ApiConfigResult): result is ApiError =>
   !!result && typeof (result as ApiError).errorHtml === 'string';
+
+/**
+ * Every resolved API surface must carry a database id — there is no default
+ * database. A resolved structure without one is a misconfiguration; fail loud
+ * rather than silently proceeding with an undefined tenant.
+ */
+const assertDatabaseId = (result: ApiStructure): void => {
+  if (!result.databaseId) {
+    const error = new Error(
+      'No database id resolved for this request. A database id is required; there is no default database.'
+    ) as Error & { code?: string };
+    error.code = 'NO_DATABASE_ID';
+    throw error;
+  }
+};
 
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value.split(',').map((s) => s.trim()).filter(Boolean);
@@ -273,27 +287,10 @@ const queryByApiName = async (
 const determineMode = (ctx: ResolveContext): ResolutionMode => {
   const { opts, headers } = ctx;
 
-  // Static single-tenant mode: scoped routing off — expose configured schemas
-  // directly with no route resolution.
-  if (!opts.api?.enableScopedRouting) return 'static';
   if (opts.api?.isPublic === false) {
     return getPrivateHeaderMode(headers) ?? 'scoped-route';
   }
   return 'scoped-route';
-};
-
-const resolveStatic = (ctx: ResolveContext): ApiStructure => {
-  const { opts } = ctx;
-  return {
-    dbname: opts.pg?.database ?? '',
-    anonRole: opts.api?.anonRole ?? '',
-    roleName: opts.api?.roleName ?? '',
-    schema: opts.api?.exposedSchemas ?? [],
-    apiModules: [],
-    domains: [],
-    databaseId: opts.api?.defaultDatabaseId,
-    isPublic: false
-  };
 };
 
 const resolveSchemataHeader = async (
@@ -347,7 +344,6 @@ const resolveMetaSchemaHeader = (
  */
 const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
   const { opts, pool, host } = ctx;
-  if (!opts.api?.enableScopedRouting) return null;
 
   const schema = opts.api?.scopedRoutingSchema || 'constructive_routing_public';
   const route = await resolveRoute(pool, schema, host);
@@ -437,10 +433,6 @@ export const getApiConfig = async (
   let result: ApiConfigResult;
 
   switch (mode) {
-  case 'static':
-    result = resolveStatic(ctx);
-    break;
-
   case 'schemata-header':
     result = await resolveSchemataHeader(ctx, validatedSchemas);
     break;
@@ -460,6 +452,7 @@ export const getApiConfig = async (
 
   // Cache successful results
   if (result && !isApiError(result)) {
+    assertDatabaseId(result);
     svcCache.set(cacheKey, result);
   }
 
@@ -473,23 +466,6 @@ export const getApiConfig = async (
 export const createApiMiddleware = (opts: ApiOptions) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
-
-    // Fast path: static single-tenant mode (scoped routing disabled) — no
-    // route resolution, expose the configured schemas directly.
-    if (!opts.api?.enableScopedRouting) {
-      req.api = resolveStatic({
-        opts,
-        pool: null as unknown as Pool,
-        domain: '',
-        subdomain: null,
-        cacheKey: 'static',
-        headers: {},
-        host: ''
-      });
-      req.databaseId = req.api.databaseId;
-      req.svc_key = 'static';
-      return next();
-    }
 
     try {
       const apiConfig = await getApiConfig(opts, req);
@@ -513,6 +489,12 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       if (err.code === 'NO_VALID_SCHEMAS') {
         res.status(404).send(errorPage404Message(err.message));
+        return;
+      }
+
+      if (err.code === 'NO_DATABASE_ID') {
+        log.error('[api-middleware] no database id resolved:', err.message);
+        res.status(500).send(errorPage50x);
         return;
       }
 

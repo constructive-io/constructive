@@ -48,7 +48,8 @@ describe('Schema Snapshot', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          api: { enableScopedRouting: false, isPublic: false }
+          scopedRouting: false,
+          api: { isPublic: false }
         }
       },
       [

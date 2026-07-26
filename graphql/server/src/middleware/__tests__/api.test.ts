@@ -36,7 +36,6 @@ const createPrivateOptions = (): ApiOptions => ({
   },
   api: {
     isPublic: false,
-    enableScopedRouting: true,
     metaSchemas: ['metaschema_public']
   }
 } as unknown as ApiOptions);

@@ -102,12 +102,8 @@ class Server {
       serverHost: effectiveOpts.server?.host,
       serverPort: effectiveOpts.server?.port,
       apiIsPublic: apiOpts.isPublic,
-      enableScopedRouting: apiOpts.enableScopedRouting,
       scopedRoutingSchema: apiOpts.scopedRoutingSchema,
       metaSchemas: apiOpts.metaSchemas?.join(',') || 'default',
-      exposedSchemas: apiOpts.exposedSchemas?.join(',') || 'none',
-      anonRole: apiOpts.anonRole,
-      roleName: apiOpts.roleName,
       observabilityEnabled
     });
 

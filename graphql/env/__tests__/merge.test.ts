@@ -36,7 +36,6 @@ describe('getEnvOptions', () => {
         simpleInflection: false
       },
       api: {
-        enableScopedRouting: false,
         isPublic: false,
         metaSchemas: ['config_meta']
       },
@@ -57,13 +56,11 @@ describe('getEnvOptions', () => {
       GRAPHILE_SCHEMA: 'env_schema_a,env_schema_b',
       FEATURES_SIMPLE_INFLECTION: 'true',
       FEATURES_POSTGIS: 'false',
-      API_ENABLE_SCOPED_ROUTING: 'true',
       API_IS_PUBLIC: 'true',
       API_EXPOSED_SCHEMAS: 'public,app',
       API_META_SCHEMAS: 'env_meta1,env_meta2',
       API_ANON_ROLE: 'env_anon',
       API_ROLE_NAME: 'env_role',
-      API_DEFAULT_DATABASE_ID: 'env_db',
       SMS_PROVIDER: 'devsms',
       SMS_SENDER_ID: 'EnvSender',
       SMS_REQUEST_TIMEOUT_MS: '4000',
@@ -89,8 +86,7 @@ describe('getEnvOptions', () => {
           oppositeBaseNames: false
         },
         api: {
-          enableScopedRouting: false,
-          defaultDatabaseId: 'override_db'
+          isPublic: false
         },
         sms: {
           senderId: 'OverrideSender',

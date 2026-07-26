@@ -315,8 +315,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         schemas: [...aliceSchemas, ...bobSchemas, ...mallorySchemas],
         authRole: 'anonymous',
         server: {
+          scopedRouting: true,
           api: {
-            enableScopedRouting: true,
             isPublic: false,
             metaSchemas
           }
