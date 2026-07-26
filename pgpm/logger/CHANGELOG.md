@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/logger@2.14.0...@pgpmjs/logger@2.15.0) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/logger
+
 # [2.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/logger@2.13.1...@pgpmjs/logger@2.14.0) (2026-07-12)
 
 **Note:** Version bump only for package @pgpmjs/logger
