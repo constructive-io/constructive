@@ -1,3 +1,7 @@
+Requires Node.js >= 22 (`nvm use` picks it up from `.nvmrc`). Older Node versions
+break all GraphQL list/connection queries at runtime — see "Node Version
+Requirement" in [GRAPHILE.md](GRAPHILE.md).
+
 First initialize the database for testing:
 
 ```sh
