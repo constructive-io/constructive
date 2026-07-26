@@ -188,4 +188,27 @@ describe('getApiConfig with scoped routing enabled', () => {
     expect(result).toBeFalsy();
     expect(query.mock.calls.some(([sql]) => String(sql).includes('services_public'))).toBe(false);
   });
+
+  it('throws NO_DATABASE_ID when a route resolves without a database id (no default database)', async () => {
+    const routeWithoutDbId = matchedRoute({
+      resolved_config: {
+        api_id: 'api-1',
+        dbname: 'tenant_db',
+        role_name: 'api_role',
+        anon_role: 'api_anon',
+        is_public: true,
+        schemas: ['app_public']
+      }
+    });
+    const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
+      if (sql.includes('resolve_route')) return { rows: [routeWithoutDbId] };
+      throw new Error(`unexpected query: ${sql}`);
+    });
+    mockGetPgPool.mockReturnValue(createPool(query) as never);
+
+    await expect(
+      getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }))
+    ).rejects.toMatchObject({ code: 'NO_DATABASE_ID' });
+  });
 });
