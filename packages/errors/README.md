@@ -51,11 +51,15 @@ throw errors.ACCOUNT_EXISTS();
 The generated layer is produced from a committed audit snapshot:
 
 ```bash
+# 1. re-audit constructive-db (refreshes scripts/db-error-inventory.json)
+CONSTRUCTIVE_DB_DIR=~/repos/constructive-db python3 scripts/audit-db-errors.py
+# 2. regenerate src/generated/registry.generated.ts from the snapshot
 python3 scripts/generate-registry.py
 ```
 
-It reads `scripts/db-error-inventory.json` (the constructive-db error audit) and,
-when a `constructive-io/dashboard` checkout is found (via `DASHBOARD_DIR` or a
-sibling `../dashboard`), seeds public copy from its error catalogs. Re-run the
-constructive-db audit and overwrite `scripts/db-error-inventory.json` before
-regenerating when DB error codes change. Never hand-edit the generated file.
+`audit-db-errors.py` scans every `EXCEPTION`/`THROW` across constructive-db deploy
+sources and generated output and writes `scripts/db-error-inventory.json` (the
+committed audit snapshot). `generate-registry.py` reads that snapshot and, when a
+`constructive-io/dashboard` checkout is found (via `DASHBOARD_DIR` or a sibling
+`../dashboard`), seeds public copy from its error catalogs. Re-run both whenever
+constructive-db error codes change. Never hand-edit the generated file.
