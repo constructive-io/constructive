@@ -1,6 +1,6 @@
 # pgpm Table Creation Rules
 
-When creating a new table in `metaschema_modules_public`, `metaschema_public`, or `services_public` schemas in the constructive-db repository, follow these steps.
+When creating a new table in `metaschema_modules_public`, `metaschema_public`, or `constructive_routing_public` schemas in the constructive-db repository, follow these steps.
 
 ## Required: Deterministic ID Trigger
 

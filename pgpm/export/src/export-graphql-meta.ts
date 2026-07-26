@@ -148,6 +148,13 @@ export const exportGraphQLMeta = async ({
     const tableConfig = META_TABLE_CONFIG[key];
     if (!tableConfig) return;
 
+    // Schema-qualified manifest keys (e.g. constructive_catalog_public.apis)
+    // mark tables whose name collides with a table in another plane. GraphQL
+    // type/query names are derived from the bare table name, so these cannot
+    // be addressed unambiguously through the meta API — only the SQL flow
+    // exports them.
+    if (key.includes('.')) return;
+
     // Build fields dynamically: either from hardcoded config or via introspection
     const { fields: configFields, enumFields } = await buildDynamicFieldsFromGraphQL(client, tableConfig);
     if (Object.keys(configFields).length === 0) return;
