@@ -14,8 +14,7 @@ if (process.argv.includes('--version') || process.argv.includes('-v')) {
 
 // Check for --tty false or --no-tty to enable non-interactive mode (noTty)
 const ttyIdx = process.argv.indexOf('--tty');
-const noTty =
-  (ttyIdx !== -1 && process.argv[ttyIdx + 1] === 'false') || process.argv.includes('--no-tty');
+const noTty = (ttyIdx !== -1 && process.argv[ttyIdx + 1] === 'false') || process.argv.includes('--no-tty');
 
 const options: Partial<CLIOptions> = {
   noTty,

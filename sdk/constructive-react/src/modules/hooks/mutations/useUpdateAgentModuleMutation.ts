@@ -4,107 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { agentModuleKeys } from '../query-keys';
-import { agentModuleMutationKeys } from '../mutation-keys';
-import type {
-  AgentModuleSelect,
-  AgentModuleWithRelations,
-  AgentModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  AgentModuleSelect,
-  AgentModuleWithRelations,
-  AgentModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { agentModuleKeys } from "../query-keys";
+import { agentModuleMutationKeys } from "../mutation-keys";
+import type { AgentModuleSelect, AgentModuleWithRelations, AgentModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AgentModuleSelect, AgentModuleWithRelations, AgentModulePatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a AgentModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAgentModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', agentModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAgentModuleMutation<S extends AgentModuleSelect>(
-  params: {
-    selection: {
-      fields: S & AgentModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, AgentModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateAgentModule: {
-          agentModule: InferSelectResult<AgentModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        agentModulePatch: AgentModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateAgentModule: {
-      agentModule: InferSelectResult<AgentModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    agentModulePatch: AgentModulePatch;
-  }
->;
-export function useUpdateAgentModuleMutation(
-  params: {
-    selection: SelectionConfig<AgentModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        agentModulePatch: AgentModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateAgentModuleMutation<S extends AgentModuleSelect>(params: {
+  selection: ({
+    fields: S & AgentModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, AgentModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateAgentModule: {
+    agentModule: InferSelectResult<AgentModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  agentModulePatch: AgentModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateAgentModule: {
+    agentModule: InferSelectResult<AgentModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  agentModulePatch: AgentModulePatch;
+}>;
+export function useUpdateAgentModuleMutation(params: {
+  selection: SelectionConfig<AgentModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  agentModulePatch: AgentModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<AgentModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentModuleMutationKeys.all,
-    mutationFn: ({ id, agentModulePatch }: { id: string; agentModulePatch: AgentModulePatch }) =>
-      getClient()
-        .agentModule.update({
-          where: {
-            id,
-          },
-          data: agentModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      agentModulePatch
+    }: {
+      id: string;
+      agentModulePatch: AgentModulePatch;
+    }) => getClient().agentModule.update({
+      where: {
+        id
+      },
+      data: agentModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: agentModuleKeys.detail(variables.id),
+        queryKey: agentModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: agentModuleKeys.lists(),
+        queryKey: agentModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

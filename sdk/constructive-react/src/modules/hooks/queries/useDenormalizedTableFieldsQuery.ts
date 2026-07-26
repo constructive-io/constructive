@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { denormalizedTableFieldKeys } from '../query-keys';
-import type {
-  DenormalizedTableFieldSelect,
-  DenormalizedTableFieldWithRelations,
-  DenormalizedTableFieldFilter,
-  DenormalizedTableFieldOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  DenormalizedTableFieldSelect,
-  DenormalizedTableFieldWithRelations,
-  DenormalizedTableFieldFilter,
-  DenormalizedTableFieldOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { denormalizedTableFieldKeys } from "../query-keys";
+import type { DenormalizedTableFieldSelect, DenormalizedTableFieldWithRelations, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { DenormalizedTableFieldSelect, DenormalizedTableFieldWithRelations, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const denormalizedTableFieldsQueryKey = denormalizedTableFieldKeys.list;
 /**
  * Query hook for fetching DenormalizedTableField list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDenormalizedTableFieldsQuery({
@@ -45,60 +30,33 @@ export const denormalizedTableFieldsQueryKey = denormalizedTableFieldKeys.list;
  * });
  * ```
  */
-export function useDenormalizedTableFieldsQuery<
-  S extends DenormalizedTableFieldSelect,
-  TData = {
-    denormalizedTableFields: ConnectionResult<
-      InferSelectResult<DenormalizedTableFieldWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, DenormalizedTableFieldSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        denormalizedTableFields: ConnectionResult<
-          InferSelectResult<DenormalizedTableFieldWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDenormalizedTableFieldsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      DenormalizedTableFieldSelect,
-      DenormalizedTableFieldFilter,
-      DenormalizedTableFieldOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    DenormalizedTableFieldSelect,
-    DenormalizedTableFieldFilter,
-    DenormalizedTableFieldOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useDenormalizedTableFieldsQuery<S extends DenormalizedTableFieldSelect, TData = {
+  denormalizedTableFields: ConnectionResult<InferSelectResult<DenormalizedTableFieldWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DenormalizedTableFieldSelect>;
+} & Omit<UseQueryOptions<{
+  denormalizedTableFields: ConnectionResult<InferSelectResult<DenormalizedTableFieldWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDenormalizedTableFieldsQuery(params: {
+  selection: ListSelectionConfig<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: denormalizedTableFieldKeys.list(args),
     queryFn: () => getClient().denormalizedTableField.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch DenormalizedTableField list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDenormalizedTableFieldsQuery({
@@ -109,72 +67,38 @@ export function useDenormalizedTableFieldsQuery(
  * });
  * ```
  */
-export async function fetchDenormalizedTableFieldsQuery<
-  S extends DenormalizedTableFieldSelect,
->(params: {
+export async function fetchDenormalizedTableFieldsQuery<S extends DenormalizedTableFieldSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, DenormalizedTableFieldSelect>;
+  } & Omit<ListSelectionConfig<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DenormalizedTableFieldSelect>;
 }): Promise<{
-  denormalizedTableFields: ConnectionResult<
-    InferSelectResult<DenormalizedTableFieldWithRelations, S>
-  >;
+  denormalizedTableFields: ConnectionResult<InferSelectResult<DenormalizedTableFieldWithRelations, S>>;
 }>;
 export async function fetchDenormalizedTableFieldsQuery(params: {
-  selection: ListSelectionConfig<
-    DenormalizedTableFieldSelect,
-    DenormalizedTableFieldFilter,
-    DenormalizedTableFieldOrderBy
-  >;
+  selection: ListSelectionConfig<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    DenormalizedTableFieldSelect,
-    DenormalizedTableFieldFilter,
-    DenormalizedTableFieldOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>(params.selection);
   return getClient().denormalizedTableField.findMany(args).unwrap();
 }
 /**
  * Prefetch DenormalizedTableField list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDenormalizedTableFieldsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDenormalizedTableFieldsQuery<S extends DenormalizedTableFieldSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, DenormalizedTableFieldSelect>;
-  }
-): Promise<void>;
-export async function prefetchDenormalizedTableFieldsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      DenormalizedTableFieldSelect,
-      DenormalizedTableFieldFilter,
-      DenormalizedTableFieldOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    DenormalizedTableFieldSelect,
-    DenormalizedTableFieldFilter,
-    DenormalizedTableFieldOrderBy
-  >(params.selection);
+export async function prefetchDenormalizedTableFieldsQuery<S extends DenormalizedTableFieldSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DenormalizedTableFieldSelect>;
+}): Promise<void>;
+export async function prefetchDenormalizedTableFieldsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: denormalizedTableFieldKeys.list(args),
-    queryFn: () => getClient().denormalizedTableField.findMany(args).unwrap(),
+    queryFn: () => getClient().denormalizedTableField.findMany(args).unwrap()
   });
 }

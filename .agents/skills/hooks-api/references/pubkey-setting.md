@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries
+Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
 
 ## Usage
 
 ```typescript
-usePubkeySettingsQuery({ selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } } })
-usePubkeySettingQuery({ id: '<UUID>', selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } } })
+usePubkeySettingsQuery({ selection: { fields: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } } })
+usePubkeySettingQuery({ id: '<UUID>', selection: { fields: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } } })
 useCreatePubkeySettingMutation({ selection: { fields: { id: true } } })
 useUpdatePubkeySettingMutation({ selection: { fields: { id: true } } })
 useDeletePubkeySettingMutation({})
@@ -20,7 +20,7 @@ useDeletePubkeySettingMutation({})
 
 ```typescript
 const { data, isLoading } = usePubkeySettingsQuery({
-  selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } },
+  selection: { fields: { createdAt: true, cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, updatedAt: true, userField: true } },
 });
 ```
 

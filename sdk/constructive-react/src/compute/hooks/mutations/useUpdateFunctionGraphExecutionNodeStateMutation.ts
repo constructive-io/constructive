@@ -4,96 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionGraphExecutionNodeStateKeys } from '../query-keys';
-import { functionGraphExecutionNodeStateMutationKeys } from '../mutation-keys';
-import type {
-  FunctionGraphExecutionNodeStateSelect,
-  FunctionGraphExecutionNodeStateWithRelations,
-  FunctionGraphExecutionNodeStatePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionGraphExecutionNodeStateSelect,
-  FunctionGraphExecutionNodeStateWithRelations,
-  FunctionGraphExecutionNodeStatePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionGraphExecutionNodeStateKeys } from "../query-keys";
+import { functionGraphExecutionNodeStateMutationKeys } from "../mutation-keys";
+import type { FunctionGraphExecutionNodeStateSelect, FunctionGraphExecutionNodeStateWithRelations, FunctionGraphExecutionNodeStatePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionGraphExecutionNodeStateSelect, FunctionGraphExecutionNodeStateWithRelations, FunctionGraphExecutionNodeStatePatch } from "../../orm/input-types";
 /**
  * Per-node execution state — tracks individual node lifecycle for debugging
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionGraphExecutionNodeStateMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', functionGraphExecutionNodeStatePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionGraphExecutionNodeStateMutation<
-  S extends FunctionGraphExecutionNodeStateSelect,
->(
-  params: {
-    selection: {
-      fields: S & FunctionGraphExecutionNodeStateSelect;
-    } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateFunctionGraphExecutionNodeState: {
-          functionGraphExecutionNodeState: InferSelectResult<
-            FunctionGraphExecutionNodeStateWithRelations,
-            S
-          >;
-        };
-      },
-      Error,
-      {
-        id: string;
-        createdAt: string;
-        functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateFunctionGraphExecutionNodeState: {
-      functionGraphExecutionNodeState: InferSelectResult<
-        FunctionGraphExecutionNodeStateWithRelations,
-        S
-      >;
-    };
-  },
-  Error,
-  {
-    id: string;
-    createdAt: string;
-    functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
-  }
->;
-export function useUpdateFunctionGraphExecutionNodeStateMutation(
-  params: {
-    selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        createdAt: string;
-        functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateFunctionGraphExecutionNodeStateMutation<S extends FunctionGraphExecutionNodeStateSelect>(params: {
+  selection: ({
+    fields: S & FunctionGraphExecutionNodeStateSelect;
+  } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>);
+} & Omit<UseMutationOptions<{
+  updateFunctionGraphExecutionNodeState: {
+    functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+  functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateFunctionGraphExecutionNodeState: {
+    functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+  functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
+}>;
+export function useUpdateFunctionGraphExecutionNodeStateMutation(params: {
+  selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  createdAt: string;
+  functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<FunctionGraphExecutionNodeStateSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -101,30 +66,27 @@ export function useUpdateFunctionGraphExecutionNodeStateMutation(
     mutationFn: ({
       id,
       createdAt,
-      functionGraphExecutionNodeStatePatch,
+      functionGraphExecutionNodeStatePatch
     }: {
       id: string;
       createdAt: string;
       functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
-    }) =>
-      getClient()
-        .functionGraphExecutionNodeState.update({
-          where: {
-            id,
-            createdAt,
-          },
-          data: functionGraphExecutionNodeStatePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().functionGraphExecutionNodeState.update({
+      where: {
+        id,
+        createdAt
+      },
+      data: functionGraphExecutionNodeStatePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.detail(variables.id),
+        queryKey: functionGraphExecutionNodeStateKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.lists(),
+        queryKey: functionGraphExecutionNodeStateKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

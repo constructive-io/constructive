@@ -4,88 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { rateLimitsModuleKeys } from '../query-keys';
-import { rateLimitsModuleMutationKeys } from '../mutation-keys';
-import type {
-  RateLimitsModuleSelect,
-  RateLimitsModuleWithRelations,
-  CreateRateLimitsModuleInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  RateLimitsModuleSelect,
-  RateLimitsModuleWithRelations,
-  CreateRateLimitsModuleInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { rateLimitsModuleKeys } from "../query-keys";
+import { rateLimitsModuleMutationKeys } from "../mutation-keys";
+import type { RateLimitsModuleSelect, RateLimitsModuleWithRelations, CreateRateLimitsModuleInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RateLimitsModuleSelect, RateLimitsModuleWithRelations, CreateRateLimitsModuleInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a RateLimitsModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateRateLimitsModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateRateLimitsModuleMutation<S extends RateLimitsModuleSelect>(
-  params: {
-    selection: {
-      fields: S & RateLimitsModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createRateLimitsModule: {
-          rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
-        };
-      },
-      Error,
-      CreateRateLimitsModuleInput['rateLimitsModule']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createRateLimitsModule: {
-      rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
-    };
-  },
-  Error,
-  CreateRateLimitsModuleInput['rateLimitsModule']
->;
-export function useCreateRateLimitsModuleMutation(
-  params: {
-    selection: SelectionConfig<RateLimitsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<any, Error, CreateRateLimitsModuleInput['rateLimitsModule']>,
-    'mutationFn'
-  >
-) {
+export function useCreateRateLimitsModuleMutation<S extends RateLimitsModuleSelect>(params: {
+  selection: ({
+    fields: S & RateLimitsModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>);
+} & Omit<UseMutationOptions<{
+  createRateLimitsModule: {
+    rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
+  };
+}, Error, CreateRateLimitsModuleInput["rateLimitsModule"]>, "mutationFn">): UseMutationResult<{
+  createRateLimitsModule: {
+    rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S>;
+  };
+}, Error, CreateRateLimitsModuleInput["rateLimitsModule"]>;
+export function useCreateRateLimitsModuleMutation(params: {
+  selection: SelectionConfig<RateLimitsModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateRateLimitsModuleInput["rateLimitsModule"]>, "mutationFn">) {
   const args = buildSelectionArgs<RateLimitsModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: rateLimitsModuleMutationKeys.create(),
-    mutationFn: (data: CreateRateLimitsModuleInput['rateLimitsModule']) =>
-      getClient()
-        .rateLimitsModule.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateRateLimitsModuleInput["rateLimitsModule"]) => getClient().rateLimitsModule.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: rateLimitsModuleKeys.lists(),
+        queryKey: rateLimitsModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

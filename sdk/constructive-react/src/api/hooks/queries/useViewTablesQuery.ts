@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { viewTableKeys } from '../query-keys';
-import type {
-  ViewTableSelect,
-  ViewTableWithRelations,
-  ViewTableFilter,
-  ViewTableOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ViewTableSelect,
-  ViewTableWithRelations,
-  ViewTableFilter,
-  ViewTableOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { viewTableKeys } from "../query-keys";
+import type { ViewTableSelect, ViewTableWithRelations, ViewTableFilter, ViewTableOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ViewTableSelect, ViewTableWithRelations, ViewTableFilter, ViewTableOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const viewTablesQueryKey = viewTableKeys.list;
 /**
  * Junction table linking views to their joined tables for referential integrity
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useViewTablesQuery({
@@ -45,47 +30,33 @@ export const viewTablesQueryKey = viewTableKeys.list;
  * });
  * ```
  */
-export function useViewTablesQuery<
-  S extends ViewTableSelect,
-  TData = {
-    viewTables: ConnectionResult<InferSelectResult<ViewTableWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ViewTableFilter, ViewTableOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ViewTableSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        viewTables: ConnectionResult<InferSelectResult<ViewTableWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useViewTablesQuery(
-  params: {
-    selection: ListSelectionConfig<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useViewTablesQuery<S extends ViewTableSelect, TData = {
+  viewTables: ConnectionResult<InferSelectResult<ViewTableWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ViewTableFilter, ViewTableOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewTableSelect>;
+} & Omit<UseQueryOptions<{
+  viewTables: ConnectionResult<InferSelectResult<ViewTableWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useViewTablesQuery(params: {
+  selection: ListSelectionConfig<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: viewTableKeys.list(args),
     queryFn: () => getClient().viewTable.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Junction table linking views to their joined tables for referential integrity
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchViewTablesQuery({
@@ -99,47 +70,35 @@ export function useViewTablesQuery(
 export async function fetchViewTablesQuery<S extends ViewTableSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ViewTableFilter, ViewTableOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, ViewTableSelect>;
+  } & Omit<ListSelectionConfig<S, ViewTableFilter, ViewTableOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewTableSelect>;
 }): Promise<{
   viewTables: ConnectionResult<InferSelectResult<ViewTableWithRelations, S>>;
 }>;
 export async function fetchViewTablesQuery(params: {
   selection: ListSelectionConfig<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>;
 }) {
-  const args = buildListSelectionArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>(params.selection);
   return getClient().viewTable.findMany(args).unwrap();
 }
 /**
  * Junction table linking views to their joined tables for referential integrity
- *
+ * 
  * @example
  * ```ts
  * await prefetchViewTablesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchViewTablesQuery<S extends ViewTableSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ViewTableFilter, ViewTableOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ViewTableSelect>;
-  }
-): Promise<void>;
-export async function prefetchViewTablesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>(
-    params.selection
-  );
+export async function prefetchViewTablesQuery<S extends ViewTableSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ViewTableFilter, ViewTableOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewTableSelect>;
+}): Promise<void>;
+export async function prefetchViewTablesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: viewTableKeys.list(args),
-    queryFn: () => getClient().viewTable.findMany(args).unwrap(),
+    queryFn: () => getClient().viewTable.findMany(args).unwrap()
   });
 }

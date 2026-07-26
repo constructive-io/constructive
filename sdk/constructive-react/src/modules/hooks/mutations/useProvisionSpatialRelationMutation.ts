@@ -4,57 +4,39 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customMutationKeys } from '../mutation-keys';
-import type { ProvisionSpatialRelationVariables } from '../../orm/mutation';
-import type {
-  ProvisionSpatialRelationPayloadSelect,
-  ProvisionSpatialRelationPayload,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect, StrictSelect } from '../../orm/select-types';
-export type { ProvisionSpatialRelationVariables } from '../../orm/mutation';
-export type { ProvisionSpatialRelationPayloadSelect } from '../../orm/input-types';
-export function useProvisionSpatialRelationMutation<
-  S extends ProvisionSpatialRelationPayloadSelect,
->(
-  params: {
-    selection: {
-      fields: S & ProvisionSpatialRelationPayloadSelect;
-    } & HookStrictSelect<NoInfer<S>, ProvisionSpatialRelationPayloadSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
-      },
-      Error,
-      ProvisionSpatialRelationVariables
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
-  },
-  Error,
-  ProvisionSpatialRelationVariables
-> {
+import { useMutation } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customMutationKeys } from "../mutation-keys";
+import type { ProvisionSpatialRelationVariables } from "../../orm/mutation";
+import type { ProvisionSpatialRelationPayloadSelect, ProvisionSpatialRelationPayload } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
+export type { ProvisionSpatialRelationVariables } from "../../orm/mutation";
+export type { ProvisionSpatialRelationPayloadSelect } from "../../orm/input-types";
+export function useProvisionSpatialRelationMutation<S extends ProvisionSpatialRelationPayloadSelect>(params: {
+  selection: ({
+    fields: S & ProvisionSpatialRelationPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, ProvisionSpatialRelationPayloadSelect>);
+} & Omit<UseMutationOptions<{
+  provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
+}, Error, ProvisionSpatialRelationVariables>, "mutationFn">): UseMutationResult<{
+  provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
+}, Error, ProvisionSpatialRelationVariables> {
   const args = buildSelectionArgs<S>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   return useMutation({
     mutationKey: customMutationKeys.provisionSpatialRelation(),
-    mutationFn: (variables: ProvisionSpatialRelationVariables) =>
-      getClient()
-        .mutation.provisionSpatialRelation(variables, {
-          select: args.select,
-        } as {
-          select: S;
-        } & StrictSelect<S, ProvisionSpatialRelationPayloadSelect>)
-        .unwrap(),
-    ...mutationOptions,
+    mutationFn: (variables: ProvisionSpatialRelationVariables) => getClient().mutation.provisionSpatialRelation(variables, {
+      select: args.select
+    } as {
+      select: S;
+    } & StrictSelect<S, ProvisionSpatialRelationPayloadSelect>).unwrap(),
+    ...mutationOptions
   });
 }

@@ -4,36 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformResourcesRequirementsStateKeys } from '../query-keys';
-import type {
-  PlatformResourcesRequirementsStateSelect,
-  PlatformResourcesRequirementsStateWithRelations,
-  PlatformResourcesRequirementsStateFilter,
-  PlatformResourcesRequirementsStateOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformResourcesRequirementsStateSelect,
-  PlatformResourcesRequirementsStateWithRelations,
-  PlatformResourcesRequirementsStateFilter,
-  PlatformResourcesRequirementsStateOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformResourcesRequirementsStateKeys } from "../query-keys";
+import type { PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateWithRelations, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateWithRelations, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
-export const platformResourcesRequirementsStatesQueryKey =
-  platformResourcesRequirementsStateKeys.list;
+export const platformResourcesRequirementsStatesQueryKey = platformResourcesRequirementsStateKeys.list;
 /**
  * Query hook for fetching PlatformResourcesRequirementsState list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourcesRequirementsStatesQuery({
@@ -46,64 +30,33 @@ export const platformResourcesRequirementsStatesQueryKey =
  * });
  * ```
  */
-export function usePlatformResourcesRequirementsStatesQuery<
-  S extends PlatformResourcesRequirementsStateSelect,
-  TData = {
-    platformResourcesRequirementsStates: ConnectionResult<
-      InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<
-        S,
-        PlatformResourcesRequirementsStateFilter,
-        PlatformResourcesRequirementsStateOrderBy
-      >,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformResourcesRequirementsStates: ConnectionResult<
-          InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformResourcesRequirementsStatesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformResourcesRequirementsStateSelect,
-      PlatformResourcesRequirementsStateFilter,
-      PlatformResourcesRequirementsStateOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformResourcesRequirementsStateSelect,
-    PlatformResourcesRequirementsStateFilter,
-    PlatformResourcesRequirementsStateOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformResourcesRequirementsStatesQuery<S extends PlatformResourcesRequirementsStateSelect, TData = {
+  platformResourcesRequirementsStates: ConnectionResult<InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
+} & Omit<UseQueryOptions<{
+  platformResourcesRequirementsStates: ConnectionResult<InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformResourcesRequirementsStatesQuery(params: {
+  selection: ListSelectionConfig<PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourcesRequirementsStateKeys.list(args),
     queryFn: () => getClient().platformResourcesRequirementsState.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch PlatformResourcesRequirementsState list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformResourcesRequirementsStatesQuery({
@@ -114,82 +67,38 @@ export function usePlatformResourcesRequirementsStatesQuery(
  * });
  * ```
  */
-export async function fetchPlatformResourcesRequirementsStatesQuery<
-  S extends PlatformResourcesRequirementsStateSelect,
->(params: {
+export async function fetchPlatformResourcesRequirementsStatesQuery<S extends PlatformResourcesRequirementsStateSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<
-      S,
-      PlatformResourcesRequirementsStateFilter,
-      PlatformResourcesRequirementsStateOrderBy
-    >,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
 }): Promise<{
-  platformResourcesRequirementsStates: ConnectionResult<
-    InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>
-  >;
+  platformResourcesRequirementsStates: ConnectionResult<InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>>;
 }>;
 export async function fetchPlatformResourcesRequirementsStatesQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformResourcesRequirementsStateSelect,
-    PlatformResourcesRequirementsStateFilter,
-    PlatformResourcesRequirementsStateOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformResourcesRequirementsStateSelect,
-    PlatformResourcesRequirementsStateFilter,
-    PlatformResourcesRequirementsStateOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>(params.selection);
   return getClient().platformResourcesRequirementsState.findMany(args).unwrap();
 }
 /**
  * Prefetch PlatformResourcesRequirementsState list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformResourcesRequirementsStatesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformResourcesRequirementsStatesQuery<
-  S extends PlatformResourcesRequirementsStateSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<
-        S,
-        PlatformResourcesRequirementsStateFilter,
-        PlatformResourcesRequirementsStateOrderBy
-      >,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformResourcesRequirementsStatesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformResourcesRequirementsStateSelect,
-      PlatformResourcesRequirementsStateFilter,
-      PlatformResourcesRequirementsStateOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformResourcesRequirementsStateSelect,
-    PlatformResourcesRequirementsStateFilter,
-    PlatformResourcesRequirementsStateOrderBy
-  >(params.selection);
+export async function prefetchPlatformResourcesRequirementsStatesQuery<S extends PlatformResourcesRequirementsStateSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
+}): Promise<void>;
+export async function prefetchPlatformResourcesRequirementsStatesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateFilter, PlatformResourcesRequirementsStateOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourcesRequirementsStateKeys.list(args),
-    queryFn: () => getClient().platformResourcesRequirementsState.findMany(args).unwrap(),
+    queryFn: () => getClient().platformResourcesRequirementsState.findMany(args).unwrap()
   });
 }

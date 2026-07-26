@@ -6,30 +6,15 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { userCredentialsModuleKeys } from '../query-keys';
-import type {
-  UserCredentialsModuleSelect,
-  UserCredentialsModuleWithRelations,
-  UserCredentialsModuleFilter,
-  UserCredentialsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  UserCredentialsModuleSelect,
-  UserCredentialsModuleWithRelations,
-  UserCredentialsModuleFilter,
-  UserCredentialsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { userCredentialsModuleKeys } from "../query-keys";
+import type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const userCredentialsModulesQueryKey = userCredentialsModuleKeys.list;
 /**
@@ -49,55 +34,28 @@ export const userCredentialsModulesQueryKey = userCredentialsModuleKeys.list;
  * });
  * ```
  */
-export function useUserCredentialsModulesQuery<
-  S extends UserCredentialsModuleSelect,
-  TData = {
-    userCredentialsModules: ConnectionResult<
-      InferSelectResult<UserCredentialsModuleWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        userCredentialsModules: ConnectionResult<
-          InferSelectResult<UserCredentialsModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useUserCredentialsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      UserCredentialsModuleSelect,
-      UserCredentialsModuleFilter,
-      UserCredentialsModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    UserCredentialsModuleSelect,
-    UserCredentialsModuleFilter,
-    UserCredentialsModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useUserCredentialsModulesQuery<S extends UserCredentialsModuleSelect, TData = {
+  userCredentialsModules: ConnectionResult<InferSelectResult<UserCredentialsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  userCredentialsModules: ConnectionResult<InferSelectResult<UserCredentialsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useUserCredentialsModulesQuery(params: {
+  selection: ListSelectionConfig<UserCredentialsModuleSelect, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<UserCredentialsModuleSelect, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: userCredentialsModuleKeys.list(args),
     queryFn: () => getClient().userCredentialsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
@@ -115,33 +73,17 @@ export function useUserCredentialsModulesQuery(
  * });
  * ```
  */
-export async function fetchUserCredentialsModulesQuery<
-  S extends UserCredentialsModuleSelect,
->(params: {
+export async function fetchUserCredentialsModulesQuery<S extends UserCredentialsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
 }): Promise<{
-  userCredentialsModules: ConnectionResult<
-    InferSelectResult<UserCredentialsModuleWithRelations, S>
-  >;
+  userCredentialsModules: ConnectionResult<InferSelectResult<UserCredentialsModuleWithRelations, S>>;
 }>;
 export async function fetchUserCredentialsModulesQuery(params: {
-  selection: ListSelectionConfig<
-    UserCredentialsModuleSelect,
-    UserCredentialsModuleFilter,
-    UserCredentialsModuleOrderBy
-  >;
+  selection: ListSelectionConfig<UserCredentialsModuleSelect, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    UserCredentialsModuleSelect,
-    UserCredentialsModuleFilter,
-    UserCredentialsModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<UserCredentialsModuleSelect, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>(params.selection);
   return getClient().userCredentialsModule.findMany(args).unwrap();
 }
 /**
@@ -154,35 +96,17 @@ export async function fetchUserCredentialsModulesQuery(params: {
  * await prefetchUserCredentialsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchUserCredentialsModulesQuery<S extends UserCredentialsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchUserCredentialsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      UserCredentialsModuleSelect,
-      UserCredentialsModuleFilter,
-      UserCredentialsModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    UserCredentialsModuleSelect,
-    UserCredentialsModuleFilter,
-    UserCredentialsModuleOrderBy
-  >(params.selection);
+export async function prefetchUserCredentialsModulesQuery<S extends UserCredentialsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
+}): Promise<void>;
+export async function prefetchUserCredentialsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<UserCredentialsModuleSelect, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<UserCredentialsModuleSelect, UserCredentialsModuleFilter, UserCredentialsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userCredentialsModuleKeys.list(args),
-    queryFn: () => getClient().userCredentialsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().userCredentialsModule.findMany(args).unwrap()
   });
 }

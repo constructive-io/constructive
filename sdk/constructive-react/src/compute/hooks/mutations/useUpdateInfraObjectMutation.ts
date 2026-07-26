@@ -4,88 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { infraObjectKeys } from '../query-keys';
-import { infraObjectMutationKeys } from '../mutation-keys';
-import type {
-  InfraObjectSelect,
-  InfraObjectWithRelations,
-  InfraObjectPatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  InfraObjectSelect,
-  InfraObjectWithRelations,
-  InfraObjectPatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { infraObjectKeys } from "../query-keys";
+import { infraObjectMutationKeys } from "../mutation-keys";
+import type { InfraObjectSelect, InfraObjectWithRelations, InfraObjectPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { InfraObjectSelect, InfraObjectWithRelations, InfraObjectPatch } from "../../orm/input-types";
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateInfraObjectMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', infraObjectPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateInfraObjectMutation<S extends InfraObjectSelect>(
-  params: {
-    selection: {
-      fields: S & InfraObjectSelect;
-    } & HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateInfraObject: {
-          infraObject: InferSelectResult<InfraObjectWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        databaseId: string;
-        infraObjectPatch: InfraObjectPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateInfraObject: {
-      infraObject: InferSelectResult<InfraObjectWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    databaseId: string;
-    infraObjectPatch: InfraObjectPatch;
-  }
->;
-export function useUpdateInfraObjectMutation(
-  params: {
-    selection: SelectionConfig<InfraObjectSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        databaseId: string;
-        infraObjectPatch: InfraObjectPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateInfraObjectMutation<S extends InfraObjectSelect>(params: {
+  selection: ({
+    fields: S & InfraObjectSelect;
+  } & HookStrictSelect<NoInfer<S>, InfraObjectSelect>);
+} & Omit<UseMutationOptions<{
+  updateInfraObject: {
+    infraObject: InferSelectResult<InfraObjectWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+  infraObjectPatch: InfraObjectPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateInfraObject: {
+    infraObject: InferSelectResult<InfraObjectWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+  infraObjectPatch: InfraObjectPatch;
+}>;
+export function useUpdateInfraObjectMutation(params: {
+  selection: SelectionConfig<InfraObjectSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  databaseId: string;
+  infraObjectPatch: InfraObjectPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<InfraObjectSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -93,30 +66,27 @@ export function useUpdateInfraObjectMutation(
     mutationFn: ({
       id,
       databaseId,
-      infraObjectPatch,
+      infraObjectPatch
     }: {
       id: string;
       databaseId: string;
       infraObjectPatch: InfraObjectPatch;
-    }) =>
-      getClient()
-        .infraObject.update({
-          where: {
-            id,
-            databaseId,
-          },
-          data: infraObjectPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().infraObject.update({
+      where: {
+        id,
+        databaseId
+      },
+      data: infraObjectPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.detail(variables.id),
+        queryKey: infraObjectKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.lists(),
+        queryKey: infraObjectKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

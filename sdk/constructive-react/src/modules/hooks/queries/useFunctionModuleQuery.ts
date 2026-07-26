@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionModuleKeys } from '../query-keys';
-import type { FunctionModuleSelect, FunctionModuleWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { FunctionModuleSelect, FunctionModuleWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionModuleKeys } from "../query-keys";
+import type { FunctionModuleSelect, FunctionModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionModuleSelect, FunctionModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const functionModuleQueryKey = functionModuleKeys.detail;
 /**
  * Query hook for fetching a single FunctionModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionModuleQuery({
@@ -26,52 +26,38 @@ export const functionModuleQueryKey = functionModuleKeys.detail;
  * });
  * ```
  */
-export function useFunctionModuleQuery<
-  S extends FunctionModuleSelect,
-  TData = {
-    functionModule: InferSelectResult<FunctionModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        functionModule: InferSelectResult<FunctionModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFunctionModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useFunctionModuleQuery<S extends FunctionModuleSelect, TData = {
+  functionModule: InferSelectResult<FunctionModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionModuleSelect>;
+} & Omit<UseQueryOptions<{
+  functionModule: InferSelectResult<FunctionModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFunctionModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<FunctionModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<FunctionModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().functionModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single FunctionModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFunctionModuleQuery({
@@ -93,46 +79,35 @@ export async function fetchFunctionModuleQuery(params: {
   selection: SelectionConfig<FunctionModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionModuleSelect>(params.selection);
-  return getClient()
-    .functionModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().functionModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single FunctionModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchFunctionModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionModuleQuery<S extends FunctionModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchFunctionModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchFunctionModuleQuery<S extends FunctionModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionModuleSelect>;
+}): Promise<void>;
+export async function prefetchFunctionModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<FunctionModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<FunctionModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().functionModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

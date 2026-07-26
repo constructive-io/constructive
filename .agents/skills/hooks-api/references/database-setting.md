@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Database-wide feature flags and settings; controls which platform features are available to all APIs in this database
+Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope
 
 ## Usage
 
 ```typescript
-useDatabaseSettingsQuery({ selection: { fields: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } } })
-useDatabaseSettingQuery({ id: '<UUID>', selection: { fields: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } } })
+useDatabaseSettingsQuery({ selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } } })
+useDatabaseSettingQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } } })
 useCreateDatabaseSettingMutation({ selection: { fields: { id: true } } })
 useUpdateDatabaseSettingMutation({ selection: { fields: { id: true } } })
 useDeleteDatabaseSettingMutation({})
@@ -20,7 +20,7 @@ useDeleteDatabaseSettingMutation({})
 
 ```typescript
 const { data, isLoading } = useDatabaseSettingsQuery({
-  selection: { fields: { annotations: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, labels: true, options: true, updatedAt: true } },
 });
 ```
 

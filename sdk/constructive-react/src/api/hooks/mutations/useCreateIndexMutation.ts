@@ -4,77 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { indexKeys } from '../query-keys';
-import { indexMutationKeys } from '../mutation-keys';
-import type { IndexSelect, IndexWithRelations, CreateIndexInput } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { IndexSelect, IndexWithRelations, CreateIndexInput } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { indexKeys } from "../query-keys";
+import { indexMutationKeys } from "../mutation-keys";
+import type { IndexSelect, IndexWithRelations, CreateIndexInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { IndexSelect, IndexWithRelations, CreateIndexInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a Index
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateIndexMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateIndexMutation<S extends IndexSelect>(
-  params: {
-    selection: {
-      fields: S & IndexSelect;
-    } & HookStrictSelect<NoInfer<S>, IndexSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createIndex: {
-          index: InferSelectResult<IndexWithRelations, S>;
-        };
-      },
-      Error,
-      CreateIndexInput['index']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createIndex: {
-      index: InferSelectResult<IndexWithRelations, S>;
-    };
-  },
-  Error,
-  CreateIndexInput['index']
->;
-export function useCreateIndexMutation(
-  params: {
-    selection: SelectionConfig<IndexSelect>;
-  } & Omit<UseMutationOptions<any, Error, CreateIndexInput['index']>, 'mutationFn'>
-) {
+export function useCreateIndexMutation<S extends IndexSelect>(params: {
+  selection: ({
+    fields: S & IndexSelect;
+  } & HookStrictSelect<NoInfer<S>, IndexSelect>);
+} & Omit<UseMutationOptions<{
+  createIndex: {
+    index: InferSelectResult<IndexWithRelations, S>;
+  };
+}, Error, CreateIndexInput["index"]>, "mutationFn">): UseMutationResult<{
+  createIndex: {
+    index: InferSelectResult<IndexWithRelations, S>;
+  };
+}, Error, CreateIndexInput["index"]>;
+export function useCreateIndexMutation(params: {
+  selection: SelectionConfig<IndexSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateIndexInput["index"]>, "mutationFn">) {
   const args = buildSelectionArgs<IndexSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: indexMutationKeys.create(),
-    mutationFn: (data: CreateIndexInput['index']) =>
-      getClient()
-        .index.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateIndexInput["index"]) => getClient().index.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: indexKeys.lists(),
+        queryKey: indexKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

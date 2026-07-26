@@ -4,76 +4,57 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customQueryKeys } from '../query-keys';
-import type { ReadFunctionGraphVariables } from '../../orm/query';
-export type { ReadFunctionGraphVariables } from '../../orm/query';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customQueryKeys } from "../query-keys";
+import type { ReadFunctionGraphVariables } from "../../orm/query";
+export type { ReadFunctionGraphVariables } from "../../orm/query";
 /** Query key factory - re-exported from query-keys.ts */
 export const readFunctionGraphQueryKey = customQueryKeys.readFunctionGraph;
 /**
  * Query hook for readFunctionGraph
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useReadFunctionGraphQuery({ variables: { graphId } });
- *
+ * 
  * if (data?.readFunctionGraph) {
  *   console.log(data.readFunctionGraph);
  * }
  * ```
  */
-export function useReadFunctionGraphQuery<
-  TData = {
-    readFunctionGraph: unknown | null;
-  },
->(
-  params?: {
-    variables?: ReadFunctionGraphVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        readFunctionGraph: unknown | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useReadFunctionGraphQuery<
-  TData = {
-    readFunctionGraph: unknown | null;
-  },
->(
-  params?: {
-    variables?: ReadFunctionGraphVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        readFunctionGraph: unknown | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData> {
+export function useReadFunctionGraphQuery<TData = {
+  readFunctionGraph: unknown | null;
+}>(params?: {
+  variables?: ReadFunctionGraphVariables;
+} & Omit<UseQueryOptions<{
+  readFunctionGraph: unknown | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useReadFunctionGraphQuery<TData = {
+  readFunctionGraph: unknown | null;
+}>(params?: {
+  variables?: ReadFunctionGraphVariables;
+} & Omit<UseQueryOptions<{
+  readFunctionGraph: unknown | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const { variables: _variables, ...queryOptions } = params ?? {};
+  const {
+    variables: _variables,
+    ...queryOptions
+  } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: readFunctionGraphQueryKey(variables),
     queryFn: () => getClient().query.readFunctionGraph(variables).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch readFunctionGraph without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchReadFunctionGraphQuery({ variables: { graphId } });
@@ -87,21 +68,18 @@ export async function fetchReadFunctionGraphQuery(params?: {
 }
 /**
  * Prefetch readFunctionGraph for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchReadFunctionGraphQuery(queryClient, { variables: { graphId } });
  * ```
  */
-export async function prefetchReadFunctionGraphQuery(
-  queryClient: QueryClient,
-  params?: {
-    variables?: ReadFunctionGraphVariables;
-  }
-): Promise<void> {
+export async function prefetchReadFunctionGraphQuery(queryClient: QueryClient, params?: {
+  variables?: ReadFunctionGraphVariables;
+}): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: readFunctionGraphQueryKey(variables),
-    queryFn: () => getClient().query.readFunctionGraph(variables).unwrap(),
+    queryFn: () => getClient().query.readFunctionGraph(variables).unwrap()
   });
 }

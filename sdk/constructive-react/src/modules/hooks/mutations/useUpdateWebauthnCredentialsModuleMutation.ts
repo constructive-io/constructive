@@ -4,115 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { webauthnCredentialsModuleKeys } from '../query-keys';
-import { webauthnCredentialsModuleMutationKeys } from '../mutation-keys';
-import type {
-  WebauthnCredentialsModuleSelect,
-  WebauthnCredentialsModuleWithRelations,
-  WebauthnCredentialsModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  WebauthnCredentialsModuleSelect,
-  WebauthnCredentialsModuleWithRelations,
-  WebauthnCredentialsModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { webauthnCredentialsModuleKeys } from "../query-keys";
+import { webauthnCredentialsModuleMutationKeys } from "../mutation-keys";
+import type { WebauthnCredentialsModuleSelect, WebauthnCredentialsModuleWithRelations, WebauthnCredentialsModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebauthnCredentialsModuleSelect, WebauthnCredentialsModuleWithRelations, WebauthnCredentialsModulePatch } from "../../orm/input-types";
 /**
  * Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state.
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateWebauthnCredentialsModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', webauthnCredentialsModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateWebauthnCredentialsModuleMutation<
-  S extends WebauthnCredentialsModuleSelect,
->(
-  params: {
-    selection: {
-      fields: S & WebauthnCredentialsModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, WebauthnCredentialsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateWebauthnCredentialsModule: {
-          webauthnCredentialsModule: InferSelectResult<WebauthnCredentialsModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateWebauthnCredentialsModule: {
-      webauthnCredentialsModule: InferSelectResult<WebauthnCredentialsModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
-  }
->;
-export function useUpdateWebauthnCredentialsModuleMutation(
-  params: {
-    selection: SelectionConfig<WebauthnCredentialsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateWebauthnCredentialsModuleMutation<S extends WebauthnCredentialsModuleSelect>(params: {
+  selection: ({
+    fields: S & WebauthnCredentialsModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, WebauthnCredentialsModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateWebauthnCredentialsModule: {
+    webauthnCredentialsModule: InferSelectResult<WebauthnCredentialsModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateWebauthnCredentialsModule: {
+    webauthnCredentialsModule: InferSelectResult<WebauthnCredentialsModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
+}>;
+export function useUpdateWebauthnCredentialsModuleMutation(params: {
+  selection: SelectionConfig<WebauthnCredentialsModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<WebauthnCredentialsModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: webauthnCredentialsModuleMutationKeys.all,
     mutationFn: ({
       id,
-      webauthnCredentialsModulePatch,
+      webauthnCredentialsModulePatch
     }: {
       id: string;
       webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
-    }) =>
-      getClient()
-        .webauthnCredentialsModule.update({
-          where: {
-            id,
-          },
-          data: webauthnCredentialsModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().webauthnCredentialsModule.update({
+      where: {
+        id
+      },
+      data: webauthnCredentialsModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: webauthnCredentialsModuleKeys.detail(variables.id),
+        queryKey: webauthnCredentialsModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: webauthnCredentialsModuleKeys.lists(),
+        queryKey: webauthnCredentialsModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

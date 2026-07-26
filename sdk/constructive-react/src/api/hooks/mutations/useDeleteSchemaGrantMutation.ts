@@ -4,95 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { schemaGrantKeys } from '../query-keys';
-import { schemaGrantMutationKeys } from '../mutation-keys';
-import type { SchemaGrantSelect, SchemaGrantWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { SchemaGrantSelect, SchemaGrantWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { schemaGrantKeys } from "../query-keys";
+import { schemaGrantMutationKeys } from "../mutation-keys";
+import type { SchemaGrantSelect, SchemaGrantWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { SchemaGrantSelect, SchemaGrantWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a SchemaGrant with typed selection
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteSchemaGrantMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteSchemaGrantMutation<S extends SchemaGrantSelect>(
-  params: {
-    selection: {
-      fields: S & SchemaGrantSelect;
-    } & HookStrictSelect<NoInfer<S>, SchemaGrantSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteSchemaGrant: {
-          schemaGrant: InferSelectResult<SchemaGrantWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteSchemaGrant: {
-      schemaGrant: InferSelectResult<SchemaGrantWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteSchemaGrantMutation(
-  params: {
-    selection: SelectionConfig<SchemaGrantSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteSchemaGrantMutation<S extends SchemaGrantSelect>(params: {
+  selection: ({
+    fields: S & SchemaGrantSelect;
+  } & HookStrictSelect<NoInfer<S>, SchemaGrantSelect>);
+} & Omit<UseMutationOptions<{
+  deleteSchemaGrant: {
+    schemaGrant: InferSelectResult<SchemaGrantWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteSchemaGrant: {
+    schemaGrant: InferSelectResult<SchemaGrantWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteSchemaGrantMutation(params: {
+  selection: SelectionConfig<SchemaGrantSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<SchemaGrantSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: schemaGrantMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .schemaGrant.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().schemaGrant.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: schemaGrantKeys.detail(variables.id),
+        queryKey: schemaGrantKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: schemaGrantKeys.lists(),
+        queryKey: schemaGrantKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

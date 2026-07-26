@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Database-wide feature flags and settings; controls which platform features are available to all APIs in this database
+Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope
 
 ## Usage
 

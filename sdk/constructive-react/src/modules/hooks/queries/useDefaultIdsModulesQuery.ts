@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { defaultIdsModuleKeys } from '../query-keys';
-import type {
-  DefaultIdsModuleSelect,
-  DefaultIdsModuleWithRelations,
-  DefaultIdsModuleFilter,
-  DefaultIdsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  DefaultIdsModuleSelect,
-  DefaultIdsModuleWithRelations,
-  DefaultIdsModuleFilter,
-  DefaultIdsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { defaultIdsModuleKeys } from "../query-keys";
+import type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const defaultIdsModulesQueryKey = defaultIdsModuleKeys.list;
 /**
  * Query hook for fetching DefaultIdsModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDefaultIdsModulesQuery({
@@ -45,53 +30,33 @@ export const defaultIdsModulesQueryKey = defaultIdsModuleKeys.list;
  * });
  * ```
  */
-export function useDefaultIdsModulesQuery<
-  S extends DefaultIdsModuleSelect,
-  TData = {
-    defaultIdsModules: ConnectionResult<InferSelectResult<DefaultIdsModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        defaultIdsModules: ConnectionResult<InferSelectResult<DefaultIdsModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDefaultIdsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      DefaultIdsModuleSelect,
-      DefaultIdsModuleFilter,
-      DefaultIdsModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    DefaultIdsModuleSelect,
-    DefaultIdsModuleFilter,
-    DefaultIdsModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useDefaultIdsModulesQuery<S extends DefaultIdsModuleSelect, TData = {
+  defaultIdsModules: ConnectionResult<InferSelectResult<DefaultIdsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  defaultIdsModules: ConnectionResult<InferSelectResult<DefaultIdsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDefaultIdsModulesQuery(params: {
+  selection: ListSelectionConfig<DefaultIdsModuleSelect, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<DefaultIdsModuleSelect, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: defaultIdsModuleKeys.list(args),
     queryFn: () => getClient().defaultIdsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch DefaultIdsModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDefaultIdsModulesQuery({
@@ -105,59 +70,35 @@ export function useDefaultIdsModulesQuery(
 export async function fetchDefaultIdsModulesQuery<S extends DefaultIdsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
 }): Promise<{
   defaultIdsModules: ConnectionResult<InferSelectResult<DefaultIdsModuleWithRelations, S>>;
 }>;
 export async function fetchDefaultIdsModulesQuery(params: {
-  selection: ListSelectionConfig<
-    DefaultIdsModuleSelect,
-    DefaultIdsModuleFilter,
-    DefaultIdsModuleOrderBy
-  >;
+  selection: ListSelectionConfig<DefaultIdsModuleSelect, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    DefaultIdsModuleSelect,
-    DefaultIdsModuleFilter,
-    DefaultIdsModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<DefaultIdsModuleSelect, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>(params.selection);
   return getClient().defaultIdsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch DefaultIdsModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDefaultIdsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDefaultIdsModulesQuery<S extends DefaultIdsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchDefaultIdsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      DefaultIdsModuleSelect,
-      DefaultIdsModuleFilter,
-      DefaultIdsModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    DefaultIdsModuleSelect,
-    DefaultIdsModuleFilter,
-    DefaultIdsModuleOrderBy
-  >(params.selection);
+export async function prefetchDefaultIdsModulesQuery<S extends DefaultIdsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
+}): Promise<void>;
+export async function prefetchDefaultIdsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<DefaultIdsModuleSelect, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<DefaultIdsModuleSelect, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: defaultIdsModuleKeys.list(args),
-    queryFn: () => getClient().defaultIdsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().defaultIdsModule.findMany(args).unwrap()
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { uniqueConstraintKeys } from '../query-keys';
-import type { UniqueConstraintSelect, UniqueConstraintWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { UniqueConstraintSelect, UniqueConstraintWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { uniqueConstraintKeys } from "../query-keys";
+import type { UniqueConstraintSelect, UniqueConstraintWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UniqueConstraintSelect, UniqueConstraintWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const uniqueConstraintQueryKey = uniqueConstraintKeys.detail;
 /**
  * Query hook for fetching a single UniqueConstraint
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useUniqueConstraintQuery({
@@ -26,52 +26,38 @@ export const uniqueConstraintQueryKey = uniqueConstraintKeys.detail;
  * });
  * ```
  */
-export function useUniqueConstraintQuery<
-  S extends UniqueConstraintSelect,
-  TData = {
-    uniqueConstraint: InferSelectResult<UniqueConstraintWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        uniqueConstraint: InferSelectResult<UniqueConstraintWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useUniqueConstraintQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<UniqueConstraintSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useUniqueConstraintQuery<S extends UniqueConstraintSelect, TData = {
+  uniqueConstraint: InferSelectResult<UniqueConstraintWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
+} & Omit<UseQueryOptions<{
+  uniqueConstraint: InferSelectResult<UniqueConstraintWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useUniqueConstraintQuery(params: {
+  id: string;
+  selection: SelectionConfig<UniqueConstraintSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<UniqueConstraintSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: uniqueConstraintKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .uniqueConstraint.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().uniqueConstraint.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single UniqueConstraint without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchUniqueConstraintQuery({
@@ -93,46 +79,35 @@ export async function fetchUniqueConstraintQuery(params: {
   selection: SelectionConfig<UniqueConstraintSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<UniqueConstraintSelect>(params.selection);
-  return getClient()
-    .uniqueConstraint.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().uniqueConstraint.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single UniqueConstraint for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchUniqueConstraintQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchUniqueConstraintQuery<S extends UniqueConstraintSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
-  }
-): Promise<void>;
-export async function prefetchUniqueConstraintQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<UniqueConstraintSelect>;
-  }
-): Promise<void> {
+export async function prefetchUniqueConstraintQuery<S extends UniqueConstraintSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UniqueConstraintSelect>;
+}): Promise<void>;
+export async function prefetchUniqueConstraintQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<UniqueConstraintSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<UniqueConstraintSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: uniqueConstraintKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .uniqueConstraint.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().uniqueConstraint.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

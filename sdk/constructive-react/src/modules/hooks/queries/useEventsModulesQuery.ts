@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { eventsModuleKeys } from '../query-keys';
-import type {
-  EventsModuleSelect,
-  EventsModuleWithRelations,
-  EventsModuleFilter,
-  EventsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  EventsModuleSelect,
-  EventsModuleWithRelations,
-  EventsModuleFilter,
-  EventsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { eventsModuleKeys } from "../query-keys";
+import type { EventsModuleSelect, EventsModuleWithRelations, EventsModuleFilter, EventsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { EventsModuleSelect, EventsModuleWithRelations, EventsModuleFilter, EventsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const eventsModulesQueryKey = eventsModuleKeys.list;
 /**
  * Query hook for fetching EventsModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useEventsModulesQuery({
@@ -45,47 +30,33 @@ export const eventsModulesQueryKey = eventsModuleKeys.list;
  * });
  * ```
  */
-export function useEventsModulesQuery<
-  S extends EventsModuleSelect,
-  TData = {
-    eventsModules: ConnectionResult<InferSelectResult<EventsModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, EventsModuleFilter, EventsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        eventsModules: ConnectionResult<InferSelectResult<EventsModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useEventsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useEventsModulesQuery<S extends EventsModuleSelect, TData = {
+  eventsModules: ConnectionResult<InferSelectResult<EventsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, EventsModuleFilter, EventsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  eventsModules: ConnectionResult<InferSelectResult<EventsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useEventsModulesQuery(params: {
+  selection: ListSelectionConfig<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: eventsModuleKeys.list(args),
     queryFn: () => getClient().eventsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch EventsModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchEventsModulesQuery({
@@ -99,47 +70,35 @@ export function useEventsModulesQuery(
 export async function fetchEventsModulesQuery<S extends EventsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, EventsModuleFilter, EventsModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, EventsModuleFilter, EventsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
 }): Promise<{
   eventsModules: ConnectionResult<InferSelectResult<EventsModuleWithRelations, S>>;
 }>;
 export async function fetchEventsModulesQuery(params: {
   selection: ListSelectionConfig<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>(params.selection);
   return getClient().eventsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch EventsModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchEventsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchEventsModulesQuery<S extends EventsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, EventsModuleFilter, EventsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchEventsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>(
-    params.selection
-  );
+export async function prefetchEventsModulesQuery<S extends EventsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, EventsModuleFilter, EventsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
+}): Promise<void>;
+export async function prefetchEventsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<EventsModuleSelect, EventsModuleFilter, EventsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: eventsModuleKeys.list(args),
-    queryFn: () => getClient().eventsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().eventsModule.findMany(args).unwrap()
   });
 }

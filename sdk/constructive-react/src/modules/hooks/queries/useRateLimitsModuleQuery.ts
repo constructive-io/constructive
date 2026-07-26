@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { rateLimitsModuleKeys } from '../query-keys';
-import type { RateLimitsModuleSelect, RateLimitsModuleWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { RateLimitsModuleSelect, RateLimitsModuleWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { rateLimitsModuleKeys } from "../query-keys";
+import type { RateLimitsModuleSelect, RateLimitsModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RateLimitsModuleSelect, RateLimitsModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const rateLimitsModuleQueryKey = rateLimitsModuleKeys.detail;
 /**
  * Query hook for fetching a single RateLimitsModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useRateLimitsModuleQuery({
@@ -26,52 +26,38 @@ export const rateLimitsModuleQueryKey = rateLimitsModuleKeys.detail;
  * });
  * ```
  */
-export function useRateLimitsModuleQuery<
-  S extends RateLimitsModuleSelect,
-  TData = {
-    rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useRateLimitsModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<RateLimitsModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useRateLimitsModuleQuery<S extends RateLimitsModuleSelect, TData = {
+  rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useRateLimitsModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<RateLimitsModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<RateLimitsModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: rateLimitsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .rateLimitsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().rateLimitsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single RateLimitsModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchRateLimitsModuleQuery({
@@ -93,46 +79,35 @@ export async function fetchRateLimitsModuleQuery(params: {
   selection: SelectionConfig<RateLimitsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RateLimitsModuleSelect>(params.selection);
-  return getClient()
-    .rateLimitsModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().rateLimitsModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single RateLimitsModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchRateLimitsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRateLimitsModuleQuery<S extends RateLimitsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchRateLimitsModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<RateLimitsModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchRateLimitsModuleQuery<S extends RateLimitsModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
+}): Promise<void>;
+export async function prefetchRateLimitsModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<RateLimitsModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<RateLimitsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: rateLimitsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .rateLimitsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().rateLimitsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

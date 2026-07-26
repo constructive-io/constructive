@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformSecretKeys } from '../query-keys';
-import type {
-  PlatformSecretSelect,
-  PlatformSecretWithRelations,
-  PlatformSecretFilter,
-  PlatformSecretOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformSecretSelect,
-  PlatformSecretWithRelations,
-  PlatformSecretFilter,
-  PlatformSecretOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformSecretKeys } from "../query-keys";
+import type { PlatformSecretSelect, PlatformSecretWithRelations, PlatformSecretFilter, PlatformSecretOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformSecretSelect, PlatformSecretWithRelations, PlatformSecretFilter, PlatformSecretOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformSecretsQueryKey = platformSecretKeys.list;
 /**
  * Query hook for fetching PlatformSecret list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformSecretsQuery({
@@ -45,53 +30,33 @@ export const platformSecretsQueryKey = platformSecretKeys.list;
  * });
  * ```
  */
-export function usePlatformSecretsQuery<
-  S extends PlatformSecretSelect,
-  TData = {
-    platformSecrets: ConnectionResult<InferSelectResult<PlatformSecretWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PlatformSecretFilter, PlatformSecretOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PlatformSecretSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformSecrets: ConnectionResult<InferSelectResult<PlatformSecretWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformSecretsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformSecretSelect,
-      PlatformSecretFilter,
-      PlatformSecretOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformSecretSelect,
-    PlatformSecretFilter,
-    PlatformSecretOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformSecretsQuery<S extends PlatformSecretSelect, TData = {
+  platformSecrets: ConnectionResult<InferSelectResult<PlatformSecretWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformSecretFilter, PlatformSecretOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSecretSelect>;
+} & Omit<UseQueryOptions<{
+  platformSecrets: ConnectionResult<InferSelectResult<PlatformSecretWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformSecretsQuery(params: {
+  selection: ListSelectionConfig<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformSecretKeys.list(args),
     queryFn: () => getClient().platformSecret.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch PlatformSecret list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformSecretsQuery({
@@ -105,55 +70,35 @@ export function usePlatformSecretsQuery(
 export async function fetchPlatformSecretsQuery<S extends PlatformSecretSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSecretFilter, PlatformSecretOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PlatformSecretSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformSecretFilter, PlatformSecretOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSecretSelect>;
 }): Promise<{
   platformSecrets: ConnectionResult<InferSelectResult<PlatformSecretWithRelations, S>>;
 }>;
 export async function fetchPlatformSecretsQuery(params: {
   selection: ListSelectionConfig<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformSecretSelect,
-    PlatformSecretFilter,
-    PlatformSecretOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy>(params.selection);
   return getClient().platformSecret.findMany(args).unwrap();
 }
 /**
  * Prefetch PlatformSecret list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformSecretsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformSecretsQuery<S extends PlatformSecretSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PlatformSecretFilter, PlatformSecretOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PlatformSecretSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformSecretsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformSecretSelect,
-      PlatformSecretFilter,
-      PlatformSecretOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformSecretSelect,
-    PlatformSecretFilter,
-    PlatformSecretOrderBy
-  >(params.selection);
+export async function prefetchPlatformSecretsQuery<S extends PlatformSecretSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformSecretFilter, PlatformSecretOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSecretSelect>;
+}): Promise<void>;
+export async function prefetchPlatformSecretsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformSecretKeys.list(args),
-    queryFn: () => getClient().platformSecret.findMany(args).unwrap(),
+    queryFn: () => getClient().platformSecret.findMany(args).unwrap()
   });
 }

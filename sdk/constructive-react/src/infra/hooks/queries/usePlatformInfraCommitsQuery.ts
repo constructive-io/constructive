@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformInfraCommitKeys } from '../query-keys';
-import type {
-  PlatformInfraCommitSelect,
-  PlatformInfraCommitWithRelations,
-  PlatformInfraCommitFilter,
-  PlatformInfraCommitOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformInfraCommitSelect,
-  PlatformInfraCommitWithRelations,
-  PlatformInfraCommitFilter,
-  PlatformInfraCommitOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformInfraCommitKeys } from "../query-keys";
+import type { PlatformInfraCommitSelect, PlatformInfraCommitWithRelations, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformInfraCommitSelect, PlatformInfraCommitWithRelations, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformInfraCommitsQueryKey = platformInfraCommitKeys.list;
 /**
  * Commit history — each commit snapshots a tree root for a store
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformInfraCommitsQuery({
@@ -45,58 +30,33 @@ export const platformInfraCommitsQueryKey = platformInfraCommitKeys.list;
  * });
  * ```
  */
-export function usePlatformInfraCommitsQuery<
-  S extends PlatformInfraCommitSelect,
-  TData = {
-    platformInfraCommits: ConnectionResult<InferSelectResult<PlatformInfraCommitWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformInfraCommits: ConnectionResult<
-          InferSelectResult<PlatformInfraCommitWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformInfraCommitsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformInfraCommitSelect,
-      PlatformInfraCommitFilter,
-      PlatformInfraCommitOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformInfraCommitSelect,
-    PlatformInfraCommitFilter,
-    PlatformInfraCommitOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformInfraCommitsQuery<S extends PlatformInfraCommitSelect, TData = {
+  platformInfraCommits: ConnectionResult<InferSelectResult<PlatformInfraCommitWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
+} & Omit<UseQueryOptions<{
+  platformInfraCommits: ConnectionResult<InferSelectResult<PlatformInfraCommitWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformInfraCommitsQuery(params: {
+  selection: ListSelectionConfig<PlatformInfraCommitSelect, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformInfraCommitSelect, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformInfraCommitKeys.list(args),
     queryFn: () => getClient().platformInfraCommit.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Commit history — each commit snapshots a tree root for a store
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformInfraCommitsQuery({
@@ -110,65 +70,35 @@ export function usePlatformInfraCommitsQuery(
 export async function fetchPlatformInfraCommitsQuery<S extends PlatformInfraCommitSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
 }): Promise<{
   platformInfraCommits: ConnectionResult<InferSelectResult<PlatformInfraCommitWithRelations, S>>;
 }>;
 export async function fetchPlatformInfraCommitsQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformInfraCommitSelect,
-    PlatformInfraCommitFilter,
-    PlatformInfraCommitOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformInfraCommitSelect, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformInfraCommitSelect,
-    PlatformInfraCommitFilter,
-    PlatformInfraCommitOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformInfraCommitSelect, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>(params.selection);
   return getClient().platformInfraCommit.findMany(args).unwrap();
 }
 /**
  * Commit history — each commit snapshots a tree root for a store
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformInfraCommitsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformInfraCommitsQuery<S extends PlatformInfraCommitSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformInfraCommitsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformInfraCommitSelect,
-      PlatformInfraCommitFilter,
-      PlatformInfraCommitOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformInfraCommitSelect,
-    PlatformInfraCommitFilter,
-    PlatformInfraCommitOrderBy
-  >(params.selection);
+export async function prefetchPlatformInfraCommitsQuery<S extends PlatformInfraCommitSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
+}): Promise<void>;
+export async function prefetchPlatformInfraCommitsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformInfraCommitSelect, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformInfraCommitSelect, PlatformInfraCommitFilter, PlatformInfraCommitOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformInfraCommitKeys.list(args),
-    queryFn: () => getClient().platformInfraCommit.findMany(args).unwrap(),
+    queryFn: () => getClient().platformInfraCommit.findMany(args).unwrap()
   });
 }

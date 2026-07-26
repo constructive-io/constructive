@@ -4,88 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { configSecretsUserModuleKeys } from '../query-keys';
-import { configSecretsUserModuleMutationKeys } from '../mutation-keys';
-import type {
-  ConfigSecretsUserModuleSelect,
-  ConfigSecretsUserModuleWithRelations,
-  CreateConfigSecretsUserModuleInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  ConfigSecretsUserModuleSelect,
-  ConfigSecretsUserModuleWithRelations,
-  CreateConfigSecretsUserModuleInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { configSecretsUserModuleKeys } from "../query-keys";
+import { configSecretsUserModuleMutationKeys } from "../mutation-keys";
+import type { ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleWithRelations, CreateConfigSecretsUserModuleInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleWithRelations, CreateConfigSecretsUserModuleInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a ConfigSecretsUserModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateConfigSecretsUserModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateConfigSecretsUserModuleMutation<S extends ConfigSecretsUserModuleSelect>(
-  params: {
-    selection: {
-      fields: S & ConfigSecretsUserModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createConfigSecretsUserModule: {
-          configSecretsUserModule: InferSelectResult<ConfigSecretsUserModuleWithRelations, S>;
-        };
-      },
-      Error,
-      CreateConfigSecretsUserModuleInput['configSecretsUserModule']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createConfigSecretsUserModule: {
-      configSecretsUserModule: InferSelectResult<ConfigSecretsUserModuleWithRelations, S>;
-    };
-  },
-  Error,
-  CreateConfigSecretsUserModuleInput['configSecretsUserModule']
->;
-export function useCreateConfigSecretsUserModuleMutation(
-  params: {
-    selection: SelectionConfig<ConfigSecretsUserModuleSelect>;
-  } & Omit<
-    UseMutationOptions<any, Error, CreateConfigSecretsUserModuleInput['configSecretsUserModule']>,
-    'mutationFn'
-  >
-) {
+export function useCreateConfigSecretsUserModuleMutation<S extends ConfigSecretsUserModuleSelect>(params: {
+  selection: ({
+    fields: S & ConfigSecretsUserModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>);
+} & Omit<UseMutationOptions<{
+  createConfigSecretsUserModule: {
+    configSecretsUserModule: InferSelectResult<ConfigSecretsUserModuleWithRelations, S>;
+  };
+}, Error, CreateConfigSecretsUserModuleInput["configSecretsUserModule"]>, "mutationFn">): UseMutationResult<{
+  createConfigSecretsUserModule: {
+    configSecretsUserModule: InferSelectResult<ConfigSecretsUserModuleWithRelations, S>;
+  };
+}, Error, CreateConfigSecretsUserModuleInput["configSecretsUserModule"]>;
+export function useCreateConfigSecretsUserModuleMutation(params: {
+  selection: SelectionConfig<ConfigSecretsUserModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateConfigSecretsUserModuleInput["configSecretsUserModule"]>, "mutationFn">) {
   const args = buildSelectionArgs<ConfigSecretsUserModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: configSecretsUserModuleMutationKeys.create(),
-    mutationFn: (data: CreateConfigSecretsUserModuleInput['configSecretsUserModule']) =>
-      getClient()
-        .configSecretsUserModule.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateConfigSecretsUserModuleInput["configSecretsUserModule"]) => getClient().configSecretsUserModule.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: configSecretsUserModuleKeys.lists(),
+        queryKey: configSecretsUserModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

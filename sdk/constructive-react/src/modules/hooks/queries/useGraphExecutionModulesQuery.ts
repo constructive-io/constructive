@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { graphExecutionModuleKeys } from '../query-keys';
-import type {
-  GraphExecutionModuleSelect,
-  GraphExecutionModuleWithRelations,
-  GraphExecutionModuleFilter,
-  GraphExecutionModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  GraphExecutionModuleSelect,
-  GraphExecutionModuleWithRelations,
-  GraphExecutionModuleFilter,
-  GraphExecutionModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { graphExecutionModuleKeys } from "../query-keys";
+import type { GraphExecutionModuleSelect, GraphExecutionModuleWithRelations, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { GraphExecutionModuleSelect, GraphExecutionModuleWithRelations, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const graphExecutionModulesQueryKey = graphExecutionModuleKeys.list;
 /**
  * Query hook for fetching GraphExecutionModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useGraphExecutionModulesQuery({
@@ -45,60 +30,33 @@ export const graphExecutionModulesQueryKey = graphExecutionModuleKeys.list;
  * });
  * ```
  */
-export function useGraphExecutionModulesQuery<
-  S extends GraphExecutionModuleSelect,
-  TData = {
-    graphExecutionModules: ConnectionResult<
-      InferSelectResult<GraphExecutionModuleWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        graphExecutionModules: ConnectionResult<
-          InferSelectResult<GraphExecutionModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useGraphExecutionModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      GraphExecutionModuleSelect,
-      GraphExecutionModuleFilter,
-      GraphExecutionModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    GraphExecutionModuleSelect,
-    GraphExecutionModuleFilter,
-    GraphExecutionModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useGraphExecutionModulesQuery<S extends GraphExecutionModuleSelect, TData = {
+  graphExecutionModules: ConnectionResult<InferSelectResult<GraphExecutionModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
+} & Omit<UseQueryOptions<{
+  graphExecutionModules: ConnectionResult<InferSelectResult<GraphExecutionModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useGraphExecutionModulesQuery(params: {
+  selection: ListSelectionConfig<GraphExecutionModuleSelect, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<GraphExecutionModuleSelect, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: graphExecutionModuleKeys.list(args),
     queryFn: () => getClient().graphExecutionModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch GraphExecutionModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchGraphExecutionModulesQuery({
@@ -109,70 +67,38 @@ export function useGraphExecutionModulesQuery(
  * });
  * ```
  */
-export async function fetchGraphExecutionModulesQuery<
-  S extends GraphExecutionModuleSelect,
->(params: {
+export async function fetchGraphExecutionModulesQuery<S extends GraphExecutionModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
+  } & Omit<ListSelectionConfig<S, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
 }): Promise<{
   graphExecutionModules: ConnectionResult<InferSelectResult<GraphExecutionModuleWithRelations, S>>;
 }>;
 export async function fetchGraphExecutionModulesQuery(params: {
-  selection: ListSelectionConfig<
-    GraphExecutionModuleSelect,
-    GraphExecutionModuleFilter,
-    GraphExecutionModuleOrderBy
-  >;
+  selection: ListSelectionConfig<GraphExecutionModuleSelect, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    GraphExecutionModuleSelect,
-    GraphExecutionModuleFilter,
-    GraphExecutionModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<GraphExecutionModuleSelect, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>(params.selection);
   return getClient().graphExecutionModule.findMany(args).unwrap();
 }
 /**
  * Prefetch GraphExecutionModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchGraphExecutionModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchGraphExecutionModulesQuery<S extends GraphExecutionModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchGraphExecutionModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      GraphExecutionModuleSelect,
-      GraphExecutionModuleFilter,
-      GraphExecutionModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    GraphExecutionModuleSelect,
-    GraphExecutionModuleFilter,
-    GraphExecutionModuleOrderBy
-  >(params.selection);
+export async function prefetchGraphExecutionModulesQuery<S extends GraphExecutionModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
+}): Promise<void>;
+export async function prefetchGraphExecutionModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<GraphExecutionModuleSelect, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<GraphExecutionModuleSelect, GraphExecutionModuleFilter, GraphExecutionModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: graphExecutionModuleKeys.list(args),
-    queryFn: () => getClient().graphExecutionModule.findMany(args).unwrap(),
+    queryFn: () => getClient().graphExecutionModule.findMany(args).unwrap()
   });
 }

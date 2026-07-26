@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { infraSecretsModuleKeys } from '../query-keys';
-import type {
-  InfraSecretsModuleSelect,
-  InfraSecretsModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  InfraSecretsModuleSelect,
-  InfraSecretsModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { infraSecretsModuleKeys } from "../query-keys";
+import type { InfraSecretsModuleSelect, InfraSecretsModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { InfraSecretsModuleSelect, InfraSecretsModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const infraSecretsModuleQueryKey = infraSecretsModuleKeys.detail;
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useInfraSecretsModuleQuery({
@@ -32,52 +26,38 @@ export const infraSecretsModuleQueryKey = infraSecretsModuleKeys.detail;
  * });
  * ```
  */
-export function useInfraSecretsModuleQuery<
-  S extends InfraSecretsModuleSelect,
-  TData = {
-    infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useInfraSecretsModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<InfraSecretsModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useInfraSecretsModuleQuery<S extends InfraSecretsModuleSelect, TData = {
+  infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useInfraSecretsModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<InfraSecretsModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<InfraSecretsModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: infraSecretsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .infraSecretsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().infraSecretsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchInfraSecretsModuleQuery({
@@ -99,46 +79,35 @@ export async function fetchInfraSecretsModuleQuery(params: {
   selection: SelectionConfig<InfraSecretsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<InfraSecretsModuleSelect>(params.selection);
-  return getClient()
-    .infraSecretsModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().infraSecretsModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```ts
  * await prefetchInfraSecretsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchInfraSecretsModuleQuery<S extends InfraSecretsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchInfraSecretsModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<InfraSecretsModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchInfraSecretsModuleQuery<S extends InfraSecretsModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
+}): Promise<void>;
+export async function prefetchInfraSecretsModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<InfraSecretsModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<InfraSecretsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: infraSecretsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .infraSecretsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().infraSecretsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

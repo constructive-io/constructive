@@ -317,8 +317,7 @@ export interface RefRelations {}
 export interface StoreRelations {}
 // ============ Entity Types With Relations ============
 export type CommitWithRelations = Commit & CommitRelations;
-export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord &
-  GetAllTreeNodesRecordRelations;
+export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord & GetAllTreeNodesRecordRelations;
 export type ObjectWithRelations = Object & ObjectRelations;
 export type RefWithRelations = Ref & RefRelations;
 export type StoreWithRelations = Store & StoreRelations;
@@ -451,80 +450,11 @@ export interface StoreFilter {
   or?: StoreFilter[];
 }
 // ============ OrderBy Types ============
-export type CommitOrderBy =
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'NATURAL'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC';
-export type GetAllTreeNodesRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'PATH_ASC'
-  | 'PATH_DESC';
-export type ObjectOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type RefOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
-export type StoreOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type CommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
+export type GetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
+export type ObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type RefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
+export type StoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 // ============ CRUD Input Types ============
 export interface CreateCommitInput {
   clientMutationId?: string;

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { connectedAccountsModuleKeys } from '../query-keys';
-import type {
-  ConnectedAccountsModuleSelect,
-  ConnectedAccountsModuleWithRelations,
-  ConnectedAccountsModuleFilter,
-  ConnectedAccountsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ConnectedAccountsModuleSelect,
-  ConnectedAccountsModuleWithRelations,
-  ConnectedAccountsModuleFilter,
-  ConnectedAccountsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { connectedAccountsModuleKeys } from "../query-keys";
+import type { ConnectedAccountsModuleSelect, ConnectedAccountsModuleWithRelations, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ConnectedAccountsModuleSelect, ConnectedAccountsModuleWithRelations, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const connectedAccountsModulesQueryKey = connectedAccountsModuleKeys.list;
 /**
  * Query hook for fetching ConnectedAccountsModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useConnectedAccountsModulesQuery({
@@ -45,60 +30,33 @@ export const connectedAccountsModulesQueryKey = connectedAccountsModuleKeys.list
  * });
  * ```
  */
-export function useConnectedAccountsModulesQuery<
-  S extends ConnectedAccountsModuleSelect,
-  TData = {
-    connectedAccountsModules: ConnectionResult<
-      InferSelectResult<ConnectedAccountsModuleWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, ConnectedAccountsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        connectedAccountsModules: ConnectionResult<
-          InferSelectResult<ConnectedAccountsModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useConnectedAccountsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      ConnectedAccountsModuleSelect,
-      ConnectedAccountsModuleFilter,
-      ConnectedAccountsModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    ConnectedAccountsModuleSelect,
-    ConnectedAccountsModuleFilter,
-    ConnectedAccountsModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useConnectedAccountsModulesQuery<S extends ConnectedAccountsModuleSelect, TData = {
+  connectedAccountsModules: ConnectionResult<InferSelectResult<ConnectedAccountsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConnectedAccountsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  connectedAccountsModules: ConnectionResult<InferSelectResult<ConnectedAccountsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useConnectedAccountsModulesQuery(params: {
+  selection: ListSelectionConfig<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: connectedAccountsModuleKeys.list(args),
     queryFn: () => getClient().connectedAccountsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch ConnectedAccountsModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchConnectedAccountsModulesQuery({
@@ -109,74 +67,38 @@ export function useConnectedAccountsModulesQuery(
  * });
  * ```
  */
-export async function fetchConnectedAccountsModulesQuery<
-  S extends ConnectedAccountsModuleSelect,
->(params: {
+export async function fetchConnectedAccountsModulesQuery<S extends ConnectedAccountsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, ConnectedAccountsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConnectedAccountsModuleSelect>;
 }): Promise<{
-  connectedAccountsModules: ConnectionResult<
-    InferSelectResult<ConnectedAccountsModuleWithRelations, S>
-  >;
+  connectedAccountsModules: ConnectionResult<InferSelectResult<ConnectedAccountsModuleWithRelations, S>>;
 }>;
 export async function fetchConnectedAccountsModulesQuery(params: {
-  selection: ListSelectionConfig<
-    ConnectedAccountsModuleSelect,
-    ConnectedAccountsModuleFilter,
-    ConnectedAccountsModuleOrderBy
-  >;
+  selection: ListSelectionConfig<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    ConnectedAccountsModuleSelect,
-    ConnectedAccountsModuleFilter,
-    ConnectedAccountsModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>(params.selection);
   return getClient().connectedAccountsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch ConnectedAccountsModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchConnectedAccountsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchConnectedAccountsModulesQuery<
-  S extends ConnectedAccountsModuleSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, ConnectedAccountsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchConnectedAccountsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      ConnectedAccountsModuleSelect,
-      ConnectedAccountsModuleFilter,
-      ConnectedAccountsModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    ConnectedAccountsModuleSelect,
-    ConnectedAccountsModuleFilter,
-    ConnectedAccountsModuleOrderBy
-  >(params.selection);
+export async function prefetchConnectedAccountsModulesQuery<S extends ConnectedAccountsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConnectedAccountsModuleSelect>;
+}): Promise<void>;
+export async function prefetchConnectedAccountsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: connectedAccountsModuleKeys.list(args),
-    queryFn: () => getClient().connectedAccountsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().connectedAccountsModule.findMany(args).unwrap()
   });
 }

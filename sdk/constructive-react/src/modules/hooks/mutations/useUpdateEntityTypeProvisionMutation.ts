@@ -11,24 +11,16 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { entityTypeProvisionKeys } from '../query-keys';
-import { entityTypeProvisionMutationKeys } from '../mutation-keys';
-import type {
-  EntityTypeProvisionSelect,
-  EntityTypeProvisionWithRelations,
-  EntityTypeProvisionPatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  EntityTypeProvisionSelect,
-  EntityTypeProvisionWithRelations,
-  EntityTypeProvisionPatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { entityTypeProvisionKeys } from "../query-keys";
+import { entityTypeProvisionMutationKeys } from "../mutation-keys";
+import type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations, EntityTypeProvisionPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations, EntityTypeProvisionPatch } from "../../orm/input-types";
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
      and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
@@ -48,83 +40,61 @@ export type {
  * mutate({ id: 'value-here', entityTypeProvisionPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateEntityTypeProvisionMutation<S extends EntityTypeProvisionSelect>(
-  params: {
-    selection: {
-      fields: S & EntityTypeProvisionSelect;
-    } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateEntityTypeProvision: {
-          entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        entityTypeProvisionPatch: EntityTypeProvisionPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateEntityTypeProvision: {
-      entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    entityTypeProvisionPatch: EntityTypeProvisionPatch;
-  }
->;
-export function useUpdateEntityTypeProvisionMutation(
-  params: {
-    selection: SelectionConfig<EntityTypeProvisionSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        entityTypeProvisionPatch: EntityTypeProvisionPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateEntityTypeProvisionMutation<S extends EntityTypeProvisionSelect>(params: {
+  selection: ({
+    fields: S & EntityTypeProvisionSelect;
+  } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>);
+} & Omit<UseMutationOptions<{
+  updateEntityTypeProvision: {
+    entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  entityTypeProvisionPatch: EntityTypeProvisionPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateEntityTypeProvision: {
+    entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  entityTypeProvisionPatch: EntityTypeProvisionPatch;
+}>;
+export function useUpdateEntityTypeProvisionMutation(params: {
+  selection: SelectionConfig<EntityTypeProvisionSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  entityTypeProvisionPatch: EntityTypeProvisionPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<EntityTypeProvisionSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: entityTypeProvisionMutationKeys.all,
     mutationFn: ({
       id,
-      entityTypeProvisionPatch,
+      entityTypeProvisionPatch
     }: {
       id: string;
       entityTypeProvisionPatch: EntityTypeProvisionPatch;
-    }) =>
-      getClient()
-        .entityTypeProvision.update({
-          where: {
-            id,
-          },
-          data: entityTypeProvisionPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().entityTypeProvision.update({
+      where: {
+        id
+      },
+      data: entityTypeProvisionPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.detail(variables.id),
+        queryKey: entityTypeProvisionKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.lists(),
+        queryKey: entityTypeProvisionKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { defaultPrivilegeKeys } from '../query-keys';
-import type {
-  DefaultPrivilegeSelect,
-  DefaultPrivilegeWithRelations,
-  DefaultPrivilegeFilter,
-  DefaultPrivilegeOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  DefaultPrivilegeSelect,
-  DefaultPrivilegeWithRelations,
-  DefaultPrivilegeFilter,
-  DefaultPrivilegeOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { defaultPrivilegeKeys } from "../query-keys";
+import type { DefaultPrivilegeSelect, DefaultPrivilegeWithRelations, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { DefaultPrivilegeSelect, DefaultPrivilegeWithRelations, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const defaultPrivilegesQueryKey = defaultPrivilegeKeys.list;
 /**
  * Query hook for fetching DefaultPrivilege list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDefaultPrivilegesQuery({
@@ -45,53 +30,33 @@ export const defaultPrivilegesQueryKey = defaultPrivilegeKeys.list;
  * });
  * ```
  */
-export function useDefaultPrivilegesQuery<
-  S extends DefaultPrivilegeSelect,
-  TData = {
-    defaultPrivileges: ConnectionResult<InferSelectResult<DefaultPrivilegeWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        defaultPrivileges: ConnectionResult<InferSelectResult<DefaultPrivilegeWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDefaultPrivilegesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      DefaultPrivilegeSelect,
-      DefaultPrivilegeFilter,
-      DefaultPrivilegeOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    DefaultPrivilegeSelect,
-    DefaultPrivilegeFilter,
-    DefaultPrivilegeOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useDefaultPrivilegesQuery<S extends DefaultPrivilegeSelect, TData = {
+  defaultPrivileges: ConnectionResult<InferSelectResult<DefaultPrivilegeWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
+} & Omit<UseQueryOptions<{
+  defaultPrivileges: ConnectionResult<InferSelectResult<DefaultPrivilegeWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDefaultPrivilegesQuery(params: {
+  selection: ListSelectionConfig<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: defaultPrivilegeKeys.list(args),
     queryFn: () => getClient().defaultPrivilege.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch DefaultPrivilege list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDefaultPrivilegesQuery({
@@ -105,59 +70,35 @@ export function useDefaultPrivilegesQuery(
 export async function fetchDefaultPrivilegesQuery<S extends DefaultPrivilegeSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
+  } & Omit<ListSelectionConfig<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
 }): Promise<{
   defaultPrivileges: ConnectionResult<InferSelectResult<DefaultPrivilegeWithRelations, S>>;
 }>;
 export async function fetchDefaultPrivilegesQuery(params: {
-  selection: ListSelectionConfig<
-    DefaultPrivilegeSelect,
-    DefaultPrivilegeFilter,
-    DefaultPrivilegeOrderBy
-  >;
+  selection: ListSelectionConfig<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    DefaultPrivilegeSelect,
-    DefaultPrivilegeFilter,
-    DefaultPrivilegeOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>(params.selection);
   return getClient().defaultPrivilege.findMany(args).unwrap();
 }
 /**
  * Prefetch DefaultPrivilege list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDefaultPrivilegesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDefaultPrivilegesQuery<S extends DefaultPrivilegeSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
-  }
-): Promise<void>;
-export async function prefetchDefaultPrivilegesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      DefaultPrivilegeSelect,
-      DefaultPrivilegeFilter,
-      DefaultPrivilegeOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    DefaultPrivilegeSelect,
-    DefaultPrivilegeFilter,
-    DefaultPrivilegeOrderBy
-  >(params.selection);
+export async function prefetchDefaultPrivilegesQuery<S extends DefaultPrivilegeSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
+}): Promise<void>;
+export async function prefetchDefaultPrivilegesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: defaultPrivilegeKeys.list(args),
-    queryFn: () => getClient().defaultPrivilege.findMany(args).unwrap(),
+    queryFn: () => getClient().defaultPrivilege.findMany(args).unwrap()
   });
 }

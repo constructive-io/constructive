@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { databaseProvisionModuleKeys } from '../query-keys';
-import type {
-  DatabaseProvisionModuleSelect,
-  DatabaseProvisionModuleWithRelations,
-  DatabaseProvisionModuleFilter,
-  DatabaseProvisionModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  DatabaseProvisionModuleSelect,
-  DatabaseProvisionModuleWithRelations,
-  DatabaseProvisionModuleFilter,
-  DatabaseProvisionModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { databaseProvisionModuleKeys } from "../query-keys";
+import type { DatabaseProvisionModuleSelect, DatabaseProvisionModuleWithRelations, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { DatabaseProvisionModuleSelect, DatabaseProvisionModuleWithRelations, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const databaseProvisionModulesQueryKey = databaseProvisionModuleKeys.list;
 /**
  * Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDatabaseProvisionModulesQuery({
@@ -45,60 +30,33 @@ export const databaseProvisionModulesQueryKey = databaseProvisionModuleKeys.list
  * });
  * ```
  */
-export function useDatabaseProvisionModulesQuery<
-  S extends DatabaseProvisionModuleSelect,
-  TData = {
-    databaseProvisionModules: ConnectionResult<
-      InferSelectResult<DatabaseProvisionModuleWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        databaseProvisionModules: ConnectionResult<
-          InferSelectResult<DatabaseProvisionModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDatabaseProvisionModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      DatabaseProvisionModuleSelect,
-      DatabaseProvisionModuleFilter,
-      DatabaseProvisionModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    DatabaseProvisionModuleSelect,
-    DatabaseProvisionModuleFilter,
-    DatabaseProvisionModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useDatabaseProvisionModulesQuery<S extends DatabaseProvisionModuleSelect, TData = {
+  databaseProvisionModules: ConnectionResult<InferSelectResult<DatabaseProvisionModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
+} & Omit<UseQueryOptions<{
+  databaseProvisionModules: ConnectionResult<InferSelectResult<DatabaseProvisionModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDatabaseProvisionModulesQuery(params: {
+  selection: ListSelectionConfig<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: databaseProvisionModuleKeys.list(args),
     queryFn: () => getClient().databaseProvisionModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDatabaseProvisionModulesQuery({
@@ -109,74 +67,38 @@ export function useDatabaseProvisionModulesQuery(
  * });
  * ```
  */
-export async function fetchDatabaseProvisionModulesQuery<
-  S extends DatabaseProvisionModuleSelect,
->(params: {
+export async function fetchDatabaseProvisionModulesQuery<S extends DatabaseProvisionModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
+  } & Omit<ListSelectionConfig<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
 }): Promise<{
-  databaseProvisionModules: ConnectionResult<
-    InferSelectResult<DatabaseProvisionModuleWithRelations, S>
-  >;
+  databaseProvisionModules: ConnectionResult<InferSelectResult<DatabaseProvisionModuleWithRelations, S>>;
 }>;
 export async function fetchDatabaseProvisionModulesQuery(params: {
-  selection: ListSelectionConfig<
-    DatabaseProvisionModuleSelect,
-    DatabaseProvisionModuleFilter,
-    DatabaseProvisionModuleOrderBy
-  >;
+  selection: ListSelectionConfig<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    DatabaseProvisionModuleSelect,
-    DatabaseProvisionModuleFilter,
-    DatabaseProvisionModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>(params.selection);
   return getClient().databaseProvisionModule.findMany(args).unwrap();
 }
 /**
  * Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
- *
+ * 
  * @example
  * ```ts
  * await prefetchDatabaseProvisionModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDatabaseProvisionModulesQuery<
-  S extends DatabaseProvisionModuleSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchDatabaseProvisionModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      DatabaseProvisionModuleSelect,
-      DatabaseProvisionModuleFilter,
-      DatabaseProvisionModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    DatabaseProvisionModuleSelect,
-    DatabaseProvisionModuleFilter,
-    DatabaseProvisionModuleOrderBy
-  >(params.selection);
+export async function prefetchDatabaseProvisionModulesQuery<S extends DatabaseProvisionModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
+}): Promise<void>;
+export async function prefetchDatabaseProvisionModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: databaseProvisionModuleKeys.list(args),
-    queryFn: () => getClient().databaseProvisionModule.findMany(args).unwrap(),
+    queryFn: () => getClient().databaseProvisionModule.findMany(args).unwrap()
   });
 }

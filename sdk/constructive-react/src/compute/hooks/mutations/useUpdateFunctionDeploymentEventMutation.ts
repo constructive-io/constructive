@@ -4,88 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionDeploymentEventKeys } from '../query-keys';
-import { functionDeploymentEventMutationKeys } from '../mutation-keys';
-import type {
-  FunctionDeploymentEventSelect,
-  FunctionDeploymentEventWithRelations,
-  FunctionDeploymentEventPatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionDeploymentEventSelect,
-  FunctionDeploymentEventWithRelations,
-  FunctionDeploymentEventPatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionDeploymentEventKeys } from "../query-keys";
+import { functionDeploymentEventMutationKeys } from "../mutation-keys";
+import type { FunctionDeploymentEventSelect, FunctionDeploymentEventWithRelations, FunctionDeploymentEventPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionDeploymentEventSelect, FunctionDeploymentEventWithRelations, FunctionDeploymentEventPatch } from "../../orm/input-types";
 /**
  * Deployment lifecycle events — audit log of provisioning, scaling, and failure events
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionDeploymentEventMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', functionDeploymentEventPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionDeploymentEventMutation<S extends FunctionDeploymentEventSelect>(
-  params: {
-    selection: {
-      fields: S & FunctionDeploymentEventSelect;
-    } & HookStrictSelect<NoInfer<S>, FunctionDeploymentEventSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateFunctionDeploymentEvent: {
-          functionDeploymentEvent: InferSelectResult<FunctionDeploymentEventWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        createdAt: string;
-        functionDeploymentEventPatch: FunctionDeploymentEventPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateFunctionDeploymentEvent: {
-      functionDeploymentEvent: InferSelectResult<FunctionDeploymentEventWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    createdAt: string;
-    functionDeploymentEventPatch: FunctionDeploymentEventPatch;
-  }
->;
-export function useUpdateFunctionDeploymentEventMutation(
-  params: {
-    selection: SelectionConfig<FunctionDeploymentEventSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        createdAt: string;
-        functionDeploymentEventPatch: FunctionDeploymentEventPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateFunctionDeploymentEventMutation<S extends FunctionDeploymentEventSelect>(params: {
+  selection: ({
+    fields: S & FunctionDeploymentEventSelect;
+  } & HookStrictSelect<NoInfer<S>, FunctionDeploymentEventSelect>);
+} & Omit<UseMutationOptions<{
+  updateFunctionDeploymentEvent: {
+    functionDeploymentEvent: InferSelectResult<FunctionDeploymentEventWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+  functionDeploymentEventPatch: FunctionDeploymentEventPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateFunctionDeploymentEvent: {
+    functionDeploymentEvent: InferSelectResult<FunctionDeploymentEventWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+  functionDeploymentEventPatch: FunctionDeploymentEventPatch;
+}>;
+export function useUpdateFunctionDeploymentEventMutation(params: {
+  selection: SelectionConfig<FunctionDeploymentEventSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  createdAt: string;
+  functionDeploymentEventPatch: FunctionDeploymentEventPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<FunctionDeploymentEventSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -93,30 +66,27 @@ export function useUpdateFunctionDeploymentEventMutation(
     mutationFn: ({
       id,
       createdAt,
-      functionDeploymentEventPatch,
+      functionDeploymentEventPatch
     }: {
       id: string;
       createdAt: string;
       functionDeploymentEventPatch: FunctionDeploymentEventPatch;
-    }) =>
-      getClient()
-        .functionDeploymentEvent.update({
-          where: {
-            id,
-            createdAt,
-          },
-          data: functionDeploymentEventPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().functionDeploymentEvent.update({
+      where: {
+        id,
+        createdAt
+      },
+      data: functionDeploymentEventPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentEventKeys.detail(variables.id),
+        queryKey: functionDeploymentEventKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentEventKeys.lists(),
+        queryKey: functionDeploymentEventKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -417,42 +417,6 @@ export interface OrgAdminGrant {
   isGrant?: boolean | null;
   updatedAt?: string | null;
 }
-/** Organizational chart edges defining parent-child reporting relationships between members within an entity */
-export interface OrgChartEdge {
-  /** User ID of the subordinate (employee) in this reporting relationship */
-  childId?: string | null;
-  createdAt?: string | null;
-  /** Organization this hierarchy edge belongs to */
-  entityId?: string | null;
-  id: string;
-  /** User ID of the manager; NULL indicates a top-level position with no direct report */
-  parentId?: string | null;
-  /** Numeric seniority level for this position (higher = more senior) */
-  positionLevel?: number | null;
-  /** Job title or role name for this position in the org chart */
-  positionTitle?: string | null;
-  updatedAt?: string | null;
-}
-/** Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table */
-export interface OrgChartEdgeGrant {
-  /** User ID of the subordinate being placed in the hierarchy */
-  childId?: string | null;
-  /** Timestamp when this grant or revocation was recorded */
-  createdAt?: string | null;
-  /** Organization this grant applies to */
-  entityId?: string | null;
-  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
-  grantorId?: string | null;
-  id: string;
-  /** TRUE to add/update the edge, FALSE to remove it */
-  isGrant?: boolean | null;
-  /** User ID of the manager being assigned; NULL for top-level positions */
-  parentId?: string | null;
-  /** Numeric seniority level being assigned in this grant */
-  positionLevel?: number | null;
-  /** Job title or role name being assigned in this grant */
-  positionTitle?: string | null;
-}
 /** Records of successfully claimed invitations, linking senders to receivers */
 export interface OrgClaimedInvite {
   createdAt?: string | null;
@@ -465,14 +429,6 @@ export interface OrgClaimedInvite {
   /** User ID of the original invitation sender */
   senderId?: string | null;
   updatedAt?: string | null;
-}
-export interface OrgGetManagersRecord {
-  depth?: number | null;
-  userId?: string | null;
-}
-export interface OrgGetSubordinatesRecord {
-  depth?: number | null;
-  userId?: string | null;
 }
 /** Records of individual permission grants and revocations for members via bitmask */
 export interface OrgGrant {
@@ -716,11 +672,7 @@ export interface AppPermissionDefaultPermissionRelations {
 }
 export interface MembershipTypeRelations {}
 export interface OrgAdminGrantRelations {}
-export interface OrgChartEdgeRelations {}
-export interface OrgChartEdgeGrantRelations {}
 export interface OrgClaimedInviteRelations {}
-export interface OrgGetManagersRecordRelations {}
-export interface OrgGetSubordinatesRecordRelations {}
 export interface OrgGrantRelations {}
 export interface OrgInviteRelations {}
 export interface OrgMemberRelations {}
@@ -750,42 +702,27 @@ export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteR
 export type AppGrantWithRelations = AppGrant & AppGrantRelations;
 export type AppInviteWithRelations = AppInvite & AppInviteRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
-export type AppMembershipDefaultWithRelations = AppMembershipDefault &
-  AppMembershipDefaultRelations;
+export type AppMembershipDefaultWithRelations = AppMembershipDefault & AppMembershipDefaultRelations;
 export type AppOwnerGrantWithRelations = AppOwnerGrant & AppOwnerGrantRelations;
 export type AppPermissionWithRelations = AppPermission & AppPermissionRelations;
-export type AppPermissionDefaultWithRelations = AppPermissionDefault &
-  AppPermissionDefaultRelations;
-export type AppPermissionDefaultGrantWithRelations = AppPermissionDefaultGrant &
-  AppPermissionDefaultGrantRelations;
-export type AppPermissionDefaultPermissionWithRelations = AppPermissionDefaultPermission &
-  AppPermissionDefaultPermissionRelations;
+export type AppPermissionDefaultWithRelations = AppPermissionDefault & AppPermissionDefaultRelations;
+export type AppPermissionDefaultGrantWithRelations = AppPermissionDefaultGrant & AppPermissionDefaultGrantRelations;
+export type AppPermissionDefaultPermissionWithRelations = AppPermissionDefaultPermission & AppPermissionDefaultPermissionRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type OrgAdminGrantWithRelations = OrgAdminGrant & OrgAdminGrantRelations;
-export type OrgChartEdgeWithRelations = OrgChartEdge & OrgChartEdgeRelations;
-export type OrgChartEdgeGrantWithRelations = OrgChartEdgeGrant & OrgChartEdgeGrantRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
-export type OrgGetManagersRecordWithRelations = OrgGetManagersRecord &
-  OrgGetManagersRecordRelations;
-export type OrgGetSubordinatesRecordWithRelations = OrgGetSubordinatesRecord &
-  OrgGetSubordinatesRecordRelations;
 export type OrgGrantWithRelations = OrgGrant & OrgGrantRelations;
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgMemberWithRelations = OrgMember & OrgMemberRelations;
 export type OrgMemberProfileWithRelations = OrgMemberProfile & OrgMemberProfileRelations;
 export type OrgMembershipWithRelations = OrgMembership & OrgMembershipRelations;
-export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
-  OrgMembershipDefaultRelations;
-export type OrgMembershipSettingWithRelations = OrgMembershipSetting &
-  OrgMembershipSettingRelations;
+export type OrgMembershipDefaultWithRelations = OrgMembershipDefault & OrgMembershipDefaultRelations;
+export type OrgMembershipSettingWithRelations = OrgMembershipSetting & OrgMembershipSettingRelations;
 export type OrgOwnerGrantWithRelations = OrgOwnerGrant & OrgOwnerGrantRelations;
 export type OrgPermissionWithRelations = OrgPermission & OrgPermissionRelations;
-export type OrgPermissionDefaultWithRelations = OrgPermissionDefault &
-  OrgPermissionDefaultRelations;
-export type OrgPermissionDefaultGrantWithRelations = OrgPermissionDefaultGrant &
-  OrgPermissionDefaultGrantRelations;
-export type OrgPermissionDefaultPermissionWithRelations = OrgPermissionDefaultPermission &
-  OrgPermissionDefaultPermissionRelations;
+export type OrgPermissionDefaultWithRelations = OrgPermissionDefault & OrgPermissionDefaultRelations;
+export type OrgPermissionDefaultGrantWithRelations = OrgPermissionDefaultGrant & OrgPermissionDefaultGrantRelations;
+export type OrgPermissionDefaultPermissionWithRelations = OrgPermissionDefaultPermission & OrgPermissionDefaultPermissionRelations;
 // ============ Entity Select Types ============
 export type AppAdminGrantSelect = {
   actorId?: boolean;
@@ -921,27 +858,6 @@ export type OrgAdminGrantSelect = {
   isGrant?: boolean;
   updatedAt?: boolean;
 };
-export type OrgChartEdgeSelect = {
-  childId?: boolean;
-  createdAt?: boolean;
-  entityId?: boolean;
-  id?: boolean;
-  parentId?: boolean;
-  positionLevel?: boolean;
-  positionTitle?: boolean;
-  updatedAt?: boolean;
-};
-export type OrgChartEdgeGrantSelect = {
-  childId?: boolean;
-  createdAt?: boolean;
-  entityId?: boolean;
-  grantorId?: boolean;
-  id?: boolean;
-  isGrant?: boolean;
-  parentId?: boolean;
-  positionLevel?: boolean;
-  positionTitle?: boolean;
-};
 export type OrgClaimedInviteSelect = {
   createdAt?: boolean;
   data?: boolean;
@@ -950,14 +866,6 @@ export type OrgClaimedInviteSelect = {
   receiverId?: boolean;
   senderId?: boolean;
   updatedAt?: boolean;
-};
-export type OrgGetManagersRecordSelect = {
-  depth?: boolean;
-  userId?: boolean;
-};
-export type OrgGetSubordinatesRecordSelect = {
-  depth?: boolean;
-  userId?: boolean;
 };
 export type OrgGrantSelect = {
   actorId?: boolean;
@@ -1413,56 +1321,6 @@ export interface OrgAdminGrantFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-export interface OrgChartEdgeFilter {
-  /** Checks for all expressions in this list. */
-  and?: OrgChartEdgeFilter[];
-  /** Filter by the object’s `childId` field. */
-  childId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: OrgChartEdgeFilter;
-  /** Checks for any expressions in this list. */
-  or?: OrgChartEdgeFilter[];
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `positionLevel` field. */
-  positionLevel?: IntFilter;
-  /** Filter by the object’s `positionTitle` field. */
-  positionTitle?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-export interface OrgChartEdgeGrantFilter {
-  /** Checks for all expressions in this list. */
-  and?: OrgChartEdgeGrantFilter[];
-  /** Filter by the object’s `childId` field. */
-  childId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `grantorId` field. */
-  grantorId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isGrant` field. */
-  isGrant?: BooleanFilter;
-  /** Negates the expression. */
-  not?: OrgChartEdgeGrantFilter;
-  /** Checks for any expressions in this list. */
-  or?: OrgChartEdgeGrantFilter[];
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `positionLevel` field. */
-  positionLevel?: IntFilter;
-  /** Filter by the object’s `positionTitle` field. */
-  positionTitle?: StringFilter;
-}
 export interface OrgClaimedInviteFilter {
   /** Checks for all expressions in this list. */
   and?: OrgClaimedInviteFilter[];
@@ -1482,20 +1340,6 @@ export interface OrgClaimedInviteFilter {
   senderId?: UUIDFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-}
-export interface OrgGetManagersRecordFilter {
-  depth?: IntFilter;
-  userId?: UUIDFilter;
-  and?: OrgGetManagersRecordFilter[];
-  or?: OrgGetManagersRecordFilter[];
-  not?: OrgGetManagersRecordFilter;
-}
-export interface OrgGetSubordinatesRecordFilter {
-  depth?: IntFilter;
-  userId?: UUIDFilter;
-  and?: OrgGetSubordinatesRecordFilter[];
-  or?: OrgGetSubordinatesRecordFilter[];
-  not?: OrgGetSubordinatesRecordFilter;
 }
 export interface OrgGrantFilter {
   /** Filter by the object’s `actorId` field. */
@@ -1824,582 +1668,32 @@ export interface OrgPermissionDefaultPermissionFilter {
   updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
-export type AppAdminGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppClaimedInviteOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppInviteOrderBy =
-  | 'CHANNEL_ASC'
-  | 'CHANNEL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'NATURAL'
-  | 'PHONE_ASC'
-  | 'PHONE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppMembershipOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_OWNER_ASC'
-  | 'IS_OWNER_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type AppMembershipDefaultOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type AppOwnerGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppPermissionOrderBy =
-  | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppPermissionDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppPermissionDefaultGrantOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppPermissionDefaultPermissionOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type MembershipTypeOrderBy =
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'HAS_USERS_TABLE_ENTRY_ASC'
-  | 'HAS_USERS_TABLE_ENTRY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PARENT_MEMBERSHIP_TYPE_ASC'
-  | 'PARENT_MEMBERSHIP_TYPE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type OrgAdminGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgChartEdgeOrderBy =
-  | 'CHILD_ID_ASC'
-  | 'CHILD_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgChartEdgeGrantOrderBy =
-  | 'CHILD_ID_ASC'
-  | 'CHILD_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type OrgClaimedInviteOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgGetManagersRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'DEPTH_ASC'
-  | 'DEPTH_DESC'
-  | 'USER_ID_ASC'
-  | 'USER_ID_DESC';
-export type OrgGetSubordinatesRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'DEPTH_ASC'
-  | 'DEPTH_DESC'
-  | 'USER_ID_ASC'
-  | 'USER_ID_DESC';
-export type OrgGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgInviteOrderBy =
-  | 'CHANNEL_ASC'
-  | 'CHANNEL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'IS_READ_ONLY_ASC'
-  | 'IS_READ_ONLY_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'NATURAL'
-  | 'PHONE_ASC'
-  | 'PHONE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgMemberOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type OrgMemberProfileOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'BIO_ASC'
-  | 'BIO_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MEMBERSHIP_ID_ASC'
-  | 'MEMBERSHIP_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_PICTURE_ASC'
-  | 'PROFILE_PICTURE_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgMembershipOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_EXTERNAL_ASC'
-  | 'IS_EXTERNAL_DESC'
-  | 'IS_OWNER_ASC'
-  | 'IS_OWNER_DESC'
-  | 'IS_READ_ONLY_ASC'
-  | 'IS_READ_ONLY_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type OrgMembershipDefaultOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type OrgMembershipSettingOrderBy =
-  | 'ALLOW_EXTERNAL_MEMBERS_ASC'
-  | 'ALLOW_EXTERNAL_MEMBERS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATE_CHILD_CASCADE_ADMINS_ASC'
-  | 'CREATE_CHILD_CASCADE_ADMINS_DESC'
-  | 'CREATE_CHILD_CASCADE_MEMBERS_ASC'
-  | 'CREATE_CHILD_CASCADE_MEMBERS_DESC'
-  | 'CREATE_CHILD_CASCADE_OWNERS_ASC'
-  | 'CREATE_CHILD_CASCADE_OWNERS_DESC'
-  | 'DELETE_MEMBER_CASCADE_CHILDREN_ASC'
-  | 'DELETE_MEMBER_CASCADE_CHILDREN_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITE_PROFILE_ASSIGNMENT_MODE_ASC'
-  | 'INVITE_PROFILE_ASSIGNMENT_MODE_DESC'
-  | 'LIMIT_ALLOCATION_MODE_ASC'
-  | 'LIMIT_ALLOCATION_MODE_DESC'
-  | 'NATURAL'
-  | 'POPULATE_MEMBER_EMAIL_ASC'
-  | 'POPULATE_MEMBER_EMAIL_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type OrgOwnerGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgPermissionOrderBy =
-  | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type OrgPermissionDefaultOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type OrgPermissionDefaultGrantOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgPermissionDefaultPermissionOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppAdminGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppClaimedInviteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppInviteOrderBy = "CHANNEL_ASC" | "CHANNEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_COUNT_ASC" | "INVITE_COUNT_DESC" | "INVITE_LIMIT_ASC" | "INVITE_LIMIT_DESC" | "INVITE_TOKEN_ASC" | "INVITE_TOKEN_DESC" | "INVITE_VALID_ASC" | "INVITE_VALID_DESC" | "MULTIPLE_ASC" | "MULTIPLE_DESC" | "NATURAL" | "PHONE_ASC" | "PHONE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppMembershipOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "GRANTED_ASC" | "GRANTED_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_BANNED_ASC" | "IS_BANNED_DESC" | "IS_DISABLED_ASC" | "IS_DISABLED_DESC" | "IS_OWNER_ASC" | "IS_OWNER_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type AppMembershipDefaultOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ID_ASC" | "ID_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type AppOwnerGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppPermissionOrderBy = "BITNUM_ASC" | "BITNUM_DESC" | "BITSTR_ASC" | "BITSTR_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppPermissionDefaultOrderBy = "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppPermissionDefaultGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AppPermissionDefaultPermissionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type MembershipTypeOrderBy = "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "HAS_USERS_TABLE_ENTRY_ASC" | "HAS_USERS_TABLE_ENTRY_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARENT_MEMBERSHIP_TYPE_ASC" | "PARENT_MEMBERSHIP_TYPE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type OrgAdminGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgClaimedInviteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgInviteOrderBy = "CHANNEL_ASC" | "CHANNEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_COUNT_ASC" | "INVITE_COUNT_DESC" | "INVITE_LIMIT_ASC" | "INVITE_LIMIT_DESC" | "INVITE_TOKEN_ASC" | "INVITE_TOKEN_DESC" | "INVITE_VALID_ASC" | "INVITE_VALID_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "MULTIPLE_ASC" | "MULTIPLE_DESC" | "NATURAL" | "PHONE_ASC" | "PHONE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgMemberOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type OrgMemberProfileOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "BIO_ASC" | "BIO_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MEMBERSHIP_ID_ASC" | "MEMBERSHIP_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_PICTURE_ASC" | "PROFILE_PICTURE_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgMembershipOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTED_ASC" | "GRANTED_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_BANNED_ASC" | "IS_BANNED_DESC" | "IS_DISABLED_ASC" | "IS_DISABLED_DESC" | "IS_EXTERNAL_ASC" | "IS_EXTERNAL_DESC" | "IS_OWNER_ASC" | "IS_OWNER_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type OrgMembershipDefaultOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type OrgMembershipSettingOrderBy = "ALLOW_EXTERNAL_MEMBERS_ASC" | "ALLOW_EXTERNAL_MEMBERS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "CREATE_CHILD_CASCADE_ADMINS_ASC" | "CREATE_CHILD_CASCADE_ADMINS_DESC" | "CREATE_CHILD_CASCADE_MEMBERS_ASC" | "CREATE_CHILD_CASCADE_MEMBERS_DESC" | "CREATE_CHILD_CASCADE_OWNERS_ASC" | "CREATE_CHILD_CASCADE_OWNERS_DESC" | "DELETE_MEMBER_CASCADE_CHILDREN_ASC" | "DELETE_MEMBER_CASCADE_CHILDREN_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_PROFILE_ASSIGNMENT_MODE_ASC" | "INVITE_PROFILE_ASSIGNMENT_MODE_DESC" | "LIMIT_ALLOCATION_MODE_ASC" | "LIMIT_ALLOCATION_MODE_DESC" | "NATURAL" | "POPULATE_MEMBER_EMAIL_ASC" | "POPULATE_MEMBER_EMAIL_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type OrgOwnerGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgPermissionOrderBy = "BITNUM_ASC" | "BITNUM_DESC" | "BITSTR_ASC" | "BITSTR_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type OrgPermissionDefaultOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type OrgPermissionDefaultGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgPermissionDefaultPermissionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 // ============ CRUD Input Types ============
 export interface CreateAppAdminGrantInput {
   clientMutationId?: string;
@@ -2729,62 +2023,6 @@ export interface DeleteOrgAdminGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateOrgChartEdgeInput {
-  clientMutationId?: string;
-  orgChartEdge: {
-    childId: string;
-    entityId: string;
-    parentId?: string;
-    positionLevel?: number;
-    positionTitle?: string;
-  };
-}
-export interface OrgChartEdgePatch {
-  childId?: string | null;
-  entityId?: string | null;
-  parentId?: string | null;
-  positionLevel?: number | null;
-  positionTitle?: string | null;
-}
-export interface UpdateOrgChartEdgeInput {
-  clientMutationId?: string;
-  id: string;
-  orgChartEdgePatch: OrgChartEdgePatch;
-}
-export interface DeleteOrgChartEdgeInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  orgChartEdgeGrant: {
-    childId: string;
-    entityId: string;
-    grantorId?: string;
-    isGrant?: boolean;
-    parentId?: string;
-    positionLevel?: number;
-    positionTitle?: string;
-  };
-}
-export interface OrgChartEdgeGrantPatch {
-  childId?: string | null;
-  entityId?: string | null;
-  grantorId?: string | null;
-  isGrant?: boolean | null;
-  parentId?: string | null;
-  positionLevel?: number | null;
-  positionTitle?: string | null;
-}
-export interface UpdateOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  id: string;
-  orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch;
-}
-export interface DeleteOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateOrgClaimedInviteInput {
   clientMutationId?: string;
   orgClaimedInvite: {
@@ -2806,46 +2044,6 @@ export interface UpdateOrgClaimedInviteInput {
   orgClaimedInvitePatch: OrgClaimedInvitePatch;
 }
 export interface DeleteOrgClaimedInviteInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateOrgGetManagersRecordInput {
-  clientMutationId?: string;
-  orgGetManagersRecord: {
-    depth?: number;
-    userId: string;
-  };
-}
-export interface OrgGetManagersRecordPatch {
-  depth?: number | null;
-  userId?: string | null;
-}
-export interface UpdateOrgGetManagersRecordInput {
-  clientMutationId?: string;
-  id: string;
-  orgGetManagersRecordPatch: OrgGetManagersRecordPatch;
-}
-export interface DeleteOrgGetManagersRecordInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateOrgGetSubordinatesRecordInput {
-  clientMutationId?: string;
-  orgGetSubordinatesRecord: {
-    depth?: number;
-    userId: string;
-  };
-}
-export interface OrgGetSubordinatesRecordPatch {
-  depth?: number | null;
-  userId?: string | null;
-}
-export interface UpdateOrgGetSubordinatesRecordInput {
-  clientMutationId?: string;
-  id: string;
-  orgGetSubordinatesRecordPatch: OrgGetSubordinatesRecordPatch;
-}
-export interface DeleteOrgGetSubordinatesRecordInput {
   clientMutationId?: string;
   id: string;
 }
@@ -3198,13 +2396,13 @@ export interface DeleteOrgPermissionDefaultPermissionInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  AppPermission: {
-    appPermissionDefaultGrantsByPermissionId: 'AppPermissionDefaultGrant',
+  "AppPermission": {
+    "appPermissionDefaultGrantsByPermissionId": "AppPermissionDefaultGrant"
   },
-  OrgPermission: {
-    orgPermissionDefaultGrantsByPermissionId: 'OrgPermissionDefaultGrant',
-    orgPermissionDefaultPermissionsByPermissionId: 'OrgPermissionDefaultPermission',
-  },
+  "OrgPermission": {
+    "orgPermissionDefaultGrantsByPermissionId": "OrgPermissionDefaultGrant",
+    "orgPermissionDefaultPermissionsByPermissionId": "OrgPermissionDefaultPermission"
+  }
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface ProvisionBucketInput {
@@ -3545,42 +2743,6 @@ export interface OrgAdminGrantInput {
   /** True to grant admin, false to revoke admin */
   isGrant?: boolean;
   updatedAt?: string;
-}
-/** An input for mutations affecting `OrgChartEdge` */
-export interface OrgChartEdgeInput {
-  /** User ID of the subordinate (employee) in this reporting relationship */
-  childId: string;
-  createdAt?: string;
-  /** Organization this hierarchy edge belongs to */
-  entityId: string;
-  id?: string;
-  /** User ID of the manager; NULL indicates a top-level position with no direct report */
-  parentId?: string;
-  /** Numeric seniority level for this position (higher = more senior) */
-  positionLevel?: number;
-  /** Job title or role name for this position in the org chart */
-  positionTitle?: string;
-  updatedAt?: string;
-}
-/** An input for mutations affecting `OrgChartEdgeGrant` */
-export interface OrgChartEdgeGrantInput {
-  /** User ID of the subordinate being placed in the hierarchy */
-  childId: string;
-  /** Timestamp when this grant or revocation was recorded */
-  createdAt?: string;
-  /** Organization this grant applies to */
-  entityId: string;
-  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
-  grantorId?: string;
-  id?: string;
-  /** TRUE to add/update the edge, FALSE to remove it */
-  isGrant?: boolean;
-  /** User ID of the manager being assigned; NULL for top-level positions */
-  parentId?: string;
-  /** Numeric seniority level being assigned in this grant */
-  positionLevel?: number;
-  /** Job title or role name being assigned in this grant */
-  positionTitle?: string;
 }
 /** An input for mutations affecting `OrgClaimedInvite` */
 export interface OrgClaimedInviteInput {
@@ -4810,96 +3972,6 @@ export type DeleteOrgAdminGrantPayloadSelect = {
     select: OrgAdminGrantEdgeSelect;
   };
 };
-export interface CreateOrgChartEdgePayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdge` that was created by this mutation. */
-  orgChartEdge?: OrgChartEdge | null;
-  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
-}
-export type CreateOrgChartEdgePayloadSelect = {
-  clientMutationId?: boolean;
-  orgChartEdge?: {
-    select: OrgChartEdgeSelect;
-  };
-  orgChartEdgeEdge?: {
-    select: OrgChartEdgeEdgeSelect;
-  };
-};
-export interface UpdateOrgChartEdgePayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdge` that was updated by this mutation. */
-  orgChartEdge?: OrgChartEdge | null;
-  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
-}
-export type UpdateOrgChartEdgePayloadSelect = {
-  clientMutationId?: boolean;
-  orgChartEdge?: {
-    select: OrgChartEdgeSelect;
-  };
-  orgChartEdgeEdge?: {
-    select: OrgChartEdgeEdgeSelect;
-  };
-};
-export interface DeleteOrgChartEdgePayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdge` that was deleted by this mutation. */
-  orgChartEdge?: OrgChartEdge | null;
-  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
-}
-export type DeleteOrgChartEdgePayloadSelect = {
-  clientMutationId?: boolean;
-  orgChartEdge?: {
-    select: OrgChartEdgeSelect;
-  };
-  orgChartEdgeEdge?: {
-    select: OrgChartEdgeEdgeSelect;
-  };
-};
-export interface CreateOrgChartEdgeGrantPayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdgeGrant` that was created by this mutation. */
-  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
-  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
-}
-export type CreateOrgChartEdgeGrantPayloadSelect = {
-  clientMutationId?: boolean;
-  orgChartEdgeGrant?: {
-    select: OrgChartEdgeGrantSelect;
-  };
-  orgChartEdgeGrantEdge?: {
-    select: OrgChartEdgeGrantEdgeSelect;
-  };
-};
-export interface UpdateOrgChartEdgeGrantPayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdgeGrant` that was updated by this mutation. */
-  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
-  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
-}
-export type UpdateOrgChartEdgeGrantPayloadSelect = {
-  clientMutationId?: boolean;
-  orgChartEdgeGrant?: {
-    select: OrgChartEdgeGrantSelect;
-  };
-  orgChartEdgeGrantEdge?: {
-    select: OrgChartEdgeGrantEdgeSelect;
-  };
-};
-export interface DeleteOrgChartEdgeGrantPayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdgeGrant` that was deleted by this mutation. */
-  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
-  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
-}
-export type DeleteOrgChartEdgeGrantPayloadSelect = {
-  clientMutationId?: boolean;
-  orgChartEdgeGrant?: {
-    select: OrgChartEdgeGrantSelect;
-  };
-  orgChartEdgeGrantEdge?: {
-    select: OrgChartEdgeGrantEdgeSelect;
-  };
-};
 export interface CreateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was created by this mutation. */
@@ -5668,30 +4740,6 @@ export type OrgAdminGrantEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgAdminGrantSelect;
-  };
-};
-/** A `OrgChartEdge` edge in the connection. */
-export interface OrgChartEdgeEdge {
-  cursor?: string | null;
-  /** The `OrgChartEdge` at the end of the edge. */
-  node?: OrgChartEdge | null;
-}
-export type OrgChartEdgeEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: OrgChartEdgeSelect;
-  };
-};
-/** A `OrgChartEdgeGrant` edge in the connection. */
-export interface OrgChartEdgeGrantEdge {
-  cursor?: string | null;
-  /** The `OrgChartEdgeGrant` at the end of the edge. */
-  node?: OrgChartEdgeGrant | null;
-}
-export type OrgChartEdgeGrantEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: OrgChartEdgeGrantSelect;
   };
 };
 /** A `OrgClaimedInvite` edge in the connection. */

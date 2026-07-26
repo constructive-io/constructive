@@ -4,88 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformInfraCommitKeys } from '../query-keys';
-import { platformInfraCommitMutationKeys } from '../mutation-keys';
-import type {
-  PlatformInfraCommitSelect,
-  PlatformInfraCommitWithRelations,
-  PlatformInfraCommitPatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PlatformInfraCommitSelect,
-  PlatformInfraCommitWithRelations,
-  PlatformInfraCommitPatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformInfraCommitKeys } from "../query-keys";
+import { platformInfraCommitMutationKeys } from "../mutation-keys";
+import type { PlatformInfraCommitSelect, PlatformInfraCommitWithRelations, PlatformInfraCommitPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformInfraCommitSelect, PlatformInfraCommitWithRelations, PlatformInfraCommitPatch } from "../../orm/input-types";
 /**
  * Commit history — each commit snapshots a tree root for a store
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformInfraCommitMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', platformInfraCommitPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformInfraCommitMutation<S extends PlatformInfraCommitSelect>(
-  params: {
-    selection: {
-      fields: S & PlatformInfraCommitSelect;
-    } & HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updatePlatformInfraCommit: {
-          platformInfraCommit: InferSelectResult<PlatformInfraCommitWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        scopeId: string;
-        platformInfraCommitPatch: PlatformInfraCommitPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updatePlatformInfraCommit: {
-      platformInfraCommit: InferSelectResult<PlatformInfraCommitWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    scopeId: string;
-    platformInfraCommitPatch: PlatformInfraCommitPatch;
-  }
->;
-export function useUpdatePlatformInfraCommitMutation(
-  params: {
-    selection: SelectionConfig<PlatformInfraCommitSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        scopeId: string;
-        platformInfraCommitPatch: PlatformInfraCommitPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdatePlatformInfraCommitMutation<S extends PlatformInfraCommitSelect>(params: {
+  selection: ({
+    fields: S & PlatformInfraCommitSelect;
+  } & HookStrictSelect<NoInfer<S>, PlatformInfraCommitSelect>);
+} & Omit<UseMutationOptions<{
+  updatePlatformInfraCommit: {
+    platformInfraCommit: InferSelectResult<PlatformInfraCommitWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  scopeId: string;
+  platformInfraCommitPatch: PlatformInfraCommitPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updatePlatformInfraCommit: {
+    platformInfraCommit: InferSelectResult<PlatformInfraCommitWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  scopeId: string;
+  platformInfraCommitPatch: PlatformInfraCommitPatch;
+}>;
+export function useUpdatePlatformInfraCommitMutation(params: {
+  selection: SelectionConfig<PlatformInfraCommitSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  scopeId: string;
+  platformInfraCommitPatch: PlatformInfraCommitPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<PlatformInfraCommitSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -93,30 +66,27 @@ export function useUpdatePlatformInfraCommitMutation(
     mutationFn: ({
       id,
       scopeId,
-      platformInfraCommitPatch,
+      platformInfraCommitPatch
     }: {
       id: string;
       scopeId: string;
       platformInfraCommitPatch: PlatformInfraCommitPatch;
-    }) =>
-      getClient()
-        .platformInfraCommit.update({
-          where: {
-            id,
-            scopeId,
-          },
-          data: platformInfraCommitPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().platformInfraCommit.update({
+      where: {
+        id,
+        scopeId
+      },
+      data: platformInfraCommitPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformInfraCommitKeys.detail(variables.id),
+        queryKey: platformInfraCommitKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: platformInfraCommitKeys.lists(),
+        queryKey: platformInfraCommitKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { webhookEventKeys } from '../query-keys';
-import type {
-  WebhookEventSelect,
-  WebhookEventWithRelations,
-  WebhookEventFilter,
-  WebhookEventOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  WebhookEventSelect,
-  WebhookEventWithRelations,
-  WebhookEventFilter,
-  WebhookEventOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { webhookEventKeys } from "../query-keys";
+import type { WebhookEventSelect, WebhookEventWithRelations, WebhookEventFilter, WebhookEventOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebhookEventSelect, WebhookEventWithRelations, WebhookEventFilter, WebhookEventOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const webhookEventsQueryKey = webhookEventKeys.list;
 /**
  * Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useWebhookEventsQuery({
@@ -45,47 +30,33 @@ export const webhookEventsQueryKey = webhookEventKeys.list;
  * });
  * ```
  */
-export function useWebhookEventsQuery<
-  S extends WebhookEventSelect,
-  TData = {
-    webhookEvents: ConnectionResult<InferSelectResult<WebhookEventWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, WebhookEventFilter, WebhookEventOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        webhookEvents: ConnectionResult<InferSelectResult<WebhookEventWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useWebhookEventsQuery(
-  params: {
-    selection: ListSelectionConfig<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useWebhookEventsQuery<S extends WebhookEventSelect, TData = {
+  webhookEvents: ConnectionResult<InferSelectResult<WebhookEventWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, WebhookEventFilter, WebhookEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
+} & Omit<UseQueryOptions<{
+  webhookEvents: ConnectionResult<InferSelectResult<WebhookEventWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useWebhookEventsQuery(params: {
+  selection: ListSelectionConfig<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: webhookEventKeys.list(args),
     queryFn: () => getClient().webhookEvent.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchWebhookEventsQuery({
@@ -99,47 +70,35 @@ export function useWebhookEventsQuery(
 export async function fetchWebhookEventsQuery<S extends WebhookEventSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, WebhookEventFilter, WebhookEventOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
+  } & Omit<ListSelectionConfig<S, WebhookEventFilter, WebhookEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
 }): Promise<{
   webhookEvents: ConnectionResult<InferSelectResult<WebhookEventWithRelations, S>>;
 }>;
 export async function fetchWebhookEventsQuery(params: {
   selection: ListSelectionConfig<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>;
 }) {
-  const args = buildListSelectionArgs<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>(params.selection);
   return getClient().webhookEvent.findMany(args).unwrap();
 }
 /**
  * Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued
- *
+ * 
  * @example
  * ```ts
  * await prefetchWebhookEventsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchWebhookEventsQuery<S extends WebhookEventSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, WebhookEventFilter, WebhookEventOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
-  }
-): Promise<void>;
-export async function prefetchWebhookEventsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>(
-    params.selection
-  );
+export async function prefetchWebhookEventsQuery<S extends WebhookEventSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, WebhookEventFilter, WebhookEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
+}): Promise<void>;
+export async function prefetchWebhookEventsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<WebhookEventSelect, WebhookEventFilter, WebhookEventOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: webhookEventKeys.list(args),
-    queryFn: () => getClient().webhookEvent.findMany(args).unwrap(),
+    queryFn: () => getClient().webhookEvent.findMany(args).unwrap()
   });
 }

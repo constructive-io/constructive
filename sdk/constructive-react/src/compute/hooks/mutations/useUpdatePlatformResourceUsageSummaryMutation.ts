@@ -4,93 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformResourceUsageSummaryKeys } from '../query-keys';
-import { platformResourceUsageSummaryMutationKeys } from '../mutation-keys';
-import type {
-  PlatformResourceUsageSummarySelect,
-  PlatformResourceUsageSummaryWithRelations,
-  PlatformResourceUsageSummaryPatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PlatformResourceUsageSummarySelect,
-  PlatformResourceUsageSummaryWithRelations,
-  PlatformResourceUsageSummaryPatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformResourceUsageSummaryKeys } from "../query-keys";
+import { platformResourceUsageSummaryMutationKeys } from "../mutation-keys";
+import type { PlatformResourceUsageSummarySelect, PlatformResourceUsageSummaryWithRelations, PlatformResourceUsageSummaryPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourceUsageSummarySelect, PlatformResourceUsageSummaryWithRelations, PlatformResourceUsageSummaryPatch } from "../../orm/input-types";
 /**
  * Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformResourceUsageSummaryMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', platformResourceUsageSummaryPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformResourceUsageSummaryMutation<
-  S extends PlatformResourceUsageSummarySelect,
->(
-  params: {
-    selection: {
-      fields: S & PlatformResourceUsageSummarySelect;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourceUsageSummarySelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updatePlatformResourceUsageSummary: {
-          platformResourceUsageSummary: InferSelectResult<
-            PlatformResourceUsageSummaryWithRelations,
-            S
-          >;
-        };
-      },
-      Error,
-      {
-        id: string;
-        date: string;
-        platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updatePlatformResourceUsageSummary: {
-      platformResourceUsageSummary: InferSelectResult<PlatformResourceUsageSummaryWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    date: string;
-    platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
-  }
->;
-export function useUpdatePlatformResourceUsageSummaryMutation(
-  params: {
-    selection: SelectionConfig<PlatformResourceUsageSummarySelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        date: string;
-        platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdatePlatformResourceUsageSummaryMutation<S extends PlatformResourceUsageSummarySelect>(params: {
+  selection: ({
+    fields: S & PlatformResourceUsageSummarySelect;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourceUsageSummarySelect>);
+} & Omit<UseMutationOptions<{
+  updatePlatformResourceUsageSummary: {
+    platformResourceUsageSummary: InferSelectResult<PlatformResourceUsageSummaryWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  date: string;
+  platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updatePlatformResourceUsageSummary: {
+    platformResourceUsageSummary: InferSelectResult<PlatformResourceUsageSummaryWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  date: string;
+  platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
+}>;
+export function useUpdatePlatformResourceUsageSummaryMutation(params: {
+  selection: SelectionConfig<PlatformResourceUsageSummarySelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  date: string;
+  platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<PlatformResourceUsageSummarySelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -98,30 +66,27 @@ export function useUpdatePlatformResourceUsageSummaryMutation(
     mutationFn: ({
       id,
       date,
-      platformResourceUsageSummaryPatch,
+      platformResourceUsageSummaryPatch
     }: {
       id: string;
       date: string;
       platformResourceUsageSummaryPatch: PlatformResourceUsageSummaryPatch;
-    }) =>
-      getClient()
-        .platformResourceUsageSummary.update({
-          where: {
-            id,
-            date,
-          },
-          data: platformResourceUsageSummaryPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().platformResourceUsageSummary.update({
+      where: {
+        id,
+        date
+      },
+      data: platformResourceUsageSummaryPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformResourceUsageSummaryKeys.detail(variables.id),
+        queryKey: platformResourceUsageSummaryKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: platformResourceUsageSummaryKeys.lists(),
+        queryKey: platformResourceUsageSummaryKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

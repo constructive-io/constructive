@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-SEO and social sharing metadata for a site: page title, description, and Open Graph image
+SEO and social sharing metadata for a site surface
 
 ## Usage
 
 ```typescript
-useSiteMetadataQuery({ selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } } })
-useSiteMetadatumQuery({ id: '<UUID>', selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } } })
+useSiteMetadataQuery({ selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } } })
+useSiteMetadatumQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } } })
 useCreateSiteMetadatumMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMetadatumMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMetadatumMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMetadatumMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true } },
+  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ogImage: true, siteId: true, title: true, updatedAt: true } },
 });
 ```
 

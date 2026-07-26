@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { permissionsModuleKeys } from '../query-keys';
-import type {
-  PermissionsModuleSelect,
-  PermissionsModuleWithRelations,
-  PermissionsModuleFilter,
-  PermissionsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PermissionsModuleSelect,
-  PermissionsModuleWithRelations,
-  PermissionsModuleFilter,
-  PermissionsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { permissionsModuleKeys } from "../query-keys";
+import type { PermissionsModuleSelect, PermissionsModuleWithRelations, PermissionsModuleFilter, PermissionsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PermissionsModuleSelect, PermissionsModuleWithRelations, PermissionsModuleFilter, PermissionsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const permissionsModulesQueryKey = permissionsModuleKeys.list;
 /**
  * Query hook for fetching PermissionsModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePermissionsModulesQuery({
@@ -45,53 +30,33 @@ export const permissionsModulesQueryKey = permissionsModuleKeys.list;
  * });
  * ```
  */
-export function usePermissionsModulesQuery<
-  S extends PermissionsModuleSelect,
-  TData = {
-    permissionsModules: ConnectionResult<InferSelectResult<PermissionsModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PermissionsModuleFilter, PermissionsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PermissionsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        permissionsModules: ConnectionResult<InferSelectResult<PermissionsModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePermissionsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PermissionsModuleSelect,
-      PermissionsModuleFilter,
-      PermissionsModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PermissionsModuleSelect,
-    PermissionsModuleFilter,
-    PermissionsModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePermissionsModulesQuery<S extends PermissionsModuleSelect, TData = {
+  permissionsModules: ConnectionResult<InferSelectResult<PermissionsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PermissionsModuleFilter, PermissionsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PermissionsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  permissionsModules: ConnectionResult<InferSelectResult<PermissionsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePermissionsModulesQuery(params: {
+  selection: ListSelectionConfig<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: permissionsModuleKeys.list(args),
     queryFn: () => getClient().permissionsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch PermissionsModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPermissionsModulesQuery({
@@ -105,59 +70,35 @@ export function usePermissionsModulesQuery(
 export async function fetchPermissionsModulesQuery<S extends PermissionsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PermissionsModuleFilter, PermissionsModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PermissionsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, PermissionsModuleFilter, PermissionsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PermissionsModuleSelect>;
 }): Promise<{
   permissionsModules: ConnectionResult<InferSelectResult<PermissionsModuleWithRelations, S>>;
 }>;
 export async function fetchPermissionsModulesQuery(params: {
-  selection: ListSelectionConfig<
-    PermissionsModuleSelect,
-    PermissionsModuleFilter,
-    PermissionsModuleOrderBy
-  >;
+  selection: ListSelectionConfig<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PermissionsModuleSelect,
-    PermissionsModuleFilter,
-    PermissionsModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy>(params.selection);
   return getClient().permissionsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch PermissionsModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPermissionsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPermissionsModulesQuery<S extends PermissionsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PermissionsModuleFilter, PermissionsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PermissionsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchPermissionsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PermissionsModuleSelect,
-      PermissionsModuleFilter,
-      PermissionsModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PermissionsModuleSelect,
-    PermissionsModuleFilter,
-    PermissionsModuleOrderBy
-  >(params.selection);
+export async function prefetchPermissionsModulesQuery<S extends PermissionsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PermissionsModuleFilter, PermissionsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PermissionsModuleSelect>;
+}): Promise<void>;
+export async function prefetchPermissionsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: permissionsModuleKeys.list(args),
-    queryFn: () => getClient().permissionsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().permissionsModule.findMany(args).unwrap()
   });
 }

@@ -4,25 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { enumKeys } from '../query-keys';
-import type { EnumSelect, EnumWithRelations, EnumFilter, EnumOrderBy } from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type { EnumSelect, EnumWithRelations, EnumFilter, EnumOrderBy } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { enumKeys } from "../query-keys";
+import type { EnumSelect, EnumWithRelations, EnumFilter, EnumOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { EnumSelect, EnumWithRelations, EnumFilter, EnumOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const enumsQueryKey = enumKeys.list;
 /**
  * Query hook for fetching Enum list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useEnumsQuery({
@@ -35,45 +30,33 @@ export const enumsQueryKey = enumKeys.list;
  * });
  * ```
  */
-export function useEnumsQuery<
-  S extends EnumSelect,
-  TData = {
-    enums: ConnectionResult<InferSelectResult<EnumWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, EnumFilter, EnumOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, EnumSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        enums: ConnectionResult<InferSelectResult<EnumWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useEnumsQuery(
-  params: {
-    selection: ListSelectionConfig<EnumSelect, EnumFilter, EnumOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useEnumsQuery<S extends EnumSelect, TData = {
+  enums: ConnectionResult<InferSelectResult<EnumWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, EnumFilter, EnumOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EnumSelect>;
+} & Omit<UseQueryOptions<{
+  enums: ConnectionResult<InferSelectResult<EnumWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useEnumsQuery(params: {
+  selection: ListSelectionConfig<EnumSelect, EnumFilter, EnumOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildListSelectionArgs<EnumSelect, EnumFilter, EnumOrderBy>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: enumKeys.list(args),
     queryFn: () => getClient().enum.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch Enum list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchEnumsQuery({
@@ -87,8 +70,7 @@ export function useEnumsQuery(
 export async function fetchEnumsQuery<S extends EnumSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, EnumFilter, EnumOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, EnumSelect>;
+  } & Omit<ListSelectionConfig<S, EnumFilter, EnumOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EnumSelect>;
 }): Promise<{
   enums: ConnectionResult<InferSelectResult<EnumWithRelations, S>>;
 }>;
@@ -100,30 +82,23 @@ export async function fetchEnumsQuery(params: {
 }
 /**
  * Prefetch Enum list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchEnumsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchEnumsQuery<S extends EnumSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, EnumFilter, EnumOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, EnumSelect>;
-  }
-): Promise<void>;
-export async function prefetchEnumsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<EnumSelect, EnumFilter, EnumOrderBy>;
-  }
-): Promise<void> {
+export async function prefetchEnumsQuery<S extends EnumSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, EnumFilter, EnumOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EnumSelect>;
+}): Promise<void>;
+export async function prefetchEnumsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<EnumSelect, EnumFilter, EnumOrderBy>;
+}): Promise<void> {
   const args = buildListSelectionArgs<EnumSelect, EnumFilter, EnumOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: enumKeys.list(args),
-    queryFn: () => getClient().enum.findMany(args).unwrap(),
+    queryFn: () => getClient().enum.findMany(args).unwrap()
   });
 }

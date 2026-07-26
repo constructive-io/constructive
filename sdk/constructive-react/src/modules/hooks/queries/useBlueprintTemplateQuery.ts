@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { blueprintTemplateKeys } from '../query-keys';
-import type {
-  BlueprintTemplateSelect,
-  BlueprintTemplateWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  BlueprintTemplateSelect,
-  BlueprintTemplateWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { blueprintTemplateKeys } from "../query-keys";
+import type { BlueprintTemplateSelect, BlueprintTemplateWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { BlueprintTemplateSelect, BlueprintTemplateWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const blueprintTemplateQueryKey = blueprintTemplateKeys.detail;
 /**
  * A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible).
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useBlueprintTemplateQuery({
@@ -32,52 +26,38 @@ export const blueprintTemplateQueryKey = blueprintTemplateKeys.detail;
  * });
  * ```
  */
-export function useBlueprintTemplateQuery<
-  S extends BlueprintTemplateSelect,
-  TData = {
-    blueprintTemplate: InferSelectResult<BlueprintTemplateWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, BlueprintTemplateSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        blueprintTemplate: InferSelectResult<BlueprintTemplateWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useBlueprintTemplateQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<BlueprintTemplateSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useBlueprintTemplateQuery<S extends BlueprintTemplateSelect, TData = {
+  blueprintTemplate: InferSelectResult<BlueprintTemplateWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, BlueprintTemplateSelect>;
+} & Omit<UseQueryOptions<{
+  blueprintTemplate: InferSelectResult<BlueprintTemplateWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useBlueprintTemplateQuery(params: {
+  id: string;
+  selection: SelectionConfig<BlueprintTemplateSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<BlueprintTemplateSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: blueprintTemplateKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .blueprintTemplate.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().blueprintTemplate.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible).
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchBlueprintTemplateQuery({
@@ -99,46 +79,35 @@ export async function fetchBlueprintTemplateQuery(params: {
   selection: SelectionConfig<BlueprintTemplateSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<BlueprintTemplateSelect>(params.selection);
-  return getClient()
-    .blueprintTemplate.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().blueprintTemplate.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible).
- *
+ * 
  * @example
  * ```ts
  * await prefetchBlueprintTemplateQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchBlueprintTemplateQuery<S extends BlueprintTemplateSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, BlueprintTemplateSelect>;
-  }
-): Promise<void>;
-export async function prefetchBlueprintTemplateQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<BlueprintTemplateSelect>;
-  }
-): Promise<void> {
+export async function prefetchBlueprintTemplateQuery<S extends BlueprintTemplateSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, BlueprintTemplateSelect>;
+}): Promise<void>;
+export async function prefetchBlueprintTemplateQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<BlueprintTemplateSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<BlueprintTemplateSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: blueprintTemplateKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .blueprintTemplate.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().blueprintTemplate.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

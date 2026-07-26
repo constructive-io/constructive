@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { appPermissionDefaultPermissionKeys } from '../query-keys';
-import type {
-  AppPermissionDefaultPermissionSelect,
-  AppPermissionDefaultPermissionWithRelations,
-  AppPermissionDefaultPermissionFilter,
-  AppPermissionDefaultPermissionOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  AppPermissionDefaultPermissionSelect,
-  AppPermissionDefaultPermissionWithRelations,
-  AppPermissionDefaultPermissionFilter,
-  AppPermissionDefaultPermissionOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { appPermissionDefaultPermissionKeys } from "../query-keys";
+import type { AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionWithRelations, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionWithRelations, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appPermissionDefaultPermissionsQueryKey = appPermissionDefaultPermissionKeys.list;
 /**
  * Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppPermissionDefaultPermissionsQuery({
@@ -45,64 +30,33 @@ export const appPermissionDefaultPermissionsQueryKey = appPermissionDefaultPermi
  * });
  * ```
  */
-export function useAppPermissionDefaultPermissionsQuery<
-  S extends AppPermissionDefaultPermissionSelect,
-  TData = {
-    appPermissionDefaultPermissions: ConnectionResult<
-      InferSelectResult<AppPermissionDefaultPermissionWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<
-        S,
-        AppPermissionDefaultPermissionFilter,
-        AppPermissionDefaultPermissionOrderBy
-      >,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, AppPermissionDefaultPermissionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appPermissionDefaultPermissions: ConnectionResult<
-          InferSelectResult<AppPermissionDefaultPermissionWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppPermissionDefaultPermissionsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      AppPermissionDefaultPermissionSelect,
-      AppPermissionDefaultPermissionFilter,
-      AppPermissionDefaultPermissionOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    AppPermissionDefaultPermissionSelect,
-    AppPermissionDefaultPermissionFilter,
-    AppPermissionDefaultPermissionOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useAppPermissionDefaultPermissionsQuery<S extends AppPermissionDefaultPermissionSelect, TData = {
+  appPermissionDefaultPermissions: ConnectionResult<InferSelectResult<AppPermissionDefaultPermissionWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppPermissionDefaultPermissionSelect>;
+} & Omit<UseQueryOptions<{
+  appPermissionDefaultPermissions: ConnectionResult<InferSelectResult<AppPermissionDefaultPermissionWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppPermissionDefaultPermissionsQuery(params: {
+  selection: ListSelectionConfig<AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appPermissionDefaultPermissionKeys.list(args),
     queryFn: () => getClient().appPermissionDefaultPermission.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppPermissionDefaultPermissionsQuery({
@@ -113,82 +67,38 @@ export function useAppPermissionDefaultPermissionsQuery(
  * });
  * ```
  */
-export async function fetchAppPermissionDefaultPermissionsQuery<
-  S extends AppPermissionDefaultPermissionSelect,
->(params: {
+export async function fetchAppPermissionDefaultPermissionsQuery<S extends AppPermissionDefaultPermissionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<
-      S,
-      AppPermissionDefaultPermissionFilter,
-      AppPermissionDefaultPermissionOrderBy
-    >,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, AppPermissionDefaultPermissionSelect>;
+  } & Omit<ListSelectionConfig<S, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppPermissionDefaultPermissionSelect>;
 }): Promise<{
-  appPermissionDefaultPermissions: ConnectionResult<
-    InferSelectResult<AppPermissionDefaultPermissionWithRelations, S>
-  >;
+  appPermissionDefaultPermissions: ConnectionResult<InferSelectResult<AppPermissionDefaultPermissionWithRelations, S>>;
 }>;
 export async function fetchAppPermissionDefaultPermissionsQuery(params: {
-  selection: ListSelectionConfig<
-    AppPermissionDefaultPermissionSelect,
-    AppPermissionDefaultPermissionFilter,
-    AppPermissionDefaultPermissionOrderBy
-  >;
+  selection: ListSelectionConfig<AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    AppPermissionDefaultPermissionSelect,
-    AppPermissionDefaultPermissionFilter,
-    AppPermissionDefaultPermissionOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>(params.selection);
   return getClient().appPermissionDefaultPermission.findMany(args).unwrap();
 }
 /**
  * Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppPermissionDefaultPermissionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppPermissionDefaultPermissionsQuery<
-  S extends AppPermissionDefaultPermissionSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<
-        S,
-        AppPermissionDefaultPermissionFilter,
-        AppPermissionDefaultPermissionOrderBy
-      >,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, AppPermissionDefaultPermissionSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppPermissionDefaultPermissionsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      AppPermissionDefaultPermissionSelect,
-      AppPermissionDefaultPermissionFilter,
-      AppPermissionDefaultPermissionOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    AppPermissionDefaultPermissionSelect,
-    AppPermissionDefaultPermissionFilter,
-    AppPermissionDefaultPermissionOrderBy
-  >(params.selection);
+export async function prefetchAppPermissionDefaultPermissionsQuery<S extends AppPermissionDefaultPermissionSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppPermissionDefaultPermissionSelect>;
+}): Promise<void>;
+export async function prefetchAppPermissionDefaultPermissionsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<AppPermissionDefaultPermissionSelect, AppPermissionDefaultPermissionFilter, AppPermissionDefaultPermissionOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appPermissionDefaultPermissionKeys.list(args),
-    queryFn: () => getClient().appPermissionDefaultPermission.findMany(args).unwrap(),
+    queryFn: () => getClient().appPermissionDefaultPermission.findMany(args).unwrap()
   });
 }

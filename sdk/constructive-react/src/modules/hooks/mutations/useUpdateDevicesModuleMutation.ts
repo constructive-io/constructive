@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { devicesModuleKeys } from '../query-keys';
-import { devicesModuleMutationKeys } from '../mutation-keys';
-import type {
-  DevicesModuleSelect,
-  DevicesModuleWithRelations,
-  DevicesModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  DevicesModuleSelect,
-  DevicesModuleWithRelations,
-  DevicesModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { devicesModuleKeys } from "../query-keys";
+import { devicesModuleMutationKeys } from "../mutation-keys";
+import type { DevicesModuleSelect, DevicesModuleWithRelations, DevicesModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { DevicesModuleSelect, DevicesModuleWithRelations, DevicesModulePatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a DevicesModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateDevicesModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', devicesModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateDevicesModuleMutation<S extends DevicesModuleSelect>(
-  params: {
-    selection: {
-      fields: S & DevicesModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateDevicesModule: {
-          devicesModule: InferSelectResult<DevicesModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        devicesModulePatch: DevicesModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateDevicesModule: {
-      devicesModule: InferSelectResult<DevicesModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    devicesModulePatch: DevicesModulePatch;
-  }
->;
-export function useUpdateDevicesModuleMutation(
-  params: {
-    selection: SelectionConfig<DevicesModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        devicesModulePatch: DevicesModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateDevicesModuleMutation<S extends DevicesModuleSelect>(params: {
+  selection: ({
+    fields: S & DevicesModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateDevicesModule: {
+    devicesModule: InferSelectResult<DevicesModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  devicesModulePatch: DevicesModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateDevicesModule: {
+    devicesModule: InferSelectResult<DevicesModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  devicesModulePatch: DevicesModulePatch;
+}>;
+export function useUpdateDevicesModuleMutation(params: {
+  selection: SelectionConfig<DevicesModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  devicesModulePatch: DevicesModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<DevicesModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: devicesModuleMutationKeys.all,
     mutationFn: ({
       id,
-      devicesModulePatch,
+      devicesModulePatch
     }: {
       id: string;
       devicesModulePatch: DevicesModulePatch;
-    }) =>
-      getClient()
-        .devicesModule.update({
-          where: {
-            id,
-          },
-          data: devicesModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().devicesModule.update({
+      where: {
+        id
+      },
+      data: devicesModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: devicesModuleKeys.detail(variables.id),
+        queryKey: devicesModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: devicesModuleKeys.lists(),
+        queryKey: devicesModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

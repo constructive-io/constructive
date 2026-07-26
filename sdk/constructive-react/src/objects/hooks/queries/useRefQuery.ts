@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { refKeys } from '../query-keys';
-import type { RefSelect, RefWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { RefSelect, RefWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { refKeys } from "../query-keys";
+import type { RefSelect, RefWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RefSelect, RefWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const refQueryKey = refKeys.detail;
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useRefQuery({
@@ -26,52 +26,38 @@ export const refQueryKey = refKeys.detail;
  * });
  * ```
  */
-export function useRefQuery<
-  S extends RefSelect,
-  TData = {
-    ref: InferSelectResult<RefWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RefSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        ref: InferSelectResult<RefWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useRefQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<RefSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useRefQuery<S extends RefSelect, TData = {
+  ref: InferSelectResult<RefWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RefSelect>;
+} & Omit<UseQueryOptions<{
+  ref: InferSelectResult<RefWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useRefQuery(params: {
+  id: string;
+  selection: SelectionConfig<RefSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<RefSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: refKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .ref.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().ref.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchRefQuery({
@@ -93,46 +79,35 @@ export async function fetchRefQuery(params: {
   selection: SelectionConfig<RefSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RefSelect>(params.selection);
-  return getClient()
-    .ref.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().ref.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```ts
  * await prefetchRefQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRefQuery<S extends RefSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RefSelect>;
-  }
-): Promise<void>;
-export async function prefetchRefQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<RefSelect>;
-  }
-): Promise<void> {
+export async function prefetchRefQuery<S extends RefSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RefSelect>;
+}): Promise<void>;
+export async function prefetchRefQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<RefSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<RefSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: refKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .ref.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().ref.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

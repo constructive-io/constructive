@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { orgClaimedInviteKeys } from '../query-keys';
-import type {
-  OrgClaimedInviteSelect,
-  OrgClaimedInviteWithRelations,
-  OrgClaimedInviteFilter,
-  OrgClaimedInviteOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  OrgClaimedInviteSelect,
-  OrgClaimedInviteWithRelations,
-  OrgClaimedInviteFilter,
-  OrgClaimedInviteOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { orgClaimedInviteKeys } from "../query-keys";
+import type { OrgClaimedInviteSelect, OrgClaimedInviteWithRelations, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgClaimedInviteSelect, OrgClaimedInviteWithRelations, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const orgClaimedInvitesQueryKey = orgClaimedInviteKeys.list;
 /**
  * Records of successfully claimed invitations, linking senders to receivers
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgClaimedInvitesQuery({
@@ -45,53 +30,33 @@ export const orgClaimedInvitesQueryKey = orgClaimedInviteKeys.list;
  * });
  * ```
  */
-export function useOrgClaimedInvitesQuery<
-  S extends OrgClaimedInviteSelect,
-  TData = {
-    orgClaimedInvites: ConnectionResult<InferSelectResult<OrgClaimedInviteWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        orgClaimedInvites: ConnectionResult<InferSelectResult<OrgClaimedInviteWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useOrgClaimedInvitesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      OrgClaimedInviteSelect,
-      OrgClaimedInviteFilter,
-      OrgClaimedInviteOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    OrgClaimedInviteSelect,
-    OrgClaimedInviteFilter,
-    OrgClaimedInviteOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useOrgClaimedInvitesQuery<S extends OrgClaimedInviteSelect, TData = {
+  orgClaimedInvites: ConnectionResult<InferSelectResult<OrgClaimedInviteWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
+} & Omit<UseQueryOptions<{
+  orgClaimedInvites: ConnectionResult<InferSelectResult<OrgClaimedInviteWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useOrgClaimedInvitesQuery(params: {
+  selection: ListSelectionConfig<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgClaimedInviteKeys.list(args),
     queryFn: () => getClient().orgClaimedInvite.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Records of successfully claimed invitations, linking senders to receivers
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchOrgClaimedInvitesQuery({
@@ -105,59 +70,35 @@ export function useOrgClaimedInvitesQuery(
 export async function fetchOrgClaimedInvitesQuery<S extends OrgClaimedInviteSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
+  } & Omit<ListSelectionConfig<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
 }): Promise<{
   orgClaimedInvites: ConnectionResult<InferSelectResult<OrgClaimedInviteWithRelations, S>>;
 }>;
 export async function fetchOrgClaimedInvitesQuery(params: {
-  selection: ListSelectionConfig<
-    OrgClaimedInviteSelect,
-    OrgClaimedInviteFilter,
-    OrgClaimedInviteOrderBy
-  >;
+  selection: ListSelectionConfig<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    OrgClaimedInviteSelect,
-    OrgClaimedInviteFilter,
-    OrgClaimedInviteOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>(params.selection);
   return getClient().orgClaimedInvite.findMany(args).unwrap();
 }
 /**
  * Records of successfully claimed invitations, linking senders to receivers
- *
+ * 
  * @example
  * ```ts
  * await prefetchOrgClaimedInvitesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgClaimedInvitesQuery<S extends OrgClaimedInviteSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
-  }
-): Promise<void>;
-export async function prefetchOrgClaimedInvitesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      OrgClaimedInviteSelect,
-      OrgClaimedInviteFilter,
-      OrgClaimedInviteOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    OrgClaimedInviteSelect,
-    OrgClaimedInviteFilter,
-    OrgClaimedInviteOrderBy
-  >(params.selection);
+export async function prefetchOrgClaimedInvitesQuery<S extends OrgClaimedInviteSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
+}): Promise<void>;
+export async function prefetchOrgClaimedInvitesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgClaimedInviteKeys.list(args),
-    queryFn: () => getClient().orgClaimedInvite.findMany(args).unwrap(),
+    queryFn: () => getClient().orgClaimedInvite.findMany(args).unwrap()
   });
 }

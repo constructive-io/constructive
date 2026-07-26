@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { phoneNumbersModuleKeys } from '../query-keys';
-import type {
-  PhoneNumbersModuleSelect,
-  PhoneNumbersModuleWithRelations,
-  PhoneNumbersModuleFilter,
-  PhoneNumbersModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PhoneNumbersModuleSelect,
-  PhoneNumbersModuleWithRelations,
-  PhoneNumbersModuleFilter,
-  PhoneNumbersModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { phoneNumbersModuleKeys } from "../query-keys";
+import type { PhoneNumbersModuleSelect, PhoneNumbersModuleWithRelations, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PhoneNumbersModuleSelect, PhoneNumbersModuleWithRelations, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const phoneNumbersModulesQueryKey = phoneNumbersModuleKeys.list;
 /**
  * Query hook for fetching PhoneNumbersModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePhoneNumbersModulesQuery({
@@ -45,58 +30,33 @@ export const phoneNumbersModulesQueryKey = phoneNumbersModuleKeys.list;
  * });
  * ```
  */
-export function usePhoneNumbersModulesQuery<
-  S extends PhoneNumbersModuleSelect,
-  TData = {
-    phoneNumbersModules: ConnectionResult<InferSelectResult<PhoneNumbersModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        phoneNumbersModules: ConnectionResult<
-          InferSelectResult<PhoneNumbersModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePhoneNumbersModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PhoneNumbersModuleSelect,
-      PhoneNumbersModuleFilter,
-      PhoneNumbersModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PhoneNumbersModuleSelect,
-    PhoneNumbersModuleFilter,
-    PhoneNumbersModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePhoneNumbersModulesQuery<S extends PhoneNumbersModuleSelect, TData = {
+  phoneNumbersModules: ConnectionResult<InferSelectResult<PhoneNumbersModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
+} & Omit<UseQueryOptions<{
+  phoneNumbersModules: ConnectionResult<InferSelectResult<PhoneNumbersModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePhoneNumbersModulesQuery(params: {
+  selection: ListSelectionConfig<PhoneNumbersModuleSelect, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PhoneNumbersModuleSelect, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: phoneNumbersModuleKeys.list(args),
     queryFn: () => getClient().phoneNumbersModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch PhoneNumbersModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPhoneNumbersModulesQuery({
@@ -110,62 +70,35 @@ export function usePhoneNumbersModulesQuery(
 export async function fetchPhoneNumbersModulesQuery<S extends PhoneNumbersModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
+  } & Omit<ListSelectionConfig<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
 }): Promise<{
   phoneNumbersModules: ConnectionResult<InferSelectResult<PhoneNumbersModuleWithRelations, S>>;
 }>;
 export async function fetchPhoneNumbersModulesQuery(params: {
-  selection: ListSelectionConfig<
-    PhoneNumbersModuleSelect,
-    PhoneNumbersModuleFilter,
-    PhoneNumbersModuleOrderBy
-  >;
+  selection: ListSelectionConfig<PhoneNumbersModuleSelect, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PhoneNumbersModuleSelect,
-    PhoneNumbersModuleFilter,
-    PhoneNumbersModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PhoneNumbersModuleSelect, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>(params.selection);
   return getClient().phoneNumbersModule.findMany(args).unwrap();
 }
 /**
  * Prefetch PhoneNumbersModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPhoneNumbersModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPhoneNumbersModulesQuery<S extends PhoneNumbersModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchPhoneNumbersModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PhoneNumbersModuleSelect,
-      PhoneNumbersModuleFilter,
-      PhoneNumbersModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PhoneNumbersModuleSelect,
-    PhoneNumbersModuleFilter,
-    PhoneNumbersModuleOrderBy
-  >(params.selection);
+export async function prefetchPhoneNumbersModulesQuery<S extends PhoneNumbersModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
+}): Promise<void>;
+export async function prefetchPhoneNumbersModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PhoneNumbersModuleSelect, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PhoneNumbersModuleSelect, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: phoneNumbersModuleKeys.list(args),
-    queryFn: () => getClient().phoneNumbersModule.findMany(args).unwrap(),
+    queryFn: () => getClient().phoneNumbersModule.findMany(args).unwrap()
   });
 }

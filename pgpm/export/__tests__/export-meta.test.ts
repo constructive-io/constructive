@@ -132,12 +132,12 @@ describe('Export Meta Config Validation', () => {
       expect(lastMetaschema).toBeLessThan(firstService);
     });
 
-    it('scoped plane tables should come before metaschema_modules_public tables', () => {
+    it('metaschema_modules_public tables should come before scoped plane tables', () => {
       const order = META_TABLE_ORDER as unknown as string[];
-      const lastService = order.indexOf('api_schemas');
-      const firstModule = order.indexOf('rls_module');
+      const lastModule = order.indexOf('rls_module');
+      const firstScoped = order.indexOf('apis');
 
-      expect(lastService).toBeLessThan(firstModule);
+      expect(lastModule).toBeLessThan(firstScoped);
     });
   });
 });

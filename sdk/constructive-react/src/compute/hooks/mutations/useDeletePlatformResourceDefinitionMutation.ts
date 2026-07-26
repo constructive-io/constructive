@@ -4,103 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformResourceDefinitionKeys } from '../query-keys';
-import { platformResourceDefinitionMutationKeys } from '../mutation-keys';
-import type {
-  PlatformResourceDefinitionSelect,
-  PlatformResourceDefinitionWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PlatformResourceDefinitionSelect,
-  PlatformResourceDefinitionWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformResourceDefinitionKeys } from "../query-keys";
+import { platformResourceDefinitionMutationKeys } from "../mutation-keys";
+import type { PlatformResourceDefinitionSelect, PlatformResourceDefinitionWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourceDefinitionSelect, PlatformResourceDefinitionWithRelations } from "../../orm/input-types";
 /**
  * Resource definitions — templates for resource kinds declaring default spec and secret/config requirements
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformResourceDefinitionMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformResourceDefinitionMutation<
-  S extends PlatformResourceDefinitionSelect,
->(
-  params: {
-    selection: {
-      fields: S & PlatformResourceDefinitionSelect;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourceDefinitionSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deletePlatformResourceDefinition: {
-          platformResourceDefinition: InferSelectResult<PlatformResourceDefinitionWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deletePlatformResourceDefinition: {
-      platformResourceDefinition: InferSelectResult<PlatformResourceDefinitionWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeletePlatformResourceDefinitionMutation(
-  params: {
-    selection: SelectionConfig<PlatformResourceDefinitionSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeletePlatformResourceDefinitionMutation<S extends PlatformResourceDefinitionSelect>(params: {
+  selection: ({
+    fields: S & PlatformResourceDefinitionSelect;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourceDefinitionSelect>);
+} & Omit<UseMutationOptions<{
+  deletePlatformResourceDefinition: {
+    platformResourceDefinition: InferSelectResult<PlatformResourceDefinitionWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deletePlatformResourceDefinition: {
+    platformResourceDefinition: InferSelectResult<PlatformResourceDefinitionWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeletePlatformResourceDefinitionMutation(params: {
+  selection: SelectionConfig<PlatformResourceDefinitionSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<PlatformResourceDefinitionSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformResourceDefinitionMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .platformResourceDefinition.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().platformResourceDefinition.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformResourceDefinitionKeys.detail(variables.id),
+        queryKey: platformResourceDefinitionKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: platformResourceDefinitionKeys.lists(),
+        queryKey: platformResourceDefinitionKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

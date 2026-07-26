@@ -579,11 +579,9 @@ export type AppLimitCapWithRelations = AppLimitCap & AppLimitCapRelations;
 export type AppLimitCapsDefaultWithRelations = AppLimitCapsDefault & AppLimitCapsDefaultRelations;
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
 export type AppLimitCreditCodeWithRelations = AppLimitCreditCode & AppLimitCreditCodeRelations;
-export type AppLimitCreditCodeItemWithRelations = AppLimitCreditCodeItem &
-  AppLimitCreditCodeItemRelations;
+export type AppLimitCreditCodeItemWithRelations = AppLimitCreditCodeItem & AppLimitCreditCodeItemRelations;
 export type AppLimitCreditWithRelations = AppLimitCredit & AppLimitCreditRelations;
-export type AppLimitCreditRedemptionWithRelations = AppLimitCreditRedemption &
-  AppLimitCreditRedemptionRelations;
+export type AppLimitCreditRedemptionWithRelations = AppLimitCreditRedemption & AppLimitCreditRedemptionRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type AppLimitEventWithRelations = AppLimitEvent & AppLimitEventRelations;
 export type AppLimitWarningWithRelations = AppLimitWarning & AppLimitWarningRelations;
@@ -1243,338 +1241,24 @@ export interface OrgLimitWarningFilter {
   warningType?: StringFilter;
 }
 // ============ OrderBy Types ============
-export type AppLimitCapOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppLimitCapsDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppLimitOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC';
-export type AppLimitCreditCodeOrderBy =
-  | 'CODE_ASC'
-  | 'CODE_DESC'
-  | 'CURRENT_REDEMPTIONS_ASC'
-  | 'CURRENT_REDEMPTIONS_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_REDEMPTIONS_ASC'
-  | 'MAX_REDEMPTIONS_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppLimitCreditCodeItemOrderBy =
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_CODE_ID_ASC'
-  | 'CREDIT_CODE_ID_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppLimitCreditOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
-export type AppLimitCreditRedemptionOrderBy =
-  | 'CREDIT_CODE_ID_ASC'
-  | 'CREDIT_CODE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppLimitDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC';
-export type AppLimitEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DELTA_ASC'
-  | 'DELTA_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_AT_EVENT_ASC'
-  | 'MAX_AT_EVENT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_AFTER_ASC'
-  | 'NUM_AFTER_DESC'
-  | 'NUM_BEFORE_ASC'
-  | 'NUM_BEFORE_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
-export type AppLimitWarningOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'THRESHOLD_VALUE_ASC'
-  | 'THRESHOLD_VALUE_DESC'
-  | 'WARNING_TYPE_ASC'
-  | 'WARNING_TYPE_DESC';
-export type OrgLimitAggregateOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'RESERVED_ASC'
-  | 'RESERVED_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC';
-export type OrgLimitCapOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type OrgLimitCapsDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type OrgLimitOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC';
-export type OrgLimitCreditOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
-export type OrgLimitDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC';
-export type OrgLimitEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DELTA_ASC'
-  | 'DELTA_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_AT_EVENT_ASC'
-  | 'MAX_AT_EVENT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_AFTER_ASC'
-  | 'NUM_AFTER_DESC'
-  | 'NUM_BEFORE_ASC'
-  | 'NUM_BEFORE_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
-export type OrgLimitWarningOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'THRESHOLD_VALUE_ASC'
-  | 'THRESHOLD_VALUE_DESC'
-  | 'WARNING_TYPE_ASC'
-  | 'WARNING_TYPE_DESC';
+export type AppLimitCapOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppLimitCapsDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppLimitOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_ASC" | "NUM_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PERIOD_CREDITS_ASC" | "PERIOD_CREDITS_DESC" | "PLAN_MAX_ASC" | "PLAN_MAX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PURCHASED_CREDITS_ASC" | "PURCHASED_CREDITS_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC" | "WINDOW_DURATION_ASC" | "WINDOW_DURATION_DESC" | "WINDOW_START_ASC" | "WINDOW_START_DESC";
+export type AppLimitCreditCodeOrderBy = "CODE_ASC" | "CODE_DESC" | "CURRENT_REDEMPTIONS_ASC" | "CURRENT_REDEMPTIONS_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "MAX_REDEMPTIONS_ASC" | "MAX_REDEMPTIONS_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppLimitCreditCodeItemOrderBy = "AMOUNT_ASC" | "AMOUNT_DESC" | "CREDIT_CODE_ID_ASC" | "CREDIT_CODE_ID_DESC" | "CREDIT_TYPE_ASC" | "CREDIT_TYPE_DESC" | "DEFAULT_LIMIT_ID_ASC" | "DEFAULT_LIMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppLimitCreditOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "AMOUNT_ASC" | "AMOUNT_DESC" | "CREDIT_TYPE_ASC" | "CREDIT_TYPE_DESC" | "DEFAULT_LIMIT_ID_ASC" | "DEFAULT_LIMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
+export type AppLimitCreditRedemptionOrderBy = "CREDIT_CODE_ID_ASC" | "CREDIT_CODE_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type AppLimitDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC";
+export type AppLimitEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DELTA_ASC" | "DELTA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_AT_EVENT_ASC" | "MAX_AT_EVENT_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_AFTER_ASC" | "NUM_AFTER_DESC" | "NUM_BEFORE_ASC" | "NUM_BEFORE_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
+export type AppLimitWarningOrderBy = "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "THRESHOLD_VALUE_ASC" | "THRESHOLD_VALUE_DESC" | "WARNING_TYPE_ASC" | "WARNING_TYPE_DESC";
+export type OrgLimitAggregateOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_ASC" | "NUM_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PERIOD_CREDITS_ASC" | "PERIOD_CREDITS_DESC" | "PLAN_MAX_ASC" | "PLAN_MAX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PURCHASED_CREDITS_ASC" | "PURCHASED_CREDITS_DESC" | "RESERVED_ASC" | "RESERVED_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC" | "WINDOW_DURATION_ASC" | "WINDOW_DURATION_DESC" | "WINDOW_START_ASC" | "WINDOW_START_DESC";
+export type OrgLimitCapOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type OrgLimitCapsDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type OrgLimitOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_ASC" | "NUM_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PERIOD_CREDITS_ASC" | "PERIOD_CREDITS_DESC" | "PLAN_MAX_ASC" | "PLAN_MAX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PURCHASED_CREDITS_ASC" | "PURCHASED_CREDITS_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC" | "WINDOW_DURATION_ASC" | "WINDOW_DURATION_DESC" | "WINDOW_START_ASC" | "WINDOW_START_DESC";
+export type OrgLimitCreditOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "AMOUNT_ASC" | "AMOUNT_DESC" | "CREDIT_TYPE_ASC" | "CREDIT_TYPE_DESC" | "DEFAULT_LIMIT_ID_ASC" | "DEFAULT_LIMIT_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
+export type OrgLimitDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC";
+export type OrgLimitEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DELTA_ASC" | "DELTA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_AT_EVENT_ASC" | "MAX_AT_EVENT_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_AFTER_ASC" | "NUM_AFTER_DESC" | "NUM_BEFORE_ASC" | "NUM_BEFORE_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
+export type OrgLimitWarningOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "THRESHOLD_VALUE_ASC" | "THRESHOLD_VALUE_DESC" | "WARNING_TYPE_ASC" | "WARNING_TYPE_DESC";
 // ============ CRUD Input Types ============
 export interface CreateAppLimitCapInput {
   clientMutationId?: string;
@@ -2086,17 +1770,17 @@ export interface DeleteOrgLimitWarningInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  AppLimitCreditCode: {
-    appLimitCreditCodeItemsByCreditCodeId: 'AppLimitCreditCodeItem',
-    appLimitCreditRedemptionsByCreditCodeId: 'AppLimitCreditRedemption',
+  "AppLimitCreditCode": {
+    "appLimitCreditCodeItemsByCreditCodeId": "AppLimitCreditCodeItem",
+    "appLimitCreditRedemptionsByCreditCodeId": "AppLimitCreditRedemption"
   },
-  AppLimitDefault: {
-    appLimitCreditCodeItemsByDefaultLimitId: 'AppLimitCreditCodeItem',
-    appLimitCreditsByDefaultLimitId: 'AppLimitCredit',
+  "AppLimitDefault": {
+    "appLimitCreditCodeItemsByDefaultLimitId": "AppLimitCreditCodeItem",
+    "appLimitCreditsByDefaultLimitId": "AppLimitCredit"
   },
-  OrgLimitDefault: {
-    orgLimitCreditsByDefaultLimitId: 'OrgLimitCredit',
-  },
+  "OrgLimitDefault": {
+    "orgLimitCreditsByDefaultLimitId": "OrgLimitCredit"
+  }
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface ProvisionBucketInput {

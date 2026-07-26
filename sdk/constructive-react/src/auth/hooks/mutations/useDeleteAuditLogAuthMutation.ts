@@ -4,99 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { auditLogAuthKeys } from '../query-keys';
-import { auditLogAuthMutationKeys } from '../mutation-keys';
-import type { AuditLogAuthSelect, AuditLogAuthWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { AuditLogAuthSelect, AuditLogAuthWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { auditLogAuthKeys } from "../query-keys";
+import { auditLogAuthMutationKeys } from "../mutation-keys";
+import type { AuditLogAuthSelect, AuditLogAuthWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AuditLogAuthSelect, AuditLogAuthWithRelations } from "../../orm/input-types";
 /**
  * Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteAuditLogAuthMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteAuditLogAuthMutation<S extends AuditLogAuthSelect>(
-  params: {
-    selection: {
-      fields: S & AuditLogAuthSelect;
-    } & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteAuditLogAuth: {
-          auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        createdAt: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteAuditLogAuth: {
-      auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    createdAt: string;
-  }
->;
-export function useDeleteAuditLogAuthMutation(
-  params: {
-    selection: SelectionConfig<AuditLogAuthSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        createdAt: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteAuditLogAuthMutation<S extends AuditLogAuthSelect>(params: {
+  selection: ({
+    fields: S & AuditLogAuthSelect;
+  } & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>);
+} & Omit<UseMutationOptions<{
+  deleteAuditLogAuth: {
+    auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteAuditLogAuth: {
+    auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+}>;
+export function useDeleteAuditLogAuthMutation(params: {
+  selection: SelectionConfig<AuditLogAuthSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  createdAt: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<AuditLogAuthSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: auditLogAuthMutationKeys.all,
-    mutationFn: ({ id, createdAt }: { id: string; createdAt: string }) =>
-      getClient()
-        .auditLogAuth.delete({
-          where: {
-            id,
-            createdAt,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      createdAt
+    }: {
+      id: string;
+      createdAt: string;
+    }) => getClient().auditLogAuth.delete({
+      where: {
+        id,
+        createdAt
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: auditLogAuthKeys.detail(variables.id),
+        queryKey: auditLogAuthKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: auditLogAuthKeys.lists(),
+        queryKey: auditLogAuthKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

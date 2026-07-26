@@ -4,101 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { billingProviderModuleKeys } from '../query-keys';
-import { billingProviderModuleMutationKeys } from '../mutation-keys';
-import type {
-  BillingProviderModuleSelect,
-  BillingProviderModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  BillingProviderModuleSelect,
-  BillingProviderModuleWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { billingProviderModuleKeys } from "../query-keys";
+import { billingProviderModuleMutationKeys } from "../mutation-keys";
+import type { BillingProviderModuleSelect, BillingProviderModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { BillingProviderModuleSelect, BillingProviderModuleWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a BillingProviderModule with typed selection
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteBillingProviderModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteBillingProviderModuleMutation<S extends BillingProviderModuleSelect>(
-  params: {
-    selection: {
-      fields: S & BillingProviderModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteBillingProviderModule: {
-          billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteBillingProviderModule: {
-      billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteBillingProviderModuleMutation(
-  params: {
-    selection: SelectionConfig<BillingProviderModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteBillingProviderModuleMutation<S extends BillingProviderModuleSelect>(params: {
+  selection: ({
+    fields: S & BillingProviderModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>);
+} & Omit<UseMutationOptions<{
+  deleteBillingProviderModule: {
+    billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteBillingProviderModule: {
+    billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteBillingProviderModuleMutation(params: {
+  selection: SelectionConfig<BillingProviderModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<BillingProviderModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: billingProviderModuleMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .billingProviderModule.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().billingProviderModule.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: billingProviderModuleKeys.detail(variables.id),
+        queryKey: billingProviderModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.lists(),
+        queryKey: billingProviderModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

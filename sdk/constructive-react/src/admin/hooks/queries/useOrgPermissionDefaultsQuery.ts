@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { orgPermissionDefaultKeys } from '../query-keys';
-import type {
-  OrgPermissionDefaultSelect,
-  OrgPermissionDefaultWithRelations,
-  OrgPermissionDefaultFilter,
-  OrgPermissionDefaultOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  OrgPermissionDefaultSelect,
-  OrgPermissionDefaultWithRelations,
-  OrgPermissionDefaultFilter,
-  OrgPermissionDefaultOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { orgPermissionDefaultKeys } from "../query-keys";
+import type { OrgPermissionDefaultSelect, OrgPermissionDefaultWithRelations, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgPermissionDefaultSelect, OrgPermissionDefaultWithRelations, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const orgPermissionDefaultsQueryKey = orgPermissionDefaultKeys.list;
 /**
  * Stores the default permission bitmask assigned to new members upon joining
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgPermissionDefaultsQuery({
@@ -45,60 +30,33 @@ export const orgPermissionDefaultsQueryKey = orgPermissionDefaultKeys.list;
  * });
  * ```
  */
-export function useOrgPermissionDefaultsQuery<
-  S extends OrgPermissionDefaultSelect,
-  TData = {
-    orgPermissionDefaults: ConnectionResult<
-      InferSelectResult<OrgPermissionDefaultWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        orgPermissionDefaults: ConnectionResult<
-          InferSelectResult<OrgPermissionDefaultWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useOrgPermissionDefaultsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      OrgPermissionDefaultSelect,
-      OrgPermissionDefaultFilter,
-      OrgPermissionDefaultOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    OrgPermissionDefaultSelect,
-    OrgPermissionDefaultFilter,
-    OrgPermissionDefaultOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useOrgPermissionDefaultsQuery<S extends OrgPermissionDefaultSelect, TData = {
+  orgPermissionDefaults: ConnectionResult<InferSelectResult<OrgPermissionDefaultWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
+} & Omit<UseQueryOptions<{
+  orgPermissionDefaults: ConnectionResult<InferSelectResult<OrgPermissionDefaultWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useOrgPermissionDefaultsQuery(params: {
+  selection: ListSelectionConfig<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgPermissionDefaultKeys.list(args),
     queryFn: () => getClient().orgPermissionDefault.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Stores the default permission bitmask assigned to new members upon joining
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchOrgPermissionDefaultsQuery({
@@ -109,70 +67,38 @@ export function useOrgPermissionDefaultsQuery(
  * });
  * ```
  */
-export async function fetchOrgPermissionDefaultsQuery<
-  S extends OrgPermissionDefaultSelect,
->(params: {
+export async function fetchOrgPermissionDefaultsQuery<S extends OrgPermissionDefaultSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
+  } & Omit<ListSelectionConfig<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
 }): Promise<{
   orgPermissionDefaults: ConnectionResult<InferSelectResult<OrgPermissionDefaultWithRelations, S>>;
 }>;
 export async function fetchOrgPermissionDefaultsQuery(params: {
-  selection: ListSelectionConfig<
-    OrgPermissionDefaultSelect,
-    OrgPermissionDefaultFilter,
-    OrgPermissionDefaultOrderBy
-  >;
+  selection: ListSelectionConfig<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    OrgPermissionDefaultSelect,
-    OrgPermissionDefaultFilter,
-    OrgPermissionDefaultOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>(params.selection);
   return getClient().orgPermissionDefault.findMany(args).unwrap();
 }
 /**
  * Stores the default permission bitmask assigned to new members upon joining
- *
+ * 
  * @example
  * ```ts
  * await prefetchOrgPermissionDefaultsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgPermissionDefaultsQuery<S extends OrgPermissionDefaultSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
-  }
-): Promise<void>;
-export async function prefetchOrgPermissionDefaultsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      OrgPermissionDefaultSelect,
-      OrgPermissionDefaultFilter,
-      OrgPermissionDefaultOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    OrgPermissionDefaultSelect,
-    OrgPermissionDefaultFilter,
-    OrgPermissionDefaultOrderBy
-  >(params.selection);
+export async function prefetchOrgPermissionDefaultsQuery<S extends OrgPermissionDefaultSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
+}): Promise<void>;
+export async function prefetchOrgPermissionDefaultsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgPermissionDefaultKeys.list(args),
-    queryFn: () => getClient().orgPermissionDefault.findMany(args).unwrap(),
+    queryFn: () => getClient().orgPermissionDefault.findMany(args).unwrap()
   });
 }

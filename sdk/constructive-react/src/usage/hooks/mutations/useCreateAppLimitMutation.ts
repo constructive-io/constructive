@@ -4,85 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { appLimitKeys } from '../query-keys';
-import { appLimitMutationKeys } from '../mutation-keys';
-import type {
-  AppLimitSelect,
-  AppLimitWithRelations,
-  CreateAppLimitInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  AppLimitSelect,
-  AppLimitWithRelations,
-  CreateAppLimitInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { appLimitKeys } from "../query-keys";
+import { appLimitMutationKeys } from "../mutation-keys";
+import type { AppLimitSelect, AppLimitWithRelations, CreateAppLimitInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppLimitSelect, AppLimitWithRelations, CreateAppLimitInput } from "../../orm/input-types";
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateAppLimitMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateAppLimitMutation<S extends AppLimitSelect>(
-  params: {
-    selection: {
-      fields: S & AppLimitSelect;
-    } & HookStrictSelect<NoInfer<S>, AppLimitSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createAppLimit: {
-          appLimit: InferSelectResult<AppLimitWithRelations, S>;
-        };
-      },
-      Error,
-      CreateAppLimitInput['appLimit']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createAppLimit: {
-      appLimit: InferSelectResult<AppLimitWithRelations, S>;
-    };
-  },
-  Error,
-  CreateAppLimitInput['appLimit']
->;
-export function useCreateAppLimitMutation(
-  params: {
-    selection: SelectionConfig<AppLimitSelect>;
-  } & Omit<UseMutationOptions<any, Error, CreateAppLimitInput['appLimit']>, 'mutationFn'>
-) {
+export function useCreateAppLimitMutation<S extends AppLimitSelect>(params: {
+  selection: ({
+    fields: S & AppLimitSelect;
+  } & HookStrictSelect<NoInfer<S>, AppLimitSelect>);
+} & Omit<UseMutationOptions<{
+  createAppLimit: {
+    appLimit: InferSelectResult<AppLimitWithRelations, S>;
+  };
+}, Error, CreateAppLimitInput["appLimit"]>, "mutationFn">): UseMutationResult<{
+  createAppLimit: {
+    appLimit: InferSelectResult<AppLimitWithRelations, S>;
+  };
+}, Error, CreateAppLimitInput["appLimit"]>;
+export function useCreateAppLimitMutation(params: {
+  selection: SelectionConfig<AppLimitSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateAppLimitInput["appLimit"]>, "mutationFn">) {
   const args = buildSelectionArgs<AppLimitSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: appLimitMutationKeys.create(),
-    mutationFn: (data: CreateAppLimitInput['appLimit']) =>
-      getClient()
-        .appLimit.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateAppLimitInput["appLimit"]) => getClient().appLimit.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: appLimitKeys.lists(),
+        queryKey: appLimitKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

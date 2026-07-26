@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformResourcesHealthKeys } from '../query-keys';
-import type {
-  PlatformResourcesHealthSelect,
-  PlatformResourcesHealthWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PlatformResourcesHealthSelect,
-  PlatformResourcesHealthWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformResourcesHealthKeys } from "../query-keys";
+import type { PlatformResourcesHealthSelect, PlatformResourcesHealthWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourcesHealthSelect, PlatformResourcesHealthWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformResourcesHealthQueryKey = platformResourcesHealthKeys.detail;
 /**
  * Query hook for fetching a single PlatformResourcesHealth
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourcesHealthQuery({
@@ -32,52 +26,38 @@ export const platformResourcesHealthQueryKey = platformResourcesHealthKeys.detai
  * });
  * ```
  */
-export function usePlatformResourcesHealthQuery<
-  S extends PlatformResourcesHealthSelect,
-  TData = {
-    platformResourcesHealth: InferSelectResult<PlatformResourcesHealthWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourcesHealthSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformResourcesHealth: InferSelectResult<PlatformResourcesHealthWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformResourcesHealthQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformResourcesHealthSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function usePlatformResourcesHealthQuery<S extends PlatformResourcesHealthSelect, TData = {
+  platformResourcesHealth: InferSelectResult<PlatformResourcesHealthWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourcesHealthSelect>;
+} & Omit<UseQueryOptions<{
+  platformResourcesHealth: InferSelectResult<PlatformResourcesHealthWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformResourcesHealthQuery(params: {
+  id: string;
+  selection: SelectionConfig<PlatformResourcesHealthSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<PlatformResourcesHealthSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourcesHealthKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformResourcesHealth.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().platformResourcesHealth.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single PlatformResourcesHealth without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformResourcesHealthQuery({
@@ -86,9 +66,7 @@ export function usePlatformResourcesHealthQuery(
  * });
  * ```
  */
-export async function fetchPlatformResourcesHealthQuery<
-  S extends PlatformResourcesHealthSelect,
->(params: {
+export async function fetchPlatformResourcesHealthQuery<S extends PlatformResourcesHealthSelect>(params: {
   id: string;
   selection: {
     fields: S;
@@ -101,46 +79,35 @@ export async function fetchPlatformResourcesHealthQuery(params: {
   selection: SelectionConfig<PlatformResourcesHealthSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformResourcesHealthSelect>(params.selection);
-  return getClient()
-    .platformResourcesHealth.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().platformResourcesHealth.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single PlatformResourcesHealth for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformResourcesHealthQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformResourcesHealthQuery<S extends PlatformResourcesHealthSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourcesHealthSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformResourcesHealthQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformResourcesHealthSelect>;
-  }
-): Promise<void> {
+export async function prefetchPlatformResourcesHealthQuery<S extends PlatformResourcesHealthSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourcesHealthSelect>;
+}): Promise<void>;
+export async function prefetchPlatformResourcesHealthQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<PlatformResourcesHealthSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<PlatformResourcesHealthSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourcesHealthKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformResourcesHealth.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().platformResourcesHealth.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

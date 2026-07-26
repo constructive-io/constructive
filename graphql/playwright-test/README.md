@@ -64,7 +64,7 @@ let connections: Awaited<ReturnType<typeof getConnectionsWithServer>>;
 
 test.beforeAll(async () => {
   connections = await getConnectionsWithServer({
-    schemas: ['services_public', 'app_public'],
+    schemas: ['app_public'],
     authRole: 'anonymous',
     server: {
       port: 5555,
@@ -150,14 +150,14 @@ Low-level function to create just the HTTP server without database setup.
 
 1. Creates an isolated test database using `pgsql-test`
 2. Starts an Express server with Constructive GraphQL middleware
-3. Configures `enableServicesApi: false` to bypass domain/subdomain routing
+3. Configures `enableScopedRouting: false` (static mode) to bypass host route resolution
 4. Exposes the specified schemas directly via the GraphQL endpoint
 5. Returns the server URL for Playwright to connect to
 6. Provides a teardown function that stops the server and cleans up the database
 
 ## Configuration
 
-The server is configured with `enableServicesApi: false`, which means:
-- No domain/subdomain routing is required
+The server is configured with `enableScopedRouting: false`, which means:
+- No host route resolution (`resolve_route()`) is required
 - Schemas are exposed directly based on the `schemas` parameter
 - Perfect for isolated testing without complex domain setup

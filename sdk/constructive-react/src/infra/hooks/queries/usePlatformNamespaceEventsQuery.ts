@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformNamespaceEventKeys } from '../query-keys';
-import type {
-  PlatformNamespaceEventSelect,
-  PlatformNamespaceEventWithRelations,
-  PlatformNamespaceEventFilter,
-  PlatformNamespaceEventOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformNamespaceEventSelect,
-  PlatformNamespaceEventWithRelations,
-  PlatformNamespaceEventFilter,
-  PlatformNamespaceEventOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformNamespaceEventKeys } from "../query-keys";
+import type { PlatformNamespaceEventSelect, PlatformNamespaceEventWithRelations, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformNamespaceEventSelect, PlatformNamespaceEventWithRelations, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformNamespaceEventsQueryKey = platformNamespaceEventKeys.list;
 /**
  * Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformNamespaceEventsQuery({
@@ -45,60 +30,33 @@ export const platformNamespaceEventsQueryKey = platformNamespaceEventKeys.list;
  * });
  * ```
  */
-export function usePlatformNamespaceEventsQuery<
-  S extends PlatformNamespaceEventSelect,
-  TData = {
-    platformNamespaceEvents: ConnectionResult<
-      InferSelectResult<PlatformNamespaceEventWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformNamespaceEventSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformNamespaceEvents: ConnectionResult<
-          InferSelectResult<PlatformNamespaceEventWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformNamespaceEventsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformNamespaceEventSelect,
-      PlatformNamespaceEventFilter,
-      PlatformNamespaceEventOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformNamespaceEventSelect,
-    PlatformNamespaceEventFilter,
-    PlatformNamespaceEventOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformNamespaceEventsQuery<S extends PlatformNamespaceEventSelect, TData = {
+  platformNamespaceEvents: ConnectionResult<InferSelectResult<PlatformNamespaceEventWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformNamespaceEventSelect>;
+} & Omit<UseQueryOptions<{
+  platformNamespaceEvents: ConnectionResult<InferSelectResult<PlatformNamespaceEventWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformNamespaceEventsQuery(params: {
+  selection: ListSelectionConfig<PlatformNamespaceEventSelect, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformNamespaceEventSelect, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformNamespaceEventKeys.list(args),
     queryFn: () => getClient().platformNamespaceEvent.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformNamespaceEventsQuery({
@@ -109,72 +67,38 @@ export function usePlatformNamespaceEventsQuery(
  * });
  * ```
  */
-export async function fetchPlatformNamespaceEventsQuery<
-  S extends PlatformNamespaceEventSelect,
->(params: {
+export async function fetchPlatformNamespaceEventsQuery<S extends PlatformNamespaceEventSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PlatformNamespaceEventSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformNamespaceEventSelect>;
 }): Promise<{
-  platformNamespaceEvents: ConnectionResult<
-    InferSelectResult<PlatformNamespaceEventWithRelations, S>
-  >;
+  platformNamespaceEvents: ConnectionResult<InferSelectResult<PlatformNamespaceEventWithRelations, S>>;
 }>;
 export async function fetchPlatformNamespaceEventsQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformNamespaceEventSelect,
-    PlatformNamespaceEventFilter,
-    PlatformNamespaceEventOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformNamespaceEventSelect, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformNamespaceEventSelect,
-    PlatformNamespaceEventFilter,
-    PlatformNamespaceEventOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformNamespaceEventSelect, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>(params.selection);
   return getClient().platformNamespaceEvent.findMany(args).unwrap();
 }
 /**
  * Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformNamespaceEventsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformNamespaceEventsQuery<S extends PlatformNamespaceEventSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformNamespaceEventSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformNamespaceEventsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformNamespaceEventSelect,
-      PlatformNamespaceEventFilter,
-      PlatformNamespaceEventOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformNamespaceEventSelect,
-    PlatformNamespaceEventFilter,
-    PlatformNamespaceEventOrderBy
-  >(params.selection);
+export async function prefetchPlatformNamespaceEventsQuery<S extends PlatformNamespaceEventSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformNamespaceEventSelect>;
+}): Promise<void>;
+export async function prefetchPlatformNamespaceEventsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformNamespaceEventSelect, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformNamespaceEventSelect, PlatformNamespaceEventFilter, PlatformNamespaceEventOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformNamespaceEventKeys.list(args),
-    queryFn: () => getClient().platformNamespaceEvent.findMany(args).unwrap(),
+    queryFn: () => getClient().platformNamespaceEvent.findMany(args).unwrap()
   });
 }

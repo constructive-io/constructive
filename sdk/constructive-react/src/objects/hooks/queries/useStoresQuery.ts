@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { storeKeys } from '../query-keys';
-import type {
-  StoreSelect,
-  StoreWithRelations,
-  StoreFilter,
-  StoreOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  StoreSelect,
-  StoreWithRelations,
-  StoreFilter,
-  StoreOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { storeKeys } from "../query-keys";
+import type { StoreSelect, StoreWithRelations, StoreFilter, StoreOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { StoreSelect, StoreWithRelations, StoreFilter, StoreOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const storesQueryKey = storeKeys.list;
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useStoresQuery({
@@ -45,45 +30,33 @@ export const storesQueryKey = storeKeys.list;
  * });
  * ```
  */
-export function useStoresQuery<
-  S extends StoreSelect,
-  TData = {
-    stores: ConnectionResult<InferSelectResult<StoreWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, StoreFilter, StoreOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, StoreSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        stores: ConnectionResult<InferSelectResult<StoreWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useStoresQuery(
-  params: {
-    selection: ListSelectionConfig<StoreSelect, StoreFilter, StoreOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useStoresQuery<S extends StoreSelect, TData = {
+  stores: ConnectionResult<InferSelectResult<StoreWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, StoreFilter, StoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, StoreSelect>;
+} & Omit<UseQueryOptions<{
+  stores: ConnectionResult<InferSelectResult<StoreWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useStoresQuery(params: {
+  selection: ListSelectionConfig<StoreSelect, StoreFilter, StoreOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildListSelectionArgs<StoreSelect, StoreFilter, StoreOrderBy>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: storeKeys.list(args),
     queryFn: () => getClient().store.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchStoresQuery({
@@ -97,8 +70,7 @@ export function useStoresQuery(
 export async function fetchStoresQuery<S extends StoreSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, StoreFilter, StoreOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, StoreSelect>;
+  } & Omit<ListSelectionConfig<S, StoreFilter, StoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, StoreSelect>;
 }): Promise<{
   stores: ConnectionResult<InferSelectResult<StoreWithRelations, S>>;
 }>;
@@ -110,30 +82,23 @@ export async function fetchStoresQuery(params: {
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- *
+ * 
  * @example
  * ```ts
  * await prefetchStoresQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchStoresQuery<S extends StoreSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, StoreFilter, StoreOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, StoreSelect>;
-  }
-): Promise<void>;
-export async function prefetchStoresQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<StoreSelect, StoreFilter, StoreOrderBy>;
-  }
-): Promise<void> {
+export async function prefetchStoresQuery<S extends StoreSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, StoreFilter, StoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, StoreSelect>;
+}): Promise<void>;
+export async function prefetchStoresQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<StoreSelect, StoreFilter, StoreOrderBy>;
+}): Promise<void> {
   const args = buildListSelectionArgs<StoreSelect, StoreFilter, StoreOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: storeKeys.list(args),
-    queryFn: () => getClient().store.findMany(args).unwrap(),
+    queryFn: () => getClient().store.findMany(args).unwrap()
   });
 }

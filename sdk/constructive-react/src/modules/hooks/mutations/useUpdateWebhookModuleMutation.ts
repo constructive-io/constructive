@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { webhookModuleKeys } from '../query-keys';
-import { webhookModuleMutationKeys } from '../mutation-keys';
-import type {
-  WebhookModuleSelect,
-  WebhookModuleWithRelations,
-  WebhookModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  WebhookModuleSelect,
-  WebhookModuleWithRelations,
-  WebhookModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { webhookModuleKeys } from "../query-keys";
+import { webhookModuleMutationKeys } from "../mutation-keys";
+import type { WebhookModuleSelect, WebhookModuleWithRelations, WebhookModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebhookModuleSelect, WebhookModuleWithRelations, WebhookModulePatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a WebhookModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateWebhookModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', webhookModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateWebhookModuleMutation<S extends WebhookModuleSelect>(
-  params: {
-    selection: {
-      fields: S & WebhookModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateWebhookModule: {
-          webhookModule: InferSelectResult<WebhookModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        webhookModulePatch: WebhookModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateWebhookModule: {
-      webhookModule: InferSelectResult<WebhookModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    webhookModulePatch: WebhookModulePatch;
-  }
->;
-export function useUpdateWebhookModuleMutation(
-  params: {
-    selection: SelectionConfig<WebhookModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        webhookModulePatch: WebhookModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateWebhookModuleMutation<S extends WebhookModuleSelect>(params: {
+  selection: ({
+    fields: S & WebhookModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, WebhookModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateWebhookModule: {
+    webhookModule: InferSelectResult<WebhookModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  webhookModulePatch: WebhookModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateWebhookModule: {
+    webhookModule: InferSelectResult<WebhookModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  webhookModulePatch: WebhookModulePatch;
+}>;
+export function useUpdateWebhookModuleMutation(params: {
+  selection: SelectionConfig<WebhookModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  webhookModulePatch: WebhookModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<WebhookModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: webhookModuleMutationKeys.all,
     mutationFn: ({
       id,
-      webhookModulePatch,
+      webhookModulePatch
     }: {
       id: string;
       webhookModulePatch: WebhookModulePatch;
-    }) =>
-      getClient()
-        .webhookModule.update({
-          where: {
-            id,
-          },
-          data: webhookModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().webhookModule.update({
+      where: {
+        id
+      },
+      data: webhookModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: webhookModuleKeys.detail(variables.id),
+        queryKey: webhookModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: webhookModuleKeys.lists(),
+        queryKey: webhookModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

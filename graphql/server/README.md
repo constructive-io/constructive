@@ -99,20 +99,20 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 - `GET /debug/memory` -> memory/process/Graphile debug snapshot when observability is enabled
 - `GET /debug/db` -> PostgreSQL activity/locks/pool debug snapshot when observability is enabled
 
-## Meta API routing
+## Scoped routing
 
-When `API_ENABLE_META=true` (default):
+When `API_ENABLE_SCOPED_ROUTING=true` (default):
 
-- The server resolves APIs from `services_public.domains` using the request host.
+- The server resolves the request host with a single `resolve_route()` call against the compiled route bindings in the scoped routing schema (`API_SCOPED_ROUTING_SCHEMA`, default `constructive_routing_public`), mapping host → tenant/api/database/role.
 - Only APIs where `api.is_public` matches `API_IS_PUBLIC` are served.
 - In private mode (`API_IS_PUBLIC=false`), you can override with headers:
   - `X-Api-Name` + `X-Database-Id`
   - `X-Schemata` + `X-Database-Id`
   - `X-Meta-Schema` + `X-Database-Id`
 
-When `API_ENABLE_META=false`:
+When `API_ENABLE_SCOPED_ROUTING=false` (static single-tenant mode):
 
-- The server skips meta lookups and serves the fixed schemas in `API_EXPOSED_SCHEMAS`.
+- The server skips route resolution and serves the fixed schemas in `API_EXPOSED_SCHEMAS`.
 - Roles and database IDs come from `API_ANON_ROLE`, `API_ROLE_NAME`, and `API_DEFAULT_DATABASE_ID`.
 
 ## Configuration
@@ -130,13 +130,14 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
-| `API_ENABLE_META`              | Enable meta API routing               | `true`                                                        |
+| `API_ENABLE_SCOPED_ROUTING`    | Enable scoped routing                 | `true`                                                        |
+| `API_SCOPED_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `constructive_routing_public`                                 |
 | `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
-| `API_EXPOSED_SCHEMAS`          | Schemas when meta routing is disabled | empty                                                         |
-| `API_META_SCHEMAS`             | Meta schemas to query                 | `services_public,metaschema_public,metaschema_modules_public` |
+| `API_EXPOSED_SCHEMAS`          | Schemas when scoped routing is disabled | empty                                                       |
+| `API_META_SCHEMAS`             | Meta schemas to query                 | `constructive_routing_public,metaschema_public,metaschema_modules_public` |
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
-| `API_DEFAULT_DATABASE_ID`      | Default database ID                   | `hard-coded`                                                  |
+| `API_DEFAULT_DATABASE_ID`      | Default database ID                   | unset                                                         |
 | `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |
 | `GRAPHQL_DEBUG_SAMPLER_ENABLED` | Enables periodic NDJSON sampling when observability is on | `true`                                   |
 | `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds | `10000`                                                       |

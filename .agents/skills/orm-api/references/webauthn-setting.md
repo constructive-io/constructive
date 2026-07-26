@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries
+WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage
 
 ## Usage
 

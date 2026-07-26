@@ -4,95 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { storeKeys } from '../query-keys';
-import { storeMutationKeys } from '../mutation-keys';
-import type { StoreSelect, StoreWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { StoreSelect, StoreWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { storeKeys } from "../query-keys";
+import { storeMutationKeys } from "../mutation-keys";
+import type { StoreSelect, StoreWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { StoreSelect, StoreWithRelations } from "../../orm/input-types";
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteStoreMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteStoreMutation<S extends StoreSelect>(
-  params: {
-    selection: {
-      fields: S & StoreSelect;
-    } & HookStrictSelect<NoInfer<S>, StoreSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteStore: {
-          store: InferSelectResult<StoreWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteStore: {
-      store: InferSelectResult<StoreWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteStoreMutation(
-  params: {
-    selection: SelectionConfig<StoreSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteStoreMutation<S extends StoreSelect>(params: {
+  selection: ({
+    fields: S & StoreSelect;
+  } & HookStrictSelect<NoInfer<S>, StoreSelect>);
+} & Omit<UseMutationOptions<{
+  deleteStore: {
+    store: InferSelectResult<StoreWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteStore: {
+    store: InferSelectResult<StoreWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteStoreMutation(params: {
+  selection: SelectionConfig<StoreSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: storeMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .store.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().store.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: storeKeys.detail(variables.id),
+        queryKey: storeKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: storeKeys.lists(),
+        queryKey: storeKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

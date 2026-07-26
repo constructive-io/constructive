@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformInternalSecretKeys } from '../query-keys';
-import type {
-  PlatformInternalSecretSelect,
-  PlatformInternalSecretWithRelations,
-  PlatformInternalSecretFilter,
-  PlatformInternalSecretOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformInternalSecretSelect,
-  PlatformInternalSecretWithRelations,
-  PlatformInternalSecretFilter,
-  PlatformInternalSecretOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformInternalSecretKeys } from "../query-keys";
+import type { PlatformInternalSecretSelect, PlatformInternalSecretWithRelations, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformInternalSecretSelect, PlatformInternalSecretWithRelations, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformInternalSecretsQueryKey = platformInternalSecretKeys.list;
 /**
  * Query hook for fetching PlatformInternalSecret list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformInternalSecretsQuery({
@@ -45,60 +30,33 @@ export const platformInternalSecretsQueryKey = platformInternalSecretKeys.list;
  * });
  * ```
  */
-export function usePlatformInternalSecretsQuery<
-  S extends PlatformInternalSecretSelect,
-  TData = {
-    platformInternalSecrets: ConnectionResult<
-      InferSelectResult<PlatformInternalSecretWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformInternalSecretSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformInternalSecrets: ConnectionResult<
-          InferSelectResult<PlatformInternalSecretWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformInternalSecretsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformInternalSecretSelect,
-      PlatformInternalSecretFilter,
-      PlatformInternalSecretOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformInternalSecretSelect,
-    PlatformInternalSecretFilter,
-    PlatformInternalSecretOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformInternalSecretsQuery<S extends PlatformInternalSecretSelect, TData = {
+  platformInternalSecrets: ConnectionResult<InferSelectResult<PlatformInternalSecretWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInternalSecretSelect>;
+} & Omit<UseQueryOptions<{
+  platformInternalSecrets: ConnectionResult<InferSelectResult<PlatformInternalSecretWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformInternalSecretsQuery(params: {
+  selection: ListSelectionConfig<PlatformInternalSecretSelect, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformInternalSecretSelect, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformInternalSecretKeys.list(args),
     queryFn: () => getClient().platformInternalSecret.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch PlatformInternalSecret list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformInternalSecretsQuery({
@@ -109,72 +67,38 @@ export function usePlatformInternalSecretsQuery(
  * });
  * ```
  */
-export async function fetchPlatformInternalSecretsQuery<
-  S extends PlatformInternalSecretSelect,
->(params: {
+export async function fetchPlatformInternalSecretsQuery<S extends PlatformInternalSecretSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PlatformInternalSecretSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInternalSecretSelect>;
 }): Promise<{
-  platformInternalSecrets: ConnectionResult<
-    InferSelectResult<PlatformInternalSecretWithRelations, S>
-  >;
+  platformInternalSecrets: ConnectionResult<InferSelectResult<PlatformInternalSecretWithRelations, S>>;
 }>;
 export async function fetchPlatformInternalSecretsQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformInternalSecretSelect,
-    PlatformInternalSecretFilter,
-    PlatformInternalSecretOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformInternalSecretSelect, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformInternalSecretSelect,
-    PlatformInternalSecretFilter,
-    PlatformInternalSecretOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformInternalSecretSelect, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>(params.selection);
   return getClient().platformInternalSecret.findMany(args).unwrap();
 }
 /**
  * Prefetch PlatformInternalSecret list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformInternalSecretsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformInternalSecretsQuery<S extends PlatformInternalSecretSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformInternalSecretSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformInternalSecretsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformInternalSecretSelect,
-      PlatformInternalSecretFilter,
-      PlatformInternalSecretOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformInternalSecretSelect,
-    PlatformInternalSecretFilter,
-    PlatformInternalSecretOrderBy
-  >(params.selection);
+export async function prefetchPlatformInternalSecretsQuery<S extends PlatformInternalSecretSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInternalSecretSelect>;
+}): Promise<void>;
+export async function prefetchPlatformInternalSecretsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformInternalSecretSelect, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformInternalSecretSelect, PlatformInternalSecretFilter, PlatformInternalSecretOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformInternalSecretKeys.list(args),
-    queryFn: () => getClient().platformInternalSecret.findMany(args).unwrap(),
+    queryFn: () => getClient().platformInternalSecret.findMany(args).unwrap()
   });
 }

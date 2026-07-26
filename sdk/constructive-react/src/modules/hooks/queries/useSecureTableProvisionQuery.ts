@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { secureTableProvisionKeys } from '../query-keys';
-import type {
-  SecureTableProvisionSelect,
-  SecureTableProvisionWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  SecureTableProvisionSelect,
-  SecureTableProvisionWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { secureTableProvisionKeys } from "../query-keys";
+import type { SecureTableProvisionSelect, SecureTableProvisionWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { SecureTableProvisionSelect, SecureTableProvisionWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const secureTableProvisionQueryKey = secureTableProvisionKeys.detail;
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useSecureTableProvisionQuery({
@@ -32,52 +26,38 @@ export const secureTableProvisionQueryKey = secureTableProvisionKeys.detail;
  * });
  * ```
  */
-export function useSecureTableProvisionQuery<
-  S extends SecureTableProvisionSelect,
-  TData = {
-    secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useSecureTableProvisionQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<SecureTableProvisionSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useSecureTableProvisionQuery<S extends SecureTableProvisionSelect, TData = {
+  secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
+} & Omit<UseQueryOptions<{
+  secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useSecureTableProvisionQuery(params: {
+  id: string;
+  selection: SelectionConfig<SecureTableProvisionSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<SecureTableProvisionSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: secureTableProvisionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .secureTableProvision.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().secureTableProvision.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchSecureTableProvisionQuery({
@@ -99,46 +79,35 @@ export async function fetchSecureTableProvisionQuery(params: {
   selection: SelectionConfig<SecureTableProvisionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SecureTableProvisionSelect>(params.selection);
-  return getClient()
-    .secureTableProvision.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().secureTableProvision.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```ts
  * await prefetchSecureTableProvisionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSecureTableProvisionQuery<S extends SecureTableProvisionSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
-  }
-): Promise<void>;
-export async function prefetchSecureTableProvisionQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<SecureTableProvisionSelect>;
-  }
-): Promise<void> {
+export async function prefetchSecureTableProvisionQuery<S extends SecureTableProvisionSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
+}): Promise<void>;
+export async function prefetchSecureTableProvisionQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<SecureTableProvisionSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<SecureTableProvisionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: secureTableProvisionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .secureTableProvision.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().secureTableProvision.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

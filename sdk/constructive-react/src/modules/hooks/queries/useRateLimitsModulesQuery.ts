@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { rateLimitsModuleKeys } from '../query-keys';
-import type {
-  RateLimitsModuleSelect,
-  RateLimitsModuleWithRelations,
-  RateLimitsModuleFilter,
-  RateLimitsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  RateLimitsModuleSelect,
-  RateLimitsModuleWithRelations,
-  RateLimitsModuleFilter,
-  RateLimitsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { rateLimitsModuleKeys } from "../query-keys";
+import type { RateLimitsModuleSelect, RateLimitsModuleWithRelations, RateLimitsModuleFilter, RateLimitsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { RateLimitsModuleSelect, RateLimitsModuleWithRelations, RateLimitsModuleFilter, RateLimitsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const rateLimitsModulesQueryKey = rateLimitsModuleKeys.list;
 /**
  * Query hook for fetching RateLimitsModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useRateLimitsModulesQuery({
@@ -45,53 +30,33 @@ export const rateLimitsModulesQueryKey = rateLimitsModuleKeys.list;
  * });
  * ```
  */
-export function useRateLimitsModulesQuery<
-  S extends RateLimitsModuleSelect,
-  TData = {
-    rateLimitsModules: ConnectionResult<InferSelectResult<RateLimitsModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        rateLimitsModules: ConnectionResult<InferSelectResult<RateLimitsModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useRateLimitsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      RateLimitsModuleSelect,
-      RateLimitsModuleFilter,
-      RateLimitsModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    RateLimitsModuleSelect,
-    RateLimitsModuleFilter,
-    RateLimitsModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useRateLimitsModulesQuery<S extends RateLimitsModuleSelect, TData = {
+  rateLimitsModules: ConnectionResult<InferSelectResult<RateLimitsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  rateLimitsModules: ConnectionResult<InferSelectResult<RateLimitsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useRateLimitsModulesQuery(params: {
+  selection: ListSelectionConfig<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: rateLimitsModuleKeys.list(args),
     queryFn: () => getClient().rateLimitsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch RateLimitsModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchRateLimitsModulesQuery({
@@ -105,59 +70,35 @@ export function useRateLimitsModulesQuery(
 export async function fetchRateLimitsModulesQuery<S extends RateLimitsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
 }): Promise<{
   rateLimitsModules: ConnectionResult<InferSelectResult<RateLimitsModuleWithRelations, S>>;
 }>;
 export async function fetchRateLimitsModulesQuery(params: {
-  selection: ListSelectionConfig<
-    RateLimitsModuleSelect,
-    RateLimitsModuleFilter,
-    RateLimitsModuleOrderBy
-  >;
+  selection: ListSelectionConfig<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    RateLimitsModuleSelect,
-    RateLimitsModuleFilter,
-    RateLimitsModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy>(params.selection);
   return getClient().rateLimitsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch RateLimitsModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchRateLimitsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRateLimitsModulesQuery<S extends RateLimitsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchRateLimitsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      RateLimitsModuleSelect,
-      RateLimitsModuleFilter,
-      RateLimitsModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    RateLimitsModuleSelect,
-    RateLimitsModuleFilter,
-    RateLimitsModuleOrderBy
-  >(params.selection);
+export async function prefetchRateLimitsModulesQuery<S extends RateLimitsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RateLimitsModuleSelect>;
+}): Promise<void>;
+export async function prefetchRateLimitsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: rateLimitsModuleKeys.list(args),
-    queryFn: () => getClient().rateLimitsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().rateLimitsModule.findMany(args).unwrap()
   });
 }

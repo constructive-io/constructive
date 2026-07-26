@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { databaseKeys } from '../query-keys';
-import type { DatabaseSelect, DatabaseWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { DatabaseSelect, DatabaseWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { databaseKeys } from "../query-keys";
+import type { DatabaseSelect, DatabaseWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { DatabaseSelect, DatabaseWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const databaseQueryKey = databaseKeys.detail;
 /**
  * Query hook for fetching a single Database
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDatabaseQuery({
@@ -26,52 +26,38 @@ export const databaseQueryKey = databaseKeys.detail;
  * });
  * ```
  */
-export function useDatabaseQuery<
-  S extends DatabaseSelect,
-  TData = {
-    database: InferSelectResult<DatabaseWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        database: InferSelectResult<DatabaseWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDatabaseQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<DatabaseSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useDatabaseQuery<S extends DatabaseSelect, TData = {
+  database: InferSelectResult<DatabaseWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
+} & Omit<UseQueryOptions<{
+  database: InferSelectResult<DatabaseWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDatabaseQuery(params: {
+  id: string;
+  selection: SelectionConfig<DatabaseSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<DatabaseSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: databaseKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .database.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().database.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single Database without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDatabaseQuery({
@@ -93,46 +79,35 @@ export async function fetchDatabaseQuery(params: {
   selection: SelectionConfig<DatabaseSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DatabaseSelect>(params.selection);
-  return getClient()
-    .database.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().database.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single Database for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDatabaseQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDatabaseQuery<S extends DatabaseSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
-  }
-): Promise<void>;
-export async function prefetchDatabaseQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<DatabaseSelect>;
-  }
-): Promise<void> {
+export async function prefetchDatabaseQuery<S extends DatabaseSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
+}): Promise<void>;
+export async function prefetchDatabaseQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<DatabaseSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<DatabaseSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: databaseKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .database.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().database.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

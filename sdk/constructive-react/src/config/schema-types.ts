@@ -4,161 +4,17 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type {
-  Config,
-  PlatformConfig,
-  PlatformInternalSecret,
-  PlatformSecret,
-  Secret,
-  BigFloatFilter,
-  BigIntFilter,
-  BitStringFilter,
-  BooleanFilter,
-  DateFilter,
-  DatetimeFilter,
-  FloatFilter,
-  FullTextFilter,
-  IntFilter,
-  IntListFilter,
-  InternetAddressFilter,
-  JSONFilter,
-  StringFilter,
-  StringListFilter,
-  UUIDFilter,
-  UUIDListFilter,
-  VectorFilter,
-} from './types';
+import type { Config, PlatformConfig, PlatformInternalSecret, PlatformSecret, Secret, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 /** Methods to use when ordering `Config`. */
-export type ConfigOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'VALUE_ASC'
-  | 'VALUE_DESC';
+export type ConfigOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALUE_ASC" | "VALUE_DESC";
 /** Methods to use when ordering `PlatformConfig`. */
-export type PlatformConfigOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'VALUE_ASC'
-  | 'VALUE_DESC';
+export type PlatformConfigOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALUE_ASC" | "VALUE_DESC";
 /** Methods to use when ordering `PlatformInternalSecret`. */
-export type PlatformInternalSecretOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'RETIRED_AT_ASC'
-  | 'RETIRED_AT_DESC'
-  | 'ROTATED_AT_ASC'
-  | 'ROTATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type PlatformInternalSecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `PlatformSecret`. */
-export type PlatformSecretOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'RETIRED_AT_ASC'
-  | 'RETIRED_AT_DESC'
-  | 'ROTATED_AT_ASC'
-  | 'ROTATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type PlatformSecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PROVIDER_ASC" | "PROVIDER_DESC" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `Secret`. */
-export type SecretOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'RETIRED_AT_ASC'
-  | 'RETIRED_AT_DESC'
-  | 'ROTATED_AT_ASC'
-  | 'ROTATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type SecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PROVIDER_ASC" | "PROVIDER_DESC" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** A filter to be used against `Config` object types. All fields are combined with a logical ‘and.’ */
 export interface ConfigFilter {
   /** Checks for all expressions in this list. */
@@ -680,6 +536,8 @@ export interface MetaTable {
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
+  /** Provisioning scope metadata (null if no @scope tag) */
+  scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
@@ -810,6 +668,19 @@ export interface MetaRelations {
   hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
 }
+/** Provisioning scope metadata for a table */
+export interface MetaScope {
+  /** SQL name of the entity table for entity scopes, else null */
+  entityTable?: string | null;
+  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  keyColumn?: string | null;
+  /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
+  scope: string;
+  /** Provenance of the scope metadata (always 'smartTag') */
+  source: string;
+  /** Coarse bucket: 'global', 'database', or 'entity' */
+  tier: string;
+}
 /** Search metadata for a table */
 export interface MetaSearch {
   /** Active search algorithms on this table */
@@ -842,6 +713,8 @@ export interface MetaEnum {
 }
 /** Information about a PostgreSQL type */
 export interface MetaType {
+  /** Scalar serialization contract (null for plain scalars) */
+  encoding?: MetaScalarEncoding | null;
   gqlType: string;
   hasDefault?: boolean | null;
   isArray: boolean;
@@ -906,4 +779,19 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+export interface MetaScalarEncoding {
+  /** For 'vector': declared length, else null. */
+  dimensions?: number | null;
+  /** For 'ltree': values are dot-separated path strings. */
+  dotPath?: boolean | null;
+  /** For 'vector': element scalar (e.g. 'float'). */
+  elementType?: string | null;
+  /** For 'geojson': Point/LineString/Polygon/…, else null. */
+  geometrySubtype?: string | null;
+  /** Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite. */
+  kind: string;
+  /** For 'geojson': spatial reference id, else null. */
+  srid?: number | null;
 }

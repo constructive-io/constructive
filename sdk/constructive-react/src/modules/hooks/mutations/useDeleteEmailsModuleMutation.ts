@@ -4,95 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { emailsModuleKeys } from '../query-keys';
-import { emailsModuleMutationKeys } from '../mutation-keys';
-import type { EmailsModuleSelect, EmailsModuleWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { EmailsModuleSelect, EmailsModuleWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { emailsModuleKeys } from "../query-keys";
+import { emailsModuleMutationKeys } from "../mutation-keys";
+import type { EmailsModuleSelect, EmailsModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { EmailsModuleSelect, EmailsModuleWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a EmailsModule with typed selection
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteEmailsModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteEmailsModuleMutation<S extends EmailsModuleSelect>(
-  params: {
-    selection: {
-      fields: S & EmailsModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, EmailsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteEmailsModule: {
-          emailsModule: InferSelectResult<EmailsModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteEmailsModule: {
-      emailsModule: InferSelectResult<EmailsModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteEmailsModuleMutation(
-  params: {
-    selection: SelectionConfig<EmailsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteEmailsModuleMutation<S extends EmailsModuleSelect>(params: {
+  selection: ({
+    fields: S & EmailsModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, EmailsModuleSelect>);
+} & Omit<UseMutationOptions<{
+  deleteEmailsModule: {
+    emailsModule: InferSelectResult<EmailsModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteEmailsModule: {
+    emailsModule: InferSelectResult<EmailsModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteEmailsModuleMutation(params: {
+  selection: SelectionConfig<EmailsModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<EmailsModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: emailsModuleMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .emailsModule.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().emailsModule.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: emailsModuleKeys.detail(variables.id),
+        queryKey: emailsModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: emailsModuleKeys.lists(),
+        queryKey: emailsModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { agentPersonaKeys } from '../query-keys';
-import type {
-  AgentPersonaSelect,
-  AgentPersonaWithRelations,
-  AgentPersonaFilter,
-  AgentPersonaOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  AgentPersonaSelect,
-  AgentPersonaWithRelations,
-  AgentPersonaFilter,
-  AgentPersonaOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { agentPersonaKeys } from "../query-keys";
+import type { AgentPersonaSelect, AgentPersonaWithRelations, AgentPersonaFilter, AgentPersonaOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { AgentPersonaSelect, AgentPersonaWithRelations, AgentPersonaFilter, AgentPersonaOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const agentPersonasQueryKey = agentPersonaKeys.list;
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentPersonasQuery({
@@ -45,47 +30,33 @@ export const agentPersonasQueryKey = agentPersonaKeys.list;
  * });
  * ```
  */
-export function useAgentPersonasQuery<
-  S extends AgentPersonaSelect,
-  TData = {
-    agentPersonas: ConnectionResult<InferSelectResult<AgentPersonaWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AgentPersonaFilter, AgentPersonaOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        agentPersonas: ConnectionResult<InferSelectResult<AgentPersonaWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAgentPersonasQuery(
-  params: {
-    selection: ListSelectionConfig<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useAgentPersonasQuery<S extends AgentPersonaSelect, TData = {
+  agentPersonas: ConnectionResult<InferSelectResult<AgentPersonaWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AgentPersonaFilter, AgentPersonaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+} & Omit<UseQueryOptions<{
+  agentPersonas: ConnectionResult<InferSelectResult<AgentPersonaWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAgentPersonasQuery(params: {
+  selection: ListSelectionConfig<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentPersonaKeys.list(args),
     queryFn: () => getClient().agentPersona.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAgentPersonasQuery({
@@ -99,47 +70,35 @@ export function useAgentPersonasQuery(
 export async function fetchAgentPersonasQuery<S extends AgentPersonaSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AgentPersonaFilter, AgentPersonaOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+  } & Omit<ListSelectionConfig<S, AgentPersonaFilter, AgentPersonaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
 }): Promise<{
   agentPersonas: ConnectionResult<InferSelectResult<AgentPersonaWithRelations, S>>;
 }>;
 export async function fetchAgentPersonasQuery(params: {
   selection: ListSelectionConfig<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>(params.selection);
   return getClient().agentPersona.findMany(args).unwrap();
 }
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- *
+ * 
  * @example
  * ```ts
  * await prefetchAgentPersonasQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAgentPersonasQuery<S extends AgentPersonaSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AgentPersonaFilter, AgentPersonaOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
-  }
-): Promise<void>;
-export async function prefetchAgentPersonasQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>(
-    params.selection
-  );
+export async function prefetchAgentPersonasQuery<S extends AgentPersonaSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AgentPersonaFilter, AgentPersonaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+}): Promise<void>;
+export async function prefetchAgentPersonasQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<AgentPersonaSelect, AgentPersonaFilter, AgentPersonaOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentPersonaKeys.list(args),
-    queryFn: () => getClient().agentPersona.findMany(args).unwrap(),
+    queryFn: () => getClient().agentPersona.findMany(args).unwrap()
   });
 }

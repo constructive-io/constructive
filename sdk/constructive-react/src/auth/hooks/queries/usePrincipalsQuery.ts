@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { principalKeys } from '../query-keys';
-import type {
-  PrincipalSelect,
-  PrincipalWithRelations,
-  PrincipalFilter,
-  PrincipalOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PrincipalSelect,
-  PrincipalWithRelations,
-  PrincipalFilter,
-  PrincipalOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { principalKeys } from "../query-keys";
+import type { PrincipalSelect, PrincipalWithRelations, PrincipalFilter, PrincipalOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PrincipalSelect, PrincipalWithRelations, PrincipalFilter, PrincipalOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const principalsQueryKey = principalKeys.list;
 /**
  * Scoped sub-identities (API keys and agents) with precomputed SPRT
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePrincipalsQuery({
@@ -45,47 +30,33 @@ export const principalsQueryKey = principalKeys.list;
  * });
  * ```
  */
-export function usePrincipalsQuery<
-  S extends PrincipalSelect,
-  TData = {
-    principals: ConnectionResult<InferSelectResult<PrincipalWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PrincipalFilter, PrincipalOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PrincipalSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        principals: ConnectionResult<InferSelectResult<PrincipalWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePrincipalsQuery(
-  params: {
-    selection: ListSelectionConfig<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePrincipalsQuery<S extends PrincipalSelect, TData = {
+  principals: ConnectionResult<InferSelectResult<PrincipalWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PrincipalFilter, PrincipalOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalSelect>;
+} & Omit<UseQueryOptions<{
+  principals: ConnectionResult<InferSelectResult<PrincipalWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePrincipalsQuery(params: {
+  selection: ListSelectionConfig<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: principalKeys.list(args),
     queryFn: () => getClient().principal.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Scoped sub-identities (API keys and agents) with precomputed SPRT
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPrincipalsQuery({
@@ -99,47 +70,35 @@ export function usePrincipalsQuery(
 export async function fetchPrincipalsQuery<S extends PrincipalSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PrincipalFilter, PrincipalOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PrincipalSelect>;
+  } & Omit<ListSelectionConfig<S, PrincipalFilter, PrincipalOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalSelect>;
 }): Promise<{
   principals: ConnectionResult<InferSelectResult<PrincipalWithRelations, S>>;
 }>;
 export async function fetchPrincipalsQuery(params: {
   selection: ListSelectionConfig<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>;
 }) {
-  const args = buildListSelectionArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>(params.selection);
   return getClient().principal.findMany(args).unwrap();
 }
 /**
  * Scoped sub-identities (API keys and agents) with precomputed SPRT
- *
+ * 
  * @example
  * ```ts
  * await prefetchPrincipalsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPrincipalsQuery<S extends PrincipalSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PrincipalFilter, PrincipalOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PrincipalSelect>;
-  }
-): Promise<void>;
-export async function prefetchPrincipalsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>(
-    params.selection
-  );
+export async function prefetchPrincipalsQuery<S extends PrincipalSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PrincipalFilter, PrincipalOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalSelect>;
+}): Promise<void>;
+export async function prefetchPrincipalsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: principalKeys.list(args),
-    queryFn: () => getClient().principal.findMany(args).unwrap(),
+    queryFn: () => getClient().principal.findMany(args).unwrap()
   });
 }

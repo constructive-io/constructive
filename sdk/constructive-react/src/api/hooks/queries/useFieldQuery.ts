@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { fieldKeys } from '../query-keys';
-import type { FieldSelect, FieldWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { FieldSelect, FieldWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { fieldKeys } from "../query-keys";
+import type { FieldSelect, FieldWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FieldSelect, FieldWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const fieldQueryKey = fieldKeys.detail;
 /**
  * Query hook for fetching a single Field
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFieldQuery({
@@ -26,52 +26,38 @@ export const fieldQueryKey = fieldKeys.detail;
  * });
  * ```
  */
-export function useFieldQuery<
-  S extends FieldSelect,
-  TData = {
-    field: InferSelectResult<FieldWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FieldSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        field: InferSelectResult<FieldWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFieldQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<FieldSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useFieldQuery<S extends FieldSelect, TData = {
+  field: InferSelectResult<FieldWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FieldSelect>;
+} & Omit<UseQueryOptions<{
+  field: InferSelectResult<FieldWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFieldQuery(params: {
+  id: string;
+  selection: SelectionConfig<FieldSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<FieldSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: fieldKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .field.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().field.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single Field without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFieldQuery({
@@ -93,46 +79,35 @@ export async function fetchFieldQuery(params: {
   selection: SelectionConfig<FieldSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FieldSelect>(params.selection);
-  return getClient()
-    .field.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().field.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single Field for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchFieldQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFieldQuery<S extends FieldSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FieldSelect>;
-  }
-): Promise<void>;
-export async function prefetchFieldQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<FieldSelect>;
-  }
-): Promise<void> {
+export async function prefetchFieldQuery<S extends FieldSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FieldSelect>;
+}): Promise<void>;
+export async function prefetchFieldQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<FieldSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<FieldSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: fieldKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .field.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().field.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

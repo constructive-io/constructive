@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { appMembershipKeys } from '../query-keys';
-import type {
-  AppMembershipSelect,
-  AppMembershipWithRelations,
-  AppMembershipFilter,
-  AppMembershipOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  AppMembershipSelect,
-  AppMembershipWithRelations,
-  AppMembershipFilter,
-  AppMembershipOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { appMembershipKeys } from "../query-keys";
+import type { AppMembershipSelect, AppMembershipWithRelations, AppMembershipFilter, AppMembershipOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppMembershipSelect, AppMembershipWithRelations, AppMembershipFilter, AppMembershipOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appMembershipsQueryKey = appMembershipKeys.list;
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppMembershipsQuery({
@@ -45,49 +30,33 @@ export const appMembershipsQueryKey = appMembershipKeys.list;
  * });
  * ```
  */
-export function useAppMembershipsQuery<
-  S extends AppMembershipSelect,
-  TData = {
-    appMemberships: ConnectionResult<InferSelectResult<AppMembershipWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AppMembershipFilter, AppMembershipOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appMemberships: ConnectionResult<InferSelectResult<AppMembershipWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppMembershipsQuery(
-  params: {
-    selection: ListSelectionConfig<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    AppMembershipSelect,
-    AppMembershipFilter,
-    AppMembershipOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useAppMembershipsQuery<S extends AppMembershipSelect, TData = {
+  appMemberships: ConnectionResult<InferSelectResult<AppMembershipWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppMembershipFilter, AppMembershipOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
+} & Omit<UseQueryOptions<{
+  appMemberships: ConnectionResult<InferSelectResult<AppMembershipWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppMembershipsQuery(params: {
+  selection: ListSelectionConfig<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appMembershipKeys.list(args),
     queryFn: () => getClient().appMembership.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppMembershipsQuery({
@@ -101,51 +70,35 @@ export function useAppMembershipsQuery(
 export async function fetchAppMembershipsQuery<S extends AppMembershipSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppMembershipFilter, AppMembershipOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
+  } & Omit<ListSelectionConfig<S, AppMembershipFilter, AppMembershipOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
 }): Promise<{
   appMemberships: ConnectionResult<InferSelectResult<AppMembershipWithRelations, S>>;
 }>;
 export async function fetchAppMembershipsQuery(params: {
   selection: ListSelectionConfig<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    AppMembershipSelect,
-    AppMembershipFilter,
-    AppMembershipOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>(params.selection);
   return getClient().appMembership.findMany(args).unwrap();
 }
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppMembershipsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppMembershipsQuery<S extends AppMembershipSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AppMembershipFilter, AppMembershipOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppMembershipsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    AppMembershipSelect,
-    AppMembershipFilter,
-    AppMembershipOrderBy
-  >(params.selection);
+export async function prefetchAppMembershipsQuery<S extends AppMembershipSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppMembershipFilter, AppMembershipOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppMembershipSelect>;
+}): Promise<void>;
+export async function prefetchAppMembershipsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appMembershipKeys.list(args),
-    queryFn: () => getClient().appMembership.findMany(args).unwrap(),
+    queryFn: () => getClient().appMembership.findMany(args).unwrap()
   });
 }

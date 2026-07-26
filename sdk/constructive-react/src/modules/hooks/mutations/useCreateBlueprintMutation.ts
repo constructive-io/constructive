@@ -4,85 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { blueprintKeys } from '../query-keys';
-import { blueprintMutationKeys } from '../mutation-keys';
-import type {
-  BlueprintSelect,
-  BlueprintWithRelations,
-  CreateBlueprintInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  BlueprintSelect,
-  BlueprintWithRelations,
-  CreateBlueprintInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { blueprintKeys } from "../query-keys";
+import { blueprintMutationKeys } from "../mutation-keys";
+import type { BlueprintSelect, BlueprintWithRelations, CreateBlueprintInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { BlueprintSelect, BlueprintWithRelations, CreateBlueprintInput } from "../../orm/input-types";
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateBlueprintMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateBlueprintMutation<S extends BlueprintSelect>(
-  params: {
-    selection: {
-      fields: S & BlueprintSelect;
-    } & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createBlueprint: {
-          blueprint: InferSelectResult<BlueprintWithRelations, S>;
-        };
-      },
-      Error,
-      CreateBlueprintInput['blueprint']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createBlueprint: {
-      blueprint: InferSelectResult<BlueprintWithRelations, S>;
-    };
-  },
-  Error,
-  CreateBlueprintInput['blueprint']
->;
-export function useCreateBlueprintMutation(
-  params: {
-    selection: SelectionConfig<BlueprintSelect>;
-  } & Omit<UseMutationOptions<any, Error, CreateBlueprintInput['blueprint']>, 'mutationFn'>
-) {
+export function useCreateBlueprintMutation<S extends BlueprintSelect>(params: {
+  selection: ({
+    fields: S & BlueprintSelect;
+  } & HookStrictSelect<NoInfer<S>, BlueprintSelect>);
+} & Omit<UseMutationOptions<{
+  createBlueprint: {
+    blueprint: InferSelectResult<BlueprintWithRelations, S>;
+  };
+}, Error, CreateBlueprintInput["blueprint"]>, "mutationFn">): UseMutationResult<{
+  createBlueprint: {
+    blueprint: InferSelectResult<BlueprintWithRelations, S>;
+  };
+}, Error, CreateBlueprintInput["blueprint"]>;
+export function useCreateBlueprintMutation(params: {
+  selection: SelectionConfig<BlueprintSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateBlueprintInput["blueprint"]>, "mutationFn">) {
   const args = buildSelectionArgs<BlueprintSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: blueprintMutationKeys.create(),
-    mutationFn: (data: CreateBlueprintInput['blueprint']) =>
-      getClient()
-        .blueprint.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateBlueprintInput["blueprint"]) => getClient().blueprint.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists(),
+        queryKey: blueprintKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

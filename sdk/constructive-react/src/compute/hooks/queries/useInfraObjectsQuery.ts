@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { infraObjectKeys } from '../query-keys';
-import type {
-  InfraObjectSelect,
-  InfraObjectWithRelations,
-  InfraObjectFilter,
-  InfraObjectOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  InfraObjectSelect,
-  InfraObjectWithRelations,
-  InfraObjectFilter,
-  InfraObjectOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { infraObjectKeys } from "../query-keys";
+import type { InfraObjectSelect, InfraObjectWithRelations, InfraObjectFilter, InfraObjectOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { InfraObjectSelect, InfraObjectWithRelations, InfraObjectFilter, InfraObjectOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const infraObjectsQueryKey = infraObjectKeys.list;
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useInfraObjectsQuery({
@@ -45,47 +30,33 @@ export const infraObjectsQueryKey = infraObjectKeys.list;
  * });
  * ```
  */
-export function useInfraObjectsQuery<
-  S extends InfraObjectSelect,
-  TData = {
-    infraObjects: ConnectionResult<InferSelectResult<InfraObjectWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, InfraObjectFilter, InfraObjectOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        infraObjects: ConnectionResult<InferSelectResult<InfraObjectWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useInfraObjectsQuery(
-  params: {
-    selection: ListSelectionConfig<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useInfraObjectsQuery<S extends InfraObjectSelect, TData = {
+  infraObjects: ConnectionResult<InferSelectResult<InfraObjectWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, InfraObjectFilter, InfraObjectOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
+} & Omit<UseQueryOptions<{
+  infraObjects: ConnectionResult<InferSelectResult<InfraObjectWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useInfraObjectsQuery(params: {
+  selection: ListSelectionConfig<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: infraObjectKeys.list(args),
     queryFn: () => getClient().infraObject.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchInfraObjectsQuery({
@@ -99,47 +70,35 @@ export function useInfraObjectsQuery(
 export async function fetchInfraObjectsQuery<S extends InfraObjectSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, InfraObjectFilter, InfraObjectOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
+  } & Omit<ListSelectionConfig<S, InfraObjectFilter, InfraObjectOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
 }): Promise<{
   infraObjects: ConnectionResult<InferSelectResult<InfraObjectWithRelations, S>>;
 }>;
 export async function fetchInfraObjectsQuery(params: {
   selection: ListSelectionConfig<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>;
 }) {
-  const args = buildListSelectionArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>(params.selection);
   return getClient().infraObject.findMany(args).unwrap();
 }
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```ts
  * await prefetchInfraObjectsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchInfraObjectsQuery<S extends InfraObjectSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, InfraObjectFilter, InfraObjectOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
-  }
-): Promise<void>;
-export async function prefetchInfraObjectsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>(
-    params.selection
-  );
+export async function prefetchInfraObjectsQuery<S extends InfraObjectSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, InfraObjectFilter, InfraObjectOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraObjectSelect>;
+}): Promise<void>;
+export async function prefetchInfraObjectsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: infraObjectKeys.list(args),
-    queryFn: () => getClient().infraObject.findMany(args).unwrap(),
+    queryFn: () => getClient().infraObject.findMany(args).unwrap()
   });
 }

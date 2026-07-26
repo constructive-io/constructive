@@ -4,327 +4,27 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type {
-  Agent,
-  AgentMessage,
-  AgentPersona,
-  AgentPlan,
-  AgentPrompt,
-  AgentResource,
-  AgentResourceChunk,
-  AgentTask,
-  AgentThread,
-  BigFloatFilter,
-  BigIntFilter,
-  BitStringFilter,
-  BooleanFilter,
-  DateFilter,
-  DatetimeFilter,
-  FloatFilter,
-  FullTextFilter,
-  IntFilter,
-  IntListFilter,
-  InternetAddressFilter,
-  JSONFilter,
-  StringFilter,
-  StringListFilter,
-  UUIDFilter,
-  UUIDListFilter,
-  VectorFilter,
-} from './types';
+import type { Agent, AgentMessage, AgentPersona, AgentPlan, AgentPrompt, AgentResource, AgentResourceChunk, AgentTask, AgentThread, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 /** Methods to use when ordering `AgentMessage`. */
-export type AgentMessageOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'AGENT_ID_ASC'
-  | 'AGENT_ID_DESC'
-  | 'AUTHOR_ROLE_ASC'
-  | 'AUTHOR_ROLE_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MODEL_ASC'
-  | 'MODEL_DESC'
-  | 'NATURAL'
-  | 'PARTS_ASC'
-  | 'PARTS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'THREAD_ID_ASC'
-  | 'THREAD_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AgentMessageOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "AGENT_ID_ASC" | "AGENT_ID_DESC" | "AUTHOR_ROLE_ASC" | "AUTHOR_ROLE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "MODEL_ASC" | "MODEL_DESC" | "NATURAL" | "PARTS_ASC" | "PARTS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "THREAD_ID_ASC" | "THREAD_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `Agent`. */
-export type AgentOrderBy =
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_EPHEMERAL_ASC'
-  | 'IS_EPHEMERAL_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'PERSONA_ID_ASC'
-  | 'PERSONA_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AgentOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_EPHEMERAL_ASC" | "IS_EPHEMERAL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PARENT_ID_ASC" | "PARENT_ID_DESC" | "PERSONA_ID_ASC" | "PERSONA_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "SYSTEM_PROMPT_ASC" | "SYSTEM_PROMPT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AgentPersona`. */
-export type AgentPersonaOrderBy =
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type AgentPersonaOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SYSTEM_PROMPT_ASC" | "SYSTEM_PROMPT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `AgentPlan`. */
-export type AgentPlanOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'THREAD_ID_ASC'
-  | 'THREAD_ID_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AgentPlanOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "THREAD_ID_ASC" | "THREAD_ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AgentPrompt`. */
-export type AgentPromptOrderBy =
-  | 'CONTENT_ASC'
-  | 'CONTENT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_DEFAULT_ASC'
-  | 'IS_DEFAULT_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type AgentPromptOrderBy = "CONTENT_ASC" | "CONTENT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_DEFAULT_ASC" | "IS_DEFAULT_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `AgentResourceChunk`. */
-export type AgentResourceChunkOrderBy =
-  | 'AGENT_RESOURCE_ID_ASC'
-  | 'AGENT_RESOURCE_ID_DESC'
-  | 'BODY_ASC'
-  | 'BODY_DESC'
-  | 'CHUNK_INDEX_ASC'
-  | 'CHUNK_INDEX_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'EMBEDDING_ASC'
-  | 'EMBEDDING_DESC'
-  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
-  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AgentResourceChunkOrderBy = "AGENT_RESOURCE_ID_ASC" | "AGENT_RESOURCE_ID_DESC" | "BODY_ASC" | "BODY_DESC" | "CHUNK_INDEX_ASC" | "CHUNK_INDEX_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EMBEDDING_ASC" | "EMBEDDING_DESC" | "EMBEDDING_VECTOR_DISTANCE_ASC" | "EMBEDDING_VECTOR_DISTANCE_DESC" | "ID_ASC" | "ID_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SEARCH_SCORE_ASC" | "SEARCH_SCORE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AgentResource`. */
-export type AgentResourceOrderBy =
-  | 'ARCHIVED_AT_ASC'
-  | 'ARCHIVED_AT_DESC'
-  | 'BODY_ASC'
-  | 'BODY_DESC'
-  | 'BODY_TRGM_SIMILARITY_ASC'
-  | 'BODY_TRGM_SIMILARITY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'EMBEDDING_ASC'
-  | 'EMBEDDING_DESC'
-  | 'EMBEDDING_UPDATED_AT_ASC'
-  | 'EMBEDDING_UPDATED_AT_DESC'
-  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
-  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_ARCHIVED_ASC'
-  | 'IS_ARCHIVED_DESC'
-  | 'KEYWORDS_ASC'
-  | 'KEYWORDS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'KIND_TRGM_SIMILARITY_ASC'
-  | 'KIND_TRGM_SIMILARITY_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SEARCH_ASC'
-  | 'SEARCH_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC'
-  | 'SEARCH_TSV_RANK_ASC'
-  | 'SEARCH_TSV_RANK_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'TITLE_TRGM_SIMILARITY_ASC'
-  | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type AgentResourceOrderBy = "ARCHIVED_AT_ASC" | "ARCHIVED_AT_DESC" | "BODY_ASC" | "BODY_DESC" | "BODY_TRGM_SIMILARITY_ASC" | "BODY_TRGM_SIMILARITY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "DESCRIPTION_TRGM_SIMILARITY_ASC" | "DESCRIPTION_TRGM_SIMILARITY_DESC" | "EMBEDDING_ASC" | "EMBEDDING_DESC" | "EMBEDDING_UPDATED_AT_ASC" | "EMBEDDING_UPDATED_AT_DESC" | "EMBEDDING_VECTOR_DISTANCE_ASC" | "EMBEDDING_VECTOR_DISTANCE_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ARCHIVED_ASC" | "IS_ARCHIVED_DESC" | "KEYWORDS_ASC" | "KEYWORDS_DESC" | "KIND_ASC" | "KIND_DESC" | "KIND_TRGM_SIMILARITY_ASC" | "KIND_TRGM_SIMILARITY_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SEARCH_ASC" | "SEARCH_DESC" | "SEARCH_SCORE_ASC" | "SEARCH_SCORE_DESC" | "SEARCH_TSV_RANK_ASC" | "SEARCH_TSV_RANK_DESC" | "SLUG_ASC" | "SLUG_DESC" | "TITLE_ASC" | "TITLE_DESC" | "TITLE_TRGM_SIMILARITY_ASC" | "TITLE_TRGM_SIMILARITY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `AgentTask`. */
-export type AgentTaskOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'APPROVAL_FEEDBACK_ASC'
-  | 'APPROVAL_FEEDBACK_DESC'
-  | 'APPROVAL_STATUS_ASC'
-  | 'APPROVAL_STATUS_DESC'
-  | 'APPROVED_AT_ASC'
-  | 'APPROVED_AT_DESC'
-  | 'APPROVED_BY_ASC'
-  | 'APPROVED_BY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORDER_INDEX_ASC'
-  | 'ORDER_INDEX_DESC'
-  | 'PLAN_ID_ASC'
-  | 'PLAN_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUIRES_APPROVAL_ASC'
-  | 'REQUIRES_APPROVAL_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AgentTaskOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "APPROVAL_FEEDBACK_ASC" | "APPROVAL_FEEDBACK_DESC" | "APPROVAL_STATUS_ASC" | "APPROVAL_STATUS_DESC" | "APPROVED_AT_ASC" | "APPROVED_AT_DESC" | "APPROVED_BY_ASC" | "APPROVED_BY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ERROR_ASC" | "ERROR_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORDER_INDEX_ASC" | "ORDER_INDEX_DESC" | "PLAN_ID_ASC" | "PLAN_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRES_APPROVAL_ASC" | "REQUIRES_APPROVAL_DESC" | "SOURCE_ASC" | "SOURCE_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AgentThread`. */
-export type AgentThreadOrderBy =
-  | 'AGENT_ID_ASC'
-  | 'AGENT_ID_DESC'
-  | 'ARCHIVED_AT_ASC'
-  | 'ARCHIVED_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ARCHIVED_ASC'
-  | 'IS_ARCHIVED_DESC'
-  | 'MODEL_ASC'
-  | 'MODEL_DESC'
-  | 'MODE_ASC'
-  | 'MODE_DESC'
-  | 'NATURAL'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PARENT_THREAD_ID_ASC'
-  | 'PARENT_THREAD_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROMPT_TEMPLATE_ID_ASC'
-  | 'PROMPT_TEMPLATE_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'SYSTEM_PROMPT_ASC'
-  | 'SYSTEM_PROMPT_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AgentThreadOrderBy = "AGENT_ID_ASC" | "AGENT_ID_DESC" | "ARCHIVED_AT_ASC" | "ARCHIVED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ARCHIVED_ASC" | "IS_ARCHIVED_DESC" | "MODEL_ASC" | "MODEL_DESC" | "MODE_ASC" | "MODE_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PARENT_THREAD_ID_ASC" | "PARENT_THREAD_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROMPT_TEMPLATE_ID_ASC" | "PROMPT_TEMPLATE_ID_DESC" | "STATUS_ASC" | "STATUS_DESC" | "SYSTEM_PROMPT_ASC" | "SYSTEM_PROMPT_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Similarity metric for vector search */
-export type VectorMetric = 'COSINE' | 'IP' | 'L2';
+export type VectorMetric = "COSINE" | "IP" | "L2";
 /** A filter to be used against `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentFilter {
   /** Filter by the object’s `agentMessages` relation. */
@@ -1756,6 +1456,8 @@ export interface MetaTable {
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
+  /** Provisioning scope metadata (null if no @scope tag) */
+  scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
@@ -1910,6 +1612,19 @@ export interface MetaRelations {
   hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
 }
+/** Provisioning scope metadata for a table */
+export interface MetaScope {
+  /** SQL name of the entity table for entity scopes, else null */
+  entityTable?: string | null;
+  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  keyColumn?: string | null;
+  /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
+  scope: string;
+  /** Provenance of the scope metadata (always 'smartTag') */
+  source: string;
+  /** Coarse bucket: 'global', 'database', or 'entity' */
+  tier: string;
+}
 /** Search metadata for a table */
 export interface MetaSearch {
   /** Active search algorithms on this table */
@@ -1942,6 +1657,8 @@ export interface MetaEnum {
 }
 /** Information about a PostgreSQL type */
 export interface MetaType {
+  /** Scalar serialization contract (null for plain scalars) */
+  encoding?: MetaScalarEncoding | null;
   gqlType: string;
   hasDefault?: boolean | null;
   isArray: boolean;
@@ -2006,4 +1723,19 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+export interface MetaScalarEncoding {
+  /** For 'vector': declared length, else null. */
+  dimensions?: number | null;
+  /** For 'ltree': values are dot-separated path strings. */
+  dotPath?: boolean | null;
+  /** For 'vector': element scalar (e.g. 'float'). */
+  elementType?: string | null;
+  /** For 'geojson': Point/LineString/Polygon/…, else null. */
+  geometrySubtype?: string | null;
+  /** Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite. */
+  kind: string;
+  /** For 'geojson': spatial reference id, else null. */
+  srid?: number | null;
 }

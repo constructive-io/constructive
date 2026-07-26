@@ -4,77 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { storeKeys } from '../query-keys';
-import { storeMutationKeys } from '../mutation-keys';
-import type { StoreSelect, StoreWithRelations, CreateStoreInput } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { StoreSelect, StoreWithRelations, CreateStoreInput } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { storeKeys } from "../query-keys";
+import { storeMutationKeys } from "../mutation-keys";
+import type { StoreSelect, StoreWithRelations, CreateStoreInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { StoreSelect, StoreWithRelations, CreateStoreInput } from "../../orm/input-types";
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateStoreMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateStoreMutation<S extends StoreSelect>(
-  params: {
-    selection: {
-      fields: S & StoreSelect;
-    } & HookStrictSelect<NoInfer<S>, StoreSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createStore: {
-          store: InferSelectResult<StoreWithRelations, S>;
-        };
-      },
-      Error,
-      CreateStoreInput['store']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createStore: {
-      store: InferSelectResult<StoreWithRelations, S>;
-    };
-  },
-  Error,
-  CreateStoreInput['store']
->;
-export function useCreateStoreMutation(
-  params: {
-    selection: SelectionConfig<StoreSelect>;
-  } & Omit<UseMutationOptions<any, Error, CreateStoreInput['store']>, 'mutationFn'>
-) {
+export function useCreateStoreMutation<S extends StoreSelect>(params: {
+  selection: ({
+    fields: S & StoreSelect;
+  } & HookStrictSelect<NoInfer<S>, StoreSelect>);
+} & Omit<UseMutationOptions<{
+  createStore: {
+    store: InferSelectResult<StoreWithRelations, S>;
+  };
+}, Error, CreateStoreInput["store"]>, "mutationFn">): UseMutationResult<{
+  createStore: {
+    store: InferSelectResult<StoreWithRelations, S>;
+  };
+}, Error, CreateStoreInput["store"]>;
+export function useCreateStoreMutation(params: {
+  selection: SelectionConfig<StoreSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateStoreInput["store"]>, "mutationFn">) {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: storeMutationKeys.create(),
-    mutationFn: (data: CreateStoreInput['store']) =>
-      getClient()
-        .store.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateStoreInput["store"]) => getClient().store.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: storeKeys.lists(),
+        queryKey: storeKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

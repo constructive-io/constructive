@@ -4,100 +4,15 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type {
-  Commit,
-  GetAllTreeNodesRecord,
-  Object,
-  Ref,
-  Store,
-  BigFloatFilter,
-  BigIntFilter,
-  BitStringFilter,
-  BooleanFilter,
-  DateFilter,
-  DatetimeFilter,
-  FloatFilter,
-  FullTextFilter,
-  IntFilter,
-  IntListFilter,
-  InternetAddressFilter,
-  JSONFilter,
-  StringFilter,
-  StringListFilter,
-  UUIDFilter,
-  UUIDListFilter,
-  VectorFilter,
-} from './types';
+import type { Commit, GetAllTreeNodesRecord, Object, Ref, Store, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 /** Methods to use when ordering `Commit`. */
-export type CommitOrderBy =
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'NATURAL'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC';
+export type CommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
 /** Methods to use when ordering `Object`. */
-export type ObjectOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type ObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `Ref`. */
-export type RefOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
+export type RefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
 /** Methods to use when ordering `Store`. */
-export type StoreOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type StoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’ */
 export interface CommitFilter {
   /** Checks for all expressions in this list. */
@@ -570,6 +485,8 @@ export interface MetaTable {
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
+  /** Provisioning scope metadata (null if no @scope tag) */
+  scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
@@ -700,6 +617,19 @@ export interface MetaRelations {
   hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
 }
+/** Provisioning scope metadata for a table */
+export interface MetaScope {
+  /** SQL name of the entity table for entity scopes, else null */
+  entityTable?: string | null;
+  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  keyColumn?: string | null;
+  /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
+  scope: string;
+  /** Provenance of the scope metadata (always 'smartTag') */
+  source: string;
+  /** Coarse bucket: 'global', 'database', or 'entity' */
+  tier: string;
+}
 /** Search metadata for a table */
 export interface MetaSearch {
   /** Active search algorithms on this table */
@@ -732,6 +662,8 @@ export interface MetaEnum {
 }
 /** Information about a PostgreSQL type */
 export interface MetaType {
+  /** Scalar serialization contract (null for plain scalars) */
+  encoding?: MetaScalarEncoding | null;
   gqlType: string;
   hasDefault?: boolean | null;
   isArray: boolean;
@@ -796,4 +728,19 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+export interface MetaScalarEncoding {
+  /** For 'vector': declared length, else null. */
+  dimensions?: number | null;
+  /** For 'ltree': values are dot-separated path strings. */
+  dotPath?: boolean | null;
+  /** For 'vector': element scalar (e.g. 'float'). */
+  elementType?: string | null;
+  /** For 'geojson': Point/LineString/Polygon/…, else null. */
+  geometrySubtype?: string | null;
+  /** Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite. */
+  kind: string;
+  /** For 'geojson': spatial reference id, else null. */
+  srid?: number | null;
 }

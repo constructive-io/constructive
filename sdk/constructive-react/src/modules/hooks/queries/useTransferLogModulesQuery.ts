@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { transferLogModuleKeys } from '../query-keys';
-import type {
-  TransferLogModuleSelect,
-  TransferLogModuleWithRelations,
-  TransferLogModuleFilter,
-  TransferLogModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  TransferLogModuleSelect,
-  TransferLogModuleWithRelations,
-  TransferLogModuleFilter,
-  TransferLogModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { transferLogModuleKeys } from "../query-keys";
+import type { TransferLogModuleSelect, TransferLogModuleWithRelations, TransferLogModuleFilter, TransferLogModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { TransferLogModuleSelect, TransferLogModuleWithRelations, TransferLogModuleFilter, TransferLogModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const transferLogModulesQueryKey = transferLogModuleKeys.list;
 /**
  * Query hook for fetching TransferLogModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useTransferLogModulesQuery({
@@ -45,53 +30,33 @@ export const transferLogModulesQueryKey = transferLogModuleKeys.list;
  * });
  * ```
  */
-export function useTransferLogModulesQuery<
-  S extends TransferLogModuleSelect,
-  TData = {
-    transferLogModules: ConnectionResult<InferSelectResult<TransferLogModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, TransferLogModuleFilter, TransferLogModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        transferLogModules: ConnectionResult<InferSelectResult<TransferLogModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useTransferLogModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      TransferLogModuleSelect,
-      TransferLogModuleFilter,
-      TransferLogModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    TransferLogModuleSelect,
-    TransferLogModuleFilter,
-    TransferLogModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useTransferLogModulesQuery<S extends TransferLogModuleSelect, TData = {
+  transferLogModules: ConnectionResult<InferSelectResult<TransferLogModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, TransferLogModuleFilter, TransferLogModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
+} & Omit<UseQueryOptions<{
+  transferLogModules: ConnectionResult<InferSelectResult<TransferLogModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useTransferLogModulesQuery(params: {
+  selection: ListSelectionConfig<TransferLogModuleSelect, TransferLogModuleFilter, TransferLogModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<TransferLogModuleSelect, TransferLogModuleFilter, TransferLogModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: transferLogModuleKeys.list(args),
     queryFn: () => getClient().transferLogModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch TransferLogModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchTransferLogModulesQuery({
@@ -105,59 +70,35 @@ export function useTransferLogModulesQuery(
 export async function fetchTransferLogModulesQuery<S extends TransferLogModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, TransferLogModuleFilter, TransferLogModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
+  } & Omit<ListSelectionConfig<S, TransferLogModuleFilter, TransferLogModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
 }): Promise<{
   transferLogModules: ConnectionResult<InferSelectResult<TransferLogModuleWithRelations, S>>;
 }>;
 export async function fetchTransferLogModulesQuery(params: {
-  selection: ListSelectionConfig<
-    TransferLogModuleSelect,
-    TransferLogModuleFilter,
-    TransferLogModuleOrderBy
-  >;
+  selection: ListSelectionConfig<TransferLogModuleSelect, TransferLogModuleFilter, TransferLogModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    TransferLogModuleSelect,
-    TransferLogModuleFilter,
-    TransferLogModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<TransferLogModuleSelect, TransferLogModuleFilter, TransferLogModuleOrderBy>(params.selection);
   return getClient().transferLogModule.findMany(args).unwrap();
 }
 /**
  * Prefetch TransferLogModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchTransferLogModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchTransferLogModulesQuery<S extends TransferLogModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, TransferLogModuleFilter, TransferLogModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchTransferLogModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      TransferLogModuleSelect,
-      TransferLogModuleFilter,
-      TransferLogModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    TransferLogModuleSelect,
-    TransferLogModuleFilter,
-    TransferLogModuleOrderBy
-  >(params.selection);
+export async function prefetchTransferLogModulesQuery<S extends TransferLogModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, TransferLogModuleFilter, TransferLogModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
+}): Promise<void>;
+export async function prefetchTransferLogModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<TransferLogModuleSelect, TransferLogModuleFilter, TransferLogModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<TransferLogModuleSelect, TransferLogModuleFilter, TransferLogModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: transferLogModuleKeys.list(args),
-    queryFn: () => getClient().transferLogModule.findMany(args).unwrap(),
+    queryFn: () => getClient().transferLogModule.findMany(args).unwrap()
   });
 }

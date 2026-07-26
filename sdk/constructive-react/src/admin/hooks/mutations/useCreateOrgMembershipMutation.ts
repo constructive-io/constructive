@@ -4,85 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { orgMembershipKeys } from '../query-keys';
-import { orgMembershipMutationKeys } from '../mutation-keys';
-import type {
-  OrgMembershipSelect,
-  OrgMembershipWithRelations,
-  CreateOrgMembershipInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  OrgMembershipSelect,
-  OrgMembershipWithRelations,
-  CreateOrgMembershipInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { orgMembershipKeys } from "../query-keys";
+import { orgMembershipMutationKeys } from "../mutation-keys";
+import type { OrgMembershipSelect, OrgMembershipWithRelations, CreateOrgMembershipInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgMembershipSelect, OrgMembershipWithRelations, CreateOrgMembershipInput } from "../../orm/input-types";
 /**
  * Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateOrgMembershipMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateOrgMembershipMutation<S extends OrgMembershipSelect>(
-  params: {
-    selection: {
-      fields: S & OrgMembershipSelect;
-    } & HookStrictSelect<NoInfer<S>, OrgMembershipSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createOrgMembership: {
-          orgMembership: InferSelectResult<OrgMembershipWithRelations, S>;
-        };
-      },
-      Error,
-      CreateOrgMembershipInput['orgMembership']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createOrgMembership: {
-      orgMembership: InferSelectResult<OrgMembershipWithRelations, S>;
-    };
-  },
-  Error,
-  CreateOrgMembershipInput['orgMembership']
->;
-export function useCreateOrgMembershipMutation(
-  params: {
-    selection: SelectionConfig<OrgMembershipSelect>;
-  } & Omit<UseMutationOptions<any, Error, CreateOrgMembershipInput['orgMembership']>, 'mutationFn'>
-) {
+export function useCreateOrgMembershipMutation<S extends OrgMembershipSelect>(params: {
+  selection: ({
+    fields: S & OrgMembershipSelect;
+  } & HookStrictSelect<NoInfer<S>, OrgMembershipSelect>);
+} & Omit<UseMutationOptions<{
+  createOrgMembership: {
+    orgMembership: InferSelectResult<OrgMembershipWithRelations, S>;
+  };
+}, Error, CreateOrgMembershipInput["orgMembership"]>, "mutationFn">): UseMutationResult<{
+  createOrgMembership: {
+    orgMembership: InferSelectResult<OrgMembershipWithRelations, S>;
+  };
+}, Error, CreateOrgMembershipInput["orgMembership"]>;
+export function useCreateOrgMembershipMutation(params: {
+  selection: SelectionConfig<OrgMembershipSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateOrgMembershipInput["orgMembership"]>, "mutationFn">) {
   const args = buildSelectionArgs<OrgMembershipSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: orgMembershipMutationKeys.create(),
-    mutationFn: (data: CreateOrgMembershipInput['orgMembership']) =>
-      getClient()
-        .orgMembership.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateOrgMembershipInput["orgMembership"]) => getClient().orgMembership.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orgMembershipKeys.lists(),
+        queryKey: orgMembershipKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

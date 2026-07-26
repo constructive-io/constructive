@@ -5,7 +5,14 @@
  */
 import objectPath from 'nested-obj';
 
-export type FieldType = 'string' | 'boolean' | 'int' | 'float' | 'json' | 'uuid' | 'enum';
+export type FieldType =
+  | 'string'
+  | 'boolean'
+  | 'int'
+  | 'float'
+  | 'json'
+  | 'uuid'
+  | 'enum';
 
 export interface FieldSchema {
   [fieldName: string]: FieldType;
@@ -18,7 +25,7 @@ export interface FieldSchema {
  */
 export function coerceAnswers(
   answers: Record<string, unknown>,
-  schema: FieldSchema
+  schema: FieldSchema,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = { ...answers };
 
@@ -37,7 +44,8 @@ export function coerceAnswers(
     switch (fieldType) {
       case 'boolean':
         if (typeof value === 'boolean') break;
-        result[key] = strValue === 'true' || strValue === '1' || strValue === 'yes';
+        result[key] =
+          strValue === 'true' || strValue === '1' || strValue === 'yes';
         break;
       case 'int':
         if (typeof value === 'number') break;
@@ -97,7 +105,7 @@ export function coerceAnswers(
  */
 export function stripUndefined(
   obj: Record<string, unknown>,
-  schema?: FieldSchema
+  schema?: FieldSchema,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const allowedKeys = schema ? new Set(Object.keys(schema)) : null;
@@ -116,7 +124,9 @@ export function stripUndefined(
  * Custom mutation commands receive an `input` field as a JSON string
  * from the CLI prompt. This parses it into a proper object.
  */
-export function parseMutationInput(answers: Record<string, unknown>): Record<string, unknown> {
+export function parseMutationInput(
+  answers: Record<string, unknown>,
+): Record<string, unknown> {
   if (typeof answers.input === 'string') {
     try {
       const parsed = JSON.parse(answers.input);
@@ -140,7 +150,9 @@ export function parseMutationInput(answers: Record<string, unknown>): Record<str
  * Non-dotted keys are passed through unchanged.
  * Uses `nested-obj` for safe nested property setting.
  */
-export function unflattenDotNotation(answers: Record<string, unknown>): Record<string, unknown> {
+export function unflattenDotNotation(
+  answers: Record<string, unknown>,
+): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(answers)) {
@@ -173,7 +185,10 @@ export function unflattenDotNotation(answers: Record<string, unknown>): Record<s
  * Handles minimist delivering numbers or strings depending on the input.
  * Returns undefined when the flag is missing or not a valid number.
  */
-export function parseIntFlag(argv: Record<string, unknown>, name: string): number | undefined {
+export function parseIntFlag(
+  argv: Record<string, unknown>,
+  name: string,
+): number | undefined {
   const val = argv[name];
   if (typeof val === 'number') return val;
   if (typeof val === 'string') {
@@ -187,7 +202,10 @@ export function parseIntFlag(argv: Record<string, unknown>, name: string): numbe
  * Parse a CLI flag as a string.
  * Returns undefined when the flag is missing or not a string.
  */
-export function parseStringFlag(argv: Record<string, unknown>, name: string): string | undefined {
+export function parseStringFlag(
+  argv: Record<string, unknown>,
+  name: string,
+): string | undefined {
   const val = argv[name];
   return typeof val === 'string' ? val : undefined;
 }
@@ -196,7 +214,9 @@ export function parseStringFlag(argv: Record<string, unknown>, name: string): st
  * Parse --orderBy flag as a comma-separated list of enum values.
  * e.g. --orderBy NAME_ASC,CREATED_AT_DESC → ['NAME_ASC', 'CREATED_AT_DESC']
  */
-export function parseOrderByFlag(argv: Record<string, unknown>): string[] | undefined {
+export function parseOrderByFlag(
+  argv: Record<string, unknown>,
+): string[] | undefined {
   const val = argv.orderBy;
   return typeof val === 'string' ? val.split(',') : undefined;
 }
@@ -207,10 +227,12 @@ export function parseOrderByFlag(argv: Record<string, unknown>): string[] | unde
  */
 export function parseSelectFlag(
   argv: Record<string, unknown>,
-  defaultSelect: Record<string, unknown>
+  defaultSelect: Record<string, unknown>,
 ): Record<string, unknown> {
   const raw = argv.select;
-  return typeof raw === 'string' ? buildSelectFromPaths(raw) : defaultSelect;
+  return typeof raw === 'string'
+    ? buildSelectFromPaths(raw)
+    : defaultSelect;
 }
 
 /**
@@ -226,7 +248,7 @@ export function parseSelectFlag(
 export function parseFindManyArgs<T = Record<string, unknown>>(
   argv: Record<string, unknown>,
   defaultSelect: Record<string, unknown>,
-  extraWhere?: Record<string, unknown>
+  extraWhere?: Record<string, unknown>,
 ): T {
   const limit = parseIntFlag(argv, 'limit');
   const last = parseIntFlag(argv, 'last');
@@ -235,10 +257,9 @@ export function parseFindManyArgs<T = Record<string, unknown>>(
   const before = parseStringFlag(argv, 'before');
   const select = parseSelectFlag(argv, defaultSelect);
   const parsed = unflattenDotNotation(argv);
-  const where =
-    (parsed.where ?? extraWhere)
-      ? { ...(extraWhere ?? {}), ...((parsed.where as Record<string, unknown>) ?? {}) }
-      : undefined;
+  const where = parsed.where ?? extraWhere
+    ? { ...(extraWhere ?? {}), ...((parsed.where as Record<string, unknown>) ?? {}) }
+    : undefined;
   const orderBy = parseOrderByFlag(argv);
 
   return {
@@ -260,7 +281,7 @@ export function parseFindManyArgs<T = Record<string, unknown>>(
  */
 export function parseFindFirstArgs<T = Record<string, unknown>>(
   argv: Record<string, unknown>,
-  defaultSelect: Record<string, unknown>
+  defaultSelect: Record<string, unknown>,
 ): T {
   const select = parseSelectFlag(argv, defaultSelect);
   const parsed = unflattenDotNotation(argv);
@@ -274,7 +295,9 @@ export function parseFindFirstArgs<T = Record<string, unknown>>(
   } as unknown as T;
 }
 
-export function buildSelectFromPaths(paths: string): Record<string, unknown> {
+export function buildSelectFromPaths(
+  paths: string,
+): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const trimmedPaths = paths
     .split(',')

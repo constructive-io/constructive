@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { infraSecretsModuleKeys } from '../query-keys';
-import { infraSecretsModuleMutationKeys } from '../mutation-keys';
-import type {
-  InfraSecretsModuleSelect,
-  InfraSecretsModuleWithRelations,
-  InfraSecretsModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  InfraSecretsModuleSelect,
-  InfraSecretsModuleWithRelations,
-  InfraSecretsModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { infraSecretsModuleKeys } from "../query-keys";
+import { infraSecretsModuleMutationKeys } from "../mutation-keys";
+import type { InfraSecretsModuleSelect, InfraSecretsModuleWithRelations, InfraSecretsModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { InfraSecretsModuleSelect, InfraSecretsModuleWithRelations, InfraSecretsModulePatch } from "../../orm/input-types";
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateInfraSecretsModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', infraSecretsModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateInfraSecretsModuleMutation<S extends InfraSecretsModuleSelect>(
-  params: {
-    selection: {
-      fields: S & InfraSecretsModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateInfraSecretsModule: {
-          infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        infraSecretsModulePatch: InfraSecretsModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateInfraSecretsModule: {
-      infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    infraSecretsModulePatch: InfraSecretsModulePatch;
-  }
->;
-export function useUpdateInfraSecretsModuleMutation(
-  params: {
-    selection: SelectionConfig<InfraSecretsModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        infraSecretsModulePatch: InfraSecretsModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateInfraSecretsModuleMutation<S extends InfraSecretsModuleSelect>(params: {
+  selection: ({
+    fields: S & InfraSecretsModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateInfraSecretsModule: {
+    infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  infraSecretsModulePatch: InfraSecretsModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateInfraSecretsModule: {
+    infraSecretsModule: InferSelectResult<InfraSecretsModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  infraSecretsModulePatch: InfraSecretsModulePatch;
+}>;
+export function useUpdateInfraSecretsModuleMutation(params: {
+  selection: SelectionConfig<InfraSecretsModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  infraSecretsModulePatch: InfraSecretsModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<InfraSecretsModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: infraSecretsModuleMutationKeys.all,
     mutationFn: ({
       id,
-      infraSecretsModulePatch,
+      infraSecretsModulePatch
     }: {
       id: string;
       infraSecretsModulePatch: InfraSecretsModulePatch;
-    }) =>
-      getClient()
-        .infraSecretsModule.update({
-          where: {
-            id,
-          },
-          data: infraSecretsModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().infraSecretsModule.update({
+      where: {
+        id
+      },
+      data: infraSecretsModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: infraSecretsModuleKeys.detail(variables.id),
+        queryKey: infraSecretsModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: infraSecretsModuleKeys.lists(),
+        queryKey: infraSecretsModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { webauthnAuthModuleKeys } from '../query-keys';
-import type {
-  WebauthnAuthModuleSelect,
-  WebauthnAuthModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  WebauthnAuthModuleSelect,
-  WebauthnAuthModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { webauthnAuthModuleKeys } from "../query-keys";
+import type { WebauthnAuthModuleSelect, WebauthnAuthModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebauthnAuthModuleSelect, WebauthnAuthModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const webauthnAuthModuleQueryKey = webauthnAuthModuleKeys.detail;
 /**
  * Query hook for fetching a single WebauthnAuthModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useWebauthnAuthModuleQuery({
@@ -32,52 +26,38 @@ export const webauthnAuthModuleQueryKey = webauthnAuthModuleKeys.detail;
  * });
  * ```
  */
-export function useWebauthnAuthModuleQuery<
-  S extends WebauthnAuthModuleSelect,
-  TData = {
-    webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, WebauthnAuthModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useWebauthnAuthModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<WebauthnAuthModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useWebauthnAuthModuleQuery<S extends WebauthnAuthModuleSelect, TData = {
+  webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, WebauthnAuthModuleSelect>;
+} & Omit<UseQueryOptions<{
+  webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useWebauthnAuthModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<WebauthnAuthModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<WebauthnAuthModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: webauthnAuthModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .webauthnAuthModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().webauthnAuthModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single WebauthnAuthModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchWebauthnAuthModuleQuery({
@@ -99,46 +79,35 @@ export async function fetchWebauthnAuthModuleQuery(params: {
   selection: SelectionConfig<WebauthnAuthModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<WebauthnAuthModuleSelect>(params.selection);
-  return getClient()
-    .webauthnAuthModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().webauthnAuthModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single WebauthnAuthModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchWebauthnAuthModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchWebauthnAuthModuleQuery<S extends WebauthnAuthModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, WebauthnAuthModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchWebauthnAuthModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<WebauthnAuthModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchWebauthnAuthModuleQuery<S extends WebauthnAuthModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, WebauthnAuthModuleSelect>;
+}): Promise<void>;
+export async function prefetchWebauthnAuthModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<WebauthnAuthModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<WebauthnAuthModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: webauthnAuthModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .webauthnAuthModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().webauthnAuthModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

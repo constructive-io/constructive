@@ -11,21 +11,15 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { relationProvisionKeys } from '../query-keys';
-import type {
-  RelationProvisionSelect,
-  RelationProvisionWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  RelationProvisionSelect,
-  RelationProvisionWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { relationProvisionKeys } from "../query-keys";
+import type { RelationProvisionSelect, RelationProvisionWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RelationProvisionSelect, RelationProvisionWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const relationProvisionQueryKey = relationProvisionKeys.detail;
 /**
@@ -46,47 +40,33 @@ export const relationProvisionQueryKey = relationProvisionKeys.detail;
  * });
  * ```
  */
-export function useRelationProvisionQuery<
-  S extends RelationProvisionSelect,
-  TData = {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        relationProvision: InferSelectResult<RelationProvisionWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useRelationProvisionQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<RelationProvisionSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useRelationProvisionQuery<S extends RelationProvisionSelect, TData = {
+  relationProvision: InferSelectResult<RelationProvisionWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
+} & Omit<UseQueryOptions<{
+  relationProvision: InferSelectResult<RelationProvisionWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useRelationProvisionQuery(params: {
+  id: string;
+  selection: SelectionConfig<RelationProvisionSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: relationProvisionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .relationProvision.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().relationProvision.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -120,12 +100,10 @@ export async function fetchRelationProvisionQuery(params: {
   selection: SelectionConfig<RelationProvisionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
-  return getClient()
-    .relationProvision.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().relationProvision.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Provisions relational structure between tables. Supports four relation types:
@@ -142,31 +120,22 @@ export async function fetchRelationProvisionQuery(params: {
  * await prefetchRelationProvisionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRelationProvisionQuery<S extends RelationProvisionSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
-  }
-): Promise<void>;
-export async function prefetchRelationProvisionQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<RelationProvisionSelect>;
-  }
-): Promise<void> {
+export async function prefetchRelationProvisionQuery<S extends RelationProvisionSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
+}): Promise<void>;
+export async function prefetchRelationProvisionQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<RelationProvisionSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: relationProvisionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .relationProvision.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().relationProvision.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

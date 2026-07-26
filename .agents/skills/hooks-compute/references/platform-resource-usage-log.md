@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer)
+Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus)
 
 ## Usage
 

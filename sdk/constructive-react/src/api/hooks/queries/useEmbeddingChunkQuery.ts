@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { embeddingChunkKeys } from '../query-keys';
-import type { EmbeddingChunkSelect, EmbeddingChunkWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { EmbeddingChunkSelect, EmbeddingChunkWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { embeddingChunkKeys } from "../query-keys";
+import type { EmbeddingChunkSelect, EmbeddingChunkWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { EmbeddingChunkSelect, EmbeddingChunkWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const embeddingChunkQueryKey = embeddingChunkKeys.detail;
 /**
  * Query hook for fetching a single EmbeddingChunk
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useEmbeddingChunkQuery({
@@ -26,52 +26,38 @@ export const embeddingChunkQueryKey = embeddingChunkKeys.detail;
  * });
  * ```
  */
-export function useEmbeddingChunkQuery<
-  S extends EmbeddingChunkSelect,
-  TData = {
-    embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, EmbeddingChunkSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useEmbeddingChunkQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<EmbeddingChunkSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useEmbeddingChunkQuery<S extends EmbeddingChunkSelect, TData = {
+  embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, EmbeddingChunkSelect>;
+} & Omit<UseQueryOptions<{
+  embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useEmbeddingChunkQuery(params: {
+  id: string;
+  selection: SelectionConfig<EmbeddingChunkSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<EmbeddingChunkSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: embeddingChunkKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .embeddingChunk.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().embeddingChunk.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single EmbeddingChunk without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchEmbeddingChunkQuery({
@@ -93,46 +79,35 @@ export async function fetchEmbeddingChunkQuery(params: {
   selection: SelectionConfig<EmbeddingChunkSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<EmbeddingChunkSelect>(params.selection);
-  return getClient()
-    .embeddingChunk.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().embeddingChunk.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single EmbeddingChunk for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchEmbeddingChunkQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchEmbeddingChunkQuery<S extends EmbeddingChunkSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, EmbeddingChunkSelect>;
-  }
-): Promise<void>;
-export async function prefetchEmbeddingChunkQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<EmbeddingChunkSelect>;
-  }
-): Promise<void> {
+export async function prefetchEmbeddingChunkQuery<S extends EmbeddingChunkSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, EmbeddingChunkSelect>;
+}): Promise<void>;
+export async function prefetchEmbeddingChunkQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<EmbeddingChunkSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<EmbeddingChunkSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: embeddingChunkKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .embeddingChunk.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().embeddingChunk.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { realtimeModuleKeys } from '../query-keys';
-import type { RealtimeModuleSelect, RealtimeModuleWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { RealtimeModuleSelect, RealtimeModuleWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { realtimeModuleKeys } from "../query-keys";
+import type { RealtimeModuleSelect, RealtimeModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RealtimeModuleSelect, RealtimeModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const realtimeModuleQueryKey = realtimeModuleKeys.detail;
 /**
  * Query hook for fetching a single RealtimeModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useRealtimeModuleQuery({
@@ -26,52 +26,38 @@ export const realtimeModuleQueryKey = realtimeModuleKeys.detail;
  * });
  * ```
  */
-export function useRealtimeModuleQuery<
-  S extends RealtimeModuleSelect,
-  TData = {
-    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useRealtimeModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<RealtimeModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useRealtimeModuleQuery<S extends RealtimeModuleSelect, TData = {
+  realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
+} & Omit<UseQueryOptions<{
+  realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useRealtimeModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<RealtimeModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: realtimeModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .realtimeModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().realtimeModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single RealtimeModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchRealtimeModuleQuery({
@@ -93,46 +79,35 @@ export async function fetchRealtimeModuleQuery(params: {
   selection: SelectionConfig<RealtimeModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
-  return getClient()
-    .realtimeModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().realtimeModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single RealtimeModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchRealtimeModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRealtimeModuleQuery<S extends RealtimeModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchRealtimeModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<RealtimeModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchRealtimeModuleQuery<S extends RealtimeModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
+}): Promise<void>;
+export async function prefetchRealtimeModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<RealtimeModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: realtimeModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .realtimeModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().realtimeModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

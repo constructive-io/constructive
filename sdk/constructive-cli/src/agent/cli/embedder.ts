@@ -22,11 +22,7 @@ function createOllamaEmbedder(
   baseUrl: string = 'http://localhost:11434',
   model: string = 'nomic-embed-text'
 ): EmbedderFunction {
-  let clientP:
-    | Promise<{
-        generateEmbedding: (text: string, model: string) => Promise<{ embedding: number[] }>;
-      }>
-    | undefined;
+  let clientP: Promise<{ generateEmbedding: (text: string, model: string) => Promise<{ embedding: number[] }> }> | undefined;
   return async (text: string): Promise<number[]> => {
     if (!clientP) {
       clientP = import('@agentic-kit/ollama')
@@ -56,16 +52,16 @@ function createOllamaEmbedder(
  * @param store - Optional appstash config store for reading persisted config
  * @returns An EmbedderFunction or null if no embedder is configured
  */
-export function resolveEmbedder(store?: {
-  getVar: (key: string) => string | undefined;
-}): EmbedderFunction | null {
+export function resolveEmbedder(
+  store?: { getVar: (key: string) => string | undefined }
+): EmbedderFunction | null {
   // 1. Check environment variables first
   const envProvider = process.env.EMBEDDER_PROVIDER;
   if (envProvider) {
     return buildEmbedder({
       provider: envProvider,
       model: process.env.EMBEDDER_MODEL,
-      baseUrl: process.env.EMBEDDER_BASE_URL,
+      baseUrl: process.env.EMBEDDER_BASE_URL
     });
   }
 
@@ -76,7 +72,7 @@ export function resolveEmbedder(store?: {
       return buildEmbedder({
         provider: configProvider,
         model: store.getVar('embedder.model'),
-        baseUrl: store.getVar('embedder.baseUrl'),
+        baseUrl: store.getVar('embedder.baseUrl')
       });
     }
   }
@@ -90,11 +86,13 @@ export function resolveEmbedder(store?: {
  */
 function buildEmbedder(config: EmbedderConfig): EmbedderFunction | null {
   switch (config.provider) {
-    case 'ollama':
-      return createOllamaEmbedder(config.baseUrl, config.model);
-    default:
-      console.error(`Unknown embedder provider: '${config.provider}'. Supported: ollama`);
-      return null;
+  case 'ollama':
+    return createOllamaEmbedder(config.baseUrl, config.model);
+  default:
+    console.error(
+      `Unknown embedder provider: '${config.provider}'. Supported: ollama`
+    );
+    return null;
   }
 }
 

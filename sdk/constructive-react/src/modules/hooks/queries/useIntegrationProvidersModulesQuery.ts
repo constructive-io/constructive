@@ -8,30 +8,15 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { integrationProvidersModuleKeys } from '../query-keys';
-import type {
-  IntegrationProvidersModuleSelect,
-  IntegrationProvidersModuleWithRelations,
-  IntegrationProvidersModuleFilter,
-  IntegrationProvidersModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  IntegrationProvidersModuleSelect,
-  IntegrationProvidersModuleWithRelations,
-  IntegrationProvidersModuleFilter,
-  IntegrationProvidersModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { integrationProvidersModuleKeys } from "../query-keys";
+import type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const integrationProvidersModulesQueryKey = integrationProvidersModuleKeys.list;
 /**
@@ -53,55 +38,28 @@ export const integrationProvidersModulesQueryKey = integrationProvidersModuleKey
  * });
  * ```
  */
-export function useIntegrationProvidersModulesQuery<
-  S extends IntegrationProvidersModuleSelect,
-  TData = {
-    integrationProvidersModules: ConnectionResult<
-      InferSelectResult<IntegrationProvidersModuleWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        integrationProvidersModules: ConnectionResult<
-          InferSelectResult<IntegrationProvidersModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useIntegrationProvidersModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      IntegrationProvidersModuleSelect,
-      IntegrationProvidersModuleFilter,
-      IntegrationProvidersModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    IntegrationProvidersModuleSelect,
-    IntegrationProvidersModuleFilter,
-    IntegrationProvidersModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useIntegrationProvidersModulesQuery<S extends IntegrationProvidersModuleSelect, TData = {
+  integrationProvidersModules: ConnectionResult<InferSelectResult<IntegrationProvidersModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
+} & Omit<UseQueryOptions<{
+  integrationProvidersModules: ConnectionResult<InferSelectResult<IntegrationProvidersModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useIntegrationProvidersModulesQuery(params: {
+  selection: ListSelectionConfig<IntegrationProvidersModuleSelect, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<IntegrationProvidersModuleSelect, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: integrationProvidersModuleKeys.list(args),
     queryFn: () => getClient().integrationProvidersModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
@@ -121,33 +79,17 @@ export function useIntegrationProvidersModulesQuery(
  * });
  * ```
  */
-export async function fetchIntegrationProvidersModulesQuery<
-  S extends IntegrationProvidersModuleSelect,
->(params: {
+export async function fetchIntegrationProvidersModulesQuery<S extends IntegrationProvidersModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
+  } & Omit<ListSelectionConfig<S, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
 }): Promise<{
-  integrationProvidersModules: ConnectionResult<
-    InferSelectResult<IntegrationProvidersModuleWithRelations, S>
-  >;
+  integrationProvidersModules: ConnectionResult<InferSelectResult<IntegrationProvidersModuleWithRelations, S>>;
 }>;
 export async function fetchIntegrationProvidersModulesQuery(params: {
-  selection: ListSelectionConfig<
-    IntegrationProvidersModuleSelect,
-    IntegrationProvidersModuleFilter,
-    IntegrationProvidersModuleOrderBy
-  >;
+  selection: ListSelectionConfig<IntegrationProvidersModuleSelect, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    IntegrationProvidersModuleSelect,
-    IntegrationProvidersModuleFilter,
-    IntegrationProvidersModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<IntegrationProvidersModuleSelect, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>(params.selection);
   return getClient().integrationProvidersModule.findMany(args).unwrap();
 }
 /**
@@ -162,37 +104,17 @@ export async function fetchIntegrationProvidersModulesQuery(params: {
  * await prefetchIntegrationProvidersModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchIntegrationProvidersModulesQuery<
-  S extends IntegrationProvidersModuleSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchIntegrationProvidersModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      IntegrationProvidersModuleSelect,
-      IntegrationProvidersModuleFilter,
-      IntegrationProvidersModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    IntegrationProvidersModuleSelect,
-    IntegrationProvidersModuleFilter,
-    IntegrationProvidersModuleOrderBy
-  >(params.selection);
+export async function prefetchIntegrationProvidersModulesQuery<S extends IntegrationProvidersModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
+}): Promise<void>;
+export async function prefetchIntegrationProvidersModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<IntegrationProvidersModuleSelect, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<IntegrationProvidersModuleSelect, IntegrationProvidersModuleFilter, IntegrationProvidersModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: integrationProvidersModuleKeys.list(args),
-    queryFn: () => getClient().integrationProvidersModule.findMany(args).unwrap(),
+    queryFn: () => getClient().integrationProvidersModule.findMany(args).unwrap()
   });
 }

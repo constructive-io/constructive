@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 47 tables and 9 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 65 tables and 11 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 47 tables and 9 custom operations
+ORM client for the api API — provides typed CRUD operations for 65 tables and 11 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the api API — provides typed CRUD operations for 47 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: api, apiModule, apiSchema, apiSetting, app, astMigration, checkConstraint, compositeType, ...
+// Available models: api, apiModule, apiSchema, apiSetting, astMigration, checkConstraint, compositeType, corsSetting, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -41,7 +41,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [api-module](references/api-module.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
-- [app](references/app.md)
 - [ast-migration](references/ast-migration.md)
 - [check-constraint](references/check-constraint.md)
 - [composite-type](references/composite-type.md)
@@ -51,21 +50,40 @@ See the `references/` directory for detailed per-entity API documentation:
 - [database-transfer](references/database-transfer.md)
 - [default-privilege](references/default-privilege.md)
 - [domain](references/domain.md)
+- [domain-event](references/domain-event.md)
+- [domain-verification](references/domain-verification.md)
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
+- [exclusion-constraint](references/exclusion-constraint.md)
 - [field](references/field.md)
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
+- [hostname-binding](references/hostname-binding.md)
 - [http-route](references/http-route.md)
 - [index](references/index.md)
 - [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
 - [partition](references/partition.md)
+- [platform-api](references/platform-api.md)
+- [platform-api-module](references/platform-api-module.md)
+- [platform-api-schema](references/platform-api-schema.md)
+- [platform-api-setting](references/platform-api-setting.md)
+- [platform-cors-setting](references/platform-cors-setting.md)
+- [platform-domain](references/platform-domain.md)
+- [platform-domain-event](references/platform-domain-event.md)
+- [platform-domain-verification](references/platform-domain-verification.md)
+- [platform-managed-domain](references/platform-managed-domain.md)
+- [platform-site](references/platform-site.md)
+- [platform-site-metadatum](references/platform-site-metadatum.md)
+- [platform-site-module](references/platform-site-module.md)
+- [platform-site-theme](references/platform-site-theme.md)
 - [policy](references/policy.md)
 - [primary-key-constraint](references/primary-key-constraint.md)
 - [pubkey-setting](references/pubkey-setting.md)
 - [rls-setting](references/rls-setting.md)
+- [route-binding](references/route-binding.md)
+- [route](references/route.md)
 - [schema](references/schema.md)
 - [schema-grant](references/schema-grant.md)
 - [site](references/site.md)
@@ -84,8 +102,10 @@ See the `references/` directory for detailed per-entity API documentation:
 - [view-rule](references/view-rule.md)
 - [view-table](references/view-table.md)
 - [webauthn-setting](references/webauthn-setting.md)
+- [api-schema-names](references/api-schema-names.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
 - [resolve-http-route](references/resolve-http-route.md)
+- [resolve-route](references/resolve-route.md)
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)

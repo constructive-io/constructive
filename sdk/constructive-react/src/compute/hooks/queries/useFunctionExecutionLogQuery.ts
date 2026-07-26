@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionExecutionLogKeys } from '../query-keys';
-import type {
-  FunctionExecutionLogSelect,
-  FunctionExecutionLogWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionExecutionLogSelect,
-  FunctionExecutionLogWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionExecutionLogKeys } from "../query-keys";
+import type { FunctionExecutionLogSelect, FunctionExecutionLogWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionExecutionLogSelect, FunctionExecutionLogWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const functionExecutionLogQueryKey = functionExecutionLogKeys.detail;
 /**
  * Function execution logs — structured console output per invocation
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionExecutionLogQuery({
@@ -32,52 +26,38 @@ export const functionExecutionLogQueryKey = functionExecutionLogKeys.detail;
  * });
  * ```
  */
-export function useFunctionExecutionLogQuery<
-  S extends FunctionExecutionLogSelect,
-  TData = {
-    functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFunctionExecutionLogQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionExecutionLogSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useFunctionExecutionLogQuery<S extends FunctionExecutionLogSelect, TData = {
+  functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
+} & Omit<UseQueryOptions<{
+  functionExecutionLog: InferSelectResult<FunctionExecutionLogWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFunctionExecutionLogQuery(params: {
+  id: string;
+  selection: SelectionConfig<FunctionExecutionLogSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<FunctionExecutionLogSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionExecutionLogKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionExecutionLog.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().functionExecutionLog.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Function execution logs — structured console output per invocation
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFunctionExecutionLogQuery({
@@ -99,46 +79,35 @@ export async function fetchFunctionExecutionLogQuery(params: {
   selection: SelectionConfig<FunctionExecutionLogSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionExecutionLogSelect>(params.selection);
-  return getClient()
-    .functionExecutionLog.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().functionExecutionLog.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Function execution logs — structured console output per invocation
- *
+ * 
  * @example
  * ```ts
  * await prefetchFunctionExecutionLogQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionExecutionLogQuery<S extends FunctionExecutionLogSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
-  }
-): Promise<void>;
-export async function prefetchFunctionExecutionLogQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionExecutionLogSelect>;
-  }
-): Promise<void> {
+export async function prefetchFunctionExecutionLogQuery<S extends FunctionExecutionLogSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
+}): Promise<void>;
+export async function prefetchFunctionExecutionLogQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<FunctionExecutionLogSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<FunctionExecutionLogSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionExecutionLogKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionExecutionLog.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().functionExecutionLog.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

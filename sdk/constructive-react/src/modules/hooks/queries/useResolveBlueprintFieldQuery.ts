@@ -4,76 +4,57 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customQueryKeys } from '../query-keys';
-import type { ResolveBlueprintFieldVariables } from '../../orm/query';
-export type { ResolveBlueprintFieldVariables } from '../../orm/query';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customQueryKeys } from "../query-keys";
+import type { ResolveBlueprintFieldVariables } from "../../orm/query";
+export type { ResolveBlueprintFieldVariables } from "../../orm/query";
 /** Query key factory - re-exported from query-keys.ts */
 export const resolveBlueprintFieldQueryKey = customQueryKeys.resolveBlueprintField;
 /**
  * Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useResolveBlueprintFieldQuery({ variables: { databaseId, fieldName, tableId } });
- *
+ * 
  * if (data?.resolveBlueprintField) {
  *   console.log(data.resolveBlueprintField);
  * }
  * ```
  */
-export function useResolveBlueprintFieldQuery<
-  TData = {
-    resolveBlueprintField: string | null;
-  },
->(
-  params?: {
-    variables?: ResolveBlueprintFieldVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resolveBlueprintField: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useResolveBlueprintFieldQuery<
-  TData = {
-    resolveBlueprintField: string | null;
-  },
->(
-  params?: {
-    variables?: ResolveBlueprintFieldVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resolveBlueprintField: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData> {
+export function useResolveBlueprintFieldQuery<TData = {
+  resolveBlueprintField: string | null;
+}>(params?: {
+  variables?: ResolveBlueprintFieldVariables;
+} & Omit<UseQueryOptions<{
+  resolveBlueprintField: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useResolveBlueprintFieldQuery<TData = {
+  resolveBlueprintField: string | null;
+}>(params?: {
+  variables?: ResolveBlueprintFieldVariables;
+} & Omit<UseQueryOptions<{
+  resolveBlueprintField: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const { variables: _variables, ...queryOptions } = params ?? {};
+  const {
+    variables: _variables,
+    ...queryOptions
+  } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: resolveBlueprintFieldQueryKey(variables),
     queryFn: () => getClient().query.resolveBlueprintField(variables).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch resolveBlueprintField without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchResolveBlueprintFieldQuery({ variables: { databaseId, fieldName, tableId } });
@@ -87,21 +68,18 @@ export async function fetchResolveBlueprintFieldQuery(params?: {
 }
 /**
  * Prefetch resolveBlueprintField for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchResolveBlueprintFieldQuery(queryClient, { variables: { databaseId, fieldName, tableId } });
  * ```
  */
-export async function prefetchResolveBlueprintFieldQuery(
-  queryClient: QueryClient,
-  params?: {
-    variables?: ResolveBlueprintFieldVariables;
-  }
-): Promise<void> {
+export async function prefetchResolveBlueprintFieldQuery(queryClient: QueryClient, params?: {
+  variables?: ResolveBlueprintFieldVariables;
+}): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: resolveBlueprintFieldQueryKey(variables),
-    queryFn: () => getClient().query.resolveBlueprintField(variables).unwrap(),
+    queryFn: () => getClient().query.resolveBlueprintField(variables).unwrap()
   });
 }

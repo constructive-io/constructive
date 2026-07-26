@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionGraphRefKeys } from '../query-keys';
-import type { FunctionGraphRefSelect, FunctionGraphRefWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { FunctionGraphRefSelect, FunctionGraphRefWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionGraphRefKeys } from "../query-keys";
+import type { FunctionGraphRefSelect, FunctionGraphRefWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionGraphRefSelect, FunctionGraphRefWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphRefQueryKey = functionGraphRefKeys.detail;
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphRefQuery({
@@ -26,52 +26,38 @@ export const functionGraphRefQueryKey = functionGraphRefKeys.detail;
  * });
  * ```
  */
-export function useFunctionGraphRefQuery<
-  S extends FunctionGraphRefSelect,
-  TData = {
-    functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFunctionGraphRefQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionGraphRefSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useFunctionGraphRefQuery<S extends FunctionGraphRefSelect, TData = {
+  functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
+} & Omit<UseQueryOptions<{
+  functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFunctionGraphRefQuery(params: {
+  id: string;
+  selection: SelectionConfig<FunctionGraphRefSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<FunctionGraphRefSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphRefKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionGraphRef.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().functionGraphRef.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFunctionGraphRefQuery({
@@ -93,46 +79,35 @@ export async function fetchFunctionGraphRefQuery(params: {
   selection: SelectionConfig<FunctionGraphRefSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionGraphRefSelect>(params.selection);
-  return getClient()
-    .functionGraphRef.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().functionGraphRef.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```ts
  * await prefetchFunctionGraphRefQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionGraphRefQuery<S extends FunctionGraphRefSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
-  }
-): Promise<void>;
-export async function prefetchFunctionGraphRefQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionGraphRefSelect>;
-  }
-): Promise<void> {
+export async function prefetchFunctionGraphRefQuery<S extends FunctionGraphRefSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
+}): Promise<void>;
+export async function prefetchFunctionGraphRefQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<FunctionGraphRefSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<FunctionGraphRefSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphRefKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionGraphRef.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().functionGraphRef.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

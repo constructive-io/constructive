@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { namespaceEventKeys } from '../query-keys';
-import type {
-  NamespaceEventSelect,
-  NamespaceEventWithRelations,
-  NamespaceEventFilter,
-  NamespaceEventOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  NamespaceEventSelect,
-  NamespaceEventWithRelations,
-  NamespaceEventFilter,
-  NamespaceEventOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { namespaceEventKeys } from "../query-keys";
+import type { NamespaceEventSelect, NamespaceEventWithRelations, NamespaceEventFilter, NamespaceEventOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { NamespaceEventSelect, NamespaceEventWithRelations, NamespaceEventFilter, NamespaceEventOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const namespaceEventsQueryKey = namespaceEventKeys.list;
 /**
  * Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useNamespaceEventsQuery({
@@ -45,53 +30,33 @@ export const namespaceEventsQueryKey = namespaceEventKeys.list;
  * });
  * ```
  */
-export function useNamespaceEventsQuery<
-  S extends NamespaceEventSelect,
-  TData = {
-    namespaceEvents: ConnectionResult<InferSelectResult<NamespaceEventWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, NamespaceEventFilter, NamespaceEventOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, NamespaceEventSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        namespaceEvents: ConnectionResult<InferSelectResult<NamespaceEventWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useNamespaceEventsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      NamespaceEventSelect,
-      NamespaceEventFilter,
-      NamespaceEventOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    NamespaceEventSelect,
-    NamespaceEventFilter,
-    NamespaceEventOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useNamespaceEventsQuery<S extends NamespaceEventSelect, TData = {
+  namespaceEvents: ConnectionResult<InferSelectResult<NamespaceEventWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, NamespaceEventFilter, NamespaceEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NamespaceEventSelect>;
+} & Omit<UseQueryOptions<{
+  namespaceEvents: ConnectionResult<InferSelectResult<NamespaceEventWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useNamespaceEventsQuery(params: {
+  selection: ListSelectionConfig<NamespaceEventSelect, NamespaceEventFilter, NamespaceEventOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<NamespaceEventSelect, NamespaceEventFilter, NamespaceEventOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: namespaceEventKeys.list(args),
     queryFn: () => getClient().namespaceEvent.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchNamespaceEventsQuery({
@@ -105,55 +70,35 @@ export function useNamespaceEventsQuery(
 export async function fetchNamespaceEventsQuery<S extends NamespaceEventSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, NamespaceEventFilter, NamespaceEventOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, NamespaceEventSelect>;
+  } & Omit<ListSelectionConfig<S, NamespaceEventFilter, NamespaceEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NamespaceEventSelect>;
 }): Promise<{
   namespaceEvents: ConnectionResult<InferSelectResult<NamespaceEventWithRelations, S>>;
 }>;
 export async function fetchNamespaceEventsQuery(params: {
   selection: ListSelectionConfig<NamespaceEventSelect, NamespaceEventFilter, NamespaceEventOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    NamespaceEventSelect,
-    NamespaceEventFilter,
-    NamespaceEventOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<NamespaceEventSelect, NamespaceEventFilter, NamespaceEventOrderBy>(params.selection);
   return getClient().namespaceEvent.findMany(args).unwrap();
 }
 /**
  * Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
- *
+ * 
  * @example
  * ```ts
  * await prefetchNamespaceEventsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchNamespaceEventsQuery<S extends NamespaceEventSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, NamespaceEventFilter, NamespaceEventOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, NamespaceEventSelect>;
-  }
-): Promise<void>;
-export async function prefetchNamespaceEventsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      NamespaceEventSelect,
-      NamespaceEventFilter,
-      NamespaceEventOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    NamespaceEventSelect,
-    NamespaceEventFilter,
-    NamespaceEventOrderBy
-  >(params.selection);
+export async function prefetchNamespaceEventsQuery<S extends NamespaceEventSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, NamespaceEventFilter, NamespaceEventOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NamespaceEventSelect>;
+}): Promise<void>;
+export async function prefetchNamespaceEventsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<NamespaceEventSelect, NamespaceEventFilter, NamespaceEventOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<NamespaceEventSelect, NamespaceEventFilter, NamespaceEventOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: namespaceEventKeys.list(args),
-    queryFn: () => getClient().namespaceEvent.findMany(args).unwrap(),
+    queryFn: () => getClient().namespaceEvent.findMany(args).unwrap()
   });
 }

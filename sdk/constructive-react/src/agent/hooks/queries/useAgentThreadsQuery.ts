@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { agentThreadKeys } from '../query-keys';
-import type {
-  AgentThreadSelect,
-  AgentThreadWithRelations,
-  AgentThreadFilter,
-  AgentThreadOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  AgentThreadSelect,
-  AgentThreadWithRelations,
-  AgentThreadFilter,
-  AgentThreadOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { agentThreadKeys } from "../query-keys";
+import type { AgentThreadSelect, AgentThreadWithRelations, AgentThreadFilter, AgentThreadOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { AgentThreadSelect, AgentThreadWithRelations, AgentThreadFilter, AgentThreadOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const agentThreadsQueryKey = agentThreadKeys.list;
 /**
  * Top-level AI/LLM conversation thread
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentThreadsQuery({
@@ -45,47 +30,33 @@ export const agentThreadsQueryKey = agentThreadKeys.list;
  * });
  * ```
  */
-export function useAgentThreadsQuery<
-  S extends AgentThreadSelect,
-  TData = {
-    agentThreads: ConnectionResult<InferSelectResult<AgentThreadWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AgentThreadFilter, AgentThreadOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AgentThreadSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        agentThreads: ConnectionResult<InferSelectResult<AgentThreadWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAgentThreadsQuery(
-  params: {
-    selection: ListSelectionConfig<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useAgentThreadsQuery<S extends AgentThreadSelect, TData = {
+  agentThreads: ConnectionResult<InferSelectResult<AgentThreadWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AgentThreadFilter, AgentThreadOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentThreadSelect>;
+} & Omit<UseQueryOptions<{
+  agentThreads: ConnectionResult<InferSelectResult<AgentThreadWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAgentThreadsQuery(params: {
+  selection: ListSelectionConfig<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentThreadKeys.list(args),
     queryFn: () => getClient().agentThread.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Top-level AI/LLM conversation thread
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAgentThreadsQuery({
@@ -99,47 +70,35 @@ export function useAgentThreadsQuery(
 export async function fetchAgentThreadsQuery<S extends AgentThreadSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AgentThreadFilter, AgentThreadOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, AgentThreadSelect>;
+  } & Omit<ListSelectionConfig<S, AgentThreadFilter, AgentThreadOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentThreadSelect>;
 }): Promise<{
   agentThreads: ConnectionResult<InferSelectResult<AgentThreadWithRelations, S>>;
 }>;
 export async function fetchAgentThreadsQuery(params: {
   selection: ListSelectionConfig<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>(params.selection);
   return getClient().agentThread.findMany(args).unwrap();
 }
 /**
  * Top-level AI/LLM conversation thread
- *
+ * 
  * @example
  * ```ts
  * await prefetchAgentThreadsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAgentThreadsQuery<S extends AgentThreadSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AgentThreadFilter, AgentThreadOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AgentThreadSelect>;
-  }
-): Promise<void>;
-export async function prefetchAgentThreadsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>(
-    params.selection
-  );
+export async function prefetchAgentThreadsQuery<S extends AgentThreadSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AgentThreadFilter, AgentThreadOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentThreadSelect>;
+}): Promise<void>;
+export async function prefetchAgentThreadsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<AgentThreadSelect, AgentThreadFilter, AgentThreadOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentThreadKeys.list(args),
-    queryFn: () => getClient().agentThread.findMany(args).unwrap(),
+    queryFn: () => getClient().agentThread.findMany(args).unwrap()
   });
 }

@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { resourceDefinitionKeys } from '../query-keys';
-import type {
-  ResourceDefinitionSelect,
-  ResourceDefinitionWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  ResourceDefinitionSelect,
-  ResourceDefinitionWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { resourceDefinitionKeys } from "../query-keys";
+import type { ResourceDefinitionSelect, ResourceDefinitionWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { ResourceDefinitionSelect, ResourceDefinitionWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const resourceDefinitionQueryKey = resourceDefinitionKeys.detail;
 /**
  * Resource definitions — templates for resource kinds declaring default spec and secret/config requirements
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useResourceDefinitionQuery({
@@ -32,52 +26,38 @@ export const resourceDefinitionQueryKey = resourceDefinitionKeys.detail;
  * });
  * ```
  */
-export function useResourceDefinitionQuery<
-  S extends ResourceDefinitionSelect,
-  TData = {
-    resourceDefinition: InferSelectResult<ResourceDefinitionWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, ResourceDefinitionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resourceDefinition: InferSelectResult<ResourceDefinitionWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useResourceDefinitionQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<ResourceDefinitionSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useResourceDefinitionQuery<S extends ResourceDefinitionSelect, TData = {
+  resourceDefinition: InferSelectResult<ResourceDefinitionWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, ResourceDefinitionSelect>;
+} & Omit<UseQueryOptions<{
+  resourceDefinition: InferSelectResult<ResourceDefinitionWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useResourceDefinitionQuery(params: {
+  id: string;
+  selection: SelectionConfig<ResourceDefinitionSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<ResourceDefinitionSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourceDefinitionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .resourceDefinition.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().resourceDefinition.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Resource definitions — templates for resource kinds declaring default spec and secret/config requirements
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchResourceDefinitionQuery({
@@ -99,46 +79,35 @@ export async function fetchResourceDefinitionQuery(params: {
   selection: SelectionConfig<ResourceDefinitionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ResourceDefinitionSelect>(params.selection);
-  return getClient()
-    .resourceDefinition.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().resourceDefinition.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Resource definitions — templates for resource kinds declaring default spec and secret/config requirements
- *
+ * 
  * @example
  * ```ts
  * await prefetchResourceDefinitionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchResourceDefinitionQuery<S extends ResourceDefinitionSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, ResourceDefinitionSelect>;
-  }
-): Promise<void>;
-export async function prefetchResourceDefinitionQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<ResourceDefinitionSelect>;
-  }
-): Promise<void> {
+export async function prefetchResourceDefinitionQuery<S extends ResourceDefinitionSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, ResourceDefinitionSelect>;
+}): Promise<void>;
+export async function prefetchResourceDefinitionQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<ResourceDefinitionSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<ResourceDefinitionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourceDefinitionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .resourceDefinition.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().resourceDefinition.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

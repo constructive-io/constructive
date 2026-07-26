@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site
+Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog
 
 ## Usage
 
 ```typescript
-useDomainsQuery({ selection: { fields: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } } })
-useDomainQuery({ id: '<UUID>', selection: { fields: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } } })
+useDomainsQuery({ selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } } })
+useDomainQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } } })
 useCreateDomainMutation({ selection: { fields: { id: true } } })
 useUpdateDomainMutation({ selection: { fields: { id: true } } })
 useDeleteDomainMutation({})
@@ -20,7 +20,7 @@ useDeleteDomainMutation({})
 
 ```typescript
 const { data, isLoading } = useDomainsQuery({
-  selection: { fields: { annotations: true, apiId: true, databaseId: true, domain: true, id: true, labels: true, serviceId: true, siteId: true, subdomain: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDomainsQuery({
 const { mutate } = useCreateDomainMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', apiId: '<UUID>', databaseId: '<UUID>', domain: '<Hostname>', labels: '<JSON>', serviceId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>' });
+mutate({ config: '<JSON>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```

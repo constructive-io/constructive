@@ -4,99 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { refKeys } from '../query-keys';
-import { refMutationKeys } from '../mutation-keys';
-import type { RefSelect, RefWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { RefSelect, RefWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { refKeys } from "../query-keys";
+import { refMutationKeys } from "../mutation-keys";
+import type { RefSelect, RefWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RefSelect, RefWithRelations } from "../../orm/input-types";
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteRefMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteRefMutation<S extends RefSelect>(
-  params: {
-    selection: {
-      fields: S & RefSelect;
-    } & HookStrictSelect<NoInfer<S>, RefSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteRef: {
-          ref: InferSelectResult<RefWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        databaseId: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteRef: {
-      ref: InferSelectResult<RefWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    databaseId: string;
-  }
->;
-export function useDeleteRefMutation(
-  params: {
-    selection: SelectionConfig<RefSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        databaseId: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteRefMutation<S extends RefSelect>(params: {
+  selection: ({
+    fields: S & RefSelect;
+  } & HookStrictSelect<NoInfer<S>, RefSelect>);
+} & Omit<UseMutationOptions<{
+  deleteRef: {
+    ref: InferSelectResult<RefWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteRef: {
+    ref: InferSelectResult<RefWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+}>;
+export function useDeleteRefMutation(params: {
+  selection: SelectionConfig<RefSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  databaseId: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<RefSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: refMutationKeys.all,
-    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
-      getClient()
-        .ref.delete({
-          where: {
-            id,
-            databaseId,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      databaseId
+    }: {
+      id: string;
+      databaseId: string;
+    }) => getClient().ref.delete({
+      where: {
+        id,
+        databaseId
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: refKeys.detail(variables.id),
+        queryKey: refKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: refKeys.lists(),
+        queryKey: refKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

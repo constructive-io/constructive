@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformResourceStatusCheckKeys } from '../query-keys';
-import type {
-  PlatformResourceStatusCheckSelect,
-  PlatformResourceStatusCheckWithRelations,
-  PlatformResourceStatusCheckFilter,
-  PlatformResourceStatusCheckOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformResourceStatusCheckSelect,
-  PlatformResourceStatusCheckWithRelations,
-  PlatformResourceStatusCheckFilter,
-  PlatformResourceStatusCheckOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformResourceStatusCheckKeys } from "../query-keys";
+import type { PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckWithRelations, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckWithRelations, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformResourceStatusChecksQueryKey = platformResourceStatusCheckKeys.list;
 /**
  * On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails)
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourceStatusChecksQuery({
@@ -45,60 +30,33 @@ export const platformResourceStatusChecksQueryKey = platformResourceStatusCheckK
  * });
  * ```
  */
-export function usePlatformResourceStatusChecksQuery<
-  S extends PlatformResourceStatusCheckSelect,
-  TData = {
-    platformResourceStatusChecks: ConnectionResult<
-      InferSelectResult<PlatformResourceStatusCheckWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformResourceStatusCheckSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformResourceStatusChecks: ConnectionResult<
-          InferSelectResult<PlatformResourceStatusCheckWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformResourceStatusChecksQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformResourceStatusCheckSelect,
-      PlatformResourceStatusCheckFilter,
-      PlatformResourceStatusCheckOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformResourceStatusCheckSelect,
-    PlatformResourceStatusCheckFilter,
-    PlatformResourceStatusCheckOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformResourceStatusChecksQuery<S extends PlatformResourceStatusCheckSelect, TData = {
+  platformResourceStatusChecks: ConnectionResult<InferSelectResult<PlatformResourceStatusCheckWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourceStatusCheckSelect>;
+} & Omit<UseQueryOptions<{
+  platformResourceStatusChecks: ConnectionResult<InferSelectResult<PlatformResourceStatusCheckWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformResourceStatusChecksQuery(params: {
+  selection: ListSelectionConfig<PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourceStatusCheckKeys.list(args),
     queryFn: () => getClient().platformResourceStatusCheck.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails)
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformResourceStatusChecksQuery({
@@ -109,74 +67,38 @@ export function usePlatformResourceStatusChecksQuery(
  * });
  * ```
  */
-export async function fetchPlatformResourceStatusChecksQuery<
-  S extends PlatformResourceStatusCheckSelect,
->(params: {
+export async function fetchPlatformResourceStatusChecksQuery<S extends PlatformResourceStatusCheckSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PlatformResourceStatusCheckSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourceStatusCheckSelect>;
 }): Promise<{
-  platformResourceStatusChecks: ConnectionResult<
-    InferSelectResult<PlatformResourceStatusCheckWithRelations, S>
-  >;
+  platformResourceStatusChecks: ConnectionResult<InferSelectResult<PlatformResourceStatusCheckWithRelations, S>>;
 }>;
 export async function fetchPlatformResourceStatusChecksQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformResourceStatusCheckSelect,
-    PlatformResourceStatusCheckFilter,
-    PlatformResourceStatusCheckOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformResourceStatusCheckSelect,
-    PlatformResourceStatusCheckFilter,
-    PlatformResourceStatusCheckOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>(params.selection);
   return getClient().platformResourceStatusCheck.findMany(args).unwrap();
 }
 /**
  * On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails)
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformResourceStatusChecksQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformResourceStatusChecksQuery<
-  S extends PlatformResourceStatusCheckSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformResourceStatusCheckSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformResourceStatusChecksQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformResourceStatusCheckSelect,
-      PlatformResourceStatusCheckFilter,
-      PlatformResourceStatusCheckOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformResourceStatusCheckSelect,
-    PlatformResourceStatusCheckFilter,
-    PlatformResourceStatusCheckOrderBy
-  >(params.selection);
+export async function prefetchPlatformResourceStatusChecksQuery<S extends PlatformResourceStatusCheckSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourceStatusCheckSelect>;
+}): Promise<void>;
+export async function prefetchPlatformResourceStatusChecksQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformResourceStatusCheckSelect, PlatformResourceStatusCheckFilter, PlatformResourceStatusCheckOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourceStatusCheckKeys.list(args),
-    queryFn: () => getClient().platformResourceStatusCheck.findMany(args).unwrap(),
+    queryFn: () => getClient().platformResourceStatusCheck.findMany(args).unwrap()
   });
 }

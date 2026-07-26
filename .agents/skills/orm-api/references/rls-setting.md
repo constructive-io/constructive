@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries
+RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
 
 ## Usage
 

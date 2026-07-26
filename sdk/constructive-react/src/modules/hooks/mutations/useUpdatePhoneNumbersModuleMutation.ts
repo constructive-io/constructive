@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { phoneNumbersModuleKeys } from '../query-keys';
-import { phoneNumbersModuleMutationKeys } from '../mutation-keys';
-import type {
-  PhoneNumbersModuleSelect,
-  PhoneNumbersModuleWithRelations,
-  PhoneNumbersModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PhoneNumbersModuleSelect,
-  PhoneNumbersModuleWithRelations,
-  PhoneNumbersModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { phoneNumbersModuleKeys } from "../query-keys";
+import { phoneNumbersModuleMutationKeys } from "../mutation-keys";
+import type { PhoneNumbersModuleSelect, PhoneNumbersModuleWithRelations, PhoneNumbersModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PhoneNumbersModuleSelect, PhoneNumbersModuleWithRelations, PhoneNumbersModulePatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a PhoneNumbersModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePhoneNumbersModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', phoneNumbersModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePhoneNumbersModuleMutation<S extends PhoneNumbersModuleSelect>(
-  params: {
-    selection: {
-      fields: S & PhoneNumbersModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updatePhoneNumbersModule: {
-          phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        phoneNumbersModulePatch: PhoneNumbersModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updatePhoneNumbersModule: {
-      phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    phoneNumbersModulePatch: PhoneNumbersModulePatch;
-  }
->;
-export function useUpdatePhoneNumbersModuleMutation(
-  params: {
-    selection: SelectionConfig<PhoneNumbersModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        phoneNumbersModulePatch: PhoneNumbersModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdatePhoneNumbersModuleMutation<S extends PhoneNumbersModuleSelect>(params: {
+  selection: ({
+    fields: S & PhoneNumbersModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updatePhoneNumbersModule: {
+    phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  phoneNumbersModulePatch: PhoneNumbersModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updatePhoneNumbersModule: {
+    phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  phoneNumbersModulePatch: PhoneNumbersModulePatch;
+}>;
+export function useUpdatePhoneNumbersModuleMutation(params: {
+  selection: SelectionConfig<PhoneNumbersModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  phoneNumbersModulePatch: PhoneNumbersModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<PhoneNumbersModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: phoneNumbersModuleMutationKeys.all,
     mutationFn: ({
       id,
-      phoneNumbersModulePatch,
+      phoneNumbersModulePatch
     }: {
       id: string;
       phoneNumbersModulePatch: PhoneNumbersModulePatch;
-    }) =>
-      getClient()
-        .phoneNumbersModule.update({
-          where: {
-            id,
-          },
-          data: phoneNumbersModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().phoneNumbersModule.update({
+      where: {
+        id
+      },
+      data: phoneNumbersModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: phoneNumbersModuleKeys.detail(variables.id),
+        queryKey: phoneNumbersModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: phoneNumbersModuleKeys.lists(),
+        queryKey: phoneNumbersModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

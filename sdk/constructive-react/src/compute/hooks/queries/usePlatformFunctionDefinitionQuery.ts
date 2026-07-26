@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformFunctionDefinitionKeys } from '../query-keys';
-import type {
-  PlatformFunctionDefinitionSelect,
-  PlatformFunctionDefinitionWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PlatformFunctionDefinitionSelect,
-  PlatformFunctionDefinitionWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformFunctionDefinitionKeys } from "../query-keys";
+import type { PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionDefinitionQueryKey = platformFunctionDefinitionKeys.detail;
 /**
  * Function definitions — registered cloud functions with routing, queue, and retry configuration
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionDefinitionQuery({
@@ -32,58 +26,38 @@ export const platformFunctionDefinitionQueryKey = platformFunctionDefinitionKeys
  * });
  * ```
  */
-export function usePlatformFunctionDefinitionQuery<
-  S extends PlatformFunctionDefinitionSelect,
-  TData = {
-    platformFunctionDefinition: InferSelectResult<
-      PlatformFunctionDefinitionWithRelations,
-      S
-    > | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformFunctionDefinition: InferSelectResult<
-          PlatformFunctionDefinitionWithRelations,
-          S
-        > | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformFunctionDefinitionQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformFunctionDefinitionSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function usePlatformFunctionDefinitionQuery<S extends PlatformFunctionDefinitionSelect, TData = {
+  platformFunctionDefinition: InferSelectResult<PlatformFunctionDefinitionWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
+} & Omit<UseQueryOptions<{
+  platformFunctionDefinition: InferSelectResult<PlatformFunctionDefinitionWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformFunctionDefinitionQuery(params: {
+  id: string;
+  selection: SelectionConfig<PlatformFunctionDefinitionSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<PlatformFunctionDefinitionSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionDefinitionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformFunctionDefinition.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().platformFunctionDefinition.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Function definitions — registered cloud functions with routing, queue, and retry configuration
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionDefinitionQuery({
@@ -92,9 +66,7 @@ export function usePlatformFunctionDefinitionQuery(
  * });
  * ```
  */
-export async function fetchPlatformFunctionDefinitionQuery<
-  S extends PlatformFunctionDefinitionSelect,
->(params: {
+export async function fetchPlatformFunctionDefinitionQuery<S extends PlatformFunctionDefinitionSelect>(params: {
   id: string;
   selection: {
     fields: S;
@@ -107,48 +79,35 @@ export async function fetchPlatformFunctionDefinitionQuery(params: {
   selection: SelectionConfig<PlatformFunctionDefinitionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformFunctionDefinitionSelect>(params.selection);
-  return getClient()
-    .platformFunctionDefinition.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().platformFunctionDefinition.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Function definitions — registered cloud functions with routing, queue, and retry configuration
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformFunctionDefinitionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformFunctionDefinitionQuery<
-  S extends PlatformFunctionDefinitionSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformFunctionDefinitionQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformFunctionDefinitionSelect>;
-  }
-): Promise<void> {
+export async function prefetchPlatformFunctionDefinitionQuery<S extends PlatformFunctionDefinitionSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
+}): Promise<void>;
+export async function prefetchPlatformFunctionDefinitionQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<PlatformFunctionDefinitionSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<PlatformFunctionDefinitionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionDefinitionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformFunctionDefinition.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().platformFunctionDefinition.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

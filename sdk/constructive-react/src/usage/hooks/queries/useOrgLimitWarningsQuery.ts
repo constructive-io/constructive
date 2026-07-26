@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { orgLimitWarningKeys } from '../query-keys';
-import type {
-  OrgLimitWarningSelect,
-  OrgLimitWarningWithRelations,
-  OrgLimitWarningFilter,
-  OrgLimitWarningOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  OrgLimitWarningSelect,
-  OrgLimitWarningWithRelations,
-  OrgLimitWarningFilter,
-  OrgLimitWarningOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { orgLimitWarningKeys } from "../query-keys";
+import type { OrgLimitWarningSelect, OrgLimitWarningWithRelations, OrgLimitWarningFilter, OrgLimitWarningOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgLimitWarningSelect, OrgLimitWarningWithRelations, OrgLimitWarningFilter, OrgLimitWarningOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitWarningsQueryKey = orgLimitWarningKeys.list;
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitWarningsQuery({
@@ -45,53 +30,33 @@ export const orgLimitWarningsQueryKey = orgLimitWarningKeys.list;
  * });
  * ```
  */
-export function useOrgLimitWarningsQuery<
-  S extends OrgLimitWarningSelect,
-  TData = {
-    orgLimitWarnings: ConnectionResult<InferSelectResult<OrgLimitWarningWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, OrgLimitWarningFilter, OrgLimitWarningOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        orgLimitWarnings: ConnectionResult<InferSelectResult<OrgLimitWarningWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useOrgLimitWarningsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      OrgLimitWarningSelect,
-      OrgLimitWarningFilter,
-      OrgLimitWarningOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    OrgLimitWarningSelect,
-    OrgLimitWarningFilter,
-    OrgLimitWarningOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useOrgLimitWarningsQuery<S extends OrgLimitWarningSelect, TData = {
+  orgLimitWarnings: ConnectionResult<InferSelectResult<OrgLimitWarningWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgLimitWarningFilter, OrgLimitWarningOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
+} & Omit<UseQueryOptions<{
+  orgLimitWarnings: ConnectionResult<InferSelectResult<OrgLimitWarningWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useOrgLimitWarningsQuery(params: {
+  selection: ListSelectionConfig<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitWarningKeys.list(args),
     queryFn: () => getClient().orgLimitWarning.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchOrgLimitWarningsQuery({
@@ -105,59 +70,35 @@ export function useOrgLimitWarningsQuery(
 export async function fetchOrgLimitWarningsQuery<S extends OrgLimitWarningSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitWarningFilter, OrgLimitWarningOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
+  } & Omit<ListSelectionConfig<S, OrgLimitWarningFilter, OrgLimitWarningOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
 }): Promise<{
   orgLimitWarnings: ConnectionResult<InferSelectResult<OrgLimitWarningWithRelations, S>>;
 }>;
 export async function fetchOrgLimitWarningsQuery(params: {
-  selection: ListSelectionConfig<
-    OrgLimitWarningSelect,
-    OrgLimitWarningFilter,
-    OrgLimitWarningOrderBy
-  >;
+  selection: ListSelectionConfig<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    OrgLimitWarningSelect,
-    OrgLimitWarningFilter,
-    OrgLimitWarningOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy>(params.selection);
   return getClient().orgLimitWarning.findMany(args).unwrap();
 }
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- *
+ * 
  * @example
  * ```ts
  * await prefetchOrgLimitWarningsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgLimitWarningsQuery<S extends OrgLimitWarningSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, OrgLimitWarningFilter, OrgLimitWarningOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
-  }
-): Promise<void>;
-export async function prefetchOrgLimitWarningsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      OrgLimitWarningSelect,
-      OrgLimitWarningFilter,
-      OrgLimitWarningOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    OrgLimitWarningSelect,
-    OrgLimitWarningFilter,
-    OrgLimitWarningOrderBy
-  >(params.selection);
+export async function prefetchOrgLimitWarningsQuery<S extends OrgLimitWarningSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgLimitWarningFilter, OrgLimitWarningOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
+}): Promise<void>;
+export async function prefetchOrgLimitWarningsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitWarningKeys.list(args),
-    queryFn: () => getClient().orgLimitWarning.findMany(args).unwrap(),
+    queryFn: () => getClient().orgLimitWarning.findMany(args).unwrap()
   });
 }

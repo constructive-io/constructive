@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { functionGraphRefKeys } from '../query-keys';
-import type {
-  FunctionGraphRefSelect,
-  FunctionGraphRefWithRelations,
-  FunctionGraphRefFilter,
-  FunctionGraphRefOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  FunctionGraphRefSelect,
-  FunctionGraphRefWithRelations,
-  FunctionGraphRefFilter,
-  FunctionGraphRefOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { functionGraphRefKeys } from "../query-keys";
+import type { FunctionGraphRefSelect, FunctionGraphRefWithRelations, FunctionGraphRefFilter, FunctionGraphRefOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionGraphRefSelect, FunctionGraphRefWithRelations, FunctionGraphRefFilter, FunctionGraphRefOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphRefsQueryKey = functionGraphRefKeys.list;
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphRefsQuery({
@@ -45,53 +30,33 @@ export const functionGraphRefsQueryKey = functionGraphRefKeys.list;
  * });
  * ```
  */
-export function useFunctionGraphRefsQuery<
-  S extends FunctionGraphRefSelect,
-  TData = {
-    functionGraphRefs: ConnectionResult<InferSelectResult<FunctionGraphRefWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, FunctionGraphRefFilter, FunctionGraphRefOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        functionGraphRefs: ConnectionResult<InferSelectResult<FunctionGraphRefWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFunctionGraphRefsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      FunctionGraphRefSelect,
-      FunctionGraphRefFilter,
-      FunctionGraphRefOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    FunctionGraphRefSelect,
-    FunctionGraphRefFilter,
-    FunctionGraphRefOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useFunctionGraphRefsQuery<S extends FunctionGraphRefSelect, TData = {
+  functionGraphRefs: ConnectionResult<InferSelectResult<FunctionGraphRefWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, FunctionGraphRefFilter, FunctionGraphRefOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
+} & Omit<UseQueryOptions<{
+  functionGraphRefs: ConnectionResult<InferSelectResult<FunctionGraphRefWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFunctionGraphRefsQuery(params: {
+  selection: ListSelectionConfig<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphRefKeys.list(args),
     queryFn: () => getClient().functionGraphRef.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFunctionGraphRefsQuery({
@@ -105,59 +70,35 @@ export function useFunctionGraphRefsQuery(
 export async function fetchFunctionGraphRefsQuery<S extends FunctionGraphRefSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphRefFilter, FunctionGraphRefOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
+  } & Omit<ListSelectionConfig<S, FunctionGraphRefFilter, FunctionGraphRefOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
 }): Promise<{
   functionGraphRefs: ConnectionResult<InferSelectResult<FunctionGraphRefWithRelations, S>>;
 }>;
 export async function fetchFunctionGraphRefsQuery(params: {
-  selection: ListSelectionConfig<
-    FunctionGraphRefSelect,
-    FunctionGraphRefFilter,
-    FunctionGraphRefOrderBy
-  >;
+  selection: ListSelectionConfig<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    FunctionGraphRefSelect,
-    FunctionGraphRefFilter,
-    FunctionGraphRefOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy>(params.selection);
   return getClient().functionGraphRef.findMany(args).unwrap();
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```ts
  * await prefetchFunctionGraphRefsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchFunctionGraphRefsQuery<S extends FunctionGraphRefSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, FunctionGraphRefFilter, FunctionGraphRefOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
-  }
-): Promise<void>;
-export async function prefetchFunctionGraphRefsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      FunctionGraphRefSelect,
-      FunctionGraphRefFilter,
-      FunctionGraphRefOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    FunctionGraphRefSelect,
-    FunctionGraphRefFilter,
-    FunctionGraphRefOrderBy
-  >(params.selection);
+export async function prefetchFunctionGraphRefsQuery<S extends FunctionGraphRefSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, FunctionGraphRefFilter, FunctionGraphRefOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
+}): Promise<void>;
+export async function prefetchFunctionGraphRefsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<FunctionGraphRefSelect, FunctionGraphRefFilter, FunctionGraphRefOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphRefKeys.list(args),
-    queryFn: () => getClient().functionGraphRef.findMany(args).unwrap(),
+    queryFn: () => getClient().functionGraphRef.findMany(args).unwrap()
   });
 }

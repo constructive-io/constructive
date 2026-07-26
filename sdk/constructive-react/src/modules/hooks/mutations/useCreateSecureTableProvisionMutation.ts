@@ -4,88 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { secureTableProvisionKeys } from '../query-keys';
-import { secureTableProvisionMutationKeys } from '../mutation-keys';
-import type {
-  SecureTableProvisionSelect,
-  SecureTableProvisionWithRelations,
-  CreateSecureTableProvisionInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  SecureTableProvisionSelect,
-  SecureTableProvisionWithRelations,
-  CreateSecureTableProvisionInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { secureTableProvisionKeys } from "../query-keys";
+import { secureTableProvisionMutationKeys } from "../mutation-keys";
+import type { SecureTableProvisionSelect, SecureTableProvisionWithRelations, CreateSecureTableProvisionInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { SecureTableProvisionSelect, SecureTableProvisionWithRelations, CreateSecureTableProvisionInput } from "../../orm/input-types";
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateSecureTableProvisionMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateSecureTableProvisionMutation<S extends SecureTableProvisionSelect>(
-  params: {
-    selection: {
-      fields: S & SecureTableProvisionSelect;
-    } & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createSecureTableProvision: {
-          secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S>;
-        };
-      },
-      Error,
-      CreateSecureTableProvisionInput['secureTableProvision']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createSecureTableProvision: {
-      secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S>;
-    };
-  },
-  Error,
-  CreateSecureTableProvisionInput['secureTableProvision']
->;
-export function useCreateSecureTableProvisionMutation(
-  params: {
-    selection: SelectionConfig<SecureTableProvisionSelect>;
-  } & Omit<
-    UseMutationOptions<any, Error, CreateSecureTableProvisionInput['secureTableProvision']>,
-    'mutationFn'
-  >
-) {
+export function useCreateSecureTableProvisionMutation<S extends SecureTableProvisionSelect>(params: {
+  selection: ({
+    fields: S & SecureTableProvisionSelect;
+  } & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>);
+} & Omit<UseMutationOptions<{
+  createSecureTableProvision: {
+    secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S>;
+  };
+}, Error, CreateSecureTableProvisionInput["secureTableProvision"]>, "mutationFn">): UseMutationResult<{
+  createSecureTableProvision: {
+    secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S>;
+  };
+}, Error, CreateSecureTableProvisionInput["secureTableProvision"]>;
+export function useCreateSecureTableProvisionMutation(params: {
+  selection: SelectionConfig<SecureTableProvisionSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateSecureTableProvisionInput["secureTableProvision"]>, "mutationFn">) {
   const args = buildSelectionArgs<SecureTableProvisionSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: secureTableProvisionMutationKeys.create(),
-    mutationFn: (data: CreateSecureTableProvisionInput['secureTableProvision']) =>
-      getClient()
-        .secureTableProvision.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateSecureTableProvisionInput["secureTableProvision"]) => getClient().secureTableProvision.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.lists(),
+        queryKey: secureTableProvisionKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

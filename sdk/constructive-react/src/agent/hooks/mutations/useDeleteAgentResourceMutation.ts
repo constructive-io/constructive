@@ -4,95 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { agentResourceKeys } from '../query-keys';
-import { agentResourceMutationKeys } from '../mutation-keys';
-import type { AgentResourceSelect, AgentResourceWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { AgentResourceSelect, AgentResourceWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { agentResourceKeys } from "../query-keys";
+import { agentResourceMutationKeys } from "../mutation-keys";
+import type { AgentResourceSelect, AgentResourceWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AgentResourceSelect, AgentResourceWithRelations } from "../../orm/input-types";
 /**
  * Unified skills and knowledge resources for agent retrieval
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteAgentResourceMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteAgentResourceMutation<S extends AgentResourceSelect>(
-  params: {
-    selection: {
-      fields: S & AgentResourceSelect;
-    } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteAgentResource: {
-          agentResource: InferSelectResult<AgentResourceWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteAgentResource: {
-      agentResource: InferSelectResult<AgentResourceWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteAgentResourceMutation(
-  params: {
-    selection: SelectionConfig<AgentResourceSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteAgentResourceMutation<S extends AgentResourceSelect>(params: {
+  selection: ({
+    fields: S & AgentResourceSelect;
+  } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>);
+} & Omit<UseMutationOptions<{
+  deleteAgentResource: {
+    agentResource: InferSelectResult<AgentResourceWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteAgentResource: {
+    agentResource: InferSelectResult<AgentResourceWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteAgentResourceMutation(params: {
+  selection: SelectionConfig<AgentResourceSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<AgentResourceSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentResourceMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .agentResource.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().agentResource.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: agentResourceKeys.detail(variables.id),
+        queryKey: agentResourceKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: agentResourceKeys.lists(),
+        queryKey: agentResourceKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

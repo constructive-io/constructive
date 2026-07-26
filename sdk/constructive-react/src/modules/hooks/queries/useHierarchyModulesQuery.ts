@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { hierarchyModuleKeys } from '../query-keys';
-import type {
-  HierarchyModuleSelect,
-  HierarchyModuleWithRelations,
-  HierarchyModuleFilter,
-  HierarchyModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  HierarchyModuleSelect,
-  HierarchyModuleWithRelations,
-  HierarchyModuleFilter,
-  HierarchyModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { hierarchyModuleKeys } from "../query-keys";
+import type { HierarchyModuleSelect, HierarchyModuleWithRelations, HierarchyModuleFilter, HierarchyModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { HierarchyModuleSelect, HierarchyModuleWithRelations, HierarchyModuleFilter, HierarchyModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const hierarchyModulesQueryKey = hierarchyModuleKeys.list;
 /**
  * Query hook for fetching HierarchyModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useHierarchyModulesQuery({
@@ -45,53 +30,33 @@ export const hierarchyModulesQueryKey = hierarchyModuleKeys.list;
  * });
  * ```
  */
-export function useHierarchyModulesQuery<
-  S extends HierarchyModuleSelect,
-  TData = {
-    hierarchyModules: ConnectionResult<InferSelectResult<HierarchyModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, HierarchyModuleFilter, HierarchyModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, HierarchyModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        hierarchyModules: ConnectionResult<InferSelectResult<HierarchyModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useHierarchyModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      HierarchyModuleSelect,
-      HierarchyModuleFilter,
-      HierarchyModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    HierarchyModuleSelect,
-    HierarchyModuleFilter,
-    HierarchyModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useHierarchyModulesQuery<S extends HierarchyModuleSelect, TData = {
+  hierarchyModules: ConnectionResult<InferSelectResult<HierarchyModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, HierarchyModuleFilter, HierarchyModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, HierarchyModuleSelect>;
+} & Omit<UseQueryOptions<{
+  hierarchyModules: ConnectionResult<InferSelectResult<HierarchyModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useHierarchyModulesQuery(params: {
+  selection: ListSelectionConfig<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: hierarchyModuleKeys.list(args),
     queryFn: () => getClient().hierarchyModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch HierarchyModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchHierarchyModulesQuery({
@@ -105,59 +70,35 @@ export function useHierarchyModulesQuery(
 export async function fetchHierarchyModulesQuery<S extends HierarchyModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, HierarchyModuleFilter, HierarchyModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, HierarchyModuleSelect>;
+  } & Omit<ListSelectionConfig<S, HierarchyModuleFilter, HierarchyModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, HierarchyModuleSelect>;
 }): Promise<{
   hierarchyModules: ConnectionResult<InferSelectResult<HierarchyModuleWithRelations, S>>;
 }>;
 export async function fetchHierarchyModulesQuery(params: {
-  selection: ListSelectionConfig<
-    HierarchyModuleSelect,
-    HierarchyModuleFilter,
-    HierarchyModuleOrderBy
-  >;
+  selection: ListSelectionConfig<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    HierarchyModuleSelect,
-    HierarchyModuleFilter,
-    HierarchyModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy>(params.selection);
   return getClient().hierarchyModule.findMany(args).unwrap();
 }
 /**
  * Prefetch HierarchyModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchHierarchyModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchHierarchyModulesQuery<S extends HierarchyModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, HierarchyModuleFilter, HierarchyModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, HierarchyModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchHierarchyModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      HierarchyModuleSelect,
-      HierarchyModuleFilter,
-      HierarchyModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    HierarchyModuleSelect,
-    HierarchyModuleFilter,
-    HierarchyModuleOrderBy
-  >(params.selection);
+export async function prefetchHierarchyModulesQuery<S extends HierarchyModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, HierarchyModuleFilter, HierarchyModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, HierarchyModuleSelect>;
+}): Promise<void>;
+export async function prefetchHierarchyModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: hierarchyModuleKeys.list(args),
-    queryFn: () => getClient().hierarchyModule.findMany(args).unwrap(),
+    queryFn: () => getClient().hierarchyModule.findMany(args).unwrap()
   });
 }

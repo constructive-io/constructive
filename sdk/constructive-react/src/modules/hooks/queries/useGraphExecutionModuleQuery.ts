@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { graphExecutionModuleKeys } from '../query-keys';
-import type {
-  GraphExecutionModuleSelect,
-  GraphExecutionModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  GraphExecutionModuleSelect,
-  GraphExecutionModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { graphExecutionModuleKeys } from "../query-keys";
+import type { GraphExecutionModuleSelect, GraphExecutionModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { GraphExecutionModuleSelect, GraphExecutionModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const graphExecutionModuleQueryKey = graphExecutionModuleKeys.detail;
 /**
  * Query hook for fetching a single GraphExecutionModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useGraphExecutionModuleQuery({
@@ -32,52 +26,38 @@ export const graphExecutionModuleQueryKey = graphExecutionModuleKeys.detail;
  * });
  * ```
  */
-export function useGraphExecutionModuleQuery<
-  S extends GraphExecutionModuleSelect,
-  TData = {
-    graphExecutionModule: InferSelectResult<GraphExecutionModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        graphExecutionModule: InferSelectResult<GraphExecutionModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useGraphExecutionModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<GraphExecutionModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useGraphExecutionModuleQuery<S extends GraphExecutionModuleSelect, TData = {
+  graphExecutionModule: InferSelectResult<GraphExecutionModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
+} & Omit<UseQueryOptions<{
+  graphExecutionModule: InferSelectResult<GraphExecutionModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useGraphExecutionModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<GraphExecutionModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<GraphExecutionModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: graphExecutionModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .graphExecutionModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().graphExecutionModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single GraphExecutionModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchGraphExecutionModuleQuery({
@@ -99,46 +79,35 @@ export async function fetchGraphExecutionModuleQuery(params: {
   selection: SelectionConfig<GraphExecutionModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<GraphExecutionModuleSelect>(params.selection);
-  return getClient()
-    .graphExecutionModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().graphExecutionModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single GraphExecutionModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchGraphExecutionModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchGraphExecutionModuleQuery<S extends GraphExecutionModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchGraphExecutionModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<GraphExecutionModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchGraphExecutionModuleQuery<S extends GraphExecutionModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, GraphExecutionModuleSelect>;
+}): Promise<void>;
+export async function prefetchGraphExecutionModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<GraphExecutionModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<GraphExecutionModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: graphExecutionModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .graphExecutionModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().graphExecutionModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }
