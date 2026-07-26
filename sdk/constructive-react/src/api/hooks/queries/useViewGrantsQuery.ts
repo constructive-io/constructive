@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { viewGrantKeys } from "../query-keys";
-import type { ViewGrantSelect, ViewGrantWithRelations, ViewGrantFilter, ViewGrantOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ViewGrantSelect, ViewGrantWithRelations, ViewGrantFilter, ViewGrantOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { viewGrantKeys } from '../query-keys';
+import type {
+  ViewGrantSelect,
+  ViewGrantWithRelations,
+  ViewGrantFilter,
+  ViewGrantOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ViewGrantSelect,
+  ViewGrantWithRelations,
+  ViewGrantFilter,
+  ViewGrantOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const viewGrantsQueryKey = viewGrantKeys.list;
 /**
  * Query hook for fetching ViewGrant list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useViewGrantsQuery({
@@ -30,33 +45,47 @@ export const viewGrantsQueryKey = viewGrantKeys.list;
  * });
  * ```
  */
-export function useViewGrantsQuery<S extends ViewGrantSelect, TData = {
-  viewGrants: ConnectionResult<InferSelectResult<ViewGrantWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ViewGrantFilter, ViewGrantOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewGrantSelect>;
-} & Omit<UseQueryOptions<{
-  viewGrants: ConnectionResult<InferSelectResult<ViewGrantWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useViewGrantsQuery(params: {
-  selection: ListSelectionConfig<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useViewGrantsQuery<
+  S extends ViewGrantSelect,
+  TData = {
+    viewGrants: ConnectionResult<InferSelectResult<ViewGrantWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ViewGrantFilter, ViewGrantOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ViewGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        viewGrants: ConnectionResult<InferSelectResult<ViewGrantWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useViewGrantsQuery(
+  params: {
+    selection: ListSelectionConfig<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: viewGrantKeys.list(args),
     queryFn: () => getClient().viewGrant.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch ViewGrant list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchViewGrantsQuery({
@@ -70,35 +99,47 @@ export function useViewGrantsQuery(params: {
 export async function fetchViewGrantsQuery<S extends ViewGrantSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ViewGrantFilter, ViewGrantOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewGrantSelect>;
+  } & Omit<ListSelectionConfig<S, ViewGrantFilter, ViewGrantOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ViewGrantSelect>;
 }): Promise<{
   viewGrants: ConnectionResult<InferSelectResult<ViewGrantWithRelations, S>>;
 }>;
 export async function fetchViewGrantsQuery(params: {
   selection: ListSelectionConfig<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>;
 }) {
-  const args = buildListSelectionArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>(params.selection);
+  const args = buildListSelectionArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>(
+    params.selection
+  );
   return getClient().viewGrant.findMany(args).unwrap();
 }
 /**
  * Prefetch ViewGrant list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchViewGrantsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchViewGrantsQuery<S extends ViewGrantSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ViewGrantFilter, ViewGrantOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewGrantSelect>;
-}): Promise<void>;
-export async function prefetchViewGrantsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>(params.selection);
+export async function prefetchViewGrantsQuery<S extends ViewGrantSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ViewGrantFilter, ViewGrantOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ViewGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchViewGrantsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<ViewGrantSelect, ViewGrantFilter, ViewGrantOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: viewGrantKeys.list(args),
-    queryFn: () => getClient().viewGrant.findMany(args).unwrap()
+    queryFn: () => getClient().viewGrant.findMany(args).unwrap(),
   });
 }

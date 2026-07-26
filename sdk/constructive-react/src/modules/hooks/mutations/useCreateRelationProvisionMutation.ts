@@ -11,16 +11,24 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { relationProvisionKeys } from "../query-keys";
-import { relationProvisionMutationKeys } from "../mutation-keys";
-import type { RelationProvisionSelect, RelationProvisionWithRelations, CreateRelationProvisionInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RelationProvisionSelect, RelationProvisionWithRelations, CreateRelationProvisionInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { relationProvisionKeys } from '../query-keys';
+import { relationProvisionMutationKeys } from '../mutation-keys';
+import type {
+  RelationProvisionSelect,
+  RelationProvisionWithRelations,
+  CreateRelationProvisionInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  RelationProvisionSelect,
+  RelationProvisionWithRelations,
+  CreateRelationProvisionInput,
+} from '../../orm/input-types';
 /**
  * Provisions relational structure between tables. Supports four relation types:
      - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
@@ -40,40 +48,58 @@ export type { RelationProvisionSelect, RelationProvisionWithRelations, CreateRel
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateRelationProvisionMutation<S extends RelationProvisionSelect>(params: {
-  selection: ({
-    fields: S & RelationProvisionSelect;
-  } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>);
-} & Omit<UseMutationOptions<{
-  createRelationProvision: {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
-  };
-}, Error, CreateRelationProvisionInput["relationProvision"]>, "mutationFn">): UseMutationResult<{
-  createRelationProvision: {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
-  };
-}, Error, CreateRelationProvisionInput["relationProvision"]>;
-export function useCreateRelationProvisionMutation(params: {
-  selection: SelectionConfig<RelationProvisionSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateRelationProvisionInput["relationProvision"]>, "mutationFn">) {
+export function useCreateRelationProvisionMutation<S extends RelationProvisionSelect>(
+  params: {
+    selection: {
+      fields: S & RelationProvisionSelect;
+    } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createRelationProvision: {
+          relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
+        };
+      },
+      Error,
+      CreateRelationProvisionInput['relationProvision']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createRelationProvision: {
+      relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
+    };
+  },
+  Error,
+  CreateRelationProvisionInput['relationProvision']
+>;
+export function useCreateRelationProvisionMutation(
+  params: {
+    selection: SelectionConfig<RelationProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateRelationProvisionInput['relationProvision']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: relationProvisionMutationKeys.create(),
-    mutationFn: (data: CreateRelationProvisionInput["relationProvision"]) => getClient().relationProvision.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateRelationProvisionInput['relationProvision']) =>
+      getClient()
+        .relationProvision.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.lists()
+        queryKey: relationProvisionKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

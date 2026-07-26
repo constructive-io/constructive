@@ -19,64 +19,98 @@
 // ============================================================================
 
 export const dbPresetMutationKeys = {
-  /** All dbPreset mutation keys */all: ["mutation", "dbpreset"] as const,
-  /** Create dbPreset mutation key */create: () => ["mutation", "dbpreset", "create"] as const,
-  /** Update dbPreset mutation key */update: (id: string | number) => ["mutation", "dbpreset", "update", id] as const,
-  /** Delete dbPreset mutation key */delete: (id: string | number) => ["mutation", "dbpreset", "delete", id] as const
+  /** All dbPreset mutation keys */ all: ['mutation', 'dbpreset'] as const,
+  /** Create dbPreset mutation key */ create: () => ['mutation', 'dbpreset', 'create'] as const,
+  /** Update dbPreset mutation key */ update: (id: string | number) =>
+    ['mutation', 'dbpreset', 'update', id] as const,
+  /** Delete dbPreset mutation key */ delete: (id: string | number) =>
+    ['mutation', 'dbpreset', 'delete', id] as const,
 } as const;
 export const namespaceMutationKeys = {
-  /** All namespace mutation keys */all: ["mutation", "namespace"] as const,
-  /** Create namespace mutation key */create: () => ["mutation", "namespace", "create"] as const,
-  /** Update namespace mutation key */update: (id: string | number) => ["mutation", "namespace", "update", id] as const,
-  /** Delete namespace mutation key */delete: (id: string | number) => ["mutation", "namespace", "delete", id] as const
+  /** All namespace mutation keys */ all: ['mutation', 'namespace'] as const,
+  /** Create namespace mutation key */ create: () => ['mutation', 'namespace', 'create'] as const,
+  /** Update namespace mutation key */ update: (id: string | number) =>
+    ['mutation', 'namespace', 'update', id] as const,
+  /** Delete namespace mutation key */ delete: (id: string | number) =>
+    ['mutation', 'namespace', 'delete', id] as const,
 } as const;
 export const namespaceEventMutationKeys = {
-  /** All namespaceEvent mutation keys */all: ["mutation", "namespaceevent"] as const,
-  /** Create namespaceEvent mutation key */create: () => ["mutation", "namespaceevent", "create"] as const,
-  /** Update namespaceEvent mutation key */update: (id: string | number) => ["mutation", "namespaceevent", "update", id] as const,
-  /** Delete namespaceEvent mutation key */delete: (id: string | number) => ["mutation", "namespaceevent", "delete", id] as const
+  /** All namespaceEvent mutation keys */ all: ['mutation', 'namespaceevent'] as const,
+  /** Create namespaceEvent mutation key */ create: () =>
+    ['mutation', 'namespaceevent', 'create'] as const,
+  /** Update namespaceEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'namespaceevent', 'update', id] as const,
+  /** Delete namespaceEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'namespaceevent', 'delete', id] as const,
 } as const;
 export const platformInfraCommitMutationKeys = {
-  /** All platformInfraCommit mutation keys */all: ["mutation", "platforminfracommit"] as const,
-  /** Create platformInfraCommit mutation key */create: () => ["mutation", "platforminfracommit", "create"] as const,
-  /** Update platformInfraCommit mutation key */update: (id: string | number) => ["mutation", "platforminfracommit", "update", id] as const,
-  /** Delete platformInfraCommit mutation key */delete: (id: string | number) => ["mutation", "platforminfracommit", "delete", id] as const
+  /** All platformInfraCommit mutation keys */ all: ['mutation', 'platforminfracommit'] as const,
+  /** Create platformInfraCommit mutation key */ create: () =>
+    ['mutation', 'platforminfracommit', 'create'] as const,
+  /** Update platformInfraCommit mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfracommit', 'update', id] as const,
+  /** Delete platformInfraCommit mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfracommit', 'delete', id] as const,
 } as const;
 export const platformInfraGetAllTreeNodesRecordMutationKeys = {
-  /** All platformInfraGetAllTreeNodesRecord mutation keys */all: ["mutation", "platforminfragetalltreenodesrecord"] as const,
-  /** Create platformInfraGetAllTreeNodesRecord mutation key */create: () => ["mutation", "platforminfragetalltreenodesrecord", "create"] as const,
-  /** Update platformInfraGetAllTreeNodesRecord mutation key */update: (id: string | number) => ["mutation", "platforminfragetalltreenodesrecord", "update", id] as const,
-  /** Delete platformInfraGetAllTreeNodesRecord mutation key */delete: (id: string | number) => ["mutation", "platforminfragetalltreenodesrecord", "delete", id] as const
+  /** All platformInfraGetAllTreeNodesRecord mutation keys */ all: [
+    'mutation',
+    'platforminfragetalltreenodesrecord',
+  ] as const,
+  /** Create platformInfraGetAllTreeNodesRecord mutation key */ create: () =>
+    ['mutation', 'platforminfragetalltreenodesrecord', 'create'] as const,
+  /** Update platformInfraGetAllTreeNodesRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfragetalltreenodesrecord', 'update', id] as const,
+  /** Delete platformInfraGetAllTreeNodesRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfragetalltreenodesrecord', 'delete', id] as const,
 } as const;
 export const platformInfraObjectMutationKeys = {
-  /** All platformInfraObject mutation keys */all: ["mutation", "platforminfraobject"] as const,
-  /** Create platformInfraObject mutation key */create: () => ["mutation", "platforminfraobject", "create"] as const,
-  /** Update platformInfraObject mutation key */update: (id: string | number) => ["mutation", "platforminfraobject", "update", id] as const,
-  /** Delete platformInfraObject mutation key */delete: (id: string | number) => ["mutation", "platforminfraobject", "delete", id] as const
+  /** All platformInfraObject mutation keys */ all: ['mutation', 'platforminfraobject'] as const,
+  /** Create platformInfraObject mutation key */ create: () =>
+    ['mutation', 'platforminfraobject', 'create'] as const,
+  /** Update platformInfraObject mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfraobject', 'update', id] as const,
+  /** Delete platformInfraObject mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfraobject', 'delete', id] as const,
 } as const;
 export const platformInfraRefMutationKeys = {
-  /** All platformInfraRef mutation keys */all: ["mutation", "platforminfraref"] as const,
-  /** Create platformInfraRef mutation key */create: () => ["mutation", "platforminfraref", "create"] as const,
-  /** Update platformInfraRef mutation key */update: (id: string | number) => ["mutation", "platforminfraref", "update", id] as const,
-  /** Delete platformInfraRef mutation key */delete: (id: string | number) => ["mutation", "platforminfraref", "delete", id] as const
+  /** All platformInfraRef mutation keys */ all: ['mutation', 'platforminfraref'] as const,
+  /** Create platformInfraRef mutation key */ create: () =>
+    ['mutation', 'platforminfraref', 'create'] as const,
+  /** Update platformInfraRef mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfraref', 'update', id] as const,
+  /** Delete platformInfraRef mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfraref', 'delete', id] as const,
 } as const;
 export const platformInfraStoreMutationKeys = {
-  /** All platformInfraStore mutation keys */all: ["mutation", "platforminfrastore"] as const,
-  /** Create platformInfraStore mutation key */create: () => ["mutation", "platforminfrastore", "create"] as const,
-  /** Update platformInfraStore mutation key */update: (id: string | number) => ["mutation", "platforminfrastore", "update", id] as const,
-  /** Delete platformInfraStore mutation key */delete: (id: string | number) => ["mutation", "platforminfrastore", "delete", id] as const
+  /** All platformInfraStore mutation keys */ all: ['mutation', 'platforminfrastore'] as const,
+  /** Create platformInfraStore mutation key */ create: () =>
+    ['mutation', 'platforminfrastore', 'create'] as const,
+  /** Update platformInfraStore mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfrastore', 'update', id] as const,
+  /** Delete platformInfraStore mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfrastore', 'delete', id] as const,
 } as const;
 export const platformNamespaceMutationKeys = {
-  /** All platformNamespace mutation keys */all: ["mutation", "platformnamespace"] as const,
-  /** Create platformNamespace mutation key */create: () => ["mutation", "platformnamespace", "create"] as const,
-  /** Update platformNamespace mutation key */update: (id: string | number) => ["mutation", "platformnamespace", "update", id] as const,
-  /** Delete platformNamespace mutation key */delete: (id: string | number) => ["mutation", "platformnamespace", "delete", id] as const
+  /** All platformNamespace mutation keys */ all: ['mutation', 'platformnamespace'] as const,
+  /** Create platformNamespace mutation key */ create: () =>
+    ['mutation', 'platformnamespace', 'create'] as const,
+  /** Update platformNamespace mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformnamespace', 'update', id] as const,
+  /** Delete platformNamespace mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformnamespace', 'delete', id] as const,
 } as const;
 export const platformNamespaceEventMutationKeys = {
-  /** All platformNamespaceEvent mutation keys */all: ["mutation", "platformnamespaceevent"] as const,
-  /** Create platformNamespaceEvent mutation key */create: () => ["mutation", "platformnamespaceevent", "create"] as const,
-  /** Update platformNamespaceEvent mutation key */update: (id: string | number) => ["mutation", "platformnamespaceevent", "update", id] as const,
-  /** Delete platformNamespaceEvent mutation key */delete: (id: string | number) => ["mutation", "platformnamespaceevent", "delete", id] as const
+  /** All platformNamespaceEvent mutation keys */ all: [
+    'mutation',
+    'platformnamespaceevent',
+  ] as const,
+  /** Create platformNamespaceEvent mutation key */ create: () =>
+    ['mutation', 'platformnamespaceevent', 'create'] as const,
+  /** Update platformNamespaceEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformnamespaceevent', 'update', id] as const,
+  /** Delete platformNamespaceEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformnamespaceevent', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -84,10 +118,28 @@ export const platformNamespaceEventMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
-  /** Mutation key for platformInfraInitEmptyRepo */platformInfraInitEmptyRepo: (identifier?: string) => identifier ? ["mutation", "platformInfraInitEmptyRepo", identifier] as const : ["mutation", "platformInfraInitEmptyRepo"] as const,
-  /** Mutation key for platformInfraInsertNodeAtPath */platformInfraInsertNodeAtPath: (identifier?: string) => identifier ? ["mutation", "platformInfraInsertNodeAtPath", identifier] as const : ["mutation", "platformInfraInsertNodeAtPath"] as const,
-  /** Mutation key for platformInfraSetDataAtPath */platformInfraSetDataAtPath: (identifier?: string) => identifier ? ["mutation", "platformInfraSetDataAtPath", identifier] as const : ["mutation", "platformInfraSetDataAtPath"] as const,
-  /** Mutation key for provisionBucket */provisionBucket: (identifier?: string) => identifier ? ["mutation", "provisionBucket", identifier] as const : ["mutation", "provisionBucket"] as const
+  /** Mutation key for platformInfraInitEmptyRepo */ platformInfraInitEmptyRepo: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraInitEmptyRepo', identifier] as const)
+      : (['mutation', 'platformInfraInitEmptyRepo'] as const),
+  /** Mutation key for platformInfraInsertNodeAtPath */ platformInfraInsertNodeAtPath: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraInsertNodeAtPath', identifier] as const)
+      : (['mutation', 'platformInfraInsertNodeAtPath'] as const),
+  /** Mutation key for platformInfraSetDataAtPath */ platformInfraSetDataAtPath: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraSetDataAtPath', identifier] as const)
+      : (['mutation', 'platformInfraSetDataAtPath'] as const),
+  /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionBucket', identifier] as const)
+      : (['mutation', 'provisionBucket'] as const),
 } as const;
 /**
 
@@ -122,5 +174,5 @@ export const mutationKeys = {
   platformInfraStore: platformInfraStoreMutationKeys,
   platformNamespace: platformNamespaceMutationKeys,
   platformNamespaceEvent: platformNamespaceEventMutationKeys,
-  custom: customMutationKeys
+  custom: customMutationKeys,
 } as const;

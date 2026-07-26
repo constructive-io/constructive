@@ -4,83 +4,99 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { databaseKeys } from "../query-keys";
-import { databaseMutationKeys } from "../mutation-keys";
-import type { DatabaseSelect, DatabaseWithRelations, DatabasePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DatabaseSelect, DatabaseWithRelations, DatabasePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { databaseKeys } from '../query-keys';
+import { databaseMutationKeys } from '../mutation-keys';
+import type { DatabaseSelect, DatabaseWithRelations, DatabasePatch } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DatabaseSelect, DatabaseWithRelations, DatabasePatch } from '../../orm/input-types';
 /**
  * Mutation hook for updating a Database
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateDatabaseMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', databasePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateDatabaseMutation<S extends DatabaseSelect>(params: {
-  selection: ({
-    fields: S & DatabaseSelect;
-  } & HookStrictSelect<NoInfer<S>, DatabaseSelect>);
-} & Omit<UseMutationOptions<{
-  updateDatabase: {
-    database: InferSelectResult<DatabaseWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  databasePatch: DatabasePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateDatabase: {
-    database: InferSelectResult<DatabaseWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  databasePatch: DatabasePatch;
-}>;
-export function useUpdateDatabaseMutation(params: {
-  selection: SelectionConfig<DatabaseSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  databasePatch: DatabasePatch;
-}>, "mutationFn">) {
+export function useUpdateDatabaseMutation<S extends DatabaseSelect>(
+  params: {
+    selection: {
+      fields: S & DatabaseSelect;
+    } & HookStrictSelect<NoInfer<S>, DatabaseSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateDatabase: {
+          database: InferSelectResult<DatabaseWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        databasePatch: DatabasePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateDatabase: {
+      database: InferSelectResult<DatabaseWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    databasePatch: DatabasePatch;
+  }
+>;
+export function useUpdateDatabaseMutation(
+  params: {
+    selection: SelectionConfig<DatabaseSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        databasePatch: DatabasePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<DatabaseSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: databaseMutationKeys.all,
-    mutationFn: ({
-      id,
-      databasePatch
-    }: {
-      id: string;
-      databasePatch: DatabasePatch;
-    }) => getClient().database.update({
-      where: {
-        id
-      },
-      data: databasePatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, databasePatch }: { id: string; databasePatch: DatabasePatch }) =>
+      getClient()
+        .database.update({
+          where: {
+            id,
+          },
+          data: databasePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: databaseKeys.detail(variables.id)
+        queryKey: databaseKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: databaseKeys.lists()
+        queryKey: databaseKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

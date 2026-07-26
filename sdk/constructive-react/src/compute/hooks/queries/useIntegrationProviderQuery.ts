@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { integrationProviderKeys } from "../query-keys";
-import type { IntegrationProviderSelect, IntegrationProviderWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { IntegrationProviderSelect, IntegrationProviderWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { integrationProviderKeys } from '../query-keys';
+import type {
+  IntegrationProviderSelect,
+  IntegrationProviderWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  IntegrationProviderSelect,
+  IntegrationProviderWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const integrationProviderQueryKey = integrationProviderKeys.detail;
 /**
  * Branded catalog of external service integrations and their canonical secret/config requirements. Each row defines a provider (e.g. Mailgun, Postgres) that function and resource definitions can reference by slug. The required_secrets/required_configs arrays are guidance that the UI can copy into a definition; the definition arrays remain the source of truth.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useIntegrationProviderQuery({
@@ -26,38 +32,52 @@ export const integrationProviderQueryKey = integrationProviderKeys.detail;
  * });
  * ```
  */
-export function useIntegrationProviderQuery<S extends IntegrationProviderSelect, TData = {
-  integrationProvider: InferSelectResult<IntegrationProviderWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
-} & Omit<UseQueryOptions<{
-  integrationProvider: InferSelectResult<IntegrationProviderWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useIntegrationProviderQuery(params: {
-  id: string;
-  selection: SelectionConfig<IntegrationProviderSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useIntegrationProviderQuery<
+  S extends IntegrationProviderSelect,
+  TData = {
+    integrationProvider: InferSelectResult<IntegrationProviderWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        integrationProvider: InferSelectResult<IntegrationProviderWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useIntegrationProviderQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<IntegrationProviderSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<IntegrationProviderSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: integrationProviderKeys.detail(params.id),
-    queryFn: () => getClient().integrationProvider.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .integrationProvider.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Branded catalog of external service integrations and their canonical secret/config requirements. Each row defines a provider (e.g. Mailgun, Postgres) that function and resource definitions can reference by slug. The required_secrets/required_configs arrays are guidance that the UI can copy into a definition; the definition arrays remain the source of truth.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchIntegrationProviderQuery({
@@ -79,35 +99,46 @@ export async function fetchIntegrationProviderQuery(params: {
   selection: SelectionConfig<IntegrationProviderSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<IntegrationProviderSelect>(params.selection);
-  return getClient().integrationProvider.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .integrationProvider.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Branded catalog of external service integrations and their canonical secret/config requirements. Each row defines a provider (e.g. Mailgun, Postgres) that function and resource definitions can reference by slug. The required_secrets/required_configs arrays are guidance that the UI can copy into a definition; the definition arrays remain the source of truth.
- * 
+ *
  * @example
  * ```ts
  * await prefetchIntegrationProviderQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchIntegrationProviderQuery<S extends IntegrationProviderSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
-}): Promise<void>;
-export async function prefetchIntegrationProviderQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<IntegrationProviderSelect>;
-}): Promise<void> {
+export async function prefetchIntegrationProviderQuery<S extends IntegrationProviderSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
+  }
+): Promise<void>;
+export async function prefetchIntegrationProviderQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<IntegrationProviderSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<IntegrationProviderSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: integrationProviderKeys.detail(params.id),
-    queryFn: () => getClient().integrationProvider.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .integrationProvider.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

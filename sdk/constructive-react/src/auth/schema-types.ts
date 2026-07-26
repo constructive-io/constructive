@@ -4,37 +4,317 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type { AuditLogAuth, CryptoAddress, Email, IdentityProvider, OrgApiKeyList, PhoneNumber, Principal, PrincipalEntity, PrincipalScopeOverride, RoleType, User, UserConnectedAccount, WebauthnCredential, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
+import type {
+  AuditLogAuth,
+  CryptoAddress,
+  Email,
+  IdentityProvider,
+  OrgApiKeyList,
+  PhoneNumber,
+  Principal,
+  PrincipalEntity,
+  PrincipalScopeOverride,
+  RoleType,
+  User,
+  UserConnectedAccount,
+  WebauthnCredential,
+  BigFloatFilter,
+  BigIntFilter,
+  BitStringFilter,
+  BooleanFilter,
+  DateFilter,
+  DatetimeFilter,
+  FloatFilter,
+  FullTextFilter,
+  IntFilter,
+  IntListFilter,
+  InternetAddressFilter,
+  JSONFilter,
+  StringFilter,
+  StringListFilter,
+  UUIDFilter,
+  UUIDListFilter,
+  VectorFilter,
+} from './types';
 export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
 /** Methods to use when ordering `AuditLogAuth`. */
-export type AuditLogAuthOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EVENT_ASC" | "EVENT_DESC" | "ID_ASC" | "ID_DESC" | "IP_ADDRESS_ASC" | "IP_ADDRESS_DESC" | "NATURAL" | "ORIGIN_ASC" | "ORIGIN_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SUCCESS_ASC" | "SUCCESS_DESC" | "USER_AGENT_ASC" | "USER_AGENT_DESC";
+export type AuditLogAuthOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EVENT_ASC'
+  | 'EVENT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IP_ADDRESS_ASC'
+  | 'IP_ADDRESS_DESC'
+  | 'NATURAL'
+  | 'ORIGIN_ASC'
+  | 'ORIGIN_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SUCCESS_ASC'
+  | 'SUCCESS_DESC'
+  | 'USER_AGENT_ASC'
+  | 'USER_AGENT_DESC';
 /** Methods to use when ordering `CryptoAddress`. */
-export type CryptoAddressOrderBy = "ADDRESS_ASC" | "ADDRESS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "IS_PRIMARY_ASC" | "IS_PRIMARY_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type CryptoAddressOrderBy =
+  | 'ADDRESS_ASC'
+  | 'ADDRESS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PRIMARY_ASC'
+  | 'IS_PRIMARY_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `Email`. */
-export type EmailOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ID_ASC" | "ID_DESC" | "IS_PRIMARY_ASC" | "IS_PRIMARY_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type EmailOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PRIMARY_ASC'
+  | 'IS_PRIMARY_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `IdentityProvider`. */
-export type IdentityProviderOrderBy = "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "ENABLED_ASC" | "ENABLED_DESC" | "KIND_ASC" | "KIND_DESC" | "NATURAL" | "SLUG_ASC" | "SLUG_DESC";
+export type IdentityProviderOrderBy =
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'ENABLED_ASC'
+  | 'ENABLED_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'NATURAL'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
 /** Methods to use when ordering `OrgApiKeyList`. */
-export type OrgApiKeyListOrderBy = "ACCESS_LEVEL_ASC" | "ACCESS_LEVEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "KEY_ID_ASC" | "KEY_ID_DESC" | "LAST_USED_AT_ASC" | "LAST_USED_AT_DESC" | "MFA_LEVEL_ASC" | "MFA_LEVEL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "ORG_ID_ASC" | "ORG_ID_DESC" | "PRINCIPAL_ID_ASC" | "PRINCIPAL_ID_DESC" | "REVOKED_AT_ASC" | "REVOKED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type OrgApiKeyListOrderBy =
+  | 'ACCESS_LEVEL_ASC'
+  | 'ACCESS_LEVEL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KEY_ID_ASC'
+  | 'KEY_ID_DESC'
+  | 'LAST_USED_AT_ASC'
+  | 'LAST_USED_AT_DESC'
+  | 'MFA_LEVEL_ASC'
+  | 'MFA_LEVEL_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'ORG_ID_ASC'
+  | 'ORG_ID_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'REVOKED_AT_ASC'
+  | 'REVOKED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PhoneNumber`. */
-export type PhoneNumberOrderBy = "CC_ASC" | "CC_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "IS_PRIMARY_ASC" | "IS_PRIMARY_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUMBER_ASC" | "NUMBER_DESC" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PhoneNumberOrderBy =
+  | 'CC_ASC'
+  | 'CC_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_PRIMARY_ASC'
+  | 'IS_PRIMARY_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'NUMBER_ASC'
+  | 'NUMBER_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PrincipalEntity`. */
-export type PrincipalEntityOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRINCIPAL_ID_ASC" | "PRINCIPAL_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PrincipalEntityOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `Principal`. */
-export type PrincipalOrderBy = "BYPASS_STEP_UP_ASC" | "BYPASS_STEP_UP_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "USER_ID_ASC" | "USER_ID_DESC" | "USE_ADMIN_OWNER_ASC" | "USE_ADMIN_OWNER_DESC";
+export type PrincipalOrderBy =
+  | 'BYPASS_STEP_UP_ASC'
+  | 'BYPASS_STEP_UP_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'USER_ID_ASC'
+  | 'USER_ID_DESC'
+  | 'USE_ADMIN_OWNER_ASC'
+  | 'USE_ADMIN_OWNER_DESC';
 /** Methods to use when ordering `PrincipalScopeOverride`. */
-export type PrincipalScopeOverrideOrderBy = "ALLOWED_MASK_ASC" | "ALLOWED_MASK_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "MEMBERSHIP_TYPE_ASC" | "MEMBERSHIP_TYPE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRINCIPAL_ID_ASC" | "PRINCIPAL_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "USE_ADMIN_OWNER_ASC" | "USE_ADMIN_OWNER_DESC";
+export type PrincipalScopeOverrideOrderBy =
+  | 'ALLOWED_MASK_ASC'
+  | 'ALLOWED_MASK_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
+  | 'MEMBERSHIP_TYPE_ASC'
+  | 'MEMBERSHIP_TYPE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'USE_ADMIN_OWNER_ASC'
+  | 'USE_ADMIN_OWNER_DESC';
 /** Methods to use when ordering `RoleType`. */
-export type RoleTypeOrderBy = "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type RoleTypeOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `UserConnectedAccount`. */
-export type UserConnectedAccountOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DETAILS_ASC" | "DETAILS_DESC" | "IDENTIFIER_ASC" | "IDENTIFIER_DESC" | "ID_ASC" | "ID_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "SERVICE_ASC" | "SERVICE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type UserConnectedAccountOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DETAILS_ASC'
+  | 'DETAILS_DESC'
+  | 'IDENTIFIER_ASC'
+  | 'IDENTIFIER_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'SERVICE_ASC'
+  | 'SERVICE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `User`. */
-export type UserOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "DISPLAY_NAME_TRGM_SIMILARITY_ASC" | "DISPLAY_NAME_TRGM_SIMILARITY_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_PICTURE_ASC" | "PROFILE_PICTURE_DESC" | "SEARCH_SCORE_ASC" | "SEARCH_SCORE_DESC" | "SEARCH_TSV_ASC" | "SEARCH_TSV_DESC" | "SEARCH_TSV_RANK_ASC" | "SEARCH_TSV_RANK_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "USERNAME_ASC" | "USERNAME_DESC";
+export type UserOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'DISPLAY_NAME_TRGM_SIMILARITY_ASC'
+  | 'DISPLAY_NAME_TRGM_SIMILARITY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROFILE_PICTURE_ASC'
+  | 'PROFILE_PICTURE_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_ASC'
+  | 'SEARCH_TSV_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'TYPE_ASC'
+  | 'TYPE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'USERNAME_ASC'
+  | 'USERNAME_DESC';
 /** Methods to use when ordering `WebauthnCredential`. */
-export type WebauthnCredentialOrderBy = "BACKUP_ELIGIBLE_ASC" | "BACKUP_ELIGIBLE_DESC" | "BACKUP_STATE_ASC" | "BACKUP_STATE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREDENTIAL_DEVICE_TYPE_ASC" | "CREDENTIAL_DEVICE_TYPE_DESC" | "CREDENTIAL_ID_ASC" | "CREDENTIAL_ID_DESC" | "ID_ASC" | "ID_DESC" | "LAST_USED_AT_ASC" | "LAST_USED_AT_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PUBLIC_KEY_ASC" | "PUBLIC_KEY_DESC" | "SIGN_COUNT_ASC" | "SIGN_COUNT_DESC" | "TRANSPORTS_ASC" | "TRANSPORTS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WEBAUTHN_USER_ID_ASC" | "WEBAUTHN_USER_ID_DESC";
+export type WebauthnCredentialOrderBy =
+  | 'BACKUP_ELIGIBLE_ASC'
+  | 'BACKUP_ELIGIBLE_DESC'
+  | 'BACKUP_STATE_ASC'
+  | 'BACKUP_STATE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREDENTIAL_DEVICE_TYPE_ASC'
+  | 'CREDENTIAL_DEVICE_TYPE_DESC'
+  | 'CREDENTIAL_ID_ASC'
+  | 'CREDENTIAL_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_USED_AT_ASC'
+  | 'LAST_USED_AT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PUBLIC_KEY_ASC'
+  | 'PUBLIC_KEY_DESC'
+  | 'SIGN_COUNT_ASC'
+  | 'SIGN_COUNT_DESC'
+  | 'TRANSPORTS_ASC'
+  | 'TRANSPORTS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'WEBAUTHN_USER_ID_ASC'
+  | 'WEBAUTHN_USER_ID_DESC';
 /** A filter to be used against `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
 export interface AuditLogAuthFilter {
   /** Filter by the object’s `actor` relation. */

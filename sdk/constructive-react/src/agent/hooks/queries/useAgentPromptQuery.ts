@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentPromptKeys } from "../query-keys";
-import type { AgentPromptSelect, AgentPromptWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentPromptSelect, AgentPromptWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentPromptKeys } from '../query-keys';
+import type { AgentPromptSelect, AgentPromptWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentPromptSelect, AgentPromptWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentPromptQueryKey = agentPromptKeys.detail;
 /**
  * Shared system prompt templates for agent conversations
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentPromptQuery({
@@ -26,38 +26,52 @@ export const agentPromptQueryKey = agentPromptKeys.detail;
  * });
  * ```
  */
-export function useAgentPromptQuery<S extends AgentPromptSelect, TData = {
-  agentPrompt: InferSelectResult<AgentPromptWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentPromptSelect>;
-} & Omit<UseQueryOptions<{
-  agentPrompt: InferSelectResult<AgentPromptWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentPromptQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentPromptSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentPromptQuery<
+  S extends AgentPromptSelect,
+  TData = {
+    agentPrompt: InferSelectResult<AgentPromptWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentPromptSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentPrompt: InferSelectResult<AgentPromptWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentPromptQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentPromptSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentPromptSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentPromptKeys.detail(params.id),
-    queryFn: () => getClient().agentPrompt.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agentPrompt.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Shared system prompt templates for agent conversations
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentPromptQuery({
@@ -79,35 +93,46 @@ export async function fetchAgentPromptQuery(params: {
   selection: SelectionConfig<AgentPromptSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentPromptSelect>(params.selection);
-  return getClient().agentPrompt.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agentPrompt.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Shared system prompt templates for agent conversations
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentPromptQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentPromptQuery<S extends AgentPromptSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentPromptSelect>;
-}): Promise<void>;
-export async function prefetchAgentPromptQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentPromptSelect>;
-}): Promise<void> {
+export async function prefetchAgentPromptQuery<S extends AgentPromptSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentPromptSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentPromptQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentPromptSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentPromptSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentPromptKeys.detail(params.id),
-    queryFn: () => getClient().agentPrompt.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agentPrompt.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { routeKeys } from "../query-keys";
-import type { RouteSelect, RouteWithRelations, RouteFilter, RouteOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { RouteSelect, RouteWithRelations, RouteFilter, RouteOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { routeKeys } from '../query-keys';
+import type {
+  RouteSelect,
+  RouteWithRelations,
+  RouteFilter,
+  RouteOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  RouteSelect,
+  RouteWithRelations,
+  RouteFilter,
+  RouteOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const routesQueryKey = routeKeys.list;
 /**
  * Routes binding a domain hostname and path to a typed catalog target
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRoutesQuery({
@@ -30,33 +45,45 @@ export const routesQueryKey = routeKeys.list;
  * });
  * ```
  */
-export function useRoutesQuery<S extends RouteSelect, TData = {
-  routes: ConnectionResult<InferSelectResult<RouteWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RouteFilter, RouteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteSelect>;
-} & Omit<UseQueryOptions<{
-  routes: ConnectionResult<InferSelectResult<RouteWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRoutesQuery(params: {
-  selection: ListSelectionConfig<RouteSelect, RouteFilter, RouteOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useRoutesQuery<
+  S extends RouteSelect,
+  TData = {
+    routes: ConnectionResult<InferSelectResult<RouteWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RouteFilter, RouteOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RouteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        routes: ConnectionResult<InferSelectResult<RouteWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRoutesQuery(
+  params: {
+    selection: ListSelectionConfig<RouteSelect, RouteFilter, RouteOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<RouteSelect, RouteFilter, RouteOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: routeKeys.list(args),
     queryFn: () => getClient().route.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Routes binding a domain hostname and path to a typed catalog target
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRoutesQuery({
@@ -70,7 +97,8 @@ export function useRoutesQuery(params: {
 export async function fetchRoutesQuery<S extends RouteSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RouteFilter, RouteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteSelect>;
+  } & Omit<ListSelectionConfig<S, RouteFilter, RouteOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, RouteSelect>;
 }): Promise<{
   routes: ConnectionResult<InferSelectResult<RouteWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchRoutesQuery(params: {
 }
 /**
  * Routes binding a domain hostname and path to a typed catalog target
- * 
+ *
  * @example
  * ```ts
  * await prefetchRoutesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRoutesQuery<S extends RouteSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RouteFilter, RouteOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteSelect>;
-}): Promise<void>;
-export async function prefetchRoutesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<RouteSelect, RouteFilter, RouteOrderBy>;
-}): Promise<void> {
+export async function prefetchRoutesQuery<S extends RouteSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RouteFilter, RouteOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RouteSelect>;
+  }
+): Promise<void>;
+export async function prefetchRoutesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<RouteSelect, RouteFilter, RouteOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<RouteSelect, RouteFilter, RouteOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: routeKeys.list(args),
-    queryFn: () => getClient().route.findMany(args).unwrap()
+    queryFn: () => getClient().route.findMany(args).unwrap(),
   });
 }

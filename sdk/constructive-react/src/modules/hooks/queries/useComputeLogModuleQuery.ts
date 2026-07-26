@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { computeLogModuleKeys } from "../query-keys";
-import type { ComputeLogModuleSelect, ComputeLogModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ComputeLogModuleSelect, ComputeLogModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { computeLogModuleKeys } from '../query-keys';
+import type { ComputeLogModuleSelect, ComputeLogModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { ComputeLogModuleSelect, ComputeLogModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const computeLogModuleQueryKey = computeLogModuleKeys.detail;
 /**
  * Query hook for fetching a single ComputeLogModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useComputeLogModuleQuery({
@@ -26,38 +26,52 @@ export const computeLogModuleQueryKey = computeLogModuleKeys.detail;
  * });
  * ```
  */
-export function useComputeLogModuleQuery<S extends ComputeLogModuleSelect, TData = {
-  computeLogModule: InferSelectResult<ComputeLogModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
-} & Omit<UseQueryOptions<{
-  computeLogModule: InferSelectResult<ComputeLogModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useComputeLogModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<ComputeLogModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useComputeLogModuleQuery<
+  S extends ComputeLogModuleSelect,
+  TData = {
+    computeLogModule: InferSelectResult<ComputeLogModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        computeLogModule: InferSelectResult<ComputeLogModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useComputeLogModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<ComputeLogModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<ComputeLogModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: computeLogModuleKeys.detail(params.id),
-    queryFn: () => getClient().computeLogModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .computeLogModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single ComputeLogModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchComputeLogModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchComputeLogModuleQuery(params: {
   selection: SelectionConfig<ComputeLogModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ComputeLogModuleSelect>(params.selection);
-  return getClient().computeLogModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .computeLogModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single ComputeLogModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchComputeLogModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchComputeLogModuleQuery<S extends ComputeLogModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
-}): Promise<void>;
-export async function prefetchComputeLogModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<ComputeLogModuleSelect>;
-}): Promise<void> {
+export async function prefetchComputeLogModuleQuery<S extends ComputeLogModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchComputeLogModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<ComputeLogModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<ComputeLogModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: computeLogModuleKeys.detail(params.id),
-    queryFn: () => getClient().computeLogModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .computeLogModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentPersonaKeys } from "../query-keys";
-import type { AgentPersonaSelect, AgentPersonaWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentPersonaSelect, AgentPersonaWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentPersonaKeys } from '../query-keys';
+import type { AgentPersonaSelect, AgentPersonaWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentPersonaSelect, AgentPersonaWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentPersonaQueryKey = agentPersonaKeys.detail;
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentPersonaQuery({
@@ -26,38 +26,52 @@ export const agentPersonaQueryKey = agentPersonaKeys.detail;
  * });
  * ```
  */
-export function useAgentPersonaQuery<S extends AgentPersonaSelect, TData = {
-  agentPersona: InferSelectResult<AgentPersonaWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
-} & Omit<UseQueryOptions<{
-  agentPersona: InferSelectResult<AgentPersonaWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentPersonaQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentPersonaSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentPersonaQuery<
+  S extends AgentPersonaSelect,
+  TData = {
+    agentPersona: InferSelectResult<AgentPersonaWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentPersona: InferSelectResult<AgentPersonaWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentPersonaQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentPersonaSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentPersonaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentPersonaKeys.detail(params.id),
-    queryFn: () => getClient().agentPersona.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agentPersona.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentPersonaQuery({
@@ -79,35 +93,46 @@ export async function fetchAgentPersonaQuery(params: {
   selection: SelectionConfig<AgentPersonaSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentPersonaSelect>(params.selection);
-  return getClient().agentPersona.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agentPersona.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentPersonaQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentPersonaQuery<S extends AgentPersonaSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
-}): Promise<void>;
-export async function prefetchAgentPersonaQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentPersonaSelect>;
-}): Promise<void> {
+export async function prefetchAgentPersonaQuery<S extends AgentPersonaSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentPersonaQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentPersonaSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentPersonaSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentPersonaKeys.detail(params.id),
-    queryFn: () => getClient().agentPersona.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agentPersona.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

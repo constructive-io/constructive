@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformFunctionExecutionLogKeys } from "../query-keys";
-import type { PlatformFunctionExecutionLogSelect, PlatformFunctionExecutionLogWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionExecutionLogSelect, PlatformFunctionExecutionLogWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformFunctionExecutionLogKeys } from '../query-keys';
+import type {
+  PlatformFunctionExecutionLogSelect,
+  PlatformFunctionExecutionLogWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformFunctionExecutionLogSelect,
+  PlatformFunctionExecutionLogWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionExecutionLogQueryKey = platformFunctionExecutionLogKeys.detail;
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionExecutionLogQuery({
@@ -26,38 +32,58 @@ export const platformFunctionExecutionLogQueryKey = platformFunctionExecutionLog
  * });
  * ```
  */
-export function usePlatformFunctionExecutionLogQuery<S extends PlatformFunctionExecutionLogSelect, TData = {
-  platformFunctionExecutionLog: InferSelectResult<PlatformFunctionExecutionLogWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>;
-} & Omit<UseQueryOptions<{
-  platformFunctionExecutionLog: InferSelectResult<PlatformFunctionExecutionLogWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformFunctionExecutionLogQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformFunctionExecutionLogQuery<
+  S extends PlatformFunctionExecutionLogSelect,
+  TData = {
+    platformFunctionExecutionLog: InferSelectResult<
+      PlatformFunctionExecutionLogWithRelations,
+      S
+    > | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformFunctionExecutionLog: InferSelectResult<
+          PlatformFunctionExecutionLogWithRelations,
+          S
+        > | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformFunctionExecutionLogQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformFunctionExecutionLogSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionExecutionLogKeys.detail(params.id),
-    queryFn: () => getClient().platformFunctionExecutionLog.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformFunctionExecutionLog.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionExecutionLogQuery({
@@ -66,48 +92,66 @@ export function usePlatformFunctionExecutionLogQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformFunctionExecutionLogQuery<S extends PlatformFunctionExecutionLogSelect>(params: {
+export async function fetchPlatformFunctionExecutionLogQuery<
+  S extends PlatformFunctionExecutionLogSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
   } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>;
 }): Promise<{
-  platformFunctionExecutionLog: InferSelectResult<PlatformFunctionExecutionLogWithRelations, S> | null;
+  platformFunctionExecutionLog: InferSelectResult<
+    PlatformFunctionExecutionLogWithRelations,
+    S
+  > | null;
 }>;
 export async function fetchPlatformFunctionExecutionLogQuery(params: {
   id: string;
   selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformFunctionExecutionLogSelect>(params.selection);
-  return getClient().platformFunctionExecutionLog.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformFunctionExecutionLog.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformFunctionExecutionLogQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformFunctionExecutionLogQuery<S extends PlatformFunctionExecutionLogSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>;
-}): Promise<void>;
-export async function prefetchPlatformFunctionExecutionLogQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
-}): Promise<void> {
+export async function prefetchPlatformFunctionExecutionLogQuery<
+  S extends PlatformFunctionExecutionLogSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformFunctionExecutionLogQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformFunctionExecutionLogSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionExecutionLogKeys.detail(params.id),
-    queryFn: () => getClient().platformFunctionExecutionLog.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformFunctionExecutionLog.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

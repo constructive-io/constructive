@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { domainEventKeys } from "../query-keys";
-import type { DomainEventSelect, DomainEventWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainEventSelect, DomainEventWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { domainEventKeys } from '../query-keys';
+import type { DomainEventSelect, DomainEventWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DomainEventSelect, DomainEventWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const domainEventQueryKey = domainEventKeys.detail;
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDomainEventQuery({
@@ -26,38 +26,52 @@ export const domainEventQueryKey = domainEventKeys.detail;
  * });
  * ```
  */
-export function useDomainEventQuery<S extends DomainEventSelect, TData = {
-  domainEvent: InferSelectResult<DomainEventWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
-} & Omit<UseQueryOptions<{
-  domainEvent: InferSelectResult<DomainEventWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDomainEventQuery(params: {
-  id: string;
-  selection: SelectionConfig<DomainEventSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDomainEventQuery<
+  S extends DomainEventSelect,
+  TData = {
+    domainEvent: InferSelectResult<DomainEventWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        domainEvent: InferSelectResult<DomainEventWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDomainEventQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DomainEventSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DomainEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: domainEventKeys.detail(params.id),
-    queryFn: () => getClient().domainEvent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .domainEvent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDomainEventQuery({
@@ -79,35 +93,46 @@ export async function fetchDomainEventQuery(params: {
   selection: SelectionConfig<DomainEventSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DomainEventSelect>(params.selection);
-  return getClient().domainEvent.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .domainEvent.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```ts
  * await prefetchDomainEventQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDomainEventQuery<S extends DomainEventSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
-}): Promise<void>;
-export async function prefetchDomainEventQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DomainEventSelect>;
-}): Promise<void> {
+export async function prefetchDomainEventQuery<S extends DomainEventSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
+  }
+): Promise<void>;
+export async function prefetchDomainEventQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DomainEventSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DomainEventSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: domainEventKeys.detail(params.id),
-    queryFn: () => getClient().domainEvent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .domainEvent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

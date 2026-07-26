@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { configKeys } from "../query-keys";
-import type { ConfigSelect, ConfigWithRelations, ConfigFilter, ConfigOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ConfigSelect, ConfigWithRelations, ConfigFilter, ConfigOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { configKeys } from '../query-keys';
+import type {
+  ConfigSelect,
+  ConfigWithRelations,
+  ConfigFilter,
+  ConfigOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ConfigSelect,
+  ConfigWithRelations,
+  ConfigFilter,
+  ConfigOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const configsQueryKey = configKeys.list;
 /**
  * Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useConfigsQuery({
@@ -30,33 +45,45 @@ export const configsQueryKey = configKeys.list;
  * });
  * ```
  */
-export function useConfigsQuery<S extends ConfigSelect, TData = {
-  configs: ConnectionResult<InferSelectResult<ConfigWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ConfigFilter, ConfigOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConfigSelect>;
-} & Omit<UseQueryOptions<{
-  configs: ConnectionResult<InferSelectResult<ConfigWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useConfigsQuery(params: {
-  selection: ListSelectionConfig<ConfigSelect, ConfigFilter, ConfigOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useConfigsQuery<
+  S extends ConfigSelect,
+  TData = {
+    configs: ConnectionResult<InferSelectResult<ConfigWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ConfigFilter, ConfigOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ConfigSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        configs: ConnectionResult<InferSelectResult<ConfigWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useConfigsQuery(
+  params: {
+    selection: ListSelectionConfig<ConfigSelect, ConfigFilter, ConfigOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<ConfigSelect, ConfigFilter, ConfigOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: configKeys.list(args),
     queryFn: () => getClient().config.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchConfigsQuery({
@@ -70,7 +97,8 @@ export function useConfigsQuery(params: {
 export async function fetchConfigsQuery<S extends ConfigSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ConfigFilter, ConfigOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConfigSelect>;
+  } & Omit<ListSelectionConfig<S, ConfigFilter, ConfigOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ConfigSelect>;
 }): Promise<{
   configs: ConnectionResult<InferSelectResult<ConfigWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchConfigsQuery(params: {
 }
 /**
  * Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
- * 
+ *
  * @example
  * ```ts
  * await prefetchConfigsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchConfigsQuery<S extends ConfigSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ConfigFilter, ConfigOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConfigSelect>;
-}): Promise<void>;
-export async function prefetchConfigsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ConfigSelect, ConfigFilter, ConfigOrderBy>;
-}): Promise<void> {
+export async function prefetchConfigsQuery<S extends ConfigSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ConfigFilter, ConfigOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ConfigSelect>;
+  }
+): Promise<void>;
+export async function prefetchConfigsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<ConfigSelect, ConfigFilter, ConfigOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<ConfigSelect, ConfigFilter, ConfigOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: configKeys.list(args),
-    queryFn: () => getClient().config.findMany(args).unwrap()
+    queryFn: () => getClient().config.findMany(args).unwrap(),
   });
 }

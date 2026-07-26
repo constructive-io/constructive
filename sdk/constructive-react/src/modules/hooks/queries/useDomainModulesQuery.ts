@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { domainModuleKeys } from "../query-keys";
-import type { DomainModuleSelect, DomainModuleWithRelations, DomainModuleFilter, DomainModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainModuleSelect, DomainModuleWithRelations, DomainModuleFilter, DomainModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { domainModuleKeys } from '../query-keys';
+import type {
+  DomainModuleSelect,
+  DomainModuleWithRelations,
+  DomainModuleFilter,
+  DomainModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DomainModuleSelect,
+  DomainModuleWithRelations,
+  DomainModuleFilter,
+  DomainModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const domainModulesQueryKey = domainModuleKeys.list;
 /**
  * Query hook for fetching DomainModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDomainModulesQuery({
@@ -30,33 +45,47 @@ export const domainModulesQueryKey = domainModuleKeys.list;
  * });
  * ```
  */
-export function useDomainModulesQuery<S extends DomainModuleSelect, TData = {
-  domainModules: ConnectionResult<InferSelectResult<DomainModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DomainModuleFilter, DomainModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
-} & Omit<UseQueryOptions<{
-  domainModules: ConnectionResult<InferSelectResult<DomainModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDomainModulesQuery(params: {
-  selection: ListSelectionConfig<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useDomainModulesQuery<
+  S extends DomainModuleSelect,
+  TData = {
+    domainModules: ConnectionResult<InferSelectResult<DomainModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DomainModuleFilter, DomainModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        domainModules: ConnectionResult<InferSelectResult<DomainModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDomainModulesQuery(
+  params: {
+    selection: ListSelectionConfig<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: domainModuleKeys.list(args),
     queryFn: () => getClient().domainModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch DomainModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDomainModulesQuery({
@@ -70,35 +99,47 @@ export function useDomainModulesQuery(params: {
 export async function fetchDomainModulesQuery<S extends DomainModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DomainModuleFilter, DomainModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
+  } & Omit<ListSelectionConfig<S, DomainModuleFilter, DomainModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
 }): Promise<{
   domainModules: ConnectionResult<InferSelectResult<DomainModuleWithRelations, S>>;
 }>;
 export async function fetchDomainModulesQuery(params: {
   selection: ListSelectionConfig<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>(
+    params.selection
+  );
   return getClient().domainModule.findMany(args).unwrap();
 }
 /**
  * Prefetch DomainModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDomainModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDomainModulesQuery<S extends DomainModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DomainModuleFilter, DomainModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
-}): Promise<void>;
-export async function prefetchDomainModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>(params.selection);
+export async function prefetchDomainModulesQuery<S extends DomainModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DomainModuleFilter, DomainModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DomainModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDomainModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: domainModuleKeys.list(args),
-    queryFn: () => getClient().domainModule.findMany(args).unwrap()
+    queryFn: () => getClient().domainModule.findMany(args).unwrap(),
   });
 }

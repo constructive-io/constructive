@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { rateLimitMetersModuleKeys } from "../query-keys";
-import type { RateLimitMetersModuleSelect, RateLimitMetersModuleWithRelations, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { RateLimitMetersModuleSelect, RateLimitMetersModuleWithRelations, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { rateLimitMetersModuleKeys } from '../query-keys';
+import type {
+  RateLimitMetersModuleSelect,
+  RateLimitMetersModuleWithRelations,
+  RateLimitMetersModuleFilter,
+  RateLimitMetersModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  RateLimitMetersModuleSelect,
+  RateLimitMetersModuleWithRelations,
+  RateLimitMetersModuleFilter,
+  RateLimitMetersModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const rateLimitMetersModulesQueryKey = rateLimitMetersModuleKeys.list;
 /**
  * Query hook for fetching RateLimitMetersModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRateLimitMetersModulesQuery({
@@ -30,33 +45,60 @@ export const rateLimitMetersModulesQueryKey = rateLimitMetersModuleKeys.list;
  * });
  * ```
  */
-export function useRateLimitMetersModulesQuery<S extends RateLimitMetersModuleSelect, TData = {
-  rateLimitMetersModules: ConnectionResult<InferSelectResult<RateLimitMetersModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RateLimitMetersModuleSelect>;
-} & Omit<UseQueryOptions<{
-  rateLimitMetersModules: ConnectionResult<InferSelectResult<RateLimitMetersModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRateLimitMetersModulesQuery(params: {
-  selection: ListSelectionConfig<RateLimitMetersModuleSelect, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<RateLimitMetersModuleSelect, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useRateLimitMetersModulesQuery<
+  S extends RateLimitMetersModuleSelect,
+  TData = {
+    rateLimitMetersModules: ConnectionResult<
+      InferSelectResult<RateLimitMetersModuleWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, RateLimitMetersModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        rateLimitMetersModules: ConnectionResult<
+          InferSelectResult<RateLimitMetersModuleWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRateLimitMetersModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      RateLimitMetersModuleSelect,
+      RateLimitMetersModuleFilter,
+      RateLimitMetersModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    RateLimitMetersModuleSelect,
+    RateLimitMetersModuleFilter,
+    RateLimitMetersModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: rateLimitMetersModuleKeys.list(args),
     queryFn: () => getClient().rateLimitMetersModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch RateLimitMetersModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRateLimitMetersModulesQuery({
@@ -67,38 +109,72 @@ export function useRateLimitMetersModulesQuery(params: {
  * });
  * ```
  */
-export async function fetchRateLimitMetersModulesQuery<S extends RateLimitMetersModuleSelect>(params: {
+export async function fetchRateLimitMetersModulesQuery<
+  S extends RateLimitMetersModuleSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RateLimitMetersModuleSelect>;
+  } & Omit<
+    ListSelectionConfig<S, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, RateLimitMetersModuleSelect>;
 }): Promise<{
-  rateLimitMetersModules: ConnectionResult<InferSelectResult<RateLimitMetersModuleWithRelations, S>>;
+  rateLimitMetersModules: ConnectionResult<
+    InferSelectResult<RateLimitMetersModuleWithRelations, S>
+  >;
 }>;
 export async function fetchRateLimitMetersModulesQuery(params: {
-  selection: ListSelectionConfig<RateLimitMetersModuleSelect, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>;
+  selection: ListSelectionConfig<
+    RateLimitMetersModuleSelect,
+    RateLimitMetersModuleFilter,
+    RateLimitMetersModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<RateLimitMetersModuleSelect, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    RateLimitMetersModuleSelect,
+    RateLimitMetersModuleFilter,
+    RateLimitMetersModuleOrderBy
+  >(params.selection);
   return getClient().rateLimitMetersModule.findMany(args).unwrap();
 }
 /**
  * Prefetch RateLimitMetersModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchRateLimitMetersModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRateLimitMetersModulesQuery<S extends RateLimitMetersModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RateLimitMetersModuleSelect>;
-}): Promise<void>;
-export async function prefetchRateLimitMetersModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<RateLimitMetersModuleSelect, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<RateLimitMetersModuleSelect, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>(params.selection);
+export async function prefetchRateLimitMetersModulesQuery<S extends RateLimitMetersModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, RateLimitMetersModuleFilter, RateLimitMetersModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, RateLimitMetersModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchRateLimitMetersModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      RateLimitMetersModuleSelect,
+      RateLimitMetersModuleFilter,
+      RateLimitMetersModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    RateLimitMetersModuleSelect,
+    RateLimitMetersModuleFilter,
+    RateLimitMetersModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: rateLimitMetersModuleKeys.list(args),
-    queryFn: () => getClient().rateLimitMetersModule.findMany(args).unwrap()
+    queryFn: () => getClient().rateLimitMetersModule.findMany(args).unwrap(),
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { blueprintKeys } from "../query-keys";
-import type { BlueprintSelect, BlueprintWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { BlueprintSelect, BlueprintWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { blueprintKeys } from '../query-keys';
+import type { BlueprintSelect, BlueprintWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { BlueprintSelect, BlueprintWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const blueprintQueryKey = blueprintKeys.detail;
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useBlueprintQuery({
@@ -26,38 +26,52 @@ export const blueprintQueryKey = blueprintKeys.detail;
  * });
  * ```
  */
-export function useBlueprintQuery<S extends BlueprintSelect, TData = {
-  blueprint: InferSelectResult<BlueprintWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
-} & Omit<UseQueryOptions<{
-  blueprint: InferSelectResult<BlueprintWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useBlueprintQuery(params: {
-  id: string;
-  selection: SelectionConfig<BlueprintSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useBlueprintQuery<
+  S extends BlueprintSelect,
+  TData = {
+    blueprint: InferSelectResult<BlueprintWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        blueprint: InferSelectResult<BlueprintWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useBlueprintQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<BlueprintSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<BlueprintSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: blueprintKeys.detail(params.id),
-    queryFn: () => getClient().blueprint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .blueprint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchBlueprintQuery({
@@ -79,35 +93,46 @@ export async function fetchBlueprintQuery(params: {
   selection: SelectionConfig<BlueprintSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<BlueprintSelect>(params.selection);
-  return getClient().blueprint.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .blueprint.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```ts
  * await prefetchBlueprintQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchBlueprintQuery<S extends BlueprintSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
-}): Promise<void>;
-export async function prefetchBlueprintQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<BlueprintSelect>;
-}): Promise<void> {
+export async function prefetchBlueprintQuery<S extends BlueprintSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
+  }
+): Promise<void>;
+export async function prefetchBlueprintQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<BlueprintSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<BlueprintSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: blueprintKeys.detail(params.id),
-    queryFn: () => getClient().blueprint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .blueprint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

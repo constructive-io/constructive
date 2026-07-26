@@ -11,16 +11,22 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { relationProvisionKeys } from "../query-keys";
-import { relationProvisionMutationKeys } from "../mutation-keys";
-import type { RelationProvisionSelect, RelationProvisionWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RelationProvisionSelect, RelationProvisionWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { relationProvisionKeys } from '../query-keys';
+import { relationProvisionMutationKeys } from '../mutation-keys';
+import type {
+  RelationProvisionSelect,
+  RelationProvisionWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  RelationProvisionSelect,
+  RelationProvisionWithRelations,
+} from '../../orm/input-types';
 /**
  * Provisions relational structure between tables. Supports four relation types:
      - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
@@ -40,55 +46,73 @@ export type { RelationProvisionSelect, RelationProvisionWithRelations } from "..
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteRelationProvisionMutation<S extends RelationProvisionSelect>(params: {
-  selection: ({
-    fields: S & RelationProvisionSelect;
-  } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>);
-} & Omit<UseMutationOptions<{
-  deleteRelationProvision: {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteRelationProvision: {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteRelationProvisionMutation(params: {
-  selection: SelectionConfig<RelationProvisionSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteRelationProvisionMutation<S extends RelationProvisionSelect>(
+  params: {
+    selection: {
+      fields: S & RelationProvisionSelect;
+    } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteRelationProvision: {
+          relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteRelationProvision: {
+      relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteRelationProvisionMutation(
+  params: {
+    selection: SelectionConfig<RelationProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: relationProvisionMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().relationProvision.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .relationProvision.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: relationProvisionKeys.detail(variables.id)
+        queryKey: relationProvisionKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.lists()
+        queryKey: relationProvisionKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

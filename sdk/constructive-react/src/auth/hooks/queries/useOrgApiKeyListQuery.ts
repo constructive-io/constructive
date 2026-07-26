@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgApiKeyListKeys } from "../query-keys";
-import type { OrgApiKeyListSelect, OrgApiKeyListWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgApiKeyListSelect, OrgApiKeyListWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgApiKeyListKeys } from '../query-keys';
+import type { OrgApiKeyListSelect, OrgApiKeyListWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgApiKeyListSelect, OrgApiKeyListWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgApiKeyListQueryKey = orgApiKeyListKeys.detail;
 /**
  * Query hook for fetching a single OrgApiKeyList
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgApiKeyListQuery({
@@ -26,38 +26,52 @@ export const orgApiKeyListQueryKey = orgApiKeyListKeys.detail;
  * });
  * ```
  */
-export function useOrgApiKeyListQuery<S extends OrgApiKeyListSelect, TData = {
-  orgApiKeyList: InferSelectResult<OrgApiKeyListWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
-} & Omit<UseQueryOptions<{
-  orgApiKeyList: InferSelectResult<OrgApiKeyListWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgApiKeyListQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgApiKeyListSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgApiKeyListQuery<
+  S extends OrgApiKeyListSelect,
+  TData = {
+    orgApiKeyList: InferSelectResult<OrgApiKeyListWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgApiKeyList: InferSelectResult<OrgApiKeyListWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgApiKeyListQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgApiKeyListSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgApiKeyListSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgApiKeyListKeys.detail(params.id),
-    queryFn: () => getClient().orgApiKeyList.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgApiKeyList.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single OrgApiKeyList without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgApiKeyListQuery({
@@ -79,35 +93,46 @@ export async function fetchOrgApiKeyListQuery(params: {
   selection: SelectionConfig<OrgApiKeyListSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgApiKeyListSelect>(params.selection);
-  return getClient().orgApiKeyList.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgApiKeyList.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single OrgApiKeyList for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgApiKeyListQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgApiKeyListQuery<S extends OrgApiKeyListSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
-}): Promise<void>;
-export async function prefetchOrgApiKeyListQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgApiKeyListSelect>;
-}): Promise<void> {
+export async function prefetchOrgApiKeyListQuery<S extends OrgApiKeyListSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgApiKeyListSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgApiKeyListQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgApiKeyListSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgApiKeyListSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgApiKeyListKeys.detail(params.id),
-    queryFn: () => getClient().orgApiKeyList.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgApiKeyList.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

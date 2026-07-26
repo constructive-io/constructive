@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { policyKeys } from "../query-keys";
-import type { PolicySelect, PolicyWithRelations, PolicyFilter, PolicyOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PolicySelect, PolicyWithRelations, PolicyFilter, PolicyOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { policyKeys } from '../query-keys';
+import type {
+  PolicySelect,
+  PolicyWithRelations,
+  PolicyFilter,
+  PolicyOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PolicySelect,
+  PolicyWithRelations,
+  PolicyFilter,
+  PolicyOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const policiesQueryKey = policyKeys.list;
 /**
  * Query hook for fetching Policy list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePoliciesQuery({
@@ -30,33 +45,45 @@ export const policiesQueryKey = policyKeys.list;
  * });
  * ```
  */
-export function usePoliciesQuery<S extends PolicySelect, TData = {
-  policies: ConnectionResult<InferSelectResult<PolicyWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PolicyFilter, PolicyOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PolicySelect>;
-} & Omit<UseQueryOptions<{
-  policies: ConnectionResult<InferSelectResult<PolicyWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePoliciesQuery(params: {
-  selection: ListSelectionConfig<PolicySelect, PolicyFilter, PolicyOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePoliciesQuery<
+  S extends PolicySelect,
+  TData = {
+    policies: ConnectionResult<InferSelectResult<PolicyWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PolicyFilter, PolicyOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PolicySelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        policies: ConnectionResult<InferSelectResult<PolicyWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePoliciesQuery(
+  params: {
+    selection: ListSelectionConfig<PolicySelect, PolicyFilter, PolicyOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<PolicySelect, PolicyFilter, PolicyOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: policyKeys.list(args),
     queryFn: () => getClient().policy.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch Policy list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPoliciesQuery({
@@ -70,7 +97,8 @@ export function usePoliciesQuery(params: {
 export async function fetchPoliciesQuery<S extends PolicySelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PolicyFilter, PolicyOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PolicySelect>;
+  } & Omit<ListSelectionConfig<S, PolicyFilter, PolicyOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PolicySelect>;
 }): Promise<{
   policies: ConnectionResult<InferSelectResult<PolicyWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchPoliciesQuery(params: {
 }
 /**
  * Prefetch Policy list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchPoliciesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPoliciesQuery<S extends PolicySelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PolicyFilter, PolicyOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PolicySelect>;
-}): Promise<void>;
-export async function prefetchPoliciesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PolicySelect, PolicyFilter, PolicyOrderBy>;
-}): Promise<void> {
+export async function prefetchPoliciesQuery<S extends PolicySelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PolicyFilter, PolicyOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PolicySelect>;
+  }
+): Promise<void>;
+export async function prefetchPoliciesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<PolicySelect, PolicyFilter, PolicyOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<PolicySelect, PolicyFilter, PolicyOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: policyKeys.list(args),
-    queryFn: () => getClient().policy.findMany(args).unwrap()
+    queryFn: () => getClient().policy.findMany(args).unwrap(),
   });
 }

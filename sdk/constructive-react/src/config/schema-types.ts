@@ -4,17 +4,161 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type { Config, PlatformConfig, PlatformInternalSecret, PlatformSecret, Secret, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
+import type {
+  Config,
+  PlatformConfig,
+  PlatformInternalSecret,
+  PlatformSecret,
+  Secret,
+  BigFloatFilter,
+  BigIntFilter,
+  BitStringFilter,
+  BooleanFilter,
+  DateFilter,
+  DatetimeFilter,
+  FloatFilter,
+  FullTextFilter,
+  IntFilter,
+  IntListFilter,
+  InternetAddressFilter,
+  JSONFilter,
+  StringFilter,
+  StringListFilter,
+  UUIDFilter,
+  UUIDListFilter,
+  VectorFilter,
+} from './types';
 /** Methods to use when ordering `Config`. */
-export type ConfigOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALUE_ASC" | "VALUE_DESC";
+export type ConfigOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALUE_ASC'
+  | 'VALUE_DESC';
 /** Methods to use when ordering `PlatformConfig`. */
-export type PlatformConfigOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALUE_ASC" | "VALUE_DESC";
+export type PlatformConfigOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALUE_ASC'
+  | 'VALUE_DESC';
 /** Methods to use when ordering `PlatformInternalSecret`. */
-export type PlatformInternalSecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformInternalSecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformSecret`. */
-export type PlatformSecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PROVIDER_ASC" | "PROVIDER_DESC" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformSecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `Secret`. */
-export type SecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PROVIDER_ASC" | "PROVIDER_DESC" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** A filter to be used against `Config` object types. All fields are combined with a logical ‘and.’ */
 export interface ConfigFilter {
   /** Checks for all expressions in this list. */

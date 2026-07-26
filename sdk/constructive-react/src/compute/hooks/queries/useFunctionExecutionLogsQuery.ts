@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { functionExecutionLogKeys } from "../query-keys";
-import type { FunctionExecutionLogSelect, FunctionExecutionLogWithRelations, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionExecutionLogSelect, FunctionExecutionLogWithRelations, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { functionExecutionLogKeys } from '../query-keys';
+import type {
+  FunctionExecutionLogSelect,
+  FunctionExecutionLogWithRelations,
+  FunctionExecutionLogFilter,
+  FunctionExecutionLogOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  FunctionExecutionLogSelect,
+  FunctionExecutionLogWithRelations,
+  FunctionExecutionLogFilter,
+  FunctionExecutionLogOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionExecutionLogsQueryKey = functionExecutionLogKeys.list;
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionExecutionLogsQuery({
@@ -30,33 +45,60 @@ export const functionExecutionLogsQueryKey = functionExecutionLogKeys.list;
  * });
  * ```
  */
-export function useFunctionExecutionLogsQuery<S extends FunctionExecutionLogSelect, TData = {
-  functionExecutionLogs: ConnectionResult<InferSelectResult<FunctionExecutionLogWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
-} & Omit<UseQueryOptions<{
-  functionExecutionLogs: ConnectionResult<InferSelectResult<FunctionExecutionLogWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionExecutionLogsQuery(params: {
-  selection: ListSelectionConfig<FunctionExecutionLogSelect, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<FunctionExecutionLogSelect, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useFunctionExecutionLogsQuery<
+  S extends FunctionExecutionLogSelect,
+  TData = {
+    functionExecutionLogs: ConnectionResult<
+      InferSelectResult<FunctionExecutionLogWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionExecutionLogs: ConnectionResult<
+          InferSelectResult<FunctionExecutionLogWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionExecutionLogsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      FunctionExecutionLogSelect,
+      FunctionExecutionLogFilter,
+      FunctionExecutionLogOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    FunctionExecutionLogSelect,
+    FunctionExecutionLogFilter,
+    FunctionExecutionLogOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionExecutionLogKeys.list(args),
     queryFn: () => getClient().functionExecutionLog.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionExecutionLogsQuery({
@@ -67,38 +109,70 @@ export function useFunctionExecutionLogsQuery(params: {
  * });
  * ```
  */
-export async function fetchFunctionExecutionLogsQuery<S extends FunctionExecutionLogSelect>(params: {
+export async function fetchFunctionExecutionLogsQuery<
+  S extends FunctionExecutionLogSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
+  } & Omit<
+    ListSelectionConfig<S, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
 }): Promise<{
   functionExecutionLogs: ConnectionResult<InferSelectResult<FunctionExecutionLogWithRelations, S>>;
 }>;
 export async function fetchFunctionExecutionLogsQuery(params: {
-  selection: ListSelectionConfig<FunctionExecutionLogSelect, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>;
+  selection: ListSelectionConfig<
+    FunctionExecutionLogSelect,
+    FunctionExecutionLogFilter,
+    FunctionExecutionLogOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<FunctionExecutionLogSelect, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    FunctionExecutionLogSelect,
+    FunctionExecutionLogFilter,
+    FunctionExecutionLogOrderBy
+  >(params.selection);
   return getClient().functionExecutionLog.findMany(args).unwrap();
 }
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionExecutionLogsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchFunctionExecutionLogsQuery<S extends FunctionExecutionLogSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
-}): Promise<void>;
-export async function prefetchFunctionExecutionLogsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<FunctionExecutionLogSelect, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<FunctionExecutionLogSelect, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>(params.selection);
+export async function prefetchFunctionExecutionLogsQuery<S extends FunctionExecutionLogSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionExecutionLogFilter, FunctionExecutionLogOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionExecutionLogSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionExecutionLogsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      FunctionExecutionLogSelect,
+      FunctionExecutionLogFilter,
+      FunctionExecutionLogOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    FunctionExecutionLogSelect,
+    FunctionExecutionLogFilter,
+    FunctionExecutionLogOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionExecutionLogKeys.list(args),
-    queryFn: () => getClient().functionExecutionLog.findMany(args).unwrap()
+    queryFn: () => getClient().functionExecutionLog.findMany(args).unwrap(),
   });
 }

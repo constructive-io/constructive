@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionGraphStoreKeys } from "../query-keys";
-import { functionGraphStoreMutationKeys } from "../mutation-keys";
-import type { FunctionGraphStoreSelect, FunctionGraphStoreWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphStoreSelect, FunctionGraphStoreWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionGraphStoreKeys } from '../query-keys';
+import { functionGraphStoreMutationKeys } from '../mutation-keys';
+import type {
+  FunctionGraphStoreSelect,
+  FunctionGraphStoreWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionGraphStoreSelect,
+  FunctionGraphStoreWithRelations,
+} from '../../orm/input-types';
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteFunctionGraphStoreMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteFunctionGraphStoreMutation<S extends FunctionGraphStoreSelect>(params: {
-  selection: ({
-    fields: S & FunctionGraphStoreSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>);
-} & Omit<UseMutationOptions<{
-  deleteFunctionGraphStore: {
-    functionGraphStore: InferSelectResult<FunctionGraphStoreWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteFunctionGraphStore: {
-    functionGraphStore: InferSelectResult<FunctionGraphStoreWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteFunctionGraphStoreMutation(params: {
-  selection: SelectionConfig<FunctionGraphStoreSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteFunctionGraphStoreMutation<S extends FunctionGraphStoreSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionGraphStoreSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteFunctionGraphStore: {
+          functionGraphStore: InferSelectResult<FunctionGraphStoreWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteFunctionGraphStore: {
+      functionGraphStore: InferSelectResult<FunctionGraphStoreWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteFunctionGraphStoreMutation(
+  params: {
+    selection: SelectionConfig<FunctionGraphStoreSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionGraphStoreSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionGraphStoreMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().functionGraphStore.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .functionGraphStore.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: functionGraphStoreKeys.detail(variables.id)
+        queryKey: functionGraphStoreKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionGraphStoreKeys.lists()
+        queryKey: functionGraphStoreKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformManagedDomainKeys } from "../query-keys";
-import { platformManagedDomainMutationKeys } from "../mutation-keys";
-import type { PlatformManagedDomainSelect, PlatformManagedDomainWithRelations, PlatformManagedDomainPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformManagedDomainSelect, PlatformManagedDomainWithRelations, PlatformManagedDomainPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformManagedDomainKeys } from '../query-keys';
+import { platformManagedDomainMutationKeys } from '../mutation-keys';
+import type {
+  PlatformManagedDomainSelect,
+  PlatformManagedDomainWithRelations,
+  PlatformManagedDomainPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformManagedDomainSelect,
+  PlatformManagedDomainWithRelations,
+  PlatformManagedDomainPatch,
+} from '../../orm/input-types';
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformManagedDomainMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformManagedDomainPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformManagedDomainMutation<S extends PlatformManagedDomainSelect>(params: {
-  selection: ({
-    fields: S & PlatformManagedDomainSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformManagedDomain: {
-    platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformManagedDomainPatch: PlatformManagedDomainPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformManagedDomain: {
-    platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformManagedDomainPatch: PlatformManagedDomainPatch;
-}>;
-export function useUpdatePlatformManagedDomainMutation(params: {
-  selection: SelectionConfig<PlatformManagedDomainSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  platformManagedDomainPatch: PlatformManagedDomainPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformManagedDomainMutation<S extends PlatformManagedDomainSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformManagedDomainSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformManagedDomain: {
+          platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        platformManagedDomainPatch: PlatformManagedDomainPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformManagedDomain: {
+      platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    platformManagedDomainPatch: PlatformManagedDomainPatch;
+  }
+>;
+export function useUpdatePlatformManagedDomainMutation(
+  params: {
+    selection: SelectionConfig<PlatformManagedDomainSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        platformManagedDomainPatch: PlatformManagedDomainPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformManagedDomainSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformManagedDomainMutationKeys.all,
     mutationFn: ({
       id,
-      platformManagedDomainPatch
+      platformManagedDomainPatch,
     }: {
       id: string;
       platformManagedDomainPatch: PlatformManagedDomainPatch;
-    }) => getClient().platformManagedDomain.update({
-      where: {
-        id
-      },
-      data: platformManagedDomainPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformManagedDomain.update({
+          where: {
+            id,
+          },
+          data: platformManagedDomainPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformManagedDomainKeys.detail(variables.id)
+        queryKey: platformManagedDomainKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformManagedDomainKeys.lists()
+        queryKey: platformManagedDomainKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

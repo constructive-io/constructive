@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentResourceChunkKeys } from "../query-keys";
-import { agentResourceChunkMutationKeys } from "../mutation-keys";
-import type { AgentResourceChunkSelect, AgentResourceChunkWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentResourceChunkSelect, AgentResourceChunkWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentResourceChunkKeys } from '../query-keys';
+import { agentResourceChunkMutationKeys } from '../mutation-keys';
+import type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+} from '../../orm/input-types';
 /**
  * Mutation hook for deleting a AgentResourceChunk with typed selection
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteAgentResourceChunkMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteAgentResourceChunkMutation<S extends AgentResourceChunkSelect>(params: {
-  selection: ({
-    fields: S & AgentResourceChunkSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>);
-} & Omit<UseMutationOptions<{
-  deleteAgentResourceChunk: {
-    agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteAgentResourceChunk: {
-    agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteAgentResourceChunkMutation(params: {
-  selection: SelectionConfig<AgentResourceChunkSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteAgentResourceChunkMutation<S extends AgentResourceChunkSelect>(
+  params: {
+    selection: {
+      fields: S & AgentResourceChunkSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteAgentResourceChunk: {
+          agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteAgentResourceChunk: {
+      agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteAgentResourceChunkMutation(
+  params: {
+    selection: SelectionConfig<AgentResourceChunkSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AgentResourceChunkSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentResourceChunkMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().agentResourceChunk.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .agentResourceChunk.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: agentResourceChunkKeys.detail(variables.id)
+        queryKey: agentResourceChunkKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: agentResourceChunkKeys.lists()
+        queryKey: agentResourceChunkKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,15 +4,100 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type { Commit, GetAllTreeNodesRecord, Object, Ref, Store, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
+import type {
+  Commit,
+  GetAllTreeNodesRecord,
+  Object,
+  Ref,
+  Store,
+  BigFloatFilter,
+  BigIntFilter,
+  BitStringFilter,
+  BooleanFilter,
+  DateFilter,
+  DatetimeFilter,
+  FloatFilter,
+  FullTextFilter,
+  IntFilter,
+  IntListFilter,
+  InternetAddressFilter,
+  JSONFilter,
+  StringFilter,
+  StringListFilter,
+  UUIDFilter,
+  UUIDListFilter,
+  VectorFilter,
+} from './types';
 /** Methods to use when ordering `Commit`. */
-export type CommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
+export type CommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
 /** Methods to use when ordering `Object`. */
-export type ObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type ObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `Ref`. */
-export type RefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
+export type RefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
 /** Methods to use when ordering `Store`. */
-export type StoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type StoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’ */
 export interface CommitFilter {
   /** Checks for all expressions in this list. */

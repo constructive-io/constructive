@@ -6,15 +6,21 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { userCredentialsModuleKeys } from "../query-keys";
-import type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { userCredentialsModuleKeys } from '../query-keys';
+import type {
+  UserCredentialsModuleSelect,
+  UserCredentialsModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  UserCredentialsModuleSelect,
+  UserCredentialsModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const userCredentialsModuleQueryKey = userCredentialsModuleKeys.detail;
 /**
@@ -30,33 +36,47 @@ export const userCredentialsModuleQueryKey = userCredentialsModuleKeys.detail;
  * });
  * ```
  */
-export function useUserCredentialsModuleQuery<S extends UserCredentialsModuleSelect, TData = {
-  userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useUserCredentialsModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<UserCredentialsModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useUserCredentialsModuleQuery<
+  S extends UserCredentialsModuleSelect,
+  TData = {
+    userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useUserCredentialsModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<UserCredentialsModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<UserCredentialsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: userCredentialsModuleKeys.detail(params.id),
-    queryFn: () => getClient().userCredentialsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .userCredentialsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
@@ -72,7 +92,9 @@ export function useUserCredentialsModuleQuery(params: {
  * });
  * ```
  */
-export async function fetchUserCredentialsModuleQuery<S extends UserCredentialsModuleSelect>(params: {
+export async function fetchUserCredentialsModuleQuery<
+  S extends UserCredentialsModuleSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -85,10 +107,12 @@ export async function fetchUserCredentialsModuleQuery(params: {
   selection: SelectionConfig<UserCredentialsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<UserCredentialsModuleSelect>(params.selection);
-  return getClient().userCredentialsModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .userCredentialsModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Per-user bcrypt credential store (password hashes, API key hashes).
@@ -100,22 +124,31 @@ export async function fetchUserCredentialsModuleQuery(params: {
  * await prefetchUserCredentialsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchUserCredentialsModuleQuery<S extends UserCredentialsModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
-}): Promise<void>;
-export async function prefetchUserCredentialsModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<UserCredentialsModuleSelect>;
-}): Promise<void> {
+export async function prefetchUserCredentialsModuleQuery<S extends UserCredentialsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchUserCredentialsModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<UserCredentialsModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<UserCredentialsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userCredentialsModuleKeys.detail(params.id),
-    queryFn: () => getClient().userCredentialsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .userCredentialsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

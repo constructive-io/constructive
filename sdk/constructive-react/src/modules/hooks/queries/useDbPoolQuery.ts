@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { dbPoolKeys } from "../query-keys";
-import type { DbPoolSelect, DbPoolWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DbPoolSelect, DbPoolWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { dbPoolKeys } from '../query-keys';
+import type { DbPoolSelect, DbPoolWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DbPoolSelect, DbPoolWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const dbPoolQueryKey = dbPoolKeys.detail;
 /**
  * Warm database pool entries. Rows are inserted as warming (which enqueues a db_pool:warm_database job), become ready once provisioned, and are handed to users via metaschema_private.db_pool_claim (invoked by metaschema_public.request_database).
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDbPoolQuery({
@@ -26,38 +26,52 @@ export const dbPoolQueryKey = dbPoolKeys.detail;
  * });
  * ```
  */
-export function useDbPoolQuery<S extends DbPoolSelect, TData = {
-  dbPool: InferSelectResult<DbPoolWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
-} & Omit<UseQueryOptions<{
-  dbPool: InferSelectResult<DbPoolWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDbPoolQuery(params: {
-  id: string;
-  selection: SelectionConfig<DbPoolSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDbPoolQuery<
+  S extends DbPoolSelect,
+  TData = {
+    dbPool: InferSelectResult<DbPoolWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        dbPool: InferSelectResult<DbPoolWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDbPoolQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DbPoolSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DbPoolSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: dbPoolKeys.detail(params.id),
-    queryFn: () => getClient().dbPool.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .dbPool.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Warm database pool entries. Rows are inserted as warming (which enqueues a db_pool:warm_database job), become ready once provisioned, and are handed to users via metaschema_private.db_pool_claim (invoked by metaschema_public.request_database).
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDbPoolQuery({
@@ -79,35 +93,46 @@ export async function fetchDbPoolQuery(params: {
   selection: SelectionConfig<DbPoolSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DbPoolSelect>(params.selection);
-  return getClient().dbPool.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .dbPool.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Warm database pool entries. Rows are inserted as warming (which enqueues a db_pool:warm_database job), become ready once provisioned, and are handed to users via metaschema_private.db_pool_claim (invoked by metaschema_public.request_database).
- * 
+ *
  * @example
  * ```ts
  * await prefetchDbPoolQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDbPoolQuery<S extends DbPoolSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
-}): Promise<void>;
-export async function prefetchDbPoolQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DbPoolSelect>;
-}): Promise<void> {
+export async function prefetchDbPoolQuery<S extends DbPoolSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
+  }
+): Promise<void>;
+export async function prefetchDbPoolQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DbPoolSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DbPoolSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: dbPoolKeys.detail(params.id),
-    queryFn: () => getClient().dbPool.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .dbPool.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

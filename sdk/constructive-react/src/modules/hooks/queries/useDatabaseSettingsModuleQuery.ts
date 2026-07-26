@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { databaseSettingsModuleKeys } from "../query-keys";
-import type { DatabaseSettingsModuleSelect, DatabaseSettingsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DatabaseSettingsModuleSelect, DatabaseSettingsModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { databaseSettingsModuleKeys } from '../query-keys';
+import type {
+  DatabaseSettingsModuleSelect,
+  DatabaseSettingsModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  DatabaseSettingsModuleSelect,
+  DatabaseSettingsModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const databaseSettingsModuleQueryKey = databaseSettingsModuleKeys.detail;
 /**
  * Query hook for fetching a single DatabaseSettingsModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDatabaseSettingsModuleQuery({
@@ -26,38 +32,52 @@ export const databaseSettingsModuleQueryKey = databaseSettingsModuleKeys.detail;
  * });
  * ```
  */
-export function useDatabaseSettingsModuleQuery<S extends DatabaseSettingsModuleSelect, TData = {
-  databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DatabaseSettingsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDatabaseSettingsModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<DatabaseSettingsModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDatabaseSettingsModuleQuery<
+  S extends DatabaseSettingsModuleSelect,
+  TData = {
+    databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DatabaseSettingsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDatabaseSettingsModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DatabaseSettingsModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DatabaseSettingsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: databaseSettingsModuleKeys.detail(params.id),
-    queryFn: () => getClient().databaseSettingsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .databaseSettingsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single DatabaseSettingsModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDatabaseSettingsModuleQuery({
@@ -66,7 +86,9 @@ export function useDatabaseSettingsModuleQuery(params: {
  * });
  * ```
  */
-export async function fetchDatabaseSettingsModuleQuery<S extends DatabaseSettingsModuleSelect>(params: {
+export async function fetchDatabaseSettingsModuleQuery<
+  S extends DatabaseSettingsModuleSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +101,46 @@ export async function fetchDatabaseSettingsModuleQuery(params: {
   selection: SelectionConfig<DatabaseSettingsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DatabaseSettingsModuleSelect>(params.selection);
-  return getClient().databaseSettingsModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .databaseSettingsModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single DatabaseSettingsModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDatabaseSettingsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDatabaseSettingsModuleQuery<S extends DatabaseSettingsModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DatabaseSettingsModuleSelect>;
-}): Promise<void>;
-export async function prefetchDatabaseSettingsModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DatabaseSettingsModuleSelect>;
-}): Promise<void> {
+export async function prefetchDatabaseSettingsModuleQuery<S extends DatabaseSettingsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DatabaseSettingsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDatabaseSettingsModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DatabaseSettingsModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DatabaseSettingsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: databaseSettingsModuleKeys.detail(params.id),
-    queryFn: () => getClient().databaseSettingsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .databaseSettingsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

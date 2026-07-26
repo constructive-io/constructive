@@ -19,58 +19,82 @@
 // ============================================================================
 
 export const agentMutationKeys = {
-  /** All agent mutation keys */all: ["mutation", "agent"] as const,
-  /** Create agent mutation key */create: () => ["mutation", "agent", "create"] as const,
-  /** Update agent mutation key */update: (id: string | number) => ["mutation", "agent", "update", id] as const,
-  /** Delete agent mutation key */delete: (id: string | number) => ["mutation", "agent", "delete", id] as const
+  /** All agent mutation keys */ all: ['mutation', 'agent'] as const,
+  /** Create agent mutation key */ create: () => ['mutation', 'agent', 'create'] as const,
+  /** Update agent mutation key */ update: (id: string | number) =>
+    ['mutation', 'agent', 'update', id] as const,
+  /** Delete agent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agent', 'delete', id] as const,
 } as const;
 export const agentMessageMutationKeys = {
-  /** All agentMessage mutation keys */all: ["mutation", "agentmessage"] as const,
-  /** Create agentMessage mutation key */create: () => ["mutation", "agentmessage", "create"] as const,
-  /** Update agentMessage mutation key */update: (id: string | number) => ["mutation", "agentmessage", "update", id] as const,
-  /** Delete agentMessage mutation key */delete: (id: string | number) => ["mutation", "agentmessage", "delete", id] as const
+  /** All agentMessage mutation keys */ all: ['mutation', 'agentmessage'] as const,
+  /** Create agentMessage mutation key */ create: () =>
+    ['mutation', 'agentmessage', 'create'] as const,
+  /** Update agentMessage mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentmessage', 'update', id] as const,
+  /** Delete agentMessage mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentmessage', 'delete', id] as const,
 } as const;
 export const agentPersonaMutationKeys = {
-  /** All agentPersona mutation keys */all: ["mutation", "agentpersona"] as const,
-  /** Create agentPersona mutation key */create: () => ["mutation", "agentpersona", "create"] as const,
-  /** Update agentPersona mutation key */update: (id: string | number) => ["mutation", "agentpersona", "update", id] as const,
-  /** Delete agentPersona mutation key */delete: (id: string | number) => ["mutation", "agentpersona", "delete", id] as const
+  /** All agentPersona mutation keys */ all: ['mutation', 'agentpersona'] as const,
+  /** Create agentPersona mutation key */ create: () =>
+    ['mutation', 'agentpersona', 'create'] as const,
+  /** Update agentPersona mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentpersona', 'update', id] as const,
+  /** Delete agentPersona mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentpersona', 'delete', id] as const,
 } as const;
 export const agentPlanMutationKeys = {
-  /** All agentPlan mutation keys */all: ["mutation", "agentplan"] as const,
-  /** Create agentPlan mutation key */create: () => ["mutation", "agentplan", "create"] as const,
-  /** Update agentPlan mutation key */update: (id: string | number) => ["mutation", "agentplan", "update", id] as const,
-  /** Delete agentPlan mutation key */delete: (id: string | number) => ["mutation", "agentplan", "delete", id] as const
+  /** All agentPlan mutation keys */ all: ['mutation', 'agentplan'] as const,
+  /** Create agentPlan mutation key */ create: () => ['mutation', 'agentplan', 'create'] as const,
+  /** Update agentPlan mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentplan', 'update', id] as const,
+  /** Delete agentPlan mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentplan', 'delete', id] as const,
 } as const;
 export const agentPromptMutationKeys = {
-  /** All agentPrompt mutation keys */all: ["mutation", "agentprompt"] as const,
-  /** Create agentPrompt mutation key */create: () => ["mutation", "agentprompt", "create"] as const,
-  /** Update agentPrompt mutation key */update: (id: string | number) => ["mutation", "agentprompt", "update", id] as const,
-  /** Delete agentPrompt mutation key */delete: (id: string | number) => ["mutation", "agentprompt", "delete", id] as const
+  /** All agentPrompt mutation keys */ all: ['mutation', 'agentprompt'] as const,
+  /** Create agentPrompt mutation key */ create: () =>
+    ['mutation', 'agentprompt', 'create'] as const,
+  /** Update agentPrompt mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentprompt', 'update', id] as const,
+  /** Delete agentPrompt mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentprompt', 'delete', id] as const,
 } as const;
 export const agentResourceChunkMutationKeys = {
-  /** All agentResourceChunk mutation keys */all: ["mutation", "agentresourcechunk"] as const,
-  /** Create agentResourceChunk mutation key */create: () => ["mutation", "agentresourcechunk", "create"] as const,
-  /** Update agentResourceChunk mutation key */update: (id: string | number) => ["mutation", "agentresourcechunk", "update", id] as const,
-  /** Delete agentResourceChunk mutation key */delete: (id: string | number) => ["mutation", "agentresourcechunk", "delete", id] as const
+  /** All agentResourceChunk mutation keys */ all: ['mutation', 'agentresourcechunk'] as const,
+  /** Create agentResourceChunk mutation key */ create: () =>
+    ['mutation', 'agentresourcechunk', 'create'] as const,
+  /** Update agentResourceChunk mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentresourcechunk', 'update', id] as const,
+  /** Delete agentResourceChunk mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentresourcechunk', 'delete', id] as const,
 } as const;
 export const agentResourceMutationKeys = {
-  /** All agentResource mutation keys */all: ["mutation", "agentresource"] as const,
-  /** Create agentResource mutation key */create: () => ["mutation", "agentresource", "create"] as const,
-  /** Update agentResource mutation key */update: (id: string | number) => ["mutation", "agentresource", "update", id] as const,
-  /** Delete agentResource mutation key */delete: (id: string | number) => ["mutation", "agentresource", "delete", id] as const
+  /** All agentResource mutation keys */ all: ['mutation', 'agentresource'] as const,
+  /** Create agentResource mutation key */ create: () =>
+    ['mutation', 'agentresource', 'create'] as const,
+  /** Update agentResource mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentresource', 'update', id] as const,
+  /** Delete agentResource mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentresource', 'delete', id] as const,
 } as const;
 export const agentTaskMutationKeys = {
-  /** All agentTask mutation keys */all: ["mutation", "agenttask"] as const,
-  /** Create agentTask mutation key */create: () => ["mutation", "agenttask", "create"] as const,
-  /** Update agentTask mutation key */update: (id: string | number) => ["mutation", "agenttask", "update", id] as const,
-  /** Delete agentTask mutation key */delete: (id: string | number) => ["mutation", "agenttask", "delete", id] as const
+  /** All agentTask mutation keys */ all: ['mutation', 'agenttask'] as const,
+  /** Create agentTask mutation key */ create: () => ['mutation', 'agenttask', 'create'] as const,
+  /** Update agentTask mutation key */ update: (id: string | number) =>
+    ['mutation', 'agenttask', 'update', id] as const,
+  /** Delete agentTask mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agenttask', 'delete', id] as const,
 } as const;
 export const agentThreadMutationKeys = {
-  /** All agentThread mutation keys */all: ["mutation", "agentthread"] as const,
-  /** Create agentThread mutation key */create: () => ["mutation", "agentthread", "create"] as const,
-  /** Update agentThread mutation key */update: (id: string | number) => ["mutation", "agentthread", "update", id] as const,
-  /** Delete agentThread mutation key */delete: (id: string | number) => ["mutation", "agentthread", "delete", id] as const
+  /** All agentThread mutation keys */ all: ['mutation', 'agentthread'] as const,
+  /** Create agentThread mutation key */ create: () =>
+    ['mutation', 'agentthread', 'create'] as const,
+  /** Update agentThread mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentthread', 'update', id] as const,
+  /** Delete agentThread mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentthread', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -78,7 +102,10 @@ export const agentThreadMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
-  /** Mutation key for provisionBucket */provisionBucket: (identifier?: string) => identifier ? ["mutation", "provisionBucket", identifier] as const : ["mutation", "provisionBucket"] as const
+  /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionBucket', identifier] as const)
+      : (['mutation', 'provisionBucket'] as const),
 } as const;
 /**
 
@@ -112,5 +139,5 @@ export const mutationKeys = {
   agentResource: agentResourceMutationKeys,
   agentTask: agentTaskMutationKeys,
   agentThread: agentThreadMutationKeys,
-  custom: customMutationKeys
+  custom: customMutationKeys,
 } as const;

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { agentResourceKeys } from "../query-keys";
-import type { AgentResourceSelect, AgentResourceWithRelations, AgentResourceFilter, AgentResourceOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentResourceSelect, AgentResourceWithRelations, AgentResourceFilter, AgentResourceOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { agentResourceKeys } from '../query-keys';
+import type {
+  AgentResourceSelect,
+  AgentResourceWithRelations,
+  AgentResourceFilter,
+  AgentResourceOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AgentResourceSelect,
+  AgentResourceWithRelations,
+  AgentResourceFilter,
+  AgentResourceOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentResourcesQueryKey = agentResourceKeys.list;
 /**
  * Unified skills and knowledge resources for agent retrieval
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentResourcesQuery({
@@ -30,33 +45,49 @@ export const agentResourcesQueryKey = agentResourceKeys.list;
  * });
  * ```
  */
-export function useAgentResourcesQuery<S extends AgentResourceSelect, TData = {
-  agentResources: ConnectionResult<InferSelectResult<AgentResourceWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AgentResourceFilter, AgentResourceOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
-} & Omit<UseQueryOptions<{
-  agentResources: ConnectionResult<InferSelectResult<AgentResourceWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentResourcesQuery(params: {
-  selection: ListSelectionConfig<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAgentResourcesQuery<
+  S extends AgentResourceSelect,
+  TData = {
+    agentResources: ConnectionResult<InferSelectResult<AgentResourceWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AgentResourceFilter, AgentResourceOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentResources: ConnectionResult<InferSelectResult<AgentResourceWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentResourcesQuery(
+  params: {
+    selection: ListSelectionConfig<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    AgentResourceSelect,
+    AgentResourceFilter,
+    AgentResourceOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentResourceKeys.list(args),
     queryFn: () => getClient().agentResource.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Unified skills and knowledge resources for agent retrieval
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentResourcesQuery({
@@ -70,35 +101,51 @@ export function useAgentResourcesQuery(params: {
 export async function fetchAgentResourcesQuery<S extends AgentResourceSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AgentResourceFilter, AgentResourceOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
+  } & Omit<ListSelectionConfig<S, AgentResourceFilter, AgentResourceOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
 }): Promise<{
   agentResources: ConnectionResult<InferSelectResult<AgentResourceWithRelations, S>>;
 }>;
 export async function fetchAgentResourcesQuery(params: {
   selection: ListSelectionConfig<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    AgentResourceSelect,
+    AgentResourceFilter,
+    AgentResourceOrderBy
+  >(params.selection);
   return getClient().agentResource.findMany(args).unwrap();
 }
 /**
  * Unified skills and knowledge resources for agent retrieval
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentResourcesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAgentResourcesQuery<S extends AgentResourceSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AgentResourceFilter, AgentResourceOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
-}): Promise<void>;
-export async function prefetchAgentResourcesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>(params.selection);
+export async function prefetchAgentResourcesQuery<S extends AgentResourceSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AgentResourceFilter, AgentResourceOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentResourcesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    AgentResourceSelect,
+    AgentResourceFilter,
+    AgentResourceOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentResourceKeys.list(args),
-    queryFn: () => getClient().agentResource.findMany(args).unwrap()
+    queryFn: () => getClient().agentResource.findMany(args).unwrap(),
   });
 }

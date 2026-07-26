@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionGraphKeys } from "../query-keys";
-import type { FunctionGraphSelect, FunctionGraphWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphSelect, FunctionGraphWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionGraphKeys } from '../query-keys';
+import type { FunctionGraphSelect, FunctionGraphWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { FunctionGraphSelect, FunctionGraphWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphQueryKey = functionGraphKeys.detail;
 /**
  * Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphQuery({
@@ -26,38 +26,52 @@ export const functionGraphQueryKey = functionGraphKeys.detail;
  * });
  * ```
  */
-export function useFunctionGraphQuery<S extends FunctionGraphSelect, TData = {
-  functionGraph: InferSelectResult<FunctionGraphWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphSelect>;
-} & Omit<UseQueryOptions<{
-  functionGraph: InferSelectResult<FunctionGraphWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionGraphQuery(params: {
-  id: string;
-  selection: SelectionConfig<FunctionGraphSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useFunctionGraphQuery<
+  S extends FunctionGraphSelect,
+  TData = {
+    functionGraph: InferSelectResult<FunctionGraphWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionGraph: InferSelectResult<FunctionGraphWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionGraphQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionGraphSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<FunctionGraphSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphKeys.detail(params.id),
-    queryFn: () => getClient().functionGraph.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .functionGraph.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionGraphQuery({
@@ -79,35 +93,46 @@ export async function fetchFunctionGraphQuery(params: {
   selection: SelectionConfig<FunctionGraphSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionGraphSelect>(params.selection);
-  return getClient().functionGraph.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .functionGraph.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionGraphQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionGraphQuery<S extends FunctionGraphSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphSelect>;
-}): Promise<void>;
-export async function prefetchFunctionGraphQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<FunctionGraphSelect>;
-}): Promise<void> {
+export async function prefetchFunctionGraphQuery<S extends FunctionGraphSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionGraphQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionGraphSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<FunctionGraphSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphKeys.detail(params.id),
-    queryFn: () => getClient().functionGraph.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .functionGraph.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

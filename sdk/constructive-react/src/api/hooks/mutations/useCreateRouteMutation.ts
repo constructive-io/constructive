@@ -4,62 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { routeKeys } from "../query-keys";
-import { routeMutationKeys } from "../mutation-keys";
-import type { RouteSelect, RouteWithRelations, CreateRouteInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RouteSelect, RouteWithRelations, CreateRouteInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { routeKeys } from '../query-keys';
+import { routeMutationKeys } from '../mutation-keys';
+import type { RouteSelect, RouteWithRelations, CreateRouteInput } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { RouteSelect, RouteWithRelations, CreateRouteInput } from '../../orm/input-types';
 /**
  * Routes binding a domain hostname and path to a typed catalog target
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateRouteMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateRouteMutation<S extends RouteSelect>(params: {
-  selection: ({
-    fields: S & RouteSelect;
-  } & HookStrictSelect<NoInfer<S>, RouteSelect>);
-} & Omit<UseMutationOptions<{
-  createRoute: {
-    route: InferSelectResult<RouteWithRelations, S>;
-  };
-}, Error, CreateRouteInput["route"]>, "mutationFn">): UseMutationResult<{
-  createRoute: {
-    route: InferSelectResult<RouteWithRelations, S>;
-  };
-}, Error, CreateRouteInput["route"]>;
-export function useCreateRouteMutation(params: {
-  selection: SelectionConfig<RouteSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateRouteInput["route"]>, "mutationFn">) {
+export function useCreateRouteMutation<S extends RouteSelect>(
+  params: {
+    selection: {
+      fields: S & RouteSelect;
+    } & HookStrictSelect<NoInfer<S>, RouteSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createRoute: {
+          route: InferSelectResult<RouteWithRelations, S>;
+        };
+      },
+      Error,
+      CreateRouteInput['route']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createRoute: {
+      route: InferSelectResult<RouteWithRelations, S>;
+    };
+  },
+  Error,
+  CreateRouteInput['route']
+>;
+export function useCreateRouteMutation(
+  params: {
+    selection: SelectionConfig<RouteSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateRouteInput['route']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<RouteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: routeMutationKeys.create(),
-    mutationFn: (data: CreateRouteInput["route"]) => getClient().route.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateRouteInput['route']) =>
+      getClient()
+        .route.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: routeKeys.lists()
+        queryKey: routeKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

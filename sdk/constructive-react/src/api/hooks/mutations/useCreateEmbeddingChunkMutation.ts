@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { embeddingChunkKeys } from "../query-keys";
-import { embeddingChunkMutationKeys } from "../mutation-keys";
-import type { EmbeddingChunkSelect, EmbeddingChunkWithRelations, CreateEmbeddingChunkInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { EmbeddingChunkSelect, EmbeddingChunkWithRelations, CreateEmbeddingChunkInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { embeddingChunkKeys } from '../query-keys';
+import { embeddingChunkMutationKeys } from '../mutation-keys';
+import type {
+  EmbeddingChunkSelect,
+  EmbeddingChunkWithRelations,
+  CreateEmbeddingChunkInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  EmbeddingChunkSelect,
+  EmbeddingChunkWithRelations,
+  CreateEmbeddingChunkInput,
+} from '../../orm/input-types';
 /**
  * Mutation hook for creating a EmbeddingChunk
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateEmbeddingChunkMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateEmbeddingChunkMutation<S extends EmbeddingChunkSelect>(params: {
-  selection: ({
-    fields: S & EmbeddingChunkSelect;
-  } & HookStrictSelect<NoInfer<S>, EmbeddingChunkSelect>);
-} & Omit<UseMutationOptions<{
-  createEmbeddingChunk: {
-    embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S>;
-  };
-}, Error, CreateEmbeddingChunkInput["embeddingChunk"]>, "mutationFn">): UseMutationResult<{
-  createEmbeddingChunk: {
-    embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S>;
-  };
-}, Error, CreateEmbeddingChunkInput["embeddingChunk"]>;
-export function useCreateEmbeddingChunkMutation(params: {
-  selection: SelectionConfig<EmbeddingChunkSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateEmbeddingChunkInput["embeddingChunk"]>, "mutationFn">) {
+export function useCreateEmbeddingChunkMutation<S extends EmbeddingChunkSelect>(
+  params: {
+    selection: {
+      fields: S & EmbeddingChunkSelect;
+    } & HookStrictSelect<NoInfer<S>, EmbeddingChunkSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createEmbeddingChunk: {
+          embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S>;
+        };
+      },
+      Error,
+      CreateEmbeddingChunkInput['embeddingChunk']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createEmbeddingChunk: {
+      embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S>;
+    };
+  },
+  Error,
+  CreateEmbeddingChunkInput['embeddingChunk']
+>;
+export function useCreateEmbeddingChunkMutation(
+  params: {
+    selection: SelectionConfig<EmbeddingChunkSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateEmbeddingChunkInput['embeddingChunk']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<EmbeddingChunkSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: embeddingChunkMutationKeys.create(),
-    mutationFn: (data: CreateEmbeddingChunkInput["embeddingChunk"]) => getClient().embeddingChunk.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateEmbeddingChunkInput['embeddingChunk']) =>
+      getClient()
+        .embeddingChunk.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: embeddingChunkKeys.lists()
+        queryKey: embeddingChunkKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { corsSettingKeys } from "../query-keys";
-import type { CorsSettingSelect, CorsSettingWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { CorsSettingSelect, CorsSettingWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { corsSettingKeys } from '../query-keys';
+import type { CorsSettingSelect, CorsSettingWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { CorsSettingSelect, CorsSettingWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const corsSettingQueryKey = corsSettingKeys.detail;
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCorsSettingQuery({
@@ -26,38 +26,52 @@ export const corsSettingQueryKey = corsSettingKeys.detail;
  * });
  * ```
  */
-export function useCorsSettingQuery<S extends CorsSettingSelect, TData = {
-  corsSetting: InferSelectResult<CorsSettingWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
-} & Omit<UseQueryOptions<{
-  corsSetting: InferSelectResult<CorsSettingWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCorsSettingQuery(params: {
-  id: string;
-  selection: SelectionConfig<CorsSettingSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useCorsSettingQuery<
+  S extends CorsSettingSelect,
+  TData = {
+    corsSetting: InferSelectResult<CorsSettingWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        corsSetting: InferSelectResult<CorsSettingWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCorsSettingQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<CorsSettingSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<CorsSettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: corsSettingKeys.detail(params.id),
-    queryFn: () => getClient().corsSetting.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .corsSetting.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCorsSettingQuery({
@@ -79,35 +93,46 @@ export async function fetchCorsSettingQuery(params: {
   selection: SelectionConfig<CorsSettingSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<CorsSettingSelect>(params.selection);
-  return getClient().corsSetting.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .corsSetting.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```ts
  * await prefetchCorsSettingQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchCorsSettingQuery<S extends CorsSettingSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
-}): Promise<void>;
-export async function prefetchCorsSettingQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<CorsSettingSelect>;
-}): Promise<void> {
+export async function prefetchCorsSettingQuery<S extends CorsSettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchCorsSettingQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<CorsSettingSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<CorsSettingSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: corsSettingKeys.detail(params.id),
-    queryFn: () => getClient().corsSetting.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .corsSetting.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

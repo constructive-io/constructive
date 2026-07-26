@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { pubkeySettingKeys } from "../query-keys";
-import type { PubkeySettingSelect, PubkeySettingWithRelations, PubkeySettingFilter, PubkeySettingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PubkeySettingSelect, PubkeySettingWithRelations, PubkeySettingFilter, PubkeySettingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { pubkeySettingKeys } from '../query-keys';
+import type {
+  PubkeySettingSelect,
+  PubkeySettingWithRelations,
+  PubkeySettingFilter,
+  PubkeySettingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PubkeySettingSelect,
+  PubkeySettingWithRelations,
+  PubkeySettingFilter,
+  PubkeySettingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const pubkeySettingsQueryKey = pubkeySettingKeys.list;
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePubkeySettingsQuery({
@@ -30,33 +45,49 @@ export const pubkeySettingsQueryKey = pubkeySettingKeys.list;
  * });
  * ```
  */
-export function usePubkeySettingsQuery<S extends PubkeySettingSelect, TData = {
-  pubkeySettings: ConnectionResult<InferSelectResult<PubkeySettingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PubkeySettingFilter, PubkeySettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
-} & Omit<UseQueryOptions<{
-  pubkeySettings: ConnectionResult<InferSelectResult<PubkeySettingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePubkeySettingsQuery(params: {
-  selection: ListSelectionConfig<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePubkeySettingsQuery<
+  S extends PubkeySettingSelect,
+  TData = {
+    pubkeySettings: ConnectionResult<InferSelectResult<PubkeySettingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PubkeySettingFilter, PubkeySettingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        pubkeySettings: ConnectionResult<InferSelectResult<PubkeySettingWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePubkeySettingsQuery(
+  params: {
+    selection: ListSelectionConfig<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PubkeySettingSelect,
+    PubkeySettingFilter,
+    PubkeySettingOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: pubkeySettingKeys.list(args),
     queryFn: () => getClient().pubkeySetting.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPubkeySettingsQuery({
@@ -70,35 +101,51 @@ export function usePubkeySettingsQuery(params: {
 export async function fetchPubkeySettingsQuery<S extends PubkeySettingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PubkeySettingFilter, PubkeySettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
+  } & Omit<ListSelectionConfig<S, PubkeySettingFilter, PubkeySettingOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
 }): Promise<{
   pubkeySettings: ConnectionResult<InferSelectResult<PubkeySettingWithRelations, S>>;
 }>;
 export async function fetchPubkeySettingsQuery(params: {
   selection: ListSelectionConfig<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>;
 }) {
-  const args = buildListSelectionArgs<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PubkeySettingSelect,
+    PubkeySettingFilter,
+    PubkeySettingOrderBy
+  >(params.selection);
   return getClient().pubkeySetting.findMany(args).unwrap();
 }
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```ts
  * await prefetchPubkeySettingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPubkeySettingsQuery<S extends PubkeySettingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PubkeySettingFilter, PubkeySettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
-}): Promise<void>;
-export async function prefetchPubkeySettingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>(params.selection);
+export async function prefetchPubkeySettingsQuery<S extends PubkeySettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PubkeySettingFilter, PubkeySettingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchPubkeySettingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<PubkeySettingSelect, PubkeySettingFilter, PubkeySettingOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PubkeySettingSelect,
+    PubkeySettingFilter,
+    PubkeySettingOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: pubkeySettingKeys.list(args),
-    queryFn: () => getClient().pubkeySetting.findMany(args).unwrap()
+    queryFn: () => getClient().pubkeySetting.findMany(args).unwrap(),
   });
 }

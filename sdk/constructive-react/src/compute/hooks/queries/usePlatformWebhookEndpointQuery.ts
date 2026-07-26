@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformWebhookEndpointKeys } from "../query-keys";
-import type { PlatformWebhookEndpointSelect, PlatformWebhookEndpointWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformWebhookEndpointSelect, PlatformWebhookEndpointWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformWebhookEndpointKeys } from '../query-keys';
+import type {
+  PlatformWebhookEndpointSelect,
+  PlatformWebhookEndpointWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformWebhookEndpointSelect,
+  PlatformWebhookEndpointWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformWebhookEndpointQueryKey = platformWebhookEndpointKeys.detail;
 /**
  * Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformWebhookEndpointQuery({
@@ -26,38 +32,52 @@ export const platformWebhookEndpointQueryKey = platformWebhookEndpointKeys.detai
  * });
  * ```
  */
-export function usePlatformWebhookEndpointQuery<S extends PlatformWebhookEndpointSelect, TData = {
-  platformWebhookEndpoint: InferSelectResult<PlatformWebhookEndpointWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformWebhookEndpointSelect>;
-} & Omit<UseQueryOptions<{
-  platformWebhookEndpoint: InferSelectResult<PlatformWebhookEndpointWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformWebhookEndpointQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformWebhookEndpointSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformWebhookEndpointQuery<
+  S extends PlatformWebhookEndpointSelect,
+  TData = {
+    platformWebhookEndpoint: InferSelectResult<PlatformWebhookEndpointWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformWebhookEndpointSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformWebhookEndpoint: InferSelectResult<PlatformWebhookEndpointWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformWebhookEndpointQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformWebhookEndpointSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformWebhookEndpointSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformWebhookEndpointKeys.detail(params.id),
-    queryFn: () => getClient().platformWebhookEndpoint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformWebhookEndpoint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformWebhookEndpointQuery({
@@ -66,7 +86,9 @@ export function usePlatformWebhookEndpointQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformWebhookEndpointQuery<S extends PlatformWebhookEndpointSelect>(params: {
+export async function fetchPlatformWebhookEndpointQuery<
+  S extends PlatformWebhookEndpointSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +101,46 @@ export async function fetchPlatformWebhookEndpointQuery(params: {
   selection: SelectionConfig<PlatformWebhookEndpointSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformWebhookEndpointSelect>(params.selection);
-  return getClient().platformWebhookEndpoint.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformWebhookEndpoint.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformWebhookEndpointQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformWebhookEndpointQuery<S extends PlatformWebhookEndpointSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformWebhookEndpointSelect>;
-}): Promise<void>;
-export async function prefetchPlatformWebhookEndpointQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformWebhookEndpointSelect>;
-}): Promise<void> {
+export async function prefetchPlatformWebhookEndpointQuery<S extends PlatformWebhookEndpointSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformWebhookEndpointSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformWebhookEndpointQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformWebhookEndpointSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformWebhookEndpointSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformWebhookEndpointKeys.detail(params.id),
-    queryFn: () => getClient().platformWebhookEndpoint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformWebhookEndpoint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

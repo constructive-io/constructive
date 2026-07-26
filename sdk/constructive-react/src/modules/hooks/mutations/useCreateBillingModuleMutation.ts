@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { billingModuleKeys } from "../query-keys";
-import { billingModuleMutationKeys } from "../mutation-keys";
-import type { BillingModuleSelect, BillingModuleWithRelations, CreateBillingModuleInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { BillingModuleSelect, BillingModuleWithRelations, CreateBillingModuleInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { billingModuleKeys } from '../query-keys';
+import { billingModuleMutationKeys } from '../mutation-keys';
+import type {
+  BillingModuleSelect,
+  BillingModuleWithRelations,
+  CreateBillingModuleInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  BillingModuleSelect,
+  BillingModuleWithRelations,
+  CreateBillingModuleInput,
+} from '../../orm/input-types';
 /**
  * Mutation hook for creating a BillingModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateBillingModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateBillingModuleMutation<S extends BillingModuleSelect>(params: {
-  selection: ({
-    fields: S & BillingModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, BillingModuleSelect>);
-} & Omit<UseMutationOptions<{
-  createBillingModule: {
-    billingModule: InferSelectResult<BillingModuleWithRelations, S>;
-  };
-}, Error, CreateBillingModuleInput["billingModule"]>, "mutationFn">): UseMutationResult<{
-  createBillingModule: {
-    billingModule: InferSelectResult<BillingModuleWithRelations, S>;
-  };
-}, Error, CreateBillingModuleInput["billingModule"]>;
-export function useCreateBillingModuleMutation(params: {
-  selection: SelectionConfig<BillingModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateBillingModuleInput["billingModule"]>, "mutationFn">) {
+export function useCreateBillingModuleMutation<S extends BillingModuleSelect>(
+  params: {
+    selection: {
+      fields: S & BillingModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createBillingModule: {
+          billingModule: InferSelectResult<BillingModuleWithRelations, S>;
+        };
+      },
+      Error,
+      CreateBillingModuleInput['billingModule']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createBillingModule: {
+      billingModule: InferSelectResult<BillingModuleWithRelations, S>;
+    };
+  },
+  Error,
+  CreateBillingModuleInput['billingModule']
+>;
+export function useCreateBillingModuleMutation(
+  params: {
+    selection: SelectionConfig<BillingModuleSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateBillingModuleInput['billingModule']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<BillingModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: billingModuleMutationKeys.create(),
-    mutationFn: (data: CreateBillingModuleInput["billingModule"]) => getClient().billingModule.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateBillingModuleInput['billingModule']) =>
+      getClient()
+        .billingModule.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.lists()
+        queryKey: billingModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

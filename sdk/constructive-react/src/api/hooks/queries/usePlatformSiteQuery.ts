@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteKeys } from "../query-keys";
-import type { PlatformSiteSelect, PlatformSiteWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteSelect, PlatformSiteWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteKeys } from '../query-keys';
+import type { PlatformSiteSelect, PlatformSiteWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { PlatformSiteSelect, PlatformSiteWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformSiteQueryKey = platformSiteKeys.detail;
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformSiteQuery({
@@ -26,38 +26,52 @@ export const platformSiteQueryKey = platformSiteKeys.detail;
  * });
  * ```
  */
-export function usePlatformSiteQuery<S extends PlatformSiteSelect, TData = {
-  platformSite: InferSelectResult<PlatformSiteWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteSelect>;
-} & Omit<UseQueryOptions<{
-  platformSite: InferSelectResult<PlatformSiteWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformSiteQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformSiteSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformSiteQuery<
+  S extends PlatformSiteSelect,
+  TData = {
+    platformSite: InferSelectResult<PlatformSiteWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformSite: InferSelectResult<PlatformSiteWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformSiteQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformSiteSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformSiteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformSiteKeys.detail(params.id),
-    queryFn: () => getClient().platformSite.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformSite.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformSiteQuery({
@@ -79,35 +93,46 @@ export async function fetchPlatformSiteQuery(params: {
   selection: SelectionConfig<PlatformSiteSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformSiteSelect>(params.selection);
-  return getClient().platformSite.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformSite.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformSiteQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformSiteQuery<S extends PlatformSiteSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteSelect>;
-}): Promise<void>;
-export async function prefetchPlatformSiteQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformSiteSelect>;
-}): Promise<void> {
+export async function prefetchPlatformSiteQuery<S extends PlatformSiteSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformSiteQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformSiteSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformSiteSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformSiteKeys.detail(params.id),
-    queryFn: () => getClient().platformSite.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformSite.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

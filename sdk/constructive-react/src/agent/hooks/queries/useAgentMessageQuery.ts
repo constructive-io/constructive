@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentMessageKeys } from "../query-keys";
-import type { AgentMessageSelect, AgentMessageWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentMessageSelect, AgentMessageWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentMessageKeys } from '../query-keys';
+import type { AgentMessageSelect, AgentMessageWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentMessageSelect, AgentMessageWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentMessageQueryKey = agentMessageKeys.detail;
 /**
  * Message within an agent thread with TextPart/ToolPart jsonb parts
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentMessageQuery({
@@ -26,38 +26,52 @@ export const agentMessageQueryKey = agentMessageKeys.detail;
  * });
  * ```
  */
-export function useAgentMessageQuery<S extends AgentMessageSelect, TData = {
-  agentMessage: InferSelectResult<AgentMessageWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentMessageSelect>;
-} & Omit<UseQueryOptions<{
-  agentMessage: InferSelectResult<AgentMessageWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentMessageQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentMessageSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentMessageQuery<
+  S extends AgentMessageSelect,
+  TData = {
+    agentMessage: InferSelectResult<AgentMessageWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentMessageSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentMessage: InferSelectResult<AgentMessageWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentMessageQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentMessageSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentMessageSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentMessageKeys.detail(params.id),
-    queryFn: () => getClient().agentMessage.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agentMessage.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Message within an agent thread with TextPart/ToolPart jsonb parts
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentMessageQuery({
@@ -79,35 +93,46 @@ export async function fetchAgentMessageQuery(params: {
   selection: SelectionConfig<AgentMessageSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentMessageSelect>(params.selection);
-  return getClient().agentMessage.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agentMessage.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Message within an agent thread with TextPart/ToolPart jsonb parts
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentMessageQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentMessageQuery<S extends AgentMessageSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentMessageSelect>;
-}): Promise<void>;
-export async function prefetchAgentMessageQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentMessageSelect>;
-}): Promise<void> {
+export async function prefetchAgentMessageQuery<S extends AgentMessageSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentMessageSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentMessageQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentMessageSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentMessageSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentMessageKeys.detail(params.id),
-    queryFn: () => getClient().agentMessage.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agentMessage.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

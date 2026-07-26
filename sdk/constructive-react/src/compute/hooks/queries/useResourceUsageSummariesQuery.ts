@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { resourceUsageSummaryKeys } from "../query-keys";
-import type { ResourceUsageSummarySelect, ResourceUsageSummaryWithRelations, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ResourceUsageSummarySelect, ResourceUsageSummaryWithRelations, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { resourceUsageSummaryKeys } from '../query-keys';
+import type {
+  ResourceUsageSummarySelect,
+  ResourceUsageSummaryWithRelations,
+  ResourceUsageSummaryFilter,
+  ResourceUsageSummaryOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ResourceUsageSummarySelect,
+  ResourceUsageSummaryWithRelations,
+  ResourceUsageSummaryFilter,
+  ResourceUsageSummaryOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const resourceUsageSummariesQueryKey = resourceUsageSummaryKeys.list;
 /**
  * Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useResourceUsageSummariesQuery({
@@ -30,33 +45,60 @@ export const resourceUsageSummariesQueryKey = resourceUsageSummaryKeys.list;
  * });
  * ```
  */
-export function useResourceUsageSummariesQuery<S extends ResourceUsageSummarySelect, TData = {
-  resourceUsageSummaries: ConnectionResult<InferSelectResult<ResourceUsageSummaryWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourceUsageSummarySelect>;
-} & Omit<UseQueryOptions<{
-  resourceUsageSummaries: ConnectionResult<InferSelectResult<ResourceUsageSummaryWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useResourceUsageSummariesQuery(params: {
-  selection: ListSelectionConfig<ResourceUsageSummarySelect, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ResourceUsageSummarySelect, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useResourceUsageSummariesQuery<
+  S extends ResourceUsageSummarySelect,
+  TData = {
+    resourceUsageSummaries: ConnectionResult<
+      InferSelectResult<ResourceUsageSummaryWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, ResourceUsageSummarySelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        resourceUsageSummaries: ConnectionResult<
+          InferSelectResult<ResourceUsageSummaryWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useResourceUsageSummariesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      ResourceUsageSummarySelect,
+      ResourceUsageSummaryFilter,
+      ResourceUsageSummaryOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    ResourceUsageSummarySelect,
+    ResourceUsageSummaryFilter,
+    ResourceUsageSummaryOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourceUsageSummaryKeys.list(args),
     queryFn: () => getClient().resourceUsageSummary.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchResourceUsageSummariesQuery({
@@ -67,38 +109,70 @@ export function useResourceUsageSummariesQuery(params: {
  * });
  * ```
  */
-export async function fetchResourceUsageSummariesQuery<S extends ResourceUsageSummarySelect>(params: {
+export async function fetchResourceUsageSummariesQuery<
+  S extends ResourceUsageSummarySelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourceUsageSummarySelect>;
+  } & Omit<
+    ListSelectionConfig<S, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, ResourceUsageSummarySelect>;
 }): Promise<{
   resourceUsageSummaries: ConnectionResult<InferSelectResult<ResourceUsageSummaryWithRelations, S>>;
 }>;
 export async function fetchResourceUsageSummariesQuery(params: {
-  selection: ListSelectionConfig<ResourceUsageSummarySelect, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>;
+  selection: ListSelectionConfig<
+    ResourceUsageSummarySelect,
+    ResourceUsageSummaryFilter,
+    ResourceUsageSummaryOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<ResourceUsageSummarySelect, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    ResourceUsageSummarySelect,
+    ResourceUsageSummaryFilter,
+    ResourceUsageSummaryOrderBy
+  >(params.selection);
   return getClient().resourceUsageSummary.findMany(args).unwrap();
 }
 /**
  * Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals
- * 
+ *
  * @example
  * ```ts
  * await prefetchResourceUsageSummariesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchResourceUsageSummariesQuery<S extends ResourceUsageSummarySelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourceUsageSummarySelect>;
-}): Promise<void>;
-export async function prefetchResourceUsageSummariesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ResourceUsageSummarySelect, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ResourceUsageSummarySelect, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>(params.selection);
+export async function prefetchResourceUsageSummariesQuery<S extends ResourceUsageSummarySelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, ResourceUsageSummaryFilter, ResourceUsageSummaryOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, ResourceUsageSummarySelect>;
+  }
+): Promise<void>;
+export async function prefetchResourceUsageSummariesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      ResourceUsageSummarySelect,
+      ResourceUsageSummaryFilter,
+      ResourceUsageSummaryOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    ResourceUsageSummarySelect,
+    ResourceUsageSummaryFilter,
+    ResourceUsageSummaryOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourceUsageSummaryKeys.list(args),
-    queryFn: () => getClient().resourceUsageSummary.findMany(args).unwrap()
+    queryFn: () => getClient().resourceUsageSummary.findMany(args).unwrap(),
   });
 }

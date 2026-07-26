@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { plansModuleKeys } from "../query-keys";
-import type { PlansModuleSelect, PlansModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlansModuleSelect, PlansModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { plansModuleKeys } from '../query-keys';
+import type { PlansModuleSelect, PlansModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { PlansModuleSelect, PlansModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const plansModuleQueryKey = plansModuleKeys.detail;
 /**
  * Query hook for fetching a single PlansModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlansModuleQuery({
@@ -26,38 +26,52 @@ export const plansModuleQueryKey = plansModuleKeys.detail;
  * });
  * ```
  */
-export function usePlansModuleQuery<S extends PlansModuleSelect, TData = {
-  plansModule: InferSelectResult<PlansModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
-} & Omit<UseQueryOptions<{
-  plansModule: InferSelectResult<PlansModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlansModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlansModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlansModuleQuery<
+  S extends PlansModuleSelect,
+  TData = {
+    plansModule: InferSelectResult<PlansModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        plansModule: InferSelectResult<PlansModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlansModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlansModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlansModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: plansModuleKeys.detail(params.id),
-    queryFn: () => getClient().plansModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .plansModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single PlansModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlansModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchPlansModuleQuery(params: {
   selection: SelectionConfig<PlansModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlansModuleSelect>(params.selection);
-  return getClient().plansModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .plansModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single PlansModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlansModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlansModuleQuery<S extends PlansModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
-}): Promise<void>;
-export async function prefetchPlansModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlansModuleSelect>;
-}): Promise<void> {
+export async function prefetchPlansModuleQuery<S extends PlansModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlansModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlansModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlansModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlansModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: plansModuleKeys.detail(params.id),
-    queryFn: () => getClient().plansModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .plansModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

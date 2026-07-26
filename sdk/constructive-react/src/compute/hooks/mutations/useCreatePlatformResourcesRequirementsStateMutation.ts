@@ -4,62 +4,102 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformResourcesRequirementsStateKeys } from "../query-keys";
-import { platformResourcesRequirementsStateMutationKeys } from "../mutation-keys";
-import type { PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateWithRelations, CreatePlatformResourcesRequirementsStateInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformResourcesRequirementsStateSelect, PlatformResourcesRequirementsStateWithRelations, CreatePlatformResourcesRequirementsStateInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformResourcesRequirementsStateKeys } from '../query-keys';
+import { platformResourcesRequirementsStateMutationKeys } from '../mutation-keys';
+import type {
+  PlatformResourcesRequirementsStateSelect,
+  PlatformResourcesRequirementsStateWithRelations,
+  CreatePlatformResourcesRequirementsStateInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformResourcesRequirementsStateSelect,
+  PlatformResourcesRequirementsStateWithRelations,
+  CreatePlatformResourcesRequirementsStateInput,
+} from '../../orm/input-types';
 /**
  * Mutation hook for creating a PlatformResourcesRequirementsState
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreatePlatformResourcesRequirementsStateMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreatePlatformResourcesRequirementsStateMutation<S extends PlatformResourcesRequirementsStateSelect>(params: {
-  selection: ({
-    fields: S & PlatformResourcesRequirementsStateSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>);
-} & Omit<UseMutationOptions<{
-  createPlatformResourcesRequirementsState: {
-    platformResourcesRequirementsState: InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>;
-  };
-}, Error, CreatePlatformResourcesRequirementsStateInput["platformResourcesRequirementsState"]>, "mutationFn">): UseMutationResult<{
-  createPlatformResourcesRequirementsState: {
-    platformResourcesRequirementsState: InferSelectResult<PlatformResourcesRequirementsStateWithRelations, S>;
-  };
-}, Error, CreatePlatformResourcesRequirementsStateInput["platformResourcesRequirementsState"]>;
-export function useCreatePlatformResourcesRequirementsStateMutation(params: {
-  selection: SelectionConfig<PlatformResourcesRequirementsStateSelect>;
-} & Omit<UseMutationOptions<any, Error, CreatePlatformResourcesRequirementsStateInput["platformResourcesRequirementsState"]>, "mutationFn">) {
+export function useCreatePlatformResourcesRequirementsStateMutation<
+  S extends PlatformResourcesRequirementsStateSelect,
+>(
+  params: {
+    selection: {
+      fields: S & PlatformResourcesRequirementsStateSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformResourcesRequirementsStateSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createPlatformResourcesRequirementsState: {
+          platformResourcesRequirementsState: InferSelectResult<
+            PlatformResourcesRequirementsStateWithRelations,
+            S
+          >;
+        };
+      },
+      Error,
+      CreatePlatformResourcesRequirementsStateInput['platformResourcesRequirementsState']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createPlatformResourcesRequirementsState: {
+      platformResourcesRequirementsState: InferSelectResult<
+        PlatformResourcesRequirementsStateWithRelations,
+        S
+      >;
+    };
+  },
+  Error,
+  CreatePlatformResourcesRequirementsStateInput['platformResourcesRequirementsState']
+>;
+export function useCreatePlatformResourcesRequirementsStateMutation(
+  params: {
+    selection: SelectionConfig<PlatformResourcesRequirementsStateSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      CreatePlatformResourcesRequirementsStateInput['platformResourcesRequirementsState']
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformResourcesRequirementsStateSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformResourcesRequirementsStateMutationKeys.create(),
-    mutationFn: (data: CreatePlatformResourcesRequirementsStateInput["platformResourcesRequirementsState"]) => getClient().platformResourcesRequirementsState.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (
+      data: CreatePlatformResourcesRequirementsStateInput['platformResourcesRequirementsState']
+    ) =>
+      getClient()
+        .platformResourcesRequirementsState.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: platformResourcesRequirementsStateKeys.lists()
+        queryKey: platformResourcesRequirementsStateKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

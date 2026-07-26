@@ -4,65 +4,78 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { customQueryKeys } from "../query-keys";
-import type { ResolveHttpRouteVariables } from "../../orm/query";
-import type { ResolveHttpRouteRecordSelect, ResolveHttpRouteRecord } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ResolveHttpRouteVariables } from "../../orm/query";
-export type { ResolveHttpRouteRecordSelect } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { customQueryKeys } from '../query-keys';
+import type { ResolveHttpRouteVariables } from '../../orm/query';
+import type { ResolveHttpRouteRecordSelect, ResolveHttpRouteRecord } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { ResolveHttpRouteVariables } from '../../orm/query';
+export type { ResolveHttpRouteRecordSelect } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const resolveHttpRouteQueryKey = customQueryKeys.resolveHttpRoute;
 /**
  * Query hook for resolveHttpRoute
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useResolveHttpRouteQuery({ variables: { requestHost, requestMethod, requestPath }, selection: { fields: { id: true } } });
- * 
+ *
  * if (data?.resolveHttpRoute) {
  *   console.log(data.resolveHttpRoute);
  * }
  * ```
  */
-export function useResolveHttpRouteQuery<S extends ResolveHttpRouteRecordSelect, TData = {
-  resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
-}>(params: {
-  variables?: ResolveHttpRouteVariables;
-  selection: ({
-    fields: S & ResolveHttpRouteRecordSelect;
-  } & HookStrictSelect<NoInfer<S>, ResolveHttpRouteRecordSelect>);
-} & Omit<UseQueryOptions<{
-  resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useResolveHttpRouteQuery(params: {
-  variables?: ResolveHttpRouteVariables;
-  selection: SelectionConfig<ResolveHttpRouteRecordSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useResolveHttpRouteQuery<
+  S extends ResolveHttpRouteRecordSelect,
+  TData = {
+    resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
+  },
+>(
+  params: {
+    variables?: ResolveHttpRouteVariables;
+    selection: {
+      fields: S & ResolveHttpRouteRecordSelect;
+    } & HookStrictSelect<NoInfer<S>, ResolveHttpRouteRecordSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useResolveHttpRouteQuery(
+  params: {
+    variables?: ResolveHttpRouteVariables;
+    selection: SelectionConfig<ResolveHttpRouteRecordSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const variables = params.variables ?? {};
   const args = buildSelectionArgs<ResolveHttpRouteRecordSelect>(params.selection);
-  const {
-    variables: _variables,
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { variables: _variables, selection: _selection, ...queryOptions } = params ?? {};
   void _variables;
   void _selection;
   return useQuery({
     queryKey: resolveHttpRouteQueryKey(variables),
-    queryFn: () => getClient().query.resolveHttpRoute(variables, {
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .query.resolveHttpRoute(variables, {
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch resolveHttpRoute without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchResolveHttpRouteQuery({ variables: { requestHost, requestMethod, requestPath }, selection: { fields: { id: true } } });
@@ -70,9 +83,9 @@ export function useResolveHttpRouteQuery(params: {
  */
 export async function fetchResolveHttpRouteQuery<S extends ResolveHttpRouteRecordSelect>(params: {
   variables?: ResolveHttpRouteVariables;
-  selection: ({
+  selection: {
     fields: S & ResolveHttpRouteRecordSelect;
-  } & HookStrictSelect<NoInfer<S>, ResolveHttpRouteRecordSelect>);
+  } & HookStrictSelect<NoInfer<S>, ResolveHttpRouteRecordSelect>;
 }): Promise<{
   resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
 }>;
@@ -82,34 +95,45 @@ export async function fetchResolveHttpRouteQuery(params: {
 }) {
   const variables = params.variables ?? {};
   const args = buildSelectionArgs<ResolveHttpRouteRecordSelect>(params.selection);
-  return getClient().query.resolveHttpRoute(variables, {
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .query.resolveHttpRoute(variables, {
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch resolveHttpRoute for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchResolveHttpRouteQuery(queryClient, { variables: { requestHost, requestMethod, requestPath }, selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchResolveHttpRouteQuery<S extends ResolveHttpRouteRecordSelect>(queryClient: QueryClient, params: {
-  variables?: ResolveHttpRouteVariables;
-  selection: ({
-    fields: S & ResolveHttpRouteRecordSelect;
-  } & HookStrictSelect<NoInfer<S>, ResolveHttpRouteRecordSelect>);
-}): Promise<void>;
-export async function prefetchResolveHttpRouteQuery(queryClient: QueryClient, params: {
-  variables?: ResolveHttpRouteVariables;
-  selection: SelectionConfig<ResolveHttpRouteRecordSelect>;
-}): Promise<void> {
+export async function prefetchResolveHttpRouteQuery<S extends ResolveHttpRouteRecordSelect>(
+  queryClient: QueryClient,
+  params: {
+    variables?: ResolveHttpRouteVariables;
+    selection: {
+      fields: S & ResolveHttpRouteRecordSelect;
+    } & HookStrictSelect<NoInfer<S>, ResolveHttpRouteRecordSelect>;
+  }
+): Promise<void>;
+export async function prefetchResolveHttpRouteQuery(
+  queryClient: QueryClient,
+  params: {
+    variables?: ResolveHttpRouteVariables;
+    selection: SelectionConfig<ResolveHttpRouteRecordSelect>;
+  }
+): Promise<void> {
   const variables = params.variables ?? {};
   const args = buildSelectionArgs<ResolveHttpRouteRecordSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resolveHttpRouteQueryKey(variables),
-    queryFn: () => getClient().query.resolveHttpRoute(variables, {
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .query.resolveHttpRoute(variables, {
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -11,15 +11,30 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { entityTypeProvisionKeys } from "../query-keys";
-import type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { entityTypeProvisionKeys } from '../query-keys';
+import type {
+  EntityTypeProvisionSelect,
+  EntityTypeProvisionWithRelations,
+  EntityTypeProvisionFilter,
+  EntityTypeProvisionOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  EntityTypeProvisionSelect,
+  EntityTypeProvisionWithRelations,
+  EntityTypeProvisionFilter,
+  EntityTypeProvisionOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const entityTypeProvisionsQueryKey = entityTypeProvisionKeys.list;
 /**
@@ -44,28 +59,53 @@ export const entityTypeProvisionsQueryKey = entityTypeProvisionKeys.list;
  * });
  * ```
  */
-export function useEntityTypeProvisionsQuery<S extends EntityTypeProvisionSelect, TData = {
-  entityTypeProvisions: ConnectionResult<InferSelectResult<EntityTypeProvisionWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
-} & Omit<UseQueryOptions<{
-  entityTypeProvisions: ConnectionResult<InferSelectResult<EntityTypeProvisionWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useEntityTypeProvisionsQuery(params: {
-  selection: ListSelectionConfig<EntityTypeProvisionSelect, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<EntityTypeProvisionSelect, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useEntityTypeProvisionsQuery<
+  S extends EntityTypeProvisionSelect,
+  TData = {
+    entityTypeProvisions: ConnectionResult<InferSelectResult<EntityTypeProvisionWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        entityTypeProvisions: ConnectionResult<
+          InferSelectResult<EntityTypeProvisionWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useEntityTypeProvisionsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      EntityTypeProvisionSelect,
+      EntityTypeProvisionFilter,
+      EntityTypeProvisionOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    EntityTypeProvisionSelect,
+    EntityTypeProvisionFilter,
+    EntityTypeProvisionOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: entityTypeProvisionKeys.list(args),
     queryFn: () => getClient().entityTypeProvision.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
@@ -91,14 +131,26 @@ export function useEntityTypeProvisionsQuery(params: {
 export async function fetchEntityTypeProvisionsQuery<S extends EntityTypeProvisionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
+  } & Omit<
+    ListSelectionConfig<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
 }): Promise<{
   entityTypeProvisions: ConnectionResult<InferSelectResult<EntityTypeProvisionWithRelations, S>>;
 }>;
 export async function fetchEntityTypeProvisionsQuery(params: {
-  selection: ListSelectionConfig<EntityTypeProvisionSelect, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>;
+  selection: ListSelectionConfig<
+    EntityTypeProvisionSelect,
+    EntityTypeProvisionFilter,
+    EntityTypeProvisionOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<EntityTypeProvisionSelect, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    EntityTypeProvisionSelect,
+    EntityTypeProvisionFilter,
+    EntityTypeProvisionOrderBy
+  >(params.selection);
   return getClient().entityTypeProvision.findMany(args).unwrap();
 }
 /**
@@ -116,17 +168,35 @@ export async function fetchEntityTypeProvisionsQuery(params: {
  * await prefetchEntityTypeProvisionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchEntityTypeProvisionsQuery<S extends EntityTypeProvisionSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
-}): Promise<void>;
-export async function prefetchEntityTypeProvisionsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<EntityTypeProvisionSelect, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<EntityTypeProvisionSelect, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>(params.selection);
+export async function prefetchEntityTypeProvisionsQuery<S extends EntityTypeProvisionSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
+  }
+): Promise<void>;
+export async function prefetchEntityTypeProvisionsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      EntityTypeProvisionSelect,
+      EntityTypeProvisionFilter,
+      EntityTypeProvisionOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    EntityTypeProvisionSelect,
+    EntityTypeProvisionFilter,
+    EntityTypeProvisionOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: entityTypeProvisionKeys.list(args),
-    queryFn: () => getClient().entityTypeProvision.findMany(args).unwrap()
+    queryFn: () => getClient().entityTypeProvision.findMany(args).unwrap(),
   });
 }

@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformFunctionDeploymentKeys } from "../query-keys";
-import type { PlatformFunctionDeploymentSelect, PlatformFunctionDeploymentWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionDeploymentSelect, PlatformFunctionDeploymentWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformFunctionDeploymentKeys } from '../query-keys';
+import type {
+  PlatformFunctionDeploymentSelect,
+  PlatformFunctionDeploymentWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformFunctionDeploymentSelect,
+  PlatformFunctionDeploymentWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionDeploymentQueryKey = platformFunctionDeploymentKeys.detail;
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionDeploymentQuery({
@@ -26,38 +32,58 @@ export const platformFunctionDeploymentQueryKey = platformFunctionDeploymentKeys
  * });
  * ```
  */
-export function usePlatformFunctionDeploymentQuery<S extends PlatformFunctionDeploymentSelect, TData = {
-  platformFunctionDeployment: InferSelectResult<PlatformFunctionDeploymentWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentSelect>;
-} & Omit<UseQueryOptions<{
-  platformFunctionDeployment: InferSelectResult<PlatformFunctionDeploymentWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformFunctionDeploymentQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformFunctionDeploymentSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformFunctionDeploymentQuery<
+  S extends PlatformFunctionDeploymentSelect,
+  TData = {
+    platformFunctionDeployment: InferSelectResult<
+      PlatformFunctionDeploymentWithRelations,
+      S
+    > | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformFunctionDeployment: InferSelectResult<
+          PlatformFunctionDeploymentWithRelations,
+          S
+        > | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformFunctionDeploymentQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformFunctionDeploymentSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformFunctionDeploymentSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionDeploymentKeys.detail(params.id),
-    queryFn: () => getClient().platformFunctionDeployment.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformFunctionDeployment.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionDeploymentQuery({
@@ -66,7 +92,9 @@ export function usePlatformFunctionDeploymentQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformFunctionDeploymentQuery<S extends PlatformFunctionDeploymentSelect>(params: {
+export async function fetchPlatformFunctionDeploymentQuery<
+  S extends PlatformFunctionDeploymentSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +107,48 @@ export async function fetchPlatformFunctionDeploymentQuery(params: {
   selection: SelectionConfig<PlatformFunctionDeploymentSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformFunctionDeploymentSelect>(params.selection);
-  return getClient().platformFunctionDeployment.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformFunctionDeployment.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformFunctionDeploymentQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformFunctionDeploymentQuery<S extends PlatformFunctionDeploymentSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentSelect>;
-}): Promise<void>;
-export async function prefetchPlatformFunctionDeploymentQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformFunctionDeploymentSelect>;
-}): Promise<void> {
+export async function prefetchPlatformFunctionDeploymentQuery<
+  S extends PlatformFunctionDeploymentSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformFunctionDeploymentSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformFunctionDeploymentQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformFunctionDeploymentSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformFunctionDeploymentSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionDeploymentKeys.detail(params.id),
-    queryFn: () => getClient().platformFunctionDeployment.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformFunctionDeployment.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { apiSurfaceModuleKeys } from "../query-keys";
-import type { ApiSurfaceModuleSelect, ApiSurfaceModuleWithRelations, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ApiSurfaceModuleSelect, ApiSurfaceModuleWithRelations, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { apiSurfaceModuleKeys } from '../query-keys';
+import type {
+  ApiSurfaceModuleSelect,
+  ApiSurfaceModuleWithRelations,
+  ApiSurfaceModuleFilter,
+  ApiSurfaceModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ApiSurfaceModuleSelect,
+  ApiSurfaceModuleWithRelations,
+  ApiSurfaceModuleFilter,
+  ApiSurfaceModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const apiSurfaceModulesQueryKey = apiSurfaceModuleKeys.list;
 /**
  * Query hook for fetching ApiSurfaceModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useApiSurfaceModulesQuery({
@@ -30,33 +45,53 @@ export const apiSurfaceModulesQueryKey = apiSurfaceModuleKeys.list;
  * });
  * ```
  */
-export function useApiSurfaceModulesQuery<S extends ApiSurfaceModuleSelect, TData = {
-  apiSurfaceModules: ConnectionResult<InferSelectResult<ApiSurfaceModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiSurfaceModuleSelect>;
-} & Omit<UseQueryOptions<{
-  apiSurfaceModules: ConnectionResult<InferSelectResult<ApiSurfaceModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useApiSurfaceModulesQuery(params: {
-  selection: ListSelectionConfig<ApiSurfaceModuleSelect, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ApiSurfaceModuleSelect, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useApiSurfaceModulesQuery<
+  S extends ApiSurfaceModuleSelect,
+  TData = {
+    apiSurfaceModules: ConnectionResult<InferSelectResult<ApiSurfaceModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiSurfaceModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        apiSurfaceModules: ConnectionResult<InferSelectResult<ApiSurfaceModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useApiSurfaceModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      ApiSurfaceModuleSelect,
+      ApiSurfaceModuleFilter,
+      ApiSurfaceModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    ApiSurfaceModuleSelect,
+    ApiSurfaceModuleFilter,
+    ApiSurfaceModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: apiSurfaceModuleKeys.list(args),
     queryFn: () => getClient().apiSurfaceModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch ApiSurfaceModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchApiSurfaceModulesQuery({
@@ -70,35 +105,59 @@ export function useApiSurfaceModulesQuery(params: {
 export async function fetchApiSurfaceModulesQuery<S extends ApiSurfaceModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiSurfaceModuleSelect>;
+  } & Omit<ListSelectionConfig<S, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ApiSurfaceModuleSelect>;
 }): Promise<{
   apiSurfaceModules: ConnectionResult<InferSelectResult<ApiSurfaceModuleWithRelations, S>>;
 }>;
 export async function fetchApiSurfaceModulesQuery(params: {
-  selection: ListSelectionConfig<ApiSurfaceModuleSelect, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>;
+  selection: ListSelectionConfig<
+    ApiSurfaceModuleSelect,
+    ApiSurfaceModuleFilter,
+    ApiSurfaceModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<ApiSurfaceModuleSelect, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    ApiSurfaceModuleSelect,
+    ApiSurfaceModuleFilter,
+    ApiSurfaceModuleOrderBy
+  >(params.selection);
   return getClient().apiSurfaceModule.findMany(args).unwrap();
 }
 /**
  * Prefetch ApiSurfaceModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchApiSurfaceModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchApiSurfaceModulesQuery<S extends ApiSurfaceModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiSurfaceModuleSelect>;
-}): Promise<void>;
-export async function prefetchApiSurfaceModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ApiSurfaceModuleSelect, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ApiSurfaceModuleSelect, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>(params.selection);
+export async function prefetchApiSurfaceModulesQuery<S extends ApiSurfaceModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ApiSurfaceModuleFilter, ApiSurfaceModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiSurfaceModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchApiSurfaceModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      ApiSurfaceModuleSelect,
+      ApiSurfaceModuleFilter,
+      ApiSurfaceModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    ApiSurfaceModuleSelect,
+    ApiSurfaceModuleFilter,
+    ApiSurfaceModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: apiSurfaceModuleKeys.list(args),
-    queryFn: () => getClient().apiSurfaceModule.findMany(args).unwrap()
+    queryFn: () => getClient().apiSurfaceModule.findMany(args).unwrap(),
   });
 }

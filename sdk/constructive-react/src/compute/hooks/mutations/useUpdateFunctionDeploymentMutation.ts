@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionDeploymentKeys } from "../query-keys";
-import { functionDeploymentMutationKeys } from "../mutation-keys";
-import type { FunctionDeploymentSelect, FunctionDeploymentWithRelations, FunctionDeploymentPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionDeploymentSelect, FunctionDeploymentWithRelations, FunctionDeploymentPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionDeploymentKeys } from '../query-keys';
+import { functionDeploymentMutationKeys } from '../mutation-keys';
+import type {
+  FunctionDeploymentSelect,
+  FunctionDeploymentWithRelations,
+  FunctionDeploymentPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionDeploymentSelect,
+  FunctionDeploymentWithRelations,
+  FunctionDeploymentPatch,
+} from '../../orm/input-types';
 /**
  * Function deployment bindings — ties a handler image to a namespace for Knative provisioning and routing (one row per handler image per namespace)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionDeploymentMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', functionDeploymentPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionDeploymentMutation<S extends FunctionDeploymentSelect>(params: {
-  selection: ({
-    fields: S & FunctionDeploymentSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionDeploymentSelect>);
-} & Omit<UseMutationOptions<{
-  updateFunctionDeployment: {
-    functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  functionDeploymentPatch: FunctionDeploymentPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateFunctionDeployment: {
-    functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  functionDeploymentPatch: FunctionDeploymentPatch;
-}>;
-export function useUpdateFunctionDeploymentMutation(params: {
-  selection: SelectionConfig<FunctionDeploymentSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  functionDeploymentPatch: FunctionDeploymentPatch;
-}>, "mutationFn">) {
+export function useUpdateFunctionDeploymentMutation<S extends FunctionDeploymentSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionDeploymentSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionDeploymentSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateFunctionDeployment: {
+          functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        functionDeploymentPatch: FunctionDeploymentPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateFunctionDeployment: {
+      functionDeployment: InferSelectResult<FunctionDeploymentWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    functionDeploymentPatch: FunctionDeploymentPatch;
+  }
+>;
+export function useUpdateFunctionDeploymentMutation(
+  params: {
+    selection: SelectionConfig<FunctionDeploymentSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        functionDeploymentPatch: FunctionDeploymentPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionDeploymentSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionDeploymentMutationKeys.all,
     mutationFn: ({
       id,
-      functionDeploymentPatch
+      functionDeploymentPatch,
     }: {
       id: string;
       functionDeploymentPatch: FunctionDeploymentPatch;
-    }) => getClient().functionDeployment.update({
-      where: {
-        id
-      },
-      data: functionDeploymentPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .functionDeployment.update({
+          where: {
+            id,
+          },
+          data: functionDeploymentPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentKeys.detail(variables.id)
+        queryKey: functionDeploymentKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentKeys.lists()
+        queryKey: functionDeploymentKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

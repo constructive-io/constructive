@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { databaseSettingsModuleKeys } from "../query-keys";
-import { databaseSettingsModuleMutationKeys } from "../mutation-keys";
-import type { DatabaseSettingsModuleSelect, DatabaseSettingsModuleWithRelations, DatabaseSettingsModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DatabaseSettingsModuleSelect, DatabaseSettingsModuleWithRelations, DatabaseSettingsModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { databaseSettingsModuleKeys } from '../query-keys';
+import { databaseSettingsModuleMutationKeys } from '../mutation-keys';
+import type {
+  DatabaseSettingsModuleSelect,
+  DatabaseSettingsModuleWithRelations,
+  DatabaseSettingsModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  DatabaseSettingsModuleSelect,
+  DatabaseSettingsModuleWithRelations,
+  DatabaseSettingsModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a DatabaseSettingsModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateDatabaseSettingsModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', databaseSettingsModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateDatabaseSettingsModuleMutation<S extends DatabaseSettingsModuleSelect>(params: {
-  selection: ({
-    fields: S & DatabaseSettingsModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, DatabaseSettingsModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateDatabaseSettingsModule: {
-    databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  databaseSettingsModulePatch: DatabaseSettingsModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateDatabaseSettingsModule: {
-    databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  databaseSettingsModulePatch: DatabaseSettingsModulePatch;
-}>;
-export function useUpdateDatabaseSettingsModuleMutation(params: {
-  selection: SelectionConfig<DatabaseSettingsModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  databaseSettingsModulePatch: DatabaseSettingsModulePatch;
-}>, "mutationFn">) {
+export function useUpdateDatabaseSettingsModuleMutation<S extends DatabaseSettingsModuleSelect>(
+  params: {
+    selection: {
+      fields: S & DatabaseSettingsModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, DatabaseSettingsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateDatabaseSettingsModule: {
+          databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        databaseSettingsModulePatch: DatabaseSettingsModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateDatabaseSettingsModule: {
+      databaseSettingsModule: InferSelectResult<DatabaseSettingsModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    databaseSettingsModulePatch: DatabaseSettingsModulePatch;
+  }
+>;
+export function useUpdateDatabaseSettingsModuleMutation(
+  params: {
+    selection: SelectionConfig<DatabaseSettingsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        databaseSettingsModulePatch: DatabaseSettingsModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<DatabaseSettingsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: databaseSettingsModuleMutationKeys.all,
     mutationFn: ({
       id,
-      databaseSettingsModulePatch
+      databaseSettingsModulePatch,
     }: {
       id: string;
       databaseSettingsModulePatch: DatabaseSettingsModulePatch;
-    }) => getClient().databaseSettingsModule.update({
-      where: {
-        id
-      },
-      data: databaseSettingsModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .databaseSettingsModule.update({
+          where: {
+            id,
+          },
+          data: databaseSettingsModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: databaseSettingsModuleKeys.detail(variables.id)
+        queryKey: databaseSettingsModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: databaseSettingsModuleKeys.lists()
+        queryKey: databaseSettingsModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

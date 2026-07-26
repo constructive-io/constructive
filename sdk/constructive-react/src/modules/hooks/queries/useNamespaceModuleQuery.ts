@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { namespaceModuleKeys } from "../query-keys";
-import type { NamespaceModuleSelect, NamespaceModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { NamespaceModuleSelect, NamespaceModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { namespaceModuleKeys } from '../query-keys';
+import type { NamespaceModuleSelect, NamespaceModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { NamespaceModuleSelect, NamespaceModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const namespaceModuleQueryKey = namespaceModuleKeys.detail;
 /**
  * Query hook for fetching a single NamespaceModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useNamespaceModuleQuery({
@@ -26,38 +26,52 @@ export const namespaceModuleQueryKey = namespaceModuleKeys.detail;
  * });
  * ```
  */
-export function useNamespaceModuleQuery<S extends NamespaceModuleSelect, TData = {
-  namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
-} & Omit<UseQueryOptions<{
-  namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useNamespaceModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<NamespaceModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useNamespaceModuleQuery<
+  S extends NamespaceModuleSelect,
+  TData = {
+    namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useNamespaceModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<NamespaceModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<NamespaceModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: namespaceModuleKeys.detail(params.id),
-    queryFn: () => getClient().namespaceModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .namespaceModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single NamespaceModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchNamespaceModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchNamespaceModuleQuery(params: {
   selection: SelectionConfig<NamespaceModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<NamespaceModuleSelect>(params.selection);
-  return getClient().namespaceModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .namespaceModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single NamespaceModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchNamespaceModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchNamespaceModuleQuery<S extends NamespaceModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
-}): Promise<void>;
-export async function prefetchNamespaceModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<NamespaceModuleSelect>;
-}): Promise<void> {
+export async function prefetchNamespaceModuleQuery<S extends NamespaceModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchNamespaceModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<NamespaceModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<NamespaceModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: namespaceModuleKeys.detail(params.id),
-    queryFn: () => getClient().namespaceModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .namespaceModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

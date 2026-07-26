@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { notificationsModuleKeys } from "../query-keys";
-import type { NotificationsModuleSelect, NotificationsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { NotificationsModuleSelect, NotificationsModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { notificationsModuleKeys } from '../query-keys';
+import type {
+  NotificationsModuleSelect,
+  NotificationsModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  NotificationsModuleSelect,
+  NotificationsModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const notificationsModuleQueryKey = notificationsModuleKeys.detail;
 /**
  * Query hook for fetching a single NotificationsModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useNotificationsModuleQuery({
@@ -26,38 +32,52 @@ export const notificationsModuleQueryKey = notificationsModuleKeys.detail;
  * });
  * ```
  */
-export function useNotificationsModuleQuery<S extends NotificationsModuleSelect, TData = {
-  notificationsModule: InferSelectResult<NotificationsModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, NotificationsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  notificationsModule: InferSelectResult<NotificationsModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useNotificationsModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<NotificationsModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useNotificationsModuleQuery<
+  S extends NotificationsModuleSelect,
+  TData = {
+    notificationsModule: InferSelectResult<NotificationsModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, NotificationsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        notificationsModule: InferSelectResult<NotificationsModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useNotificationsModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<NotificationsModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<NotificationsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: notificationsModuleKeys.detail(params.id),
-    queryFn: () => getClient().notificationsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .notificationsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single NotificationsModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchNotificationsModuleQuery({
@@ -79,35 +99,46 @@ export async function fetchNotificationsModuleQuery(params: {
   selection: SelectionConfig<NotificationsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<NotificationsModuleSelect>(params.selection);
-  return getClient().notificationsModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .notificationsModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single NotificationsModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchNotificationsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchNotificationsModuleQuery<S extends NotificationsModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, NotificationsModuleSelect>;
-}): Promise<void>;
-export async function prefetchNotificationsModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<NotificationsModuleSelect>;
-}): Promise<void> {
+export async function prefetchNotificationsModuleQuery<S extends NotificationsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, NotificationsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchNotificationsModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<NotificationsModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<NotificationsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: notificationsModuleKeys.detail(params.id),
-    queryFn: () => getClient().notificationsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .notificationsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

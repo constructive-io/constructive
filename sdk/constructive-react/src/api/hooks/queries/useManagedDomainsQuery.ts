@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { managedDomainKeys } from "../query-keys";
-import type { ManagedDomainSelect, ManagedDomainWithRelations, ManagedDomainFilter, ManagedDomainOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ManagedDomainSelect, ManagedDomainWithRelations, ManagedDomainFilter, ManagedDomainOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { managedDomainKeys } from '../query-keys';
+import type {
+  ManagedDomainSelect,
+  ManagedDomainWithRelations,
+  ManagedDomainFilter,
+  ManagedDomainOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ManagedDomainSelect,
+  ManagedDomainWithRelations,
+  ManagedDomainFilter,
+  ManagedDomainOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const managedDomainsQueryKey = managedDomainKeys.list;
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useManagedDomainsQuery({
@@ -30,33 +45,49 @@ export const managedDomainsQueryKey = managedDomainKeys.list;
  * });
  * ```
  */
-export function useManagedDomainsQuery<S extends ManagedDomainSelect, TData = {
-  managedDomains: ConnectionResult<InferSelectResult<ManagedDomainWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ManagedDomainFilter, ManagedDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
-} & Omit<UseQueryOptions<{
-  managedDomains: ConnectionResult<InferSelectResult<ManagedDomainWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useManagedDomainsQuery(params: {
-  selection: ListSelectionConfig<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useManagedDomainsQuery<
+  S extends ManagedDomainSelect,
+  TData = {
+    managedDomains: ConnectionResult<InferSelectResult<ManagedDomainWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ManagedDomainFilter, ManagedDomainOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        managedDomains: ConnectionResult<InferSelectResult<ManagedDomainWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useManagedDomainsQuery(
+  params: {
+    selection: ListSelectionConfig<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    ManagedDomainSelect,
+    ManagedDomainFilter,
+    ManagedDomainOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: managedDomainKeys.list(args),
     queryFn: () => getClient().managedDomain.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchManagedDomainsQuery({
@@ -70,35 +101,51 @@ export function useManagedDomainsQuery(params: {
 export async function fetchManagedDomainsQuery<S extends ManagedDomainSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ManagedDomainFilter, ManagedDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
+  } & Omit<ListSelectionConfig<S, ManagedDomainFilter, ManagedDomainOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
 }): Promise<{
   managedDomains: ConnectionResult<InferSelectResult<ManagedDomainWithRelations, S>>;
 }>;
 export async function fetchManagedDomainsQuery(params: {
   selection: ListSelectionConfig<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>;
 }) {
-  const args = buildListSelectionArgs<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    ManagedDomainSelect,
+    ManagedDomainFilter,
+    ManagedDomainOrderBy
+  >(params.selection);
   return getClient().managedDomain.findMany(args).unwrap();
 }
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```ts
  * await prefetchManagedDomainsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchManagedDomainsQuery<S extends ManagedDomainSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ManagedDomainFilter, ManagedDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
-}): Promise<void>;
-export async function prefetchManagedDomainsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>(params.selection);
+export async function prefetchManagedDomainsQuery<S extends ManagedDomainSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ManagedDomainFilter, ManagedDomainOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ManagedDomainSelect>;
+  }
+): Promise<void>;
+export async function prefetchManagedDomainsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<ManagedDomainSelect, ManagedDomainFilter, ManagedDomainOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    ManagedDomainSelect,
+    ManagedDomainFilter,
+    ManagedDomainOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: managedDomainKeys.list(args),
-    queryFn: () => getClient().managedDomain.findMany(args).unwrap()
+    queryFn: () => getClient().managedDomain.findMany(args).unwrap(),
   });
 }

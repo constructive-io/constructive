@@ -4,46 +4,68 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { customQueryKeys } from "../query-keys";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { customQueryKeys } from '../query-keys';
 /** Query key factory - re-exported from query-keys.ts */
 export const currentUserAgentQueryKey = customQueryKeys.currentUserAgent;
 /**
  * Query hook for currentUserAgent
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCurrentUserAgentQuery();
- * 
+ *
  * if (data?.currentUserAgent) {
  *   console.log(data.currentUserAgent);
  * }
  * ```
  */
-export function useCurrentUserAgentQuery<TData = {
-  currentUserAgent: string | null;
-}>(params?: Omit<UseQueryOptions<{
-  currentUserAgent: string | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCurrentUserAgentQuery<TData = {
-  currentUserAgent: string | null;
-}>(params?: Omit<UseQueryOptions<{
-  currentUserAgent: string | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
+export function useCurrentUserAgentQuery<
+  TData = {
+    currentUserAgent: string | null;
+  },
+>(
+  params?: Omit<
+    UseQueryOptions<
+      {
+        currentUserAgent: string | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCurrentUserAgentQuery<
+  TData = {
+    currentUserAgent: string | null;
+  },
+>(
+  params?: Omit<
+    UseQueryOptions<
+      {
+        currentUserAgent: string | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData> {
   const queryOptions = params ?? {};
   return useQuery({
     queryKey: currentUserAgentQueryKey(),
     queryFn: () => getClient().query.currentUserAgent().unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch currentUserAgent without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCurrentUserAgentQuery();
@@ -54,7 +76,7 @@ export async function fetchCurrentUserAgentQuery() {
 }
 /**
  * Prefetch currentUserAgent for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchCurrentUserAgentQuery(queryClient);
@@ -63,6 +85,6 @@ export async function fetchCurrentUserAgentQuery() {
 export async function prefetchCurrentUserAgentQuery(queryClient: QueryClient): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: currentUserAgentQueryKey(),
-    queryFn: () => getClient().query.currentUserAgent().unwrap()
+    queryFn: () => getClient().query.currentUserAgent().unwrap(),
   });
 }

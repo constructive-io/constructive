@@ -4,61 +4,93 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformFunctionExecutionLogKeys } from "../query-keys";
-import { platformFunctionExecutionLogMutationKeys } from "../mutation-keys";
-import type { PlatformFunctionExecutionLogSelect, PlatformFunctionExecutionLogWithRelations, PlatformFunctionExecutionLogPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionExecutionLogSelect, PlatformFunctionExecutionLogWithRelations, PlatformFunctionExecutionLogPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformFunctionExecutionLogKeys } from '../query-keys';
+import { platformFunctionExecutionLogMutationKeys } from '../mutation-keys';
+import type {
+  PlatformFunctionExecutionLogSelect,
+  PlatformFunctionExecutionLogWithRelations,
+  PlatformFunctionExecutionLogPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformFunctionExecutionLogSelect,
+  PlatformFunctionExecutionLogWithRelations,
+  PlatformFunctionExecutionLogPatch,
+} from '../../orm/input-types';
 /**
  * Function execution logs — structured console output per invocation
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformFunctionExecutionLogMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformFunctionExecutionLogPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformFunctionExecutionLogMutation<S extends PlatformFunctionExecutionLogSelect>(params: {
-  selection: ({
-    fields: S & PlatformFunctionExecutionLogSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformFunctionExecutionLog: {
-    platformFunctionExecutionLog: InferSelectResult<PlatformFunctionExecutionLogWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformFunctionExecutionLog: {
-    platformFunctionExecutionLog: InferSelectResult<PlatformFunctionExecutionLogWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
-}>;
-export function useUpdatePlatformFunctionExecutionLogMutation(params: {
-  selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformFunctionExecutionLogMutation<
+  S extends PlatformFunctionExecutionLogSelect,
+>(
+  params: {
+    selection: {
+      fields: S & PlatformFunctionExecutionLogSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformFunctionExecutionLogSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformFunctionExecutionLog: {
+          platformFunctionExecutionLog: InferSelectResult<
+            PlatformFunctionExecutionLogWithRelations,
+            S
+          >;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformFunctionExecutionLog: {
+      platformFunctionExecutionLog: InferSelectResult<PlatformFunctionExecutionLogWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
+  }
+>;
+export function useUpdatePlatformFunctionExecutionLogMutation(
+  params: {
+    selection: SelectionConfig<PlatformFunctionExecutionLogSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformFunctionExecutionLogSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +98,30 @@ export function useUpdatePlatformFunctionExecutionLogMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      platformFunctionExecutionLogPatch
+      platformFunctionExecutionLogPatch,
     }: {
       id: string;
       createdAt: string;
       platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
-    }) => getClient().platformFunctionExecutionLog.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: platformFunctionExecutionLogPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformFunctionExecutionLog.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: platformFunctionExecutionLogPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformFunctionExecutionLogKeys.detail(variables.id)
+        queryKey: platformFunctionExecutionLogKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformFunctionExecutionLogKeys.lists()
+        queryKey: platformFunctionExecutionLogKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

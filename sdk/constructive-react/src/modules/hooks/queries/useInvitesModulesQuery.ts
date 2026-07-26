@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { invitesModuleKeys } from "../query-keys";
-import type { InvitesModuleSelect, InvitesModuleWithRelations, InvitesModuleFilter, InvitesModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { InvitesModuleSelect, InvitesModuleWithRelations, InvitesModuleFilter, InvitesModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { invitesModuleKeys } from '../query-keys';
+import type {
+  InvitesModuleSelect,
+  InvitesModuleWithRelations,
+  InvitesModuleFilter,
+  InvitesModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  InvitesModuleSelect,
+  InvitesModuleWithRelations,
+  InvitesModuleFilter,
+  InvitesModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const invitesModulesQueryKey = invitesModuleKeys.list;
 /**
  * Query hook for fetching InvitesModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useInvitesModulesQuery({
@@ -30,33 +45,49 @@ export const invitesModulesQueryKey = invitesModuleKeys.list;
  * });
  * ```
  */
-export function useInvitesModulesQuery<S extends InvitesModuleSelect, TData = {
-  invitesModules: ConnectionResult<InferSelectResult<InvitesModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, InvitesModuleFilter, InvitesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InvitesModuleSelect>;
-} & Omit<UseQueryOptions<{
-  invitesModules: ConnectionResult<InferSelectResult<InvitesModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useInvitesModulesQuery(params: {
-  selection: ListSelectionConfig<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useInvitesModulesQuery<
+  S extends InvitesModuleSelect,
+  TData = {
+    invitesModules: ConnectionResult<InferSelectResult<InvitesModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, InvitesModuleFilter, InvitesModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, InvitesModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        invitesModules: ConnectionResult<InferSelectResult<InvitesModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useInvitesModulesQuery(
+  params: {
+    selection: ListSelectionConfig<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    InvitesModuleSelect,
+    InvitesModuleFilter,
+    InvitesModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: invitesModuleKeys.list(args),
     queryFn: () => getClient().invitesModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch InvitesModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchInvitesModulesQuery({
@@ -70,35 +101,51 @@ export function useInvitesModulesQuery(params: {
 export async function fetchInvitesModulesQuery<S extends InvitesModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, InvitesModuleFilter, InvitesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InvitesModuleSelect>;
+  } & Omit<ListSelectionConfig<S, InvitesModuleFilter, InvitesModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, InvitesModuleSelect>;
 }): Promise<{
   invitesModules: ConnectionResult<InferSelectResult<InvitesModuleWithRelations, S>>;
 }>;
 export async function fetchInvitesModulesQuery(params: {
   selection: ListSelectionConfig<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    InvitesModuleSelect,
+    InvitesModuleFilter,
+    InvitesModuleOrderBy
+  >(params.selection);
   return getClient().invitesModule.findMany(args).unwrap();
 }
 /**
  * Prefetch InvitesModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchInvitesModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchInvitesModulesQuery<S extends InvitesModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, InvitesModuleFilter, InvitesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InvitesModuleSelect>;
-}): Promise<void>;
-export async function prefetchInvitesModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>(params.selection);
+export async function prefetchInvitesModulesQuery<S extends InvitesModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, InvitesModuleFilter, InvitesModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, InvitesModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchInvitesModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<InvitesModuleSelect, InvitesModuleFilter, InvitesModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    InvitesModuleSelect,
+    InvitesModuleFilter,
+    InvitesModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: invitesModuleKeys.list(args),
-    queryFn: () => getClient().invitesModule.findMany(args).unwrap()
+    queryFn: () => getClient().invitesModule.findMany(args).unwrap(),
   });
 }

@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { databaseSettingKeys } from "../query-keys";
-import { databaseSettingMutationKeys } from "../mutation-keys";
-import type { DatabaseSettingSelect, DatabaseSettingWithRelations, CreateDatabaseSettingInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DatabaseSettingSelect, DatabaseSettingWithRelations, CreateDatabaseSettingInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { databaseSettingKeys } from '../query-keys';
+import { databaseSettingMutationKeys } from '../mutation-keys';
+import type {
+  DatabaseSettingSelect,
+  DatabaseSettingWithRelations,
+  CreateDatabaseSettingInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  DatabaseSettingSelect,
+  DatabaseSettingWithRelations,
+  CreateDatabaseSettingInput,
+} from '../../orm/input-types';
 /**
  * Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateDatabaseSettingMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateDatabaseSettingMutation<S extends DatabaseSettingSelect>(params: {
-  selection: ({
-    fields: S & DatabaseSettingSelect;
-  } & HookStrictSelect<NoInfer<S>, DatabaseSettingSelect>);
-} & Omit<UseMutationOptions<{
-  createDatabaseSetting: {
-    databaseSetting: InferSelectResult<DatabaseSettingWithRelations, S>;
-  };
-}, Error, CreateDatabaseSettingInput["databaseSetting"]>, "mutationFn">): UseMutationResult<{
-  createDatabaseSetting: {
-    databaseSetting: InferSelectResult<DatabaseSettingWithRelations, S>;
-  };
-}, Error, CreateDatabaseSettingInput["databaseSetting"]>;
-export function useCreateDatabaseSettingMutation(params: {
-  selection: SelectionConfig<DatabaseSettingSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateDatabaseSettingInput["databaseSetting"]>, "mutationFn">) {
+export function useCreateDatabaseSettingMutation<S extends DatabaseSettingSelect>(
+  params: {
+    selection: {
+      fields: S & DatabaseSettingSelect;
+    } & HookStrictSelect<NoInfer<S>, DatabaseSettingSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createDatabaseSetting: {
+          databaseSetting: InferSelectResult<DatabaseSettingWithRelations, S>;
+        };
+      },
+      Error,
+      CreateDatabaseSettingInput['databaseSetting']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createDatabaseSetting: {
+      databaseSetting: InferSelectResult<DatabaseSettingWithRelations, S>;
+    };
+  },
+  Error,
+  CreateDatabaseSettingInput['databaseSetting']
+>;
+export function useCreateDatabaseSettingMutation(
+  params: {
+    selection: SelectionConfig<DatabaseSettingSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateDatabaseSettingInput['databaseSetting']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<DatabaseSettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: databaseSettingMutationKeys.create(),
-    mutationFn: (data: CreateDatabaseSettingInput["databaseSetting"]) => getClient().databaseSetting.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateDatabaseSettingInput['databaseSetting']) =>
+      getClient()
+        .databaseSetting.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: databaseSettingKeys.lists()
+        queryKey: databaseSettingKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

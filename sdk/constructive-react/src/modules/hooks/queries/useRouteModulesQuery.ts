@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { routeModuleKeys } from "../query-keys";
-import type { RouteModuleSelect, RouteModuleWithRelations, RouteModuleFilter, RouteModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { RouteModuleSelect, RouteModuleWithRelations, RouteModuleFilter, RouteModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { routeModuleKeys } from '../query-keys';
+import type {
+  RouteModuleSelect,
+  RouteModuleWithRelations,
+  RouteModuleFilter,
+  RouteModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  RouteModuleSelect,
+  RouteModuleWithRelations,
+  RouteModuleFilter,
+  RouteModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const routeModulesQueryKey = routeModuleKeys.list;
 /**
  * Query hook for fetching RouteModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRouteModulesQuery({
@@ -30,33 +45,47 @@ export const routeModulesQueryKey = routeModuleKeys.list;
  * });
  * ```
  */
-export function useRouteModulesQuery<S extends RouteModuleSelect, TData = {
-  routeModules: ConnectionResult<InferSelectResult<RouteModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RouteModuleFilter, RouteModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
-} & Omit<UseQueryOptions<{
-  routeModules: ConnectionResult<InferSelectResult<RouteModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRouteModulesQuery(params: {
-  selection: ListSelectionConfig<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useRouteModulesQuery<
+  S extends RouteModuleSelect,
+  TData = {
+    routeModules: ConnectionResult<InferSelectResult<RouteModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RouteModuleFilter, RouteModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        routeModules: ConnectionResult<InferSelectResult<RouteModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRouteModulesQuery(
+  params: {
+    selection: ListSelectionConfig<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: routeModuleKeys.list(args),
     queryFn: () => getClient().routeModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch RouteModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRouteModulesQuery({
@@ -70,35 +99,47 @@ export function useRouteModulesQuery(params: {
 export async function fetchRouteModulesQuery<S extends RouteModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RouteModuleFilter, RouteModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
+  } & Omit<ListSelectionConfig<S, RouteModuleFilter, RouteModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
 }): Promise<{
   routeModules: ConnectionResult<InferSelectResult<RouteModuleWithRelations, S>>;
 }>;
 export async function fetchRouteModulesQuery(params: {
   selection: ListSelectionConfig<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>(
+    params.selection
+  );
   return getClient().routeModule.findMany(args).unwrap();
 }
 /**
  * Prefetch RouteModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchRouteModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRouteModulesQuery<S extends RouteModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RouteModuleFilter, RouteModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
-}): Promise<void>;
-export async function prefetchRouteModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>(params.selection);
+export async function prefetchRouteModulesQuery<S extends RouteModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RouteModuleFilter, RouteModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RouteModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchRouteModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: routeModuleKeys.list(args),
-    queryFn: () => getClient().routeModule.findMany(args).unwrap()
+    queryFn: () => getClient().routeModule.findMany(args).unwrap(),
   });
 }

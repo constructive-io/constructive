@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgMemberProfileKeys } from "../query-keys";
-import type { OrgMemberProfileSelect, OrgMemberProfileWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgMemberProfileSelect, OrgMemberProfileWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgMemberProfileKeys } from '../query-keys';
+import type { OrgMemberProfileSelect, OrgMemberProfileWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgMemberProfileSelect, OrgMemberProfileWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgMemberProfileQueryKey = orgMemberProfileKeys.detail;
 /**
  * Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgMemberProfileQuery({
@@ -26,38 +26,52 @@ export const orgMemberProfileQueryKey = orgMemberProfileKeys.detail;
  * });
  * ```
  */
-export function useOrgMemberProfileQuery<S extends OrgMemberProfileSelect, TData = {
-  orgMemberProfile: InferSelectResult<OrgMemberProfileWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
-} & Omit<UseQueryOptions<{
-  orgMemberProfile: InferSelectResult<OrgMemberProfileWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgMemberProfileQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgMemberProfileSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgMemberProfileQuery<
+  S extends OrgMemberProfileSelect,
+  TData = {
+    orgMemberProfile: InferSelectResult<OrgMemberProfileWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgMemberProfile: InferSelectResult<OrgMemberProfileWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgMemberProfileQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgMemberProfileSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgMemberProfileSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgMemberProfileKeys.detail(params.id),
-    queryFn: () => getClient().orgMemberProfile.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgMemberProfile.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgMemberProfileQuery({
@@ -79,35 +93,46 @@ export async function fetchOrgMemberProfileQuery(params: {
   selection: SelectionConfig<OrgMemberProfileSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgMemberProfileSelect>(params.selection);
-  return getClient().orgMemberProfile.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgMemberProfile.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgMemberProfileQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgMemberProfileQuery<S extends OrgMemberProfileSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
-}): Promise<void>;
-export async function prefetchOrgMemberProfileQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgMemberProfileSelect>;
-}): Promise<void> {
+export async function prefetchOrgMemberProfileQuery<S extends OrgMemberProfileSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgMemberProfileQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgMemberProfileSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgMemberProfileSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgMemberProfileKeys.detail(params.id),
-    queryFn: () => getClient().orgMemberProfile.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgMemberProfile.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

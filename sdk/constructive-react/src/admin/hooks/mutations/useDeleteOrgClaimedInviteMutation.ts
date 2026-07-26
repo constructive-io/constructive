@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgClaimedInviteKeys } from "../query-keys";
-import { orgClaimedInviteMutationKeys } from "../mutation-keys";
-import type { OrgClaimedInviteSelect, OrgClaimedInviteWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgClaimedInviteSelect, OrgClaimedInviteWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgClaimedInviteKeys } from '../query-keys';
+import { orgClaimedInviteMutationKeys } from '../mutation-keys';
+import type { OrgClaimedInviteSelect, OrgClaimedInviteWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgClaimedInviteSelect, OrgClaimedInviteWithRelations } from '../../orm/input-types';
 /**
  * Records of successfully claimed invitations, linking senders to receivers
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteOrgClaimedInviteMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteOrgClaimedInviteMutation<S extends OrgClaimedInviteSelect>(params: {
-  selection: ({
-    fields: S & OrgClaimedInviteSelect;
-  } & HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>);
-} & Omit<UseMutationOptions<{
-  deleteOrgClaimedInvite: {
-    orgClaimedInvite: InferSelectResult<OrgClaimedInviteWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteOrgClaimedInvite: {
-    orgClaimedInvite: InferSelectResult<OrgClaimedInviteWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteOrgClaimedInviteMutation(params: {
-  selection: SelectionConfig<OrgClaimedInviteSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteOrgClaimedInviteMutation<S extends OrgClaimedInviteSelect>(
+  params: {
+    selection: {
+      fields: S & OrgClaimedInviteSelect;
+    } & HookStrictSelect<NoInfer<S>, OrgClaimedInviteSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteOrgClaimedInvite: {
+          orgClaimedInvite: InferSelectResult<OrgClaimedInviteWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteOrgClaimedInvite: {
+      orgClaimedInvite: InferSelectResult<OrgClaimedInviteWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteOrgClaimedInviteMutation(
+  params: {
+    selection: SelectionConfig<OrgClaimedInviteSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<OrgClaimedInviteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: orgClaimedInviteMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().orgClaimedInvite.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .orgClaimedInvite.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: orgClaimedInviteKeys.detail(variables.id)
+        queryKey: orgClaimedInviteKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: orgClaimedInviteKeys.lists()
+        queryKey: orgClaimedInviteKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

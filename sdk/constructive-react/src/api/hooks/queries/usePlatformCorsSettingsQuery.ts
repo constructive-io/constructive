@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformCorsSettingKeys } from "../query-keys";
-import type { PlatformCorsSettingSelect, PlatformCorsSettingWithRelations, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformCorsSettingSelect, PlatformCorsSettingWithRelations, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformCorsSettingKeys } from '../query-keys';
+import type {
+  PlatformCorsSettingSelect,
+  PlatformCorsSettingWithRelations,
+  PlatformCorsSettingFilter,
+  PlatformCorsSettingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformCorsSettingSelect,
+  PlatformCorsSettingWithRelations,
+  PlatformCorsSettingFilter,
+  PlatformCorsSettingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformCorsSettingsQueryKey = platformCorsSettingKeys.list;
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformCorsSettingsQuery({
@@ -30,33 +45,58 @@ export const platformCorsSettingsQueryKey = platformCorsSettingKeys.list;
  * });
  * ```
  */
-export function usePlatformCorsSettingsQuery<S extends PlatformCorsSettingSelect, TData = {
-  platformCorsSettings: ConnectionResult<InferSelectResult<PlatformCorsSettingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
-} & Omit<UseQueryOptions<{
-  platformCorsSettings: ConnectionResult<InferSelectResult<PlatformCorsSettingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformCorsSettingsQuery(params: {
-  selection: ListSelectionConfig<PlatformCorsSettingSelect, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformCorsSettingSelect, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformCorsSettingsQuery<
+  S extends PlatformCorsSettingSelect,
+  TData = {
+    platformCorsSettings: ConnectionResult<InferSelectResult<PlatformCorsSettingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformCorsSettings: ConnectionResult<
+          InferSelectResult<PlatformCorsSettingWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformCorsSettingsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformCorsSettingSelect,
+      PlatformCorsSettingFilter,
+      PlatformCorsSettingOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformCorsSettingSelect,
+    PlatformCorsSettingFilter,
+    PlatformCorsSettingOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformCorsSettingKeys.list(args),
     queryFn: () => getClient().platformCorsSetting.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformCorsSettingsQuery({
@@ -70,35 +110,65 @@ export function usePlatformCorsSettingsQuery(params: {
 export async function fetchPlatformCorsSettingsQuery<S extends PlatformCorsSettingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
 }): Promise<{
   platformCorsSettings: ConnectionResult<InferSelectResult<PlatformCorsSettingWithRelations, S>>;
 }>;
 export async function fetchPlatformCorsSettingsQuery(params: {
-  selection: ListSelectionConfig<PlatformCorsSettingSelect, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformCorsSettingSelect,
+    PlatformCorsSettingFilter,
+    PlatformCorsSettingOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformCorsSettingSelect, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformCorsSettingSelect,
+    PlatformCorsSettingFilter,
+    PlatformCorsSettingOrderBy
+  >(params.selection);
   return getClient().platformCorsSetting.findMany(args).unwrap();
 }
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformCorsSettingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformCorsSettingsQuery<S extends PlatformCorsSettingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
-}): Promise<void>;
-export async function prefetchPlatformCorsSettingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformCorsSettingSelect, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformCorsSettingSelect, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>(params.selection);
+export async function prefetchPlatformCorsSettingsQuery<S extends PlatformCorsSettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformCorsSettingFilter, PlatformCorsSettingOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformCorsSettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformCorsSettingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformCorsSettingSelect,
+      PlatformCorsSettingFilter,
+      PlatformCorsSettingOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformCorsSettingSelect,
+    PlatformCorsSettingFilter,
+    PlatformCorsSettingOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformCorsSettingKeys.list(args),
-    queryFn: () => getClient().platformCorsSetting.findMany(args).unwrap()
+    queryFn: () => getClient().platformCorsSetting.findMany(args).unwrap(),
   });
 }

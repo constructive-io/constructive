@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { tableKeys } from "../query-keys";
-import type { TableSelect, TableWithRelations, TableFilter, TableOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { TableSelect, TableWithRelations, TableFilter, TableOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { tableKeys } from '../query-keys';
+import type {
+  TableSelect,
+  TableWithRelations,
+  TableFilter,
+  TableOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  TableSelect,
+  TableWithRelations,
+  TableFilter,
+  TableOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const tablesQueryKey = tableKeys.list;
 /**
  * Query hook for fetching Table list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useTablesQuery({
@@ -30,33 +45,45 @@ export const tablesQueryKey = tableKeys.list;
  * });
  * ```
  */
-export function useTablesQuery<S extends TableSelect, TData = {
-  tables: ConnectionResult<InferSelectResult<TableWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, TableFilter, TableOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TableSelect>;
-} & Omit<UseQueryOptions<{
-  tables: ConnectionResult<InferSelectResult<TableWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useTablesQuery(params: {
-  selection: ListSelectionConfig<TableSelect, TableFilter, TableOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useTablesQuery<
+  S extends TableSelect,
+  TData = {
+    tables: ConnectionResult<InferSelectResult<TableWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, TableFilter, TableOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, TableSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        tables: ConnectionResult<InferSelectResult<TableWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useTablesQuery(
+  params: {
+    selection: ListSelectionConfig<TableSelect, TableFilter, TableOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<TableSelect, TableFilter, TableOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: tableKeys.list(args),
     queryFn: () => getClient().table.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch Table list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchTablesQuery({
@@ -70,7 +97,8 @@ export function useTablesQuery(params: {
 export async function fetchTablesQuery<S extends TableSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, TableFilter, TableOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TableSelect>;
+  } & Omit<ListSelectionConfig<S, TableFilter, TableOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, TableSelect>;
 }): Promise<{
   tables: ConnectionResult<InferSelectResult<TableWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchTablesQuery(params: {
 }
 /**
  * Prefetch Table list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchTablesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchTablesQuery<S extends TableSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, TableFilter, TableOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TableSelect>;
-}): Promise<void>;
-export async function prefetchTablesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<TableSelect, TableFilter, TableOrderBy>;
-}): Promise<void> {
+export async function prefetchTablesQuery<S extends TableSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, TableFilter, TableOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, TableSelect>;
+  }
+): Promise<void>;
+export async function prefetchTablesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<TableSelect, TableFilter, TableOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<TableSelect, TableFilter, TableOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: tableKeys.list(args),
-    queryFn: () => getClient().table.findMany(args).unwrap()
+    queryFn: () => getClient().table.findMany(args).unwrap(),
   });
 }

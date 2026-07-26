@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformResourceEventKeys } from "../query-keys";
-import type { PlatformResourceEventSelect, PlatformResourceEventWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformResourceEventSelect, PlatformResourceEventWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformResourceEventKeys } from '../query-keys';
+import type {
+  PlatformResourceEventSelect,
+  PlatformResourceEventWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformResourceEventSelect,
+  PlatformResourceEventWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformResourceEventQueryKey = platformResourceEventKeys.detail;
 /**
  * Resource lifecycle events — audit log of provisioning, updates, and failure events
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourceEventQuery({
@@ -26,38 +32,52 @@ export const platformResourceEventQueryKey = platformResourceEventKeys.detail;
  * });
  * ```
  */
-export function usePlatformResourceEventQuery<S extends PlatformResourceEventSelect, TData = {
-  platformResourceEvent: InferSelectResult<PlatformResourceEventWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformResourceEventSelect>;
-} & Omit<UseQueryOptions<{
-  platformResourceEvent: InferSelectResult<PlatformResourceEventWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformResourceEventQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformResourceEventSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformResourceEventQuery<
+  S extends PlatformResourceEventSelect,
+  TData = {
+    platformResourceEvent: InferSelectResult<PlatformResourceEventWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformResourceEventSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformResourceEvent: InferSelectResult<PlatformResourceEventWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformResourceEventQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformResourceEventSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformResourceEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourceEventKeys.detail(params.id),
-    queryFn: () => getClient().platformResourceEvent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformResourceEvent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Resource lifecycle events — audit log of provisioning, updates, and failure events
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformResourceEventQuery({
@@ -66,7 +86,9 @@ export function usePlatformResourceEventQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformResourceEventQuery<S extends PlatformResourceEventSelect>(params: {
+export async function fetchPlatformResourceEventQuery<
+  S extends PlatformResourceEventSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +101,46 @@ export async function fetchPlatformResourceEventQuery(params: {
   selection: SelectionConfig<PlatformResourceEventSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformResourceEventSelect>(params.selection);
-  return getClient().platformResourceEvent.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformResourceEvent.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Resource lifecycle events — audit log of provisioning, updates, and failure events
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformResourceEventQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformResourceEventQuery<S extends PlatformResourceEventSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformResourceEventSelect>;
-}): Promise<void>;
-export async function prefetchPlatformResourceEventQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformResourceEventSelect>;
-}): Promise<void> {
+export async function prefetchPlatformResourceEventQuery<S extends PlatformResourceEventSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformResourceEventSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformResourceEventQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformResourceEventSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformResourceEventSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourceEventKeys.detail(params.id),
-    queryFn: () => getClient().platformResourceEvent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformResourceEvent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

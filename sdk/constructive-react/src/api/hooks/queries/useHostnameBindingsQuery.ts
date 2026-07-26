@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { hostnameBindingKeys } from "../query-keys";
-import type { HostnameBindingSelect, HostnameBindingWithRelations, HostnameBindingFilter, HostnameBindingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { HostnameBindingSelect, HostnameBindingWithRelations, HostnameBindingFilter, HostnameBindingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { hostnameBindingKeys } from '../query-keys';
+import type {
+  HostnameBindingSelect,
+  HostnameBindingWithRelations,
+  HostnameBindingFilter,
+  HostnameBindingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  HostnameBindingSelect,
+  HostnameBindingWithRelations,
+  HostnameBindingFilter,
+  HostnameBindingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const hostnameBindingsQueryKey = hostnameBindingKeys.list;
 /**
  * Compiled hostname index maintained by domain sync triggers; read only through the resolver
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useHostnameBindingsQuery({
@@ -30,33 +45,53 @@ export const hostnameBindingsQueryKey = hostnameBindingKeys.list;
  * });
  * ```
  */
-export function useHostnameBindingsQuery<S extends HostnameBindingSelect, TData = {
-  hostnameBindings: ConnectionResult<InferSelectResult<HostnameBindingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, HostnameBindingFilter, HostnameBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, HostnameBindingSelect>;
-} & Omit<UseQueryOptions<{
-  hostnameBindings: ConnectionResult<InferSelectResult<HostnameBindingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useHostnameBindingsQuery(params: {
-  selection: ListSelectionConfig<HostnameBindingSelect, HostnameBindingFilter, HostnameBindingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<HostnameBindingSelect, HostnameBindingFilter, HostnameBindingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useHostnameBindingsQuery<
+  S extends HostnameBindingSelect,
+  TData = {
+    hostnameBindings: ConnectionResult<InferSelectResult<HostnameBindingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, HostnameBindingFilter, HostnameBindingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, HostnameBindingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        hostnameBindings: ConnectionResult<InferSelectResult<HostnameBindingWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useHostnameBindingsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      HostnameBindingSelect,
+      HostnameBindingFilter,
+      HostnameBindingOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    HostnameBindingSelect,
+    HostnameBindingFilter,
+    HostnameBindingOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: hostnameBindingKeys.list(args),
     queryFn: () => getClient().hostnameBinding.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Compiled hostname index maintained by domain sync triggers; read only through the resolver
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchHostnameBindingsQuery({
@@ -70,35 +105,59 @@ export function useHostnameBindingsQuery(params: {
 export async function fetchHostnameBindingsQuery<S extends HostnameBindingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, HostnameBindingFilter, HostnameBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, HostnameBindingSelect>;
+  } & Omit<ListSelectionConfig<S, HostnameBindingFilter, HostnameBindingOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, HostnameBindingSelect>;
 }): Promise<{
   hostnameBindings: ConnectionResult<InferSelectResult<HostnameBindingWithRelations, S>>;
 }>;
 export async function fetchHostnameBindingsQuery(params: {
-  selection: ListSelectionConfig<HostnameBindingSelect, HostnameBindingFilter, HostnameBindingOrderBy>;
+  selection: ListSelectionConfig<
+    HostnameBindingSelect,
+    HostnameBindingFilter,
+    HostnameBindingOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<HostnameBindingSelect, HostnameBindingFilter, HostnameBindingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    HostnameBindingSelect,
+    HostnameBindingFilter,
+    HostnameBindingOrderBy
+  >(params.selection);
   return getClient().hostnameBinding.findMany(args).unwrap();
 }
 /**
  * Compiled hostname index maintained by domain sync triggers; read only through the resolver
- * 
+ *
  * @example
  * ```ts
  * await prefetchHostnameBindingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchHostnameBindingsQuery<S extends HostnameBindingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, HostnameBindingFilter, HostnameBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, HostnameBindingSelect>;
-}): Promise<void>;
-export async function prefetchHostnameBindingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<HostnameBindingSelect, HostnameBindingFilter, HostnameBindingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<HostnameBindingSelect, HostnameBindingFilter, HostnameBindingOrderBy>(params.selection);
+export async function prefetchHostnameBindingsQuery<S extends HostnameBindingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, HostnameBindingFilter, HostnameBindingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, HostnameBindingSelect>;
+  }
+): Promise<void>;
+export async function prefetchHostnameBindingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      HostnameBindingSelect,
+      HostnameBindingFilter,
+      HostnameBindingOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    HostnameBindingSelect,
+    HostnameBindingFilter,
+    HostnameBindingOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: hostnameBindingKeys.list(args),
-    queryFn: () => getClient().hostnameBinding.findMany(args).unwrap()
+    queryFn: () => getClient().hostnameBinding.findMany(args).unwrap(),
   });
 }

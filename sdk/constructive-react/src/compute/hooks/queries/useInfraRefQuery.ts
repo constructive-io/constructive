@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { infraRefKeys } from "../query-keys";
-import type { InfraRefSelect, InfraRefWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { InfraRefSelect, InfraRefWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { infraRefKeys } from '../query-keys';
+import type { InfraRefSelect, InfraRefWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { InfraRefSelect, InfraRefWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const infraRefQueryKey = infraRefKeys.detail;
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useInfraRefQuery({
@@ -26,38 +26,52 @@ export const infraRefQueryKey = infraRefKeys.detail;
  * });
  * ```
  */
-export function useInfraRefQuery<S extends InfraRefSelect, TData = {
-  infraRef: InferSelectResult<InfraRefWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, InfraRefSelect>;
-} & Omit<UseQueryOptions<{
-  infraRef: InferSelectResult<InfraRefWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useInfraRefQuery(params: {
-  id: string;
-  selection: SelectionConfig<InfraRefSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useInfraRefQuery<
+  S extends InfraRefSelect,
+  TData = {
+    infraRef: InferSelectResult<InfraRefWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, InfraRefSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        infraRef: InferSelectResult<InfraRefWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useInfraRefQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<InfraRefSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<InfraRefSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: infraRefKeys.detail(params.id),
-    queryFn: () => getClient().infraRef.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .infraRef.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchInfraRefQuery({
@@ -79,35 +93,46 @@ export async function fetchInfraRefQuery(params: {
   selection: SelectionConfig<InfraRefSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<InfraRefSelect>(params.selection);
-  return getClient().infraRef.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .infraRef.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```ts
  * await prefetchInfraRefQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchInfraRefQuery<S extends InfraRefSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, InfraRefSelect>;
-}): Promise<void>;
-export async function prefetchInfraRefQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<InfraRefSelect>;
-}): Promise<void> {
+export async function prefetchInfraRefQuery<S extends InfraRefSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, InfraRefSelect>;
+  }
+): Promise<void>;
+export async function prefetchInfraRefQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<InfraRefSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<InfraRefSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: infraRefKeys.detail(params.id),
-    queryFn: () => getClient().infraRef.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .infraRef.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

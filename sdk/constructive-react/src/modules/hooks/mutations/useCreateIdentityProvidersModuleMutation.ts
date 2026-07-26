@@ -12,16 +12,24 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { identityProvidersModuleKeys } from "../query-keys";
-import { identityProvidersModuleMutationKeys } from "../mutation-keys";
-import type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelations, CreateIdentityProvidersModuleInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelations, CreateIdentityProvidersModuleInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { identityProvidersModuleKeys } from '../query-keys';
+import { identityProvidersModuleMutationKeys } from '../mutation-keys';
+import type {
+  IdentityProvidersModuleSelect,
+  IdentityProvidersModuleWithRelations,
+  CreateIdentityProvidersModuleInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  IdentityProvidersModuleSelect,
+  IdentityProvidersModuleWithRelations,
+  CreateIdentityProvidersModuleInput,
+} from '../../orm/input-types';
 /**
  * Entity-aware config row for the identity_providers_module, which provisions a per-database
      identity_providers table holding OAuth2 / OIDC (and future SAML) provider definitions.
@@ -42,40 +50,58 @@ export type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelation
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateIdentityProvidersModuleMutation<S extends IdentityProvidersModuleSelect>(params: {
-  selection: ({
-    fields: S & IdentityProvidersModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>);
-} & Omit<UseMutationOptions<{
-  createIdentityProvidersModule: {
-    identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
-  };
-}, Error, CreateIdentityProvidersModuleInput["identityProvidersModule"]>, "mutationFn">): UseMutationResult<{
-  createIdentityProvidersModule: {
-    identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
-  };
-}, Error, CreateIdentityProvidersModuleInput["identityProvidersModule"]>;
-export function useCreateIdentityProvidersModuleMutation(params: {
-  selection: SelectionConfig<IdentityProvidersModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateIdentityProvidersModuleInput["identityProvidersModule"]>, "mutationFn">) {
+export function useCreateIdentityProvidersModuleMutation<S extends IdentityProvidersModuleSelect>(
+  params: {
+    selection: {
+      fields: S & IdentityProvidersModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createIdentityProvidersModule: {
+          identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
+        };
+      },
+      Error,
+      CreateIdentityProvidersModuleInput['identityProvidersModule']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createIdentityProvidersModule: {
+      identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
+    };
+  },
+  Error,
+  CreateIdentityProvidersModuleInput['identityProvidersModule']
+>;
+export function useCreateIdentityProvidersModuleMutation(
+  params: {
+    selection: SelectionConfig<IdentityProvidersModuleSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateIdentityProvidersModuleInput['identityProvidersModule']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<IdentityProvidersModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: identityProvidersModuleMutationKeys.create(),
-    mutationFn: (data: CreateIdentityProvidersModuleInput["identityProvidersModule"]) => getClient().identityProvidersModule.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateIdentityProvidersModuleInput['identityProvidersModule']) =>
+      getClient()
+        .identityProvidersModule.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.lists()
+        queryKey: identityProvidersModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

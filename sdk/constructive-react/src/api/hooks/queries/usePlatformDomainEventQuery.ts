@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformDomainEventKeys } from "../query-keys";
-import type { PlatformDomainEventSelect, PlatformDomainEventWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformDomainEventSelect, PlatformDomainEventWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformDomainEventKeys } from '../query-keys';
+import type {
+  PlatformDomainEventSelect,
+  PlatformDomainEventWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformDomainEventSelect,
+  PlatformDomainEventWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformDomainEventQueryKey = platformDomainEventKeys.detail;
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformDomainEventQuery({
@@ -26,38 +32,52 @@ export const platformDomainEventQueryKey = platformDomainEventKeys.detail;
  * });
  * ```
  */
-export function usePlatformDomainEventQuery<S extends PlatformDomainEventSelect, TData = {
-  platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>;
-} & Omit<UseQueryOptions<{
-  platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformDomainEventQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformDomainEventSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformDomainEventQuery<
+  S extends PlatformDomainEventSelect,
+  TData = {
+    platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformDomainEventQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformDomainEventSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformDomainEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformDomainEventKeys.detail(params.id),
-    queryFn: () => getClient().platformDomainEvent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformDomainEvent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformDomainEventQuery({
@@ -79,35 +99,46 @@ export async function fetchPlatformDomainEventQuery(params: {
   selection: SelectionConfig<PlatformDomainEventSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformDomainEventSelect>(params.selection);
-  return getClient().platformDomainEvent.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformDomainEvent.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformDomainEventQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformDomainEventQuery<S extends PlatformDomainEventSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>;
-}): Promise<void>;
-export async function prefetchPlatformDomainEventQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformDomainEventSelect>;
-}): Promise<void> {
+export async function prefetchPlatformDomainEventQuery<S extends PlatformDomainEventSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformDomainEventQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformDomainEventSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformDomainEventSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformDomainEventKeys.detail(params.id),
-    queryFn: () => getClient().platformDomainEvent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformDomainEvent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

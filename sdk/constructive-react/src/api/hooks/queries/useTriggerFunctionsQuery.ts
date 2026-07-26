@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { triggerFunctionKeys } from "../query-keys";
-import type { TriggerFunctionSelect, TriggerFunctionWithRelations, TriggerFunctionFilter, TriggerFunctionOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { TriggerFunctionSelect, TriggerFunctionWithRelations, TriggerFunctionFilter, TriggerFunctionOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { triggerFunctionKeys } from '../query-keys';
+import type {
+  TriggerFunctionSelect,
+  TriggerFunctionWithRelations,
+  TriggerFunctionFilter,
+  TriggerFunctionOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  TriggerFunctionSelect,
+  TriggerFunctionWithRelations,
+  TriggerFunctionFilter,
+  TriggerFunctionOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const triggerFunctionsQueryKey = triggerFunctionKeys.list;
 /**
  * Query hook for fetching TriggerFunction list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useTriggerFunctionsQuery({
@@ -30,33 +45,53 @@ export const triggerFunctionsQueryKey = triggerFunctionKeys.list;
  * });
  * ```
  */
-export function useTriggerFunctionsQuery<S extends TriggerFunctionSelect, TData = {
-  triggerFunctions: ConnectionResult<InferSelectResult<TriggerFunctionWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, TriggerFunctionFilter, TriggerFunctionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TriggerFunctionSelect>;
-} & Omit<UseQueryOptions<{
-  triggerFunctions: ConnectionResult<InferSelectResult<TriggerFunctionWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useTriggerFunctionsQuery(params: {
-  selection: ListSelectionConfig<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useTriggerFunctionsQuery<
+  S extends TriggerFunctionSelect,
+  TData = {
+    triggerFunctions: ConnectionResult<InferSelectResult<TriggerFunctionWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, TriggerFunctionFilter, TriggerFunctionOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, TriggerFunctionSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        triggerFunctions: ConnectionResult<InferSelectResult<TriggerFunctionWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useTriggerFunctionsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      TriggerFunctionSelect,
+      TriggerFunctionFilter,
+      TriggerFunctionOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    TriggerFunctionSelect,
+    TriggerFunctionFilter,
+    TriggerFunctionOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: triggerFunctionKeys.list(args),
     queryFn: () => getClient().triggerFunction.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch TriggerFunction list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchTriggerFunctionsQuery({
@@ -70,35 +105,59 @@ export function useTriggerFunctionsQuery(params: {
 export async function fetchTriggerFunctionsQuery<S extends TriggerFunctionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, TriggerFunctionFilter, TriggerFunctionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TriggerFunctionSelect>;
+  } & Omit<ListSelectionConfig<S, TriggerFunctionFilter, TriggerFunctionOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, TriggerFunctionSelect>;
 }): Promise<{
   triggerFunctions: ConnectionResult<InferSelectResult<TriggerFunctionWithRelations, S>>;
 }>;
 export async function fetchTriggerFunctionsQuery(params: {
-  selection: ListSelectionConfig<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy>;
+  selection: ListSelectionConfig<
+    TriggerFunctionSelect,
+    TriggerFunctionFilter,
+    TriggerFunctionOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    TriggerFunctionSelect,
+    TriggerFunctionFilter,
+    TriggerFunctionOrderBy
+  >(params.selection);
   return getClient().triggerFunction.findMany(args).unwrap();
 }
 /**
  * Prefetch TriggerFunction list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchTriggerFunctionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchTriggerFunctionsQuery<S extends TriggerFunctionSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, TriggerFunctionFilter, TriggerFunctionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, TriggerFunctionSelect>;
-}): Promise<void>;
-export async function prefetchTriggerFunctionsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy>(params.selection);
+export async function prefetchTriggerFunctionsQuery<S extends TriggerFunctionSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, TriggerFunctionFilter, TriggerFunctionOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, TriggerFunctionSelect>;
+  }
+): Promise<void>;
+export async function prefetchTriggerFunctionsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      TriggerFunctionSelect,
+      TriggerFunctionFilter,
+      TriggerFunctionOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    TriggerFunctionSelect,
+    TriggerFunctionFilter,
+    TriggerFunctionOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: triggerFunctionKeys.list(args),
-    queryFn: () => getClient().triggerFunction.findMany(args).unwrap()
+    queryFn: () => getClient().triggerFunction.findMany(args).unwrap(),
   });
 }

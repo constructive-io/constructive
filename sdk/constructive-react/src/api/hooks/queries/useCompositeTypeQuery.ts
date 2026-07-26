@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { compositeTypeKeys } from "../query-keys";
-import type { CompositeTypeSelect, CompositeTypeWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { CompositeTypeSelect, CompositeTypeWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { compositeTypeKeys } from '../query-keys';
+import type { CompositeTypeSelect, CompositeTypeWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { CompositeTypeSelect, CompositeTypeWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const compositeTypeQueryKey = compositeTypeKeys.detail;
 /**
  * Query hook for fetching a single CompositeType
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCompositeTypeQuery({
@@ -26,38 +26,52 @@ export const compositeTypeQueryKey = compositeTypeKeys.detail;
  * });
  * ```
  */
-export function useCompositeTypeQuery<S extends CompositeTypeSelect, TData = {
-  compositeType: InferSelectResult<CompositeTypeWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
-} & Omit<UseQueryOptions<{
-  compositeType: InferSelectResult<CompositeTypeWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCompositeTypeQuery(params: {
-  id: string;
-  selection: SelectionConfig<CompositeTypeSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useCompositeTypeQuery<
+  S extends CompositeTypeSelect,
+  TData = {
+    compositeType: InferSelectResult<CompositeTypeWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        compositeType: InferSelectResult<CompositeTypeWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCompositeTypeQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<CompositeTypeSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<CompositeTypeSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: compositeTypeKeys.detail(params.id),
-    queryFn: () => getClient().compositeType.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .compositeType.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single CompositeType without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCompositeTypeQuery({
@@ -79,35 +93,46 @@ export async function fetchCompositeTypeQuery(params: {
   selection: SelectionConfig<CompositeTypeSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<CompositeTypeSelect>(params.selection);
-  return getClient().compositeType.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .compositeType.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single CompositeType for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchCompositeTypeQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchCompositeTypeQuery<S extends CompositeTypeSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
-}): Promise<void>;
-export async function prefetchCompositeTypeQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<CompositeTypeSelect>;
-}): Promise<void> {
+export async function prefetchCompositeTypeQuery<S extends CompositeTypeSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
+  }
+): Promise<void>;
+export async function prefetchCompositeTypeQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<CompositeTypeSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<CompositeTypeSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: compositeTypeKeys.detail(params.id),
-    queryFn: () => getClient().compositeType.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .compositeType.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appGrantKeys } from "../query-keys";
-import type { AppGrantSelect, AppGrantWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppGrantSelect, AppGrantWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appGrantKeys } from '../query-keys';
+import type { AppGrantSelect, AppGrantWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AppGrantSelect, AppGrantWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appGrantQueryKey = appGrantKeys.detail;
 /**
  * Records of individual permission grants and revocations for members via bitmask
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppGrantQuery({
@@ -26,38 +26,52 @@ export const appGrantQueryKey = appGrantKeys.detail;
  * });
  * ```
  */
-export function useAppGrantQuery<S extends AppGrantSelect, TData = {
-  appGrant: InferSelectResult<AppGrantWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppGrantSelect>;
-} & Omit<UseQueryOptions<{
-  appGrant: InferSelectResult<AppGrantWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppGrantQuery(params: {
-  id: string;
-  selection: SelectionConfig<AppGrantSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAppGrantQuery<
+  S extends AppGrantSelect,
+  TData = {
+    appGrant: InferSelectResult<AppGrantWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appGrant: InferSelectResult<AppGrantWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppGrantQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AppGrantSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AppGrantSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appGrantKeys.detail(params.id),
-    queryFn: () => getClient().appGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .appGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Records of individual permission grants and revocations for members via bitmask
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppGrantQuery({
@@ -79,35 +93,46 @@ export async function fetchAppGrantQuery(params: {
   selection: SelectionConfig<AppGrantSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppGrantSelect>(params.selection);
-  return getClient().appGrant.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .appGrant.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Records of individual permission grants and revocations for members via bitmask
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppGrantQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppGrantQuery<S extends AppGrantSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppGrantSelect>;
-}): Promise<void>;
-export async function prefetchAppGrantQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AppGrantSelect>;
-}): Promise<void> {
+export async function prefetchAppGrantQuery<S extends AppGrantSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppGrantQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AppGrantSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AppGrantSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appGrantKeys.detail(params.id),
-    queryFn: () => getClient().appGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .appGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

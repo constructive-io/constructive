@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { routeBindingKeys } from "../query-keys";
-import type { RouteBindingSelect, RouteBindingWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RouteBindingSelect, RouteBindingWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { routeBindingKeys } from '../query-keys';
+import type { RouteBindingSelect, RouteBindingWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { RouteBindingSelect, RouteBindingWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const routeBindingQueryKey = routeBindingKeys.detail;
 /**
  * Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRouteBindingQuery({
@@ -26,38 +26,52 @@ export const routeBindingQueryKey = routeBindingKeys.detail;
  * });
  * ```
  */
-export function useRouteBindingQuery<S extends RouteBindingSelect, TData = {
-  routeBinding: InferSelectResult<RouteBindingWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
-} & Omit<UseQueryOptions<{
-  routeBinding: InferSelectResult<RouteBindingWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRouteBindingQuery(params: {
-  id: string;
-  selection: SelectionConfig<RouteBindingSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useRouteBindingQuery<
+  S extends RouteBindingSelect,
+  TData = {
+    routeBinding: InferSelectResult<RouteBindingWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        routeBinding: InferSelectResult<RouteBindingWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRouteBindingQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<RouteBindingSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<RouteBindingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: routeBindingKeys.detail(params.id),
-    queryFn: () => getClient().routeBinding.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .routeBinding.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRouteBindingQuery({
@@ -79,35 +93,46 @@ export async function fetchRouteBindingQuery(params: {
   selection: SelectionConfig<RouteBindingSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RouteBindingSelect>(params.selection);
-  return getClient().routeBinding.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .routeBinding.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver
- * 
+ *
  * @example
  * ```ts
  * await prefetchRouteBindingQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRouteBindingQuery<S extends RouteBindingSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
-}): Promise<void>;
-export async function prefetchRouteBindingQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<RouteBindingSelect>;
-}): Promise<void> {
+export async function prefetchRouteBindingQuery<S extends RouteBindingSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
+  }
+): Promise<void>;
+export async function prefetchRouteBindingQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<RouteBindingSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<RouteBindingSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: routeBindingKeys.detail(params.id),
-    queryFn: () => getClient().routeBinding.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .routeBinding.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

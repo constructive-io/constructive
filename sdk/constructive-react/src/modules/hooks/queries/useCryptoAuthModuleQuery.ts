@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { cryptoAuthModuleKeys } from "../query-keys";
-import type { CryptoAuthModuleSelect, CryptoAuthModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { CryptoAuthModuleSelect, CryptoAuthModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { cryptoAuthModuleKeys } from '../query-keys';
+import type { CryptoAuthModuleSelect, CryptoAuthModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { CryptoAuthModuleSelect, CryptoAuthModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const cryptoAuthModuleQueryKey = cryptoAuthModuleKeys.detail;
 /**
  * Query hook for fetching a single CryptoAuthModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCryptoAuthModuleQuery({
@@ -26,38 +26,52 @@ export const cryptoAuthModuleQueryKey = cryptoAuthModuleKeys.detail;
  * });
  * ```
  */
-export function useCryptoAuthModuleQuery<S extends CryptoAuthModuleSelect, TData = {
-  cryptoAuthModule: InferSelectResult<CryptoAuthModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
-} & Omit<UseQueryOptions<{
-  cryptoAuthModule: InferSelectResult<CryptoAuthModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCryptoAuthModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<CryptoAuthModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useCryptoAuthModuleQuery<
+  S extends CryptoAuthModuleSelect,
+  TData = {
+    cryptoAuthModule: InferSelectResult<CryptoAuthModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        cryptoAuthModule: InferSelectResult<CryptoAuthModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCryptoAuthModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<CryptoAuthModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<CryptoAuthModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: cryptoAuthModuleKeys.detail(params.id),
-    queryFn: () => getClient().cryptoAuthModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .cryptoAuthModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single CryptoAuthModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCryptoAuthModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchCryptoAuthModuleQuery(params: {
   selection: SelectionConfig<CryptoAuthModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<CryptoAuthModuleSelect>(params.selection);
-  return getClient().cryptoAuthModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .cryptoAuthModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single CryptoAuthModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchCryptoAuthModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchCryptoAuthModuleQuery<S extends CryptoAuthModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
-}): Promise<void>;
-export async function prefetchCryptoAuthModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<CryptoAuthModuleSelect>;
-}): Promise<void> {
+export async function prefetchCryptoAuthModuleQuery<S extends CryptoAuthModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchCryptoAuthModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<CryptoAuthModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<CryptoAuthModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: cryptoAuthModuleKeys.detail(params.id),
-    queryFn: () => getClient().cryptoAuthModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .cryptoAuthModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { orgLimitKeys } from "../query-keys";
-import type { OrgLimitSelect, OrgLimitWithRelations, OrgLimitFilter, OrgLimitOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitSelect, OrgLimitWithRelations, OrgLimitFilter, OrgLimitOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { orgLimitKeys } from '../query-keys';
+import type {
+  OrgLimitSelect,
+  OrgLimitWithRelations,
+  OrgLimitFilter,
+  OrgLimitOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  OrgLimitSelect,
+  OrgLimitWithRelations,
+  OrgLimitFilter,
+  OrgLimitOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitsQueryKey = orgLimitKeys.list;
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitsQuery({
@@ -30,33 +45,47 @@ export const orgLimitsQueryKey = orgLimitKeys.list;
  * });
  * ```
  */
-export function useOrgLimitsQuery<S extends OrgLimitSelect, TData = {
-  orgLimits: ConnectionResult<InferSelectResult<OrgLimitWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitFilter, OrgLimitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitSelect>;
-} & Omit<UseQueryOptions<{
-  orgLimits: ConnectionResult<InferSelectResult<OrgLimitWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgLimitsQuery(params: {
-  selection: ListSelectionConfig<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useOrgLimitsQuery<
+  S extends OrgLimitSelect,
+  TData = {
+    orgLimits: ConnectionResult<InferSelectResult<OrgLimitWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgLimitFilter, OrgLimitOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgLimitSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgLimits: ConnectionResult<InferSelectResult<OrgLimitWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgLimitsQuery(
+  params: {
+    selection: ListSelectionConfig<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitKeys.list(args),
     queryFn: () => getClient().orgLimit.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgLimitsQuery({
@@ -70,35 +99,47 @@ export function useOrgLimitsQuery(params: {
 export async function fetchOrgLimitsQuery<S extends OrgLimitSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitFilter, OrgLimitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitSelect>;
+  } & Omit<ListSelectionConfig<S, OrgLimitFilter, OrgLimitOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, OrgLimitSelect>;
 }): Promise<{
   orgLimits: ConnectionResult<InferSelectResult<OrgLimitWithRelations, S>>;
 }>;
 export async function fetchOrgLimitsQuery(params: {
   selection: ListSelectionConfig<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>;
 }) {
-  const args = buildListSelectionArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>(params.selection);
+  const args = buildListSelectionArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>(
+    params.selection
+  );
   return getClient().orgLimit.findMany(args).unwrap();
 }
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgLimitsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgLimitsQuery<S extends OrgLimitSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitFilter, OrgLimitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitSelect>;
-}): Promise<void>;
-export async function prefetchOrgLimitsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>(params.selection);
+export async function prefetchOrgLimitsQuery<S extends OrgLimitSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgLimitFilter, OrgLimitOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgLimitSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgLimitsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: orgLimitKeys.list(args),
-    queryFn: () => getClient().orgLimit.findMany(args).unwrap()
+    queryFn: () => getClient().orgLimit.findMany(args).unwrap(),
   });
 }

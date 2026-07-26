@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { siteThemeKeys } from "../query-keys";
-import type { SiteThemeSelect, SiteThemeWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { SiteThemeSelect, SiteThemeWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { siteThemeKeys } from '../query-keys';
+import type { SiteThemeSelect, SiteThemeWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { SiteThemeSelect, SiteThemeWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const siteThemeQueryKey = siteThemeKeys.detail;
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSiteThemeQuery({
@@ -26,38 +26,52 @@ export const siteThemeQueryKey = siteThemeKeys.detail;
  * });
  * ```
  */
-export function useSiteThemeQuery<S extends SiteThemeSelect, TData = {
-  siteTheme: InferSelectResult<SiteThemeWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
-} & Omit<UseQueryOptions<{
-  siteTheme: InferSelectResult<SiteThemeWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSiteThemeQuery(params: {
-  id: string;
-  selection: SelectionConfig<SiteThemeSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSiteThemeQuery<
+  S extends SiteThemeSelect,
+  TData = {
+    siteTheme: InferSelectResult<SiteThemeWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        siteTheme: InferSelectResult<SiteThemeWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSiteThemeQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<SiteThemeSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<SiteThemeSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: siteThemeKeys.detail(params.id),
-    queryFn: () => getClient().siteTheme.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .siteTheme.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSiteThemeQuery({
@@ -79,35 +93,46 @@ export async function fetchSiteThemeQuery(params: {
   selection: SelectionConfig<SiteThemeSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SiteThemeSelect>(params.selection);
-  return getClient().siteTheme.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .siteTheme.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Theme (colors, fonts, design tokens) for a site surface
- * 
+ *
  * @example
  * ```ts
  * await prefetchSiteThemeQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSiteThemeQuery<S extends SiteThemeSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
-}): Promise<void>;
-export async function prefetchSiteThemeQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<SiteThemeSelect>;
-}): Promise<void> {
+export async function prefetchSiteThemeQuery<S extends SiteThemeSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SiteThemeSelect>;
+  }
+): Promise<void>;
+export async function prefetchSiteThemeQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<SiteThemeSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<SiteThemeSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: siteThemeKeys.detail(params.id),
-    queryFn: () => getClient().siteTheme.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .siteTheme.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

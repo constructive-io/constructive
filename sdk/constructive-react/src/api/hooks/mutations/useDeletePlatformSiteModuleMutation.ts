@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteModuleKeys } from "../query-keys";
-import { platformSiteModuleMutationKeys } from "../mutation-keys";
-import type { PlatformSiteModuleSelect, PlatformSiteModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteModuleSelect, PlatformSiteModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteModuleKeys } from '../query-keys';
+import { platformSiteModuleMutationKeys } from '../mutation-keys';
+import type {
+  PlatformSiteModuleSelect,
+  PlatformSiteModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformSiteModuleSelect,
+  PlatformSiteModuleWithRelations,
+} from '../../orm/input-types';
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformSiteModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformSiteModuleMutation<S extends PlatformSiteModuleSelect>(params: {
-  selection: ({
-    fields: S & PlatformSiteModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deletePlatformSiteModule: {
-    platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePlatformSiteModule: {
-    platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeletePlatformSiteModuleMutation(params: {
-  selection: SelectionConfig<PlatformSiteModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeletePlatformSiteModuleMutation<S extends PlatformSiteModuleSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformSiteModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deletePlatformSiteModule: {
+          platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deletePlatformSiteModule: {
+      platformSiteModule: InferSelectResult<PlatformSiteModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeletePlatformSiteModuleMutation(
+  params: {
+    selection: SelectionConfig<PlatformSiteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformSiteModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformSiteModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().platformSiteModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .platformSiteModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformSiteModuleKeys.detail(variables.id)
+        queryKey: platformSiteModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformSiteModuleKeys.lists()
+        queryKey: platformSiteModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

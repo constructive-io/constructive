@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { commitKeys } from "../query-keys";
-import type { CommitSelect, CommitWithRelations, CommitFilter, CommitOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { CommitSelect, CommitWithRelations, CommitFilter, CommitOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { commitKeys } from '../query-keys';
+import type {
+  CommitSelect,
+  CommitWithRelations,
+  CommitFilter,
+  CommitOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  CommitSelect,
+  CommitWithRelations,
+  CommitFilter,
+  CommitOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const commitsQueryKey = commitKeys.list;
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCommitsQuery({
@@ -30,33 +45,45 @@ export const commitsQueryKey = commitKeys.list;
  * });
  * ```
  */
-export function useCommitsQuery<S extends CommitSelect, TData = {
-  commits: ConnectionResult<InferSelectResult<CommitWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CommitFilter, CommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CommitSelect>;
-} & Omit<UseQueryOptions<{
-  commits: ConnectionResult<InferSelectResult<CommitWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCommitsQuery(params: {
-  selection: ListSelectionConfig<CommitSelect, CommitFilter, CommitOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useCommitsQuery<
+  S extends CommitSelect,
+  TData = {
+    commits: ConnectionResult<InferSelectResult<CommitWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, CommitFilter, CommitOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, CommitSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        commits: ConnectionResult<InferSelectResult<CommitWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCommitsQuery(
+  params: {
+    selection: ListSelectionConfig<CommitSelect, CommitFilter, CommitOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<CommitSelect, CommitFilter, CommitOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: commitKeys.list(args),
     queryFn: () => getClient().commit.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCommitsQuery({
@@ -70,7 +97,8 @@ export function useCommitsQuery(params: {
 export async function fetchCommitsQuery<S extends CommitSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, CommitFilter, CommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CommitSelect>;
+  } & Omit<ListSelectionConfig<S, CommitFilter, CommitOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, CommitSelect>;
 }): Promise<{
   commits: ConnectionResult<InferSelectResult<CommitWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchCommitsQuery(params: {
 }
 /**
  * Commit history — each commit snapshots a tree root for a store
- * 
+ *
  * @example
  * ```ts
  * await prefetchCommitsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchCommitsQuery<S extends CommitSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CommitFilter, CommitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CommitSelect>;
-}): Promise<void>;
-export async function prefetchCommitsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<CommitSelect, CommitFilter, CommitOrderBy>;
-}): Promise<void> {
+export async function prefetchCommitsQuery<S extends CommitSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, CommitFilter, CommitOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, CommitSelect>;
+  }
+): Promise<void>;
+export async function prefetchCommitsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<CommitSelect, CommitFilter, CommitOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<CommitSelect, CommitFilter, CommitOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: commitKeys.list(args),
-    queryFn: () => getClient().commit.findMany(args).unwrap()
+    queryFn: () => getClient().commit.findMany(args).unwrap(),
   });
 }

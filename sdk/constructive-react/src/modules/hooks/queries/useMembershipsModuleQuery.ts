@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { membershipsModuleKeys } from "../query-keys";
-import type { MembershipsModuleSelect, MembershipsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { MembershipsModuleSelect, MembershipsModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { membershipsModuleKeys } from '../query-keys';
+import type {
+  MembershipsModuleSelect,
+  MembershipsModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  MembershipsModuleSelect,
+  MembershipsModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const membershipsModuleQueryKey = membershipsModuleKeys.detail;
 /**
  * Query hook for fetching a single MembershipsModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useMembershipsModuleQuery({
@@ -26,38 +32,52 @@ export const membershipsModuleQueryKey = membershipsModuleKeys.detail;
  * });
  * ```
  */
-export function useMembershipsModuleQuery<S extends MembershipsModuleSelect, TData = {
-  membershipsModule: InferSelectResult<MembershipsModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, MembershipsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  membershipsModule: InferSelectResult<MembershipsModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useMembershipsModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<MembershipsModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useMembershipsModuleQuery<
+  S extends MembershipsModuleSelect,
+  TData = {
+    membershipsModule: InferSelectResult<MembershipsModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, MembershipsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        membershipsModule: InferSelectResult<MembershipsModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useMembershipsModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<MembershipsModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<MembershipsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: membershipsModuleKeys.detail(params.id),
-    queryFn: () => getClient().membershipsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .membershipsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single MembershipsModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchMembershipsModuleQuery({
@@ -79,35 +99,46 @@ export async function fetchMembershipsModuleQuery(params: {
   selection: SelectionConfig<MembershipsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<MembershipsModuleSelect>(params.selection);
-  return getClient().membershipsModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .membershipsModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single MembershipsModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchMembershipsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchMembershipsModuleQuery<S extends MembershipsModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, MembershipsModuleSelect>;
-}): Promise<void>;
-export async function prefetchMembershipsModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<MembershipsModuleSelect>;
-}): Promise<void> {
+export async function prefetchMembershipsModuleQuery<S extends MembershipsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, MembershipsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchMembershipsModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<MembershipsModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<MembershipsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: membershipsModuleKeys.detail(params.id),
-    queryFn: () => getClient().membershipsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .membershipsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

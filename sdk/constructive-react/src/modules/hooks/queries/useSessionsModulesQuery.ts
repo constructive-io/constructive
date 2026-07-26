@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { sessionsModuleKeys } from "../query-keys";
-import type { SessionsModuleSelect, SessionsModuleWithRelations, SessionsModuleFilter, SessionsModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { SessionsModuleSelect, SessionsModuleWithRelations, SessionsModuleFilter, SessionsModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { sessionsModuleKeys } from '../query-keys';
+import type {
+  SessionsModuleSelect,
+  SessionsModuleWithRelations,
+  SessionsModuleFilter,
+  SessionsModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  SessionsModuleSelect,
+  SessionsModuleWithRelations,
+  SessionsModuleFilter,
+  SessionsModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const sessionsModulesQueryKey = sessionsModuleKeys.list;
 /**
  * Query hook for fetching SessionsModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSessionsModulesQuery({
@@ -30,33 +45,53 @@ export const sessionsModulesQueryKey = sessionsModuleKeys.list;
  * });
  * ```
  */
-export function useSessionsModulesQuery<S extends SessionsModuleSelect, TData = {
-  sessionsModules: ConnectionResult<InferSelectResult<SessionsModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SessionsModuleFilter, SessionsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SessionsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  sessionsModules: ConnectionResult<InferSelectResult<SessionsModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSessionsModulesQuery(params: {
-  selection: ListSelectionConfig<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useSessionsModulesQuery<
+  S extends SessionsModuleSelect,
+  TData = {
+    sessionsModules: ConnectionResult<InferSelectResult<SessionsModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SessionsModuleFilter, SessionsModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SessionsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        sessionsModules: ConnectionResult<InferSelectResult<SessionsModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSessionsModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      SessionsModuleSelect,
+      SessionsModuleFilter,
+      SessionsModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    SessionsModuleSelect,
+    SessionsModuleFilter,
+    SessionsModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: sessionsModuleKeys.list(args),
     queryFn: () => getClient().sessionsModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch SessionsModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSessionsModulesQuery({
@@ -70,35 +105,55 @@ export function useSessionsModulesQuery(params: {
 export async function fetchSessionsModulesQuery<S extends SessionsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, SessionsModuleFilter, SessionsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SessionsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, SessionsModuleFilter, SessionsModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, SessionsModuleSelect>;
 }): Promise<{
   sessionsModules: ConnectionResult<InferSelectResult<SessionsModuleWithRelations, S>>;
 }>;
 export async function fetchSessionsModulesQuery(params: {
   selection: ListSelectionConfig<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    SessionsModuleSelect,
+    SessionsModuleFilter,
+    SessionsModuleOrderBy
+  >(params.selection);
   return getClient().sessionsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch SessionsModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchSessionsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchSessionsModulesQuery<S extends SessionsModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, SessionsModuleFilter, SessionsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SessionsModuleSelect>;
-}): Promise<void>;
-export async function prefetchSessionsModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy>(params.selection);
+export async function prefetchSessionsModulesQuery<S extends SessionsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, SessionsModuleFilter, SessionsModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, SessionsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchSessionsModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      SessionsModuleSelect,
+      SessionsModuleFilter,
+      SessionsModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    SessionsModuleSelect,
+    SessionsModuleFilter,
+    SessionsModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: sessionsModuleKeys.list(args),
-    queryFn: () => getClient().sessionsModule.findMany(args).unwrap()
+    queryFn: () => getClient().sessionsModule.findMany(args).unwrap(),
   });
 }

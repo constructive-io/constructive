@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { apiModuleKeys } from "../query-keys";
-import type { ApiModuleSelect, ApiModuleWithRelations, ApiModuleFilter, ApiModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ApiModuleSelect, ApiModuleWithRelations, ApiModuleFilter, ApiModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { apiModuleKeys } from '../query-keys';
+import type {
+  ApiModuleSelect,
+  ApiModuleWithRelations,
+  ApiModuleFilter,
+  ApiModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ApiModuleSelect,
+  ApiModuleWithRelations,
+  ApiModuleFilter,
+  ApiModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const apiModulesQueryKey = apiModuleKeys.list;
 /**
  * Server-side module configuration for an API surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useApiModulesQuery({
@@ -30,33 +45,47 @@ export const apiModulesQueryKey = apiModuleKeys.list;
  * });
  * ```
  */
-export function useApiModulesQuery<S extends ApiModuleSelect, TData = {
-  apiModules: ConnectionResult<InferSelectResult<ApiModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ApiModuleFilter, ApiModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiModuleSelect>;
-} & Omit<UseQueryOptions<{
-  apiModules: ConnectionResult<InferSelectResult<ApiModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useApiModulesQuery(params: {
-  selection: ListSelectionConfig<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useApiModulesQuery<
+  S extends ApiModuleSelect,
+  TData = {
+    apiModules: ConnectionResult<InferSelectResult<ApiModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ApiModuleFilter, ApiModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        apiModules: ConnectionResult<InferSelectResult<ApiModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useApiModulesQuery(
+  params: {
+    selection: ListSelectionConfig<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: apiModuleKeys.list(args),
     queryFn: () => getClient().apiModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Server-side module configuration for an API surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchApiModulesQuery({
@@ -70,35 +99,47 @@ export function useApiModulesQuery(params: {
 export async function fetchApiModulesQuery<S extends ApiModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ApiModuleFilter, ApiModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiModuleSelect>;
+  } & Omit<ListSelectionConfig<S, ApiModuleFilter, ApiModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ApiModuleSelect>;
 }): Promise<{
   apiModules: ConnectionResult<InferSelectResult<ApiModuleWithRelations, S>>;
 }>;
 export async function fetchApiModulesQuery(params: {
   selection: ListSelectionConfig<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>(
+    params.selection
+  );
   return getClient().apiModule.findMany(args).unwrap();
 }
 /**
  * Server-side module configuration for an API surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```ts
  * await prefetchApiModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchApiModulesQuery<S extends ApiModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ApiModuleFilter, ApiModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiModuleSelect>;
-}): Promise<void>;
-export async function prefetchApiModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>(params.selection);
+export async function prefetchApiModulesQuery<S extends ApiModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ApiModuleFilter, ApiModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchApiModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<ApiModuleSelect, ApiModuleFilter, ApiModuleOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: apiModuleKeys.list(args),
-    queryFn: () => getClient().apiModule.findMany(args).unwrap()
+    queryFn: () => getClient().apiModule.findMany(args).unwrap(),
   });
 }

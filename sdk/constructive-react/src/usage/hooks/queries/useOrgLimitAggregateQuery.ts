@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgLimitAggregateKeys } from "../query-keys";
-import type { OrgLimitAggregateSelect, OrgLimitAggregateWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitAggregateSelect, OrgLimitAggregateWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgLimitAggregateKeys } from '../query-keys';
+import type {
+  OrgLimitAggregateSelect,
+  OrgLimitAggregateWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  OrgLimitAggregateSelect,
+  OrgLimitAggregateWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitAggregateQueryKey = orgLimitAggregateKeys.detail;
 /**
  * Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitAggregateQuery({
@@ -26,38 +32,52 @@ export const orgLimitAggregateQueryKey = orgLimitAggregateKeys.detail;
  * });
  * ```
  */
-export function useOrgLimitAggregateQuery<S extends OrgLimitAggregateSelect, TData = {
-  orgLimitAggregate: InferSelectResult<OrgLimitAggregateWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
-} & Omit<UseQueryOptions<{
-  orgLimitAggregate: InferSelectResult<OrgLimitAggregateWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgLimitAggregateQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgLimitAggregateSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgLimitAggregateQuery<
+  S extends OrgLimitAggregateSelect,
+  TData = {
+    orgLimitAggregate: InferSelectResult<OrgLimitAggregateWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgLimitAggregate: InferSelectResult<OrgLimitAggregateWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgLimitAggregateQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgLimitAggregateSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgLimitAggregateSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitAggregateKeys.detail(params.id),
-    queryFn: () => getClient().orgLimitAggregate.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgLimitAggregate.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgLimitAggregateQuery({
@@ -79,35 +99,46 @@ export async function fetchOrgLimitAggregateQuery(params: {
   selection: SelectionConfig<OrgLimitAggregateSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgLimitAggregateSelect>(params.selection);
-  return getClient().orgLimitAggregate.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgLimitAggregate.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgLimitAggregateQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgLimitAggregateQuery<S extends OrgLimitAggregateSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
-}): Promise<void>;
-export async function prefetchOrgLimitAggregateQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgLimitAggregateSelect>;
-}): Promise<void> {
+export async function prefetchOrgLimitAggregateQuery<S extends OrgLimitAggregateSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgLimitAggregateQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgLimitAggregateSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgLimitAggregateSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitAggregateKeys.detail(params.id),
-    queryFn: () => getClient().orgLimitAggregate.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgLimitAggregate.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgLimitWarningKeys } from "../query-keys";
-import type { OrgLimitWarningSelect, OrgLimitWarningWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitWarningSelect, OrgLimitWarningWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgLimitWarningKeys } from '../query-keys';
+import type { OrgLimitWarningSelect, OrgLimitWarningWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgLimitWarningSelect, OrgLimitWarningWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitWarningQueryKey = orgLimitWarningKeys.detail;
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitWarningQuery({
@@ -26,38 +26,52 @@ export const orgLimitWarningQueryKey = orgLimitWarningKeys.detail;
  * });
  * ```
  */
-export function useOrgLimitWarningQuery<S extends OrgLimitWarningSelect, TData = {
-  orgLimitWarning: InferSelectResult<OrgLimitWarningWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
-} & Omit<UseQueryOptions<{
-  orgLimitWarning: InferSelectResult<OrgLimitWarningWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgLimitWarningQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgLimitWarningSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgLimitWarningQuery<
+  S extends OrgLimitWarningSelect,
+  TData = {
+    orgLimitWarning: InferSelectResult<OrgLimitWarningWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgLimitWarning: InferSelectResult<OrgLimitWarningWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgLimitWarningQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgLimitWarningSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgLimitWarningSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitWarningKeys.detail(params.id),
-    queryFn: () => getClient().orgLimitWarning.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgLimitWarning.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgLimitWarningQuery({
@@ -79,35 +93,46 @@ export async function fetchOrgLimitWarningQuery(params: {
   selection: SelectionConfig<OrgLimitWarningSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgLimitWarningSelect>(params.selection);
-  return getClient().orgLimitWarning.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgLimitWarning.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgLimitWarningQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgLimitWarningQuery<S extends OrgLimitWarningSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
-}): Promise<void>;
-export async function prefetchOrgLimitWarningQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgLimitWarningSelect>;
-}): Promise<void> {
+export async function prefetchOrgLimitWarningQuery<S extends OrgLimitWarningSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgLimitWarningSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgLimitWarningQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgLimitWarningSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgLimitWarningSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitWarningKeys.detail(params.id),
-    queryFn: () => getClient().orgLimitWarning.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgLimitWarning.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

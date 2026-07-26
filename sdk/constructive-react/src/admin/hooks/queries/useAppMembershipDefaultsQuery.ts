@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { appMembershipDefaultKeys } from "../query-keys";
-import type { AppMembershipDefaultSelect, AppMembershipDefaultWithRelations, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppMembershipDefaultSelect, AppMembershipDefaultWithRelations, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { appMembershipDefaultKeys } from '../query-keys';
+import type {
+  AppMembershipDefaultSelect,
+  AppMembershipDefaultWithRelations,
+  AppMembershipDefaultFilter,
+  AppMembershipDefaultOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AppMembershipDefaultSelect,
+  AppMembershipDefaultWithRelations,
+  AppMembershipDefaultFilter,
+  AppMembershipDefaultOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appMembershipDefaultsQueryKey = appMembershipDefaultKeys.list;
 /**
  * Default membership settings per entity, controlling initial approval and verification state for new members
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppMembershipDefaultsQuery({
@@ -30,33 +45,60 @@ export const appMembershipDefaultsQueryKey = appMembershipDefaultKeys.list;
  * });
  * ```
  */
-export function useAppMembershipDefaultsQuery<S extends AppMembershipDefaultSelect, TData = {
-  appMembershipDefaults: ConnectionResult<InferSelectResult<AppMembershipDefaultWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
-} & Omit<UseQueryOptions<{
-  appMembershipDefaults: ConnectionResult<InferSelectResult<AppMembershipDefaultWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppMembershipDefaultsQuery(params: {
-  selection: ListSelectionConfig<AppMembershipDefaultSelect, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AppMembershipDefaultSelect, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAppMembershipDefaultsQuery<
+  S extends AppMembershipDefaultSelect,
+  TData = {
+    appMembershipDefaults: ConnectionResult<
+      InferSelectResult<AppMembershipDefaultWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appMembershipDefaults: ConnectionResult<
+          InferSelectResult<AppMembershipDefaultWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppMembershipDefaultsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      AppMembershipDefaultSelect,
+      AppMembershipDefaultFilter,
+      AppMembershipDefaultOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    AppMembershipDefaultSelect,
+    AppMembershipDefaultFilter,
+    AppMembershipDefaultOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appMembershipDefaultKeys.list(args),
     queryFn: () => getClient().appMembershipDefault.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Default membership settings per entity, controlling initial approval and verification state for new members
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppMembershipDefaultsQuery({
@@ -67,38 +109,70 @@ export function useAppMembershipDefaultsQuery(params: {
  * });
  * ```
  */
-export async function fetchAppMembershipDefaultsQuery<S extends AppMembershipDefaultSelect>(params: {
+export async function fetchAppMembershipDefaultsQuery<
+  S extends AppMembershipDefaultSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
+  } & Omit<
+    ListSelectionConfig<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
 }): Promise<{
   appMembershipDefaults: ConnectionResult<InferSelectResult<AppMembershipDefaultWithRelations, S>>;
 }>;
 export async function fetchAppMembershipDefaultsQuery(params: {
-  selection: ListSelectionConfig<AppMembershipDefaultSelect, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>;
+  selection: ListSelectionConfig<
+    AppMembershipDefaultSelect,
+    AppMembershipDefaultFilter,
+    AppMembershipDefaultOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<AppMembershipDefaultSelect, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    AppMembershipDefaultSelect,
+    AppMembershipDefaultFilter,
+    AppMembershipDefaultOrderBy
+  >(params.selection);
   return getClient().appMembershipDefault.findMany(args).unwrap();
 }
 /**
  * Default membership settings per entity, controlling initial approval and verification state for new members
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppMembershipDefaultsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppMembershipDefaultsQuery<S extends AppMembershipDefaultSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
-}): Promise<void>;
-export async function prefetchAppMembershipDefaultsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AppMembershipDefaultSelect, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AppMembershipDefaultSelect, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>(params.selection);
+export async function prefetchAppMembershipDefaultsQuery<S extends AppMembershipDefaultSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, AppMembershipDefaultSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppMembershipDefaultsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      AppMembershipDefaultSelect,
+      AppMembershipDefaultFilter,
+      AppMembershipDefaultOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    AppMembershipDefaultSelect,
+    AppMembershipDefaultFilter,
+    AppMembershipDefaultOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appMembershipDefaultKeys.list(args),
-    queryFn: () => getClient().appMembershipDefault.findMany(args).unwrap()
+    queryFn: () => getClient().appMembershipDefault.findMany(args).unwrap(),
   });
 }

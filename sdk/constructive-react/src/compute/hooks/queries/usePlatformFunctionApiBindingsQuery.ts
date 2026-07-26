@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformFunctionApiBindingKeys } from "../query-keys";
-import type { PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingWithRelations, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingWithRelations, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformFunctionApiBindingKeys } from '../query-keys';
+import type {
+  PlatformFunctionApiBindingSelect,
+  PlatformFunctionApiBindingWithRelations,
+  PlatformFunctionApiBindingFilter,
+  PlatformFunctionApiBindingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformFunctionApiBindingSelect,
+  PlatformFunctionApiBindingWithRelations,
+  PlatformFunctionApiBindingFilter,
+  PlatformFunctionApiBindingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionApiBindingsQueryKey = platformFunctionApiBindingKeys.list;
 /**
  * Join table binding function definitions to API endpoints with per-binding alias and config
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionApiBindingsQuery({
@@ -30,33 +45,60 @@ export const platformFunctionApiBindingsQueryKey = platformFunctionApiBindingKey
  * });
  * ```
  */
-export function usePlatformFunctionApiBindingsQuery<S extends PlatformFunctionApiBindingSelect, TData = {
-  platformFunctionApiBindings: ConnectionResult<InferSelectResult<PlatformFunctionApiBindingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionApiBindingSelect>;
-} & Omit<UseQueryOptions<{
-  platformFunctionApiBindings: ConnectionResult<InferSelectResult<PlatformFunctionApiBindingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformFunctionApiBindingsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformFunctionApiBindingsQuery<
+  S extends PlatformFunctionApiBindingSelect,
+  TData = {
+    platformFunctionApiBindings: ConnectionResult<
+      InferSelectResult<PlatformFunctionApiBindingWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionApiBindingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformFunctionApiBindings: ConnectionResult<
+          InferSelectResult<PlatformFunctionApiBindingWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformFunctionApiBindingsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionApiBindingSelect,
+      PlatformFunctionApiBindingFilter,
+      PlatformFunctionApiBindingOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformFunctionApiBindingSelect,
+    PlatformFunctionApiBindingFilter,
+    PlatformFunctionApiBindingOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionApiBindingKeys.list(args),
     queryFn: () => getClient().platformFunctionApiBinding.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Join table binding function definitions to API endpoints with per-binding alias and config
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionApiBindingsQuery({
@@ -67,38 +109,74 @@ export function usePlatformFunctionApiBindingsQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformFunctionApiBindingsQuery<S extends PlatformFunctionApiBindingSelect>(params: {
+export async function fetchPlatformFunctionApiBindingsQuery<
+  S extends PlatformFunctionApiBindingSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionApiBindingSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformFunctionApiBindingSelect>;
 }): Promise<{
-  platformFunctionApiBindings: ConnectionResult<InferSelectResult<PlatformFunctionApiBindingWithRelations, S>>;
+  platformFunctionApiBindings: ConnectionResult<
+    InferSelectResult<PlatformFunctionApiBindingWithRelations, S>
+  >;
 }>;
 export async function fetchPlatformFunctionApiBindingsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformFunctionApiBindingSelect,
+    PlatformFunctionApiBindingFilter,
+    PlatformFunctionApiBindingOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformFunctionApiBindingSelect,
+    PlatformFunctionApiBindingFilter,
+    PlatformFunctionApiBindingOrderBy
+  >(params.selection);
   return getClient().platformFunctionApiBinding.findMany(args).unwrap();
 }
 /**
  * Join table binding function definitions to API endpoints with per-binding alias and config
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformFunctionApiBindingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformFunctionApiBindingsQuery<S extends PlatformFunctionApiBindingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionApiBindingSelect>;
-}): Promise<void>;
-export async function prefetchPlatformFunctionApiBindingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformFunctionApiBindingSelect, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>(params.selection);
+export async function prefetchPlatformFunctionApiBindingsQuery<
+  S extends PlatformFunctionApiBindingSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformFunctionApiBindingFilter, PlatformFunctionApiBindingOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionApiBindingSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformFunctionApiBindingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionApiBindingSelect,
+      PlatformFunctionApiBindingFilter,
+      PlatformFunctionApiBindingOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformFunctionApiBindingSelect,
+    PlatformFunctionApiBindingFilter,
+    PlatformFunctionApiBindingOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionApiBindingKeys.list(args),
-    queryFn: () => getClient().platformFunctionApiBinding.findMany(args).unwrap()
+    queryFn: () => getClient().platformFunctionApiBinding.findMany(args).unwrap(),
   });
 }

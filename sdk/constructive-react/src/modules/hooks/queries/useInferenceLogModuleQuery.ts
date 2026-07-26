@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { inferenceLogModuleKeys } from "../query-keys";
-import type { InferenceLogModuleSelect, InferenceLogModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { InferenceLogModuleSelect, InferenceLogModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { inferenceLogModuleKeys } from '../query-keys';
+import type {
+  InferenceLogModuleSelect,
+  InferenceLogModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  InferenceLogModuleSelect,
+  InferenceLogModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const inferenceLogModuleQueryKey = inferenceLogModuleKeys.detail;
 /**
  * Query hook for fetching a single InferenceLogModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useInferenceLogModuleQuery({
@@ -26,38 +32,52 @@ export const inferenceLogModuleQueryKey = inferenceLogModuleKeys.detail;
  * });
  * ```
  */
-export function useInferenceLogModuleQuery<S extends InferenceLogModuleSelect, TData = {
-  inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, InferenceLogModuleSelect>;
-} & Omit<UseQueryOptions<{
-  inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useInferenceLogModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<InferenceLogModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useInferenceLogModuleQuery<
+  S extends InferenceLogModuleSelect,
+  TData = {
+    inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, InferenceLogModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        inferenceLogModule: InferSelectResult<InferenceLogModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useInferenceLogModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<InferenceLogModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<InferenceLogModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: inferenceLogModuleKeys.detail(params.id),
-    queryFn: () => getClient().inferenceLogModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .inferenceLogModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single InferenceLogModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchInferenceLogModuleQuery({
@@ -79,35 +99,46 @@ export async function fetchInferenceLogModuleQuery(params: {
   selection: SelectionConfig<InferenceLogModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<InferenceLogModuleSelect>(params.selection);
-  return getClient().inferenceLogModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .inferenceLogModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single InferenceLogModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchInferenceLogModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchInferenceLogModuleQuery<S extends InferenceLogModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, InferenceLogModuleSelect>;
-}): Promise<void>;
-export async function prefetchInferenceLogModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<InferenceLogModuleSelect>;
-}): Promise<void> {
+export async function prefetchInferenceLogModuleQuery<S extends InferenceLogModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, InferenceLogModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchInferenceLogModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<InferenceLogModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<InferenceLogModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: inferenceLogModuleKeys.detail(params.id),
-    queryFn: () => getClient().inferenceLogModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .inferenceLogModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { auditLogAuthKeys } from "../query-keys";
-import type { AuditLogAuthSelect, AuditLogAuthWithRelations, AuditLogAuthFilter, AuditLogAuthOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AuditLogAuthSelect, AuditLogAuthWithRelations, AuditLogAuthFilter, AuditLogAuthOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { auditLogAuthKeys } from '../query-keys';
+import type {
+  AuditLogAuthSelect,
+  AuditLogAuthWithRelations,
+  AuditLogAuthFilter,
+  AuditLogAuthOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AuditLogAuthSelect,
+  AuditLogAuthWithRelations,
+  AuditLogAuthFilter,
+  AuditLogAuthOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const auditLogAuthsQueryKey = auditLogAuthKeys.list;
 /**
  * Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAuditLogAuthsQuery({
@@ -30,33 +45,47 @@ export const auditLogAuthsQueryKey = auditLogAuthKeys.list;
  * });
  * ```
  */
-export function useAuditLogAuthsQuery<S extends AuditLogAuthSelect, TData = {
-  auditLogAuths: ConnectionResult<InferSelectResult<AuditLogAuthWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AuditLogAuthFilter, AuditLogAuthOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
-} & Omit<UseQueryOptions<{
-  auditLogAuths: ConnectionResult<InferSelectResult<AuditLogAuthWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAuditLogAuthsQuery(params: {
-  selection: ListSelectionConfig<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAuditLogAuthsQuery<
+  S extends AuditLogAuthSelect,
+  TData = {
+    auditLogAuths: ConnectionResult<InferSelectResult<AuditLogAuthWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AuditLogAuthFilter, AuditLogAuthOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        auditLogAuths: ConnectionResult<InferSelectResult<AuditLogAuthWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAuditLogAuthsQuery(
+  params: {
+    selection: ListSelectionConfig<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: auditLogAuthKeys.list(args),
     queryFn: () => getClient().auditLogAuth.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAuditLogAuthsQuery({
@@ -70,35 +99,47 @@ export function useAuditLogAuthsQuery(params: {
 export async function fetchAuditLogAuthsQuery<S extends AuditLogAuthSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AuditLogAuthFilter, AuditLogAuthOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
+  } & Omit<ListSelectionConfig<S, AuditLogAuthFilter, AuditLogAuthOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
 }): Promise<{
   auditLogAuths: ConnectionResult<InferSelectResult<AuditLogAuthWithRelations, S>>;
 }>;
 export async function fetchAuditLogAuthsQuery(params: {
   selection: ListSelectionConfig<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>(params.selection);
+  const args = buildListSelectionArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>(
+    params.selection
+  );
   return getClient().auditLogAuth.findMany(args).unwrap();
 }
 /**
  * Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
- * 
+ *
  * @example
  * ```ts
  * await prefetchAuditLogAuthsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAuditLogAuthsQuery<S extends AuditLogAuthSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AuditLogAuthFilter, AuditLogAuthOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
-}): Promise<void>;
-export async function prefetchAuditLogAuthsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>(params.selection);
+export async function prefetchAuditLogAuthsQuery<S extends AuditLogAuthSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AuditLogAuthFilter, AuditLogAuthOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
+  }
+): Promise<void>;
+export async function prefetchAuditLogAuthsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<AuditLogAuthSelect, AuditLogAuthFilter, AuditLogAuthOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: auditLogAuthKeys.list(args),
-    queryFn: () => getClient().auditLogAuth.findMany(args).unwrap()
+    queryFn: () => getClient().auditLogAuth.findMany(args).unwrap(),
   });
 }

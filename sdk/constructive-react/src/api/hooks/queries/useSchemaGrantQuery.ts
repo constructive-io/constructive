@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { schemaGrantKeys } from "../query-keys";
-import type { SchemaGrantSelect, SchemaGrantWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { SchemaGrantSelect, SchemaGrantWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { schemaGrantKeys } from '../query-keys';
+import type { SchemaGrantSelect, SchemaGrantWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { SchemaGrantSelect, SchemaGrantWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const schemaGrantQueryKey = schemaGrantKeys.detail;
 /**
  * Query hook for fetching a single SchemaGrant
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSchemaGrantQuery({
@@ -26,38 +26,52 @@ export const schemaGrantQueryKey = schemaGrantKeys.detail;
  * });
  * ```
  */
-export function useSchemaGrantQuery<S extends SchemaGrantSelect, TData = {
-  schemaGrant: InferSelectResult<SchemaGrantWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SchemaGrantSelect>;
-} & Omit<UseQueryOptions<{
-  schemaGrant: InferSelectResult<SchemaGrantWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSchemaGrantQuery(params: {
-  id: string;
-  selection: SelectionConfig<SchemaGrantSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSchemaGrantQuery<
+  S extends SchemaGrantSelect,
+  TData = {
+    schemaGrant: InferSelectResult<SchemaGrantWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SchemaGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        schemaGrant: InferSelectResult<SchemaGrantWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSchemaGrantQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<SchemaGrantSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<SchemaGrantSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: schemaGrantKeys.detail(params.id),
-    queryFn: () => getClient().schemaGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .schemaGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single SchemaGrant without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSchemaGrantQuery({
@@ -79,35 +93,46 @@ export async function fetchSchemaGrantQuery(params: {
   selection: SelectionConfig<SchemaGrantSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SchemaGrantSelect>(params.selection);
-  return getClient().schemaGrant.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .schemaGrant.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single SchemaGrant for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchSchemaGrantQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSchemaGrantQuery<S extends SchemaGrantSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SchemaGrantSelect>;
-}): Promise<void>;
-export async function prefetchSchemaGrantQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<SchemaGrantSelect>;
-}): Promise<void> {
+export async function prefetchSchemaGrantQuery<S extends SchemaGrantSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SchemaGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchSchemaGrantQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<SchemaGrantSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<SchemaGrantSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: schemaGrantKeys.detail(params.id),
-    queryFn: () => getClient().schemaGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .schemaGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

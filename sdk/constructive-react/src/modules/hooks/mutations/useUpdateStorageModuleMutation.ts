@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { storageModuleKeys } from "../query-keys";
-import { storageModuleMutationKeys } from "../mutation-keys";
-import type { StorageModuleSelect, StorageModuleWithRelations, StorageModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { StorageModuleSelect, StorageModuleWithRelations, StorageModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { storageModuleKeys } from '../query-keys';
+import { storageModuleMutationKeys } from '../mutation-keys';
+import type {
+  StorageModuleSelect,
+  StorageModuleWithRelations,
+  StorageModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  StorageModuleSelect,
+  StorageModuleWithRelations,
+  StorageModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a StorageModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateStorageModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', storageModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateStorageModuleMutation<S extends StorageModuleSelect>(params: {
-  selection: ({
-    fields: S & StorageModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, StorageModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateStorageModule: {
-    storageModule: InferSelectResult<StorageModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  storageModulePatch: StorageModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateStorageModule: {
-    storageModule: InferSelectResult<StorageModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  storageModulePatch: StorageModulePatch;
-}>;
-export function useUpdateStorageModuleMutation(params: {
-  selection: SelectionConfig<StorageModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  storageModulePatch: StorageModulePatch;
-}>, "mutationFn">) {
+export function useUpdateStorageModuleMutation<S extends StorageModuleSelect>(
+  params: {
+    selection: {
+      fields: S & StorageModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, StorageModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateStorageModule: {
+          storageModule: InferSelectResult<StorageModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        storageModulePatch: StorageModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateStorageModule: {
+      storageModule: InferSelectResult<StorageModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    storageModulePatch: StorageModulePatch;
+  }
+>;
+export function useUpdateStorageModuleMutation(
+  params: {
+    selection: SelectionConfig<StorageModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        storageModulePatch: StorageModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<StorageModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: storageModuleMutationKeys.all,
     mutationFn: ({
       id,
-      storageModulePatch
+      storageModulePatch,
     }: {
       id: string;
       storageModulePatch: StorageModulePatch;
-    }) => getClient().storageModule.update({
-      where: {
-        id
-      },
-      data: storageModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .storageModule.update({
+          where: {
+            id,
+          },
+          data: storageModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: storageModuleKeys.detail(variables.id)
+        queryKey: storageModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: storageModuleKeys.lists()
+        queryKey: storageModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

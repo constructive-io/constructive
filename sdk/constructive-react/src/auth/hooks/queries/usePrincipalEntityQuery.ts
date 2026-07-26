@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { principalEntityKeys } from "../query-keys";
-import type { PrincipalEntitySelect, PrincipalEntityWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PrincipalEntitySelect, PrincipalEntityWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { principalEntityKeys } from '../query-keys';
+import type { PrincipalEntitySelect, PrincipalEntityWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { PrincipalEntitySelect, PrincipalEntityWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const principalEntityQueryKey = principalEntityKeys.detail;
 /**
  * Association table scoping principals to specific organizations
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePrincipalEntityQuery({
@@ -26,38 +26,52 @@ export const principalEntityQueryKey = principalEntityKeys.detail;
  * });
  * ```
  */
-export function usePrincipalEntityQuery<S extends PrincipalEntitySelect, TData = {
-  principalEntity: InferSelectResult<PrincipalEntityWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
-} & Omit<UseQueryOptions<{
-  principalEntity: InferSelectResult<PrincipalEntityWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePrincipalEntityQuery(params: {
-  id: string;
-  selection: SelectionConfig<PrincipalEntitySelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePrincipalEntityQuery<
+  S extends PrincipalEntitySelect,
+  TData = {
+    principalEntity: InferSelectResult<PrincipalEntityWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        principalEntity: InferSelectResult<PrincipalEntityWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePrincipalEntityQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PrincipalEntitySelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PrincipalEntitySelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: principalEntityKeys.detail(params.id),
-    queryFn: () => getClient().principalEntity.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .principalEntity.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Association table scoping principals to specific organizations
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPrincipalEntityQuery({
@@ -79,35 +93,46 @@ export async function fetchPrincipalEntityQuery(params: {
   selection: SelectionConfig<PrincipalEntitySelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PrincipalEntitySelect>(params.selection);
-  return getClient().principalEntity.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .principalEntity.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Association table scoping principals to specific organizations
- * 
+ *
  * @example
  * ```ts
  * await prefetchPrincipalEntityQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPrincipalEntityQuery<S extends PrincipalEntitySelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
-}): Promise<void>;
-export async function prefetchPrincipalEntityQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PrincipalEntitySelect>;
-}): Promise<void> {
+export async function prefetchPrincipalEntityQuery<S extends PrincipalEntitySelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
+  }
+): Promise<void>;
+export async function prefetchPrincipalEntityQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PrincipalEntitySelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PrincipalEntitySelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: principalEntityKeys.detail(params.id),
-    queryFn: () => getClient().principalEntity.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .principalEntity.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

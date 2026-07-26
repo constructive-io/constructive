@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { corsSettingKeys } from "../query-keys";
-import type { CorsSettingSelect, CorsSettingWithRelations, CorsSettingFilter, CorsSettingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { CorsSettingSelect, CorsSettingWithRelations, CorsSettingFilter, CorsSettingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { corsSettingKeys } from '../query-keys';
+import type {
+  CorsSettingSelect,
+  CorsSettingWithRelations,
+  CorsSettingFilter,
+  CorsSettingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  CorsSettingSelect,
+  CorsSettingWithRelations,
+  CorsSettingFilter,
+  CorsSettingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const corsSettingsQueryKey = corsSettingKeys.list;
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCorsSettingsQuery({
@@ -30,33 +45,47 @@ export const corsSettingsQueryKey = corsSettingKeys.list;
  * });
  * ```
  */
-export function useCorsSettingsQuery<S extends CorsSettingSelect, TData = {
-  corsSettings: ConnectionResult<InferSelectResult<CorsSettingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CorsSettingFilter, CorsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
-} & Omit<UseQueryOptions<{
-  corsSettings: ConnectionResult<InferSelectResult<CorsSettingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCorsSettingsQuery(params: {
-  selection: ListSelectionConfig<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useCorsSettingsQuery<
+  S extends CorsSettingSelect,
+  TData = {
+    corsSettings: ConnectionResult<InferSelectResult<CorsSettingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, CorsSettingFilter, CorsSettingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        corsSettings: ConnectionResult<InferSelectResult<CorsSettingWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCorsSettingsQuery(
+  params: {
+    selection: ListSelectionConfig<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: corsSettingKeys.list(args),
     queryFn: () => getClient().corsSetting.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCorsSettingsQuery({
@@ -70,35 +99,47 @@ export function useCorsSettingsQuery(params: {
 export async function fetchCorsSettingsQuery<S extends CorsSettingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, CorsSettingFilter, CorsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
+  } & Omit<ListSelectionConfig<S, CorsSettingFilter, CorsSettingOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
 }): Promise<{
   corsSettings: ConnectionResult<InferSelectResult<CorsSettingWithRelations, S>>;
 }>;
 export async function fetchCorsSettingsQuery(params: {
   selection: ListSelectionConfig<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>;
 }) {
-  const args = buildListSelectionArgs<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>(
+    params.selection
+  );
   return getClient().corsSetting.findMany(args).unwrap();
 }
 /**
  * Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
- * 
+ *
  * @example
  * ```ts
  * await prefetchCorsSettingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchCorsSettingsQuery<S extends CorsSettingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CorsSettingFilter, CorsSettingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
-}): Promise<void>;
-export async function prefetchCorsSettingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>(params.selection);
+export async function prefetchCorsSettingsQuery<S extends CorsSettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, CorsSettingFilter, CorsSettingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, CorsSettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchCorsSettingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<CorsSettingSelect, CorsSettingFilter, CorsSettingOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: corsSettingKeys.list(args),
-    queryFn: () => getClient().corsSetting.findMany(args).unwrap()
+    queryFn: () => getClient().corsSetting.findMany(args).unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformInfraRefKeys } from "../query-keys";
-import type { PlatformInfraRefSelect, PlatformInfraRefWithRelations, PlatformInfraRefFilter, PlatformInfraRefOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformInfraRefSelect, PlatformInfraRefWithRelations, PlatformInfraRefFilter, PlatformInfraRefOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformInfraRefKeys } from '../query-keys';
+import type {
+  PlatformInfraRefSelect,
+  PlatformInfraRefWithRelations,
+  PlatformInfraRefFilter,
+  PlatformInfraRefOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformInfraRefSelect,
+  PlatformInfraRefWithRelations,
+  PlatformInfraRefFilter,
+  PlatformInfraRefOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformInfraRefsQueryKey = platformInfraRefKeys.list;
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformInfraRefsQuery({
@@ -30,33 +45,53 @@ export const platformInfraRefsQueryKey = platformInfraRefKeys.list;
  * });
  * ```
  */
-export function usePlatformInfraRefsQuery<S extends PlatformInfraRefSelect, TData = {
-  platformInfraRefs: ConnectionResult<InferSelectResult<PlatformInfraRefWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformInfraRefFilter, PlatformInfraRefOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraRefSelect>;
-} & Omit<UseQueryOptions<{
-  platformInfraRefs: ConnectionResult<InferSelectResult<PlatformInfraRefWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformInfraRefsQuery(params: {
-  selection: ListSelectionConfig<PlatformInfraRefSelect, PlatformInfraRefFilter, PlatformInfraRefOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformInfraRefSelect, PlatformInfraRefFilter, PlatformInfraRefOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformInfraRefsQuery<
+  S extends PlatformInfraRefSelect,
+  TData = {
+    platformInfraRefs: ConnectionResult<InferSelectResult<PlatformInfraRefWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PlatformInfraRefFilter, PlatformInfraRefOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PlatformInfraRefSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformInfraRefs: ConnectionResult<InferSelectResult<PlatformInfraRefWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformInfraRefsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformInfraRefSelect,
+      PlatformInfraRefFilter,
+      PlatformInfraRefOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformInfraRefSelect,
+    PlatformInfraRefFilter,
+    PlatformInfraRefOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformInfraRefKeys.list(args),
     queryFn: () => getClient().platformInfraRef.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformInfraRefsQuery({
@@ -70,35 +105,59 @@ export function usePlatformInfraRefsQuery(params: {
 export async function fetchPlatformInfraRefsQuery<S extends PlatformInfraRefSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformInfraRefFilter, PlatformInfraRefOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraRefSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformInfraRefFilter, PlatformInfraRefOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PlatformInfraRefSelect>;
 }): Promise<{
   platformInfraRefs: ConnectionResult<InferSelectResult<PlatformInfraRefWithRelations, S>>;
 }>;
 export async function fetchPlatformInfraRefsQuery(params: {
-  selection: ListSelectionConfig<PlatformInfraRefSelect, PlatformInfraRefFilter, PlatformInfraRefOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformInfraRefSelect,
+    PlatformInfraRefFilter,
+    PlatformInfraRefOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformInfraRefSelect, PlatformInfraRefFilter, PlatformInfraRefOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformInfraRefSelect,
+    PlatformInfraRefFilter,
+    PlatformInfraRefOrderBy
+  >(params.selection);
   return getClient().platformInfraRef.findMany(args).unwrap();
 }
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformInfraRefsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformInfraRefsQuery<S extends PlatformInfraRefSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformInfraRefFilter, PlatformInfraRefOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformInfraRefSelect>;
-}): Promise<void>;
-export async function prefetchPlatformInfraRefsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformInfraRefSelect, PlatformInfraRefFilter, PlatformInfraRefOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformInfraRefSelect, PlatformInfraRefFilter, PlatformInfraRefOrderBy>(params.selection);
+export async function prefetchPlatformInfraRefsQuery<S extends PlatformInfraRefSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PlatformInfraRefFilter, PlatformInfraRefOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PlatformInfraRefSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformInfraRefsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformInfraRefSelect,
+      PlatformInfraRefFilter,
+      PlatformInfraRefOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformInfraRefSelect,
+    PlatformInfraRefFilter,
+    PlatformInfraRefOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformInfraRefKeys.list(args),
-    queryFn: () => getClient().platformInfraRef.findMany(args).unwrap()
+    queryFn: () => getClient().platformInfraRef.findMany(args).unwrap(),
   });
 }

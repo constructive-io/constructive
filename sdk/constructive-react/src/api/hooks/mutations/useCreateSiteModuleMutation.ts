@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { siteModuleKeys } from "../query-keys";
-import { siteModuleMutationKeys } from "../mutation-keys";
-import type { SiteModuleSelect, SiteModuleWithRelations, CreateSiteModuleInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { SiteModuleSelect, SiteModuleWithRelations, CreateSiteModuleInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { siteModuleKeys } from '../query-keys';
+import { siteModuleMutationKeys } from '../mutation-keys';
+import type {
+  SiteModuleSelect,
+  SiteModuleWithRelations,
+  CreateSiteModuleInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  SiteModuleSelect,
+  SiteModuleWithRelations,
+  CreateSiteModuleInput,
+} from '../../orm/input-types';
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateSiteModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateSiteModuleMutation<S extends SiteModuleSelect>(params: {
-  selection: ({
-    fields: S & SiteModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, SiteModuleSelect>);
-} & Omit<UseMutationOptions<{
-  createSiteModule: {
-    siteModule: InferSelectResult<SiteModuleWithRelations, S>;
-  };
-}, Error, CreateSiteModuleInput["siteModule"]>, "mutationFn">): UseMutationResult<{
-  createSiteModule: {
-    siteModule: InferSelectResult<SiteModuleWithRelations, S>;
-  };
-}, Error, CreateSiteModuleInput["siteModule"]>;
-export function useCreateSiteModuleMutation(params: {
-  selection: SelectionConfig<SiteModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateSiteModuleInput["siteModule"]>, "mutationFn">) {
+export function useCreateSiteModuleMutation<S extends SiteModuleSelect>(
+  params: {
+    selection: {
+      fields: S & SiteModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, SiteModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createSiteModule: {
+          siteModule: InferSelectResult<SiteModuleWithRelations, S>;
+        };
+      },
+      Error,
+      CreateSiteModuleInput['siteModule']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createSiteModule: {
+      siteModule: InferSelectResult<SiteModuleWithRelations, S>;
+    };
+  },
+  Error,
+  CreateSiteModuleInput['siteModule']
+>;
+export function useCreateSiteModuleMutation(
+  params: {
+    selection: SelectionConfig<SiteModuleSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateSiteModuleInput['siteModule']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<SiteModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: siteModuleMutationKeys.create(),
-    mutationFn: (data: CreateSiteModuleInput["siteModule"]) => getClient().siteModule.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateSiteModuleInput['siteModule']) =>
+      getClient()
+        .siteModule.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: siteModuleKeys.lists()
+        queryKey: siteModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

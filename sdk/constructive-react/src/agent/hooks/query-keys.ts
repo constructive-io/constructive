@@ -20,67 +20,85 @@
 // ============================================================================
 
 export const agentKeys = {
-  /** All agent queries */all: ["agent"] as const,
-  /** List query keys */lists: () => [...agentKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentKeys.details(), id] as const
+  /** All agent queries */ all: ['agent'] as const,
+  /** List query keys */ lists: () => [...agentKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentKeys.details(), id] as const,
 } as const;
 export const agentMessageKeys = {
-  /** All agentMessage queries */all: ["agentmessage"] as const,
-  /** List query keys */lists: () => [...agentMessageKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentMessageKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentMessageKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentMessageKeys.details(), id] as const
+  /** All agentMessage queries */ all: ['agentmessage'] as const,
+  /** List query keys */ lists: () => [...agentMessageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentMessageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentMessageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentMessageKeys.details(), id] as const,
 } as const;
 export const agentPersonaKeys = {
-  /** All agentPersona queries */all: ["agentpersona"] as const,
-  /** List query keys */lists: () => [...agentPersonaKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentPersonaKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentPersonaKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentPersonaKeys.details(), id] as const
+  /** All agentPersona queries */ all: ['agentpersona'] as const,
+  /** List query keys */ lists: () => [...agentPersonaKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentPersonaKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentPersonaKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentPersonaKeys.details(), id] as const,
 } as const;
 export const agentPlanKeys = {
-  /** All agentPlan queries */all: ["agentplan"] as const,
-  /** List query keys */lists: () => [...agentPlanKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentPlanKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentPlanKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentPlanKeys.details(), id] as const
+  /** All agentPlan queries */ all: ['agentplan'] as const,
+  /** List query keys */ lists: () => [...agentPlanKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentPlanKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentPlanKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentPlanKeys.details(), id] as const,
 } as const;
 export const agentPromptKeys = {
-  /** All agentPrompt queries */all: ["agentprompt"] as const,
-  /** List query keys */lists: () => [...agentPromptKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentPromptKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentPromptKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentPromptKeys.details(), id] as const
+  /** All agentPrompt queries */ all: ['agentprompt'] as const,
+  /** List query keys */ lists: () => [...agentPromptKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentPromptKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentPromptKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentPromptKeys.details(), id] as const,
 } as const;
 export const agentResourceChunkKeys = {
-  /** All agentResourceChunk queries */all: ["agentresourcechunk"] as const,
-  /** List query keys */lists: () => [...agentResourceChunkKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentResourceChunkKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentResourceChunkKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentResourceChunkKeys.details(), id] as const
+  /** All agentResourceChunk queries */ all: ['agentresourcechunk'] as const,
+  /** List query keys */ lists: () => [...agentResourceChunkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentResourceChunkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentResourceChunkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentResourceChunkKeys.details(), id] as const,
 } as const;
 export const agentResourceKeys = {
-  /** All agentResource queries */all: ["agentresource"] as const,
-  /** List query keys */lists: () => [...agentResourceKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentResourceKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentResourceKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentResourceKeys.details(), id] as const
+  /** All agentResource queries */ all: ['agentresource'] as const,
+  /** List query keys */ lists: () => [...agentResourceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentResourceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentResourceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentResourceKeys.details(), id] as const,
 } as const;
 export const agentTaskKeys = {
-  /** All agentTask queries */all: ["agenttask"] as const,
-  /** List query keys */lists: () => [...agentTaskKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentTaskKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentTaskKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentTaskKeys.details(), id] as const
+  /** All agentTask queries */ all: ['agenttask'] as const,
+  /** List query keys */ lists: () => [...agentTaskKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentTaskKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentTaskKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentTaskKeys.details(), id] as const,
 } as const;
 export const agentThreadKeys = {
-  /** All agentThread queries */all: ["agentthread"] as const,
-  /** List query keys */lists: () => [...agentThreadKeys.all, "list"] as const,
-  /** List query key with variables */list: (variables?: object) => [...agentThreadKeys.lists(), variables] as const,
-  /** Detail query keys */details: () => [...agentThreadKeys.all, "detail"] as const,
-  /** Detail query key for specific item */detail: (id: string | number) => [...agentThreadKeys.details(), id] as const
+  /** All agentThread queries */ all: ['agentthread'] as const,
+  /** List query keys */ lists: () => [...agentThreadKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentThreadKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentThreadKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentThreadKeys.details(), id] as const,
 } as const;
 /**
 
@@ -113,7 +131,7 @@ export const queryKeys = {
   agentResourceChunk: agentResourceChunkKeys,
   agentResource: agentResourceKeys,
   agentTask: agentTaskKeys,
-  agentThread: agentThreadKeys
+  agentThread: agentThreadKeys,
 } as const;
 /** Type representing all available query key scopes */
 export type QueryKeyScope = keyof typeof queryKeys;

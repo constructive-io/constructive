@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { cryptoAddressesModuleKeys } from "../query-keys";
-import { cryptoAddressesModuleMutationKeys } from "../mutation-keys";
-import type { CryptoAddressesModuleSelect, CryptoAddressesModuleWithRelations, CryptoAddressesModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { CryptoAddressesModuleSelect, CryptoAddressesModuleWithRelations, CryptoAddressesModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { cryptoAddressesModuleKeys } from '../query-keys';
+import { cryptoAddressesModuleMutationKeys } from '../mutation-keys';
+import type {
+  CryptoAddressesModuleSelect,
+  CryptoAddressesModuleWithRelations,
+  CryptoAddressesModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  CryptoAddressesModuleSelect,
+  CryptoAddressesModuleWithRelations,
+  CryptoAddressesModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a CryptoAddressesModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateCryptoAddressesModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', cryptoAddressesModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateCryptoAddressesModuleMutation<S extends CryptoAddressesModuleSelect>(params: {
-  selection: ({
-    fields: S & CryptoAddressesModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateCryptoAddressesModule: {
-    cryptoAddressesModule: InferSelectResult<CryptoAddressesModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  cryptoAddressesModulePatch: CryptoAddressesModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateCryptoAddressesModule: {
-    cryptoAddressesModule: InferSelectResult<CryptoAddressesModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  cryptoAddressesModulePatch: CryptoAddressesModulePatch;
-}>;
-export function useUpdateCryptoAddressesModuleMutation(params: {
-  selection: SelectionConfig<CryptoAddressesModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  cryptoAddressesModulePatch: CryptoAddressesModulePatch;
-}>, "mutationFn">) {
+export function useUpdateCryptoAddressesModuleMutation<S extends CryptoAddressesModuleSelect>(
+  params: {
+    selection: {
+      fields: S & CryptoAddressesModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, CryptoAddressesModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateCryptoAddressesModule: {
+          cryptoAddressesModule: InferSelectResult<CryptoAddressesModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        cryptoAddressesModulePatch: CryptoAddressesModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateCryptoAddressesModule: {
+      cryptoAddressesModule: InferSelectResult<CryptoAddressesModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    cryptoAddressesModulePatch: CryptoAddressesModulePatch;
+  }
+>;
+export function useUpdateCryptoAddressesModuleMutation(
+  params: {
+    selection: SelectionConfig<CryptoAddressesModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        cryptoAddressesModulePatch: CryptoAddressesModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<CryptoAddressesModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: cryptoAddressesModuleMutationKeys.all,
     mutationFn: ({
       id,
-      cryptoAddressesModulePatch
+      cryptoAddressesModulePatch,
     }: {
       id: string;
       cryptoAddressesModulePatch: CryptoAddressesModulePatch;
-    }) => getClient().cryptoAddressesModule.update({
-      where: {
-        id
-      },
-      data: cryptoAddressesModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .cryptoAddressesModule.update({
+          where: {
+            id,
+          },
+          data: cryptoAddressesModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: cryptoAddressesModuleKeys.detail(variables.id)
+        queryKey: cryptoAddressesModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: cryptoAddressesModuleKeys.lists()
+        queryKey: cryptoAddressesModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

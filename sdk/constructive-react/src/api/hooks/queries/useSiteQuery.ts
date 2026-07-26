@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { siteKeys } from "../query-keys";
-import type { SiteSelect, SiteWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { SiteSelect, SiteWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { siteKeys } from '../query-keys';
+import type { SiteSelect, SiteWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { SiteSelect, SiteWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const siteQueryKey = siteKeys.detail;
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSiteQuery({
@@ -26,38 +26,52 @@ export const siteQueryKey = siteKeys.detail;
  * });
  * ```
  */
-export function useSiteQuery<S extends SiteSelect, TData = {
-  site: InferSelectResult<SiteWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SiteSelect>;
-} & Omit<UseQueryOptions<{
-  site: InferSelectResult<SiteWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSiteQuery(params: {
-  id: string;
-  selection: SelectionConfig<SiteSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSiteQuery<
+  S extends SiteSelect,
+  TData = {
+    site: InferSelectResult<SiteWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SiteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        site: InferSelectResult<SiteWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSiteQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<SiteSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<SiteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: siteKeys.detail(params.id),
-    queryFn: () => getClient().site.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .site.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSiteQuery({
@@ -79,35 +93,46 @@ export async function fetchSiteQuery(params: {
   selection: SelectionConfig<SiteSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SiteSelect>(params.selection);
-  return getClient().site.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .site.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```ts
  * await prefetchSiteQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSiteQuery<S extends SiteSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SiteSelect>;
-}): Promise<void>;
-export async function prefetchSiteQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<SiteSelect>;
-}): Promise<void> {
+export async function prefetchSiteQuery<S extends SiteSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SiteSelect>;
+  }
+): Promise<void>;
+export async function prefetchSiteQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<SiteSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<SiteSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: siteKeys.detail(params.id),
-    queryFn: () => getClient().site.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .site.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformFunctionInvocationKeys } from "../query-keys";
-import type { PlatformFunctionInvocationSelect, PlatformFunctionInvocationWithRelations, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionInvocationSelect, PlatformFunctionInvocationWithRelations, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformFunctionInvocationKeys } from '../query-keys';
+import type {
+  PlatformFunctionInvocationSelect,
+  PlatformFunctionInvocationWithRelations,
+  PlatformFunctionInvocationFilter,
+  PlatformFunctionInvocationOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformFunctionInvocationSelect,
+  PlatformFunctionInvocationWithRelations,
+  PlatformFunctionInvocationFilter,
+  PlatformFunctionInvocationOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionInvocationsQueryKey = platformFunctionInvocationKeys.list;
 /**
  * Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug.
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionInvocationsQuery({
@@ -30,33 +45,60 @@ export const platformFunctionInvocationsQueryKey = platformFunctionInvocationKey
  * });
  * ```
  */
-export function usePlatformFunctionInvocationsQuery<S extends PlatformFunctionInvocationSelect, TData = {
-  platformFunctionInvocations: ConnectionResult<InferSelectResult<PlatformFunctionInvocationWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationSelect>;
-} & Omit<UseQueryOptions<{
-  platformFunctionInvocations: ConnectionResult<InferSelectResult<PlatformFunctionInvocationWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformFunctionInvocationsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionInvocationSelect, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformFunctionInvocationSelect, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformFunctionInvocationsQuery<
+  S extends PlatformFunctionInvocationSelect,
+  TData = {
+    platformFunctionInvocations: ConnectionResult<
+      InferSelectResult<PlatformFunctionInvocationWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformFunctionInvocations: ConnectionResult<
+          InferSelectResult<PlatformFunctionInvocationWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformFunctionInvocationsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionInvocationSelect,
+      PlatformFunctionInvocationFilter,
+      PlatformFunctionInvocationOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformFunctionInvocationSelect,
+    PlatformFunctionInvocationFilter,
+    PlatformFunctionInvocationOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionInvocationKeys.list(args),
     queryFn: () => getClient().platformFunctionInvocation.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug.
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionInvocationsQuery({
@@ -67,38 +109,74 @@ export function usePlatformFunctionInvocationsQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformFunctionInvocationsQuery<S extends PlatformFunctionInvocationSelect>(params: {
+export async function fetchPlatformFunctionInvocationsQuery<
+  S extends PlatformFunctionInvocationSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationSelect>;
 }): Promise<{
-  platformFunctionInvocations: ConnectionResult<InferSelectResult<PlatformFunctionInvocationWithRelations, S>>;
+  platformFunctionInvocations: ConnectionResult<
+    InferSelectResult<PlatformFunctionInvocationWithRelations, S>
+  >;
 }>;
 export async function fetchPlatformFunctionInvocationsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionInvocationSelect, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformFunctionInvocationSelect,
+    PlatformFunctionInvocationFilter,
+    PlatformFunctionInvocationOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformFunctionInvocationSelect, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformFunctionInvocationSelect,
+    PlatformFunctionInvocationFilter,
+    PlatformFunctionInvocationOrderBy
+  >(params.selection);
   return getClient().platformFunctionInvocation.findMany(args).unwrap();
 }
 /**
  * Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug.
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformFunctionInvocationsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformFunctionInvocationsQuery<S extends PlatformFunctionInvocationSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationSelect>;
-}): Promise<void>;
-export async function prefetchPlatformFunctionInvocationsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformFunctionInvocationSelect, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformFunctionInvocationSelect, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>(params.selection);
+export async function prefetchPlatformFunctionInvocationsQuery<
+  S extends PlatformFunctionInvocationSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformFunctionInvocationFilter, PlatformFunctionInvocationOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformFunctionInvocationsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionInvocationSelect,
+      PlatformFunctionInvocationFilter,
+      PlatformFunctionInvocationOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformFunctionInvocationSelect,
+    PlatformFunctionInvocationFilter,
+    PlatformFunctionInvocationOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionInvocationKeys.list(args),
-    queryFn: () => getClient().platformFunctionInvocation.findMany(args).unwrap()
+    queryFn: () => getClient().platformFunctionInvocation.findMany(args).unwrap(),
   });
 }

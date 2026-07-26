@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { appAdminGrantKeys } from "../query-keys";
-import type { AppAdminGrantSelect, AppAdminGrantWithRelations, AppAdminGrantFilter, AppAdminGrantOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppAdminGrantSelect, AppAdminGrantWithRelations, AppAdminGrantFilter, AppAdminGrantOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { appAdminGrantKeys } from '../query-keys';
+import type {
+  AppAdminGrantSelect,
+  AppAdminGrantWithRelations,
+  AppAdminGrantFilter,
+  AppAdminGrantOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AppAdminGrantSelect,
+  AppAdminGrantWithRelations,
+  AppAdminGrantFilter,
+  AppAdminGrantOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appAdminGrantsQueryKey = appAdminGrantKeys.list;
 /**
  * Records of admin role grants and revocations between members
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppAdminGrantsQuery({
@@ -30,33 +45,49 @@ export const appAdminGrantsQueryKey = appAdminGrantKeys.list;
  * });
  * ```
  */
-export function useAppAdminGrantsQuery<S extends AppAdminGrantSelect, TData = {
-  appAdminGrants: ConnectionResult<InferSelectResult<AppAdminGrantWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppAdminGrantFilter, AppAdminGrantOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppAdminGrantSelect>;
-} & Omit<UseQueryOptions<{
-  appAdminGrants: ConnectionResult<InferSelectResult<AppAdminGrantWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppAdminGrantsQuery(params: {
-  selection: ListSelectionConfig<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAppAdminGrantsQuery<
+  S extends AppAdminGrantSelect,
+  TData = {
+    appAdminGrants: ConnectionResult<InferSelectResult<AppAdminGrantWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppAdminGrantFilter, AppAdminGrantOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppAdminGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appAdminGrants: ConnectionResult<InferSelectResult<AppAdminGrantWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppAdminGrantsQuery(
+  params: {
+    selection: ListSelectionConfig<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    AppAdminGrantSelect,
+    AppAdminGrantFilter,
+    AppAdminGrantOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appAdminGrantKeys.list(args),
     queryFn: () => getClient().appAdminGrant.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Records of admin role grants and revocations between members
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppAdminGrantsQuery({
@@ -70,35 +101,51 @@ export function useAppAdminGrantsQuery(params: {
 export async function fetchAppAdminGrantsQuery<S extends AppAdminGrantSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppAdminGrantFilter, AppAdminGrantOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppAdminGrantSelect>;
+  } & Omit<ListSelectionConfig<S, AppAdminGrantFilter, AppAdminGrantOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AppAdminGrantSelect>;
 }): Promise<{
   appAdminGrants: ConnectionResult<InferSelectResult<AppAdminGrantWithRelations, S>>;
 }>;
 export async function fetchAppAdminGrantsQuery(params: {
   selection: ListSelectionConfig<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    AppAdminGrantSelect,
+    AppAdminGrantFilter,
+    AppAdminGrantOrderBy
+  >(params.selection);
   return getClient().appAdminGrant.findMany(args).unwrap();
 }
 /**
  * Records of admin role grants and revocations between members
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppAdminGrantsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppAdminGrantsQuery<S extends AppAdminGrantSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppAdminGrantFilter, AppAdminGrantOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppAdminGrantSelect>;
-}): Promise<void>;
-export async function prefetchAppAdminGrantsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>(params.selection);
+export async function prefetchAppAdminGrantsQuery<S extends AppAdminGrantSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppAdminGrantFilter, AppAdminGrantOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppAdminGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppAdminGrantsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<AppAdminGrantSelect, AppAdminGrantFilter, AppAdminGrantOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    AppAdminGrantSelect,
+    AppAdminGrantFilter,
+    AppAdminGrantOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appAdminGrantKeys.list(args),
-    queryFn: () => getClient().appAdminGrant.findMany(args).unwrap()
+    queryFn: () => getClient().appAdminGrant.findMany(args).unwrap(),
   });
 }

@@ -4,83 +4,107 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformApiKeys } from "../query-keys";
-import { platformApiMutationKeys } from "../mutation-keys";
-import type { PlatformApiSelect, PlatformApiWithRelations, PlatformApiPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiSelect, PlatformApiWithRelations, PlatformApiPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApiKeys } from '../query-keys';
+import { platformApiMutationKeys } from '../mutation-keys';
+import type {
+  PlatformApiSelect,
+  PlatformApiWithRelations,
+  PlatformApiPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformApiSelect,
+  PlatformApiWithRelations,
+  PlatformApiPatch,
+} from '../../orm/input-types';
 /**
  * API surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformApiMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformApiPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformApiMutation<S extends PlatformApiSelect>(params: {
-  selection: ({
-    fields: S & PlatformApiSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformApi: {
-    platformApi: InferSelectResult<PlatformApiWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformApiPatch: PlatformApiPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformApi: {
-    platformApi: InferSelectResult<PlatformApiWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformApiPatch: PlatformApiPatch;
-}>;
-export function useUpdatePlatformApiMutation(params: {
-  selection: SelectionConfig<PlatformApiSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  platformApiPatch: PlatformApiPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformApiMutation<S extends PlatformApiSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformApiSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformApi: {
+          platformApi: InferSelectResult<PlatformApiWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        platformApiPatch: PlatformApiPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformApi: {
+      platformApi: InferSelectResult<PlatformApiWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    platformApiPatch: PlatformApiPatch;
+  }
+>;
+export function useUpdatePlatformApiMutation(
+  params: {
+    selection: SelectionConfig<PlatformApiSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        platformApiPatch: PlatformApiPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformApiSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformApiMutationKeys.all,
-    mutationFn: ({
-      id,
-      platformApiPatch
-    }: {
-      id: string;
-      platformApiPatch: PlatformApiPatch;
-    }) => getClient().platformApi.update({
-      where: {
-        id
-      },
-      data: platformApiPatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, platformApiPatch }: { id: string; platformApiPatch: PlatformApiPatch }) =>
+      getClient()
+        .platformApi.update({
+          where: {
+            id,
+          },
+          data: platformApiPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformApiKeys.detail(variables.id)
+        queryKey: platformApiKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformApiKeys.lists()
+        queryKey: platformApiKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

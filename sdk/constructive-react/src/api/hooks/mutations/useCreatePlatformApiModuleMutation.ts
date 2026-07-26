@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformApiModuleKeys } from "../query-keys";
-import { platformApiModuleMutationKeys } from "../mutation-keys";
-import type { PlatformApiModuleSelect, PlatformApiModuleWithRelations, CreatePlatformApiModuleInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiModuleSelect, PlatformApiModuleWithRelations, CreatePlatformApiModuleInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApiModuleKeys } from '../query-keys';
+import { platformApiModuleMutationKeys } from '../mutation-keys';
+import type {
+  PlatformApiModuleSelect,
+  PlatformApiModuleWithRelations,
+  CreatePlatformApiModuleInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformApiModuleSelect,
+  PlatformApiModuleWithRelations,
+  CreatePlatformApiModuleInput,
+} from '../../orm/input-types';
 /**
  * Server-side module configuration for an API surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreatePlatformApiModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreatePlatformApiModuleMutation<S extends PlatformApiModuleSelect>(params: {
-  selection: ({
-    fields: S & PlatformApiModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiModuleSelect>);
-} & Omit<UseMutationOptions<{
-  createPlatformApiModule: {
-    platformApiModule: InferSelectResult<PlatformApiModuleWithRelations, S>;
-  };
-}, Error, CreatePlatformApiModuleInput["platformApiModule"]>, "mutationFn">): UseMutationResult<{
-  createPlatformApiModule: {
-    platformApiModule: InferSelectResult<PlatformApiModuleWithRelations, S>;
-  };
-}, Error, CreatePlatformApiModuleInput["platformApiModule"]>;
-export function useCreatePlatformApiModuleMutation(params: {
-  selection: SelectionConfig<PlatformApiModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, CreatePlatformApiModuleInput["platformApiModule"]>, "mutationFn">) {
+export function useCreatePlatformApiModuleMutation<S extends PlatformApiModuleSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformApiModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createPlatformApiModule: {
+          platformApiModule: InferSelectResult<PlatformApiModuleWithRelations, S>;
+        };
+      },
+      Error,
+      CreatePlatformApiModuleInput['platformApiModule']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createPlatformApiModule: {
+      platformApiModule: InferSelectResult<PlatformApiModuleWithRelations, S>;
+    };
+  },
+  Error,
+  CreatePlatformApiModuleInput['platformApiModule']
+>;
+export function useCreatePlatformApiModuleMutation(
+  params: {
+    selection: SelectionConfig<PlatformApiModuleSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreatePlatformApiModuleInput['platformApiModule']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformApiModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformApiModuleMutationKeys.create(),
-    mutationFn: (data: CreatePlatformApiModuleInput["platformApiModule"]) => getClient().platformApiModule.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreatePlatformApiModuleInput['platformApiModule']) =>
+      getClient()
+        .platformApiModule.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: platformApiModuleKeys.lists()
+        queryKey: platformApiModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

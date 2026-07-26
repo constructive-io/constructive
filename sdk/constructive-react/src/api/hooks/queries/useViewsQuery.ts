@@ -4,20 +4,25 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { viewKeys } from "../query-keys";
-import type { ViewSelect, ViewWithRelations, ViewFilter, ViewOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ViewSelect, ViewWithRelations, ViewFilter, ViewOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { viewKeys } from '../query-keys';
+import type { ViewSelect, ViewWithRelations, ViewFilter, ViewOrderBy } from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type { ViewSelect, ViewWithRelations, ViewFilter, ViewOrderBy } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const viewsQueryKey = viewKeys.list;
 /**
  * Query hook for fetching View list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useViewsQuery({
@@ -30,33 +35,45 @@ export const viewsQueryKey = viewKeys.list;
  * });
  * ```
  */
-export function useViewsQuery<S extends ViewSelect, TData = {
-  views: ConnectionResult<InferSelectResult<ViewWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ViewFilter, ViewOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewSelect>;
-} & Omit<UseQueryOptions<{
-  views: ConnectionResult<InferSelectResult<ViewWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useViewsQuery(params: {
-  selection: ListSelectionConfig<ViewSelect, ViewFilter, ViewOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useViewsQuery<
+  S extends ViewSelect,
+  TData = {
+    views: ConnectionResult<InferSelectResult<ViewWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ViewFilter, ViewOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ViewSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        views: ConnectionResult<InferSelectResult<ViewWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useViewsQuery(
+  params: {
+    selection: ListSelectionConfig<ViewSelect, ViewFilter, ViewOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<ViewSelect, ViewFilter, ViewOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: viewKeys.list(args),
     queryFn: () => getClient().view.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch View list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchViewsQuery({
@@ -70,7 +87,8 @@ export function useViewsQuery(params: {
 export async function fetchViewsQuery<S extends ViewSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ViewFilter, ViewOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewSelect>;
+  } & Omit<ListSelectionConfig<S, ViewFilter, ViewOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ViewSelect>;
 }): Promise<{
   views: ConnectionResult<InferSelectResult<ViewWithRelations, S>>;
 }>;
@@ -82,23 +100,30 @@ export async function fetchViewsQuery(params: {
 }
 /**
  * Prefetch View list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchViewsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchViewsQuery<S extends ViewSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ViewFilter, ViewOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewSelect>;
-}): Promise<void>;
-export async function prefetchViewsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ViewSelect, ViewFilter, ViewOrderBy>;
-}): Promise<void> {
+export async function prefetchViewsQuery<S extends ViewSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ViewFilter, ViewOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ViewSelect>;
+  }
+): Promise<void>;
+export async function prefetchViewsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<ViewSelect, ViewFilter, ViewOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<ViewSelect, ViewFilter, ViewOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: viewKeys.list(args),
-    queryFn: () => getClient().view.findMany(args).unwrap()
+    queryFn: () => getClient().view.findMany(args).unwrap(),
   });
 }

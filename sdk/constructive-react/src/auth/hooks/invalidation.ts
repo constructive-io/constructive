@@ -13,8 +13,22 @@
 // - Remove helpers for delete operations
 // ============================================================================
 
-import type { QueryClient } from "@tanstack/react-query";
-import { auditLogAuthKeys, cryptoAddressKeys, emailKeys, identityProviderKeys, orgApiKeyListKeys, phoneNumberKeys, principalKeys, principalEntityKeys, principalScopeOverrideKeys, roleTypeKeys, userConnectedAccountKeys, userKeys, webauthnCredentialKeys } from "./query-keys";
+import type { QueryClient } from '@tanstack/react-query';
+import {
+  auditLogAuthKeys,
+  cryptoAddressKeys,
+  emailKeys,
+  identityProviderKeys,
+  orgApiKeyListKeys,
+  phoneNumberKeys,
+  principalKeys,
+  principalEntityKeys,
+  principalScopeOverrideKeys,
+  roleTypeKeys,
+  userConnectedAccountKeys,
+  userKeys,
+  webauthnCredentialKeys,
+} from './query-keys';
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -35,149 +49,218 @@ import { auditLogAuthKeys, cryptoAddressKeys, emailKeys, identityProviderKeys, o
  * ```
  */
 export const invalidate = {
-  /** Invalidate auditLogAuth queries */auditLogAuth: {
-    /** Invalidate all auditLogAuth queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: auditLogAuthKeys.all
-    }),
-    /** Invalidate auditLogAuth list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: auditLogAuthKeys.lists()
-    }),
-    /** Invalidate a specific auditLogAuth */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: auditLogAuthKeys.detail(id)
-    })
+  /** Invalidate auditLogAuth queries */ auditLogAuth: {
+    /** Invalidate all auditLogAuth queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: auditLogAuthKeys.all,
+      }),
+    /** Invalidate auditLogAuth list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: auditLogAuthKeys.lists(),
+      }),
+    /** Invalidate a specific auditLogAuth */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: auditLogAuthKeys.detail(id),
+      }),
   },
-  /** Invalidate cryptoAddress queries */cryptoAddress: {
-    /** Invalidate all cryptoAddress queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: cryptoAddressKeys.all
-    }),
-    /** Invalidate cryptoAddress list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: cryptoAddressKeys.lists()
-    }),
-    /** Invalidate a specific cryptoAddress */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: cryptoAddressKeys.detail(id)
-    })
+  /** Invalidate cryptoAddress queries */ cryptoAddress: {
+    /** Invalidate all cryptoAddress queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: cryptoAddressKeys.all,
+      }),
+    /** Invalidate cryptoAddress list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: cryptoAddressKeys.lists(),
+      }),
+    /** Invalidate a specific cryptoAddress */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: cryptoAddressKeys.detail(id),
+      }),
   },
-  /** Invalidate email queries */email: {
-    /** Invalidate all email queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: emailKeys.all
-    }),
-    /** Invalidate email list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: emailKeys.lists()
-    }),
-    /** Invalidate a specific email */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: emailKeys.detail(id)
-    })
+  /** Invalidate email queries */ email: {
+    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: emailKeys.all,
+      }),
+    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: emailKeys.lists(),
+      }),
+    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: emailKeys.detail(id),
+      }),
   },
-  /** Invalidate identityProvider queries */identityProvider: {
-    /** Invalidate all identityProvider queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: identityProviderKeys.all
-    }),
-    /** Invalidate identityProvider list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: identityProviderKeys.lists()
-    }),
-    /** Invalidate a specific identityProvider */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: identityProviderKeys.detail(id)
-    })
+  /** Invalidate identityProvider queries */ identityProvider: {
+    /** Invalidate all identityProvider queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.all,
+      }),
+    /** Invalidate identityProvider list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvider */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.detail(id),
+      }),
   },
-  /** Invalidate orgApiKeyList queries */orgApiKeyList: {
-    /** Invalidate all orgApiKeyList queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: orgApiKeyListKeys.all
-    }),
-    /** Invalidate orgApiKeyList list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: orgApiKeyListKeys.lists()
-    }),
-    /** Invalidate a specific orgApiKeyList */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: orgApiKeyListKeys.detail(id)
-    })
+  /** Invalidate orgApiKeyList queries */ orgApiKeyList: {
+    /** Invalidate all orgApiKeyList queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.all,
+      }),
+    /** Invalidate orgApiKeyList list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.lists(),
+      }),
+    /** Invalidate a specific orgApiKeyList */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.detail(id),
+      }),
   },
-  /** Invalidate phoneNumber queries */phoneNumber: {
-    /** Invalidate all phoneNumber queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: phoneNumberKeys.all
-    }),
-    /** Invalidate phoneNumber list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: phoneNumberKeys.lists()
-    }),
-    /** Invalidate a specific phoneNumber */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: phoneNumberKeys.detail(id)
-    })
+  /** Invalidate phoneNumber queries */ phoneNumber: {
+    /** Invalidate all phoneNumber queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumberKeys.all,
+      }),
+    /** Invalidate phoneNumber list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumberKeys.lists(),
+      }),
+    /** Invalidate a specific phoneNumber */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: phoneNumberKeys.detail(id),
+      }),
   },
-  /** Invalidate principal queries */principal: {
-    /** Invalidate all principal queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: principalKeys.all
-    }),
-    /** Invalidate principal list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: principalKeys.lists()
-    }),
-    /** Invalidate a specific principal */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: principalKeys.detail(id)
-    })
+  /** Invalidate principal queries */ principal: {
+    /** Invalidate all principal queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.all,
+      }),
+    /** Invalidate principal list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.lists(),
+      }),
+    /** Invalidate a specific principal */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.detail(id),
+      }),
   },
-  /** Invalidate principalEntity queries */principalEntity: {
-    /** Invalidate all principalEntity queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: principalEntityKeys.all
-    }),
-    /** Invalidate principalEntity list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: principalEntityKeys.lists()
-    }),
-    /** Invalidate a specific principalEntity */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: principalEntityKeys.detail(id)
-    })
+  /** Invalidate principalEntity queries */ principalEntity: {
+    /** Invalidate all principalEntity queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.all,
+      }),
+    /** Invalidate principalEntity list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.lists(),
+      }),
+    /** Invalidate a specific principalEntity */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.detail(id),
+      }),
   },
-  /** Invalidate principalScopeOverride queries */principalScopeOverride: {
-    /** Invalidate all principalScopeOverride queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: principalScopeOverrideKeys.all
-    }),
-    /** Invalidate principalScopeOverride list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: principalScopeOverrideKeys.lists()
-    }),
-    /** Invalidate a specific principalScopeOverride */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: principalScopeOverrideKeys.detail(id)
-    })
+  /** Invalidate principalScopeOverride queries */ principalScopeOverride: {
+    /** Invalidate all principalScopeOverride queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.all,
+      }),
+    /** Invalidate principalScopeOverride list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.lists(),
+      }),
+    /** Invalidate a specific principalScopeOverride */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.detail(id),
+      }),
   },
-  /** Invalidate roleType queries */roleType: {
-    /** Invalidate all roleType queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: roleTypeKeys.all
-    }),
-    /** Invalidate roleType list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: roleTypeKeys.lists()
-    }),
-    /** Invalidate a specific roleType */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: roleTypeKeys.detail(id)
-    })
+  /** Invalidate roleType queries */ roleType: {
+    /** Invalidate all roleType queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: roleTypeKeys.all,
+      }),
+    /** Invalidate roleType list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: roleTypeKeys.lists(),
+      }),
+    /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: roleTypeKeys.detail(id),
+      }),
   },
-  /** Invalidate userConnectedAccount queries */userConnectedAccount: {
-    /** Invalidate all userConnectedAccount queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: userConnectedAccountKeys.all
-    }),
-    /** Invalidate userConnectedAccount list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: userConnectedAccountKeys.lists()
-    }),
-    /** Invalidate a specific userConnectedAccount */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: userConnectedAccountKeys.detail(id)
-    })
+  /** Invalidate userConnectedAccount queries */ userConnectedAccount: {
+    /** Invalidate all userConnectedAccount queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.all,
+      }),
+    /** Invalidate userConnectedAccount list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.lists(),
+      }),
+    /** Invalidate a specific userConnectedAccount */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.detail(id),
+      }),
   },
-  /** Invalidate user queries */user: {
-    /** Invalidate all user queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: userKeys.all
-    }),
-    /** Invalidate user list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: userKeys.lists()
-    }),
-    /** Invalidate a specific user */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: userKeys.detail(id)
-    })
+  /** Invalidate user queries */ user: {
+    /** Invalidate all user queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userKeys.all,
+      }),
+    /** Invalidate user list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userKeys.lists(),
+      }),
+    /** Invalidate a specific user */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(id),
+      }),
   },
-  /** Invalidate webauthnCredential queries */webauthnCredential: {
-    /** Invalidate all webauthnCredential queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: webauthnCredentialKeys.all
-    }),
-    /** Invalidate webauthnCredential list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
-      queryKey: webauthnCredentialKeys.lists()
-    }),
-    /** Invalidate a specific webauthnCredential */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
-      queryKey: webauthnCredentialKeys.detail(id)
-    })
-  }
+  /** Invalidate webauthnCredential queries */ webauthnCredential: {
+    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.all,
+      }),
+    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnCredential */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.detail(id),
+      }),
+  },
 } as const;
 /**
 
@@ -191,69 +274,96 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove auditLogAuth from cache */auditLogAuth: (queryClient: QueryClient, id: string | number) => {
+  /** Remove auditLogAuth from cache */ auditLogAuth: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: auditLogAuthKeys.detail(id)
+      queryKey: auditLogAuthKeys.detail(id),
     });
   },
-  /** Remove cryptoAddress from cache */cryptoAddress: (queryClient: QueryClient, id: string | number) => {
+  /** Remove cryptoAddress from cache */ cryptoAddress: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: cryptoAddressKeys.detail(id)
+      queryKey: cryptoAddressKeys.detail(id),
     });
   },
-  /** Remove email from cache */email: (queryClient: QueryClient, id: string | number) => {
+  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: emailKeys.detail(id)
+      queryKey: emailKeys.detail(id),
     });
   },
-  /** Remove identityProvider from cache */identityProvider: (queryClient: QueryClient, id: string | number) => {
+  /** Remove identityProvider from cache */ identityProvider: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: identityProviderKeys.detail(id)
+      queryKey: identityProviderKeys.detail(id),
     });
   },
-  /** Remove orgApiKeyList from cache */orgApiKeyList: (queryClient: QueryClient, id: string | number) => {
+  /** Remove orgApiKeyList from cache */ orgApiKeyList: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: orgApiKeyListKeys.detail(id)
+      queryKey: orgApiKeyListKeys.detail(id),
     });
   },
-  /** Remove phoneNumber from cache */phoneNumber: (queryClient: QueryClient, id: string | number) => {
+  /** Remove phoneNumber from cache */ phoneNumber: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: phoneNumberKeys.detail(id)
+      queryKey: phoneNumberKeys.detail(id),
     });
   },
-  /** Remove principal from cache */principal: (queryClient: QueryClient, id: string | number) => {
+  /** Remove principal from cache */ principal: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: principalKeys.detail(id)
+      queryKey: principalKeys.detail(id),
     });
   },
-  /** Remove principalEntity from cache */principalEntity: (queryClient: QueryClient, id: string | number) => {
+  /** Remove principalEntity from cache */ principalEntity: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: principalEntityKeys.detail(id)
+      queryKey: principalEntityKeys.detail(id),
     });
   },
-  /** Remove principalScopeOverride from cache */principalScopeOverride: (queryClient: QueryClient, id: string | number) => {
+  /** Remove principalScopeOverride from cache */ principalScopeOverride: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: principalScopeOverrideKeys.detail(id)
+      queryKey: principalScopeOverrideKeys.detail(id),
     });
   },
-  /** Remove roleType from cache */roleType: (queryClient: QueryClient, id: string | number) => {
+  /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: roleTypeKeys.detail(id)
+      queryKey: roleTypeKeys.detail(id),
     });
   },
-  /** Remove userConnectedAccount from cache */userConnectedAccount: (queryClient: QueryClient, id: string | number) => {
+  /** Remove userConnectedAccount from cache */ userConnectedAccount: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: userConnectedAccountKeys.detail(id)
+      queryKey: userConnectedAccountKeys.detail(id),
     });
   },
-  /** Remove user from cache */user: (queryClient: QueryClient, id: string | number) => {
+  /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: userKeys.detail(id)
+      queryKey: userKeys.detail(id),
     });
   },
-  /** Remove webauthnCredential from cache */webauthnCredential: (queryClient: QueryClient, id: string | number) => {
+  /** Remove webauthnCredential from cache */ webauthnCredential: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: webauthnCredentialKeys.detail(id)
+      queryKey: webauthnCredentialKeys.detail(id),
     });
-  }
+  },
 } as const;

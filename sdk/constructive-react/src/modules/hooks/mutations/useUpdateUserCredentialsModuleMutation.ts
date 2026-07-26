@@ -6,16 +6,24 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { userCredentialsModuleKeys } from "../query-keys";
-import { userCredentialsModuleMutationKeys } from "../mutation-keys";
-import type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations, UserCredentialsModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations, UserCredentialsModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { userCredentialsModuleKeys } from '../query-keys';
+import { userCredentialsModuleMutationKeys } from '../mutation-keys';
+import type {
+  UserCredentialsModuleSelect,
+  UserCredentialsModuleWithRelations,
+  UserCredentialsModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  UserCredentialsModuleSelect,
+  UserCredentialsModuleWithRelations,
+  UserCredentialsModulePatch,
+} from '../../orm/input-types';
 /**
  * Per-user bcrypt credential store (password hashes, API key hashes).
      Always user-scoped with AuthzDirectOwner RLS. Consumed by user_auth_module,
@@ -30,61 +38,83 @@ export type { UserCredentialsModuleSelect, UserCredentialsModuleWithRelations, U
  * mutate({ id: 'value-here', userCredentialsModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateUserCredentialsModuleMutation<S extends UserCredentialsModuleSelect>(params: {
-  selection: ({
-    fields: S & UserCredentialsModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateUserCredentialsModule: {
-    userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  userCredentialsModulePatch: UserCredentialsModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateUserCredentialsModule: {
-    userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  userCredentialsModulePatch: UserCredentialsModulePatch;
-}>;
-export function useUpdateUserCredentialsModuleMutation(params: {
-  selection: SelectionConfig<UserCredentialsModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  userCredentialsModulePatch: UserCredentialsModulePatch;
-}>, "mutationFn">) {
+export function useUpdateUserCredentialsModuleMutation<S extends UserCredentialsModuleSelect>(
+  params: {
+    selection: {
+      fields: S & UserCredentialsModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, UserCredentialsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateUserCredentialsModule: {
+          userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        userCredentialsModulePatch: UserCredentialsModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateUserCredentialsModule: {
+      userCredentialsModule: InferSelectResult<UserCredentialsModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    userCredentialsModulePatch: UserCredentialsModulePatch;
+  }
+>;
+export function useUpdateUserCredentialsModuleMutation(
+  params: {
+    selection: SelectionConfig<UserCredentialsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        userCredentialsModulePatch: UserCredentialsModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<UserCredentialsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userCredentialsModuleMutationKeys.all,
     mutationFn: ({
       id,
-      userCredentialsModulePatch
+      userCredentialsModulePatch,
     }: {
       id: string;
       userCredentialsModulePatch: UserCredentialsModulePatch;
-    }) => getClient().userCredentialsModule.update({
-      where: {
-        id
-      },
-      data: userCredentialsModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .userCredentialsModule.update({
+          where: {
+            id,
+          },
+          data: userCredentialsModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: userCredentialsModuleKeys.detail(variables.id)
+        queryKey: userCredentialsModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: userCredentialsModuleKeys.lists()
+        queryKey: userCredentialsModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }
