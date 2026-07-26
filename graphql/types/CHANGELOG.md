@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.16.1...@constructive-io/graphql-types@3.17.0) (2026-07-26)
+
+### Features
+
+- remove default database; require an explicit database id ([31390df](https://github.com/constructive-io/constructive/commit/31390df350a6e5b816f402d19b29e9420bf2def9))
+- split single-tenant dev server out of production graphql-server ([0709556](https://github.com/constructive-io/constructive/commit/070955672decec77d8de1919b9b0adb4ec615e5d))
+
 ## [3.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.16.0...@constructive-io/graphql-types@3.16.1) (2026-07-26)
 
 **Note:** Version bump only for package @constructive-io/graphql-types
