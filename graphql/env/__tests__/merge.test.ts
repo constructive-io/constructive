@@ -36,7 +36,6 @@ describe('getEnvOptions', () => {
         simpleInflection: false
       },
       api: {
-        enableScopedRouting: false,
         isPublic: false,
         metaSchemas: ['config_meta']
       },
@@ -57,7 +56,6 @@ describe('getEnvOptions', () => {
       GRAPHILE_SCHEMA: 'env_schema_a,env_schema_b',
       FEATURES_SIMPLE_INFLECTION: 'true',
       FEATURES_POSTGIS: 'false',
-      API_ENABLE_SCOPED_ROUTING: 'true',
       API_IS_PUBLIC: 'true',
       API_EXPOSED_SCHEMAS: 'public,app',
       API_META_SCHEMAS: 'env_meta1,env_meta2',
@@ -88,7 +86,7 @@ describe('getEnvOptions', () => {
           oppositeBaseNames: false
         },
         api: {
-          enableScopedRouting: false
+          isPublic: false
         },
         sms: {
           senderId: 'OverrideSender',

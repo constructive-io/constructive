@@ -2,7 +2,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 import { GraphQLServer as server } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, OptionValue,Question } from 'inquirerer';
+import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
 const log = new Logger('server');
@@ -21,7 +21,6 @@ Options:
   --simpleInflection      Use simple inflection (default: true)
   --oppositeBaseNames     Use opposite base names (default: false)
   --postgis               Enable PostGIS extension (default: true)
-  --scopedRouting         Enable scoped routing (default: true)
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
@@ -51,14 +50,6 @@ const questions: Question[] = [
   {
     name: 'postgis',
     message: 'Enable PostGIS extension?',
-    type: 'confirm',
-    required: false,
-    default: true,
-    useDefault: true
-  },
-  {
-    name: 'scopedRouting',
-    message: 'Enable scoped routing?',
     type: 'confirm',
     required: false,
     default: true,
@@ -125,7 +116,6 @@ export default async (
     port,
     postgis,
     simpleInflection,
-    scopedRouting,
     origin
   } = await prompter.prompt(argv, questions);
 
@@ -141,64 +131,12 @@ export default async (
     }
   }
 
-  let selectedSchemas: string[] = [];
-  let authRole: string | undefined;
-  let roleName: string | undefined;
-  if (!scopedRouting) {
-    const db = await getPgPool({ database: selectedDb });
-    const result = await db.query(`
-      SELECT nspname 
-      FROM pg_namespace 
-      WHERE nspname NOT IN ('pg_catalog', 'information_schema')
-      ORDER BY nspname;
-    `);
-    
-    const schemaChoices = result.rows.map(row => ({
-      name: row.nspname,
-      value: row.nspname,
-      selected: true
-    }));
-    const { schemas } = await prompter.prompt(argv, [
-      {
-        type: 'checkbox',
-        name: 'schemas',
-        message: 'Select schemas to expose',
-        options: schemaChoices,
-        required: true
-      }
-    ]);
-    
-    selectedSchemas = (schemas as OptionValue[]).filter(s => s.selected).map(s => s.value);
-    const { authRole: selectedAuthRole, roleName: selectedRoleName } = await prompter.prompt(argv, [
-      {
-        type: 'autocomplete',
-        name: 'authRole',
-        message: 'Select the authentication role',
-        options: ['postgres', 'authenticated', 'anonymous'],
-        required: true
-      },
-      {
-        type: 'autocomplete',
-        name: 'roleName',
-        message: 'Enter the default role name:',
-        options: ['postgres', 'authenticated', 'anonymous'],
-        required: true
-      }
-    ]);
-    authRole = selectedAuthRole;
-    roleName = selectedRoleName;
-  }
-
   const options: ConstructiveOptions = getEnvOptions({
     pg: { database: selectedDb },
     features: {
       oppositeBaseNames,
       simpleInflection,
       postgis
-    },
-    api: {
-      enableScopedRouting: scopedRouting,
-      ...(scopedRouting === false && { exposedSchemas: selectedSchemas, authRole, roleName })
     },
     server: {
       port,
@@ -213,7 +151,7 @@ export default async (
 
   // Debug: Log API routing configuration
   const apiOpts = (options as any).api || {};
-  log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, enableScopedRouting=${apiOpts.enableScopedRouting}`);
+  log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, scopedRoutingSchema=${apiOpts.scopedRoutingSchema}`);
   if (apiOpts.isPublic === false) {
     log.debug(`   Header-based routing enabled (X-Api-Name, X-Database-Id, X-Meta-Schema)`);
   }

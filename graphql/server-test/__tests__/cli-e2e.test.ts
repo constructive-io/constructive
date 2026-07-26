@@ -394,7 +394,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       {
         schemas: ['simple-pets-pets-public'],
         authRole: 'anonymous',
-        server: { api: { enableScopedRouting: false, isPublic: false } }
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       [
         seed.sqlfile([
@@ -782,7 +782,7 @@ describe('CLI E2E — search commands against real DB', () => {
       {
         schemas: ['search_public'],
         authRole: 'anonymous',
-        server: { api: { enableScopedRouting: false, isPublic: false } }
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       [
         seed.sqlfile([
@@ -1126,7 +1126,7 @@ describe('CLI E2E — embedder / --auto-embed', () => {
       {
         schemas: ['search_public'],
         authRole: 'anonymous',
-        server: { api: { enableScopedRouting: false, isPublic: false } }
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       [
         seed.sqlfile([

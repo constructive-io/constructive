@@ -1,8 +1,29 @@
+import { createDevServer } from '@constructive-io/graphql-dev-server';
 import { Server } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { Server as HttpServer, createServer } from 'http';
+import { Server as HttpServer } from 'http';
 
 import type { ServerInfo, ServerOptions } from './types';
+
+/**
+ * Create a single-tenant dev test server (no scoped routing, no database id).
+ *
+ * Wraps `@constructive-io/graphql-dev-server` for suites that exercise a plain
+ * PostGraphile surface against one seeded database.
+ */
+export const createDevTestServer = async (
+  opts: ConstructiveOptions,
+  serverOpts: ServerOptions = {}
+): Promise<ServerInfo> => {
+  const { httpServer, url, graphqlUrl, port, host, stop } = await createDevServer(
+    opts,
+    {
+      host: serverOpts.host ?? '127.0.0.1',
+      port: serverOpts.port ?? 0
+    }
+  );
+  return { httpServer, url, graphqlUrl, port, host, stop };
+};
 
 /**
  * Create a test server for SuperTest testing

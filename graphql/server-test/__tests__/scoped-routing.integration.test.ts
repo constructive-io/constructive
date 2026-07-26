@@ -75,7 +75,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
       {
         schemas,
         authRole: 'anonymous',
-        server: { api: { enableScopedRouting: false, isPublic: false } }
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       scopedSeedAdapters()
     ));
@@ -155,7 +155,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 
 /**
  * End-to-end scoped plane: the request is resolved solely by
- * constructive_routing_public.resolve_route() (enableScopedRouting). There is
+ * constructive_routing_public.resolve_route(). There is
  * no legacy fallback, so a successful request proves the scoped path.
  */
 describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
@@ -174,8 +174,8 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
         schemas,
         authRole: 'anonymous',
         server: {
+          scopedRouting: true,
           api: {
-            enableScopedRouting: true,
             scopedRoutingSchema: 'constructive_routing_public',
             isPublic: true,
             metaSchemas: scopedMetaSchemas

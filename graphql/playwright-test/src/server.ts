@@ -1,91 +1,31 @@
-import {
-  cors,
-  createApiMiddleware,
-  createAuthenticateMiddleware,
-  graphile
-} from '@constructive-io/graphql-server';
+import { createDevServer } from '@constructive-io/graphql-dev-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import express from 'express';
-import { createServer,Server as HttpServer } from 'http';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
-import type { PlaywrightServerOptions,ServerInfo } from './types';
+import type { PlaywrightServerOptions, ServerInfo } from './types';
 
 /**
- * Find an available port starting from the given port
- */
-const findAvailablePort = async (startPort: number): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.listen(startPort, () => {
-      const address = server.address();
-      const port = typeof address === 'object' && address ? address.port : startPort;
-      server.close(() => resolve(port));
-    });
-    server.on('error', (err: NodeJS.ErrnoException) => {
-      if (err.code === 'EADDRINUSE') {
-        resolve(findAvailablePort(startPort + 1));
-      } else {
-        reject(err);
-      }
-    });
-  });
-};
-
-/**
- * Create a test server for Playwright testing
- * 
- * This creates an Express server with the Constructive GraphQL middleware
- * configured with enableScopedRouting: false (static mode) to bypass routing.
+ * Create a test server for Playwright testing.
+ *
+ * Delegates to `@constructive-io/graphql-dev-server`, a pure-PostGraphile
+ * single-tenant server (no scoped routing, no database id) that exposes the
+ * configured schemas directly. Production scoped routing lives in
+ * `@constructive-io/graphql-server` and is never used here.
  */
 export const createTestServer = async (
   opts: ConstructiveOptions,
   serverOpts: PlaywrightServerOptions = {}
 ): Promise<ServerInfo> => {
-  const host = serverOpts.host ?? 'localhost';
-  const requestedPort = serverOpts.port ?? 0;
-  const port = requestedPort === 0 ? await findAvailablePort(5555) : requestedPort;
+  const { httpServer, url, graphqlUrl, port, host, stop } = await createDevServer(
+    opts,
+    {
+      host: serverOpts.host ?? 'localhost',
+      port: serverOpts.port ?? 0
+    }
+  );
 
-  const app = express();
-
-  // Create middleware in static mode (enableScopedRouting: false) to bypass routing
-  const api = createApiMiddleware(opts);
-  const authenticate = createAuthenticateMiddleware(opts);
-
-  // Basic middleware setup
-  app.use(cors('*'));
-  app.use(api);
-  app.use(authenticate);
-  app.use(graphile(opts));
-
-  // Create HTTP server
-  const httpServer: HttpServer = await new Promise((resolve, reject) => {
-    const server = app.listen(port, host, () => {
-      resolve(server);
-    });
-    server.on('error', reject);
-  });
-
-  const actualPort = (httpServer.address() as { port: number }).port;
-
-  const stop = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      httpServer.close((err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-  };
-
-  return {
-    httpServer,
-    url: `http://${host}:${actualPort}`,
-    graphqlUrl: `http://${host}:${actualPort}/graphql`,
-    port: actualPort,
-    host,
-    stop
-  };
+  return { httpServer, url, graphqlUrl, port, host, stop };
 };
 
 /**

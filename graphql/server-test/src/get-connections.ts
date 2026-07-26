@@ -1,10 +1,9 @@
-import { randomUUID } from 'crypto';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { getConnections as getPgConnections } from 'pgsql-test';
 import type { SeedAdapter } from 'pgsql-test/seed/types';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 
-import { createTestServer } from './server';
+import { createDevTestServer, createTestServer } from './server';
 import { createSuperTestAgent, createQueryFn } from './supertest';
 import type { GetConnectionsInput, GetConnectionsResult } from './types';
 
@@ -54,17 +53,18 @@ export const getConnections = async (
       ...input.server?.api,
       // Apply convenience properties (these take precedence)
       exposedSchemas: input.schemas,
-      // Static single-tenant mode requires an explicit database id (there is
-      // no default database). Each isolated test database gets a fresh UUID
-      // unless the caller supplied one.
-      databaseId: input.server?.api?.databaseId ?? randomUUID(),
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
     graphile: input.graphile
   });
 
-  // Start the HTTP server using @constructive-io/graphql-server
-  const server = await createTestServer(serverOpts, input.server);
+  // Start the HTTP server. Suites default to the production scoped-routing
+  // server; static/single-tenant suites opt into the dev server with
+  // `server.scopedRouting: false`.
+  const scopedRouting = input.server?.scopedRouting ?? true;
+  const server = scopedRouting
+    ? await createTestServer(serverOpts, input.server)
+    : await createDevTestServer(serverOpts, input.server);
 
   // Create SuperTest agent
   const request = createSuperTestAgent(server);

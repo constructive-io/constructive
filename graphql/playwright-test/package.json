@@ -35,8 +35,8 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "@constructive-io/graphql-dev-server": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
-    "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-test": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@pgpmjs/types": "workspace:^",

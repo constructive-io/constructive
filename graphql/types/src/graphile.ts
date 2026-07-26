@@ -34,24 +34,15 @@ export interface ApiOptions {
   anonRole?: string;
   /** Default role name for authenticated requests */
   roleName?: string;
-  /**
-   * Explicit tenant database id for static single-tenant mode. There is no
-   * default database and this is never populated from env; a request that
-   * resolves without a database id is rejected.
-   */
-  databaseId?: string;
   /** Whether the API is publicly accessible */
   isPublic?: boolean;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
   /**
-   * Resolve incoming requests through the scoped-routing plane via
-   * <schema>.resolve_route() (host → tenant/api/db/role). This is the sole
-   * host-routing path. When disabled the server runs in static single-tenant
-   * mode and exposes `exposedSchemas` directly with no route resolution.
+   * Schema containing the compiled resolve_route() resolver. Requests are
+   * always resolved through the scoped-routing plane via
+   * <schema>.resolve_route() (host → tenant/api/db/role).
    */
-  enableScopedRouting?: boolean;
-  /** Schema containing the compiled resolve_route() resolver */
   scopedRoutingSchema?: string;
 }
 
@@ -86,6 +77,5 @@ export const apiDefaults: ApiOptions = {
     'metaschema_public',
     'metaschema_modules_public'
   ],
-  enableScopedRouting: true,
   scopedRoutingSchema: 'constructive_routing_public'
 };

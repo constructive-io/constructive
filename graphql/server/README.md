@@ -101,7 +101,7 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 
 ## Scoped routing
 
-When `API_ENABLE_SCOPED_ROUTING=true` (default):
+This is a production-only server: every request is resolved through the scoped-routing plane. There is no static single-tenant mode and no flag to disable routing. For single-database local development without route resolution or a database id, use [`@constructive-io/graphql-dev-server`](../dev-server/README.md).
 
 - The server resolves the request host with a single `resolve_route()` call against the compiled route bindings in the scoped routing schema (`API_SCOPED_ROUTING_SCHEMA`, default `constructive_routing_public`), mapping host → tenant/api/database/role.
 - Only APIs where `api.is_public` matches `API_IS_PUBLIC` are served.
@@ -109,11 +109,7 @@ When `API_ENABLE_SCOPED_ROUTING=true` (default):
   - `X-Api-Name` + `X-Database-Id`
   - `X-Schemata` + `X-Database-Id`
   - `X-Meta-Schema` + `X-Database-Id`
-
-When `API_ENABLE_SCOPED_ROUTING=false` (static single-tenant mode):
-
-- The server skips route resolution and serves the fixed schemas in `API_EXPOSED_SCHEMAS`.
-- Roles come from `API_ANON_ROLE` and `API_ROLE_NAME`. A request still requires a resolved database id; there is no default database, so a request with no database id is rejected.
+- A resolved database id is always required. There is no default database, so a request that resolves without a database id is rejected (`NO_DATABASE_ID` → HTTP 500).
 
 ## Configuration
 
@@ -130,10 +126,9 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
-| `API_ENABLE_SCOPED_ROUTING`    | Enable scoped routing                 | `true`                                                        |
 | `API_SCOPED_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `constructive_routing_public`                                 |
 | `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
-| `API_EXPOSED_SCHEMAS`          | Schemas when scoped routing is disabled | empty                                                       |
+| `API_EXPOSED_SCHEMAS`          | Additional schemas to expose          | empty                                                         |
 | `API_META_SCHEMAS`             | Meta schemas to query                 | `constructive_routing_public,metaschema_public,metaschema_modules_public` |
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |

@@ -1,8 +1,8 @@
 {
-  "name": "graphql-server-test",
-  "version": "3.1.1",
+  "name": "@constructive-io/graphql-dev-server",
+  "version": "3.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",
+  "description": "Pure-PostGraphile single-tenant dev server (no scoped routing, no database-id plugins)",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -25,47 +25,41 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@0no-co/graphql.web": "^1.2.0",
-    "@agentic-kit/ollama": "workspace:*",
-    "@constructive-io/graphql-codegen": "workspace:^",
-    "@constructive-io/graphql-query": "workspace:^",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.20.0",
-    "@types/supertest": "^7.2.0",
-    "appstash": "^0.7.0",
-    "gql-ast": "workspace:^",
-    "inquirerer": "^4.9.1",
-    "makage": "^0.3.0",
-    "nested-obj": "^0.2.2"
+    "makage": "^0.3.0"
   },
   "dependencies": {
-    "@constructive-io/graphql-dev-server": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
-    "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@constructive-io/upload-client": "workspace:*",
-    "@pgpmjs/types": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/server-utils": "workspace:^",
     "express": "^5.2.1",
-    "graphile-schema": "workspace:^",
+    "grafast": "1.0.2",
+    "grafserv": "1.0.0",
+    "graphile-build": "5.0.2",
+    "graphile-build-pg": "5.0.2",
+    "graphile-cache": "workspace:^",
+    "graphile-config": "1.0.1",
+    "graphile-settings": "workspace:^",
+    "graphile-utils": "5.0.1",
     "graphql": "16.13.0",
+    "pg-sql2": "5.0.1",
+    "postgraphile": "5.0.3",
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
-    "pgsql-test": "workspace:^",
-    "supertest": "^7.0.0"
+    "pg-env": "workspace:^"
   },
   "keywords": [
-    "testing",
     "graphql",
     "graphile",
+    "postgraphile",
     "constructive",
-    "supertest",
-    "http",
-    "integration",
-    "e2e",
-    "server"
+    "dev-server",
+    "single-tenant"
   ]
 }

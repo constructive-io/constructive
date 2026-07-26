@@ -13,19 +13,27 @@ export interface ServerOptions {
   /** Host to bind the server to (defaults to localhost) */
   host?: string;
   /**
+   * Which server to run this suite against:
+   * - `true` (default): the production `@constructive-io/graphql-server`, which
+   *   resolves every request through the scoped-routing plane. Suites must seed
+   *   real routing/database records so `resolve_route()` returns a real
+   *   database id.
+   * - `false`: the single-tenant `@constructive-io/graphql-dev-server`
+   *   (pure PostGraphile, no routing, no database id) exposing the configured
+   *   schemas directly. For local/static suites only.
+   */
+  scopedRouting?: boolean;
+  /**
    * API configuration options for the GraphQL server.
    * These options control how the server handles requests and which features are enabled.
-   * 
+   *
    * @example
    * ```typescript
    * const { query } = await getConnections({
    *   schemas: ['app_public'],
    *   server: {
    *     port: 5555,
-   *     api: {
-   *       enableScopedRouting: false,
-   *       isPublic: false
-   *     }
+   *     scopedRouting: false
    *   }
    * });
    * ```

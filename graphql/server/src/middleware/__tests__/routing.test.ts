@@ -137,12 +137,11 @@ describe('getApiConfig with scoped routing enabled', () => {
     } as unknown as Request;
   };
 
-  const createOptions = (enableScopedRouting: boolean): ApiOptions => ({
+  const createOptions = (): ApiOptions => ({
     pg: { database: 'constructive' },
     api: {
       isPublic: true,
-      metaSchemas: ['metaschema_public'],
-      enableScopedRouting
+      metaSchemas: ['metaschema_public']
     }
   } as unknown as ApiOptions);
 
@@ -167,7 +166,7 @@ describe('getApiConfig with scoped routing enabled', () => {
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    const result = await getApiConfig(createOptions(true), createRequest({ host: 'api.example.com' }));
+    const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
     expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'tenant_db' }));
     expect(query).toHaveBeenCalledWith(
@@ -184,27 +183,9 @@ describe('getApiConfig with scoped routing enabled', () => {
     });
     mockGetPgPool.mockReturnValue(createPool(query) as never);
 
-    const result = await getApiConfig(createOptions(true), createRequest({ host: 'nomatch.example.com' }));
+    const result = await getApiConfig(createOptions(), createRequest({ host: 'nomatch.example.com' }));
 
     expect(result).toBeFalsy();
     expect(query.mock.calls.some(([sql]) => String(sql).includes('services_public'))).toBe(false);
-  });
-
-  it('does not call resolve_route when scoped routing is disabled', async () => {
-    const query = jest.fn(async (sql: string, params: unknown[]) => {
-      if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
-      if (sql.includes('resolve_route')) throw new Error('resolve_route should not be called');
-      return { rows: [] };
-    });
-    mockGetPgPool.mockReturnValue(createPool(query) as never);
-
-    // Static single-tenant mode never calls resolve_route. It also has no
-    // database id, and there is no default database, so resolution fails loud
-    // rather than silently proceeding with an undefined tenant.
-    await expect(
-      getApiConfig(createOptions(false), createRequest({ host: 'api.example.com' }))
-    ).rejects.toThrow(/database id/i);
-
-    expect(query.mock.calls.some(([sql]) => String(sql).includes('resolve_route'))).toBe(false);
   });
 });

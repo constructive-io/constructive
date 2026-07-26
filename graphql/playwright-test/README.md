@@ -149,15 +149,16 @@ Low-level function to create just the HTTP server without database setup.
 ## How It Works
 
 1. Creates an isolated test database using `pgsql-test`
-2. Starts an Express server with Constructive GraphQL middleware
-3. Configures `enableScopedRouting: false` (static mode) to bypass host route resolution
+2. Starts the single-tenant `@constructive-io/graphql-dev-server` (pure PostGraphile)
+3. Skips host route resolution entirely — no scoped routing and no database id
 4. Exposes the specified schemas directly via the GraphQL endpoint
 5. Returns the server URL for Playwright to connect to
 6. Provides a teardown function that stops the server and cleans up the database
 
 ## Configuration
 
-The server is configured with `enableScopedRouting: false`, which means:
-- No host route resolution (`resolve_route()`) is required
+The server runs `@constructive-io/graphql-dev-server`, which means:
+- No host route resolution (`resolve_route()`) is required and no database id is needed
 - Schemas are exposed directly based on the `schemas` parameter
 - Perfect for isolated testing without complex domain setup
+- Production scoped routing lives in `@constructive-io/graphql-server` and is never used here

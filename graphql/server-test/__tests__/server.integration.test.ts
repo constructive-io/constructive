@@ -3,8 +3,9 @@
  *
  * All host routing resolves through the scoped routing plane
  * (constructive_routing_public.resolve_route); there is no legacy fallback.
- * Static single-tenant mode (enableScopedRouting: false) exposes the
- * configured schemas directly.
+ * The single-tenant scenario runs against the dev server
+ * (server.scopedRouting: false), which exposes the configured schemas
+ * directly with no route resolution.
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=server.integration
@@ -45,8 +46,8 @@ const teardowns: Array<() => Promise<void>> = [];
 type Scenario = {
   name: string;
   seedDir: 'simple-seed' | 'simple-seed-scoped';
+  scopedRouting: boolean;
   api: {
-    enableScopedRouting: boolean;
     isPublic: boolean;
     metaSchemas?: string[];
   };
@@ -55,14 +56,16 @@ type Scenario = {
 
 const scenarios: Scenario[] = [
   {
-    name: 'static single-tenant (scoped routing off)',
+    name: 'static single-tenant (dev server)',
     seedDir: 'simple-seed',
-    api: { enableScopedRouting: false, isPublic: false }
+    scopedRouting: false,
+    api: { isPublic: false }
   },
   {
     name: 'scoped public via domain',
     seedDir: 'simple-seed-scoped',
-    api: { enableScopedRouting: true, isPublic: true, metaSchemas: scopedMetaSchemas },
+    scopedRouting: true,
+    api: { isPublic: true, metaSchemas: scopedMetaSchemas },
     headers: {
       Host: 'app.test.constructive.io'
     }
@@ -70,7 +73,8 @@ const scenarios: Scenario[] = [
   {
     name: 'scoped private via domain',
     seedDir: 'simple-seed-scoped',
-    api: { enableScopedRouting: true, isPublic: false, metaSchemas: scopedMetaSchemas },
+    scopedRouting: true,
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       Host: 'private.test.constructive.io'
     }
@@ -78,7 +82,8 @@ const scenarios: Scenario[] = [
   {
     name: 'scoped private via X-Api-Name',
     seedDir: 'simple-seed-scoped',
-    api: { enableScopedRouting: true, isPublic: false, metaSchemas: scopedMetaSchemas },
+    scopedRouting: true,
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Api-Name': 'private'
@@ -87,7 +92,8 @@ const scenarios: Scenario[] = [
   {
     name: 'scoped private via X-Schemata',
     seedDir: 'simple-seed-scoped',
-    api: { enableScopedRouting: true, isPublic: false, metaSchemas: scopedMetaSchemas },
+    scopedRouting: true,
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Schemata': schemas.join(',')
@@ -142,6 +148,7 @@ describe.each(scenarios)('$name', (scenario) => {
         schemas,
         authRole: 'anonymous',
         server: {
+          scopedRouting: scenario.scopedRouting,
           api: scenario.api
         }
       },
@@ -242,7 +249,7 @@ describe.each(scenarios)('$name', (scenario) => {
 /**
  * X-Meta-Schema test
  *
- * enableScopedRouting: true, isPublic: false
+ * scoped routing, isPublic: false
  * Headers: X-Database-Id + X-Meta-Schema: true
  * Queries target meta-schema tables (databases, schemas, tables, apis).
  */
@@ -273,8 +280,8 @@ describe('scoped private via X-Meta-Schema', () => {
         schemas: metaApiSchemas,
         authRole: 'anonymous',
         server: {
+          scopedRouting: true,
           api: {
-            enableScopedRouting: true,
             isPublic: false,
             metaSchemas: metaApiSchemas
           }
@@ -348,8 +355,8 @@ describe('Error paths', () => {
         schemas,
         authRole: 'anonymous',
         server: {
+          scopedRouting: true,
           api: {
-            enableScopedRouting: true,
             isPublic: false,
             metaSchemas: scopedMetaSchemas
           }
@@ -397,8 +404,8 @@ describe('Error paths', () => {
           schemas,
           authRole: 'anonymous',
           server: {
+            scopedRouting: true,
             api: {
-              enableScopedRouting: true,
               isPublic: false,
               metaSchemas: scopedMetaSchemas
             }
@@ -431,8 +438,8 @@ describe('Error paths', () => {
           schemas,
           authRole: 'anonymous',
           server: {
+            scopedRouting: true,
             api: {
-              enableScopedRouting: true,
               isPublic: true,
               metaSchemas: scopedMetaSchemas
             }

@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import {
   type GraphQLQueryOptions,
@@ -43,15 +41,11 @@ const createConnectionsWithServerBase = async (
   const gqlContext = GraphQLTest(input, conn);
   await gqlContext.setup();
 
-  // Build options for the HTTP server in static mode (scoped routing off)
+  // Build options for the single-tenant dev HTTP server (no scoped routing).
   const serverOpts = getEnvOptions({
     pg: pg.config,
     api: {
-      enableScopedRouting: false,
       exposedSchemas: input.schemas,
-      // Static single-tenant mode requires an explicit database id (there is
-      // no default database); each isolated test database gets a fresh UUID.
-      databaseId: randomUUID(),
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     }
   });

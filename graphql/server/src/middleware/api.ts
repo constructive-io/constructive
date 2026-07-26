@@ -75,13 +75,12 @@ interface ResolveContext {
 }
 
 type ResolutionMode = 
-  | 'static'
   | 'schemata-header'
   | 'api-name-header'
   | 'meta-schema-header'
   | 'scoped-route';
 
-type PrivateHeaderMode = Exclude<ResolutionMode, 'static' | 'scoped-route'>;
+type PrivateHeaderMode = Exclude<ResolutionMode, 'scoped-route'>;
 
 interface RoutingHeaders {
   schemata?: string;
@@ -288,27 +287,10 @@ const queryByApiName = async (
 const determineMode = (ctx: ResolveContext): ResolutionMode => {
   const { opts, headers } = ctx;
 
-  // Static single-tenant mode: scoped routing off — expose configured schemas
-  // directly with no route resolution.
-  if (!opts.api?.enableScopedRouting) return 'static';
   if (opts.api?.isPublic === false) {
     return getPrivateHeaderMode(headers) ?? 'scoped-route';
   }
   return 'scoped-route';
-};
-
-const resolveStatic = (ctx: ResolveContext): ApiStructure => {
-  const { opts } = ctx;
-  return {
-    dbname: opts.pg?.database ?? '',
-    anonRole: opts.api?.anonRole ?? '',
-    roleName: opts.api?.roleName ?? '',
-    schema: opts.api?.exposedSchemas ?? [],
-    apiModules: [],
-    domains: [],
-    databaseId: opts.api?.databaseId,
-    isPublic: false
-  };
 };
 
 const resolveSchemataHeader = async (
@@ -362,7 +344,6 @@ const resolveMetaSchemaHeader = (
  */
 const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
   const { opts, pool, host } = ctx;
-  if (!opts.api?.enableScopedRouting) return null;
 
   const schema = opts.api?.scopedRoutingSchema || 'constructive_routing_public';
   const route = await resolveRoute(pool, schema, host);
@@ -452,10 +433,6 @@ export const getApiConfig = async (
   let result: ApiConfigResult;
 
   switch (mode) {
-  case 'static':
-    result = resolveStatic(ctx);
-    break;
-
   case 'schemata-header':
     result = await resolveSchemataHeader(ctx, validatedSchemas);
     break;
@@ -491,26 +468,6 @@ export const createApiMiddleware = (opts: ApiOptions) => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 
     try {
-      // Fast path: static single-tenant mode (scoped routing disabled) — no
-      // route resolution, expose the configured schemas directly. A database
-      // id is still required; assertDatabaseId throws when it is absent.
-      if (!opts.api?.enableScopedRouting) {
-        const staticApi = resolveStatic({
-          opts,
-          pool: null as unknown as Pool,
-          domain: '',
-          subdomain: null,
-          cacheKey: 'static',
-          headers: {},
-          host: ''
-        });
-        assertDatabaseId(staticApi);
-        req.api = staticApi;
-        req.databaseId = staticApi.databaseId;
-        req.svc_key = 'static';
-        return next();
-      }
-
       const apiConfig = await getApiConfig(opts, req);
 
       if (isApiError(apiConfig)) {
