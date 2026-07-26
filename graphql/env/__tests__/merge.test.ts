@@ -63,7 +63,6 @@ describe('getEnvOptions', () => {
       API_META_SCHEMAS: 'env_meta1,env_meta2',
       API_ANON_ROLE: 'env_anon',
       API_ROLE_NAME: 'env_role',
-      API_DEFAULT_DATABASE_ID: 'env_db',
       SMS_PROVIDER: 'devsms',
       SMS_SENDER_ID: 'EnvSender',
       SMS_REQUEST_TIMEOUT_MS: '4000',
@@ -89,8 +88,7 @@ describe('getEnvOptions', () => {
           oppositeBaseNames: false
         },
         api: {
-          enableScopedRouting: false,
-          defaultDatabaseId: 'override_db'
+          enableScopedRouting: false
         },
         sms: {
           senderId: 'OverrideSender',

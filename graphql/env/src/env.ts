@@ -19,7 +19,6 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_META_SCHEMAS,
     API_ANON_ROLE,
     API_ROLE_NAME,
-    API_DEFAULT_DATABASE_ID,
 
     EMBEDDER_PROVIDER,
     EMBEDDER_MODEL,
@@ -68,8 +67,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
-      ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
-      ...(API_DEFAULT_DATABASE_ID && { defaultDatabaseId: API_DEFAULT_DATABASE_ID })
+      ...(API_ROLE_NAME && { roleName: API_ROLE_NAME })
     },
     ...((EMBEDDER_PROVIDER || CHAT_PROVIDER) && {
       llm: {

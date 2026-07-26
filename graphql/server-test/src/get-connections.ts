@@ -53,6 +53,10 @@ export const getConnections = async (
       ...input.server?.api,
       // Apply convenience properties (these take precedence)
       exposedSchemas: input.schemas,
+      // Static single-tenant mode requires an explicit database id (there is
+      // no default database). Tests run against an isolated database, so use a
+      // stable explicit id unless the caller supplied one.
+      databaseId: input.server?.api?.databaseId ?? 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
     graphile: input.graphile

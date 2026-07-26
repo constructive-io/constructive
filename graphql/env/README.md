@@ -57,7 +57,6 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 - `API_META_SCHEMAS` - Comma-separated list of meta schemas
 - `API_ANON_ROLE` - Anonymous role name
 - `API_ROLE_NAME` - Default role name
-- `API_DEFAULT_DATABASE_ID` - Default database ID
 
 ## Defaults
 

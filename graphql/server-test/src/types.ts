@@ -24,8 +24,7 @@ export interface ServerOptions {
    *     port: 5555,
    *     api: {
    *       enableScopedRouting: false,
-   *       isPublic: false,
-   *       defaultDatabaseId: 'my-database'
+   *       isPublic: false
    *     }
    *   }
    * });

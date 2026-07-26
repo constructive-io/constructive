@@ -186,7 +186,7 @@ The `server.api` option provides full control over the GraphQL server configurat
 | `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
 | `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
 | `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
-| `defaultDatabaseId` | `string` | package default | Default database identifier |
+| `databaseId` | `string` | `test-database` | Explicit tenant database id for static mode (no default database; requests without one are rejected) |
 | `isPublic` | `boolean` | package default | Whether the API is publicly accessible |
 | `metaSchemas` | `string[]` | package default | Schemas containing metadata tables |
 
@@ -219,7 +219,6 @@ const { query } = await getConnections({
     api: {
       enableScopedRouting: false,
       isPublic: false,
-      defaultDatabaseId: 'my-test-db',
       metaSchemas: ['constructive_routing_public', 'metaschema_public']
     }
   }
