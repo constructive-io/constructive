@@ -14,8 +14,10 @@ export const PGPM_MODULE_MAP: Record<string, string> = {
   'pgpm-database-jobs': '@pgpm/database-jobs',
   'pgpm-function-resolution': '@pgpm/function-resolution',
   'metaschema-modules': '@pgpm/metaschema-modules',
-  'metaschema-schema': '@pgpm/metaschema-schema',
+  // TODO(services retirement): remove once @pgpm/metaschema-modules is
+  // republished without its `services` requires and the pin is bumped.
   'services': '@pgpm/services',
+  'metaschema-schema': '@pgpm/metaschema-schema',
   'pgpm-inflection': '@pgpm/inflection',
   'pgpm-jwt-claims': '@pgpm/jwt-claims',
   'pgpm-stamps': '@pgpm/stamps',

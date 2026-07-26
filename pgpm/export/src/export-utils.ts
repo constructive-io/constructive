@@ -111,8 +111,7 @@ export const isTimestampDefaultColumn = (columnDefault: string | null): boolean 
 export const SERVICE_REQUIRED_EXTENSIONS = [
   'plpgsql',
   'metaschema-schema',
-  'metaschema-modules',
-  'services'
+  'metaschema-modules'
 ] as const;
 
 /**
