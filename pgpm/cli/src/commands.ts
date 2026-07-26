@@ -1,5 +1,5 @@
 import { checkForUpdates } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
+import { cliExitWithError, CLIOptions, extractFirst, getPackageJson,Inquirerer, ParsedArgs } from 'inquirerer';
 import { teardownPgPools } from 'pg-cache';
 
 import add from './commands/add';
@@ -9,6 +9,7 @@ import cache from './commands/cache';
 import clear from './commands/clear';
 import deploy from './commands/deploy';
 import docker from './commands/docker';
+import doctor from './commands/doctor';
 import dump from './commands/dump';
 import env from './commands/env';
 import _export from './commands/export';
@@ -19,8 +20,6 @@ import kill from './commands/kill';
 import migrate from './commands/migrate';
 import _package from './commands/package';
 import plan from './commands/plan';
-import updateCmd from './commands/update';
-import upgrade from './commands/upgrade';
 import remove from './commands/remove';
 import renameCmd from './commands/rename';
 import revert from './commands/revert';
@@ -28,6 +27,8 @@ import slice from './commands/slice';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
 import tune from './commands/tune';
+import updateCmd from './commands/update';
+import upgrade from './commands/upgrade';
 import verify from './commands/verify';
 import { usageText } from './utils';
 
@@ -49,6 +50,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     clear: pgt(clear),
     deploy: pgt(deploy),
     docker,
+    doctor,
     dump: pgt(dump),
     env,
     verify: pgt(verify),
@@ -64,14 +66,14 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     install: pgt(install),
     migrate: pgt(migrate),
     analyze: pgt(analyze),
-        rename: pgt(renameCmd),
-        slice,
-        'test-packages': pgt(testPackages),
-        tune: pgt(tune),
-        upgrade: pgt(upgrade),
-        up: pgt(upgrade),
-        cache,
-        update: updateCmd
+    rename: pgt(renameCmd),
+    slice,
+    'test-packages': pgt(testPackages),
+    tune: pgt(tune),
+    upgrade: pgt(upgrade),
+    up: pgt(upgrade),
+    cache,
+    update: updateCmd
   };
 };
 
@@ -116,7 +118,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
       const updateResult = await checkForUpdates({
         pkgName: pkg.name,
         pkgVersion: pkg.version,
-        toolName: 'pgpm',
+        toolName: 'pgpm'
       });
       if (updateResult.hasUpdate && updateResult.message) {
         console.warn(updateResult.message);
