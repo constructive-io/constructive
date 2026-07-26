@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformApiKeys } from "../query-keys";
-import { platformApiMutationKeys } from "../mutation-keys";
-import type { PlatformApiSelect, PlatformApiWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiSelect, PlatformApiWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApiKeys } from '../query-keys';
+import { platformApiMutationKeys } from '../mutation-keys';
+import type { PlatformApiSelect, PlatformApiWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { PlatformApiSelect, PlatformApiWithRelations } from '../../orm/input-types';
 /**
  * API surfaces exposed by this scope; publication makes a surface bindable from other scopes
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformApiMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformApiMutation<S extends PlatformApiSelect>(params: {
-  selection: ({
-    fields: S & PlatformApiSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiSelect>);
-} & Omit<UseMutationOptions<{
-  deletePlatformApi: {
-    platformApi: InferSelectResult<PlatformApiWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePlatformApi: {
-    platformApi: InferSelectResult<PlatformApiWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeletePlatformApiMutation(params: {
-  selection: SelectionConfig<PlatformApiSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeletePlatformApiMutation<S extends PlatformApiSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformApiSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deletePlatformApi: {
+          platformApi: InferSelectResult<PlatformApiWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deletePlatformApi: {
+      platformApi: InferSelectResult<PlatformApiWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeletePlatformApiMutation(
+  params: {
+    selection: SelectionConfig<PlatformApiSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformApiSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformApiMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().platformApi.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .platformApi.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformApiKeys.detail(variables.id)
+        queryKey: platformApiKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformApiKeys.lists()
+        queryKey: platformApiKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

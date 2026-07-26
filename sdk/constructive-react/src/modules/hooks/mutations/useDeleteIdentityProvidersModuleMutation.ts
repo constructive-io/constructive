@@ -12,16 +12,22 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { identityProvidersModuleKeys } from "../query-keys";
-import { identityProvidersModuleMutationKeys } from "../mutation-keys";
-import type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { identityProvidersModuleKeys } from '../query-keys';
+import { identityProvidersModuleMutationKeys } from '../mutation-keys';
+import type {
+  IdentityProvidersModuleSelect,
+  IdentityProvidersModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  IdentityProvidersModuleSelect,
+  IdentityProvidersModuleWithRelations,
+} from '../../orm/input-types';
 /**
  * Entity-aware config row for the identity_providers_module, which provisions a per-database
      identity_providers table holding OAuth2 / OIDC (and future SAML) provider definitions.
@@ -42,55 +48,73 @@ export type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelation
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteIdentityProvidersModuleMutation<S extends IdentityProvidersModuleSelect>(params: {
-  selection: ({
-    fields: S & IdentityProvidersModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deleteIdentityProvidersModule: {
-    identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteIdentityProvidersModule: {
-    identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteIdentityProvidersModuleMutation(params: {
-  selection: SelectionConfig<IdentityProvidersModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteIdentityProvidersModuleMutation<S extends IdentityProvidersModuleSelect>(
+  params: {
+    selection: {
+      fields: S & IdentityProvidersModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteIdentityProvidersModule: {
+          identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteIdentityProvidersModule: {
+      identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteIdentityProvidersModuleMutation(
+  params: {
+    selection: SelectionConfig<IdentityProvidersModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<IdentityProvidersModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: identityProvidersModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().identityProvidersModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .identityProvidersModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: identityProvidersModuleKeys.detail(variables.id)
+        queryKey: identityProvidersModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.lists()
+        queryKey: identityProvidersModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentKeys } from "../query-keys";
-import { agentMutationKeys } from "../mutation-keys";
-import type { AgentSelect, AgentWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentSelect, AgentWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentKeys } from '../query-keys';
+import { agentMutationKeys } from '../mutation-keys';
+import type { AgentSelect, AgentWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentSelect, AgentWithRelations } from '../../orm/input-types';
 /**
  * Agent instance registry (human-managed or ephemeral sub-agents)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteAgentMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteAgentMutation<S extends AgentSelect>(params: {
-  selection: ({
-    fields: S & AgentSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentSelect>);
-} & Omit<UseMutationOptions<{
-  deleteAgent: {
-    agent: InferSelectResult<AgentWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteAgent: {
-    agent: InferSelectResult<AgentWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteAgentMutation(params: {
-  selection: SelectionConfig<AgentSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteAgentMutation<S extends AgentSelect>(
+  params: {
+    selection: {
+      fields: S & AgentSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteAgent: {
+          agent: InferSelectResult<AgentWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteAgent: {
+      agent: InferSelectResult<AgentWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteAgentMutation(
+  params: {
+    selection: SelectionConfig<AgentSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AgentSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().agent.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .agent.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: agentKeys.detail(variables.id)
+        queryKey: agentKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: agentKeys.lists()
+        queryKey: agentKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

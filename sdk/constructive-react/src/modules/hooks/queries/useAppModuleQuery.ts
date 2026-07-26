@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appModuleKeys } from "../query-keys";
-import type { AppModuleSelect, AppModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppModuleSelect, AppModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appModuleKeys } from '../query-keys';
+import type { AppModuleSelect, AppModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AppModuleSelect, AppModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appModuleQueryKey = appModuleKeys.detail;
 /**
  * Query hook for fetching a single AppModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppModuleQuery({
@@ -26,38 +26,52 @@ export const appModuleQueryKey = appModuleKeys.detail;
  * });
  * ```
  */
-export function useAppModuleQuery<S extends AppModuleSelect, TData = {
-  appModule: InferSelectResult<AppModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
-} & Omit<UseQueryOptions<{
-  appModule: InferSelectResult<AppModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<AppModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAppModuleQuery<
+  S extends AppModuleSelect,
+  TData = {
+    appModule: InferSelectResult<AppModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appModule: InferSelectResult<AppModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AppModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AppModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appModuleKeys.detail(params.id),
-    queryFn: () => getClient().appModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .appModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single AppModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchAppModuleQuery(params: {
   selection: SelectionConfig<AppModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppModuleSelect>(params.selection);
-  return getClient().appModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .appModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single AppModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppModuleQuery<S extends AppModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
-}): Promise<void>;
-export async function prefetchAppModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AppModuleSelect>;
-}): Promise<void> {
+export async function prefetchAppModuleQuery<S extends AppModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AppModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AppModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appModuleKeys.detail(params.id),
-    queryFn: () => getClient().appModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .appModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

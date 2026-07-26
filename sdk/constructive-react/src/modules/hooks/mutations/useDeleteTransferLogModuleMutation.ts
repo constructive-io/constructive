@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { transferLogModuleKeys } from "../query-keys";
-import { transferLogModuleMutationKeys } from "../mutation-keys";
-import type { TransferLogModuleSelect, TransferLogModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { TransferLogModuleSelect, TransferLogModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { transferLogModuleKeys } from '../query-keys';
+import { transferLogModuleMutationKeys } from '../mutation-keys';
+import type {
+  TransferLogModuleSelect,
+  TransferLogModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  TransferLogModuleSelect,
+  TransferLogModuleWithRelations,
+} from '../../orm/input-types';
 /**
  * Mutation hook for deleting a TransferLogModule with typed selection
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteTransferLogModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteTransferLogModuleMutation<S extends TransferLogModuleSelect>(params: {
-  selection: ({
-    fields: S & TransferLogModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deleteTransferLogModule: {
-    transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteTransferLogModule: {
-    transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteTransferLogModuleMutation(params: {
-  selection: SelectionConfig<TransferLogModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteTransferLogModuleMutation<S extends TransferLogModuleSelect>(
+  params: {
+    selection: {
+      fields: S & TransferLogModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteTransferLogModule: {
+          transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteTransferLogModule: {
+      transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteTransferLogModuleMutation(
+  params: {
+    selection: SelectionConfig<TransferLogModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<TransferLogModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: transferLogModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().transferLogModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .transferLogModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: transferLogModuleKeys.detail(variables.id)
+        queryKey: transferLogModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: transferLogModuleKeys.lists()
+        queryKey: transferLogModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

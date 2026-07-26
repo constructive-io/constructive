@@ -4,20 +4,36 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformFunctionInvocationAttemptKeys } from "../query-keys";
-import type { PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptWithRelations, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptWithRelations, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformFunctionInvocationAttemptKeys } from '../query-keys';
+import type {
+  PlatformFunctionInvocationAttemptSelect,
+  PlatformFunctionInvocationAttemptWithRelations,
+  PlatformFunctionInvocationAttemptFilter,
+  PlatformFunctionInvocationAttemptOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformFunctionInvocationAttemptSelect,
+  PlatformFunctionInvocationAttemptWithRelations,
+  PlatformFunctionInvocationAttemptFilter,
+  PlatformFunctionInvocationAttemptOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
-export const platformFunctionInvocationAttemptsQueryKey = platformFunctionInvocationAttemptKeys.list;
+export const platformFunctionInvocationAttemptsQueryKey =
+  platformFunctionInvocationAttemptKeys.list;
 /**
  * Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionInvocationAttemptsQuery({
@@ -30,33 +46,64 @@ export const platformFunctionInvocationAttemptsQueryKey = platformFunctionInvoca
  * });
  * ```
  */
-export function usePlatformFunctionInvocationAttemptsQuery<S extends PlatformFunctionInvocationAttemptSelect, TData = {
-  platformFunctionInvocationAttempts: ConnectionResult<InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
-} & Omit<UseQueryOptions<{
-  platformFunctionInvocationAttempts: ConnectionResult<InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformFunctionInvocationAttemptsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformFunctionInvocationAttemptsQuery<
+  S extends PlatformFunctionInvocationAttemptSelect,
+  TData = {
+    platformFunctionInvocationAttempts: ConnectionResult<
+      InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<
+        S,
+        PlatformFunctionInvocationAttemptFilter,
+        PlatformFunctionInvocationAttemptOrderBy
+      >,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformFunctionInvocationAttempts: ConnectionResult<
+          InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformFunctionInvocationAttemptsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionInvocationAttemptSelect,
+      PlatformFunctionInvocationAttemptFilter,
+      PlatformFunctionInvocationAttemptOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformFunctionInvocationAttemptSelect,
+    PlatformFunctionInvocationAttemptFilter,
+    PlatformFunctionInvocationAttemptOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionInvocationAttemptKeys.list(args),
     queryFn: () => getClient().platformFunctionInvocationAttempt.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionInvocationAttemptsQuery({
@@ -67,38 +114,82 @@ export function usePlatformFunctionInvocationAttemptsQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformFunctionInvocationAttemptsQuery<S extends PlatformFunctionInvocationAttemptSelect>(params: {
+export async function fetchPlatformFunctionInvocationAttemptsQuery<
+  S extends PlatformFunctionInvocationAttemptSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
+  } & Omit<
+    ListSelectionConfig<
+      S,
+      PlatformFunctionInvocationAttemptFilter,
+      PlatformFunctionInvocationAttemptOrderBy
+    >,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
 }): Promise<{
-  platformFunctionInvocationAttempts: ConnectionResult<InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>>;
+  platformFunctionInvocationAttempts: ConnectionResult<
+    InferSelectResult<PlatformFunctionInvocationAttemptWithRelations, S>
+  >;
 }>;
 export async function fetchPlatformFunctionInvocationAttemptsQuery(params: {
-  selection: ListSelectionConfig<PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformFunctionInvocationAttemptSelect,
+    PlatformFunctionInvocationAttemptFilter,
+    PlatformFunctionInvocationAttemptOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformFunctionInvocationAttemptSelect,
+    PlatformFunctionInvocationAttemptFilter,
+    PlatformFunctionInvocationAttemptOrderBy
+  >(params.selection);
   return getClient().platformFunctionInvocationAttempt.findMany(args).unwrap();
 }
 /**
  * Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformFunctionInvocationAttemptsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformFunctionInvocationAttemptsQuery<S extends PlatformFunctionInvocationAttemptSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
-}): Promise<void>;
-export async function prefetchPlatformFunctionInvocationAttemptsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformFunctionInvocationAttemptSelect, PlatformFunctionInvocationAttemptFilter, PlatformFunctionInvocationAttemptOrderBy>(params.selection);
+export async function prefetchPlatformFunctionInvocationAttemptsQuery<
+  S extends PlatformFunctionInvocationAttemptSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<
+        S,
+        PlatformFunctionInvocationAttemptFilter,
+        PlatformFunctionInvocationAttemptOrderBy
+      >,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformFunctionInvocationAttemptSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformFunctionInvocationAttemptsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformFunctionInvocationAttemptSelect,
+      PlatformFunctionInvocationAttemptFilter,
+      PlatformFunctionInvocationAttemptOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformFunctionInvocationAttemptSelect,
+    PlatformFunctionInvocationAttemptFilter,
+    PlatformFunctionInvocationAttemptOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionInvocationAttemptKeys.list(args),
-    queryFn: () => getClient().platformFunctionInvocationAttempt.findMany(args).unwrap()
+    queryFn: () => getClient().platformFunctionInvocationAttempt.findMany(args).unwrap(),
   });
 }

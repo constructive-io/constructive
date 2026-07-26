@@ -339,7 +339,8 @@ export interface SecretRelations {}
 // ============ Entity Types With Relations ============
 export type ConfigWithRelations = Config & ConfigRelations;
 export type PlatformConfigWithRelations = PlatformConfig & PlatformConfigRelations;
-export type PlatformInternalSecretWithRelations = PlatformInternalSecret & PlatformInternalSecretRelations;
+export type PlatformInternalSecretWithRelations = PlatformInternalSecret &
+  PlatformInternalSecretRelations;
 export type PlatformSecretWithRelations = PlatformSecret & PlatformSecretRelations;
 export type SecretWithRelations = Secret & SecretRelations;
 // ============ Entity Select Types ============
@@ -563,11 +564,132 @@ export interface SecretFilter {
   updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
-export type ConfigOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALUE_ASC" | "VALUE_DESC";
-export type PlatformConfigOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALUE_ASC" | "VALUE_DESC";
-export type PlatformInternalSecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type PlatformSecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PROVIDER_ASC" | "PROVIDER_DESC" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type SecretOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PROVIDER_ASC" | "PROVIDER_DESC" | "RETIRED_AT_ASC" | "RETIRED_AT_DESC" | "ROTATED_AT_ASC" | "ROTATED_AT_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type ConfigOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALUE_ASC'
+  | 'VALUE_DESC';
+export type PlatformConfigOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALUE_ASC'
+  | 'VALUE_DESC';
+export type PlatformInternalSecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type PlatformSecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type SecretOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'RETIRED_AT_ASC'
+  | 'RETIRED_AT_DESC'
+  | 'ROTATED_AT_ASC'
+  | 'ROTATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 // ============ CRUD Input Types ============
 export interface CreateConfigInput {
   clientMutationId?: string;

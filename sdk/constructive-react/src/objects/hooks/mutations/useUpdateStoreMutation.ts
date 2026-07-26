@@ -4,83 +4,99 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { storeKeys } from "../query-keys";
-import { storeMutationKeys } from "../mutation-keys";
-import type { StoreSelect, StoreWithRelations, StorePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { StoreSelect, StoreWithRelations, StorePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { storeKeys } from '../query-keys';
+import { storeMutationKeys } from '../mutation-keys';
+import type { StoreSelect, StoreWithRelations, StorePatch } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { StoreSelect, StoreWithRelations, StorePatch } from '../../orm/input-types';
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateStoreMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', storePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateStoreMutation<S extends StoreSelect>(params: {
-  selection: ({
-    fields: S & StoreSelect;
-  } & HookStrictSelect<NoInfer<S>, StoreSelect>);
-} & Omit<UseMutationOptions<{
-  updateStore: {
-    store: InferSelectResult<StoreWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  storePatch: StorePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateStore: {
-    store: InferSelectResult<StoreWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  storePatch: StorePatch;
-}>;
-export function useUpdateStoreMutation(params: {
-  selection: SelectionConfig<StoreSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  storePatch: StorePatch;
-}>, "mutationFn">) {
+export function useUpdateStoreMutation<S extends StoreSelect>(
+  params: {
+    selection: {
+      fields: S & StoreSelect;
+    } & HookStrictSelect<NoInfer<S>, StoreSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateStore: {
+          store: InferSelectResult<StoreWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        storePatch: StorePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateStore: {
+      store: InferSelectResult<StoreWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    storePatch: StorePatch;
+  }
+>;
+export function useUpdateStoreMutation(
+  params: {
+    selection: SelectionConfig<StoreSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        storePatch: StorePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: storeMutationKeys.all,
-    mutationFn: ({
-      id,
-      storePatch
-    }: {
-      id: string;
-      storePatch: StorePatch;
-    }) => getClient().store.update({
-      where: {
-        id
-      },
-      data: storePatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, storePatch }: { id: string; storePatch: StorePatch }) =>
+      getClient()
+        .store.update({
+          where: {
+            id,
+          },
+          data: storePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: storeKeys.detail(variables.id)
+        queryKey: storeKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: storeKeys.lists()
+        queryKey: storeKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { appModuleKeys } from "../query-keys";
-import type { AppModuleSelect, AppModuleWithRelations, AppModuleFilter, AppModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppModuleSelect, AppModuleWithRelations, AppModuleFilter, AppModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { appModuleKeys } from '../query-keys';
+import type {
+  AppModuleSelect,
+  AppModuleWithRelations,
+  AppModuleFilter,
+  AppModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AppModuleSelect,
+  AppModuleWithRelations,
+  AppModuleFilter,
+  AppModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appModulesQueryKey = appModuleKeys.list;
 /**
  * Query hook for fetching AppModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppModulesQuery({
@@ -30,33 +45,47 @@ export const appModulesQueryKey = appModuleKeys.list;
  * });
  * ```
  */
-export function useAppModulesQuery<S extends AppModuleSelect, TData = {
-  appModules: ConnectionResult<InferSelectResult<AppModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppModuleFilter, AppModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
-} & Omit<UseQueryOptions<{
-  appModules: ConnectionResult<InferSelectResult<AppModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppModulesQuery(params: {
-  selection: ListSelectionConfig<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAppModulesQuery<
+  S extends AppModuleSelect,
+  TData = {
+    appModules: ConnectionResult<InferSelectResult<AppModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppModuleFilter, AppModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appModules: ConnectionResult<InferSelectResult<AppModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppModulesQuery(
+  params: {
+    selection: ListSelectionConfig<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appModuleKeys.list(args),
     queryFn: () => getClient().appModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch AppModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppModulesQuery({
@@ -70,35 +99,47 @@ export function useAppModulesQuery(params: {
 export async function fetchAppModulesQuery<S extends AppModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppModuleFilter, AppModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
+  } & Omit<ListSelectionConfig<S, AppModuleFilter, AppModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AppModuleSelect>;
 }): Promise<{
   appModules: ConnectionResult<InferSelectResult<AppModuleWithRelations, S>>;
 }>;
 export async function fetchAppModulesQuery(params: {
   selection: ListSelectionConfig<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>(
+    params.selection
+  );
   return getClient().appModule.findMany(args).unwrap();
 }
 /**
  * Prefetch AppModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppModulesQuery<S extends AppModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppModuleFilter, AppModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppModuleSelect>;
-}): Promise<void>;
-export async function prefetchAppModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>(params.selection);
+export async function prefetchAppModulesQuery<S extends AppModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppModuleFilter, AppModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<AppModuleSelect, AppModuleFilter, AppModuleOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: appModuleKeys.list(args),
-    queryFn: () => getClient().appModule.findMany(args).unwrap()
+    queryFn: () => getClient().appModule.findMany(args).unwrap(),
   });
 }

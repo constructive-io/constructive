@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentModuleKeys } from "../query-keys";
-import type { AgentModuleSelect, AgentModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentModuleSelect, AgentModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentModuleKeys } from '../query-keys';
+import type { AgentModuleSelect, AgentModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentModuleSelect, AgentModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentModuleQueryKey = agentModuleKeys.detail;
 /**
  * Query hook for fetching a single AgentModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentModuleQuery({
@@ -26,38 +26,52 @@ export const agentModuleQueryKey = agentModuleKeys.detail;
  * });
  * ```
  */
-export function useAgentModuleQuery<S extends AgentModuleSelect, TData = {
-  agentModule: InferSelectResult<AgentModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentModuleSelect>;
-} & Omit<UseQueryOptions<{
-  agentModule: InferSelectResult<AgentModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentModuleQuery<
+  S extends AgentModuleSelect,
+  TData = {
+    agentModule: InferSelectResult<AgentModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentModule: InferSelectResult<AgentModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentModuleKeys.detail(params.id),
-    queryFn: () => getClient().agentModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agentModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single AgentModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchAgentModuleQuery(params: {
   selection: SelectionConfig<AgentModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentModuleSelect>(params.selection);
-  return getClient().agentModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agentModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single AgentModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentModuleQuery<S extends AgentModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentModuleSelect>;
-}): Promise<void>;
-export async function prefetchAgentModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentModuleSelect>;
-}): Promise<void> {
+export async function prefetchAgentModuleQuery<S extends AgentModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentModuleKeys.detail(params.id),
-    queryFn: () => getClient().agentModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agentModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

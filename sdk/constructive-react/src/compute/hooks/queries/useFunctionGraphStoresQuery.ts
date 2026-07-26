@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { functionGraphStoreKeys } from "../query-keys";
-import type { FunctionGraphStoreSelect, FunctionGraphStoreWithRelations, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphStoreSelect, FunctionGraphStoreWithRelations, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { functionGraphStoreKeys } from '../query-keys';
+import type {
+  FunctionGraphStoreSelect,
+  FunctionGraphStoreWithRelations,
+  FunctionGraphStoreFilter,
+  FunctionGraphStoreOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  FunctionGraphStoreSelect,
+  FunctionGraphStoreWithRelations,
+  FunctionGraphStoreFilter,
+  FunctionGraphStoreOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphStoresQueryKey = functionGraphStoreKeys.list;
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphStoresQuery({
@@ -30,33 +45,58 @@ export const functionGraphStoresQueryKey = functionGraphStoreKeys.list;
  * });
  * ```
  */
-export function useFunctionGraphStoresQuery<S extends FunctionGraphStoreSelect, TData = {
-  functionGraphStores: ConnectionResult<InferSelectResult<FunctionGraphStoreWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
-} & Omit<UseQueryOptions<{
-  functionGraphStores: ConnectionResult<InferSelectResult<FunctionGraphStoreWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionGraphStoresQuery(params: {
-  selection: ListSelectionConfig<FunctionGraphStoreSelect, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<FunctionGraphStoreSelect, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useFunctionGraphStoresQuery<
+  S extends FunctionGraphStoreSelect,
+  TData = {
+    functionGraphStores: ConnectionResult<InferSelectResult<FunctionGraphStoreWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionGraphStores: ConnectionResult<
+          InferSelectResult<FunctionGraphStoreWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionGraphStoresQuery(
+  params: {
+    selection: ListSelectionConfig<
+      FunctionGraphStoreSelect,
+      FunctionGraphStoreFilter,
+      FunctionGraphStoreOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    FunctionGraphStoreSelect,
+    FunctionGraphStoreFilter,
+    FunctionGraphStoreOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphStoreKeys.list(args),
     queryFn: () => getClient().functionGraphStore.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionGraphStoresQuery({
@@ -70,35 +110,62 @@ export function useFunctionGraphStoresQuery(params: {
 export async function fetchFunctionGraphStoresQuery<S extends FunctionGraphStoreSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
+  } & Omit<ListSelectionConfig<S, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
 }): Promise<{
   functionGraphStores: ConnectionResult<InferSelectResult<FunctionGraphStoreWithRelations, S>>;
 }>;
 export async function fetchFunctionGraphStoresQuery(params: {
-  selection: ListSelectionConfig<FunctionGraphStoreSelect, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>;
+  selection: ListSelectionConfig<
+    FunctionGraphStoreSelect,
+    FunctionGraphStoreFilter,
+    FunctionGraphStoreOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<FunctionGraphStoreSelect, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    FunctionGraphStoreSelect,
+    FunctionGraphStoreFilter,
+    FunctionGraphStoreOrderBy
+  >(params.selection);
   return getClient().functionGraphStore.findMany(args).unwrap();
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionGraphStoresQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchFunctionGraphStoresQuery<S extends FunctionGraphStoreSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
-}): Promise<void>;
-export async function prefetchFunctionGraphStoresQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<FunctionGraphStoreSelect, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<FunctionGraphStoreSelect, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>(params.selection);
+export async function prefetchFunctionGraphStoresQuery<S extends FunctionGraphStoreSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionGraphStoreFilter, FunctionGraphStoreOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionGraphStoreSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionGraphStoresQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      FunctionGraphStoreSelect,
+      FunctionGraphStoreFilter,
+      FunctionGraphStoreOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    FunctionGraphStoreSelect,
+    FunctionGraphStoreFilter,
+    FunctionGraphStoreOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphStoreKeys.list(args),
-    queryFn: () => getClient().functionGraphStore.findMany(args).unwrap()
+    queryFn: () => getClient().functionGraphStore.findMany(args).unwrap(),
   });
 }

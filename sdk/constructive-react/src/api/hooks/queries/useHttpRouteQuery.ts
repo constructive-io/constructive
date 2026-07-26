@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { httpRouteKeys } from "../query-keys";
-import type { HttpRouteSelect, HttpRouteWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { HttpRouteSelect, HttpRouteWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { httpRouteKeys } from '../query-keys';
+import type { HttpRouteSelect, HttpRouteWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { HttpRouteSelect, HttpRouteWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const httpRouteQueryKey = httpRouteKeys.detail;
 /**
  * Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useHttpRouteQuery({
@@ -26,38 +26,52 @@ export const httpRouteQueryKey = httpRouteKeys.detail;
  * });
  * ```
  */
-export function useHttpRouteQuery<S extends HttpRouteSelect, TData = {
-  httpRoute: InferSelectResult<HttpRouteWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, HttpRouteSelect>;
-} & Omit<UseQueryOptions<{
-  httpRoute: InferSelectResult<HttpRouteWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useHttpRouteQuery(params: {
-  id: string;
-  selection: SelectionConfig<HttpRouteSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useHttpRouteQuery<
+  S extends HttpRouteSelect,
+  TData = {
+    httpRoute: InferSelectResult<HttpRouteWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, HttpRouteSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        httpRoute: InferSelectResult<HttpRouteWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useHttpRouteQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<HttpRouteSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<HttpRouteSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: httpRouteKeys.detail(params.id),
-    queryFn: () => getClient().httpRoute.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .httpRoute.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchHttpRouteQuery({
@@ -79,35 +93,46 @@ export async function fetchHttpRouteQuery(params: {
   selection: SelectionConfig<HttpRouteSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<HttpRouteSelect>(params.selection);
-  return getClient().httpRoute.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .httpRoute.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target
- * 
+ *
  * @example
  * ```ts
  * await prefetchHttpRouteQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchHttpRouteQuery<S extends HttpRouteSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, HttpRouteSelect>;
-}): Promise<void>;
-export async function prefetchHttpRouteQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<HttpRouteSelect>;
-}): Promise<void> {
+export async function prefetchHttpRouteQuery<S extends HttpRouteSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, HttpRouteSelect>;
+  }
+): Promise<void>;
+export async function prefetchHttpRouteQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<HttpRouteSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<HttpRouteSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: httpRouteKeys.detail(params.id),
-    queryFn: () => getClient().httpRoute.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .httpRoute.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

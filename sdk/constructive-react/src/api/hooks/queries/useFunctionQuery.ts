@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionKeys } from "../query-keys";
-import type { FunctionSelect, FunctionWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionSelect, FunctionWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionKeys } from '../query-keys';
+import type { FunctionSelect, FunctionWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { FunctionSelect, FunctionWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionQueryKey = functionKeys.detail;
 /**
  * Query hook for fetching a single Function
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionQuery({
@@ -26,38 +26,52 @@ export const functionQueryKey = functionKeys.detail;
  * });
  * ```
  */
-export function useFunctionQuery<S extends FunctionSelect, TData = {
-  function: InferSelectResult<FunctionWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionSelect>;
-} & Omit<UseQueryOptions<{
-  function: InferSelectResult<FunctionWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionQuery(params: {
-  id: string;
-  selection: SelectionConfig<FunctionSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useFunctionQuery<
+  S extends FunctionSelect,
+  TData = {
+    function: InferSelectResult<FunctionWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        function: InferSelectResult<FunctionWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<FunctionSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionKeys.detail(params.id),
-    queryFn: () => getClient().function.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .function.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single Function without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionQuery({
@@ -79,35 +93,46 @@ export async function fetchFunctionQuery(params: {
   selection: SelectionConfig<FunctionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionSelect>(params.selection);
-  return getClient().function.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .function.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single Function for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionQuery<S extends FunctionSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, FunctionSelect>;
-}): Promise<void>;
-export async function prefetchFunctionQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<FunctionSelect>;
-}): Promise<void> {
+export async function prefetchFunctionQuery<S extends FunctionSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, FunctionSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<FunctionSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<FunctionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionKeys.detail(params.id),
-    queryFn: () => getClient().function.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .function.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

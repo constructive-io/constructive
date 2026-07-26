@@ -4,83 +4,99 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentKeys } from "../query-keys";
-import { agentMutationKeys } from "../mutation-keys";
-import type { AgentSelect, AgentWithRelations, AgentPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentSelect, AgentWithRelations, AgentPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentKeys } from '../query-keys';
+import { agentMutationKeys } from '../mutation-keys';
+import type { AgentSelect, AgentWithRelations, AgentPatch } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentSelect, AgentWithRelations, AgentPatch } from '../../orm/input-types';
 /**
  * Agent instance registry (human-managed or ephemeral sub-agents)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAgentMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', agentPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAgentMutation<S extends AgentSelect>(params: {
-  selection: ({
-    fields: S & AgentSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentSelect>);
-} & Omit<UseMutationOptions<{
-  updateAgent: {
-    agent: InferSelectResult<AgentWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  agentPatch: AgentPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateAgent: {
-    agent: InferSelectResult<AgentWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  agentPatch: AgentPatch;
-}>;
-export function useUpdateAgentMutation(params: {
-  selection: SelectionConfig<AgentSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  agentPatch: AgentPatch;
-}>, "mutationFn">) {
+export function useUpdateAgentMutation<S extends AgentSelect>(
+  params: {
+    selection: {
+      fields: S & AgentSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateAgent: {
+          agent: InferSelectResult<AgentWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        agentPatch: AgentPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateAgent: {
+      agent: InferSelectResult<AgentWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    agentPatch: AgentPatch;
+  }
+>;
+export function useUpdateAgentMutation(
+  params: {
+    selection: SelectionConfig<AgentSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        agentPatch: AgentPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AgentSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentMutationKeys.all,
-    mutationFn: ({
-      id,
-      agentPatch
-    }: {
-      id: string;
-      agentPatch: AgentPatch;
-    }) => getClient().agent.update({
-      where: {
-        id
-      },
-      data: agentPatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, agentPatch }: { id: string; agentPatch: AgentPatch }) =>
+      getClient()
+        .agent.update({
+          where: {
+            id,
+          },
+          data: agentPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: agentKeys.detail(variables.id)
+        queryKey: agentKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: agentKeys.lists()
+        queryKey: agentKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

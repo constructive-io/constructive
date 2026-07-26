@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentPersonaKeys } from "../query-keys";
-import { agentPersonaMutationKeys } from "../mutation-keys";
-import type { AgentPersonaSelect, AgentPersonaWithRelations, CreateAgentPersonaInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentPersonaSelect, AgentPersonaWithRelations, CreateAgentPersonaInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentPersonaKeys } from '../query-keys';
+import { agentPersonaMutationKeys } from '../mutation-keys';
+import type {
+  AgentPersonaSelect,
+  AgentPersonaWithRelations,
+  CreateAgentPersonaInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AgentPersonaSelect,
+  AgentPersonaWithRelations,
+  CreateAgentPersonaInput,
+} from '../../orm/input-types';
 /**
  * Agent persona templates (role, system prompt, default skills/knowledge)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateAgentPersonaMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateAgentPersonaMutation<S extends AgentPersonaSelect>(params: {
-  selection: ({
-    fields: S & AgentPersonaSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>);
-} & Omit<UseMutationOptions<{
-  createAgentPersona: {
-    agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
-  };
-}, Error, CreateAgentPersonaInput["agentPersona"]>, "mutationFn">): UseMutationResult<{
-  createAgentPersona: {
-    agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
-  };
-}, Error, CreateAgentPersonaInput["agentPersona"]>;
-export function useCreateAgentPersonaMutation(params: {
-  selection: SelectionConfig<AgentPersonaSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateAgentPersonaInput["agentPersona"]>, "mutationFn">) {
+export function useCreateAgentPersonaMutation<S extends AgentPersonaSelect>(
+  params: {
+    selection: {
+      fields: S & AgentPersonaSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentPersonaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createAgentPersona: {
+          agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
+        };
+      },
+      Error,
+      CreateAgentPersonaInput['agentPersona']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createAgentPersona: {
+      agentPersona: InferSelectResult<AgentPersonaWithRelations, S>;
+    };
+  },
+  Error,
+  CreateAgentPersonaInput['agentPersona']
+>;
+export function useCreateAgentPersonaMutation(
+  params: {
+    selection: SelectionConfig<AgentPersonaSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateAgentPersonaInput['agentPersona']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<AgentPersonaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentPersonaMutationKeys.create(),
-    mutationFn: (data: CreateAgentPersonaInput["agentPersona"]) => getClient().agentPersona.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateAgentPersonaInput['agentPersona']) =>
+      getClient()
+        .agentPersona.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: agentPersonaKeys.lists()
+        queryKey: agentPersonaKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,83 +4,107 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { blueprintKeys } from "../query-keys";
-import { blueprintMutationKeys } from "../mutation-keys";
-import type { BlueprintSelect, BlueprintWithRelations, BlueprintPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { BlueprintSelect, BlueprintWithRelations, BlueprintPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { blueprintKeys } from '../query-keys';
+import { blueprintMutationKeys } from '../mutation-keys';
+import type {
+  BlueprintSelect,
+  BlueprintWithRelations,
+  BlueprintPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  BlueprintSelect,
+  BlueprintWithRelations,
+  BlueprintPatch,
+} from '../../orm/input-types';
 /**
  * An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateBlueprintMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', blueprintPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateBlueprintMutation<S extends BlueprintSelect>(params: {
-  selection: ({
-    fields: S & BlueprintSelect;
-  } & HookStrictSelect<NoInfer<S>, BlueprintSelect>);
-} & Omit<UseMutationOptions<{
-  updateBlueprint: {
-    blueprint: InferSelectResult<BlueprintWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  blueprintPatch: BlueprintPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateBlueprint: {
-    blueprint: InferSelectResult<BlueprintWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  blueprintPatch: BlueprintPatch;
-}>;
-export function useUpdateBlueprintMutation(params: {
-  selection: SelectionConfig<BlueprintSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  blueprintPatch: BlueprintPatch;
-}>, "mutationFn">) {
+export function useUpdateBlueprintMutation<S extends BlueprintSelect>(
+  params: {
+    selection: {
+      fields: S & BlueprintSelect;
+    } & HookStrictSelect<NoInfer<S>, BlueprintSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateBlueprint: {
+          blueprint: InferSelectResult<BlueprintWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        blueprintPatch: BlueprintPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateBlueprint: {
+      blueprint: InferSelectResult<BlueprintWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    blueprintPatch: BlueprintPatch;
+  }
+>;
+export function useUpdateBlueprintMutation(
+  params: {
+    selection: SelectionConfig<BlueprintSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        blueprintPatch: BlueprintPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<BlueprintSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: blueprintMutationKeys.all,
-    mutationFn: ({
-      id,
-      blueprintPatch
-    }: {
-      id: string;
-      blueprintPatch: BlueprintPatch;
-    }) => getClient().blueprint.update({
-      where: {
-        id
-      },
-      data: blueprintPatch,
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id, blueprintPatch }: { id: string; blueprintPatch: BlueprintPatch }) =>
+      getClient()
+        .blueprint.update({
+          where: {
+            id,
+          },
+          data: blueprintPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: blueprintKeys.detail(variables.id)
+        queryKey: blueprintKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: blueprintKeys.lists()
+        queryKey: blueprintKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

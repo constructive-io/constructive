@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionModuleKeys } from "../query-keys";
-import { functionModuleMutationKeys } from "../mutation-keys";
-import type { FunctionModuleSelect, FunctionModuleWithRelations, FunctionModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionModuleSelect, FunctionModuleWithRelations, FunctionModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionModuleKeys } from '../query-keys';
+import { functionModuleMutationKeys } from '../mutation-keys';
+import type {
+  FunctionModuleSelect,
+  FunctionModuleWithRelations,
+  FunctionModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionModuleSelect,
+  FunctionModuleWithRelations,
+  FunctionModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a FunctionModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', functionModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionModuleMutation<S extends FunctionModuleSelect>(params: {
-  selection: ({
-    fields: S & FunctionModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateFunctionModule: {
-    functionModule: InferSelectResult<FunctionModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  functionModulePatch: FunctionModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateFunctionModule: {
-    functionModule: InferSelectResult<FunctionModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  functionModulePatch: FunctionModulePatch;
-}>;
-export function useUpdateFunctionModuleMutation(params: {
-  selection: SelectionConfig<FunctionModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  functionModulePatch: FunctionModulePatch;
-}>, "mutationFn">) {
+export function useUpdateFunctionModuleMutation<S extends FunctionModuleSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateFunctionModule: {
+          functionModule: InferSelectResult<FunctionModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        functionModulePatch: FunctionModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateFunctionModule: {
+      functionModule: InferSelectResult<FunctionModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    functionModulePatch: FunctionModulePatch;
+  }
+>;
+export function useUpdateFunctionModuleMutation(
+  params: {
+    selection: SelectionConfig<FunctionModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        functionModulePatch: FunctionModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionModuleMutationKeys.all,
     mutationFn: ({
       id,
-      functionModulePatch
+      functionModulePatch,
     }: {
       id: string;
       functionModulePatch: FunctionModulePatch;
-    }) => getClient().functionModule.update({
-      where: {
-        id
-      },
-      data: functionModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .functionModule.update({
+          where: {
+            id,
+          },
+          data: functionModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.detail(variables.id)
+        queryKey: functionModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.lists()
+        queryKey: functionModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -11,16 +11,24 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { relationProvisionKeys } from "../query-keys";
-import { relationProvisionMutationKeys } from "../mutation-keys";
-import type { RelationProvisionSelect, RelationProvisionWithRelations, RelationProvisionPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RelationProvisionSelect, RelationProvisionWithRelations, RelationProvisionPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { relationProvisionKeys } from '../query-keys';
+import { relationProvisionMutationKeys } from '../mutation-keys';
+import type {
+  RelationProvisionSelect,
+  RelationProvisionWithRelations,
+  RelationProvisionPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  RelationProvisionSelect,
+  RelationProvisionWithRelations,
+  RelationProvisionPatch,
+} from '../../orm/input-types';
 /**
  * Provisions relational structure between tables. Supports four relation types:
      - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
@@ -40,61 +48,83 @@ export type { RelationProvisionSelect, RelationProvisionWithRelations, RelationP
  * mutate({ id: 'value-here', relationProvisionPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateRelationProvisionMutation<S extends RelationProvisionSelect>(params: {
-  selection: ({
-    fields: S & RelationProvisionSelect;
-  } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>);
-} & Omit<UseMutationOptions<{
-  updateRelationProvision: {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  relationProvisionPatch: RelationProvisionPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateRelationProvision: {
-    relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  relationProvisionPatch: RelationProvisionPatch;
-}>;
-export function useUpdateRelationProvisionMutation(params: {
-  selection: SelectionConfig<RelationProvisionSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  relationProvisionPatch: RelationProvisionPatch;
-}>, "mutationFn">) {
+export function useUpdateRelationProvisionMutation<S extends RelationProvisionSelect>(
+  params: {
+    selection: {
+      fields: S & RelationProvisionSelect;
+    } & HookStrictSelect<NoInfer<S>, RelationProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateRelationProvision: {
+          relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        relationProvisionPatch: RelationProvisionPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateRelationProvision: {
+      relationProvision: InferSelectResult<RelationProvisionWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    relationProvisionPatch: RelationProvisionPatch;
+  }
+>;
+export function useUpdateRelationProvisionMutation(
+  params: {
+    selection: SelectionConfig<RelationProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        relationProvisionPatch: RelationProvisionPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: relationProvisionMutationKeys.all,
     mutationFn: ({
       id,
-      relationProvisionPatch
+      relationProvisionPatch,
     }: {
       id: string;
       relationProvisionPatch: RelationProvisionPatch;
-    }) => getClient().relationProvision.update({
-      where: {
-        id
-      },
-      data: relationProvisionPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .relationProvision.update({
+          where: {
+            id,
+          },
+          data: relationProvisionPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.detail(variables.id)
+        queryKey: relationProvisionKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: relationProvisionKeys.lists()
+        queryKey: relationProvisionKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { appLimitKeys } from "../query-keys";
-import type { AppLimitSelect, AppLimitWithRelations, AppLimitFilter, AppLimitOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppLimitSelect, AppLimitWithRelations, AppLimitFilter, AppLimitOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { appLimitKeys } from '../query-keys';
+import type {
+  AppLimitSelect,
+  AppLimitWithRelations,
+  AppLimitFilter,
+  AppLimitOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  AppLimitSelect,
+  AppLimitWithRelations,
+  AppLimitFilter,
+  AppLimitOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const appLimitsQueryKey = appLimitKeys.list;
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAppLimitsQuery({
@@ -30,33 +45,47 @@ export const appLimitsQueryKey = appLimitKeys.list;
  * });
  * ```
  */
-export function useAppLimitsQuery<S extends AppLimitSelect, TData = {
-  appLimits: ConnectionResult<InferSelectResult<AppLimitWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitFilter, AppLimitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitSelect>;
-} & Omit<UseQueryOptions<{
-  appLimits: ConnectionResult<InferSelectResult<AppLimitWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAppLimitsQuery(params: {
-  selection: ListSelectionConfig<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useAppLimitsQuery<
+  S extends AppLimitSelect,
+  TData = {
+    appLimits: ConnectionResult<InferSelectResult<AppLimitWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppLimitFilter, AppLimitOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppLimitSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        appLimits: ConnectionResult<InferSelectResult<AppLimitWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAppLimitsQuery(
+  params: {
+    selection: ListSelectionConfig<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appLimitKeys.list(args),
     queryFn: () => getClient().appLimit.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAppLimitsQuery({
@@ -70,35 +99,47 @@ export function useAppLimitsQuery(params: {
 export async function fetchAppLimitsQuery<S extends AppLimitSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitFilter, AppLimitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitSelect>;
+  } & Omit<ListSelectionConfig<S, AppLimitFilter, AppLimitOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, AppLimitSelect>;
 }): Promise<{
   appLimits: ConnectionResult<InferSelectResult<AppLimitWithRelations, S>>;
 }>;
 export async function fetchAppLimitsQuery(params: {
   selection: ListSelectionConfig<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>;
 }) {
-  const args = buildListSelectionArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>(params.selection);
+  const args = buildListSelectionArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>(
+    params.selection
+  );
   return getClient().appLimit.findMany(args).unwrap();
 }
 /**
  * Tracks per-actor usage counts against configurable maximum limits
- * 
+ *
  * @example
  * ```ts
  * await prefetchAppLimitsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppLimitsQuery<S extends AppLimitSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitFilter, AppLimitOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitSelect>;
-}): Promise<void>;
-export async function prefetchAppLimitsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>(params.selection);
+export async function prefetchAppLimitsQuery<S extends AppLimitSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, AppLimitFilter, AppLimitOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, AppLimitSelect>;
+  }
+): Promise<void>;
+export async function prefetchAppLimitsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: appLimitKeys.list(args),
-    queryFn: () => getClient().appLimit.findMany(args).unwrap()
+    queryFn: () => getClient().appLimit.findMany(args).unwrap(),
   });
 }

@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { dbUsageModuleKeys } from "../query-keys";
-import { dbUsageModuleMutationKeys } from "../mutation-keys";
-import type { DbUsageModuleSelect, DbUsageModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DbUsageModuleSelect, DbUsageModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { dbUsageModuleKeys } from '../query-keys';
+import { dbUsageModuleMutationKeys } from '../mutation-keys';
+import type { DbUsageModuleSelect, DbUsageModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DbUsageModuleSelect, DbUsageModuleWithRelations } from '../../orm/input-types';
 /**
  * Mutation hook for deleting a DbUsageModule with typed selection
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteDbUsageModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteDbUsageModuleMutation<S extends DbUsageModuleSelect>(params: {
-  selection: ({
-    fields: S & DbUsageModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deleteDbUsageModule: {
-    dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteDbUsageModule: {
-    dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteDbUsageModuleMutation(params: {
-  selection: SelectionConfig<DbUsageModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteDbUsageModuleMutation<S extends DbUsageModuleSelect>(
+  params: {
+    selection: {
+      fields: S & DbUsageModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteDbUsageModule: {
+          dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteDbUsageModule: {
+      dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteDbUsageModuleMutation(
+  params: {
+    selection: SelectionConfig<DbUsageModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<DbUsageModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: dbUsageModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().dbUsageModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .dbUsageModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: dbUsageModuleKeys.detail(variables.id)
+        queryKey: dbUsageModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.lists()
+        queryKey: dbUsageModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

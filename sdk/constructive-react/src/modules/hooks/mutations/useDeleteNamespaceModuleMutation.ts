@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { namespaceModuleKeys } from "../query-keys";
-import { namespaceModuleMutationKeys } from "../mutation-keys";
-import type { NamespaceModuleSelect, NamespaceModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { NamespaceModuleSelect, NamespaceModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { namespaceModuleKeys } from '../query-keys';
+import { namespaceModuleMutationKeys } from '../mutation-keys';
+import type { NamespaceModuleSelect, NamespaceModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { NamespaceModuleSelect, NamespaceModuleWithRelations } from '../../orm/input-types';
 /**
  * Mutation hook for deleting a NamespaceModule with typed selection
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteNamespaceModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteNamespaceModuleMutation<S extends NamespaceModuleSelect>(params: {
-  selection: ({
-    fields: S & NamespaceModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deleteNamespaceModule: {
-    namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteNamespaceModule: {
-    namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteNamespaceModuleMutation(params: {
-  selection: SelectionConfig<NamespaceModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteNamespaceModuleMutation<S extends NamespaceModuleSelect>(
+  params: {
+    selection: {
+      fields: S & NamespaceModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, NamespaceModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteNamespaceModule: {
+          namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteNamespaceModule: {
+      namespaceModule: InferSelectResult<NamespaceModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteNamespaceModuleMutation(
+  params: {
+    selection: SelectionConfig<NamespaceModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<NamespaceModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: namespaceModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().namespaceModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .namespaceModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: namespaceModuleKeys.detail(variables.id)
+        queryKey: namespaceModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.lists()
+        queryKey: namespaceModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

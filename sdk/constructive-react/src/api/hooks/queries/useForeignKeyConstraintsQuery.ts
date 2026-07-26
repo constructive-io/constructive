@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { foreignKeyConstraintKeys } from "../query-keys";
-import type { ForeignKeyConstraintSelect, ForeignKeyConstraintWithRelations, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ForeignKeyConstraintSelect, ForeignKeyConstraintWithRelations, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { foreignKeyConstraintKeys } from '../query-keys';
+import type {
+  ForeignKeyConstraintSelect,
+  ForeignKeyConstraintWithRelations,
+  ForeignKeyConstraintFilter,
+  ForeignKeyConstraintOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ForeignKeyConstraintSelect,
+  ForeignKeyConstraintWithRelations,
+  ForeignKeyConstraintFilter,
+  ForeignKeyConstraintOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const foreignKeyConstraintsQueryKey = foreignKeyConstraintKeys.list;
 /**
  * Query hook for fetching ForeignKeyConstraint list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useForeignKeyConstraintsQuery({
@@ -30,33 +45,60 @@ export const foreignKeyConstraintsQueryKey = foreignKeyConstraintKeys.list;
  * });
  * ```
  */
-export function useForeignKeyConstraintsQuery<S extends ForeignKeyConstraintSelect, TData = {
-  foreignKeyConstraints: ConnectionResult<InferSelectResult<ForeignKeyConstraintWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ForeignKeyConstraintSelect>;
-} & Omit<UseQueryOptions<{
-  foreignKeyConstraints: ConnectionResult<InferSelectResult<ForeignKeyConstraintWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useForeignKeyConstraintsQuery(params: {
-  selection: ListSelectionConfig<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useForeignKeyConstraintsQuery<
+  S extends ForeignKeyConstraintSelect,
+  TData = {
+    foreignKeyConstraints: ConnectionResult<
+      InferSelectResult<ForeignKeyConstraintWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, ForeignKeyConstraintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        foreignKeyConstraints: ConnectionResult<
+          InferSelectResult<ForeignKeyConstraintWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useForeignKeyConstraintsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      ForeignKeyConstraintSelect,
+      ForeignKeyConstraintFilter,
+      ForeignKeyConstraintOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    ForeignKeyConstraintSelect,
+    ForeignKeyConstraintFilter,
+    ForeignKeyConstraintOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: foreignKeyConstraintKeys.list(args),
     queryFn: () => getClient().foreignKeyConstraint.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch ForeignKeyConstraint list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchForeignKeyConstraintsQuery({
@@ -67,38 +109,70 @@ export function useForeignKeyConstraintsQuery(params: {
  * });
  * ```
  */
-export async function fetchForeignKeyConstraintsQuery<S extends ForeignKeyConstraintSelect>(params: {
+export async function fetchForeignKeyConstraintsQuery<
+  S extends ForeignKeyConstraintSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ForeignKeyConstraintSelect>;
+  } & Omit<
+    ListSelectionConfig<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, ForeignKeyConstraintSelect>;
 }): Promise<{
   foreignKeyConstraints: ConnectionResult<InferSelectResult<ForeignKeyConstraintWithRelations, S>>;
 }>;
 export async function fetchForeignKeyConstraintsQuery(params: {
-  selection: ListSelectionConfig<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>;
+  selection: ListSelectionConfig<
+    ForeignKeyConstraintSelect,
+    ForeignKeyConstraintFilter,
+    ForeignKeyConstraintOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    ForeignKeyConstraintSelect,
+    ForeignKeyConstraintFilter,
+    ForeignKeyConstraintOrderBy
+  >(params.selection);
   return getClient().foreignKeyConstraint.findMany(args).unwrap();
 }
 /**
  * Prefetch ForeignKeyConstraint list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchForeignKeyConstraintsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchForeignKeyConstraintsQuery<S extends ForeignKeyConstraintSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ForeignKeyConstraintSelect>;
-}): Promise<void>;
-export async function prefetchForeignKeyConstraintsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>(params.selection);
+export async function prefetchForeignKeyConstraintsQuery<S extends ForeignKeyConstraintSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, ForeignKeyConstraintSelect>;
+  }
+): Promise<void>;
+export async function prefetchForeignKeyConstraintsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      ForeignKeyConstraintSelect,
+      ForeignKeyConstraintFilter,
+      ForeignKeyConstraintOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    ForeignKeyConstraintSelect,
+    ForeignKeyConstraintFilter,
+    ForeignKeyConstraintOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: foreignKeyConstraintKeys.list(args),
-    queryFn: () => getClient().foreignKeyConstraint.findMany(args).unwrap()
+    queryFn: () => getClient().foreignKeyConstraint.findMany(args).unwrap(),
   });
 }

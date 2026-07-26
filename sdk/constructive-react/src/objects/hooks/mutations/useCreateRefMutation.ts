@@ -4,62 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { refKeys } from "../query-keys";
-import { refMutationKeys } from "../mutation-keys";
-import type { RefSelect, RefWithRelations, CreateRefInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RefSelect, RefWithRelations, CreateRefInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { refKeys } from '../query-keys';
+import { refMutationKeys } from '../mutation-keys';
+import type { RefSelect, RefWithRelations, CreateRefInput } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { RefSelect, RefWithRelations, CreateRefInput } from '../../orm/input-types';
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateRefMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateRefMutation<S extends RefSelect>(params: {
-  selection: ({
-    fields: S & RefSelect;
-  } & HookStrictSelect<NoInfer<S>, RefSelect>);
-} & Omit<UseMutationOptions<{
-  createRef: {
-    ref: InferSelectResult<RefWithRelations, S>;
-  };
-}, Error, CreateRefInput["ref"]>, "mutationFn">): UseMutationResult<{
-  createRef: {
-    ref: InferSelectResult<RefWithRelations, S>;
-  };
-}, Error, CreateRefInput["ref"]>;
-export function useCreateRefMutation(params: {
-  selection: SelectionConfig<RefSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateRefInput["ref"]>, "mutationFn">) {
+export function useCreateRefMutation<S extends RefSelect>(
+  params: {
+    selection: {
+      fields: S & RefSelect;
+    } & HookStrictSelect<NoInfer<S>, RefSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createRef: {
+          ref: InferSelectResult<RefWithRelations, S>;
+        };
+      },
+      Error,
+      CreateRefInput['ref']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createRef: {
+      ref: InferSelectResult<RefWithRelations, S>;
+    };
+  },
+  Error,
+  CreateRefInput['ref']
+>;
+export function useCreateRefMutation(
+  params: {
+    selection: SelectionConfig<RefSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateRefInput['ref']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<RefSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: refMutationKeys.create(),
-    mutationFn: (data: CreateRefInput["ref"]) => getClient().ref.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateRefInput['ref']) =>
+      getClient()
+        .ref.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: refKeys.lists()
+        queryKey: refKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

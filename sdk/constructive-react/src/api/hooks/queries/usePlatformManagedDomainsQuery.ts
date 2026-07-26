@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformManagedDomainKeys } from "../query-keys";
-import type { PlatformManagedDomainSelect, PlatformManagedDomainWithRelations, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformManagedDomainSelect, PlatformManagedDomainWithRelations, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformManagedDomainKeys } from '../query-keys';
+import type {
+  PlatformManagedDomainSelect,
+  PlatformManagedDomainWithRelations,
+  PlatformManagedDomainFilter,
+  PlatformManagedDomainOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformManagedDomainSelect,
+  PlatformManagedDomainWithRelations,
+  PlatformManagedDomainFilter,
+  PlatformManagedDomainOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformManagedDomainsQueryKey = platformManagedDomainKeys.list;
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformManagedDomainsQuery({
@@ -30,33 +45,60 @@ export const platformManagedDomainsQueryKey = platformManagedDomainKeys.list;
  * });
  * ```
  */
-export function usePlatformManagedDomainsQuery<S extends PlatformManagedDomainSelect, TData = {
-  platformManagedDomains: ConnectionResult<InferSelectResult<PlatformManagedDomainWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
-} & Omit<UseQueryOptions<{
-  platformManagedDomains: ConnectionResult<InferSelectResult<PlatformManagedDomainWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformManagedDomainsQuery(params: {
-  selection: ListSelectionConfig<PlatformManagedDomainSelect, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformManagedDomainSelect, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformManagedDomainsQuery<
+  S extends PlatformManagedDomainSelect,
+  TData = {
+    platformManagedDomains: ConnectionResult<
+      InferSelectResult<PlatformManagedDomainWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformManagedDomains: ConnectionResult<
+          InferSelectResult<PlatformManagedDomainWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformManagedDomainsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformManagedDomainSelect,
+      PlatformManagedDomainFilter,
+      PlatformManagedDomainOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformManagedDomainSelect,
+    PlatformManagedDomainFilter,
+    PlatformManagedDomainOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformManagedDomainKeys.list(args),
     queryFn: () => getClient().platformManagedDomain.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformManagedDomainsQuery({
@@ -67,38 +109,72 @@ export function usePlatformManagedDomainsQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformManagedDomainsQuery<S extends PlatformManagedDomainSelect>(params: {
+export async function fetchPlatformManagedDomainsQuery<
+  S extends PlatformManagedDomainSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
+  } & Omit<
+    ListSelectionConfig<S, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
 }): Promise<{
-  platformManagedDomains: ConnectionResult<InferSelectResult<PlatformManagedDomainWithRelations, S>>;
+  platformManagedDomains: ConnectionResult<
+    InferSelectResult<PlatformManagedDomainWithRelations, S>
+  >;
 }>;
 export async function fetchPlatformManagedDomainsQuery(params: {
-  selection: ListSelectionConfig<PlatformManagedDomainSelect, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformManagedDomainSelect,
+    PlatformManagedDomainFilter,
+    PlatformManagedDomainOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformManagedDomainSelect, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformManagedDomainSelect,
+    PlatformManagedDomainFilter,
+    PlatformManagedDomainOrderBy
+  >(params.selection);
   return getClient().platformManagedDomain.findMany(args).unwrap();
 }
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformManagedDomainsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformManagedDomainsQuery<S extends PlatformManagedDomainSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
-}): Promise<void>;
-export async function prefetchPlatformManagedDomainsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformManagedDomainSelect, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformManagedDomainSelect, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>(params.selection);
+export async function prefetchPlatformManagedDomainsQuery<S extends PlatformManagedDomainSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformManagedDomainFilter, PlatformManagedDomainOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformManagedDomainsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformManagedDomainSelect,
+      PlatformManagedDomainFilter,
+      PlatformManagedDomainOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformManagedDomainSelect,
+    PlatformManagedDomainFilter,
+    PlatformManagedDomainOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformManagedDomainKeys.list(args),
-    queryFn: () => getClient().platformManagedDomain.findMany(args).unwrap()
+    queryFn: () => getClient().platformManagedDomain.findMany(args).unwrap(),
   });
 }

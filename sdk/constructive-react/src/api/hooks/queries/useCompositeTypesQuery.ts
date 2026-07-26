@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { compositeTypeKeys } from "../query-keys";
-import type { CompositeTypeSelect, CompositeTypeWithRelations, CompositeTypeFilter, CompositeTypeOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { CompositeTypeSelect, CompositeTypeWithRelations, CompositeTypeFilter, CompositeTypeOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { compositeTypeKeys } from '../query-keys';
+import type {
+  CompositeTypeSelect,
+  CompositeTypeWithRelations,
+  CompositeTypeFilter,
+  CompositeTypeOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  CompositeTypeSelect,
+  CompositeTypeWithRelations,
+  CompositeTypeFilter,
+  CompositeTypeOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const compositeTypesQueryKey = compositeTypeKeys.list;
 /**
  * Query hook for fetching CompositeType list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCompositeTypesQuery({
@@ -30,33 +45,49 @@ export const compositeTypesQueryKey = compositeTypeKeys.list;
  * });
  * ```
  */
-export function useCompositeTypesQuery<S extends CompositeTypeSelect, TData = {
-  compositeTypes: ConnectionResult<InferSelectResult<CompositeTypeWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CompositeTypeFilter, CompositeTypeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
-} & Omit<UseQueryOptions<{
-  compositeTypes: ConnectionResult<InferSelectResult<CompositeTypeWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCompositeTypesQuery(params: {
-  selection: ListSelectionConfig<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useCompositeTypesQuery<
+  S extends CompositeTypeSelect,
+  TData = {
+    compositeTypes: ConnectionResult<InferSelectResult<CompositeTypeWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, CompositeTypeFilter, CompositeTypeOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        compositeTypes: ConnectionResult<InferSelectResult<CompositeTypeWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCompositeTypesQuery(
+  params: {
+    selection: ListSelectionConfig<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    CompositeTypeSelect,
+    CompositeTypeFilter,
+    CompositeTypeOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: compositeTypeKeys.list(args),
     queryFn: () => getClient().compositeType.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch CompositeType list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCompositeTypesQuery({
@@ -70,35 +101,51 @@ export function useCompositeTypesQuery(params: {
 export async function fetchCompositeTypesQuery<S extends CompositeTypeSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, CompositeTypeFilter, CompositeTypeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
+  } & Omit<ListSelectionConfig<S, CompositeTypeFilter, CompositeTypeOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
 }): Promise<{
   compositeTypes: ConnectionResult<InferSelectResult<CompositeTypeWithRelations, S>>;
 }>;
 export async function fetchCompositeTypesQuery(params: {
   selection: ListSelectionConfig<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>;
 }) {
-  const args = buildListSelectionArgs<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    CompositeTypeSelect,
+    CompositeTypeFilter,
+    CompositeTypeOrderBy
+  >(params.selection);
   return getClient().compositeType.findMany(args).unwrap();
 }
 /**
  * Prefetch CompositeType list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchCompositeTypesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchCompositeTypesQuery<S extends CompositeTypeSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, CompositeTypeFilter, CompositeTypeOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
-}): Promise<void>;
-export async function prefetchCompositeTypesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>(params.selection);
+export async function prefetchCompositeTypesQuery<S extends CompositeTypeSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, CompositeTypeFilter, CompositeTypeOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, CompositeTypeSelect>;
+  }
+): Promise<void>;
+export async function prefetchCompositeTypesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<CompositeTypeSelect, CompositeTypeFilter, CompositeTypeOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    CompositeTypeSelect,
+    CompositeTypeFilter,
+    CompositeTypeOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: compositeTypeKeys.list(args),
-    queryFn: () => getClient().compositeType.findMany(args).unwrap()
+    queryFn: () => getClient().compositeType.findMany(args).unwrap(),
   });
 }

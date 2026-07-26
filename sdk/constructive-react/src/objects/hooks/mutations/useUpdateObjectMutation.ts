@@ -4,61 +4,80 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { objectKeys } from "../query-keys";
-import { objectMutationKeys } from "../mutation-keys";
-import type { ObjectSelect, ObjectWithRelations, ObjectPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ObjectSelect, ObjectWithRelations, ObjectPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { objectKeys } from '../query-keys';
+import { objectMutationKeys } from '../mutation-keys';
+import type { ObjectSelect, ObjectWithRelations, ObjectPatch } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { ObjectSelect, ObjectWithRelations, ObjectPatch } from '../../orm/input-types';
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateObjectMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', objectPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateObjectMutation<S extends ObjectSelect>(params: {
-  selection: ({
-    fields: S & ObjectSelect;
-  } & HookStrictSelect<NoInfer<S>, ObjectSelect>);
-} & Omit<UseMutationOptions<{
-  updateObject: {
-    object: InferSelectResult<ObjectWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  databaseId: string;
-  objectPatch: ObjectPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateObject: {
-    object: InferSelectResult<ObjectWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  databaseId: string;
-  objectPatch: ObjectPatch;
-}>;
-export function useUpdateObjectMutation(params: {
-  selection: SelectionConfig<ObjectSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  databaseId: string;
-  objectPatch: ObjectPatch;
-}>, "mutationFn">) {
+export function useUpdateObjectMutation<S extends ObjectSelect>(
+  params: {
+    selection: {
+      fields: S & ObjectSelect;
+    } & HookStrictSelect<NoInfer<S>, ObjectSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateObject: {
+          object: InferSelectResult<ObjectWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        databaseId: string;
+        objectPatch: ObjectPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateObject: {
+      object: InferSelectResult<ObjectWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    databaseId: string;
+    objectPatch: ObjectPatch;
+  }
+>;
+export function useUpdateObjectMutation(
+  params: {
+    selection: SelectionConfig<ObjectSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        databaseId: string;
+        objectPatch: ObjectPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<ObjectSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +85,30 @@ export function useUpdateObjectMutation(params: {
     mutationFn: ({
       id,
       databaseId,
-      objectPatch
+      objectPatch,
     }: {
       id: string;
       databaseId: string;
       objectPatch: ObjectPatch;
-    }) => getClient().object.update({
-      where: {
-        id,
-        databaseId
-      },
-      data: objectPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .object.update({
+          where: {
+            id,
+            databaseId,
+          },
+          data: objectPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: objectKeys.detail(variables.id)
+        queryKey: objectKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: objectKeys.lists()
+        queryKey: objectKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

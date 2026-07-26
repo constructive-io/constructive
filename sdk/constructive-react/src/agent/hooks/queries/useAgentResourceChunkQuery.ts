@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentResourceChunkKeys } from "../query-keys";
-import type { AgentResourceChunkSelect, AgentResourceChunkWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentResourceChunkSelect, AgentResourceChunkWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentResourceChunkKeys } from '../query-keys';
+import type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AgentResourceChunkSelect,
+  AgentResourceChunkWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentResourceChunkQueryKey = agentResourceChunkKeys.detail;
 /**
  * Query hook for fetching a single AgentResourceChunk
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentResourceChunkQuery({
@@ -26,38 +32,52 @@ export const agentResourceChunkQueryKey = agentResourceChunkKeys.detail;
  * });
  * ```
  */
-export function useAgentResourceChunkQuery<S extends AgentResourceChunkSelect, TData = {
-  agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
-} & Omit<UseQueryOptions<{
-  agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentResourceChunkQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentResourceChunkSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentResourceChunkQuery<
+  S extends AgentResourceChunkSelect,
+  TData = {
+    agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agentResourceChunk: InferSelectResult<AgentResourceChunkWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentResourceChunkQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentResourceChunkSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentResourceChunkSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentResourceChunkKeys.detail(params.id),
-    queryFn: () => getClient().agentResourceChunk.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agentResourceChunk.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single AgentResourceChunk without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentResourceChunkQuery({
@@ -79,35 +99,46 @@ export async function fetchAgentResourceChunkQuery(params: {
   selection: SelectionConfig<AgentResourceChunkSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentResourceChunkSelect>(params.selection);
-  return getClient().agentResourceChunk.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agentResourceChunk.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single AgentResourceChunk for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentResourceChunkQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentResourceChunkQuery<S extends AgentResourceChunkSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
-}): Promise<void>;
-export async function prefetchAgentResourceChunkQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentResourceChunkSelect>;
-}): Promise<void> {
+export async function prefetchAgentResourceChunkQuery<S extends AgentResourceChunkSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentResourceChunkSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentResourceChunkQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentResourceChunkSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentResourceChunkSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentResourceChunkKeys.detail(params.id),
-    queryFn: () => getClient().agentResourceChunk.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agentResourceChunk.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

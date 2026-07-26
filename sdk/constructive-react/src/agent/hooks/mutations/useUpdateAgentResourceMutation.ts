@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentResourceKeys } from "../query-keys";
-import { agentResourceMutationKeys } from "../mutation-keys";
-import type { AgentResourceSelect, AgentResourceWithRelations, AgentResourcePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentResourceSelect, AgentResourceWithRelations, AgentResourcePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentResourceKeys } from '../query-keys';
+import { agentResourceMutationKeys } from '../mutation-keys';
+import type {
+  AgentResourceSelect,
+  AgentResourceWithRelations,
+  AgentResourcePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AgentResourceSelect,
+  AgentResourceWithRelations,
+  AgentResourcePatch,
+} from '../../orm/input-types';
 /**
  * Unified skills and knowledge resources for agent retrieval
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAgentResourceMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', agentResourcePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAgentResourceMutation<S extends AgentResourceSelect>(params: {
-  selection: ({
-    fields: S & AgentResourceSelect;
-  } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>);
-} & Omit<UseMutationOptions<{
-  updateAgentResource: {
-    agentResource: InferSelectResult<AgentResourceWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  agentResourcePatch: AgentResourcePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateAgentResource: {
-    agentResource: InferSelectResult<AgentResourceWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  agentResourcePatch: AgentResourcePatch;
-}>;
-export function useUpdateAgentResourceMutation(params: {
-  selection: SelectionConfig<AgentResourceSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  agentResourcePatch: AgentResourcePatch;
-}>, "mutationFn">) {
+export function useUpdateAgentResourceMutation<S extends AgentResourceSelect>(
+  params: {
+    selection: {
+      fields: S & AgentResourceSelect;
+    } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateAgentResource: {
+          agentResource: InferSelectResult<AgentResourceWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        agentResourcePatch: AgentResourcePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateAgentResource: {
+      agentResource: InferSelectResult<AgentResourceWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    agentResourcePatch: AgentResourcePatch;
+  }
+>;
+export function useUpdateAgentResourceMutation(
+  params: {
+    selection: SelectionConfig<AgentResourceSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        agentResourcePatch: AgentResourcePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AgentResourceSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: agentResourceMutationKeys.all,
     mutationFn: ({
       id,
-      agentResourcePatch
+      agentResourcePatch,
     }: {
       id: string;
       agentResourcePatch: AgentResourcePatch;
-    }) => getClient().agentResource.update({
-      where: {
-        id
-      },
-      data: agentResourcePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .agentResource.update({
+          where: {
+            id,
+          },
+          data: agentResourcePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: agentResourceKeys.detail(variables.id)
+        queryKey: agentResourceKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: agentResourceKeys.lists()
+        queryKey: agentResourceKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

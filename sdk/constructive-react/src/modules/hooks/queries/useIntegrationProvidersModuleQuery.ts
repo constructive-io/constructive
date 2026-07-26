@@ -8,15 +8,21 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { integrationProvidersModuleKeys } from "../query-keys";
-import type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { integrationProvidersModuleKeys } from '../query-keys';
+import type {
+  IntegrationProvidersModuleSelect,
+  IntegrationProvidersModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  IntegrationProvidersModuleSelect,
+  IntegrationProvidersModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const integrationProvidersModuleQueryKey = integrationProvidersModuleKeys.detail;
 /**
@@ -34,33 +40,53 @@ export const integrationProvidersModuleQueryKey = integrationProvidersModuleKeys
  * });
  * ```
  */
-export function useIntegrationProvidersModuleQuery<S extends IntegrationProvidersModuleSelect, TData = {
-  integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
-} & Omit<UseQueryOptions<{
-  integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useIntegrationProvidersModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<IntegrationProvidersModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useIntegrationProvidersModuleQuery<
+  S extends IntegrationProvidersModuleSelect,
+  TData = {
+    integrationProvidersModule: InferSelectResult<
+      IntegrationProvidersModuleWithRelations,
+      S
+    > | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        integrationProvidersModule: InferSelectResult<
+          IntegrationProvidersModuleWithRelations,
+          S
+        > | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useIntegrationProvidersModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<IntegrationProvidersModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<IntegrationProvidersModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: integrationProvidersModuleKeys.detail(params.id),
-    queryFn: () => getClient().integrationProvidersModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .integrationProvidersModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
@@ -78,7 +104,9 @@ export function useIntegrationProvidersModuleQuery(params: {
  * });
  * ```
  */
-export async function fetchIntegrationProvidersModuleQuery<S extends IntegrationProvidersModuleSelect>(params: {
+export async function fetchIntegrationProvidersModuleQuery<
+  S extends IntegrationProvidersModuleSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -91,10 +119,12 @@ export async function fetchIntegrationProvidersModuleQuery(params: {
   selection: SelectionConfig<IntegrationProvidersModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<IntegrationProvidersModuleSelect>(params.selection);
-  return getClient().integrationProvidersModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .integrationProvidersModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Config row for the integration_providers_module, which provisions a per-database
@@ -108,22 +138,33 @@ export async function fetchIntegrationProvidersModuleQuery(params: {
  * await prefetchIntegrationProvidersModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchIntegrationProvidersModuleQuery<S extends IntegrationProvidersModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
-}): Promise<void>;
-export async function prefetchIntegrationProvidersModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<IntegrationProvidersModuleSelect>;
-}): Promise<void> {
+export async function prefetchIntegrationProvidersModuleQuery<
+  S extends IntegrationProvidersModuleSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchIntegrationProvidersModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<IntegrationProvidersModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<IntegrationProvidersModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: integrationProvidersModuleKeys.detail(params.id),
-    queryFn: () => getClient().integrationProvidersModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .integrationProvidersModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

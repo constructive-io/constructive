@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { agentKeys } from "../query-keys";
-import type { AgentSelect, AgentWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AgentSelect, AgentWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { agentKeys } from '../query-keys';
+import type { AgentSelect, AgentWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { AgentSelect, AgentWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const agentQueryKey = agentKeys.detail;
 /**
  * Agent instance registry (human-managed or ephemeral sub-agents)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentQuery({
@@ -26,38 +26,52 @@ export const agentQueryKey = agentKeys.detail;
  * });
  * ```
  */
-export function useAgentQuery<S extends AgentSelect, TData = {
-  agent: InferSelectResult<AgentWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentSelect>;
-} & Omit<UseQueryOptions<{
-  agent: InferSelectResult<AgentWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useAgentQuery(params: {
-  id: string;
-  selection: SelectionConfig<AgentSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useAgentQuery<
+  S extends AgentSelect,
+  TData = {
+    agent: InferSelectResult<AgentWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        agent: InferSelectResult<AgentWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useAgentQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<AgentSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentKeys.detail(params.id),
-    queryFn: () => getClient().agent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .agent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Agent instance registry (human-managed or ephemeral sub-agents)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchAgentQuery({
@@ -79,35 +93,46 @@ export async function fetchAgentQuery(params: {
   selection: SelectionConfig<AgentSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentSelect>(params.selection);
-  return getClient().agent.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .agent.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Agent instance registry (human-managed or ephemeral sub-agents)
- * 
+ *
  * @example
  * ```ts
  * await prefetchAgentQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentQuery<S extends AgentSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, AgentSelect>;
-}): Promise<void>;
-export async function prefetchAgentQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<AgentSelect>;
-}): Promise<void> {
+export async function prefetchAgentQuery<S extends AgentSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, AgentSelect>;
+  }
+): Promise<void>;
+export async function prefetchAgentQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<AgentSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<AgentSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentKeys.detail(params.id),
-    queryFn: () => getClient().agent.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .agent.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

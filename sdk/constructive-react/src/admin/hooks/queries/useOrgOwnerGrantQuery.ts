@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgOwnerGrantKeys } from "../query-keys";
-import type { OrgOwnerGrantSelect, OrgOwnerGrantWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgOwnerGrantSelect, OrgOwnerGrantWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgOwnerGrantKeys } from '../query-keys';
+import type { OrgOwnerGrantSelect, OrgOwnerGrantWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgOwnerGrantSelect, OrgOwnerGrantWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgOwnerGrantQueryKey = orgOwnerGrantKeys.detail;
 /**
  * Records of ownership transfers and grants between members
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgOwnerGrantQuery({
@@ -26,38 +26,52 @@ export const orgOwnerGrantQueryKey = orgOwnerGrantKeys.detail;
  * });
  * ```
  */
-export function useOrgOwnerGrantQuery<S extends OrgOwnerGrantSelect, TData = {
-  orgOwnerGrant: InferSelectResult<OrgOwnerGrantWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgOwnerGrantSelect>;
-} & Omit<UseQueryOptions<{
-  orgOwnerGrant: InferSelectResult<OrgOwnerGrantWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgOwnerGrantQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgOwnerGrantSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgOwnerGrantQuery<
+  S extends OrgOwnerGrantSelect,
+  TData = {
+    orgOwnerGrant: InferSelectResult<OrgOwnerGrantWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgOwnerGrantSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgOwnerGrant: InferSelectResult<OrgOwnerGrantWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgOwnerGrantQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgOwnerGrantSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgOwnerGrantSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgOwnerGrantKeys.detail(params.id),
-    queryFn: () => getClient().orgOwnerGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgOwnerGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Records of ownership transfers and grants between members
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgOwnerGrantQuery({
@@ -79,35 +93,46 @@ export async function fetchOrgOwnerGrantQuery(params: {
   selection: SelectionConfig<OrgOwnerGrantSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgOwnerGrantSelect>(params.selection);
-  return getClient().orgOwnerGrant.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgOwnerGrant.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Records of ownership transfers and grants between members
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgOwnerGrantQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgOwnerGrantQuery<S extends OrgOwnerGrantSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgOwnerGrantSelect>;
-}): Promise<void>;
-export async function prefetchOrgOwnerGrantQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgOwnerGrantSelect>;
-}): Promise<void> {
+export async function prefetchOrgOwnerGrantQuery<S extends OrgOwnerGrantSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgOwnerGrantSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgOwnerGrantQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgOwnerGrantSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgOwnerGrantSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgOwnerGrantKeys.detail(params.id),
-    queryFn: () => getClient().orgOwnerGrant.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgOwnerGrant.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

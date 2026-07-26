@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { eventsModuleKeys } from "../query-keys";
-import type { EventsModuleSelect, EventsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { EventsModuleSelect, EventsModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { eventsModuleKeys } from '../query-keys';
+import type { EventsModuleSelect, EventsModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { EventsModuleSelect, EventsModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const eventsModuleQueryKey = eventsModuleKeys.detail;
 /**
  * Query hook for fetching a single EventsModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useEventsModuleQuery({
@@ -26,38 +26,52 @@ export const eventsModuleQueryKey = eventsModuleKeys.detail;
  * });
  * ```
  */
-export function useEventsModuleQuery<S extends EventsModuleSelect, TData = {
-  eventsModule: InferSelectResult<EventsModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
-} & Omit<UseQueryOptions<{
-  eventsModule: InferSelectResult<EventsModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useEventsModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<EventsModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useEventsModuleQuery<
+  S extends EventsModuleSelect,
+  TData = {
+    eventsModule: InferSelectResult<EventsModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        eventsModule: InferSelectResult<EventsModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useEventsModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<EventsModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<EventsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: eventsModuleKeys.detail(params.id),
-    queryFn: () => getClient().eventsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .eventsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single EventsModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchEventsModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchEventsModuleQuery(params: {
   selection: SelectionConfig<EventsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<EventsModuleSelect>(params.selection);
-  return getClient().eventsModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .eventsModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single EventsModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchEventsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchEventsModuleQuery<S extends EventsModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
-}): Promise<void>;
-export async function prefetchEventsModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<EventsModuleSelect>;
-}): Promise<void> {
+export async function prefetchEventsModuleQuery<S extends EventsModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, EventsModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchEventsModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<EventsModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<EventsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: eventsModuleKeys.detail(params.id),
-    queryFn: () => getClient().eventsModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .eventsModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

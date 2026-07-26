@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { billingProviderModuleKeys } from "../query-keys";
-import { billingProviderModuleMutationKeys } from "../mutation-keys";
-import type { BillingProviderModuleSelect, BillingProviderModuleWithRelations, BillingProviderModulePatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { BillingProviderModuleSelect, BillingProviderModuleWithRelations, BillingProviderModulePatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { billingProviderModuleKeys } from '../query-keys';
+import { billingProviderModuleMutationKeys } from '../mutation-keys';
+import type {
+  BillingProviderModuleSelect,
+  BillingProviderModuleWithRelations,
+  BillingProviderModulePatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  BillingProviderModuleSelect,
+  BillingProviderModuleWithRelations,
+  BillingProviderModulePatch,
+} from '../../orm/input-types';
 /**
  * Mutation hook for updating a BillingProviderModule
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateBillingProviderModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', billingProviderModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateBillingProviderModuleMutation<S extends BillingProviderModuleSelect>(params: {
-  selection: ({
-    fields: S & BillingProviderModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>);
-} & Omit<UseMutationOptions<{
-  updateBillingProviderModule: {
-    billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  billingProviderModulePatch: BillingProviderModulePatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateBillingProviderModule: {
-    billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  billingProviderModulePatch: BillingProviderModulePatch;
-}>;
-export function useUpdateBillingProviderModuleMutation(params: {
-  selection: SelectionConfig<BillingProviderModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  billingProviderModulePatch: BillingProviderModulePatch;
-}>, "mutationFn">) {
+export function useUpdateBillingProviderModuleMutation<S extends BillingProviderModuleSelect>(
+  params: {
+    selection: {
+      fields: S & BillingProviderModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateBillingProviderModule: {
+          billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        billingProviderModulePatch: BillingProviderModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateBillingProviderModule: {
+      billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    billingProviderModulePatch: BillingProviderModulePatch;
+  }
+>;
+export function useUpdateBillingProviderModuleMutation(
+  params: {
+    selection: SelectionConfig<BillingProviderModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        billingProviderModulePatch: BillingProviderModulePatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<BillingProviderModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: billingProviderModuleMutationKeys.all,
     mutationFn: ({
       id,
-      billingProviderModulePatch
+      billingProviderModulePatch,
     }: {
       id: string;
       billingProviderModulePatch: BillingProviderModulePatch;
-    }) => getClient().billingProviderModule.update({
-      where: {
-        id
-      },
-      data: billingProviderModulePatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .billingProviderModule.update({
+          where: {
+            id,
+          },
+          data: billingProviderModulePatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.detail(variables.id)
+        queryKey: billingProviderModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.lists()
+        queryKey: billingProviderModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

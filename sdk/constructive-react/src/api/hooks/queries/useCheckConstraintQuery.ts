@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { checkConstraintKeys } from "../query-keys";
-import type { CheckConstraintSelect, CheckConstraintWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { CheckConstraintSelect, CheckConstraintWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { checkConstraintKeys } from '../query-keys';
+import type { CheckConstraintSelect, CheckConstraintWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { CheckConstraintSelect, CheckConstraintWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const checkConstraintQueryKey = checkConstraintKeys.detail;
 /**
  * Query hook for fetching a single CheckConstraint
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useCheckConstraintQuery({
@@ -26,38 +26,52 @@ export const checkConstraintQueryKey = checkConstraintKeys.detail;
  * });
  * ```
  */
-export function useCheckConstraintQuery<S extends CheckConstraintSelect, TData = {
-  checkConstraint: InferSelectResult<CheckConstraintWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
-} & Omit<UseQueryOptions<{
-  checkConstraint: InferSelectResult<CheckConstraintWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCheckConstraintQuery(params: {
-  id: string;
-  selection: SelectionConfig<CheckConstraintSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useCheckConstraintQuery<
+  S extends CheckConstraintSelect,
+  TData = {
+    checkConstraint: InferSelectResult<CheckConstraintWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        checkConstraint: InferSelectResult<CheckConstraintWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useCheckConstraintQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<CheckConstraintSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<CheckConstraintSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: checkConstraintKeys.detail(params.id),
-    queryFn: () => getClient().checkConstraint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .checkConstraint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single CheckConstraint without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchCheckConstraintQuery({
@@ -79,35 +93,46 @@ export async function fetchCheckConstraintQuery(params: {
   selection: SelectionConfig<CheckConstraintSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<CheckConstraintSelect>(params.selection);
-  return getClient().checkConstraint.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .checkConstraint.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single CheckConstraint for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchCheckConstraintQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchCheckConstraintQuery<S extends CheckConstraintSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
-}): Promise<void>;
-export async function prefetchCheckConstraintQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<CheckConstraintSelect>;
-}): Promise<void> {
+export async function prefetchCheckConstraintQuery<S extends CheckConstraintSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
+  }
+): Promise<void>;
+export async function prefetchCheckConstraintQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<CheckConstraintSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<CheckConstraintSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: checkConstraintKeys.detail(params.id),
-    queryFn: () => getClient().checkConstraint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .checkConstraint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

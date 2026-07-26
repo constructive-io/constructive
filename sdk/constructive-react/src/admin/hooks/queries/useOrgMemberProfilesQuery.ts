@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { orgMemberProfileKeys } from "../query-keys";
-import type { OrgMemberProfileSelect, OrgMemberProfileWithRelations, OrgMemberProfileFilter, OrgMemberProfileOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgMemberProfileSelect, OrgMemberProfileWithRelations, OrgMemberProfileFilter, OrgMemberProfileOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { orgMemberProfileKeys } from '../query-keys';
+import type {
+  OrgMemberProfileSelect,
+  OrgMemberProfileWithRelations,
+  OrgMemberProfileFilter,
+  OrgMemberProfileOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  OrgMemberProfileSelect,
+  OrgMemberProfileWithRelations,
+  OrgMemberProfileFilter,
+  OrgMemberProfileOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgMemberProfilesQueryKey = orgMemberProfileKeys.list;
 /**
  * Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgMemberProfilesQuery({
@@ -30,33 +45,53 @@ export const orgMemberProfilesQueryKey = orgMemberProfileKeys.list;
  * });
  * ```
  */
-export function useOrgMemberProfilesQuery<S extends OrgMemberProfileSelect, TData = {
-  orgMemberProfiles: ConnectionResult<InferSelectResult<OrgMemberProfileWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgMemberProfileFilter, OrgMemberProfileOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
-} & Omit<UseQueryOptions<{
-  orgMemberProfiles: ConnectionResult<InferSelectResult<OrgMemberProfileWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgMemberProfilesQuery(params: {
-  selection: ListSelectionConfig<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useOrgMemberProfilesQuery<
+  S extends OrgMemberProfileSelect,
+  TData = {
+    orgMemberProfiles: ConnectionResult<InferSelectResult<OrgMemberProfileWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgMemberProfileFilter, OrgMemberProfileOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgMemberProfiles: ConnectionResult<InferSelectResult<OrgMemberProfileWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgMemberProfilesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      OrgMemberProfileSelect,
+      OrgMemberProfileFilter,
+      OrgMemberProfileOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    OrgMemberProfileSelect,
+    OrgMemberProfileFilter,
+    OrgMemberProfileOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgMemberProfileKeys.list(args),
     queryFn: () => getClient().orgMemberProfile.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgMemberProfilesQuery({
@@ -70,35 +105,59 @@ export function useOrgMemberProfilesQuery(params: {
 export async function fetchOrgMemberProfilesQuery<S extends OrgMemberProfileSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgMemberProfileFilter, OrgMemberProfileOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
+  } & Omit<ListSelectionConfig<S, OrgMemberProfileFilter, OrgMemberProfileOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
 }): Promise<{
   orgMemberProfiles: ConnectionResult<InferSelectResult<OrgMemberProfileWithRelations, S>>;
 }>;
 export async function fetchOrgMemberProfilesQuery(params: {
-  selection: ListSelectionConfig<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy>;
+  selection: ListSelectionConfig<
+    OrgMemberProfileSelect,
+    OrgMemberProfileFilter,
+    OrgMemberProfileOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    OrgMemberProfileSelect,
+    OrgMemberProfileFilter,
+    OrgMemberProfileOrderBy
+  >(params.selection);
   return getClient().orgMemberProfile.findMany(args).unwrap();
 }
 /**
  * Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgMemberProfilesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgMemberProfilesQuery<S extends OrgMemberProfileSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgMemberProfileFilter, OrgMemberProfileOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
-}): Promise<void>;
-export async function prefetchOrgMemberProfilesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy>(params.selection);
+export async function prefetchOrgMemberProfilesQuery<S extends OrgMemberProfileSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgMemberProfileFilter, OrgMemberProfileOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgMemberProfileSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgMemberProfilesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      OrgMemberProfileSelect,
+      OrgMemberProfileFilter,
+      OrgMemberProfileOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    OrgMemberProfileSelect,
+    OrgMemberProfileFilter,
+    OrgMemberProfileOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgMemberProfileKeys.list(args),
-    queryFn: () => getClient().orgMemberProfile.findMany(args).unwrap()
+    queryFn: () => getClient().orgMemberProfile.findMany(args).unwrap(),
   });
 }

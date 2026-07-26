@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { indexKeys } from "../query-keys";
-import type { IndexSelect, IndexWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { IndexSelect, IndexWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { indexKeys } from '../query-keys';
+import type { IndexSelect, IndexWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { IndexSelect, IndexWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const indexQueryKey = indexKeys.detail;
 /**
  * Query hook for fetching a single Index
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useIndexQuery({
@@ -26,38 +26,52 @@ export const indexQueryKey = indexKeys.detail;
  * });
  * ```
  */
-export function useIndexQuery<S extends IndexSelect, TData = {
-  index: InferSelectResult<IndexWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IndexSelect>;
-} & Omit<UseQueryOptions<{
-  index: InferSelectResult<IndexWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useIndexQuery(params: {
-  id: string;
-  selection: SelectionConfig<IndexSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useIndexQuery<
+  S extends IndexSelect,
+  TData = {
+    index: InferSelectResult<IndexWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IndexSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        index: InferSelectResult<IndexWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useIndexQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<IndexSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<IndexSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: indexKeys.detail(params.id),
-    queryFn: () => getClient().index.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .index.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single Index without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchIndexQuery({
@@ -79,35 +93,46 @@ export async function fetchIndexQuery(params: {
   selection: SelectionConfig<IndexSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<IndexSelect>(params.selection);
-  return getClient().index.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .index.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single Index for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchIndexQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchIndexQuery<S extends IndexSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IndexSelect>;
-}): Promise<void>;
-export async function prefetchIndexQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<IndexSelect>;
-}): Promise<void> {
+export async function prefetchIndexQuery<S extends IndexSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IndexSelect>;
+  }
+): Promise<void>;
+export async function prefetchIndexQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<IndexSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<IndexSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: indexKeys.detail(params.id),
-    queryFn: () => getClient().index.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .index.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

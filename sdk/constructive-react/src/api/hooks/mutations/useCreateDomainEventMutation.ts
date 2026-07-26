@@ -4,62 +4,85 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { domainEventKeys } from "../query-keys";
-import { domainEventMutationKeys } from "../mutation-keys";
-import type { DomainEventSelect, DomainEventWithRelations, CreateDomainEventInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DomainEventSelect, DomainEventWithRelations, CreateDomainEventInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { domainEventKeys } from '../query-keys';
+import { domainEventMutationKeys } from '../mutation-keys';
+import type {
+  DomainEventSelect,
+  DomainEventWithRelations,
+  CreateDomainEventInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  DomainEventSelect,
+  DomainEventWithRelations,
+  CreateDomainEventInput,
+} from '../../orm/input-types';
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateDomainEventMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateDomainEventMutation<S extends DomainEventSelect>(params: {
-  selection: ({
-    fields: S & DomainEventSelect;
-  } & HookStrictSelect<NoInfer<S>, DomainEventSelect>);
-} & Omit<UseMutationOptions<{
-  createDomainEvent: {
-    domainEvent: InferSelectResult<DomainEventWithRelations, S>;
-  };
-}, Error, CreateDomainEventInput["domainEvent"]>, "mutationFn">): UseMutationResult<{
-  createDomainEvent: {
-    domainEvent: InferSelectResult<DomainEventWithRelations, S>;
-  };
-}, Error, CreateDomainEventInput["domainEvent"]>;
-export function useCreateDomainEventMutation(params: {
-  selection: SelectionConfig<DomainEventSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateDomainEventInput["domainEvent"]>, "mutationFn">) {
+export function useCreateDomainEventMutation<S extends DomainEventSelect>(
+  params: {
+    selection: {
+      fields: S & DomainEventSelect;
+    } & HookStrictSelect<NoInfer<S>, DomainEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createDomainEvent: {
+          domainEvent: InferSelectResult<DomainEventWithRelations, S>;
+        };
+      },
+      Error,
+      CreateDomainEventInput['domainEvent']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createDomainEvent: {
+      domainEvent: InferSelectResult<DomainEventWithRelations, S>;
+    };
+  },
+  Error,
+  CreateDomainEventInput['domainEvent']
+>;
+export function useCreateDomainEventMutation(
+  params: {
+    selection: SelectionConfig<DomainEventSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateDomainEventInput['domainEvent']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<DomainEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: domainEventMutationKeys.create(),
-    mutationFn: (data: CreateDomainEventInput["domainEvent"]) => getClient().domainEvent.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateDomainEventInput['domainEvent']) =>
+      getClient()
+        .domainEvent.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: domainEventKeys.lists()
+        queryKey: domainEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

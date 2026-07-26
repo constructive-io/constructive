@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { infraStoreKeys } from "../query-keys";
-import type { InfraStoreSelect, InfraStoreWithRelations, InfraStoreFilter, InfraStoreOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { InfraStoreSelect, InfraStoreWithRelations, InfraStoreFilter, InfraStoreOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { infraStoreKeys } from '../query-keys';
+import type {
+  InfraStoreSelect,
+  InfraStoreWithRelations,
+  InfraStoreFilter,
+  InfraStoreOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  InfraStoreSelect,
+  InfraStoreWithRelations,
+  InfraStoreFilter,
+  InfraStoreOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const infraStoresQueryKey = infraStoreKeys.list;
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useInfraStoresQuery({
@@ -30,33 +45,47 @@ export const infraStoresQueryKey = infraStoreKeys.list;
  * });
  * ```
  */
-export function useInfraStoresQuery<S extends InfraStoreSelect, TData = {
-  infraStores: ConnectionResult<InferSelectResult<InfraStoreWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, InfraStoreFilter, InfraStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraStoreSelect>;
-} & Omit<UseQueryOptions<{
-  infraStores: ConnectionResult<InferSelectResult<InfraStoreWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useInfraStoresQuery(params: {
-  selection: ListSelectionConfig<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useInfraStoresQuery<
+  S extends InfraStoreSelect,
+  TData = {
+    infraStores: ConnectionResult<InferSelectResult<InfraStoreWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, InfraStoreFilter, InfraStoreOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, InfraStoreSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        infraStores: ConnectionResult<InferSelectResult<InfraStoreWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useInfraStoresQuery(
+  params: {
+    selection: ListSelectionConfig<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: infraStoreKeys.list(args),
     queryFn: () => getClient().infraStore.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchInfraStoresQuery({
@@ -70,35 +99,47 @@ export function useInfraStoresQuery(params: {
 export async function fetchInfraStoresQuery<S extends InfraStoreSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, InfraStoreFilter, InfraStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraStoreSelect>;
+  } & Omit<ListSelectionConfig<S, InfraStoreFilter, InfraStoreOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, InfraStoreSelect>;
 }): Promise<{
   infraStores: ConnectionResult<InferSelectResult<InfraStoreWithRelations, S>>;
 }>;
 export async function fetchInfraStoresQuery(params: {
   selection: ListSelectionConfig<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>;
 }) {
-  const args = buildListSelectionArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>(params.selection);
+  const args = buildListSelectionArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>(
+    params.selection
+  );
   return getClient().infraStore.findMany(args).unwrap();
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * await prefetchInfraStoresQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchInfraStoresQuery<S extends InfraStoreSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, InfraStoreFilter, InfraStoreOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraStoreSelect>;
-}): Promise<void>;
-export async function prefetchInfraStoresQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>(params.selection);
+export async function prefetchInfraStoresQuery<S extends InfraStoreSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, InfraStoreFilter, InfraStoreOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, InfraStoreSelect>;
+  }
+): Promise<void>;
+export async function prefetchInfraStoresQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: infraStoreKeys.list(args),
-    queryFn: () => getClient().infraStore.findMany(args).unwrap()
+    queryFn: () => getClient().infraStore.findMany(args).unwrap(),
   });
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { pubkeySettingKeys } from "../query-keys";
-import type { PubkeySettingSelect, PubkeySettingWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PubkeySettingSelect, PubkeySettingWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { pubkeySettingKeys } from '../query-keys';
+import type { PubkeySettingSelect, PubkeySettingWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { PubkeySettingSelect, PubkeySettingWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const pubkeySettingQueryKey = pubkeySettingKeys.detail;
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePubkeySettingQuery({
@@ -26,38 +26,52 @@ export const pubkeySettingQueryKey = pubkeySettingKeys.detail;
  * });
  * ```
  */
-export function usePubkeySettingQuery<S extends PubkeySettingSelect, TData = {
-  pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
-} & Omit<UseQueryOptions<{
-  pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePubkeySettingQuery(params: {
-  id: string;
-  selection: SelectionConfig<PubkeySettingSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePubkeySettingQuery<
+  S extends PubkeySettingSelect,
+  TData = {
+    pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePubkeySettingQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PubkeySettingSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PubkeySettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: pubkeySettingKeys.detail(params.id),
-    queryFn: () => getClient().pubkeySetting.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .pubkeySetting.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPubkeySettingQuery({
@@ -79,35 +93,46 @@ export async function fetchPubkeySettingQuery(params: {
   selection: SelectionConfig<PubkeySettingSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PubkeySettingSelect>(params.selection);
-  return getClient().pubkeySetting.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .pubkeySetting.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing
- * 
+ *
  * @example
  * ```ts
  * await prefetchPubkeySettingQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPubkeySettingQuery<S extends PubkeySettingSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
-}): Promise<void>;
-export async function prefetchPubkeySettingQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PubkeySettingSelect>;
-}): Promise<void> {
+export async function prefetchPubkeySettingQuery<S extends PubkeySettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PubkeySettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchPubkeySettingQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PubkeySettingSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PubkeySettingSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: pubkeySettingKeys.detail(params.id),
-    queryFn: () => getClient().pubkeySetting.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .pubkeySetting.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

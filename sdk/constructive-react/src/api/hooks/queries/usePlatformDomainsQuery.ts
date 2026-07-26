@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformDomainKeys } from "../query-keys";
-import type { PlatformDomainSelect, PlatformDomainWithRelations, PlatformDomainFilter, PlatformDomainOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformDomainSelect, PlatformDomainWithRelations, PlatformDomainFilter, PlatformDomainOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformDomainKeys } from '../query-keys';
+import type {
+  PlatformDomainSelect,
+  PlatformDomainWithRelations,
+  PlatformDomainFilter,
+  PlatformDomainOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformDomainSelect,
+  PlatformDomainWithRelations,
+  PlatformDomainFilter,
+  PlatformDomainOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformDomainsQueryKey = platformDomainKeys.list;
 /**
  * Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformDomainsQuery({
@@ -30,33 +45,53 @@ export const platformDomainsQueryKey = platformDomainKeys.list;
  * });
  * ```
  */
-export function usePlatformDomainsQuery<S extends PlatformDomainSelect, TData = {
-  platformDomains: ConnectionResult<InferSelectResult<PlatformDomainWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformDomainFilter, PlatformDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformDomainSelect>;
-} & Omit<UseQueryOptions<{
-  platformDomains: ConnectionResult<InferSelectResult<PlatformDomainWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformDomainsQuery(params: {
-  selection: ListSelectionConfig<PlatformDomainSelect, PlatformDomainFilter, PlatformDomainOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformDomainSelect, PlatformDomainFilter, PlatformDomainOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformDomainsQuery<
+  S extends PlatformDomainSelect,
+  TData = {
+    platformDomains: ConnectionResult<InferSelectResult<PlatformDomainWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PlatformDomainFilter, PlatformDomainOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PlatformDomainSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformDomains: ConnectionResult<InferSelectResult<PlatformDomainWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformDomainsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformDomainSelect,
+      PlatformDomainFilter,
+      PlatformDomainOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformDomainSelect,
+    PlatformDomainFilter,
+    PlatformDomainOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformDomainKeys.list(args),
     queryFn: () => getClient().platformDomain.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformDomainsQuery({
@@ -70,35 +105,55 @@ export function usePlatformDomainsQuery(params: {
 export async function fetchPlatformDomainsQuery<S extends PlatformDomainSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformDomainFilter, PlatformDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformDomainSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformDomainFilter, PlatformDomainOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PlatformDomainSelect>;
 }): Promise<{
   platformDomains: ConnectionResult<InferSelectResult<PlatformDomainWithRelations, S>>;
 }>;
 export async function fetchPlatformDomainsQuery(params: {
   selection: ListSelectionConfig<PlatformDomainSelect, PlatformDomainFilter, PlatformDomainOrderBy>;
 }) {
-  const args = buildListSelectionArgs<PlatformDomainSelect, PlatformDomainFilter, PlatformDomainOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformDomainSelect,
+    PlatformDomainFilter,
+    PlatformDomainOrderBy
+  >(params.selection);
   return getClient().platformDomain.findMany(args).unwrap();
 }
 /**
  * Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformDomainsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformDomainsQuery<S extends PlatformDomainSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformDomainFilter, PlatformDomainOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformDomainSelect>;
-}): Promise<void>;
-export async function prefetchPlatformDomainsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformDomainSelect, PlatformDomainFilter, PlatformDomainOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformDomainSelect, PlatformDomainFilter, PlatformDomainOrderBy>(params.selection);
+export async function prefetchPlatformDomainsQuery<S extends PlatformDomainSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, PlatformDomainFilter, PlatformDomainOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, PlatformDomainSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformDomainsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformDomainSelect,
+      PlatformDomainFilter,
+      PlatformDomainOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformDomainSelect,
+    PlatformDomainFilter,
+    PlatformDomainOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformDomainKeys.list(args),
-    queryFn: () => getClient().platformDomain.findMany(args).unwrap()
+    queryFn: () => getClient().platformDomain.findMany(args).unwrap(),
   });
 }

@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformSiteMetadatumKeys } from "../query-keys";
-import type { PlatformSiteMetadatumSelect, PlatformSiteMetadatumWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteMetadatumSelect, PlatformSiteMetadatumWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformSiteMetadatumKeys } from '../query-keys';
+import type {
+  PlatformSiteMetadatumSelect,
+  PlatformSiteMetadatumWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformSiteMetadatumSelect,
+  PlatformSiteMetadatumWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformSiteMetadatumQueryKey = platformSiteMetadatumKeys.detail;
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformSiteMetadatumQuery({
@@ -26,38 +32,52 @@ export const platformSiteMetadatumQueryKey = platformSiteMetadatumKeys.detail;
  * });
  * ```
  */
-export function usePlatformSiteMetadatumQuery<S extends PlatformSiteMetadatumSelect, TData = {
-  platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
-} & Omit<UseQueryOptions<{
-  platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformSiteMetadatumQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformSiteMetadatumSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformSiteMetadatumQuery<
+  S extends PlatformSiteMetadatumSelect,
+  TData = {
+    platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformSiteMetadatum: InferSelectResult<PlatformSiteMetadatumWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformSiteMetadatumQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformSiteMetadatumSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformSiteMetadatumSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformSiteMetadatumKeys.detail(params.id),
-    queryFn: () => getClient().platformSiteMetadatum.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformSiteMetadatum.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformSiteMetadatumQuery({
@@ -66,7 +86,9 @@ export function usePlatformSiteMetadatumQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformSiteMetadatumQuery<S extends PlatformSiteMetadatumSelect>(params: {
+export async function fetchPlatformSiteMetadatumQuery<
+  S extends PlatformSiteMetadatumSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +101,46 @@ export async function fetchPlatformSiteMetadatumQuery(params: {
   selection: SelectionConfig<PlatformSiteMetadatumSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformSiteMetadatumSelect>(params.selection);
-  return getClient().platformSiteMetadatum.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformSiteMetadatum.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * SEO and social sharing metadata for a site surface
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformSiteMetadatumQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformSiteMetadatumQuery<S extends PlatformSiteMetadatumSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
-}): Promise<void>;
-export async function prefetchPlatformSiteMetadatumQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformSiteMetadatumSelect>;
-}): Promise<void> {
+export async function prefetchPlatformSiteMetadatumQuery<S extends PlatformSiteMetadatumSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformSiteMetadatumSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformSiteMetadatumQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformSiteMetadatumSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformSiteMetadatumSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformSiteMetadatumKeys.detail(params.id),
-    queryFn: () => getClient().platformSiteMetadatum.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformSiteMetadatum.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

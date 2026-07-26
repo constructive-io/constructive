@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { platformSiteModuleKeys } from "../query-keys";
-import type { PlatformSiteModuleSelect, PlatformSiteModuleWithRelations, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformSiteModuleSelect, PlatformSiteModuleWithRelations, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { platformSiteModuleKeys } from '../query-keys';
+import type {
+  PlatformSiteModuleSelect,
+  PlatformSiteModuleWithRelations,
+  PlatformSiteModuleFilter,
+  PlatformSiteModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  PlatformSiteModuleSelect,
+  PlatformSiteModuleWithRelations,
+  PlatformSiteModuleFilter,
+  PlatformSiteModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformSiteModulesQueryKey = platformSiteModuleKeys.list;
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformSiteModulesQuery({
@@ -30,33 +45,58 @@ export const platformSiteModulesQueryKey = platformSiteModuleKeys.list;
  * });
  * ```
  */
-export function usePlatformSiteModulesQuery<S extends PlatformSiteModuleSelect, TData = {
-  platformSiteModules: ConnectionResult<InferSelectResult<PlatformSiteModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
-} & Omit<UseQueryOptions<{
-  platformSiteModules: ConnectionResult<InferSelectResult<PlatformSiteModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformSiteModulesQuery(params: {
-  selection: ListSelectionConfig<PlatformSiteModuleSelect, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<PlatformSiteModuleSelect, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function usePlatformSiteModulesQuery<
+  S extends PlatformSiteModuleSelect,
+  TData = {
+    platformSiteModules: ConnectionResult<InferSelectResult<PlatformSiteModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformSiteModules: ConnectionResult<
+          InferSelectResult<PlatformSiteModuleWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformSiteModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      PlatformSiteModuleSelect,
+      PlatformSiteModuleFilter,
+      PlatformSiteModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    PlatformSiteModuleSelect,
+    PlatformSiteModuleFilter,
+    PlatformSiteModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformSiteModuleKeys.list(args),
     queryFn: () => getClient().platformSiteModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformSiteModulesQuery({
@@ -70,35 +110,62 @@ export function usePlatformSiteModulesQuery(params: {
 export async function fetchPlatformSiteModulesQuery<S extends PlatformSiteModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
 }): Promise<{
   platformSiteModules: ConnectionResult<InferSelectResult<PlatformSiteModuleWithRelations, S>>;
 }>;
 export async function fetchPlatformSiteModulesQuery(params: {
-  selection: ListSelectionConfig<PlatformSiteModuleSelect, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>;
+  selection: ListSelectionConfig<
+    PlatformSiteModuleSelect,
+    PlatformSiteModuleFilter,
+    PlatformSiteModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<PlatformSiteModuleSelect, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    PlatformSiteModuleSelect,
+    PlatformSiteModuleFilter,
+    PlatformSiteModuleOrderBy
+  >(params.selection);
   return getClient().platformSiteModule.findMany(args).unwrap();
 }
 /**
  * Frontend module configuration for a site surface; stores module name and JSON settings
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformSiteModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformSiteModulesQuery<S extends PlatformSiteModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
-}): Promise<void>;
-export async function prefetchPlatformSiteModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<PlatformSiteModuleSelect, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<PlatformSiteModuleSelect, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>(params.selection);
+export async function prefetchPlatformSiteModulesQuery<S extends PlatformSiteModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, PlatformSiteModuleFilter, PlatformSiteModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, PlatformSiteModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformSiteModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      PlatformSiteModuleSelect,
+      PlatformSiteModuleFilter,
+      PlatformSiteModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    PlatformSiteModuleSelect,
+    PlatformSiteModuleFilter,
+    PlatformSiteModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformSiteModuleKeys.list(args),
-    queryFn: () => getClient().platformSiteModule.findMany(args).unwrap()
+    queryFn: () => getClient().platformSiteModule.findMany(args).unwrap(),
   });
 }

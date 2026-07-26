@@ -2038,67 +2038,102 @@ export type DbPresetWithRelations = DbPreset & DbPresetRelations;
 export type FunctionApiBindingWithRelations = FunctionApiBinding & FunctionApiBindingRelations;
 export type FunctionDefinitionWithRelations = FunctionDefinition & FunctionDefinitionRelations;
 export type FunctionDeploymentWithRelations = FunctionDeployment & FunctionDeploymentRelations;
-export type FunctionDeploymentEventWithRelations = FunctionDeploymentEvent & FunctionDeploymentEventRelations;
-export type FunctionExecutionLogWithRelations = FunctionExecutionLog & FunctionExecutionLogRelations;
+export type FunctionDeploymentEventWithRelations = FunctionDeploymentEvent &
+  FunctionDeploymentEventRelations;
+export type FunctionExecutionLogWithRelations = FunctionExecutionLog &
+  FunctionExecutionLogRelations;
 export type FunctionGraphCommitWithRelations = FunctionGraphCommit & FunctionGraphCommitRelations;
 export type FunctionGraphWithRelations = FunctionGraph & FunctionGraphRelations;
-export type FunctionGraphExecutionWithRelations = FunctionGraphExecution & FunctionGraphExecutionRelations;
-export type FunctionGraphExecutionNodeStateWithRelations = FunctionGraphExecutionNodeState & FunctionGraphExecutionNodeStateRelations;
-export type FunctionGraphExecutionOutputWithRelations = FunctionGraphExecutionOutput & FunctionGraphExecutionOutputRelations;
+export type FunctionGraphExecutionWithRelations = FunctionGraphExecution &
+  FunctionGraphExecutionRelations;
+export type FunctionGraphExecutionNodeStateWithRelations = FunctionGraphExecutionNodeState &
+  FunctionGraphExecutionNodeStateRelations;
+export type FunctionGraphExecutionOutputWithRelations = FunctionGraphExecutionOutput &
+  FunctionGraphExecutionOutputRelations;
 export type FunctionGraphObjectWithRelations = FunctionGraphObject & FunctionGraphObjectRelations;
 export type FunctionGraphRefWithRelations = FunctionGraphRef & FunctionGraphRefRelations;
 export type FunctionGraphStoreWithRelations = FunctionGraphStore & FunctionGraphStoreRelations;
-export type FunctionInvocationAttemptWithRelations = FunctionInvocationAttempt & FunctionInvocationAttemptRelations;
+export type FunctionInvocationAttemptWithRelations = FunctionInvocationAttempt &
+  FunctionInvocationAttemptRelations;
 export type FunctionInvocationWithRelations = FunctionInvocation & FunctionInvocationRelations;
-export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord & GetAllTreeNodesRecordRelations;
+export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord &
+  GetAllTreeNodesRecordRelations;
 export type InfraCommitWithRelations = InfraCommit & InfraCommitRelations;
-export type InfraGetAllTreeNodesRecordWithRelations = InfraGetAllTreeNodesRecord & InfraGetAllTreeNodesRecordRelations;
+export type InfraGetAllTreeNodesRecordWithRelations = InfraGetAllTreeNodesRecord &
+  InfraGetAllTreeNodesRecordRelations;
 export type InfraObjectWithRelations = InfraObject & InfraObjectRelations;
 export type InfraRefWithRelations = InfraRef & InfraRefRelations;
 export type InfraStoreWithRelations = InfraStore & InfraStoreRelations;
 export type IntegrationProviderWithRelations = IntegrationProvider & IntegrationProviderRelations;
 export type NamespaceWithRelations = Namespace & NamespaceRelations;
 export type NamespaceEventWithRelations = NamespaceEvent & NamespaceEventRelations;
-export type PlatformFunctionApiBindingWithRelations = PlatformFunctionApiBinding & PlatformFunctionApiBindingRelations;
-export type PlatformFunctionDefinitionWithRelations = PlatformFunctionDefinition & PlatformFunctionDefinitionRelations;
-export type PlatformFunctionDeploymentWithRelations = PlatformFunctionDeployment & PlatformFunctionDeploymentRelations;
-export type PlatformFunctionDeploymentEventWithRelations = PlatformFunctionDeploymentEvent & PlatformFunctionDeploymentEventRelations;
-export type PlatformFunctionExecutionLogWithRelations = PlatformFunctionExecutionLog & PlatformFunctionExecutionLogRelations;
-export type PlatformFunctionInvocationAttemptWithRelations = PlatformFunctionInvocationAttempt & PlatformFunctionInvocationAttemptRelations;
-export type PlatformFunctionInvocationWithRelations = PlatformFunctionInvocation & PlatformFunctionInvocationRelations;
+export type PlatformFunctionApiBindingWithRelations = PlatformFunctionApiBinding &
+  PlatformFunctionApiBindingRelations;
+export type PlatformFunctionDefinitionWithRelations = PlatformFunctionDefinition &
+  PlatformFunctionDefinitionRelations;
+export type PlatformFunctionDeploymentWithRelations = PlatformFunctionDeployment &
+  PlatformFunctionDeploymentRelations;
+export type PlatformFunctionDeploymentEventWithRelations = PlatformFunctionDeploymentEvent &
+  PlatformFunctionDeploymentEventRelations;
+export type PlatformFunctionExecutionLogWithRelations = PlatformFunctionExecutionLog &
+  PlatformFunctionExecutionLogRelations;
+export type PlatformFunctionInvocationAttemptWithRelations = PlatformFunctionInvocationAttempt &
+  PlatformFunctionInvocationAttemptRelations;
+export type PlatformFunctionInvocationWithRelations = PlatformFunctionInvocation &
+  PlatformFunctionInvocationRelations;
 export type PlatformInfraCommitWithRelations = PlatformInfraCommit & PlatformInfraCommitRelations;
-export type PlatformInfraGetAllTreeNodesRecordWithRelations = PlatformInfraGetAllTreeNodesRecord & PlatformInfraGetAllTreeNodesRecordRelations;
+export type PlatformInfraGetAllTreeNodesRecordWithRelations = PlatformInfraGetAllTreeNodesRecord &
+  PlatformInfraGetAllTreeNodesRecordRelations;
 export type PlatformInfraObjectWithRelations = PlatformInfraObject & PlatformInfraObjectRelations;
 export type PlatformInfraRefWithRelations = PlatformInfraRef & PlatformInfraRefRelations;
 export type PlatformInfraStoreWithRelations = PlatformInfraStore & PlatformInfraStoreRelations;
 export type PlatformNamespaceWithRelations = PlatformNamespace & PlatformNamespaceRelations;
-export type PlatformNamespaceEventWithRelations = PlatformNamespaceEvent & PlatformNamespaceEventRelations;
+export type PlatformNamespaceEventWithRelations = PlatformNamespaceEvent &
+  PlatformNamespaceEventRelations;
 export type PlatformResourceWithRelations = PlatformResource & PlatformResourceRelations;
-export type PlatformResourceDeclaredCapacityWithRelations = PlatformResourceDeclaredCapacity & PlatformResourceDeclaredCapacityRelations;
-export type PlatformResourceDefinitionWithRelations = PlatformResourceDefinition & PlatformResourceDefinitionRelations;
-export type PlatformResourceEventWithRelations = PlatformResourceEvent & PlatformResourceEventRelations;
-export type PlatformResourceInstallationWithRelations = PlatformResourceInstallation & PlatformResourceInstallationRelations;
-export type PlatformResourceStatusCheckWithRelations = PlatformResourceStatusCheck & PlatformResourceStatusCheckRelations;
-export type PlatformResourceUsageLogWithRelations = PlatformResourceUsageLog & PlatformResourceUsageLogRelations;
-export type PlatformResourceUsageSummaryWithRelations = PlatformResourceUsageSummary & PlatformResourceUsageSummaryRelations;
-export type PlatformResourceUtilizationWithRelations = PlatformResourceUtilization & PlatformResourceUtilizationRelations;
-export type PlatformResourcesHealthWithRelations = PlatformResourcesHealth & PlatformResourcesHealthRelations;
-export type PlatformResourcesRequirementsStateWithRelations = PlatformResourcesRequirementsState & PlatformResourcesRequirementsStateRelations;
-export type PlatformResourcesResolvedRequirementWithRelations = PlatformResourcesResolvedRequirement & PlatformResourcesResolvedRequirementRelations;
-export type PlatformWebhookEndpointWithRelations = PlatformWebhookEndpoint & PlatformWebhookEndpointRelations;
-export type PlatformWebhookEventWithRelations = PlatformWebhookEvent & PlatformWebhookEventRelations;
+export type PlatformResourceDeclaredCapacityWithRelations = PlatformResourceDeclaredCapacity &
+  PlatformResourceDeclaredCapacityRelations;
+export type PlatformResourceDefinitionWithRelations = PlatformResourceDefinition &
+  PlatformResourceDefinitionRelations;
+export type PlatformResourceEventWithRelations = PlatformResourceEvent &
+  PlatformResourceEventRelations;
+export type PlatformResourceInstallationWithRelations = PlatformResourceInstallation &
+  PlatformResourceInstallationRelations;
+export type PlatformResourceStatusCheckWithRelations = PlatformResourceStatusCheck &
+  PlatformResourceStatusCheckRelations;
+export type PlatformResourceUsageLogWithRelations = PlatformResourceUsageLog &
+  PlatformResourceUsageLogRelations;
+export type PlatformResourceUsageSummaryWithRelations = PlatformResourceUsageSummary &
+  PlatformResourceUsageSummaryRelations;
+export type PlatformResourceUtilizationWithRelations = PlatformResourceUtilization &
+  PlatformResourceUtilizationRelations;
+export type PlatformResourcesHealthWithRelations = PlatformResourcesHealth &
+  PlatformResourcesHealthRelations;
+export type PlatformResourcesRequirementsStateWithRelations = PlatformResourcesRequirementsState &
+  PlatformResourcesRequirementsStateRelations;
+export type PlatformResourcesResolvedRequirementWithRelations =
+  PlatformResourcesResolvedRequirement & PlatformResourcesResolvedRequirementRelations;
+export type PlatformWebhookEndpointWithRelations = PlatformWebhookEndpoint &
+  PlatformWebhookEndpointRelations;
+export type PlatformWebhookEventWithRelations = PlatformWebhookEvent &
+  PlatformWebhookEventRelations;
 export type ResourceWithRelations = Resource & ResourceRelations;
-export type ResourceDeclaredCapacityWithRelations = ResourceDeclaredCapacity & ResourceDeclaredCapacityRelations;
+export type ResourceDeclaredCapacityWithRelations = ResourceDeclaredCapacity &
+  ResourceDeclaredCapacityRelations;
 export type ResourceDefinitionWithRelations = ResourceDefinition & ResourceDefinitionRelations;
 export type ResourceEventWithRelations = ResourceEvent & ResourceEventRelations;
-export type ResourceInstallationWithRelations = ResourceInstallation & ResourceInstallationRelations;
+export type ResourceInstallationWithRelations = ResourceInstallation &
+  ResourceInstallationRelations;
 export type ResourceStatusCheckWithRelations = ResourceStatusCheck & ResourceStatusCheckRelations;
 export type ResourceUsageLogWithRelations = ResourceUsageLog & ResourceUsageLogRelations;
-export type ResourceUsageSummaryWithRelations = ResourceUsageSummary & ResourceUsageSummaryRelations;
+export type ResourceUsageSummaryWithRelations = ResourceUsageSummary &
+  ResourceUsageSummaryRelations;
 export type ResourceUtilizationWithRelations = ResourceUtilization & ResourceUtilizationRelations;
 export type ResourcesHealthWithRelations = ResourcesHealth & ResourcesHealthRelations;
-export type ResourcesRequirementsStateWithRelations = ResourcesRequirementsState & ResourcesRequirementsStateRelations;
-export type ResourcesResolvedRequirementWithRelations = ResourcesResolvedRequirement & ResourcesResolvedRequirementRelations;
+export type ResourcesRequirementsStateWithRelations = ResourcesRequirementsState &
+  ResourcesRequirementsStateRelations;
+export type ResourcesResolvedRequirementWithRelations = ResourcesResolvedRequirement &
+  ResourcesResolvedRequirementRelations;
 export type WebhookEndpointWithRelations = WebhookEndpoint & WebhookEndpointRelations;
 export type WebhookEventWithRelations = WebhookEvent & WebhookEventRelations;
 // ============ Entity Select Types ============
@@ -5659,73 +5694,1942 @@ export interface WebhookEventFilter {
   updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
-export type DbPresetOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEFINITION_ASC" | "DEFINITION_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "MODULES_HASH_ASC" | "MODULES_HASH_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type FunctionApiBindingOrderBy = "ALIAS_ASC" | "ALIAS_DESC" | "API_ID_ASC" | "API_ID_DESC" | "CONFIG_ASC" | "CONFIG_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type FunctionDefinitionOrderBy = "ACCESS_CHANNELS_ASC" | "ACCESS_CHANNELS_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FN_CATEGORY_ASC" | "FN_CATEGORY_DESC" | "FUNCTION_COLUMNS_ASC" | "FUNCTION_COLUMNS_DESC" | "GRAPH_ID_ASC" | "GRAPH_ID_DESC" | "ICON_ASC" | "ICON_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "INPUTS_ASC" | "INPUTS_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "MAX_ATTEMPTS_ASC" | "MAX_ATTEMPTS_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MODULE_TABLE_ASC" | "MODULE_TABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OUTPUTS_ASC" | "OUTPUTS_DESC" | "PAYLOAD_ARGS_ASC" | "PAYLOAD_ARGS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "PROPS_ASC" | "PROPS_DESC" | "PROTECTED_ASC" | "PROTECTED_DESC" | "PUBLISHED_AT_ASC" | "PUBLISHED_AT_DESC" | "QUEUE_NAME_ASC" | "QUEUE_NAME_DESC" | "REQUIRED_BUCKETS_ASC" | "REQUIRED_BUCKETS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_MODELS_ASC" | "REQUIRED_MODELS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "RUNTIME_ASC" | "RUNTIME_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "TARGET_FUNCTION_ASC" | "TARGET_FUNCTION_DESC" | "TARGET_SCHEMA_ASC" | "TARGET_SCHEMA_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VOLATILE_ASC" | "VOLATILE_DESC";
-export type FunctionDeploymentOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "HANDLER_NAME_ASC" | "HANDLER_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "IMAGE_VERSION_ASC" | "IMAGE_VERSION_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_AT_ASC" | "LAST_ERROR_AT_DESC" | "LAST_ERROR_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "SERVICE_NAME_ASC" | "SERVICE_NAME_DESC" | "SERVICE_URL_ASC" | "SERVICE_URL_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type FunctionDeploymentEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOYMENT_ID_ASC" | "DEPLOYMENT_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type FunctionExecutionLogOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "LOG_LEVEL_ASC" | "LOG_LEVEL_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
-export type FunctionGraphCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
-export type FunctionGraphOrderBy = "CONTEXT_ASC" | "CONTEXT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DEFINITIONS_COMMIT_ID_ASC" | "DEFINITIONS_COMMIT_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_VALID_ASC" | "IS_VALID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALIDATION_ERRORS_ASC" | "VALIDATION_ERRORS_DESC";
-export type FunctionGraphExecutionOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CURRENT_WAVE_ASC" | "CURRENT_WAVE_DESC" | "DEFINITIONS_COMMIT_ID_ASC" | "DEFINITIONS_COMMIT_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ERROR_CODE_ASC" | "ERROR_CODE_DESC" | "ERROR_MESSAGE_ASC" | "ERROR_MESSAGE_DESC" | "EXECUTION_PLAN_ASC" | "EXECUTION_PLAN_DESC" | "GRAPH_ID_ASC" | "GRAPH_ID_DESC" | "ID_ASC" | "ID_DESC" | "INPUT_PAYLOAD_ASC" | "INPUT_PAYLOAD_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "LAST_PROGRESS_AT_ASC" | "LAST_PROGRESS_AT_DESC" | "MAX_PENDING_JOBS_ASC" | "MAX_PENDING_JOBS_DESC" | "MAX_TICKS_ASC" | "MAX_TICKS_DESC" | "NATURAL" | "NODE_OUTPUTS_ASC" | "NODE_OUTPUTS_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "OUTPUT_NAMES_ASC" | "OUTPUT_NAMES_DESC" | "OUTPUT_NODE_ASC" | "OUTPUT_NODE_DESC" | "OUTPUT_PAYLOAD_ASC" | "OUTPUT_PAYLOAD_DESC" | "OUTPUT_PORT_ASC" | "OUTPUT_PORT_DESC" | "PARENT_EXECUTION_ID_ASC" | "PARENT_EXECUTION_ID_DESC" | "PARENT_INVOCATION_ID_ASC" | "PARENT_INVOCATION_ID_DESC" | "PARENT_NODE_NAME_ASC" | "PARENT_NODE_NAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRINCIPAL_ID_ASC" | "PRINCIPAL_ID_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TICK_COUNT_ASC" | "TICK_COUNT_DESC" | "TIMEOUT_AT_ASC" | "TIMEOUT_AT_DESC";
-export type FunctionGraphExecutionNodeStateOrderBy = "CALLBACK_INPUTS_ASC" | "CALLBACK_INPUTS_DESC" | "CALLBACK_META_ASC" | "CALLBACK_META_DESC" | "CALLBACK_TOKEN_HASH_ASC" | "CALLBACK_TOKEN_HASH_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ERROR_CODE_ASC" | "ERROR_CODE_DESC" | "ERROR_MESSAGE_ASC" | "ERROR_MESSAGE_DESC" | "EXECUTION_ID_ASC" | "EXECUTION_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "NODE_NAME_ASC" | "NODE_NAME_DESC" | "NODE_PATH_ASC" | "NODE_PATH_DESC" | "OUTPUT_ID_ASC" | "OUTPUT_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC";
-export type FunctionGraphExecutionOutputOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
-export type FunctionGraphObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
-export type FunctionGraphRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
-export type FunctionGraphStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
-export type FunctionInvocationAttemptOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ATTEMPT_ASC" | "ATTEMPT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "ERROR_DETAIL_ASC" | "ERROR_DETAIL_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "SUCCESS_ASC" | "SUCCESS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
-export type FunctionInvocationOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "API_BINDING_ID_ASC" | "API_BINDING_ID_DESC" | "CHANNEL_ASC" | "CHANNEL_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFINITION_SCOPE_ASC" | "DEFINITION_SCOPE_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "GRAPH_EXECUTION_ID_ASC" | "GRAPH_EXECUTION_ID_DESC" | "ID_ASC" | "ID_DESC" | "JOB_ID_ASC" | "JOB_ID_DESC" | "NATURAL" | "PARENT_INVOCATION_ID_ASC" | "PARENT_INVOCATION_ID_DESC" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVENANCE_ASC" | "PROVENANCE_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
-export type GetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
-export type InfraCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
-export type InfraGetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
-export type InfraObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type InfraRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
-export type InfraStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type IntegrationProviderOrderBy = "BRAND_ASC" | "BRAND_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ICON_ASC" | "ICON_DESC" | "ID_ASC" | "ID_DESC" | "LOGO_ASC" | "LOGO_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "SLUG_ASC" | "SLUG_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type NamespaceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_MANAGED_ASC" | "IS_MANAGED_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "NAMESPACE_NAME_ASC" | "NAMESPACE_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type NamespaceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type PlatformFunctionApiBindingOrderBy = "ALIAS_ASC" | "ALIAS_DESC" | "API_ID_ASC" | "API_ID_DESC" | "CONFIG_ASC" | "CONFIG_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type PlatformFunctionDefinitionOrderBy = "ACCESS_CHANNELS_ASC" | "ACCESS_CHANNELS_DESC" | "BILLABLE_ASC" | "BILLABLE_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FN_CATEGORY_ASC" | "FN_CATEGORY_DESC" | "FUNCTION_COLUMNS_ASC" | "FUNCTION_COLUMNS_DESC" | "GRAPH_ID_ASC" | "GRAPH_ID_DESC" | "ICON_ASC" | "ICON_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "INPUTS_ASC" | "INPUTS_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "MAX_ATTEMPTS_ASC" | "MAX_ATTEMPTS_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MODULE_TABLE_ASC" | "MODULE_TABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OUTPUTS_ASC" | "OUTPUTS_DESC" | "PAYLOAD_ARGS_ASC" | "PAYLOAD_ARGS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "PROPS_ASC" | "PROPS_DESC" | "PROTECTED_ASC" | "PROTECTED_DESC" | "PUBLISHED_AT_ASC" | "PUBLISHED_AT_DESC" | "QUEUE_NAME_ASC" | "QUEUE_NAME_DESC" | "REQUIRED_BUCKETS_ASC" | "REQUIRED_BUCKETS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_MODELS_ASC" | "REQUIRED_MODELS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "RUNTIME_ASC" | "RUNTIME_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "SYSTEM_ASC" | "SYSTEM_DESC" | "TARGET_FUNCTION_ASC" | "TARGET_FUNCTION_DESC" | "TARGET_SCHEMA_ASC" | "TARGET_SCHEMA_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VOLATILE_ASC" | "VOLATILE_DESC";
-export type PlatformFunctionDeploymentOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "HANDLER_NAME_ASC" | "HANDLER_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "IMAGE_VERSION_ASC" | "IMAGE_VERSION_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_AT_ASC" | "LAST_ERROR_AT_DESC" | "LAST_ERROR_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "SERVICE_NAME_ASC" | "SERVICE_NAME_DESC" | "SERVICE_URL_ASC" | "SERVICE_URL_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type PlatformFunctionDeploymentEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEPLOYMENT_ID_ASC" | "DEPLOYMENT_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type PlatformFunctionExecutionLogOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "LOG_LEVEL_ASC" | "LOG_LEVEL_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
-export type PlatformFunctionInvocationAttemptOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ATTEMPT_ASC" | "ATTEMPT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "ERROR_DETAIL_ASC" | "ERROR_DETAIL_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "SUCCESS_ASC" | "SUCCESS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
-export type PlatformFunctionInvocationOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "API_BINDING_ID_ASC" | "API_BINDING_ID_DESC" | "CHANNEL_ASC" | "CHANNEL_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEFINITION_SCOPE_ASC" | "DEFINITION_SCOPE_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "GRAPH_EXECUTION_ID_ASC" | "GRAPH_EXECUTION_ID_DESC" | "ID_ASC" | "ID_DESC" | "JOB_ID_ASC" | "JOB_ID_DESC" | "NATURAL" | "PARENT_INVOCATION_ID_ASC" | "PARENT_INVOCATION_ID_DESC" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVENANCE_ASC" | "PROVENANCE_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
-export type PlatformInfraCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
-export type PlatformInfraGetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
-export type PlatformInfraObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
-export type PlatformInfraRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
-export type PlatformInfraStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
-export type PlatformNamespaceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_MANAGED_ASC" | "IS_MANAGED_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "NAMESPACE_NAME_ASC" | "NAMESPACE_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type PlatformNamespaceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export type PlatformResourceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type PlatformResourceDeclaredCapacityOrderBy = "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "IS_TRANSIENT_ASC" | "IS_TRANSIENT_DESC" | "KIND_ASC" | "KIND_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "POD_COUNT_MAX_ASC" | "POD_COUNT_MAX_DESC" | "POD_COUNT_MIN_ASC" | "POD_COUNT_MIN_DESC" | "SOURCE_ASC" | "SOURCE_DESC" | "SOURCE_ID_ASC" | "SOURCE_ID_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC";
-export type PlatformResourceDefinitionOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DEFAULT_SPEC_ASC" | "DEFAULT_SPEC_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STEP_UP_MIN_AGE_ASC" | "STEP_UP_MIN_AGE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type PlatformResourceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC";
-export type PlatformResourceInstallationOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARAMS_ASC" | "PARAMS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type PlatformResourceStatusCheckOrderBy = "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUESTED_AT_ASC" | "REQUESTED_AT_DESC" | "REQUESTED_BY_ASC" | "REQUESTED_BY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STATUS_ASC" | "STATUS_DESC";
-export type PlatformResourceUsageLogOrderBy = "CPU_MILLICORES_ASC" | "CPU_MILLICORES_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_SECONDS_ASC" | "INTERVAL_SECONDS_DESC" | "MEMORY_BYTES_ASC" | "MEMORY_BYTES_DESC" | "METRICS_ASC" | "METRICS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SAMPLED_AT_ASC" | "SAMPLED_AT_DESC" | "SOURCE_ASC" | "SOURCE_DESC";
-export type PlatformResourceUsageSummaryOrderBy = "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "ID_ASC" | "ID_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
-export type PlatformResourceUtilizationOrderBy = "AVG_MEMORY_BYTES_ASC" | "AVG_MEMORY_BYTES_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_PEAK_UTILIZATION_ASC" | "CPU_PEAK_UTILIZATION_DESC" | "CPU_REQUEST_HEADROOM_MILLICORES_ASC" | "CPU_REQUEST_HEADROOM_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "KIND_ASC" | "KIND_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_PEAK_UTILIZATION_ASC" | "MEMORY_PEAK_UTILIZATION_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MEMORY_REQUEST_HEADROOM_BYTES_ASC" | "MEMORY_REQUEST_HEADROOM_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
-export type PlatformResourcesHealthOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_DETAIL_ASC" | "STATUS_DETAIL_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type PlatformResourcesRequirementsStateOrderBy = "CONFIG_HASH_ASC" | "CONFIG_HASH_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NATURAL" | "REQUIREMENTS_HASH_ASC" | "REQUIREMENTS_HASH_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_HASH_ASC" | "SECRETS_HASH_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
-export type PlatformResourcesResolvedRequirementOrderBy = "ATOM_ID_ASC" | "ATOM_ID_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRESENT_ASC" | "PRESENT_DESC" | "REQUIRED_ASC" | "REQUIRED_DESC" | "REQUIREMENT_KIND_ASC" | "REQUIREMENT_KIND_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
-export type PlatformWebhookEndpointOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "HOST_ASC" | "HOST_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "REPLAY_WINDOW_SECONDS_ASC" | "REPLAY_WINDOW_SECONDS_DESC" | "SIGNING_SECRET_NAME_ASC" | "SIGNING_SECRET_NAME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type PlatformWebhookEventOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENDPOINT_ID_ASC" | "ENDPOINT_ID_DESC" | "ERROR_ASC" | "ERROR_DESC" | "EXTERNAL_EVENT_ID_ASC" | "EXTERNAL_EVENT_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "PROVIDER_TIMESTAMP_ASC" | "PROVIDER_TIMESTAMP_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
-export type ResourceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type ResourceDeclaredCapacityOrderBy = "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "IS_TRANSIENT_ASC" | "IS_TRANSIENT_DESC" | "KIND_ASC" | "KIND_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "POD_COUNT_MAX_ASC" | "POD_COUNT_MAX_DESC" | "POD_COUNT_MIN_ASC" | "POD_COUNT_MIN_DESC" | "SOURCE_ASC" | "SOURCE_DESC" | "SOURCE_ID_ASC" | "SOURCE_ID_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC";
-export type ResourceDefinitionOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_SPEC_ASC" | "DEFAULT_SPEC_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STEP_UP_MIN_AGE_ASC" | "STEP_UP_MIN_AGE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type ResourceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC";
-export type ResourceInstallationOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARAMS_ASC" | "PARAMS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type ResourceStatusCheckOrderBy = "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUESTED_AT_ASC" | "REQUESTED_AT_DESC" | "REQUESTED_BY_ASC" | "REQUESTED_BY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STATUS_ASC" | "STATUS_DESC";
-export type ResourceUsageLogOrderBy = "CPU_MILLICORES_ASC" | "CPU_MILLICORES_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_SECONDS_ASC" | "INTERVAL_SECONDS_DESC" | "MEMORY_BYTES_ASC" | "MEMORY_BYTES_DESC" | "METRICS_ASC" | "METRICS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SAMPLED_AT_ASC" | "SAMPLED_AT_DESC" | "SOURCE_ASC" | "SOURCE_DESC";
-export type ResourceUsageSummaryOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "ID_ASC" | "ID_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
-export type ResourceUtilizationOrderBy = "AVG_MEMORY_BYTES_ASC" | "AVG_MEMORY_BYTES_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_PEAK_UTILIZATION_ASC" | "CPU_PEAK_UTILIZATION_DESC" | "CPU_REQUEST_HEADROOM_MILLICORES_ASC" | "CPU_REQUEST_HEADROOM_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "KIND_ASC" | "KIND_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_PEAK_UTILIZATION_ASC" | "MEMORY_PEAK_UTILIZATION_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MEMORY_REQUEST_HEADROOM_BYTES_ASC" | "MEMORY_REQUEST_HEADROOM_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
-export type ResourcesHealthOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_DETAIL_ASC" | "STATUS_DETAIL_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type ResourcesRequirementsStateOrderBy = "CONFIG_HASH_ASC" | "CONFIG_HASH_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NATURAL" | "REQUIREMENTS_HASH_ASC" | "REQUIREMENTS_HASH_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_HASH_ASC" | "SECRETS_HASH_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
-export type ResourcesResolvedRequirementOrderBy = "ATOM_ID_ASC" | "ATOM_ID_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRESENT_ASC" | "PRESENT_DESC" | "REQUIRED_ASC" | "REQUIRED_DESC" | "REQUIREMENT_KIND_ASC" | "REQUIREMENT_KIND_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
-export type WebhookEndpointOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "HOST_ASC" | "HOST_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "REPLAY_WINDOW_SECONDS_ASC" | "REPLAY_WINDOW_SECONDS_DESC" | "SIGNING_SECRET_NAME_ASC" | "SIGNING_SECRET_NAME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
-export type WebhookEventOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENDPOINT_ID_ASC" | "ENDPOINT_ID_DESC" | "ERROR_ASC" | "ERROR_DESC" | "EXTERNAL_EVENT_ID_ASC" | "EXTERNAL_EVENT_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "PROVIDER_TIMESTAMP_ASC" | "PROVIDER_TIMESTAMP_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DbPresetOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'MODULES_HASH_ASC'
+  | 'MODULES_HASH_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type FunctionApiBindingOrderBy =
+  | 'ALIAS_ASC'
+  | 'ALIAS_DESC'
+  | 'API_ID_ASC'
+  | 'API_ID_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type FunctionDefinitionOrderBy =
+  | 'ACCESS_CHANNELS_ASC'
+  | 'ACCESS_CHANNELS_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'FN_CATEGORY_ASC'
+  | 'FN_CATEGORY_DESC'
+  | 'FUNCTION_COLUMNS_ASC'
+  | 'FUNCTION_COLUMNS_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ICON_ASC'
+  | 'ICON_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'INPUTS_ASC'
+  | 'INPUTS_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'MAX_ATTEMPTS_ASC'
+  | 'MAX_ATTEMPTS_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MODULE_TABLE_ASC'
+  | 'MODULE_TABLE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OUTPUTS_ASC'
+  | 'OUTPUTS_DESC'
+  | 'PAYLOAD_ARGS_ASC'
+  | 'PAYLOAD_ARGS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'PROPS_ASC'
+  | 'PROPS_DESC'
+  | 'PROTECTED_ASC'
+  | 'PROTECTED_DESC'
+  | 'PUBLISHED_AT_ASC'
+  | 'PUBLISHED_AT_DESC'
+  | 'QUEUE_NAME_ASC'
+  | 'QUEUE_NAME_DESC'
+  | 'REQUIRED_BUCKETS_ASC'
+  | 'REQUIRED_BUCKETS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_MODELS_ASC'
+  | 'REQUIRED_MODELS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'RUNTIME_ASC'
+  | 'RUNTIME_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'TARGET_FUNCTION_ASC'
+  | 'TARGET_FUNCTION_DESC'
+  | 'TARGET_SCHEMA_ASC'
+  | 'TARGET_SCHEMA_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VOLATILE_ASC'
+  | 'VOLATILE_DESC';
+export type FunctionDeploymentOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'HANDLER_NAME_ASC'
+  | 'HANDLER_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'IMAGE_VERSION_ASC'
+  | 'IMAGE_VERSION_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_AT_ASC'
+  | 'LAST_ERROR_AT_DESC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'SERVICE_NAME_ASC'
+  | 'SERVICE_NAME_DESC'
+  | 'SERVICE_URL_ASC'
+  | 'SERVICE_URL_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type FunctionDeploymentEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEPLOYMENT_ID_ASC'
+  | 'DEPLOYMENT_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type FunctionExecutionLogOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LOG_LEVEL_ASC'
+  | 'LOG_LEVEL_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+export type FunctionGraphCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+export type FunctionGraphOrderBy =
+  | 'CONTEXT_ASC'
+  | 'CONTEXT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_VALID_ASC'
+  | 'IS_VALID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VALIDATION_ERRORS_ASC'
+  | 'VALIDATION_ERRORS_DESC';
+export type FunctionGraphExecutionOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CURRENT_WAVE_ASC'
+  | 'CURRENT_WAVE_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ERROR_CODE_ASC'
+  | 'ERROR_CODE_DESC'
+  | 'ERROR_MESSAGE_ASC'
+  | 'ERROR_MESSAGE_DESC'
+  | 'EXECUTION_PLAN_ASC'
+  | 'EXECUTION_PLAN_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INPUT_PAYLOAD_ASC'
+  | 'INPUT_PAYLOAD_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LAST_PROGRESS_AT_ASC'
+  | 'LAST_PROGRESS_AT_DESC'
+  | 'MAX_PENDING_JOBS_ASC'
+  | 'MAX_PENDING_JOBS_DESC'
+  | 'MAX_TICKS_ASC'
+  | 'MAX_TICKS_DESC'
+  | 'NATURAL'
+  | 'NODE_OUTPUTS_ASC'
+  | 'NODE_OUTPUTS_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'OUTPUT_NAMES_ASC'
+  | 'OUTPUT_NAMES_DESC'
+  | 'OUTPUT_NODE_ASC'
+  | 'OUTPUT_NODE_DESC'
+  | 'OUTPUT_PAYLOAD_ASC'
+  | 'OUTPUT_PAYLOAD_DESC'
+  | 'OUTPUT_PORT_ASC'
+  | 'OUTPUT_PORT_DESC'
+  | 'PARENT_EXECUTION_ID_ASC'
+  | 'PARENT_EXECUTION_ID_DESC'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PARENT_NODE_NAME_ASC'
+  | 'PARENT_NODE_NAME_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TICK_COUNT_ASC'
+  | 'TICK_COUNT_DESC'
+  | 'TIMEOUT_AT_ASC'
+  | 'TIMEOUT_AT_DESC';
+export type FunctionGraphExecutionNodeStateOrderBy =
+  | 'CALLBACK_INPUTS_ASC'
+  | 'CALLBACK_INPUTS_DESC'
+  | 'CALLBACK_META_ASC'
+  | 'CALLBACK_META_DESC'
+  | 'CALLBACK_TOKEN_HASH_ASC'
+  | 'CALLBACK_TOKEN_HASH_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ERROR_CODE_ASC'
+  | 'ERROR_CODE_DESC'
+  | 'ERROR_MESSAGE_ASC'
+  | 'ERROR_MESSAGE_DESC'
+  | 'EXECUTION_ID_ASC'
+  | 'EXECUTION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'NODE_NAME_ASC'
+  | 'NODE_NAME_DESC'
+  | 'NODE_PATH_ASC'
+  | 'NODE_PATH_DESC'
+  | 'OUTPUT_ID_ASC'
+  | 'OUTPUT_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+export type FunctionGraphExecutionOutputOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+export type FunctionGraphObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+export type FunctionGraphRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+export type FunctionGraphStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+export type FunctionInvocationAttemptOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ATTEMPT_ASC'
+  | 'ATTEMPT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DURATION_MS_ASC'
+  | 'DURATION_MS_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ERROR_DETAIL_ASC'
+  | 'ERROR_DETAIL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'SUCCESS_ASC'
+  | 'SUCCESS_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+export type FunctionInvocationOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'API_BINDING_ID_ASC'
+  | 'API_BINDING_ID_DESC'
+  | 'CHANNEL_ASC'
+  | 'CHANNEL_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFINITION_SCOPE_ASC'
+  | 'DEFINITION_SCOPE_DESC'
+  | 'DURATION_MS_ASC'
+  | 'DURATION_MS_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'GRAPH_EXECUTION_ID_ASC'
+  | 'GRAPH_EXECUTION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'JOB_ID_ASC'
+  | 'JOB_ID_DESC'
+  | 'NATURAL'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVENANCE_ASC'
+  | 'PROVENANCE_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+export type GetAllTreeNodesRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'PATH_ASC'
+  | 'PATH_DESC';
+export type InfraCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+export type InfraGetAllTreeNodesRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'PATH_ASC'
+  | 'PATH_DESC';
+export type InfraObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type InfraRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+export type InfraStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type IntegrationProviderOrderBy =
+  | 'BRAND_ASC'
+  | 'BRAND_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ICON_ASC'
+  | 'ICON_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LOGO_ASC'
+  | 'LOGO_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type NamespaceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type NamespaceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type PlatformFunctionApiBindingOrderBy =
+  | 'ALIAS_ASC'
+  | 'ALIAS_DESC'
+  | 'API_ID_ASC'
+  | 'API_ID_DESC'
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type PlatformFunctionDefinitionOrderBy =
+  | 'ACCESS_CHANNELS_ASC'
+  | 'ACCESS_CHANNELS_DESC'
+  | 'BILLABLE_ASC'
+  | 'BILLABLE_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'FN_CATEGORY_ASC'
+  | 'FN_CATEGORY_DESC'
+  | 'FUNCTION_COLUMNS_ASC'
+  | 'FUNCTION_COLUMNS_DESC'
+  | 'GRAPH_ID_ASC'
+  | 'GRAPH_ID_DESC'
+  | 'ICON_ASC'
+  | 'ICON_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'INPUTS_ASC'
+  | 'INPUTS_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'IS_PUBLISHED_ASC'
+  | 'IS_PUBLISHED_DESC'
+  | 'MAX_ATTEMPTS_ASC'
+  | 'MAX_ATTEMPTS_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MODULE_TABLE_ASC'
+  | 'MODULE_TABLE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OUTPUTS_ASC'
+  | 'OUTPUTS_DESC'
+  | 'PAYLOAD_ARGS_ASC'
+  | 'PAYLOAD_ARGS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'PROPS_ASC'
+  | 'PROPS_DESC'
+  | 'PROTECTED_ASC'
+  | 'PROTECTED_DESC'
+  | 'PUBLISHED_AT_ASC'
+  | 'PUBLISHED_AT_DESC'
+  | 'QUEUE_NAME_ASC'
+  | 'QUEUE_NAME_DESC'
+  | 'REQUIRED_BUCKETS_ASC'
+  | 'REQUIRED_BUCKETS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_MODELS_ASC'
+  | 'REQUIRED_MODELS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'RUNTIME_ASC'
+  | 'RUNTIME_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'SYSTEM_ASC'
+  | 'SYSTEM_DESC'
+  | 'TARGET_FUNCTION_ASC'
+  | 'TARGET_FUNCTION_DESC'
+  | 'TARGET_SCHEMA_ASC'
+  | 'TARGET_SCHEMA_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VOLATILE_ASC'
+  | 'VOLATILE_DESC';
+export type PlatformFunctionDeploymentOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CONCURRENCY_ASC'
+  | 'CONCURRENCY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'HANDLER_NAME_ASC'
+  | 'HANDLER_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
+  | 'IMAGE_VERSION_ASC'
+  | 'IMAGE_VERSION_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_AT_ASC'
+  | 'LAST_ERROR_AT_DESC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SCALE_MAX_ASC'
+  | 'SCALE_MAX_DESC'
+  | 'SCALE_MIN_ASC'
+  | 'SCALE_MIN_DESC'
+  | 'SERVICE_NAME_ASC'
+  | 'SERVICE_NAME_DESC'
+  | 'SERVICE_URL_ASC'
+  | 'SERVICE_URL_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TIMEOUT_SECONDS_ASC'
+  | 'TIMEOUT_SECONDS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type PlatformFunctionDeploymentEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEPLOYMENT_ID_ASC'
+  | 'DEPLOYMENT_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type PlatformFunctionExecutionLogOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'LOG_LEVEL_ASC'
+  | 'LOG_LEVEL_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+export type PlatformFunctionInvocationAttemptOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ATTEMPT_ASC'
+  | 'ATTEMPT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DURATION_MS_ASC'
+  | 'DURATION_MS_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ERROR_DETAIL_ASC'
+  | 'ERROR_DETAIL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'SUCCESS_ASC'
+  | 'SUCCESS_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+export type PlatformFunctionInvocationOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'API_BINDING_ID_ASC'
+  | 'API_BINDING_ID_DESC'
+  | 'CHANNEL_ASC'
+  | 'CHANNEL_DESC'
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_SCOPE_ASC'
+  | 'DEFINITION_SCOPE_DESC'
+  | 'DURATION_MS_ASC'
+  | 'DURATION_MS_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'GRAPH_EXECUTION_ID_ASC'
+  | 'GRAPH_EXECUTION_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'JOB_ID_ASC'
+  | 'JOB_ID_DESC'
+  | 'NATURAL'
+  | 'PARENT_INVOCATION_ID_ASC'
+  | 'PARENT_INVOCATION_ID_DESC'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVENANCE_ASC'
+  | 'PROVENANCE_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
+export type PlatformInfraCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+export type PlatformInfraGetAllTreeNodesRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'PATH_ASC'
+  | 'PATH_DESC';
+export type PlatformInfraObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+export type PlatformInfraRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+export type PlatformInfraStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+export type PlatformNamespaceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type PlatformNamespaceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+export type PlatformResourceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type PlatformResourceDeclaredCapacityOrderBy =
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_TRANSIENT_ASC'
+  | 'IS_TRANSIENT_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'POD_COUNT_MAX_ASC'
+  | 'POD_COUNT_MAX_DESC'
+  | 'POD_COUNT_MIN_ASC'
+  | 'POD_COUNT_MIN_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'SOURCE_ID_ASC'
+  | 'SOURCE_ID_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC';
+export type PlatformResourceDefinitionOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DEFAULT_SPEC_ASC'
+  | 'DEFAULT_SPEC_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STEP_UP_MIN_AGE_ASC'
+  | 'STEP_UP_MIN_AGE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type PlatformResourceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC';
+export type PlatformResourceInstallationOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PARAMS_ASC'
+  | 'PARAMS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type PlatformResourceStatusCheckOrderBy =
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUESTED_AT_ASC'
+  | 'REQUESTED_AT_DESC'
+  | 'REQUESTED_BY_ASC'
+  | 'REQUESTED_BY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+export type PlatformResourceUsageLogOrderBy =
+  | 'CPU_MILLICORES_ASC'
+  | 'CPU_MILLICORES_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTERVAL_SECONDS_ASC'
+  | 'INTERVAL_SECONDS_DESC'
+  | 'MEMORY_BYTES_ASC'
+  | 'MEMORY_BYTES_DESC'
+  | 'METRICS_ASC'
+  | 'METRICS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SAMPLED_AT_ASC'
+  | 'SAMPLED_AT_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC';
+export type PlatformResourceUsageSummaryOrderBy =
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+export type PlatformResourceUtilizationOrderBy =
+  | 'AVG_MEMORY_BYTES_ASC'
+  | 'AVG_MEMORY_BYTES_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_PEAK_UTILIZATION_ASC'
+  | 'CPU_PEAK_UTILIZATION_DESC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_ASC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_PEAK_UTILIZATION_ASC'
+  | 'MEMORY_PEAK_UTILIZATION_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_ASC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+export type PlatformResourcesHealthOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_DETAIL_ASC'
+  | 'STATUS_DETAIL_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type PlatformResourcesRequirementsStateOrderBy =
+  | 'CONFIG_HASH_ASC'
+  | 'CONFIG_HASH_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NATURAL'
+  | 'REQUIREMENTS_HASH_ASC'
+  | 'REQUIREMENTS_HASH_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_HASH_ASC'
+  | 'SECRETS_HASH_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+export type PlatformResourcesResolvedRequirementOrderBy =
+  | 'ATOM_ID_ASC'
+  | 'ATOM_ID_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRESENT_ASC'
+  | 'PRESENT_DESC'
+  | 'REQUIRED_ASC'
+  | 'REQUIRED_DESC'
+  | 'REQUIREMENT_KIND_ASC'
+  | 'REQUIREMENT_KIND_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+export type PlatformWebhookEndpointOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'HOST_ASC'
+  | 'HOST_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REPLAY_WINDOW_SECONDS_ASC'
+  | 'REPLAY_WINDOW_SECONDS_DESC'
+  | 'SIGNING_SECRET_NAME_ASC'
+  | 'SIGNING_SECRET_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type PlatformWebhookEventOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENDPOINT_ID_ASC'
+  | 'ENDPOINT_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXTERNAL_EVENT_ID_ASC'
+  | 'EXTERNAL_EVENT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PROVIDER_TIMESTAMP_ASC'
+  | 'PROVIDER_TIMESTAMP_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type ResourceOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type ResourceDeclaredCapacityOrderBy =
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'IS_TRANSIENT_ASC'
+  | 'IS_TRANSIENT_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'POD_COUNT_MAX_ASC'
+  | 'POD_COUNT_MAX_DESC'
+  | 'POD_COUNT_MIN_ASC'
+  | 'POD_COUNT_MIN_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'SOURCE_ID_ASC'
+  | 'SOURCE_ID_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC';
+export type ResourceDefinitionOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_SPEC_ASC'
+  | 'DEFAULT_SPEC_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STEP_UP_MIN_AGE_ASC'
+  | 'STEP_UP_MIN_AGE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type ResourceEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC';
+export type ResourceInstallationOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PARAMS_ASC'
+  | 'PARAMS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REVISION_ASC'
+  | 'REVISION_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type ResourceStatusCheckOrderBy =
+  | 'COMPLETED_AT_ASC'
+  | 'COMPLETED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUESTED_AT_ASC'
+  | 'REQUESTED_AT_DESC'
+  | 'REQUESTED_BY_ASC'
+  | 'REQUESTED_BY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RESULT_ASC'
+  | 'RESULT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+export type ResourceUsageLogOrderBy =
+  | 'CPU_MILLICORES_ASC'
+  | 'CPU_MILLICORES_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INTERVAL_SECONDS_ASC'
+  | 'INTERVAL_SECONDS_DESC'
+  | 'MEMORY_BYTES_ASC'
+  | 'MEMORY_BYTES_DESC'
+  | 'METRICS_ASC'
+  | 'METRICS_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SAMPLED_AT_ASC'
+  | 'SAMPLED_AT_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC';
+export type ResourceUsageSummaryOrderBy =
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+export type ResourceUtilizationOrderBy =
+  | 'AVG_MEMORY_BYTES_ASC'
+  | 'AVG_MEMORY_BYTES_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_PEAK_UTILIZATION_ASC'
+  | 'CPU_PEAK_UTILIZATION_DESC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_ASC'
+  | 'CPU_REQUEST_HEADROOM_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'GB_SECONDS_ASC'
+  | 'GB_SECONDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MAX_CPU_MILLICORES_ASC'
+  | 'MAX_CPU_MILLICORES_DESC'
+  | 'MAX_MEMORY_BYTES_ASC'
+  | 'MAX_MEMORY_BYTES_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_PEAK_UTILIZATION_ASC'
+  | 'MEMORY_PEAK_UTILIZATION_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_ASC'
+  | 'MEMORY_REQUEST_HEADROOM_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'RUNTIME_SECONDS_ASC'
+  | 'RUNTIME_SECONDS_DESC'
+  | 'SAMPLE_COUNT_ASC'
+  | 'SAMPLE_COUNT_DESC';
+export type ResourcesHealthOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'CPU_LIMIT_MILLICORES_ASC'
+  | 'CPU_LIMIT_MILLICORES_DESC'
+  | 'CPU_REQUEST_MILLICORES_ASC'
+  | 'CPU_REQUEST_MILLICORES_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INTEGRATIONS_ASC'
+  | 'INTEGRATIONS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'LAST_HEARTBEAT_AT_ASC'
+  | 'LAST_HEARTBEAT_AT_DESC'
+  | 'MEMORY_LIMIT_BYTES_ASC'
+  | 'MEMORY_LIMIT_BYTES_DESC'
+  | 'MEMORY_REQUEST_BYTES_ASC'
+  | 'MEMORY_REQUEST_BYTES_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'REPLICAS_ASC'
+  | 'REPLICAS_DESC'
+  | 'REQUIRED_CONFIGS_ASC'
+  | 'REQUIRED_CONFIGS_DESC'
+  | 'REQUIRED_SECRETS_ASC'
+  | 'REQUIRED_SECRETS_DESC'
+  | 'RESOURCE_DEFINITION_ID_ASC'
+  | 'RESOURCE_DEFINITION_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_DETAIL_ASC'
+  | 'STATUS_DETAIL_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'STORAGE_CLASS_ASC'
+  | 'STORAGE_CLASS_DESC'
+  | 'STORAGE_SIZE_BYTES_ASC'
+  | 'STORAGE_SIZE_BYTES_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type ResourcesRequirementsStateOrderBy =
+  | 'CONFIG_HASH_ASC'
+  | 'CONFIG_HASH_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NATURAL'
+  | 'REQUIREMENTS_HASH_ASC'
+  | 'REQUIREMENTS_HASH_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_HASH_ASC'
+  | 'SECRETS_HASH_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+export type ResourcesResolvedRequirementOrderBy =
+  | 'ATOM_ID_ASC'
+  | 'ATOM_ID_DESC'
+  | 'CONFIG_OBJECT_NAME_ASC'
+  | 'CONFIG_OBJECT_NAME_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRESENT_ASC'
+  | 'PRESENT_DESC'
+  | 'REQUIRED_ASC'
+  | 'REQUIRED_DESC'
+  | 'REQUIREMENT_KIND_ASC'
+  | 'REQUIREMENT_KIND_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'SECRETS_OBJECT_NAME_ASC'
+  | 'SECRETS_OBJECT_NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC';
+export type WebhookEndpointOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'FUNCTION_DEFINITION_ID_ASC'
+  | 'FUNCTION_DEFINITION_ID_DESC'
+  | 'HOST_ASC'
+  | 'HOST_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'REPLAY_WINDOW_SECONDS_ASC'
+  | 'REPLAY_WINDOW_SECONDS_DESC'
+  | 'SIGNING_SECRET_NAME_ASC'
+  | 'SIGNING_SECRET_NAME_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type WebhookEventOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENDPOINT_ID_ASC'
+  | 'ENDPOINT_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXTERNAL_EVENT_ID_ASC'
+  | 'EXTERNAL_EVENT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INVOCATION_CREATED_AT_ASC'
+  | 'INVOCATION_CREATED_AT_DESC'
+  | 'INVOCATION_ID_ASC'
+  | 'INVOCATION_ID_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PROVIDER_TIMESTAMP_ASC'
+  | 'PROVIDER_TIMESTAMP_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 // ============ CRUD Input Types ============
 export interface CreateDbPresetInput {
   clientMutationId?: string;
@@ -8206,62 +10110,62 @@ export interface DeleteWebhookEventInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  "FunctionApiBinding": {
-    "functionInvocationsByApiBindingId": "FunctionInvocation"
+  FunctionApiBinding: {
+    functionInvocationsByApiBindingId: 'FunctionInvocation',
   },
-  "FunctionDefinition": {
-    "functionApiBindings": "FunctionApiBinding",
-    "webhookEndpoints": "WebhookEndpoint"
+  FunctionDefinition: {
+    functionApiBindings: 'FunctionApiBinding',
+    webhookEndpoints: 'WebhookEndpoint',
   },
-  "FunctionGraph": {
-    "functionGraphExecutionsByGraphId": "FunctionGraphExecution",
-    "platformFunctionDefinitionsByGraphId": "PlatformFunctionDefinition"
+  FunctionGraph: {
+    functionGraphExecutionsByGraphId: 'FunctionGraphExecution',
+    platformFunctionDefinitionsByGraphId: 'PlatformFunctionDefinition',
   },
-  "Namespace": {
-    "functionDeployments": "FunctionDeployment",
-    "resourceDefinitions": "ResourceDefinition",
-    "resourceInstallations": "ResourceInstallation",
-    "resources": "Resource",
-    "webhookEndpoints": "WebhookEndpoint"
+  Namespace: {
+    functionDeployments: 'FunctionDeployment',
+    resourceDefinitions: 'ResourceDefinition',
+    resourceInstallations: 'ResourceInstallation',
+    resources: 'Resource',
+    webhookEndpoints: 'WebhookEndpoint',
   },
-  "PlatformFunctionApiBinding": {
-    "platformFunctionInvocationsByApiBindingId": "PlatformFunctionInvocation"
+  PlatformFunctionApiBinding: {
+    platformFunctionInvocationsByApiBindingId: 'PlatformFunctionInvocation',
   },
-  "PlatformFunctionDefinition": {
-    "platformFunctionApiBindingsByFunctionDefinitionId": "PlatformFunctionApiBinding",
-    "platformWebhookEndpointsByFunctionDefinitionId": "PlatformWebhookEndpoint"
+  PlatformFunctionDefinition: {
+    platformFunctionApiBindingsByFunctionDefinitionId: 'PlatformFunctionApiBinding',
+    platformWebhookEndpointsByFunctionDefinitionId: 'PlatformWebhookEndpoint',
   },
-  "PlatformNamespace": {
-    "platformFunctionDeploymentsByNamespaceId": "PlatformFunctionDeployment",
-    "platformResourceDefinitionsByNamespaceId": "PlatformResourceDefinition",
-    "platformResourceInstallationsByNamespaceId": "PlatformResourceInstallation",
-    "platformResourcesByNamespaceId": "PlatformResource",
-    "platformWebhookEndpointsByNamespaceId": "PlatformWebhookEndpoint"
+  PlatformNamespace: {
+    platformFunctionDeploymentsByNamespaceId: 'PlatformFunctionDeployment',
+    platformResourceDefinitionsByNamespaceId: 'PlatformResourceDefinition',
+    platformResourceInstallationsByNamespaceId: 'PlatformResourceInstallation',
+    platformResourcesByNamespaceId: 'PlatformResource',
+    platformWebhookEndpointsByNamespaceId: 'PlatformWebhookEndpoint',
   },
-  "PlatformResource": {
-    "platformResourceStatusChecksByResourceId": "PlatformResourceStatusCheck"
+  PlatformResource: {
+    platformResourceStatusChecksByResourceId: 'PlatformResourceStatusCheck',
   },
-  "PlatformResourceDefinition": {
-    "platformResourcesByResourceDefinitionId": "PlatformResource"
+  PlatformResourceDefinition: {
+    platformResourcesByResourceDefinitionId: 'PlatformResource',
   },
-  "PlatformResourceInstallation": {
-    "platformResourcesByInstallationId": "PlatformResource"
+  PlatformResourceInstallation: {
+    platformResourcesByInstallationId: 'PlatformResource',
   },
-  "PlatformWebhookEndpoint": {
-    "platformWebhookEventsByEndpointId": "PlatformWebhookEvent"
+  PlatformWebhookEndpoint: {
+    platformWebhookEventsByEndpointId: 'PlatformWebhookEvent',
   },
-  "Resource": {
-    "resourceStatusChecks": "ResourceStatusCheck"
+  Resource: {
+    resourceStatusChecks: 'ResourceStatusCheck',
   },
-  "ResourceDefinition": {
-    "resources": "Resource"
+  ResourceDefinition: {
+    resources: 'Resource',
   },
-  "ResourceInstallation": {
-    "resourcesByInstallationId": "Resource"
+  ResourceInstallation: {
+    resourcesByInstallationId: 'Resource',
   },
-  "WebhookEndpoint": {
-    "webhookEventsByEndpointId": "WebhookEvent"
-  }
+  WebhookEndpoint: {
+    webhookEventsByEndpointId: 'WebhookEvent',
+  },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface AddEdgeInput {

@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformApiSchemaKeys } from "../query-keys";
-import type { PlatformApiSchemaSelect, PlatformApiSchemaWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiSchemaSelect, PlatformApiSchemaWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApiSchemaKeys } from '../query-keys';
+import type {
+  PlatformApiSchemaSelect,
+  PlatformApiSchemaWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformApiSchemaSelect,
+  PlatformApiSchemaWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformApiSchemaQueryKey = platformApiSchemaKeys.detail;
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformApiSchemaQuery({
@@ -26,38 +32,52 @@ export const platformApiSchemaQueryKey = platformApiSchemaKeys.detail;
  * });
  * ```
  */
-export function usePlatformApiSchemaQuery<S extends PlatformApiSchemaSelect, TData = {
-  platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>;
-} & Omit<UseQueryOptions<{
-  platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformApiSchemaQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformApiSchemaSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformApiSchemaQuery<
+  S extends PlatformApiSchemaSelect,
+  TData = {
+    platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformApiSchemaQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformApiSchemaSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformApiSchemaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformApiSchemaKeys.detail(params.id),
-    queryFn: () => getClient().platformApiSchema.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformApiSchema.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformApiSchemaQuery({
@@ -79,35 +99,46 @@ export async function fetchPlatformApiSchemaQuery(params: {
   selection: SelectionConfig<PlatformApiSchemaSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformApiSchemaSelect>(params.selection);
-  return getClient().platformApiSchema.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformApiSchema.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformApiSchemaQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformApiSchemaQuery<S extends PlatformApiSchemaSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>;
-}): Promise<void>;
-export async function prefetchPlatformApiSchemaQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformApiSchemaSelect>;
-}): Promise<void> {
+export async function prefetchPlatformApiSchemaQuery<S extends PlatformApiSchemaSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformApiSchemaQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformApiSchemaSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformApiSchemaSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformApiSchemaKeys.detail(params.id),
-    queryFn: () => getClient().platformApiSchema.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformApiSchema.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

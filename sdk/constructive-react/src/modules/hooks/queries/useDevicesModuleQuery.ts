@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { devicesModuleKeys } from "../query-keys";
-import type { DevicesModuleSelect, DevicesModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DevicesModuleSelect, DevicesModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { devicesModuleKeys } from '../query-keys';
+import type { DevicesModuleSelect, DevicesModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DevicesModuleSelect, DevicesModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const devicesModuleQueryKey = devicesModuleKeys.detail;
 /**
  * Query hook for fetching a single DevicesModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDevicesModuleQuery({
@@ -26,38 +26,52 @@ export const devicesModuleQueryKey = devicesModuleKeys.detail;
  * });
  * ```
  */
-export function useDevicesModuleQuery<S extends DevicesModuleSelect, TData = {
-  devicesModule: InferSelectResult<DevicesModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
-} & Omit<UseQueryOptions<{
-  devicesModule: InferSelectResult<DevicesModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDevicesModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<DevicesModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDevicesModuleQuery<
+  S extends DevicesModuleSelect,
+  TData = {
+    devicesModule: InferSelectResult<DevicesModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        devicesModule: InferSelectResult<DevicesModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDevicesModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<DevicesModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<DevicesModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: devicesModuleKeys.detail(params.id),
-    queryFn: () => getClient().devicesModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .devicesModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single DevicesModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDevicesModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchDevicesModuleQuery(params: {
   selection: SelectionConfig<DevicesModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DevicesModuleSelect>(params.selection);
-  return getClient().devicesModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .devicesModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single DevicesModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDevicesModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDevicesModuleQuery<S extends DevicesModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
-}): Promise<void>;
-export async function prefetchDevicesModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<DevicesModuleSelect>;
-}): Promise<void> {
+export async function prefetchDevicesModuleQuery<S extends DevicesModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDevicesModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<DevicesModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<DevicesModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: devicesModuleKeys.detail(params.id),
-    queryFn: () => getClient().devicesModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .devicesModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

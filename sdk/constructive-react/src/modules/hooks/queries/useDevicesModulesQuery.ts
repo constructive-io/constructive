@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { devicesModuleKeys } from "../query-keys";
-import type { DevicesModuleSelect, DevicesModuleWithRelations, DevicesModuleFilter, DevicesModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DevicesModuleSelect, DevicesModuleWithRelations, DevicesModuleFilter, DevicesModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { devicesModuleKeys } from '../query-keys';
+import type {
+  DevicesModuleSelect,
+  DevicesModuleWithRelations,
+  DevicesModuleFilter,
+  DevicesModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DevicesModuleSelect,
+  DevicesModuleWithRelations,
+  DevicesModuleFilter,
+  DevicesModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const devicesModulesQueryKey = devicesModuleKeys.list;
 /**
  * Query hook for fetching DevicesModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDevicesModulesQuery({
@@ -30,33 +45,49 @@ export const devicesModulesQueryKey = devicesModuleKeys.list;
  * });
  * ```
  */
-export function useDevicesModulesQuery<S extends DevicesModuleSelect, TData = {
-  devicesModules: ConnectionResult<InferSelectResult<DevicesModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DevicesModuleFilter, DevicesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
-} & Omit<UseQueryOptions<{
-  devicesModules: ConnectionResult<InferSelectResult<DevicesModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDevicesModulesQuery(params: {
-  selection: ListSelectionConfig<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useDevicesModulesQuery<
+  S extends DevicesModuleSelect,
+  TData = {
+    devicesModules: ConnectionResult<InferSelectResult<DevicesModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DevicesModuleFilter, DevicesModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        devicesModules: ConnectionResult<InferSelectResult<DevicesModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDevicesModulesQuery(
+  params: {
+    selection: ListSelectionConfig<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    DevicesModuleSelect,
+    DevicesModuleFilter,
+    DevicesModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: devicesModuleKeys.list(args),
     queryFn: () => getClient().devicesModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch DevicesModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDevicesModulesQuery({
@@ -70,35 +101,51 @@ export function useDevicesModulesQuery(params: {
 export async function fetchDevicesModulesQuery<S extends DevicesModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DevicesModuleFilter, DevicesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
+  } & Omit<ListSelectionConfig<S, DevicesModuleFilter, DevicesModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
 }): Promise<{
   devicesModules: ConnectionResult<InferSelectResult<DevicesModuleWithRelations, S>>;
 }>;
 export async function fetchDevicesModulesQuery(params: {
   selection: ListSelectionConfig<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    DevicesModuleSelect,
+    DevicesModuleFilter,
+    DevicesModuleOrderBy
+  >(params.selection);
   return getClient().devicesModule.findMany(args).unwrap();
 }
 /**
  * Prefetch DevicesModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchDevicesModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDevicesModulesQuery<S extends DevicesModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DevicesModuleFilter, DevicesModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
-}): Promise<void>;
-export async function prefetchDevicesModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>(params.selection);
+export async function prefetchDevicesModulesQuery<S extends DevicesModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DevicesModuleFilter, DevicesModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DevicesModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchDevicesModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    DevicesModuleSelect,
+    DevicesModuleFilter,
+    DevicesModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: devicesModuleKeys.list(args),
-    queryFn: () => getClient().devicesModule.findMany(args).unwrap()
+    queryFn: () => getClient().devicesModule.findMany(args).unwrap(),
   });
 }

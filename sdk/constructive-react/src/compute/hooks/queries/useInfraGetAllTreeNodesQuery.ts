@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { infraGetAllTreeNodesRecordKeys } from "../query-keys";
-import type { InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordWithRelations, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordWithRelations, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { infraGetAllTreeNodesRecordKeys } from '../query-keys';
+import type {
+  InfraGetAllTreeNodesRecordSelect,
+  InfraGetAllTreeNodesRecordWithRelations,
+  InfraGetAllTreeNodesRecordFilter,
+  InfraGetAllTreeNodesRecordsOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  InfraGetAllTreeNodesRecordSelect,
+  InfraGetAllTreeNodesRecordWithRelations,
+  InfraGetAllTreeNodesRecordFilter,
+  InfraGetAllTreeNodesRecordsOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const infraGetAllTreeNodesQueryKey = infraGetAllTreeNodesRecordKeys.list;
 /**
  * Query hook for fetching InfraGetAllTreeNodesRecord list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useInfraGetAllTreeNodesQuery({
@@ -30,33 +45,60 @@ export const infraGetAllTreeNodesQueryKey = infraGetAllTreeNodesRecordKeys.list;
  * });
  * ```
  */
-export function useInfraGetAllTreeNodesQuery<S extends InfraGetAllTreeNodesRecordSelect, TData = {
-  infraGetAllTreeNodes: ConnectionResult<InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraGetAllTreeNodesRecordSelect>;
-} & Omit<UseQueryOptions<{
-  infraGetAllTreeNodes: ConnectionResult<InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useInfraGetAllTreeNodesQuery(params: {
-  selection: ListSelectionConfig<InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useInfraGetAllTreeNodesQuery<
+  S extends InfraGetAllTreeNodesRecordSelect,
+  TData = {
+    infraGetAllTreeNodes: ConnectionResult<
+      InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, InfraGetAllTreeNodesRecordSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        infraGetAllTreeNodes: ConnectionResult<
+          InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useInfraGetAllTreeNodesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      InfraGetAllTreeNodesRecordSelect,
+      InfraGetAllTreeNodesRecordFilter,
+      InfraGetAllTreeNodesRecordsOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    InfraGetAllTreeNodesRecordSelect,
+    InfraGetAllTreeNodesRecordFilter,
+    InfraGetAllTreeNodesRecordsOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: infraGetAllTreeNodesRecordKeys.list(args),
     queryFn: () => getClient().infraGetAllTreeNodesRecord.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch InfraGetAllTreeNodesRecord list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchInfraGetAllTreeNodesQuery({
@@ -67,38 +109,72 @@ export function useInfraGetAllTreeNodesQuery(params: {
  * });
  * ```
  */
-export async function fetchInfraGetAllTreeNodesQuery<S extends InfraGetAllTreeNodesRecordSelect>(params: {
+export async function fetchInfraGetAllTreeNodesQuery<
+  S extends InfraGetAllTreeNodesRecordSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraGetAllTreeNodesRecordSelect>;
+  } & Omit<
+    ListSelectionConfig<S, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, InfraGetAllTreeNodesRecordSelect>;
 }): Promise<{
-  infraGetAllTreeNodes: ConnectionResult<InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>>;
+  infraGetAllTreeNodes: ConnectionResult<
+    InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>
+  >;
 }>;
 export async function fetchInfraGetAllTreeNodesQuery(params: {
-  selection: ListSelectionConfig<InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>;
+  selection: ListSelectionConfig<
+    InfraGetAllTreeNodesRecordSelect,
+    InfraGetAllTreeNodesRecordFilter,
+    InfraGetAllTreeNodesRecordsOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    InfraGetAllTreeNodesRecordSelect,
+    InfraGetAllTreeNodesRecordFilter,
+    InfraGetAllTreeNodesRecordsOrderBy
+  >(params.selection);
   return getClient().infraGetAllTreeNodesRecord.findMany(args).unwrap();
 }
 /**
  * Prefetch InfraGetAllTreeNodesRecord list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchInfraGetAllTreeNodesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchInfraGetAllTreeNodesQuery<S extends InfraGetAllTreeNodesRecordSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraGetAllTreeNodesRecordSelect>;
-}): Promise<void>;
-export async function prefetchInfraGetAllTreeNodesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<InfraGetAllTreeNodesRecordSelect, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>(params.selection);
+export async function prefetchInfraGetAllTreeNodesQuery<S extends InfraGetAllTreeNodesRecordSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, InfraGetAllTreeNodesRecordFilter, InfraGetAllTreeNodesRecordsOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, InfraGetAllTreeNodesRecordSelect>;
+  }
+): Promise<void>;
+export async function prefetchInfraGetAllTreeNodesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      InfraGetAllTreeNodesRecordSelect,
+      InfraGetAllTreeNodesRecordFilter,
+      InfraGetAllTreeNodesRecordsOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    InfraGetAllTreeNodesRecordSelect,
+    InfraGetAllTreeNodesRecordFilter,
+    InfraGetAllTreeNodesRecordsOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: infraGetAllTreeNodesRecordKeys.list(args),
-    queryFn: () => getClient().infraGetAllTreeNodesRecord.findMany(args).unwrap()
+    queryFn: () => getClient().infraGetAllTreeNodesRecord.findMany(args).unwrap(),
   });
 }

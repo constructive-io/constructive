@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { userConnectedAccountKeys } from "../query-keys";
-import type { UserConnectedAccountSelect, UserConnectedAccountWithRelations, UserConnectedAccountFilter, UserConnectedAccountOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { UserConnectedAccountSelect, UserConnectedAccountWithRelations, UserConnectedAccountFilter, UserConnectedAccountOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { userConnectedAccountKeys } from '../query-keys';
+import type {
+  UserConnectedAccountSelect,
+  UserConnectedAccountWithRelations,
+  UserConnectedAccountFilter,
+  UserConnectedAccountOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  UserConnectedAccountSelect,
+  UserConnectedAccountWithRelations,
+  UserConnectedAccountFilter,
+  UserConnectedAccountOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const userConnectedAccountsQueryKey = userConnectedAccountKeys.list;
 /**
  * Query hook for fetching UserConnectedAccount list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useUserConnectedAccountsQuery({
@@ -30,33 +45,60 @@ export const userConnectedAccountsQueryKey = userConnectedAccountKeys.list;
  * });
  * ```
  */
-export function useUserConnectedAccountsQuery<S extends UserConnectedAccountSelect, TData = {
-  userConnectedAccounts: ConnectionResult<InferSelectResult<UserConnectedAccountWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserConnectedAccountSelect>;
-} & Omit<UseQueryOptions<{
-  userConnectedAccounts: ConnectionResult<InferSelectResult<UserConnectedAccountWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useUserConnectedAccountsQuery(params: {
-  selection: ListSelectionConfig<UserConnectedAccountSelect, UserConnectedAccountFilter, UserConnectedAccountOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<UserConnectedAccountSelect, UserConnectedAccountFilter, UserConnectedAccountOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useUserConnectedAccountsQuery<
+  S extends UserConnectedAccountSelect,
+  TData = {
+    userConnectedAccounts: ConnectionResult<
+      InferSelectResult<UserConnectedAccountWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, UserConnectedAccountSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        userConnectedAccounts: ConnectionResult<
+          InferSelectResult<UserConnectedAccountWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useUserConnectedAccountsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      UserConnectedAccountSelect,
+      UserConnectedAccountFilter,
+      UserConnectedAccountOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    UserConnectedAccountSelect,
+    UserConnectedAccountFilter,
+    UserConnectedAccountOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: userConnectedAccountKeys.list(args),
     queryFn: () => getClient().userConnectedAccount.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch UserConnectedAccount list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchUserConnectedAccountsQuery({
@@ -67,38 +109,70 @@ export function useUserConnectedAccountsQuery(params: {
  * });
  * ```
  */
-export async function fetchUserConnectedAccountsQuery<S extends UserConnectedAccountSelect>(params: {
+export async function fetchUserConnectedAccountsQuery<
+  S extends UserConnectedAccountSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserConnectedAccountSelect>;
+  } & Omit<
+    ListSelectionConfig<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, UserConnectedAccountSelect>;
 }): Promise<{
   userConnectedAccounts: ConnectionResult<InferSelectResult<UserConnectedAccountWithRelations, S>>;
 }>;
 export async function fetchUserConnectedAccountsQuery(params: {
-  selection: ListSelectionConfig<UserConnectedAccountSelect, UserConnectedAccountFilter, UserConnectedAccountOrderBy>;
+  selection: ListSelectionConfig<
+    UserConnectedAccountSelect,
+    UserConnectedAccountFilter,
+    UserConnectedAccountOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<UserConnectedAccountSelect, UserConnectedAccountFilter, UserConnectedAccountOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    UserConnectedAccountSelect,
+    UserConnectedAccountFilter,
+    UserConnectedAccountOrderBy
+  >(params.selection);
   return getClient().userConnectedAccount.findMany(args).unwrap();
 }
 /**
  * Prefetch UserConnectedAccount list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchUserConnectedAccountsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchUserConnectedAccountsQuery<S extends UserConnectedAccountSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserConnectedAccountSelect>;
-}): Promise<void>;
-export async function prefetchUserConnectedAccountsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<UserConnectedAccountSelect, UserConnectedAccountFilter, UserConnectedAccountOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<UserConnectedAccountSelect, UserConnectedAccountFilter, UserConnectedAccountOrderBy>(params.selection);
+export async function prefetchUserConnectedAccountsQuery<S extends UserConnectedAccountSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, UserConnectedAccountSelect>;
+  }
+): Promise<void>;
+export async function prefetchUserConnectedAccountsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      UserConnectedAccountSelect,
+      UserConnectedAccountFilter,
+      UserConnectedAccountOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    UserConnectedAccountSelect,
+    UserConnectedAccountFilter,
+    UserConnectedAccountOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userConnectedAccountKeys.list(args),
-    queryFn: () => getClient().userConnectedAccount.findMany(args).unwrap()
+    queryFn: () => getClient().userConnectedAccount.findMany(args).unwrap(),
   });
 }

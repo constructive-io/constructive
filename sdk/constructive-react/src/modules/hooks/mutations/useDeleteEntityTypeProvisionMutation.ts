@@ -11,16 +11,22 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { entityTypeProvisionKeys } from "../query-keys";
-import { entityTypeProvisionMutationKeys } from "../mutation-keys";
-import type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { entityTypeProvisionKeys } from '../query-keys';
+import { entityTypeProvisionMutationKeys } from '../mutation-keys';
+import type {
+  EntityTypeProvisionSelect,
+  EntityTypeProvisionWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  EntityTypeProvisionSelect,
+  EntityTypeProvisionWithRelations,
+} from '../../orm/input-types';
 /**
  * Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
      and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
@@ -40,55 +46,73 @@ export type { EntityTypeProvisionSelect, EntityTypeProvisionWithRelations } from
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteEntityTypeProvisionMutation<S extends EntityTypeProvisionSelect>(params: {
-  selection: ({
-    fields: S & EntityTypeProvisionSelect;
-  } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>);
-} & Omit<UseMutationOptions<{
-  deleteEntityTypeProvision: {
-    entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteEntityTypeProvision: {
-    entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteEntityTypeProvisionMutation(params: {
-  selection: SelectionConfig<EntityTypeProvisionSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteEntityTypeProvisionMutation<S extends EntityTypeProvisionSelect>(
+  params: {
+    selection: {
+      fields: S & EntityTypeProvisionSelect;
+    } & HookStrictSelect<NoInfer<S>, EntityTypeProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteEntityTypeProvision: {
+          entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteEntityTypeProvision: {
+      entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteEntityTypeProvisionMutation(
+  params: {
+    selection: SelectionConfig<EntityTypeProvisionSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<EntityTypeProvisionSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: entityTypeProvisionMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().entityTypeProvision.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .entityTypeProvision.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: entityTypeProvisionKeys.detail(variables.id)
+        queryKey: entityTypeProvisionKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.lists()
+        queryKey: entityTypeProvisionKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

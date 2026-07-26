@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { indexKeys } from "../query-keys";
-import type { IndexSelect, IndexWithRelations, IndexFilter, IndexOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { IndexSelect, IndexWithRelations, IndexFilter, IndexOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { indexKeys } from '../query-keys';
+import type {
+  IndexSelect,
+  IndexWithRelations,
+  IndexFilter,
+  IndexOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  IndexSelect,
+  IndexWithRelations,
+  IndexFilter,
+  IndexOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const indicesQueryKey = indexKeys.list;
 /**
  * Query hook for fetching Index list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useIndicesQuery({
@@ -30,33 +45,45 @@ export const indicesQueryKey = indexKeys.list;
  * });
  * ```
  */
-export function useIndicesQuery<S extends IndexSelect, TData = {
-  indices: ConnectionResult<InferSelectResult<IndexWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, IndexFilter, IndexOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IndexSelect>;
-} & Omit<UseQueryOptions<{
-  indices: ConnectionResult<InferSelectResult<IndexWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useIndicesQuery(params: {
-  selection: ListSelectionConfig<IndexSelect, IndexFilter, IndexOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useIndicesQuery<
+  S extends IndexSelect,
+  TData = {
+    indices: ConnectionResult<InferSelectResult<IndexWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, IndexFilter, IndexOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, IndexSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        indices: ConnectionResult<InferSelectResult<IndexWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useIndicesQuery(
+  params: {
+    selection: ListSelectionConfig<IndexSelect, IndexFilter, IndexOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<IndexSelect, IndexFilter, IndexOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: indexKeys.list(args),
     queryFn: () => getClient().index.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch Index list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchIndicesQuery({
@@ -70,7 +97,8 @@ export function useIndicesQuery(params: {
 export async function fetchIndicesQuery<S extends IndexSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, IndexFilter, IndexOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IndexSelect>;
+  } & Omit<ListSelectionConfig<S, IndexFilter, IndexOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, IndexSelect>;
 }): Promise<{
   indices: ConnectionResult<InferSelectResult<IndexWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchIndicesQuery(params: {
 }
 /**
  * Prefetch Index list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchIndicesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchIndicesQuery<S extends IndexSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, IndexFilter, IndexOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IndexSelect>;
-}): Promise<void>;
-export async function prefetchIndicesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<IndexSelect, IndexFilter, IndexOrderBy>;
-}): Promise<void> {
+export async function prefetchIndicesQuery<S extends IndexSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, IndexFilter, IndexOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, IndexSelect>;
+  }
+): Promise<void>;
+export async function prefetchIndicesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<IndexSelect, IndexFilter, IndexOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<IndexSelect, IndexFilter, IndexOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: indexKeys.list(args),
-    queryFn: () => getClient().index.findMany(args).unwrap()
+    queryFn: () => getClient().index.findMany(args).unwrap(),
   });
 }

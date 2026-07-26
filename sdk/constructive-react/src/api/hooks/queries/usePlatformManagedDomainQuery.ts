@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformManagedDomainKeys } from "../query-keys";
-import type { PlatformManagedDomainSelect, PlatformManagedDomainWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformManagedDomainSelect, PlatformManagedDomainWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformManagedDomainKeys } from '../query-keys';
+import type {
+  PlatformManagedDomainSelect,
+  PlatformManagedDomainWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformManagedDomainSelect,
+  PlatformManagedDomainWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const platformManagedDomainQueryKey = platformManagedDomainKeys.detail;
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformManagedDomainQuery({
@@ -26,38 +32,52 @@ export const platformManagedDomainQueryKey = platformManagedDomainKeys.detail;
  * });
  * ```
  */
-export function usePlatformManagedDomainQuery<S extends PlatformManagedDomainSelect, TData = {
-  platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
-} & Omit<UseQueryOptions<{
-  platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function usePlatformManagedDomainQuery(params: {
-  id: string;
-  selection: SelectionConfig<PlatformManagedDomainSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function usePlatformManagedDomainQuery<
+  S extends PlatformManagedDomainSelect,
+  TData = {
+    platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        platformManagedDomain: InferSelectResult<PlatformManagedDomainWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function usePlatformManagedDomainQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformManagedDomainSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<PlatformManagedDomainSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformManagedDomainKeys.detail(params.id),
-    queryFn: () => getClient().platformManagedDomain.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .platformManagedDomain.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchPlatformManagedDomainQuery({
@@ -66,7 +86,9 @@ export function usePlatformManagedDomainQuery(params: {
  * });
  * ```
  */
-export async function fetchPlatformManagedDomainQuery<S extends PlatformManagedDomainSelect>(params: {
+export async function fetchPlatformManagedDomainQuery<
+  S extends PlatformManagedDomainSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -79,35 +101,46 @@ export async function fetchPlatformManagedDomainQuery(params: {
   selection: SelectionConfig<PlatformManagedDomainSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformManagedDomainSelect>(params.selection);
-  return getClient().platformManagedDomain.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .platformManagedDomain.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Platform-operated hostnames whose DNS and certificate lifecycle the platform drives
- * 
+ *
  * @example
  * ```ts
  * await prefetchPlatformManagedDomainQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformManagedDomainQuery<S extends PlatformManagedDomainSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
-}): Promise<void>;
-export async function prefetchPlatformManagedDomainQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<PlatformManagedDomainSelect>;
-}): Promise<void> {
+export async function prefetchPlatformManagedDomainQuery<S extends PlatformManagedDomainSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, PlatformManagedDomainSelect>;
+  }
+): Promise<void>;
+export async function prefetchPlatformManagedDomainQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<PlatformManagedDomainSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<PlatformManagedDomainSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformManagedDomainKeys.detail(params.id),
-    queryFn: () => getClient().platformManagedDomain.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .platformManagedDomain.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

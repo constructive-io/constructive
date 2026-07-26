@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { rlsSettingKeys } from "../query-keys";
-import type { RlsSettingSelect, RlsSettingWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RlsSettingSelect, RlsSettingWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { rlsSettingKeys } from '../query-keys';
+import type { RlsSettingSelect, RlsSettingWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { RlsSettingSelect, RlsSettingWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const rlsSettingQueryKey = rlsSettingKeys.detail;
 /**
  * RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRlsSettingQuery({
@@ -26,38 +26,52 @@ export const rlsSettingQueryKey = rlsSettingKeys.detail;
  * });
  * ```
  */
-export function useRlsSettingQuery<S extends RlsSettingSelect, TData = {
-  rlsSetting: InferSelectResult<RlsSettingWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
-} & Omit<UseQueryOptions<{
-  rlsSetting: InferSelectResult<RlsSettingWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRlsSettingQuery(params: {
-  id: string;
-  selection: SelectionConfig<RlsSettingSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useRlsSettingQuery<
+  S extends RlsSettingSelect,
+  TData = {
+    rlsSetting: InferSelectResult<RlsSettingWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        rlsSetting: InferSelectResult<RlsSettingWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRlsSettingQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<RlsSettingSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<RlsSettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: rlsSettingKeys.detail(params.id),
-    queryFn: () => getClient().rlsSetting.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .rlsSetting.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRlsSettingQuery({
@@ -79,35 +93,46 @@ export async function fetchRlsSettingQuery(params: {
   selection: SelectionConfig<RlsSettingSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<RlsSettingSelect>(params.selection);
-  return getClient().rlsSetting.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .rlsSetting.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * RLS module runtime configuration; typed references to the authenticate/current_role function plumbing
- * 
+ *
  * @example
  * ```ts
  * await prefetchRlsSettingQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchRlsSettingQuery<S extends RlsSettingSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
-}): Promise<void>;
-export async function prefetchRlsSettingQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<RlsSettingSelect>;
-}): Promise<void> {
+export async function prefetchRlsSettingQuery<S extends RlsSettingSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, RlsSettingSelect>;
+  }
+): Promise<void>;
+export async function prefetchRlsSettingQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<RlsSettingSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<RlsSettingSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: rlsSettingKeys.detail(params.id),
-    queryFn: () => getClient().rlsSetting.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .rlsSetting.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { webhookModuleKeys } from "../query-keys";
-import type { WebhookModuleSelect, WebhookModuleWithRelations, WebhookModuleFilter, WebhookModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { WebhookModuleSelect, WebhookModuleWithRelations, WebhookModuleFilter, WebhookModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { webhookModuleKeys } from '../query-keys';
+import type {
+  WebhookModuleSelect,
+  WebhookModuleWithRelations,
+  WebhookModuleFilter,
+  WebhookModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  WebhookModuleSelect,
+  WebhookModuleWithRelations,
+  WebhookModuleFilter,
+  WebhookModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const webhookModulesQueryKey = webhookModuleKeys.list;
 /**
  * Query hook for fetching WebhookModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useWebhookModulesQuery({
@@ -30,33 +45,49 @@ export const webhookModulesQueryKey = webhookModuleKeys.list;
  * });
  * ```
  */
-export function useWebhookModulesQuery<S extends WebhookModuleSelect, TData = {
-  webhookModules: ConnectionResult<InferSelectResult<WebhookModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, WebhookModuleFilter, WebhookModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
-} & Omit<UseQueryOptions<{
-  webhookModules: ConnectionResult<InferSelectResult<WebhookModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useWebhookModulesQuery(params: {
-  selection: ListSelectionConfig<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useWebhookModulesQuery<
+  S extends WebhookModuleSelect,
+  TData = {
+    webhookModules: ConnectionResult<InferSelectResult<WebhookModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, WebhookModuleFilter, WebhookModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        webhookModules: ConnectionResult<InferSelectResult<WebhookModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useWebhookModulesQuery(
+  params: {
+    selection: ListSelectionConfig<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    WebhookModuleSelect,
+    WebhookModuleFilter,
+    WebhookModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: webhookModuleKeys.list(args),
     queryFn: () => getClient().webhookModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch WebhookModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchWebhookModulesQuery({
@@ -70,35 +101,51 @@ export function useWebhookModulesQuery(params: {
 export async function fetchWebhookModulesQuery<S extends WebhookModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, WebhookModuleFilter, WebhookModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
+  } & Omit<ListSelectionConfig<S, WebhookModuleFilter, WebhookModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
 }): Promise<{
   webhookModules: ConnectionResult<InferSelectResult<WebhookModuleWithRelations, S>>;
 }>;
 export async function fetchWebhookModulesQuery(params: {
   selection: ListSelectionConfig<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    WebhookModuleSelect,
+    WebhookModuleFilter,
+    WebhookModuleOrderBy
+  >(params.selection);
   return getClient().webhookModule.findMany(args).unwrap();
 }
 /**
  * Prefetch WebhookModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchWebhookModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchWebhookModulesQuery<S extends WebhookModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, WebhookModuleFilter, WebhookModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
-}): Promise<void>;
-export async function prefetchWebhookModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>(params.selection);
+export async function prefetchWebhookModulesQuery<S extends WebhookModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, WebhookModuleFilter, WebhookModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, WebhookModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchWebhookModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<WebhookModuleSelect, WebhookModuleFilter, WebhookModuleOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    WebhookModuleSelect,
+    WebhookModuleFilter,
+    WebhookModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: webhookModuleKeys.list(args),
-    queryFn: () => getClient().webhookModule.findMany(args).unwrap()
+    queryFn: () => getClient().webhookModule.findMany(args).unwrap(),
   });
 }

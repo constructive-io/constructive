@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { exclusionConstraintKeys } from "../query-keys";
-import type { ExclusionConstraintSelect, ExclusionConstraintWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ExclusionConstraintSelect, ExclusionConstraintWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { exclusionConstraintKeys } from '../query-keys';
+import type {
+  ExclusionConstraintSelect,
+  ExclusionConstraintWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ExclusionConstraintSelect,
+  ExclusionConstraintWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const exclusionConstraintQueryKey = exclusionConstraintKeys.detail;
 /**
  * Query hook for fetching a single ExclusionConstraint
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useExclusionConstraintQuery({
@@ -26,38 +32,52 @@ export const exclusionConstraintQueryKey = exclusionConstraintKeys.detail;
  * });
  * ```
  */
-export function useExclusionConstraintQuery<S extends ExclusionConstraintSelect, TData = {
-  exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
-} & Omit<UseQueryOptions<{
-  exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useExclusionConstraintQuery(params: {
-  id: string;
-  selection: SelectionConfig<ExclusionConstraintSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useExclusionConstraintQuery<
+  S extends ExclusionConstraintSelect,
+  TData = {
+    exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        exclusionConstraint: InferSelectResult<ExclusionConstraintWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useExclusionConstraintQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<ExclusionConstraintSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<ExclusionConstraintSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: exclusionConstraintKeys.detail(params.id),
-    queryFn: () => getClient().exclusionConstraint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .exclusionConstraint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single ExclusionConstraint without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchExclusionConstraintQuery({
@@ -79,35 +99,46 @@ export async function fetchExclusionConstraintQuery(params: {
   selection: SelectionConfig<ExclusionConstraintSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ExclusionConstraintSelect>(params.selection);
-  return getClient().exclusionConstraint.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .exclusionConstraint.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single ExclusionConstraint for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchExclusionConstraintQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchExclusionConstraintQuery<S extends ExclusionConstraintSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
-}): Promise<void>;
-export async function prefetchExclusionConstraintQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<ExclusionConstraintSelect>;
-}): Promise<void> {
+export async function prefetchExclusionConstraintQuery<S extends ExclusionConstraintSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
+  }
+): Promise<void>;
+export async function prefetchExclusionConstraintQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<ExclusionConstraintSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<ExclusionConstraintSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: exclusionConstraintKeys.detail(params.id),
-    queryFn: () => getClient().exclusionConstraint.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .exclusionConstraint.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

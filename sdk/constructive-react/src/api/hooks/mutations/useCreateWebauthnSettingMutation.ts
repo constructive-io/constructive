@@ -4,62 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { webauthnSettingKeys } from "../query-keys";
-import { webauthnSettingMutationKeys } from "../mutation-keys";
-import type { WebauthnSettingSelect, WebauthnSettingWithRelations, CreateWebauthnSettingInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { WebauthnSettingSelect, WebauthnSettingWithRelations, CreateWebauthnSettingInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { webauthnSettingKeys } from '../query-keys';
+import { webauthnSettingMutationKeys } from '../mutation-keys';
+import type {
+  WebauthnSettingSelect,
+  WebauthnSettingWithRelations,
+  CreateWebauthnSettingInput,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  WebauthnSettingSelect,
+  WebauthnSettingWithRelations,
+  CreateWebauthnSettingInput,
+} from '../../orm/input-types';
 /**
  * WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateWebauthnSettingMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateWebauthnSettingMutation<S extends WebauthnSettingSelect>(params: {
-  selection: ({
-    fields: S & WebauthnSettingSelect;
-  } & HookStrictSelect<NoInfer<S>, WebauthnSettingSelect>);
-} & Omit<UseMutationOptions<{
-  createWebauthnSetting: {
-    webauthnSetting: InferSelectResult<WebauthnSettingWithRelations, S>;
-  };
-}, Error, CreateWebauthnSettingInput["webauthnSetting"]>, "mutationFn">): UseMutationResult<{
-  createWebauthnSetting: {
-    webauthnSetting: InferSelectResult<WebauthnSettingWithRelations, S>;
-  };
-}, Error, CreateWebauthnSettingInput["webauthnSetting"]>;
-export function useCreateWebauthnSettingMutation(params: {
-  selection: SelectionConfig<WebauthnSettingSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateWebauthnSettingInput["webauthnSetting"]>, "mutationFn">) {
+export function useCreateWebauthnSettingMutation<S extends WebauthnSettingSelect>(
+  params: {
+    selection: {
+      fields: S & WebauthnSettingSelect;
+    } & HookStrictSelect<NoInfer<S>, WebauthnSettingSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createWebauthnSetting: {
+          webauthnSetting: InferSelectResult<WebauthnSettingWithRelations, S>;
+        };
+      },
+      Error,
+      CreateWebauthnSettingInput['webauthnSetting']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createWebauthnSetting: {
+      webauthnSetting: InferSelectResult<WebauthnSettingWithRelations, S>;
+    };
+  },
+  Error,
+  CreateWebauthnSettingInput['webauthnSetting']
+>;
+export function useCreateWebauthnSettingMutation(
+  params: {
+    selection: SelectionConfig<WebauthnSettingSelect>;
+  } & Omit<
+    UseMutationOptions<any, Error, CreateWebauthnSettingInput['webauthnSetting']>,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<WebauthnSettingSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: webauthnSettingMutationKeys.create(),
-    mutationFn: (data: CreateWebauthnSettingInput["webauthnSetting"]) => getClient().webauthnSetting.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateWebauthnSettingInput['webauthnSetting']) =>
+      getClient()
+        .webauthnSetting.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.lists()
+        queryKey: webauthnSettingKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

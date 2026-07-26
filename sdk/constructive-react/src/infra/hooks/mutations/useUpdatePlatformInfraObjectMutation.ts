@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformInfraObjectKeys } from "../query-keys";
-import { platformInfraObjectMutationKeys } from "../mutation-keys";
-import type { PlatformInfraObjectSelect, PlatformInfraObjectWithRelations, PlatformInfraObjectPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformInfraObjectSelect, PlatformInfraObjectWithRelations, PlatformInfraObjectPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformInfraObjectKeys } from '../query-keys';
+import { platformInfraObjectMutationKeys } from '../mutation-keys';
+import type {
+  PlatformInfraObjectSelect,
+  PlatformInfraObjectWithRelations,
+  PlatformInfraObjectPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformInfraObjectSelect,
+  PlatformInfraObjectWithRelations,
+  PlatformInfraObjectPatch,
+} from '../../orm/input-types';
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformInfraObjectMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformInfraObjectPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformInfraObjectMutation<S extends PlatformInfraObjectSelect>(params: {
-  selection: ({
-    fields: S & PlatformInfraObjectSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformInfraObjectSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformInfraObject: {
-    platformInfraObject: InferSelectResult<PlatformInfraObjectWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  scopeId: string;
-  platformInfraObjectPatch: PlatformInfraObjectPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformInfraObject: {
-    platformInfraObject: InferSelectResult<PlatformInfraObjectWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  scopeId: string;
-  platformInfraObjectPatch: PlatformInfraObjectPatch;
-}>;
-export function useUpdatePlatformInfraObjectMutation(params: {
-  selection: SelectionConfig<PlatformInfraObjectSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  scopeId: string;
-  platformInfraObjectPatch: PlatformInfraObjectPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformInfraObjectMutation<S extends PlatformInfraObjectSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformInfraObjectSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformInfraObjectSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformInfraObject: {
+          platformInfraObject: InferSelectResult<PlatformInfraObjectWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        scopeId: string;
+        platformInfraObjectPatch: PlatformInfraObjectPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformInfraObject: {
+      platformInfraObject: InferSelectResult<PlatformInfraObjectWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    scopeId: string;
+    platformInfraObjectPatch: PlatformInfraObjectPatch;
+  }
+>;
+export function useUpdatePlatformInfraObjectMutation(
+  params: {
+    selection: SelectionConfig<PlatformInfraObjectSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        scopeId: string;
+        platformInfraObjectPatch: PlatformInfraObjectPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformInfraObjectSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdatePlatformInfraObjectMutation(params: {
     mutationFn: ({
       id,
       scopeId,
-      platformInfraObjectPatch
+      platformInfraObjectPatch,
     }: {
       id: string;
       scopeId: string;
       platformInfraObjectPatch: PlatformInfraObjectPatch;
-    }) => getClient().platformInfraObject.update({
-      where: {
-        id,
-        scopeId
-      },
-      data: platformInfraObjectPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformInfraObject.update({
+          where: {
+            id,
+            scopeId,
+          },
+          data: platformInfraObjectPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformInfraObjectKeys.detail(variables.id)
+        queryKey: platformInfraObjectKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformInfraObjectKeys.lists()
+        queryKey: platformInfraObjectKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { resourceUsageLogKeys } from "../query-keys";
-import { resourceUsageLogMutationKeys } from "../mutation-keys";
-import type { ResourceUsageLogSelect, ResourceUsageLogWithRelations, ResourceUsageLogPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ResourceUsageLogSelect, ResourceUsageLogWithRelations, ResourceUsageLogPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { resourceUsageLogKeys } from '../query-keys';
+import { resourceUsageLogMutationKeys } from '../mutation-keys';
+import type {
+  ResourceUsageLogSelect,
+  ResourceUsageLogWithRelations,
+  ResourceUsageLogPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ResourceUsageLogSelect,
+  ResourceUsageLogWithRelations,
+  ResourceUsageLogPatch,
+} from '../../orm/input-types';
 /**
  * Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateResourceUsageLogMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', resourceUsageLogPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateResourceUsageLogMutation<S extends ResourceUsageLogSelect>(params: {
-  selection: ({
-    fields: S & ResourceUsageLogSelect;
-  } & HookStrictSelect<NoInfer<S>, ResourceUsageLogSelect>);
-} & Omit<UseMutationOptions<{
-  updateResourceUsageLog: {
-    resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  sampledAt: string;
-  resourceUsageLogPatch: ResourceUsageLogPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateResourceUsageLog: {
-    resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  sampledAt: string;
-  resourceUsageLogPatch: ResourceUsageLogPatch;
-}>;
-export function useUpdateResourceUsageLogMutation(params: {
-  selection: SelectionConfig<ResourceUsageLogSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  sampledAt: string;
-  resourceUsageLogPatch: ResourceUsageLogPatch;
-}>, "mutationFn">) {
+export function useUpdateResourceUsageLogMutation<S extends ResourceUsageLogSelect>(
+  params: {
+    selection: {
+      fields: S & ResourceUsageLogSelect;
+    } & HookStrictSelect<NoInfer<S>, ResourceUsageLogSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateResourceUsageLog: {
+          resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        sampledAt: string;
+        resourceUsageLogPatch: ResourceUsageLogPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateResourceUsageLog: {
+      resourceUsageLog: InferSelectResult<ResourceUsageLogWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    sampledAt: string;
+    resourceUsageLogPatch: ResourceUsageLogPatch;
+  }
+>;
+export function useUpdateResourceUsageLogMutation(
+  params: {
+    selection: SelectionConfig<ResourceUsageLogSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        sampledAt: string;
+        resourceUsageLogPatch: ResourceUsageLogPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<ResourceUsageLogSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdateResourceUsageLogMutation(params: {
     mutationFn: ({
       id,
       sampledAt,
-      resourceUsageLogPatch
+      resourceUsageLogPatch,
     }: {
       id: string;
       sampledAt: string;
       resourceUsageLogPatch: ResourceUsageLogPatch;
-    }) => getClient().resourceUsageLog.update({
-      where: {
-        id,
-        sampledAt
-      },
-      data: resourceUsageLogPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .resourceUsageLog.update({
+          where: {
+            id,
+            sampledAt,
+          },
+          data: resourceUsageLogPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: resourceUsageLogKeys.detail(variables.id)
+        queryKey: resourceUsageLogKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: resourceUsageLogKeys.lists()
+        queryKey: resourceUsageLogKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

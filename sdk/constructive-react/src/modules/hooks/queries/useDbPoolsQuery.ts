@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { dbPoolKeys } from "../query-keys";
-import type { DbPoolSelect, DbPoolWithRelations, DbPoolFilter, DbPoolOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { DbPoolSelect, DbPoolWithRelations, DbPoolFilter, DbPoolOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { dbPoolKeys } from '../query-keys';
+import type {
+  DbPoolSelect,
+  DbPoolWithRelations,
+  DbPoolFilter,
+  DbPoolOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  DbPoolSelect,
+  DbPoolWithRelations,
+  DbPoolFilter,
+  DbPoolOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const dbPoolsQueryKey = dbPoolKeys.list;
 /**
  * Warm database pool entries. Rows are inserted as warming (which enqueues a db_pool:warm_database job), become ready once provisioned, and are handed to users via metaschema_private.db_pool_claim (invoked by metaschema_public.request_database).
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useDbPoolsQuery({
@@ -30,33 +45,45 @@ export const dbPoolsQueryKey = dbPoolKeys.list;
  * });
  * ```
  */
-export function useDbPoolsQuery<S extends DbPoolSelect, TData = {
-  dbPools: ConnectionResult<InferSelectResult<DbPoolWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DbPoolFilter, DbPoolOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
-} & Omit<UseQueryOptions<{
-  dbPools: ConnectionResult<InferSelectResult<DbPoolWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useDbPoolsQuery(params: {
-  selection: ListSelectionConfig<DbPoolSelect, DbPoolFilter, DbPoolOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useDbPoolsQuery<
+  S extends DbPoolSelect,
+  TData = {
+    dbPools: ConnectionResult<InferSelectResult<DbPoolWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DbPoolFilter, DbPoolOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DbPoolSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        dbPools: ConnectionResult<InferSelectResult<DbPoolWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useDbPoolsQuery(
+  params: {
+    selection: ListSelectionConfig<DbPoolSelect, DbPoolFilter, DbPoolOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildListSelectionArgs<DbPoolSelect, DbPoolFilter, DbPoolOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: dbPoolKeys.list(args),
     queryFn: () => getClient().dbPool.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Warm database pool entries. Rows are inserted as warming (which enqueues a db_pool:warm_database job), become ready once provisioned, and are handed to users via metaschema_private.db_pool_claim (invoked by metaschema_public.request_database).
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchDbPoolsQuery({
@@ -70,7 +97,8 @@ export function useDbPoolsQuery(params: {
 export async function fetchDbPoolsQuery<S extends DbPoolSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DbPoolFilter, DbPoolOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
+  } & Omit<ListSelectionConfig<S, DbPoolFilter, DbPoolOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, DbPoolSelect>;
 }): Promise<{
   dbPools: ConnectionResult<InferSelectResult<DbPoolWithRelations, S>>;
 }>;
@@ -82,23 +110,30 @@ export async function fetchDbPoolsQuery(params: {
 }
 /**
  * Warm database pool entries. Rows are inserted as warming (which enqueues a db_pool:warm_database job), become ready once provisioned, and are handed to users via metaschema_private.db_pool_claim (invoked by metaschema_public.request_database).
- * 
+ *
  * @example
  * ```ts
  * await prefetchDbPoolsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDbPoolsQuery<S extends DbPoolSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, DbPoolFilter, DbPoolOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbPoolSelect>;
-}): Promise<void>;
-export async function prefetchDbPoolsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<DbPoolSelect, DbPoolFilter, DbPoolOrderBy>;
-}): Promise<void> {
+export async function prefetchDbPoolsQuery<S extends DbPoolSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, DbPoolFilter, DbPoolOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, DbPoolSelect>;
+  }
+): Promise<void>;
+export async function prefetchDbPoolsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<DbPoolSelect, DbPoolFilter, DbPoolOrderBy>;
+  }
+): Promise<void> {
   const args = buildListSelectionArgs<DbPoolSelect, DbPoolFilter, DbPoolOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: dbPoolKeys.list(args),
-    queryFn: () => getClient().dbPool.findMany(args).unwrap()
+    queryFn: () => getClient().dbPool.findMany(args).unwrap(),
   });
 }

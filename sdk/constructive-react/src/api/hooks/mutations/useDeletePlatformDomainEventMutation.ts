@@ -4,77 +4,101 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformDomainEventKeys } from "../query-keys";
-import { platformDomainEventMutationKeys } from "../mutation-keys";
-import type { PlatformDomainEventSelect, PlatformDomainEventWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformDomainEventSelect, PlatformDomainEventWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformDomainEventKeys } from '../query-keys';
+import { platformDomainEventMutationKeys } from '../mutation-keys';
+import type {
+  PlatformDomainEventSelect,
+  PlatformDomainEventWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformDomainEventSelect,
+  PlatformDomainEventWithRelations,
+} from '../../orm/input-types';
 /**
  * Audit trail of domain lifecycle events
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeletePlatformDomainEventMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeletePlatformDomainEventMutation<S extends PlatformDomainEventSelect>(params: {
-  selection: ({
-    fields: S & PlatformDomainEventSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>);
-} & Omit<UseMutationOptions<{
-  deletePlatformDomainEvent: {
-    platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePlatformDomainEvent: {
-    platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeletePlatformDomainEventMutation(params: {
-  selection: SelectionConfig<PlatformDomainEventSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeletePlatformDomainEventMutation<S extends PlatformDomainEventSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformDomainEventSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformDomainEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deletePlatformDomainEvent: {
+          platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deletePlatformDomainEvent: {
+      platformDomainEvent: InferSelectResult<PlatformDomainEventWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeletePlatformDomainEventMutation(
+  params: {
+    selection: SelectionConfig<PlatformDomainEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformDomainEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformDomainEventMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().platformDomainEvent.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .platformDomainEvent.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: platformDomainEventKeys.detail(variables.id)
+        queryKey: platformDomainEventKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformDomainEventKeys.lists()
+        queryKey: platformDomainEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

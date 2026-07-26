@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { apiSchemaKeys } from "../query-keys";
-import type { ApiSchemaSelect, ApiSchemaWithRelations, ApiSchemaFilter, ApiSchemaOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ApiSchemaSelect, ApiSchemaWithRelations, ApiSchemaFilter, ApiSchemaOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { apiSchemaKeys } from '../query-keys';
+import type {
+  ApiSchemaSelect,
+  ApiSchemaWithRelations,
+  ApiSchemaFilter,
+  ApiSchemaOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ApiSchemaSelect,
+  ApiSchemaWithRelations,
+  ApiSchemaFilter,
+  ApiSchemaOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const apiSchemasQueryKey = apiSchemaKeys.list;
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useApiSchemasQuery({
@@ -30,33 +45,47 @@ export const apiSchemasQueryKey = apiSchemaKeys.list;
  * });
  * ```
  */
-export function useApiSchemasQuery<S extends ApiSchemaSelect, TData = {
-  apiSchemas: ConnectionResult<InferSelectResult<ApiSchemaWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ApiSchemaFilter, ApiSchemaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiSchemaSelect>;
-} & Omit<UseQueryOptions<{
-  apiSchemas: ConnectionResult<InferSelectResult<ApiSchemaWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useApiSchemasQuery(params: {
-  selection: ListSelectionConfig<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useApiSchemasQuery<
+  S extends ApiSchemaSelect,
+  TData = {
+    apiSchemas: ConnectionResult<InferSelectResult<ApiSchemaWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ApiSchemaFilter, ApiSchemaOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiSchemaSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        apiSchemas: ConnectionResult<InferSelectResult<ApiSchemaWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useApiSchemasQuery(
+  params: {
+    selection: ListSelectionConfig<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: apiSchemaKeys.list(args),
     queryFn: () => getClient().apiSchema.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchApiSchemasQuery({
@@ -70,35 +99,47 @@ export function useApiSchemasQuery(params: {
 export async function fetchApiSchemasQuery<S extends ApiSchemaSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ApiSchemaFilter, ApiSchemaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiSchemaSelect>;
+  } & Omit<ListSelectionConfig<S, ApiSchemaFilter, ApiSchemaOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, ApiSchemaSelect>;
 }): Promise<{
   apiSchemas: ConnectionResult<InferSelectResult<ApiSchemaWithRelations, S>>;
 }>;
 export async function fetchApiSchemasQuery(params: {
   selection: ListSelectionConfig<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>;
 }) {
-  const args = buildListSelectionArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>(params.selection);
+  const args = buildListSelectionArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>(
+    params.selection
+  );
   return getClient().apiSchema.findMany(args).unwrap();
 }
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```ts
  * await prefetchApiSchemasQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchApiSchemasQuery<S extends ApiSchemaSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ApiSchemaFilter, ApiSchemaOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ApiSchemaSelect>;
-}): Promise<void>;
-export async function prefetchApiSchemasQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>(params.selection);
+export async function prefetchApiSchemasQuery<S extends ApiSchemaSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, ApiSchemaFilter, ApiSchemaOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, ApiSchemaSelect>;
+  }
+): Promise<void>;
+export async function prefetchApiSchemasQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: apiSchemaKeys.list(args),
-    queryFn: () => getClient().apiSchema.findMany(args).unwrap()
+    queryFn: () => getClient().apiSchema.findMany(args).unwrap(),
   });
 }

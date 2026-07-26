@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { defaultIdsModuleKeys } from "../query-keys";
-import { defaultIdsModuleMutationKeys } from "../mutation-keys";
-import type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { defaultIdsModuleKeys } from '../query-keys';
+import { defaultIdsModuleMutationKeys } from '../mutation-keys';
+import type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { DefaultIdsModuleSelect, DefaultIdsModuleWithRelations } from '../../orm/input-types';
 /**
  * Mutation hook for deleting a DefaultIdsModule with typed selection
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteDefaultIdsModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteDefaultIdsModuleMutation<S extends DefaultIdsModuleSelect>(params: {
-  selection: ({
-    fields: S & DefaultIdsModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deleteDefaultIdsModule: {
-    defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteDefaultIdsModule: {
-    defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteDefaultIdsModuleMutation(params: {
-  selection: SelectionConfig<DefaultIdsModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteDefaultIdsModuleMutation<S extends DefaultIdsModuleSelect>(
+  params: {
+    selection: {
+      fields: S & DefaultIdsModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, DefaultIdsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteDefaultIdsModule: {
+          defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteDefaultIdsModule: {
+      defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteDefaultIdsModuleMutation(
+  params: {
+    selection: SelectionConfig<DefaultIdsModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<DefaultIdsModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: defaultIdsModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().defaultIdsModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .defaultIdsModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: defaultIdsModuleKeys.detail(variables.id)
+        queryKey: defaultIdsModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: defaultIdsModuleKeys.lists()
+        queryKey: defaultIdsModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

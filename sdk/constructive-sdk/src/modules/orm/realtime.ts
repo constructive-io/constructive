@@ -31,7 +31,7 @@ interface WsSink<T> {
 export interface WsClient {
   subscribe<TData = Record<string, unknown>>(
     payload: { query: string; variables?: Record<string, unknown> },
-    sink: WsSink<WsExecutionResult<TData>>,
+    sink: WsSink<WsExecutionResult<TData>>
   ): () => void;
   dispose(): void;
 }
@@ -44,11 +44,7 @@ export interface WsClient {
 export type SubscriptionOperation = 'INSERT' | 'UPDATE' | 'DELETE';
 
 /** Connection state of the WebSocket */
-export type ConnectionState =
-  | 'disconnected'
-  | 'connecting'
-  | 'connected'
-  | 'reconnecting';
+export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting';
 
 /** Listener for connection state changes */
 export type ConnectionStateListener = (state: ConnectionState) => void;
@@ -78,10 +74,7 @@ export interface SubscriptionEvent<T> {
  * @typeParam T - The row type of the subscribed table
  * @typeParam TFilter - The filter type for the table
  */
-export interface SubscribeOptions<
-  T,
-  TFilter = Record<string, unknown>,
-> {
+export interface SubscribeOptions<T, TFilter = Record<string, unknown>> {
   /** Server-side filter to limit which events are delivered */
   filter?: TFilter;
   /** Called when a subscription event is received */
@@ -167,7 +160,7 @@ export class RealtimeManager {
       onEvent: (event: SubscriptionEvent<T>) => void;
       onError?: (error: Error) => void;
       onComplete?: () => void;
-    },
+    }
   ): Unsubscribe {
     this.activeSubscriptions++;
     let disposed = false;
@@ -178,11 +171,7 @@ export class RealtimeManager {
         next: (result) => {
           if (disposed) return;
           if (result.errors) {
-            options.onError?.(
-              new Error(
-                result.errors.map((e) => e.message).join('; '),
-              ),
-            );
+            options.onError?.(new Error(result.errors.map((e) => e.message).join('; ')));
             return;
           }
 
@@ -193,28 +182,22 @@ export class RealtimeManager {
           if (!payload) return;
 
           const event: SubscriptionEvent<T> = {
-            operation:
-              (payload.event as SubscriptionOperation) ?? 'UPDATE',
+            operation: (payload.event as SubscriptionOperation) ?? 'UPDATE',
             data: (payload[meta.dataFieldName] as T) ?? null,
-            previousValues: payload.previousValues as
-              | Partial<T>
-              | undefined,
-            timestamp:
-              (payload.timestamp as string) ?? new Date().toISOString(),
+            previousValues: payload.previousValues as Partial<T> | undefined,
+            timestamp: (payload.timestamp as string) ?? new Date().toISOString(),
           };
           options.onEvent(event);
         },
         error: (err) => {
           if (disposed) return;
-          options.onError?.(
-            err instanceof Error ? err : new Error(String(err)),
-          );
+          options.onError?.(err instanceof Error ? err : new Error(String(err)));
         },
         complete: () => {
           if (disposed) return;
           options.onComplete?.();
         },
-      },
+      }
     );
 
     return () => {

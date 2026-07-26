@@ -4,61 +4,90 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionInvocationAttemptKeys } from "../query-keys";
-import { functionInvocationAttemptMutationKeys } from "../mutation-keys";
-import type { FunctionInvocationAttemptSelect, FunctionInvocationAttemptWithRelations, FunctionInvocationAttemptPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionInvocationAttemptSelect, FunctionInvocationAttemptWithRelations, FunctionInvocationAttemptPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionInvocationAttemptKeys } from '../query-keys';
+import { functionInvocationAttemptMutationKeys } from '../mutation-keys';
+import type {
+  FunctionInvocationAttemptSelect,
+  FunctionInvocationAttemptWithRelations,
+  FunctionInvocationAttemptPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionInvocationAttemptSelect,
+  FunctionInvocationAttemptWithRelations,
+  FunctionInvocationAttemptPatch,
+} from '../../orm/input-types';
 /**
  * Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionInvocationAttemptMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', functionInvocationAttemptPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionInvocationAttemptMutation<S extends FunctionInvocationAttemptSelect>(params: {
-  selection: ({
-    fields: S & FunctionInvocationAttemptSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionInvocationAttemptSelect>);
-} & Omit<UseMutationOptions<{
-  updateFunctionInvocationAttempt: {
-    functionInvocationAttempt: InferSelectResult<FunctionInvocationAttemptWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateFunctionInvocationAttempt: {
-    functionInvocationAttempt: InferSelectResult<FunctionInvocationAttemptWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
-}>;
-export function useUpdateFunctionInvocationAttemptMutation(params: {
-  selection: SelectionConfig<FunctionInvocationAttemptSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
-}>, "mutationFn">) {
+export function useUpdateFunctionInvocationAttemptMutation<
+  S extends FunctionInvocationAttemptSelect,
+>(
+  params: {
+    selection: {
+      fields: S & FunctionInvocationAttemptSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionInvocationAttemptSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateFunctionInvocationAttempt: {
+          functionInvocationAttempt: InferSelectResult<FunctionInvocationAttemptWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateFunctionInvocationAttempt: {
+      functionInvocationAttempt: InferSelectResult<FunctionInvocationAttemptWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
+  }
+>;
+export function useUpdateFunctionInvocationAttemptMutation(
+  params: {
+    selection: SelectionConfig<FunctionInvocationAttemptSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionInvocationAttemptSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +95,30 @@ export function useUpdateFunctionInvocationAttemptMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      functionInvocationAttemptPatch
+      functionInvocationAttemptPatch,
     }: {
       id: string;
       createdAt: string;
       functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
-    }) => getClient().functionInvocationAttempt.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: functionInvocationAttemptPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .functionInvocationAttempt.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: functionInvocationAttemptPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionInvocationAttemptKeys.detail(variables.id)
+        queryKey: functionInvocationAttemptKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionInvocationAttemptKeys.lists()
+        queryKey: functionInvocationAttemptKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

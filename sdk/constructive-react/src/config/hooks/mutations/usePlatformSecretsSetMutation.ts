@@ -4,39 +4,55 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { customMutationKeys } from "../mutation-keys";
-import type { PlatformSecretsSetVariables } from "../../orm/mutation";
-import type { PlatformSecretsSetPayloadSelect, PlatformSecretsSetPayload } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
-export type { PlatformSecretsSetVariables } from "../../orm/mutation";
-export type { PlatformSecretsSetPayloadSelect } from "../../orm/input-types";
-export function usePlatformSecretsSetMutation<S extends PlatformSecretsSetPayloadSelect>(params: {
-  selection: ({
-    fields: S & PlatformSecretsSetPayloadSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformSecretsSetPayloadSelect>);
-} & Omit<UseMutationOptions<{
-  platformSecretsSet: InferSelectResult<PlatformSecretsSetPayload, S> | null;
-}, Error, PlatformSecretsSetVariables>, "mutationFn">): UseMutationResult<{
-  platformSecretsSet: InferSelectResult<PlatformSecretsSetPayload, S> | null;
-}, Error, PlatformSecretsSetVariables> {
+import { useMutation } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { customMutationKeys } from '../mutation-keys';
+import type { PlatformSecretsSetVariables } from '../../orm/mutation';
+import type {
+  PlatformSecretsSetPayloadSelect,
+  PlatformSecretsSetPayload,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from '../../orm/select-types';
+export type { PlatformSecretsSetVariables } from '../../orm/mutation';
+export type { PlatformSecretsSetPayloadSelect } from '../../orm/input-types';
+export function usePlatformSecretsSetMutation<S extends PlatformSecretsSetPayloadSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformSecretsSetPayloadSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformSecretsSetPayloadSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        platformSecretsSet: InferSelectResult<PlatformSecretsSetPayload, S> | null;
+      },
+      Error,
+      PlatformSecretsSetVariables
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    platformSecretsSet: InferSelectResult<PlatformSecretsSetPayload, S> | null;
+  },
+  Error,
+  PlatformSecretsSetVariables
+> {
   const args = buildSelectionArgs<S>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   return useMutation({
     mutationKey: customMutationKeys.platformSecretsSet(),
-    mutationFn: (variables: PlatformSecretsSetVariables) => getClient().mutation.platformSecretsSet(variables, {
-      select: args.select
-    } as {
-      select: S;
-    } & StrictSelect<S, PlatformSecretsSetPayloadSelect>).unwrap(),
-    ...mutationOptions
+    mutationFn: (variables: PlatformSecretsSetVariables) =>
+      getClient()
+        .mutation.platformSecretsSet(variables, {
+          select: args.select,
+        } as {
+          select: S;
+        } & StrictSelect<S, PlatformSecretsSetPayloadSelect>)
+        .unwrap(),
+    ...mutationOptions,
   });
 }

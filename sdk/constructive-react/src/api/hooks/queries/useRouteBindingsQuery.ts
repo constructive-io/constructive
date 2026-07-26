@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { routeBindingKeys } from "../query-keys";
-import type { RouteBindingSelect, RouteBindingWithRelations, RouteBindingFilter, RouteBindingOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { RouteBindingSelect, RouteBindingWithRelations, RouteBindingFilter, RouteBindingOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { routeBindingKeys } from '../query-keys';
+import type {
+  RouteBindingSelect,
+  RouteBindingWithRelations,
+  RouteBindingFilter,
+  RouteBindingOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  RouteBindingSelect,
+  RouteBindingWithRelations,
+  RouteBindingFilter,
+  RouteBindingOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const routeBindingsQueryKey = routeBindingKeys.list;
 /**
  * Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRouteBindingsQuery({
@@ -30,33 +45,47 @@ export const routeBindingsQueryKey = routeBindingKeys.list;
  * });
  * ```
  */
-export function useRouteBindingsQuery<S extends RouteBindingSelect, TData = {
-  routeBindings: ConnectionResult<InferSelectResult<RouteBindingWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RouteBindingFilter, RouteBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
-} & Omit<UseQueryOptions<{
-  routeBindings: ConnectionResult<InferSelectResult<RouteBindingWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRouteBindingsQuery(params: {
-  selection: ListSelectionConfig<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useRouteBindingsQuery<
+  S extends RouteBindingSelect,
+  TData = {
+    routeBindings: ConnectionResult<InferSelectResult<RouteBindingWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RouteBindingFilter, RouteBindingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        routeBindings: ConnectionResult<InferSelectResult<RouteBindingWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRouteBindingsQuery(
+  params: {
+    selection: ListSelectionConfig<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>(
+    params.selection
+  );
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: routeBindingKeys.list(args),
     queryFn: () => getClient().routeBinding.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRouteBindingsQuery({
@@ -70,35 +99,47 @@ export function useRouteBindingsQuery(params: {
 export async function fetchRouteBindingsQuery<S extends RouteBindingSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RouteBindingFilter, RouteBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
+  } & Omit<ListSelectionConfig<S, RouteBindingFilter, RouteBindingOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
 }): Promise<{
   routeBindings: ConnectionResult<InferSelectResult<RouteBindingWithRelations, S>>;
 }>;
 export async function fetchRouteBindingsQuery(params: {
   selection: ListSelectionConfig<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>;
 }) {
-  const args = buildListSelectionArgs<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>(params.selection);
+  const args = buildListSelectionArgs<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>(
+    params.selection
+  );
   return getClient().routeBinding.findMany(args).unwrap();
 }
 /**
  * Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver
- * 
+ *
  * @example
  * ```ts
  * await prefetchRouteBindingsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRouteBindingsQuery<S extends RouteBindingSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RouteBindingFilter, RouteBindingOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
-}): Promise<void>;
-export async function prefetchRouteBindingsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>(params.selection);
+export async function prefetchRouteBindingsQuery<S extends RouteBindingSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RouteBindingFilter, RouteBindingOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RouteBindingSelect>;
+  }
+): Promise<void>;
+export async function prefetchRouteBindingsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<RouteBindingSelect, RouteBindingFilter, RouteBindingOrderBy>(
+    params.selection
+  );
   await queryClient.prefetchQuery({
     queryKey: routeBindingKeys.list(args),
-    queryFn: () => getClient().routeBinding.findMany(args).unwrap()
+    queryFn: () => getClient().routeBinding.findMany(args).unwrap(),
   });
 }

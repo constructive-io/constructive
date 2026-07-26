@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { appLimitEventKeys } from "../query-keys";
-import { appLimitEventMutationKeys } from "../mutation-keys";
-import type { AppLimitEventSelect, AppLimitEventWithRelations, AppLimitEventPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { AppLimitEventSelect, AppLimitEventWithRelations, AppLimitEventPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { appLimitEventKeys } from '../query-keys';
+import { appLimitEventMutationKeys } from '../mutation-keys';
+import type {
+  AppLimitEventSelect,
+  AppLimitEventWithRelations,
+  AppLimitEventPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  AppLimitEventSelect,
+  AppLimitEventWithRelations,
+  AppLimitEventPatch,
+} from '../../orm/input-types';
 /**
  * Append-only log of limit events for historical reporting and audit
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAppLimitEventMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', appLimitEventPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAppLimitEventMutation<S extends AppLimitEventSelect>(params: {
-  selection: ({
-    fields: S & AppLimitEventSelect;
-  } & HookStrictSelect<NoInfer<S>, AppLimitEventSelect>);
-} & Omit<UseMutationOptions<{
-  updateAppLimitEvent: {
-    appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  appLimitEventPatch: AppLimitEventPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateAppLimitEvent: {
-    appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  appLimitEventPatch: AppLimitEventPatch;
-}>;
-export function useUpdateAppLimitEventMutation(params: {
-  selection: SelectionConfig<AppLimitEventSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  appLimitEventPatch: AppLimitEventPatch;
-}>, "mutationFn">) {
+export function useUpdateAppLimitEventMutation<S extends AppLimitEventSelect>(
+  params: {
+    selection: {
+      fields: S & AppLimitEventSelect;
+    } & HookStrictSelect<NoInfer<S>, AppLimitEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateAppLimitEvent: {
+          appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        appLimitEventPatch: AppLimitEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateAppLimitEvent: {
+      appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    appLimitEventPatch: AppLimitEventPatch;
+  }
+>;
+export function useUpdateAppLimitEventMutation(
+  params: {
+    selection: SelectionConfig<AppLimitEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        appLimitEventPatch: AppLimitEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<AppLimitEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdateAppLimitEventMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      appLimitEventPatch
+      appLimitEventPatch,
     }: {
       id: string;
       createdAt: string;
       appLimitEventPatch: AppLimitEventPatch;
-    }) => getClient().appLimitEvent.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: appLimitEventPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .appLimitEvent.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: appLimitEventPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: appLimitEventKeys.detail(variables.id)
+        queryKey: appLimitEventKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: appLimitEventKeys.lists()
+        queryKey: appLimitEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

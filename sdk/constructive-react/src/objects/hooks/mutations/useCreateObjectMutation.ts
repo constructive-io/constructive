@@ -4,62 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { objectKeys } from "../query-keys";
-import { objectMutationKeys } from "../mutation-keys";
-import type { ObjectSelect, ObjectWithRelations, CreateObjectInput } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ObjectSelect, ObjectWithRelations, CreateObjectInput } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { objectKeys } from '../query-keys';
+import { objectMutationKeys } from '../mutation-keys';
+import type { ObjectSelect, ObjectWithRelations, CreateObjectInput } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { ObjectSelect, ObjectWithRelations, CreateObjectInput } from '../../orm/input-types';
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateObjectMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateObjectMutation<S extends ObjectSelect>(params: {
-  selection: ({
-    fields: S & ObjectSelect;
-  } & HookStrictSelect<NoInfer<S>, ObjectSelect>);
-} & Omit<UseMutationOptions<{
-  createObject: {
-    object: InferSelectResult<ObjectWithRelations, S>;
-  };
-}, Error, CreateObjectInput["object"]>, "mutationFn">): UseMutationResult<{
-  createObject: {
-    object: InferSelectResult<ObjectWithRelations, S>;
-  };
-}, Error, CreateObjectInput["object"]>;
-export function useCreateObjectMutation(params: {
-  selection: SelectionConfig<ObjectSelect>;
-} & Omit<UseMutationOptions<any, Error, CreateObjectInput["object"]>, "mutationFn">) {
+export function useCreateObjectMutation<S extends ObjectSelect>(
+  params: {
+    selection: {
+      fields: S & ObjectSelect;
+    } & HookStrictSelect<NoInfer<S>, ObjectSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        createObject: {
+          object: InferSelectResult<ObjectWithRelations, S>;
+        };
+      },
+      Error,
+      CreateObjectInput['object']
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    createObject: {
+      object: InferSelectResult<ObjectWithRelations, S>;
+    };
+  },
+  Error,
+  CreateObjectInput['object']
+>;
+export function useCreateObjectMutation(
+  params: {
+    selection: SelectionConfig<ObjectSelect>;
+  } & Omit<UseMutationOptions<any, Error, CreateObjectInput['object']>, 'mutationFn'>
+) {
   const args = buildSelectionArgs<ObjectSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: objectMutationKeys.create(),
-    mutationFn: (data: CreateObjectInput["object"]) => getClient().object.create({
-      data,
-      select: args.select
-    }).unwrap(),
+    mutationFn: (data: CreateObjectInput['object']) =>
+      getClient()
+        .object.create({
+          data,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: objectKeys.lists()
+        queryKey: objectKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

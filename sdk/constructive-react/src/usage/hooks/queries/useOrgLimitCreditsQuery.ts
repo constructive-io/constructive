@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { orgLimitCreditKeys } from "../query-keys";
-import type { OrgLimitCreditSelect, OrgLimitCreditWithRelations, OrgLimitCreditFilter, OrgLimitCreditOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgLimitCreditSelect, OrgLimitCreditWithRelations, OrgLimitCreditFilter, OrgLimitCreditOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { orgLimitCreditKeys } from '../query-keys';
+import type {
+  OrgLimitCreditSelect,
+  OrgLimitCreditWithRelations,
+  OrgLimitCreditFilter,
+  OrgLimitCreditOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  OrgLimitCreditSelect,
+  OrgLimitCreditWithRelations,
+  OrgLimitCreditFilter,
+  OrgLimitCreditOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitCreditsQueryKey = orgLimitCreditKeys.list;
 /**
  * Append-only ledger of credit grants that automatically update limit ceilings
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitCreditsQuery({
@@ -30,33 +45,53 @@ export const orgLimitCreditsQueryKey = orgLimitCreditKeys.list;
  * });
  * ```
  */
-export function useOrgLimitCreditsQuery<S extends OrgLimitCreditSelect, TData = {
-  orgLimitCredits: ConnectionResult<InferSelectResult<OrgLimitCreditWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitCreditSelect>;
-} & Omit<UseQueryOptions<{
-  orgLimitCredits: ConnectionResult<InferSelectResult<OrgLimitCreditWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgLimitCreditsQuery(params: {
-  selection: ListSelectionConfig<OrgLimitCreditSelect, OrgLimitCreditFilter, OrgLimitCreditOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<OrgLimitCreditSelect, OrgLimitCreditFilter, OrgLimitCreditOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useOrgLimitCreditsQuery<
+  S extends OrgLimitCreditSelect,
+  TData = {
+    orgLimitCredits: ConnectionResult<InferSelectResult<OrgLimitCreditWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgLimitCreditSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgLimitCredits: ConnectionResult<InferSelectResult<OrgLimitCreditWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgLimitCreditsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      OrgLimitCreditSelect,
+      OrgLimitCreditFilter,
+      OrgLimitCreditOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    OrgLimitCreditSelect,
+    OrgLimitCreditFilter,
+    OrgLimitCreditOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitCreditKeys.list(args),
     queryFn: () => getClient().orgLimitCredit.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Append-only ledger of credit grants that automatically update limit ceilings
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgLimitCreditsQuery({
@@ -70,35 +105,55 @@ export function useOrgLimitCreditsQuery(params: {
 export async function fetchOrgLimitCreditsQuery<S extends OrgLimitCreditSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitCreditSelect>;
+  } & Omit<ListSelectionConfig<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, OrgLimitCreditSelect>;
 }): Promise<{
   orgLimitCredits: ConnectionResult<InferSelectResult<OrgLimitCreditWithRelations, S>>;
 }>;
 export async function fetchOrgLimitCreditsQuery(params: {
   selection: ListSelectionConfig<OrgLimitCreditSelect, OrgLimitCreditFilter, OrgLimitCreditOrderBy>;
 }) {
-  const args = buildListSelectionArgs<OrgLimitCreditSelect, OrgLimitCreditFilter, OrgLimitCreditOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    OrgLimitCreditSelect,
+    OrgLimitCreditFilter,
+    OrgLimitCreditOrderBy
+  >(params.selection);
   return getClient().orgLimitCredit.findMany(args).unwrap();
 }
 /**
  * Append-only ledger of credit grants that automatically update limit ceilings
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgLimitCreditsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgLimitCreditsQuery<S extends OrgLimitCreditSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitCreditSelect>;
-}): Promise<void>;
-export async function prefetchOrgLimitCreditsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<OrgLimitCreditSelect, OrgLimitCreditFilter, OrgLimitCreditOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<OrgLimitCreditSelect, OrgLimitCreditFilter, OrgLimitCreditOrderBy>(params.selection);
+export async function prefetchOrgLimitCreditsQuery<S extends OrgLimitCreditSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, OrgLimitCreditSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgLimitCreditsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      OrgLimitCreditSelect,
+      OrgLimitCreditFilter,
+      OrgLimitCreditOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    OrgLimitCreditSelect,
+    OrgLimitCreditFilter,
+    OrgLimitCreditOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitCreditKeys.list(args),
-    queryFn: () => getClient().orgLimitCredit.findMany(args).unwrap()
+    queryFn: () => getClient().orgLimitCredit.findMany(args).unwrap(),
   });
 }

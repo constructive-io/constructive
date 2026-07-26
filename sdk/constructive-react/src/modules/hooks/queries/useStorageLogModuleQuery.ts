@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { storageLogModuleKeys } from "../query-keys";
-import type { StorageLogModuleSelect, StorageLogModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { StorageLogModuleSelect, StorageLogModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { storageLogModuleKeys } from '../query-keys';
+import type { StorageLogModuleSelect, StorageLogModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { StorageLogModuleSelect, StorageLogModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const storageLogModuleQueryKey = storageLogModuleKeys.detail;
 /**
  * Query hook for fetching a single StorageLogModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useStorageLogModuleQuery({
@@ -26,38 +26,52 @@ export const storageLogModuleQueryKey = storageLogModuleKeys.detail;
  * });
  * ```
  */
-export function useStorageLogModuleQuery<S extends StorageLogModuleSelect, TData = {
-  storageLogModule: InferSelectResult<StorageLogModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, StorageLogModuleSelect>;
-} & Omit<UseQueryOptions<{
-  storageLogModule: InferSelectResult<StorageLogModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useStorageLogModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<StorageLogModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useStorageLogModuleQuery<
+  S extends StorageLogModuleSelect,
+  TData = {
+    storageLogModule: InferSelectResult<StorageLogModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, StorageLogModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        storageLogModule: InferSelectResult<StorageLogModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useStorageLogModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<StorageLogModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<StorageLogModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: storageLogModuleKeys.detail(params.id),
-    queryFn: () => getClient().storageLogModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .storageLogModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single StorageLogModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchStorageLogModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchStorageLogModuleQuery(params: {
   selection: SelectionConfig<StorageLogModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<StorageLogModuleSelect>(params.selection);
-  return getClient().storageLogModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .storageLogModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single StorageLogModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchStorageLogModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchStorageLogModuleQuery<S extends StorageLogModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, StorageLogModuleSelect>;
-}): Promise<void>;
-export async function prefetchStorageLogModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<StorageLogModuleSelect>;
-}): Promise<void> {
+export async function prefetchStorageLogModuleQuery<S extends StorageLogModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, StorageLogModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchStorageLogModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<StorageLogModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<StorageLogModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: storageLogModuleKeys.detail(params.id),
-    queryFn: () => getClient().storageLogModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .storageLogModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

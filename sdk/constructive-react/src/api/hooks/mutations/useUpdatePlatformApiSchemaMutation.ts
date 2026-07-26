@@ -4,83 +4,113 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { platformApiSchemaKeys } from "../query-keys";
-import { platformApiSchemaMutationKeys } from "../mutation-keys";
-import type { PlatformApiSchemaSelect, PlatformApiSchemaWithRelations, PlatformApiSchemaPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { PlatformApiSchemaSelect, PlatformApiSchemaWithRelations, PlatformApiSchemaPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { platformApiSchemaKeys } from '../query-keys';
+import { platformApiSchemaMutationKeys } from '../mutation-keys';
+import type {
+  PlatformApiSchemaSelect,
+  PlatformApiSchemaWithRelations,
+  PlatformApiSchemaPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  PlatformApiSchemaSelect,
+  PlatformApiSchemaWithRelations,
+  PlatformApiSchemaPatch,
+} from '../../orm/input-types';
 /**
  * Join table linking API surfaces to the metaschema schemas they expose
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdatePlatformApiSchemaMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', platformApiSchemaPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdatePlatformApiSchemaMutation<S extends PlatformApiSchemaSelect>(params: {
-  selection: ({
-    fields: S & PlatformApiSchemaSelect;
-  } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>);
-} & Omit<UseMutationOptions<{
-  updatePlatformApiSchema: {
-    platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformApiSchemaPatch: PlatformApiSchemaPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updatePlatformApiSchema: {
-    platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  platformApiSchemaPatch: PlatformApiSchemaPatch;
-}>;
-export function useUpdatePlatformApiSchemaMutation(params: {
-  selection: SelectionConfig<PlatformApiSchemaSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  platformApiSchemaPatch: PlatformApiSchemaPatch;
-}>, "mutationFn">) {
+export function useUpdatePlatformApiSchemaMutation<S extends PlatformApiSchemaSelect>(
+  params: {
+    selection: {
+      fields: S & PlatformApiSchemaSelect;
+    } & HookStrictSelect<NoInfer<S>, PlatformApiSchemaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updatePlatformApiSchema: {
+          platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        platformApiSchemaPatch: PlatformApiSchemaPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updatePlatformApiSchema: {
+      platformApiSchema: InferSelectResult<PlatformApiSchemaWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    platformApiSchemaPatch: PlatformApiSchemaPatch;
+  }
+>;
+export function useUpdatePlatformApiSchemaMutation(
+  params: {
+    selection: SelectionConfig<PlatformApiSchemaSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        platformApiSchemaPatch: PlatformApiSchemaPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<PlatformApiSchemaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: platformApiSchemaMutationKeys.all,
     mutationFn: ({
       id,
-      platformApiSchemaPatch
+      platformApiSchemaPatch,
     }: {
       id: string;
       platformApiSchemaPatch: PlatformApiSchemaPatch;
-    }) => getClient().platformApiSchema.update({
-      where: {
-        id
-      },
-      data: platformApiSchemaPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .platformApiSchema.update({
+          where: {
+            id,
+          },
+          data: platformApiSchemaPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: platformApiSchemaKeys.detail(variables.id)
+        queryKey: platformApiSchemaKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: platformApiSchemaKeys.lists()
+        queryKey: platformApiSchemaKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

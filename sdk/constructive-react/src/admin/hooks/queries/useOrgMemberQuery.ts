@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { orgMemberKeys } from "../query-keys";
-import type { OrgMemberSelect, OrgMemberWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { OrgMemberSelect, OrgMemberWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { orgMemberKeys } from '../query-keys';
+import type { OrgMemberSelect, OrgMemberWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { OrgMemberSelect, OrgMemberWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const orgMemberQueryKey = orgMemberKeys.detail;
 /**
  * Simplified view of active members in an entity, used for listing who belongs to an org or group
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgMemberQuery({
@@ -26,38 +26,52 @@ export const orgMemberQueryKey = orgMemberKeys.detail;
  * });
  * ```
  */
-export function useOrgMemberQuery<S extends OrgMemberSelect, TData = {
-  orgMember: InferSelectResult<OrgMemberWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgMemberSelect>;
-} & Omit<UseQueryOptions<{
-  orgMember: InferSelectResult<OrgMemberWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useOrgMemberQuery(params: {
-  id: string;
-  selection: SelectionConfig<OrgMemberSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useOrgMemberQuery<
+  S extends OrgMemberSelect,
+  TData = {
+    orgMember: InferSelectResult<OrgMemberWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgMemberSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        orgMember: InferSelectResult<OrgMemberWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useOrgMemberQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgMemberSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<OrgMemberSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgMemberKeys.detail(params.id),
-    queryFn: () => getClient().orgMember.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .orgMember.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Simplified view of active members in an entity, used for listing who belongs to an org or group
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchOrgMemberQuery({
@@ -79,35 +93,46 @@ export async function fetchOrgMemberQuery(params: {
   selection: SelectionConfig<OrgMemberSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgMemberSelect>(params.selection);
-  return getClient().orgMember.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .orgMember.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Simplified view of active members in an entity, used for listing who belongs to an org or group
- * 
+ *
  * @example
  * ```ts
  * await prefetchOrgMemberQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgMemberQuery<S extends OrgMemberSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, OrgMemberSelect>;
-}): Promise<void>;
-export async function prefetchOrgMemberQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<OrgMemberSelect>;
-}): Promise<void> {
+export async function prefetchOrgMemberQuery<S extends OrgMemberSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, OrgMemberSelect>;
+  }
+): Promise<void>;
+export async function prefetchOrgMemberQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<OrgMemberSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<OrgMemberSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgMemberKeys.detail(params.id),
-    queryFn: () => getClient().orgMember.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .orgMember.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

@@ -378,8 +378,62 @@ export interface SqlActionFilter {
   verify?: StringFilter;
 }
 // ============ OrderBy Types ============
-export type AstMigrationOrderBy = "ACTION_ID_ASC" | "ACTION_ID_DESC" | "ACTION_NAME_ASC" | "ACTION_NAME_DESC" | "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOYS_ASC" | "DEPLOYS_DESC" | "DEPLOY_ASC" | "DEPLOY_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "REQUIRES_ASC" | "REQUIRES_DESC" | "REVERT_ASC" | "REVERT_DESC" | "VERIFY_ASC" | "VERIFY_DESC";
-export type SqlActionOrderBy = "ACTION_ID_ASC" | "ACTION_ID_DESC" | "ACTION_NAME_ASC" | "ACTION_NAME_DESC" | "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOY_ASC" | "DEPLOY_DESC" | "DEPS_ASC" | "DEPS_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "REVERT_ASC" | "REVERT_DESC" | "VERIFY_ASC" | "VERIFY_DESC";
+export type AstMigrationOrderBy =
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTION_NAME_ASC'
+  | 'ACTION_NAME_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEPLOYS_ASC'
+  | 'DEPLOYS_DESC'
+  | 'DEPLOY_ASC'
+  | 'DEPLOY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'REQUIRES_ASC'
+  | 'REQUIRES_DESC'
+  | 'REVERT_ASC'
+  | 'REVERT_DESC'
+  | 'VERIFY_ASC'
+  | 'VERIFY_DESC';
+export type SqlActionOrderBy =
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTION_NAME_ASC'
+  | 'ACTION_NAME_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CONTENT_ASC'
+  | 'CONTENT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEPLOY_ASC'
+  | 'DEPLOY_DESC'
+  | 'DEPS_ASC'
+  | 'DEPS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'REVERT_ASC'
+  | 'REVERT_DESC'
+  | 'VERIFY_ASC'
+  | 'VERIFY_DESC';
 // ============ CRUD Input Types ============
 export interface CreateAstMigrationInput {
   clientMutationId?: string;

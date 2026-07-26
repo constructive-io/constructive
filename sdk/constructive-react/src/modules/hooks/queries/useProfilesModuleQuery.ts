@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { profilesModuleKeys } from "../query-keys";
-import type { ProfilesModuleSelect, ProfilesModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ProfilesModuleSelect, ProfilesModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { profilesModuleKeys } from '../query-keys';
+import type { ProfilesModuleSelect, ProfilesModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { ProfilesModuleSelect, ProfilesModuleWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const profilesModuleQueryKey = profilesModuleKeys.detail;
 /**
  * Query hook for fetching a single ProfilesModule
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useProfilesModuleQuery({
@@ -26,38 +26,52 @@ export const profilesModuleQueryKey = profilesModuleKeys.detail;
  * });
  * ```
  */
-export function useProfilesModuleQuery<S extends ProfilesModuleSelect, TData = {
-  profilesModule: InferSelectResult<ProfilesModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ProfilesModuleSelect>;
-} & Omit<UseQueryOptions<{
-  profilesModule: InferSelectResult<ProfilesModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useProfilesModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<ProfilesModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useProfilesModuleQuery<
+  S extends ProfilesModuleSelect,
+  TData = {
+    profilesModule: InferSelectResult<ProfilesModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ProfilesModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        profilesModule: InferSelectResult<ProfilesModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useProfilesModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<ProfilesModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<ProfilesModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: profilesModuleKeys.detail(params.id),
-    queryFn: () => getClient().profilesModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .profilesModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single ProfilesModule without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchProfilesModuleQuery({
@@ -79,35 +93,46 @@ export async function fetchProfilesModuleQuery(params: {
   selection: SelectionConfig<ProfilesModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ProfilesModuleSelect>(params.selection);
-  return getClient().profilesModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .profilesModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single ProfilesModule for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchProfilesModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchProfilesModuleQuery<S extends ProfilesModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ProfilesModuleSelect>;
-}): Promise<void>;
-export async function prefetchProfilesModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<ProfilesModuleSelect>;
-}): Promise<void> {
+export async function prefetchProfilesModuleQuery<S extends ProfilesModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ProfilesModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchProfilesModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<ProfilesModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<ProfilesModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: profilesModuleKeys.detail(params.id),
-    queryFn: () => getClient().profilesModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .profilesModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

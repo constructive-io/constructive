@@ -4,77 +4,95 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { realtimeModuleKeys } from "../query-keys";
-import { realtimeModuleMutationKeys } from "../mutation-keys";
-import type { RealtimeModuleSelect, RealtimeModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { RealtimeModuleSelect, RealtimeModuleWithRelations } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { realtimeModuleKeys } from '../query-keys';
+import { realtimeModuleMutationKeys } from '../mutation-keys';
+import type { RealtimeModuleSelect, RealtimeModuleWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { RealtimeModuleSelect, RealtimeModuleWithRelations } from '../../orm/input-types';
 /**
  * Mutation hook for deleting a RealtimeModule with typed selection
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteRealtimeModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteRealtimeModuleMutation<S extends RealtimeModuleSelect>(params: {
-  selection: ({
-    fields: S & RealtimeModuleSelect;
-  } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>);
-} & Omit<UseMutationOptions<{
-  deleteRealtimeModule: {
-    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteRealtimeModule: {
-    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-}>;
-export function useDeleteRealtimeModuleMutation(params: {
-  selection: SelectionConfig<RealtimeModuleSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-}>, "mutationFn">) {
+export function useDeleteRealtimeModuleMutation<S extends RealtimeModuleSelect>(
+  params: {
+    selection: {
+      fields: S & RealtimeModuleSelect;
+    } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        deleteRealtimeModule: {
+          realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    deleteRealtimeModule: {
+      realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+  }
+>;
+export function useDeleteRealtimeModuleMutation(
+  params: {
+    selection: SelectionConfig<RealtimeModuleSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: realtimeModuleMutationKeys.all,
-    mutationFn: ({
-      id
-    }: {
-      id: string;
-    }) => getClient().realtimeModule.delete({
-      where: {
-        id
-      },
-      select: args.select
-    }).unwrap(),
+    mutationFn: ({ id }: { id: string }) =>
+      getClient()
+        .realtimeModule.delete({
+          where: {
+            id,
+          },
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: realtimeModuleKeys.detail(variables.id)
+        queryKey: realtimeModuleKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.lists()
+        queryKey: realtimeModuleKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

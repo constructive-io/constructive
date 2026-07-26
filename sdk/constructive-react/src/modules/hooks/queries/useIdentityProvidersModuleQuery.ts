@@ -12,15 +12,21 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { identityProvidersModuleKeys } from "../query-keys";
-import type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { IdentityProvidersModuleSelect, IdentityProvidersModuleWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { identityProvidersModuleKeys } from '../query-keys';
+import type {
+  IdentityProvidersModuleSelect,
+  IdentityProvidersModuleWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  IdentityProvidersModuleSelect,
+  IdentityProvidersModuleWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const identityProvidersModuleQueryKey = identityProvidersModuleKeys.detail;
 /**
@@ -42,33 +48,47 @@ export const identityProvidersModuleQueryKey = identityProvidersModuleKeys.detai
  * });
  * ```
  */
-export function useIdentityProvidersModuleQuery<S extends IdentityProvidersModuleSelect, TData = {
-  identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>;
-} & Omit<UseQueryOptions<{
-  identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useIdentityProvidersModuleQuery(params: {
-  id: string;
-  selection: SelectionConfig<IdentityProvidersModuleSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useIdentityProvidersModuleQuery<
+  S extends IdentityProvidersModuleSelect,
+  TData = {
+    identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useIdentityProvidersModuleQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<IdentityProvidersModuleSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<IdentityProvidersModuleSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: identityProvidersModuleKeys.detail(params.id),
-    queryFn: () => getClient().identityProvidersModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .identityProvidersModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
@@ -90,7 +110,9 @@ export function useIdentityProvidersModuleQuery(params: {
  * });
  * ```
  */
-export async function fetchIdentityProvidersModuleQuery<S extends IdentityProvidersModuleSelect>(params: {
+export async function fetchIdentityProvidersModuleQuery<
+  S extends IdentityProvidersModuleSelect,
+>(params: {
   id: string;
   selection: {
     fields: S;
@@ -103,10 +125,12 @@ export async function fetchIdentityProvidersModuleQuery(params: {
   selection: SelectionConfig<IdentityProvidersModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<IdentityProvidersModuleSelect>(params.selection);
-  return getClient().identityProvidersModule.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .identityProvidersModule.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Entity-aware config row for the identity_providers_module, which provisions a per-database
@@ -124,22 +148,31 @@ export async function fetchIdentityProvidersModuleQuery(params: {
  * await prefetchIdentityProvidersModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchIdentityProvidersModuleQuery<S extends IdentityProvidersModuleSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>;
-}): Promise<void>;
-export async function prefetchIdentityProvidersModuleQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<IdentityProvidersModuleSelect>;
-}): Promise<void> {
+export async function prefetchIdentityProvidersModuleQuery<S extends IdentityProvidersModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, IdentityProvidersModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchIdentityProvidersModuleQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<IdentityProvidersModuleSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<IdentityProvidersModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: identityProvidersModuleKeys.detail(params.id),
-    queryFn: () => getClient().identityProvidersModule.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .identityProvidersModule.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

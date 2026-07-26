@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { storeKeys } from "../query-keys";
-import type { StoreSelect, StoreWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { StoreSelect, StoreWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { storeKeys } from '../query-keys';
+import type { StoreSelect, StoreWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { StoreSelect, StoreWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const storeQueryKey = storeKeys.detail;
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useStoreQuery({
@@ -26,38 +26,52 @@ export const storeQueryKey = storeKeys.detail;
  * });
  * ```
  */
-export function useStoreQuery<S extends StoreSelect, TData = {
-  store: InferSelectResult<StoreWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, StoreSelect>;
-} & Omit<UseQueryOptions<{
-  store: InferSelectResult<StoreWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useStoreQuery(params: {
-  id: string;
-  selection: SelectionConfig<StoreSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useStoreQuery<
+  S extends StoreSelect,
+  TData = {
+    store: InferSelectResult<StoreWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, StoreSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        store: InferSelectResult<StoreWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useStoreQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<StoreSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: storeKeys.detail(params.id),
-    queryFn: () => getClient().store.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .store.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchStoreQuery({
@@ -79,35 +93,46 @@ export async function fetchStoreQuery(params: {
   selection: SelectionConfig<StoreSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
-  return getClient().store.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .store.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Named stores — one per version-controlled tree (e.g. one graph, one definition set)
- * 
+ *
  * @example
  * ```ts
  * await prefetchStoreQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchStoreQuery<S extends StoreSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, StoreSelect>;
-}): Promise<void>;
-export async function prefetchStoreQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<StoreSelect>;
-}): Promise<void> {
+export async function prefetchStoreQuery<S extends StoreSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, StoreSelect>;
+  }
+): Promise<void>;
+export async function prefetchStoreQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<StoreSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: storeKeys.detail(params.id),
-    queryFn: () => getClient().store.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .store.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

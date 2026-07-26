@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { schemaKeys } from "../query-keys";
-import type { SchemaSelect, SchemaWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { SchemaSelect, SchemaWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { schemaKeys } from '../query-keys';
+import type { SchemaSelect, SchemaWithRelations } from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type { SchemaSelect, SchemaWithRelations } from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const schemaQueryKey = schemaKeys.detail;
 /**
  * Query hook for fetching a single Schema
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useSchemaQuery({
@@ -26,38 +26,52 @@ export const schemaQueryKey = schemaKeys.detail;
  * });
  * ```
  */
-export function useSchemaQuery<S extends SchemaSelect, TData = {
-  schema: InferSelectResult<SchemaWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SchemaSelect>;
-} & Omit<UseQueryOptions<{
-  schema: InferSelectResult<SchemaWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useSchemaQuery(params: {
-  id: string;
-  selection: SelectionConfig<SchemaSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useSchemaQuery<
+  S extends SchemaSelect,
+  TData = {
+    schema: InferSelectResult<SchemaWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SchemaSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        schema: InferSelectResult<SchemaWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useSchemaQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<SchemaSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<SchemaSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: schemaKeys.detail(params.id),
-    queryFn: () => getClient().schema.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .schema.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * Fetch a single Schema without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchSchemaQuery({
@@ -79,35 +93,46 @@ export async function fetchSchemaQuery(params: {
   selection: SelectionConfig<SchemaSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SchemaSelect>(params.selection);
-  return getClient().schema.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .schema.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * Prefetch a single Schema for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchSchemaQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSchemaQuery<S extends SchemaSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, SchemaSelect>;
-}): Promise<void>;
-export async function prefetchSchemaQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<SchemaSelect>;
-}): Promise<void> {
+export async function prefetchSchemaQuery<S extends SchemaSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, SchemaSelect>;
+  }
+): Promise<void>;
+export async function prefetchSchemaQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<SchemaSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<SchemaSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: schemaKeys.detail(params.id),
-    queryFn: () => getClient().schema.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .schema.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

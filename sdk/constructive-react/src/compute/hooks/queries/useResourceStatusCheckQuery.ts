@@ -4,20 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { resourceStatusCheckKeys } from "../query-keys";
-import type { ResourceStatusCheckSelect, ResourceStatusCheckWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ResourceStatusCheckSelect, ResourceStatusCheckWithRelations } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { resourceStatusCheckKeys } from '../query-keys';
+import type {
+  ResourceStatusCheckSelect,
+  ResourceStatusCheckWithRelations,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ResourceStatusCheckSelect,
+  ResourceStatusCheckWithRelations,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const resourceStatusCheckQueryKey = resourceStatusCheckKeys.detail;
 /**
  * On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useResourceStatusCheckQuery({
@@ -26,38 +32,52 @@ export const resourceStatusCheckQueryKey = resourceStatusCheckKeys.detail;
  * });
  * ```
  */
-export function useResourceStatusCheckQuery<S extends ResourceStatusCheckSelect, TData = {
-  resourceStatusCheck: InferSelectResult<ResourceStatusCheckWithRelations, S> | null;
-}>(params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ResourceStatusCheckSelect>;
-} & Omit<UseQueryOptions<{
-  resourceStatusCheck: InferSelectResult<ResourceStatusCheckWithRelations, S> | null;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useResourceStatusCheckQuery(params: {
-  id: string;
-  selection: SelectionConfig<ResourceStatusCheckSelect>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+export function useResourceStatusCheckQuery<
+  S extends ResourceStatusCheckSelect,
+  TData = {
+    resourceStatusCheck: InferSelectResult<ResourceStatusCheckWithRelations, S> | null;
+  },
+>(
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ResourceStatusCheckSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        resourceStatusCheck: InferSelectResult<ResourceStatusCheckWithRelations, S> | null;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useResourceStatusCheckQuery(
+  params: {
+    id: string;
+    selection: SelectionConfig<ResourceStatusCheckSelect>;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
   const args = buildSelectionArgs<ResourceStatusCheckSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourceStatusCheckKeys.detail(params.id),
-    queryFn: () => getClient().resourceStatusCheck.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap(),
-    ...queryOptions
+    queryFn: () =>
+      getClient()
+        .resourceStatusCheck.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
+    ...queryOptions,
   });
 }
 /**
  * On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails)
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchResourceStatusCheckQuery({
@@ -79,35 +99,46 @@ export async function fetchResourceStatusCheckQuery(params: {
   selection: SelectionConfig<ResourceStatusCheckSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ResourceStatusCheckSelect>(params.selection);
-  return getClient().resourceStatusCheck.findOne({
-    id: params.id,
-    select: args.select
-  }).unwrap();
+  return getClient()
+    .resourceStatusCheck.findOne({
+      id: params.id,
+      select: args.select,
+    })
+    .unwrap();
 }
 /**
  * On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails)
- * 
+ *
  * @example
  * ```ts
  * await prefetchResourceStatusCheckQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchResourceStatusCheckQuery<S extends ResourceStatusCheckSelect>(queryClient: QueryClient, params: {
-  id: string;
-  selection: {
-    fields: S;
-  } & HookStrictSelect<NoInfer<S>, ResourceStatusCheckSelect>;
-}): Promise<void>;
-export async function prefetchResourceStatusCheckQuery(queryClient: QueryClient, params: {
-  id: string;
-  selection: SelectionConfig<ResourceStatusCheckSelect>;
-}): Promise<void> {
+export async function prefetchResourceStatusCheckQuery<S extends ResourceStatusCheckSelect>(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: {
+      fields: S;
+    } & HookStrictSelect<NoInfer<S>, ResourceStatusCheckSelect>;
+  }
+): Promise<void>;
+export async function prefetchResourceStatusCheckQuery(
+  queryClient: QueryClient,
+  params: {
+    id: string;
+    selection: SelectionConfig<ResourceStatusCheckSelect>;
+  }
+): Promise<void> {
   const args = buildSelectionArgs<ResourceStatusCheckSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourceStatusCheckKeys.detail(params.id),
-    queryFn: () => getClient().resourceStatusCheck.findOne({
-      id: params.id,
-      select: args.select
-    }).unwrap()
+    queryFn: () =>
+      getClient()
+        .resourceStatusCheck.findOne({
+          id: params.id,
+          select: args.select,
+        })
+        .unwrap(),
   });
 }

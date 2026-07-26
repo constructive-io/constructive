@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { resourceEventKeys } from "../query-keys";
-import { resourceEventMutationKeys } from "../mutation-keys";
-import type { ResourceEventSelect, ResourceEventWithRelations, ResourceEventPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { ResourceEventSelect, ResourceEventWithRelations, ResourceEventPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { resourceEventKeys } from '../query-keys';
+import { resourceEventMutationKeys } from '../mutation-keys';
+import type {
+  ResourceEventSelect,
+  ResourceEventWithRelations,
+  ResourceEventPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  ResourceEventSelect,
+  ResourceEventWithRelations,
+  ResourceEventPatch,
+} from '../../orm/input-types';
 /**
  * Resource lifecycle events — audit log of provisioning, updates, and failure events
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateResourceEventMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', resourceEventPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateResourceEventMutation<S extends ResourceEventSelect>(params: {
-  selection: ({
-    fields: S & ResourceEventSelect;
-  } & HookStrictSelect<NoInfer<S>, ResourceEventSelect>);
-} & Omit<UseMutationOptions<{
-  updateResourceEvent: {
-    resourceEvent: InferSelectResult<ResourceEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  resourceEventPatch: ResourceEventPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateResourceEvent: {
-    resourceEvent: InferSelectResult<ResourceEventWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  createdAt: string;
-  resourceEventPatch: ResourceEventPatch;
-}>;
-export function useUpdateResourceEventMutation(params: {
-  selection: SelectionConfig<ResourceEventSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  createdAt: string;
-  resourceEventPatch: ResourceEventPatch;
-}>, "mutationFn">) {
+export function useUpdateResourceEventMutation<S extends ResourceEventSelect>(
+  params: {
+    selection: {
+      fields: S & ResourceEventSelect;
+    } & HookStrictSelect<NoInfer<S>, ResourceEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateResourceEvent: {
+          resourceEvent: InferSelectResult<ResourceEventWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        resourceEventPatch: ResourceEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateResourceEvent: {
+      resourceEvent: InferSelectResult<ResourceEventWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    createdAt: string;
+    resourceEventPatch: ResourceEventPatch;
+  }
+>;
+export function useUpdateResourceEventMutation(
+  params: {
+    selection: SelectionConfig<ResourceEventSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        createdAt: string;
+        resourceEventPatch: ResourceEventPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<ResourceEventSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdateResourceEventMutation(params: {
     mutationFn: ({
       id,
       createdAt,
-      resourceEventPatch
+      resourceEventPatch,
     }: {
       id: string;
       createdAt: string;
       resourceEventPatch: ResourceEventPatch;
-    }) => getClient().resourceEvent.update({
-      where: {
-        id,
-        createdAt
-      },
-      data: resourceEventPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .resourceEvent.update({
+          where: {
+            id,
+            createdAt,
+          },
+          data: resourceEventPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: resourceEventKeys.detail(variables.id)
+        queryKey: resourceEventKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: resourceEventKeys.lists()
+        queryKey: resourceEventKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

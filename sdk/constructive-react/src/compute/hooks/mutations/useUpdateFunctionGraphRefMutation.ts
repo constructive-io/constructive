@@ -4,61 +4,88 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildSelectionArgs } from "../selection";
-import type { SelectionConfig } from "../selection";
-import { functionGraphRefKeys } from "../query-keys";
-import { functionGraphRefMutationKeys } from "../mutation-keys";
-import type { FunctionGraphRefSelect, FunctionGraphRefWithRelations, FunctionGraphRefPatch } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionGraphRefSelect, FunctionGraphRefWithRelations, FunctionGraphRefPatch } from "../../orm/input-types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
+import { functionGraphRefKeys } from '../query-keys';
+import { functionGraphRefMutationKeys } from '../mutation-keys';
+import type {
+  FunctionGraphRefSelect,
+  FunctionGraphRefWithRelations,
+  FunctionGraphRefPatch,
+} from '../../orm/input-types';
+import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
+export type {
+  FunctionGraphRefSelect,
+  FunctionGraphRefWithRelations,
+  FunctionGraphRefPatch,
+} from '../../orm/input-types';
 /**
  * Branch heads — mutable pointers into the commit chain
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateFunctionGraphRefMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- * 
+ *
  * mutate({ id: 'value-here', functionGraphRefPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateFunctionGraphRefMutation<S extends FunctionGraphRefSelect>(params: {
-  selection: ({
-    fields: S & FunctionGraphRefSelect;
-  } & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>);
-} & Omit<UseMutationOptions<{
-  updateFunctionGraphRef: {
-    functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  scopeId: string;
-  functionGraphRefPatch: FunctionGraphRefPatch;
-}>, "mutationFn">): UseMutationResult<{
-  updateFunctionGraphRef: {
-    functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S>;
-  };
-}, Error, {
-  id: string;
-  scopeId: string;
-  functionGraphRefPatch: FunctionGraphRefPatch;
-}>;
-export function useUpdateFunctionGraphRefMutation(params: {
-  selection: SelectionConfig<FunctionGraphRefSelect>;
-} & Omit<UseMutationOptions<any, Error, {
-  id: string;
-  scopeId: string;
-  functionGraphRefPatch: FunctionGraphRefPatch;
-}>, "mutationFn">) {
+export function useUpdateFunctionGraphRefMutation<S extends FunctionGraphRefSelect>(
+  params: {
+    selection: {
+      fields: S & FunctionGraphRefSelect;
+    } & HookStrictSelect<NoInfer<S>, FunctionGraphRefSelect>;
+  } & Omit<
+    UseMutationOptions<
+      {
+        updateFunctionGraphRef: {
+          functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S>;
+        };
+      },
+      Error,
+      {
+        id: string;
+        scopeId: string;
+        functionGraphRefPatch: FunctionGraphRefPatch;
+      }
+    >,
+    'mutationFn'
+  >
+): UseMutationResult<
+  {
+    updateFunctionGraphRef: {
+      functionGraphRef: InferSelectResult<FunctionGraphRefWithRelations, S>;
+    };
+  },
+  Error,
+  {
+    id: string;
+    scopeId: string;
+    functionGraphRefPatch: FunctionGraphRefPatch;
+  }
+>;
+export function useUpdateFunctionGraphRefMutation(
+  params: {
+    selection: SelectionConfig<FunctionGraphRefSelect>;
+  } & Omit<
+    UseMutationOptions<
+      any,
+      Error,
+      {
+        id: string;
+        scopeId: string;
+        functionGraphRefPatch: FunctionGraphRefPatch;
+      }
+    >,
+    'mutationFn'
+  >
+) {
   const args = buildSelectionArgs<FunctionGraphRefSelect>(params.selection);
-  const {
-    selection: _selection,
-    ...mutationOptions
-  } = params ?? {};
+  const { selection: _selection, ...mutationOptions } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,27 +93,30 @@ export function useUpdateFunctionGraphRefMutation(params: {
     mutationFn: ({
       id,
       scopeId,
-      functionGraphRefPatch
+      functionGraphRefPatch,
     }: {
       id: string;
       scopeId: string;
       functionGraphRefPatch: FunctionGraphRefPatch;
-    }) => getClient().functionGraphRef.update({
-      where: {
-        id,
-        scopeId
-      },
-      data: functionGraphRefPatch,
-      select: args.select
-    }).unwrap(),
+    }) =>
+      getClient()
+        .functionGraphRef.update({
+          where: {
+            id,
+            scopeId,
+          },
+          data: functionGraphRefPatch,
+          select: args.select,
+        })
+        .unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: functionGraphRefKeys.detail(variables.id)
+        queryKey: functionGraphRefKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: functionGraphRefKeys.lists()
+        queryKey: functionGraphRefKeys.lists(),
       });
     },
-    ...mutationOptions
+    ...mutationOptions,
   });
 }

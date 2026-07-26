@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { exclusionConstraintKeys } from "../query-keys";
-import type { ExclusionConstraintSelect, ExclusionConstraintWithRelations, ExclusionConstraintFilter, ExclusionConstraintOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { ExclusionConstraintSelect, ExclusionConstraintWithRelations, ExclusionConstraintFilter, ExclusionConstraintOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { exclusionConstraintKeys } from '../query-keys';
+import type {
+  ExclusionConstraintSelect,
+  ExclusionConstraintWithRelations,
+  ExclusionConstraintFilter,
+  ExclusionConstraintOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  ExclusionConstraintSelect,
+  ExclusionConstraintWithRelations,
+  ExclusionConstraintFilter,
+  ExclusionConstraintOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const exclusionConstraintsQueryKey = exclusionConstraintKeys.list;
 /**
  * Query hook for fetching ExclusionConstraint list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useExclusionConstraintsQuery({
@@ -30,33 +45,58 @@ export const exclusionConstraintsQueryKey = exclusionConstraintKeys.list;
  * });
  * ```
  */
-export function useExclusionConstraintsQuery<S extends ExclusionConstraintSelect, TData = {
-  exclusionConstraints: ConnectionResult<InferSelectResult<ExclusionConstraintWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ExclusionConstraintFilter, ExclusionConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
-} & Omit<UseQueryOptions<{
-  exclusionConstraints: ConnectionResult<InferSelectResult<ExclusionConstraintWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useExclusionConstraintsQuery(params: {
-  selection: ListSelectionConfig<ExclusionConstraintSelect, ExclusionConstraintFilter, ExclusionConstraintOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<ExclusionConstraintSelect, ExclusionConstraintFilter, ExclusionConstraintOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useExclusionConstraintsQuery<
+  S extends ExclusionConstraintSelect,
+  TData = {
+    exclusionConstraints: ConnectionResult<InferSelectResult<ExclusionConstraintWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, ExclusionConstraintFilter, ExclusionConstraintOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        exclusionConstraints: ConnectionResult<
+          InferSelectResult<ExclusionConstraintWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useExclusionConstraintsQuery(
+  params: {
+    selection: ListSelectionConfig<
+      ExclusionConstraintSelect,
+      ExclusionConstraintFilter,
+      ExclusionConstraintOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    ExclusionConstraintSelect,
+    ExclusionConstraintFilter,
+    ExclusionConstraintOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: exclusionConstraintKeys.list(args),
     queryFn: () => getClient().exclusionConstraint.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch ExclusionConstraint list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchExclusionConstraintsQuery({
@@ -70,35 +110,65 @@ export function useExclusionConstraintsQuery(params: {
 export async function fetchExclusionConstraintsQuery<S extends ExclusionConstraintSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ExclusionConstraintFilter, ExclusionConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
+  } & Omit<
+    ListSelectionConfig<S, ExclusionConstraintFilter, ExclusionConstraintOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
 }): Promise<{
   exclusionConstraints: ConnectionResult<InferSelectResult<ExclusionConstraintWithRelations, S>>;
 }>;
 export async function fetchExclusionConstraintsQuery(params: {
-  selection: ListSelectionConfig<ExclusionConstraintSelect, ExclusionConstraintFilter, ExclusionConstraintOrderBy>;
+  selection: ListSelectionConfig<
+    ExclusionConstraintSelect,
+    ExclusionConstraintFilter,
+    ExclusionConstraintOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<ExclusionConstraintSelect, ExclusionConstraintFilter, ExclusionConstraintOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    ExclusionConstraintSelect,
+    ExclusionConstraintFilter,
+    ExclusionConstraintOrderBy
+  >(params.selection);
   return getClient().exclusionConstraint.findMany(args).unwrap();
 }
 /**
  * Prefetch ExclusionConstraint list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchExclusionConstraintsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchExclusionConstraintsQuery<S extends ExclusionConstraintSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, ExclusionConstraintFilter, ExclusionConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
-}): Promise<void>;
-export async function prefetchExclusionConstraintsQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<ExclusionConstraintSelect, ExclusionConstraintFilter, ExclusionConstraintOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<ExclusionConstraintSelect, ExclusionConstraintFilter, ExclusionConstraintOrderBy>(params.selection);
+export async function prefetchExclusionConstraintsQuery<S extends ExclusionConstraintSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, ExclusionConstraintFilter, ExclusionConstraintOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, ExclusionConstraintSelect>;
+  }
+): Promise<void>;
+export async function prefetchExclusionConstraintsQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      ExclusionConstraintSelect,
+      ExclusionConstraintFilter,
+      ExclusionConstraintOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    ExclusionConstraintSelect,
+    ExclusionConstraintFilter,
+    ExclusionConstraintOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: exclusionConstraintKeys.list(args),
-    queryFn: () => getClient().exclusionConstraint.findMany(args).unwrap()
+    queryFn: () => getClient().exclusionConstraint.findMany(args).unwrap(),
   });
 }

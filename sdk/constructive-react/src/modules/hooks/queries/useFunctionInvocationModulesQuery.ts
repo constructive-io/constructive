@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { functionInvocationModuleKeys } from "../query-keys";
-import type { FunctionInvocationModuleSelect, FunctionInvocationModuleWithRelations, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { FunctionInvocationModuleSelect, FunctionInvocationModuleWithRelations, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { functionInvocationModuleKeys } from '../query-keys';
+import type {
+  FunctionInvocationModuleSelect,
+  FunctionInvocationModuleWithRelations,
+  FunctionInvocationModuleFilter,
+  FunctionInvocationModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  FunctionInvocationModuleSelect,
+  FunctionInvocationModuleWithRelations,
+  FunctionInvocationModuleFilter,
+  FunctionInvocationModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const functionInvocationModulesQueryKey = functionInvocationModuleKeys.list;
 /**
  * Query hook for fetching FunctionInvocationModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionInvocationModulesQuery({
@@ -30,33 +45,60 @@ export const functionInvocationModulesQueryKey = functionInvocationModuleKeys.li
  * });
  * ```
  */
-export function useFunctionInvocationModulesQuery<S extends FunctionInvocationModuleSelect, TData = {
-  functionInvocationModules: ConnectionResult<InferSelectResult<FunctionInvocationModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
-} & Omit<UseQueryOptions<{
-  functionInvocationModules: ConnectionResult<InferSelectResult<FunctionInvocationModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useFunctionInvocationModulesQuery(params: {
-  selection: ListSelectionConfig<FunctionInvocationModuleSelect, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<FunctionInvocationModuleSelect, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useFunctionInvocationModulesQuery<
+  S extends FunctionInvocationModuleSelect,
+  TData = {
+    functionInvocationModules: ConnectionResult<
+      InferSelectResult<FunctionInvocationModuleWithRelations, S>
+    >;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        functionInvocationModules: ConnectionResult<
+          InferSelectResult<FunctionInvocationModuleWithRelations, S>
+        >;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useFunctionInvocationModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      FunctionInvocationModuleSelect,
+      FunctionInvocationModuleFilter,
+      FunctionInvocationModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    FunctionInvocationModuleSelect,
+    FunctionInvocationModuleFilter,
+    FunctionInvocationModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionInvocationModuleKeys.list(args),
     queryFn: () => getClient().functionInvocationModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch FunctionInvocationModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchFunctionInvocationModulesQuery({
@@ -67,38 +109,74 @@ export function useFunctionInvocationModulesQuery(params: {
  * });
  * ```
  */
-export async function fetchFunctionInvocationModulesQuery<S extends FunctionInvocationModuleSelect>(params: {
+export async function fetchFunctionInvocationModulesQuery<
+  S extends FunctionInvocationModuleSelect,
+>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
+  } & Omit<
+    ListSelectionConfig<S, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>,
+    'fields'
+  > &
+    HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
 }): Promise<{
-  functionInvocationModules: ConnectionResult<InferSelectResult<FunctionInvocationModuleWithRelations, S>>;
+  functionInvocationModules: ConnectionResult<
+    InferSelectResult<FunctionInvocationModuleWithRelations, S>
+  >;
 }>;
 export async function fetchFunctionInvocationModulesQuery(params: {
-  selection: ListSelectionConfig<FunctionInvocationModuleSelect, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>;
+  selection: ListSelectionConfig<
+    FunctionInvocationModuleSelect,
+    FunctionInvocationModuleFilter,
+    FunctionInvocationModuleOrderBy
+  >;
 }) {
-  const args = buildListSelectionArgs<FunctionInvocationModuleSelect, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    FunctionInvocationModuleSelect,
+    FunctionInvocationModuleFilter,
+    FunctionInvocationModuleOrderBy
+  >(params.selection);
   return getClient().functionInvocationModule.findMany(args).unwrap();
 }
 /**
  * Prefetch FunctionInvocationModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchFunctionInvocationModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchFunctionInvocationModulesQuery<S extends FunctionInvocationModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
-}): Promise<void>;
-export async function prefetchFunctionInvocationModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<FunctionInvocationModuleSelect, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<FunctionInvocationModuleSelect, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>(params.selection);
+export async function prefetchFunctionInvocationModulesQuery<
+  S extends FunctionInvocationModuleSelect,
+>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<
+      ListSelectionConfig<S, FunctionInvocationModuleFilter, FunctionInvocationModuleOrderBy>,
+      'fields'
+    > &
+      HookStrictSelect<NoInfer<S>, FunctionInvocationModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchFunctionInvocationModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      FunctionInvocationModuleSelect,
+      FunctionInvocationModuleFilter,
+      FunctionInvocationModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    FunctionInvocationModuleSelect,
+    FunctionInvocationModuleFilter,
+    FunctionInvocationModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionInvocationModuleKeys.list(args),
-    queryFn: () => getClient().functionInvocationModule.findMany(args).unwrap()
+    queryFn: () => getClient().functionInvocationModule.findMany(args).unwrap(),
   });
 }

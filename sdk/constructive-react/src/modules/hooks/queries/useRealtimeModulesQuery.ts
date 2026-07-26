@@ -4,20 +4,35 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
-import { getClient } from "../client";
-import { buildListSelectionArgs } from "../selection";
-import type { ListSelectionConfig } from "../selection";
-import { realtimeModuleKeys } from "../query-keys";
-import type { RealtimeModuleSelect, RealtimeModuleWithRelations, RealtimeModuleFilter, RealtimeModuleOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
-export type { RealtimeModuleSelect, RealtimeModuleWithRelations, RealtimeModuleFilter, RealtimeModuleOrderBy } from "../../orm/input-types";
+import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
+import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
+import { realtimeModuleKeys } from '../query-keys';
+import type {
+  RealtimeModuleSelect,
+  RealtimeModuleWithRelations,
+  RealtimeModuleFilter,
+  RealtimeModuleOrderBy,
+} from '../../orm/input-types';
+import type {
+  FindManyArgs,
+  InferSelectResult,
+  ConnectionResult,
+  HookStrictSelect,
+} from '../../orm/select-types';
+export type {
+  RealtimeModuleSelect,
+  RealtimeModuleWithRelations,
+  RealtimeModuleFilter,
+  RealtimeModuleOrderBy,
+} from '../../orm/input-types';
 /** Query key factory - re-exported from query-keys.ts */
 export const realtimeModulesQueryKey = realtimeModuleKeys.list;
 /**
  * Query hook for fetching RealtimeModule list
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useRealtimeModulesQuery({
@@ -30,33 +45,53 @@ export const realtimeModulesQueryKey = realtimeModuleKeys.list;
  * });
  * ```
  */
-export function useRealtimeModulesQuery<S extends RealtimeModuleSelect, TData = {
-  realtimeModules: ConnectionResult<InferSelectResult<RealtimeModuleWithRelations, S>>;
-}>(params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RealtimeModuleFilter, RealtimeModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
-} & Omit<UseQueryOptions<{
-  realtimeModules: ConnectionResult<InferSelectResult<RealtimeModuleWithRelations, S>>;
-}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useRealtimeModulesQuery(params: {
-  selection: ListSelectionConfig<RealtimeModuleSelect, RealtimeModuleFilter, RealtimeModuleOrderBy>;
-} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildListSelectionArgs<RealtimeModuleSelect, RealtimeModuleFilter, RealtimeModuleOrderBy>(params.selection);
-  const {
-    selection: _selection,
-    ...queryOptions
-  } = params ?? {};
+export function useRealtimeModulesQuery<
+  S extends RealtimeModuleSelect,
+  TData = {
+    realtimeModules: ConnectionResult<InferSelectResult<RealtimeModuleWithRelations, S>>;
+  },
+>(
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RealtimeModuleFilter, RealtimeModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
+  } & Omit<
+    UseQueryOptions<
+      {
+        realtimeModules: ConnectionResult<InferSelectResult<RealtimeModuleWithRelations, S>>;
+      },
+      Error,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData>;
+export function useRealtimeModulesQuery(
+  params: {
+    selection: ListSelectionConfig<
+      RealtimeModuleSelect,
+      RealtimeModuleFilter,
+      RealtimeModuleOrderBy
+    >;
+  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
+) {
+  const args = buildListSelectionArgs<
+    RealtimeModuleSelect,
+    RealtimeModuleFilter,
+    RealtimeModuleOrderBy
+  >(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: realtimeModuleKeys.list(args),
     queryFn: () => getClient().realtimeModule.findMany(args).unwrap(),
-    ...queryOptions
+    ...queryOptions,
   });
 }
 /**
  * Fetch RealtimeModule list without React hooks
- * 
+ *
  * @example
  * ```ts
  * const data = await fetchRealtimeModulesQuery({
@@ -70,35 +105,55 @@ export function useRealtimeModulesQuery(params: {
 export async function fetchRealtimeModulesQuery<S extends RealtimeModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, RealtimeModuleFilter, RealtimeModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
+  } & Omit<ListSelectionConfig<S, RealtimeModuleFilter, RealtimeModuleOrderBy>, 'fields'> &
+    HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
 }): Promise<{
   realtimeModules: ConnectionResult<InferSelectResult<RealtimeModuleWithRelations, S>>;
 }>;
 export async function fetchRealtimeModulesQuery(params: {
   selection: ListSelectionConfig<RealtimeModuleSelect, RealtimeModuleFilter, RealtimeModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<RealtimeModuleSelect, RealtimeModuleFilter, RealtimeModuleOrderBy>(params.selection);
+  const args = buildListSelectionArgs<
+    RealtimeModuleSelect,
+    RealtimeModuleFilter,
+    RealtimeModuleOrderBy
+  >(params.selection);
   return getClient().realtimeModule.findMany(args).unwrap();
 }
 /**
  * Prefetch RealtimeModule list for SSR or cache warming
- * 
+ *
  * @example
  * ```ts
  * await prefetchRealtimeModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchRealtimeModulesQuery<S extends RealtimeModuleSelect>(queryClient: QueryClient, params: {
-  selection: {
-    fields: S;
-  } & Omit<ListSelectionConfig<S, RealtimeModuleFilter, RealtimeModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
-}): Promise<void>;
-export async function prefetchRealtimeModulesQuery(queryClient: QueryClient, params: {
-  selection: ListSelectionConfig<RealtimeModuleSelect, RealtimeModuleFilter, RealtimeModuleOrderBy>;
-}): Promise<void> {
-  const args = buildListSelectionArgs<RealtimeModuleSelect, RealtimeModuleFilter, RealtimeModuleOrderBy>(params.selection);
+export async function prefetchRealtimeModulesQuery<S extends RealtimeModuleSelect>(
+  queryClient: QueryClient,
+  params: {
+    selection: {
+      fields: S;
+    } & Omit<ListSelectionConfig<S, RealtimeModuleFilter, RealtimeModuleOrderBy>, 'fields'> &
+      HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
+  }
+): Promise<void>;
+export async function prefetchRealtimeModulesQuery(
+  queryClient: QueryClient,
+  params: {
+    selection: ListSelectionConfig<
+      RealtimeModuleSelect,
+      RealtimeModuleFilter,
+      RealtimeModuleOrderBy
+    >;
+  }
+): Promise<void> {
+  const args = buildListSelectionArgs<
+    RealtimeModuleSelect,
+    RealtimeModuleFilter,
+    RealtimeModuleOrderBy
+  >(params.selection);
   await queryClient.prefetchQuery({
     queryKey: realtimeModuleKeys.list(args),
-    queryFn: () => getClient().realtimeModule.findMany(args).unwrap()
+    queryFn: () => getClient().realtimeModule.findMany(args).unwrap(),
   });
 }

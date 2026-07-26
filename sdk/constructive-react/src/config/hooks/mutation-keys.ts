@@ -19,34 +19,50 @@
 // ============================================================================
 
 export const configMutationKeys = {
-  /** All config mutation keys */all: ["mutation", "config"] as const,
-  /** Create config mutation key */create: () => ["mutation", "config", "create"] as const,
-  /** Update config mutation key */update: (id: string | number) => ["mutation", "config", "update", id] as const,
-  /** Delete config mutation key */delete: (id: string | number) => ["mutation", "config", "delete", id] as const
+  /** All config mutation keys */ all: ['mutation', 'config'] as const,
+  /** Create config mutation key */ create: () => ['mutation', 'config', 'create'] as const,
+  /** Update config mutation key */ update: (id: string | number) =>
+    ['mutation', 'config', 'update', id] as const,
+  /** Delete config mutation key */ delete: (id: string | number) =>
+    ['mutation', 'config', 'delete', id] as const,
 } as const;
 export const platformConfigMutationKeys = {
-  /** All platformConfig mutation keys */all: ["mutation", "platformconfig"] as const,
-  /** Create platformConfig mutation key */create: () => ["mutation", "platformconfig", "create"] as const,
-  /** Update platformConfig mutation key */update: (id: string | number) => ["mutation", "platformconfig", "update", id] as const,
-  /** Delete platformConfig mutation key */delete: (id: string | number) => ["mutation", "platformconfig", "delete", id] as const
+  /** All platformConfig mutation keys */ all: ['mutation', 'platformconfig'] as const,
+  /** Create platformConfig mutation key */ create: () =>
+    ['mutation', 'platformconfig', 'create'] as const,
+  /** Update platformConfig mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformconfig', 'update', id] as const,
+  /** Delete platformConfig mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformconfig', 'delete', id] as const,
 } as const;
 export const platformInternalSecretMutationKeys = {
-  /** All platformInternalSecret mutation keys */all: ["mutation", "platforminternalsecret"] as const,
-  /** Create platformInternalSecret mutation key */create: () => ["mutation", "platforminternalsecret", "create"] as const,
-  /** Update platformInternalSecret mutation key */update: (id: string | number) => ["mutation", "platforminternalsecret", "update", id] as const,
-  /** Delete platformInternalSecret mutation key */delete: (id: string | number) => ["mutation", "platforminternalsecret", "delete", id] as const
+  /** All platformInternalSecret mutation keys */ all: [
+    'mutation',
+    'platforminternalsecret',
+  ] as const,
+  /** Create platformInternalSecret mutation key */ create: () =>
+    ['mutation', 'platforminternalsecret', 'create'] as const,
+  /** Update platformInternalSecret mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminternalsecret', 'update', id] as const,
+  /** Delete platformInternalSecret mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminternalsecret', 'delete', id] as const,
 } as const;
 export const platformSecretMutationKeys = {
-  /** All platformSecret mutation keys */all: ["mutation", "platformsecret"] as const,
-  /** Create platformSecret mutation key */create: () => ["mutation", "platformsecret", "create"] as const,
-  /** Update platformSecret mutation key */update: (id: string | number) => ["mutation", "platformsecret", "update", id] as const,
-  /** Delete platformSecret mutation key */delete: (id: string | number) => ["mutation", "platformsecret", "delete", id] as const
+  /** All platformSecret mutation keys */ all: ['mutation', 'platformsecret'] as const,
+  /** Create platformSecret mutation key */ create: () =>
+    ['mutation', 'platformsecret', 'create'] as const,
+  /** Update platformSecret mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformsecret', 'update', id] as const,
+  /** Delete platformSecret mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformsecret', 'delete', id] as const,
 } as const;
 export const secretMutationKeys = {
-  /** All secret mutation keys */all: ["mutation", "secret"] as const,
-  /** Create secret mutation key */create: () => ["mutation", "secret", "create"] as const,
-  /** Update secret mutation key */update: (id: string | number) => ["mutation", "secret", "update", id] as const,
-  /** Delete secret mutation key */delete: (id: string | number) => ["mutation", "secret", "delete", id] as const
+  /** All secret mutation keys */ all: ['mutation', 'secret'] as const,
+  /** Create secret mutation key */ create: () => ['mutation', 'secret', 'create'] as const,
+  /** Update secret mutation key */ update: (id: string | number) =>
+    ['mutation', 'secret', 'update', id] as const,
+  /** Delete secret mutation key */ delete: (id: string | number) =>
+    ['mutation', 'secret', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -54,19 +70,68 @@ export const secretMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
-  /** Mutation key for _secretsDel */_secretsDel: (identifier?: string) => identifier ? ["mutation", "_secretsDel", identifier] as const : ["mutation", "_secretsDel"] as const,
-  /** Mutation key for _secretsRemoveArray */_secretsRemoveArray: (identifier?: string) => identifier ? ["mutation", "_secretsRemoveArray", identifier] as const : ["mutation", "_secretsRemoveArray"] as const,
-  /** Mutation key for _secretsRotate */_secretsRotate: (identifier?: string) => identifier ? ["mutation", "_secretsRotate", identifier] as const : ["mutation", "_secretsRotate"] as const,
-  /** Mutation key for _secretsSet */_secretsSet: (identifier?: string) => identifier ? ["mutation", "_secretsSet", identifier] as const : ["mutation", "_secretsSet"] as const,
-  /** Mutation key for platformInternalSecretsDel */platformInternalSecretsDel: (identifier?: string) => identifier ? ["mutation", "platformInternalSecretsDel", identifier] as const : ["mutation", "platformInternalSecretsDel"] as const,
-  /** Mutation key for platformInternalSecretsRemoveArray */platformInternalSecretsRemoveArray: (identifier?: string) => identifier ? ["mutation", "platformInternalSecretsRemoveArray", identifier] as const : ["mutation", "platformInternalSecretsRemoveArray"] as const,
-  /** Mutation key for platformInternalSecretsRotate */platformInternalSecretsRotate: (identifier?: string) => identifier ? ["mutation", "platformInternalSecretsRotate", identifier] as const : ["mutation", "platformInternalSecretsRotate"] as const,
-  /** Mutation key for platformInternalSecretsSet */platformInternalSecretsSet: (identifier?: string) => identifier ? ["mutation", "platformInternalSecretsSet", identifier] as const : ["mutation", "platformInternalSecretsSet"] as const,
-  /** Mutation key for platformSecretsDel */platformSecretsDel: (identifier?: string) => identifier ? ["mutation", "platformSecretsDel", identifier] as const : ["mutation", "platformSecretsDel"] as const,
-  /** Mutation key for platformSecretsRemoveArray */platformSecretsRemoveArray: (identifier?: string) => identifier ? ["mutation", "platformSecretsRemoveArray", identifier] as const : ["mutation", "platformSecretsRemoveArray"] as const,
-  /** Mutation key for platformSecretsRotate */platformSecretsRotate: (identifier?: string) => identifier ? ["mutation", "platformSecretsRotate", identifier] as const : ["mutation", "platformSecretsRotate"] as const,
-  /** Mutation key for platformSecretsSet */platformSecretsSet: (identifier?: string) => identifier ? ["mutation", "platformSecretsSet", identifier] as const : ["mutation", "platformSecretsSet"] as const,
-  /** Mutation key for provisionBucket */provisionBucket: (identifier?: string) => identifier ? ["mutation", "provisionBucket", identifier] as const : ["mutation", "provisionBucket"] as const
+  /** Mutation key for _secretsDel */ _secretsDel: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_secretsDel', identifier] as const)
+      : (['mutation', '_secretsDel'] as const),
+  /** Mutation key for _secretsRemoveArray */ _secretsRemoveArray: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_secretsRemoveArray', identifier] as const)
+      : (['mutation', '_secretsRemoveArray'] as const),
+  /** Mutation key for _secretsRotate */ _secretsRotate: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_secretsRotate', identifier] as const)
+      : (['mutation', '_secretsRotate'] as const),
+  /** Mutation key for _secretsSet */ _secretsSet: (identifier?: string) =>
+    identifier
+      ? (['mutation', '_secretsSet', identifier] as const)
+      : (['mutation', '_secretsSet'] as const),
+  /** Mutation key for platformInternalSecretsDel */ platformInternalSecretsDel: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInternalSecretsDel', identifier] as const)
+      : (['mutation', 'platformInternalSecretsDel'] as const),
+  /** Mutation key for platformInternalSecretsRemoveArray */ platformInternalSecretsRemoveArray: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInternalSecretsRemoveArray', identifier] as const)
+      : (['mutation', 'platformInternalSecretsRemoveArray'] as const),
+  /** Mutation key for platformInternalSecretsRotate */ platformInternalSecretsRotate: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInternalSecretsRotate', identifier] as const)
+      : (['mutation', 'platformInternalSecretsRotate'] as const),
+  /** Mutation key for platformInternalSecretsSet */ platformInternalSecretsSet: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInternalSecretsSet', identifier] as const)
+      : (['mutation', 'platformInternalSecretsSet'] as const),
+  /** Mutation key for platformSecretsDel */ platformSecretsDel: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'platformSecretsDel', identifier] as const)
+      : (['mutation', 'platformSecretsDel'] as const),
+  /** Mutation key for platformSecretsRemoveArray */ platformSecretsRemoveArray: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformSecretsRemoveArray', identifier] as const)
+      : (['mutation', 'platformSecretsRemoveArray'] as const),
+  /** Mutation key for platformSecretsRotate */ platformSecretsRotate: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'platformSecretsRotate', identifier] as const)
+      : (['mutation', 'platformSecretsRotate'] as const),
+  /** Mutation key for platformSecretsSet */ platformSecretsSet: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'platformSecretsSet', identifier] as const)
+      : (['mutation', 'platformSecretsSet'] as const),
+  /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionBucket', identifier] as const)
+      : (['mutation', 'provisionBucket'] as const),
 } as const;
 /**
 
@@ -96,5 +161,5 @@ export const mutationKeys = {
   platformInternalSecret: platformInternalSecretMutationKeys,
   platformSecret: platformSecretMutationKeys,
   secret: secretMutationKeys,
-  custom: customMutationKeys
+  custom: customMutationKeys,
 } as const;
