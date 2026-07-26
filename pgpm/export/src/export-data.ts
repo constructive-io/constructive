@@ -152,7 +152,7 @@ export const getMetadataExportColumns = async (
   let usedSavepoint = true;
   try {
     await db.query(`SAVEPOINT ${tempTable}`);
-  } catch (_e) {
+  } catch {
     usedSavepoint = false;
     await db.query('BEGIN');
   }
