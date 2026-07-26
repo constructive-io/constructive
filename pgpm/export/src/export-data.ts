@@ -121,7 +121,11 @@ export interface MetadataExportColumn {
  *
  * Results preserve the input order and names. Each column's type must be a
  * type resolvable in the connected database; each non-null default must be a
- * valid default expression for that type.
+ * valid default expression for that type. `db` must be a single session
+ * (client), not a pool: the classification runs inside a transaction (or a
+ * savepoint when the caller is already in one) that is always rolled back, so
+ * the temp table never survives — not even on failure — and nothing is ever
+ * committed.
  */
 export const getMetadataExportColumns = async (
   db: Queryable,
@@ -129,10 +133,9 @@ export const getMetadataExportColumns = async (
 ): Promise<DataExportColumn[]> => {
   if (columns.length === 0) return [];
 
+  const tempTable = 'pgpm_metadata_export_columns';
   // Synthetic column identifiers keep the DDL immune to reserved words and
   // duplicate names; results map back to the caller's columns by ordinal.
-  const suffix = Math.random().toString(36).slice(2, 10);
-  const tempTable = `pgpm_meta_export_cols_${suffix}`;
   const columnDefs = columns
     .map((c, i) => {
       const def =
@@ -143,8 +146,18 @@ export const getMetadataExportColumns = async (
     })
     .join(', ');
 
-  await db.query(`CREATE TEMP TABLE ${tempTable} (${columnDefs})`);
+  // Savepoint when already inside a caller transaction, otherwise our own
+  // transaction. Either way the work is rolled back below, so the temp table
+  // name is deterministic and can never collide or leak.
+  let usedSavepoint = true;
   try {
+    await db.query(`SAVEPOINT ${tempTable}`);
+  } catch (_e) {
+    usedSavepoint = false;
+    await db.query('BEGIN');
+  }
+  try {
+    await db.query(`CREATE TEMP TABLE ${tempTable} (${columnDefs})`);
     const tempSchemaRes = await db.query(
       `SELECT nspname FROM pg_namespace WHERE oid = pg_my_temp_schema()`
     );
@@ -163,7 +176,12 @@ export const getMetadataExportColumns = async (
       };
     });
   } finally {
-    await db.query(`DROP TABLE ${tempTable}`);
+    if (usedSavepoint) {
+      await db.query(`ROLLBACK TO SAVEPOINT ${tempTable}`);
+      await db.query(`RELEASE SAVEPOINT ${tempTable}`);
+    } else {
+      await db.query('ROLLBACK');
+    }
   }
 };
 

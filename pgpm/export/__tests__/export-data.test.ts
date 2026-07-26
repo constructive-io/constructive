@@ -188,9 +188,32 @@ describe('getMetadataExportColumns', () => {
       `SELECT count(*)::int AS n FROM pg_class c
        JOIN pg_namespace n ON n.oid = c.relnamespace
        WHERE n.nspname = pg_my_temp_schema()::regnamespace::text
-         AND c.relname LIKE 'pgpm_meta_export_cols_%'`
+         AND c.relname = 'pgpm_metadata_export_columns'`
     );
     expect(leftover.rows[0].n).toBe(0);
+  });
+
+  it('rolls back cleanly on failure: no leftover temp table, session still usable', async () => {
+    await expect(
+      getMetadataExportColumns(pg, [
+        { name: 'bad', type: 'timestamptz', columnDefault: 'not_a_function(' }
+      ])
+    ).rejects.toThrow();
+
+    // The rollback erased the temp table even though classification failed...
+    const leftover = await pg.query(
+      `SELECT count(*)::int AS n FROM pg_class c
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       WHERE n.nspname = pg_my_temp_schema()::regnamespace::text
+         AND c.relname = 'pgpm_metadata_export_columns'`
+    );
+    expect(leftover.rows[0].n).toBe(0);
+
+    // ...and the session/transaction is not aborted: further work succeeds.
+    const ok = await getMetadataExportColumns(pg, [
+      { name: 'created_at', type: 'timestamptz', columnDefault: 'now()' }
+    ]);
+    expect(ok[0].volatileDefault).toBe(true);
   });
 });
 
