@@ -70,7 +70,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   endpoint,
   public_url_prefix,
   provider,
-  allowed_origins
+  allowed_origins,
+  scope
 )
 VALUES (
   'c0000001-0000-0000-0000-000000000001',
@@ -81,7 +82,8 @@ VALUES (
   NULL,  -- use global CDN_ENDPOINT
   NULL,  -- use global CDN_PUBLIC_URL_PREFIX
   'minio',
-  ARRAY['*']
+  ARRAY['*'],
+  'app'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -162,7 +164,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   endpoint,
   public_url_prefix,
   provider,
-  allowed_origins
+  allowed_origins,
+  scope
 )
 VALUES (
   'c1c1c1c1-0000-0000-0000-000000000001',
@@ -173,7 +176,8 @@ VALUES (
   NULL,
   NULL,
   'minio',
-  ARRAY['*']
+  ARRAY['*'],
+  'app'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -284,7 +288,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   endpoint,
   public_url_prefix,
   provider,
-  allowed_origins
+  allowed_origins,
+  scope
 )
 VALUES (
   'fa66fa66-0000-0000-0000-000000000001',
@@ -295,7 +300,8 @@ VALUES (
   NULL,
   NULL,
   'minio',
-  ARRAY['*']
+  ARRAY['*'],
+  'app'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
