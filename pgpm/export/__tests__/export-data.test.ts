@@ -13,6 +13,7 @@ import {
   exportTableData,
   exportTablesData,
   getDataExportColumns,
+  getMetadataExportColumns,
   isVolatileTimestampColumn
 } from '../src/export-data';
 
@@ -111,6 +112,85 @@ describe('getDataExportColumns', () => {
     expect(excluded).not.toContain('dbname');
     // constant timestamp default survives
     expect(excluded).not.toContain('fixed_at');
+  });
+});
+
+describe('getMetadataExportColumns', () => {
+  it('classifies metadata-described columns identically to a physical table', async () => {
+    // Same columns as app_routing_public.apis, described purely as metadata
+    // (name/type/default expression) with no physical table present.
+    const classified = await getMetadataExportColumns(pg, [
+      { name: 'id', type: 'uuid', columnDefault: null },
+      { name: 'name', type: 'text', columnDefault: null },
+      { name: 'dbname', type: 'text', columnDefault: 'current_database()' },
+      { name: 'is_public', type: 'boolean', columnDefault: 'true' },
+      { name: 'created_at', type: 'timestamptz', columnDefault: 'now()' },
+      { name: 'updated_at', type: 'timestamptz', columnDefault: 'CURRENT_TIMESTAMP' },
+      { name: 'observed_at', type: 'timestamptz', columnDefault: 'clock_timestamp()' },
+      { name: 'expires_at', type: 'timestamptz', columnDefault: "now() + '2 days'::interval" },
+      { name: 'fixed_at', type: 'timestamptz', columnDefault: "'2020-01-01T00:00:00Z'::timestamptz" }
+    ]);
+    const byName = Object.fromEntries(classified.map(c => [c.name, c]));
+
+    // Wall-clock timestamp defaults — all volatile
+    expect(byName.created_at.volatileDefault).toBe(true);
+    expect(byName.updated_at.volatileDefault).toBe(true);
+    expect(byName.observed_at.volatileDefault).toBe(true);
+    expect(byName.expires_at.volatileDefault).toBe(true);
+
+    // Constant timestamp default — immutable
+    expect(byName.fixed_at.volatileDefault).toBe(false);
+
+    // Stable but non-timestamp default
+    expect(byName.dbname.volatileDefault).toBe(true);
+
+    // No default / constant defaults
+    expect(byName.id.volatileDefault).toBe(false);
+    expect(byName.is_public.volatileDefault).toBe(false);
+
+    // Types are canonicalised through the catalog, matching the physical path
+    expect(byName.created_at.type).toBe('timestamp with time zone');
+    expect(byName.name.type).toBe('text');
+
+    // Matches getDataExportColumns over the equivalent physical table
+    const physical = await getDataExportColumns(pg, 'app_routing_public', 'apis');
+    const physicalByName = Object.fromEntries(physical.map(c => [c.name, c]));
+    for (const name of Object.keys(byName)) {
+      expect(byName[name].volatileDefault).toBe(physicalByName[name].volatileDefault);
+      expect(byName[name].type).toBe(physicalByName[name].type);
+    }
+  });
+
+  it('feeds isVolatileTimestampColumn to select droppable columns', async () => {
+    const classified = await getMetadataExportColumns(pg, [
+      { name: 'created_at', type: 'timestamptz', columnDefault: 'now()' },
+      { name: 'updated_at', type: 'timestamptz', columnDefault: 'now()' },
+      { name: 'expires_at', type: 'timestamptz', columnDefault: null },
+      { name: 'dbname', type: 'text', columnDefault: 'current_database()' },
+      { name: 'fixed_at', type: 'timestamptz', columnDefault: "'2020-01-01'::timestamptz" }
+    ]);
+    const dropped = classified.filter(isVolatileTimestampColumn).map(c => c.name).sort();
+    expect(dropped).toEqual(['created_at', 'updated_at']);
+  });
+
+  it('preserves input order and returns [] for no columns, cleaning up temp tables', async () => {
+    expect(await getMetadataExportColumns(pg, [])).toEqual([]);
+
+    const order = await getMetadataExportColumns(pg, [
+      { name: 'z', type: 'text', columnDefault: null },
+      { name: 'a', type: 'timestamptz', columnDefault: 'now()' },
+      { name: 'm', type: 'integer', columnDefault: '0' }
+    ]);
+    expect(order.map(c => c.name)).toEqual(['z', 'a', 'm']);
+
+    // No leftover temp relations from the ephemeral tables
+    const leftover = await pg.query(
+      `SELECT count(*)::int AS n FROM pg_class c
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       WHERE n.nspname = pg_my_temp_schema()::regnamespace::text
+         AND c.relname LIKE 'pgpm_meta_export_cols_%'`
+    );
+    expect(leftover.rows[0].n).toBe(0);
   });
 });
 
