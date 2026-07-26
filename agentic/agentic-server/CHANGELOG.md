@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.4](https://github.com/constructive-io/constructive/compare/agentic-server@0.11.3...agentic-server@0.11.4) (2026-07-26)
+
+**Note:** Version bump only for package agentic-server
+
 ## [0.11.3](https://github.com/constructive-io/constructive/compare/agentic-server@0.11.2...agentic-server@0.11.3) (2026-07-25)
 
 **Note:** Version bump only for package agentic-server
