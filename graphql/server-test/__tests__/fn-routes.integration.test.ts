@@ -42,7 +42,6 @@ const seedAdapters = [
   seed.sqlfile([
     shared('compute', 'setup.sql'),
     shared('app-schemas', 'simple-pets', 'schema.sql'),
-    shared('scoped', 'resolver.sql'),
     shared('scoped', 'test-data.sql'),
     shared('compute', 'test-data.sql'),
     shared('app-schemas', 'simple-pets', 'test-data.sql')

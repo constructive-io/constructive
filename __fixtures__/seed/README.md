@@ -7,8 +7,8 @@ Composable SQL seed layers for integration testing. Each layer builds on the pre
 | Layer | Files | What it provides |
 |-------|-------|-----------------|
 | **base** | `base/setup.sql` | `uuid-ossp` extension, `stamps` schema + `timestamps()` trigger |
-| **routing (real modules)** | `seed.pgpm(repoRoot)` | Real `@pgpm/metaschema-modules` (+ deps: `@constructive-db/{catalog,routing,apps}`, `@pgpm/metaschema-schema`, ...) installed into the gitignored root `extensions/` — see `.agents/skills/ephemeral-pgpm-fixtures/SKILL.md`; run `pnpm fixtures:install` first |
-| **scoped data** | `scoped/resolver.sql`, `scoped/test-data.sql` | Example database (`simple-pets`) on the schema-only modules (`@constructive-db/{catalog,routing,apps}`): catalog apis/domains, routing apis/api_schemas/domains/routes + compiled hostname/route bindings, apps + app_components — plus the `resolve_route()` resolver the schema-only routing module does not ship |
+| **routing (real modules)** | `seed.pgpm(repoRoot)` | Real `@pgpm/metaschema-modules` (+ deps: `@constructive-db/{catalog,routing,apps,routing-functions}`, `@pgpm/metaschema-schema`, ...) installed into the gitignored root `extensions/` — see `.agents/skills/ephemeral-pgpm-fixtures/SKILL.md`; run `pnpm fixtures:install` first. `@constructive-db/routing-functions` ships the generated `resolve_route()` / `resolve_http_route()` / `api_schema_names()` and the hostname/route binding-sync triggers |
+| **scoped data** | `scoped/test-data.sql` | Example database (`simple-pets`) on the published modules: catalog apis/domains, routing apis/api_schemas/domains/routes, apps + app_components. The compiled hostname/route bindings are maintained by the binding-sync triggers from `@constructive-db/routing-functions` |
 | **app-schemas** | `app-schemas/simple-pets/schema.sql` | `simple-pets-*` schemas, animals table with constraints/indexes/triggers |
 | **app data** | `app-schemas/simple-pets/test-data.sql` | 5 test animals (Buddy, Max, Whiskers, Mittens, Tweety) |
 
@@ -40,7 +40,6 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
   seed.pgpm(REPO_ROOT),                               // all installed modules
   seed.sqlfile([
     `${SEED}/app-schemas/simple-pets/schema.sql`,     // app tables
-    `${SEED}/scoped/resolver.sql`,                    // resolve_route() stand-in
     `${SEED}/scoped/test-data.sql`,                   // routing/catalog/apps rows
     `${SEED}/app-schemas/simple-pets/test-data.sql`,  // test animals
   ]),
@@ -52,9 +51,9 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
 Pick only the layers you need:
 
 - **Base only** (extensions + stamps, no metaschema): `base/setup.sql` + your own schema/data
-- **Metaschema + routing only** (no app tables): `seed.pgpm(repoRoot)` + `scoped/resolver.sql` + `scoped/test-data.sql`
-- **Full stack with app data**: `seed.pgpm(repoRoot)` + `app-schemas/*` + `scoped/resolver.sql` + `scoped/test-data.sql` + `app-schemas/*/test-data.sql`
-- **Custom app schema**: `seed.pgpm(repoRoot)` + `scoped/resolver.sql` + `scoped/test-data.sql` + your own schema/data SQL
+- **Metaschema + routing only** (no app tables): `seed.pgpm(repoRoot)` + `scoped/test-data.sql`
+- **Full stack with app data**: `seed.pgpm(repoRoot)` + `app-schemas/*` + `scoped/test-data.sql` + `app-schemas/*/test-data.sql`
+- **Custom app schema**: `seed.pgpm(repoRoot)` + `scoped/test-data.sql` + your own schema/data SQL
 
 The installed modules grant `administrator`/`authenticated` — there are no
 `anonymous` grants anywhere (matching production). Server plugins resolve

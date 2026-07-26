@@ -97,14 +97,13 @@ const scenarios: Scenario[] = [
 
 const seedAdaptersFor = (seedDir: Scenario['seedDir']) => {
   if (seedDir === 'simple-seed-scoped') {
-    // Real metaschema + scoped catalog/routing/apps DDL from published pgpm
-    // modules (installed via `pnpm fixtures:install`), the resolve_route()
-    // stand-in, then app schema + data.
+    // Real metaschema + scoped catalog/routing/apps DDL and the published
+    // resolve_route() / binding-sync trigger module (installed via
+    // `pnpm fixtures:install`), then app schema + data.
     return [
       seed.pgpm(pgpmWorkspace),
       seed.sqlfile([
         shared('app-schemas', 'simple-pets', 'schema.sql'),
-        shared('scoped', 'resolver.sql'),
         shared('scoped', 'test-data.sql'),
         shared('app-schemas', 'simple-pets', 'test-data.sql')
       ])
