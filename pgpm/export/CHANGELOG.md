@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.3.2...@pgpmjs/export@1.4.0) (2026-07-26)
+
+### Features
+
+- **export:** classify metadata-described columns for volatile defaults ([a1f7462](https://github.com/constructive-io/constructive/commit/a1f7462586fd436b7dd1ad972dbbc8904d9390fb))
+- **export:** make metadata-column classification transactional and deterministic ([e6c3ccb](https://github.com/constructive-io/constructive/commit/e6c3ccbd3ae1ce6fe644fa586b90df6a9b8ce380))
+
 ## [1.3.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.3.1...@pgpmjs/export@1.3.2) (2026-07-26)
 
 **Note:** Version bump only for package @pgpmjs/export

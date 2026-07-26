@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.1.2...graphile-settings@6.1.3) (2026-07-26)
+
+### Bug Fixes
+
+- fail fast on Node < 22 (grafast requires Promise.withResolvers) ([172683e](https://github.com/constructive-io/constructive/commit/172683e95c5ab987458abbf8615182203d488c42))
+
 ## [6.1.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.1.1...graphile-settings@6.1.2) (2026-07-26)
 
 **Note:** Version bump only for package graphile-settings
