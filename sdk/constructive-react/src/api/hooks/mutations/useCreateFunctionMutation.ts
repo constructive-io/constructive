@@ -4,85 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionKeys } from '../query-keys';
-import { functionMutationKeys } from '../mutation-keys';
-import type {
-  FunctionSelect,
-  FunctionWithRelations,
-  CreateFunctionInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionSelect,
-  FunctionWithRelations,
-  CreateFunctionInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionKeys } from "../query-keys";
+import { functionMutationKeys } from "../mutation-keys";
+import type { FunctionSelect, FunctionWithRelations, CreateFunctionInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionSelect, FunctionWithRelations, CreateFunctionInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a Function
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateFunctionMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateFunctionMutation<S extends FunctionSelect>(
-  params: {
-    selection: {
-      fields: S & FunctionSelect;
-    } & HookStrictSelect<NoInfer<S>, FunctionSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createFunction: {
-          function: InferSelectResult<FunctionWithRelations, S>;
-        };
-      },
-      Error,
-      CreateFunctionInput['function']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createFunction: {
-      function: InferSelectResult<FunctionWithRelations, S>;
-    };
-  },
-  Error,
-  CreateFunctionInput['function']
->;
-export function useCreateFunctionMutation(
-  params: {
-    selection: SelectionConfig<FunctionSelect>;
-  } & Omit<UseMutationOptions<any, Error, CreateFunctionInput['function']>, 'mutationFn'>
-) {
+export function useCreateFunctionMutation<S extends FunctionSelect>(params: {
+  selection: ({
+    fields: S & FunctionSelect;
+  } & HookStrictSelect<NoInfer<S>, FunctionSelect>);
+} & Omit<UseMutationOptions<{
+  createFunction: {
+    function: InferSelectResult<FunctionWithRelations, S>;
+  };
+}, Error, CreateFunctionInput["function"]>, "mutationFn">): UseMutationResult<{
+  createFunction: {
+    function: InferSelectResult<FunctionWithRelations, S>;
+  };
+}, Error, CreateFunctionInput["function"]>;
+export function useCreateFunctionMutation(params: {
+  selection: SelectionConfig<FunctionSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateFunctionInput["function"]>, "mutationFn">) {
   const args = buildSelectionArgs<FunctionSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionMutationKeys.create(),
-    mutationFn: (data: CreateFunctionInput['function']) =>
-      getClient()
-        .function.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateFunctionInput["function"]) => getClient().function.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: functionKeys.lists(),
+        queryKey: functionKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

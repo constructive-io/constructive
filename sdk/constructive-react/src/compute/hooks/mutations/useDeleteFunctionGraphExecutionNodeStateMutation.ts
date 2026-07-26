@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionGraphExecutionNodeStateKeys } from '../query-keys';
-import { functionGraphExecutionNodeStateMutationKeys } from '../mutation-keys';
-import type {
-  FunctionGraphExecutionNodeStateSelect,
-  FunctionGraphExecutionNodeStateWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionGraphExecutionNodeStateSelect,
-  FunctionGraphExecutionNodeStateWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionGraphExecutionNodeStateKeys } from "../query-keys";
+import { functionGraphExecutionNodeStateMutationKeys } from "../mutation-keys";
+import type { FunctionGraphExecutionNodeStateSelect, FunctionGraphExecutionNodeStateWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionGraphExecutionNodeStateSelect, FunctionGraphExecutionNodeStateWithRelations } from "../../orm/input-types";
 /**
  * Per-node execution state — tracks individual node lifecycle for debugging
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteFunctionGraphExecutionNodeStateMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteFunctionGraphExecutionNodeStateMutation<
-  S extends FunctionGraphExecutionNodeStateSelect,
->(
-  params: {
-    selection: {
-      fields: S & FunctionGraphExecutionNodeStateSelect;
-    } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteFunctionGraphExecutionNodeState: {
-          functionGraphExecutionNodeState: InferSelectResult<
-            FunctionGraphExecutionNodeStateWithRelations,
-            S
-          >;
-        };
-      },
-      Error,
-      {
-        id: string;
-        createdAt: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteFunctionGraphExecutionNodeState: {
-      functionGraphExecutionNodeState: InferSelectResult<
-        FunctionGraphExecutionNodeStateWithRelations,
-        S
-      >;
-    };
-  },
-  Error,
-  {
-    id: string;
-    createdAt: string;
-  }
->;
-export function useDeleteFunctionGraphExecutionNodeStateMutation(
-  params: {
-    selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        createdAt: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteFunctionGraphExecutionNodeStateMutation<S extends FunctionGraphExecutionNodeStateSelect>(params: {
+  selection: ({
+    fields: S & FunctionGraphExecutionNodeStateSelect;
+  } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionNodeStateSelect>);
+} & Omit<UseMutationOptions<{
+  deleteFunctionGraphExecutionNodeState: {
+    functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteFunctionGraphExecutionNodeState: {
+    functionGraphExecutionNodeState: InferSelectResult<FunctionGraphExecutionNodeStateWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+}>;
+export function useDeleteFunctionGraphExecutionNodeStateMutation(params: {
+  selection: SelectionConfig<FunctionGraphExecutionNodeStateSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  createdAt: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<FunctionGraphExecutionNodeStateSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionGraphExecutionNodeStateMutationKeys.all,
-    mutationFn: ({ id, createdAt }: { id: string; createdAt: string }) =>
-      getClient()
-        .functionGraphExecutionNodeState.delete({
-          where: {
-            id,
-            createdAt,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      createdAt
+    }: {
+      id: string;
+      createdAt: string;
+    }) => getClient().functionGraphExecutionNodeState.delete({
+      where: {
+        id,
+        createdAt
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.detail(variables.id),
+        queryKey: functionGraphExecutionNodeStateKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.lists(),
+        queryKey: functionGraphExecutionNodeStateKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -7,7 +7,7 @@ Execute the resolveHttpRoute query
 ## Usage
 
 ```typescript
-db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' }).execute()
+db.query.resolveHttpRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<Str
 ### Run resolveHttpRoute
 
 ```typescript
-const result = await db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' }).execute();
+const result = await db.query.resolveHttpRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
 ```

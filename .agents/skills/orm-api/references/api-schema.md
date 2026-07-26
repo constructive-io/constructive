@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API
+Join table linking API surfaces to the metaschema schemas they expose
 
 ## Usage
 

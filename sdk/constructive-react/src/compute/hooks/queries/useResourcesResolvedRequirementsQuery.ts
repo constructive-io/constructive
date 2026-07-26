@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { resourcesResolvedRequirementKeys } from '../query-keys';
-import type {
-  ResourcesResolvedRequirementSelect,
-  ResourcesResolvedRequirementWithRelations,
-  ResourcesResolvedRequirementFilter,
-  ResourcesResolvedRequirementOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ResourcesResolvedRequirementSelect,
-  ResourcesResolvedRequirementWithRelations,
-  ResourcesResolvedRequirementFilter,
-  ResourcesResolvedRequirementOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { resourcesResolvedRequirementKeys } from "../query-keys";
+import type { ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementWithRelations, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementWithRelations, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const resourcesResolvedRequirementsQueryKey = resourcesResolvedRequirementKeys.list;
 /**
  * Query hook for fetching ResourcesResolvedRequirement list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useResourcesResolvedRequirementsQuery({
@@ -45,64 +30,33 @@ export const resourcesResolvedRequirementsQueryKey = resourcesResolvedRequiremen
  * });
  * ```
  */
-export function useResourcesResolvedRequirementsQuery<
-  S extends ResourcesResolvedRequirementSelect,
-  TData = {
-    resourcesResolvedRequirements: ConnectionResult<
-      InferSelectResult<ResourcesResolvedRequirementWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<
-        S,
-        ResourcesResolvedRequirementFilter,
-        ResourcesResolvedRequirementOrderBy
-      >,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, ResourcesResolvedRequirementSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resourcesResolvedRequirements: ConnectionResult<
-          InferSelectResult<ResourcesResolvedRequirementWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useResourcesResolvedRequirementsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      ResourcesResolvedRequirementSelect,
-      ResourcesResolvedRequirementFilter,
-      ResourcesResolvedRequirementOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    ResourcesResolvedRequirementSelect,
-    ResourcesResolvedRequirementFilter,
-    ResourcesResolvedRequirementOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useResourcesResolvedRequirementsQuery<S extends ResourcesResolvedRequirementSelect, TData = {
+  resourcesResolvedRequirements: ConnectionResult<InferSelectResult<ResourcesResolvedRequirementWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourcesResolvedRequirementSelect>;
+} & Omit<UseQueryOptions<{
+  resourcesResolvedRequirements: ConnectionResult<InferSelectResult<ResourcesResolvedRequirementWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useResourcesResolvedRequirementsQuery(params: {
+  selection: ListSelectionConfig<ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourcesResolvedRequirementKeys.list(args),
     queryFn: () => getClient().resourcesResolvedRequirement.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch ResourcesResolvedRequirement list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchResourcesResolvedRequirementsQuery({
@@ -113,78 +67,38 @@ export function useResourcesResolvedRequirementsQuery(
  * });
  * ```
  */
-export async function fetchResourcesResolvedRequirementsQuery<
-  S extends ResourcesResolvedRequirementSelect,
->(params: {
+export async function fetchResourcesResolvedRequirementsQuery<S extends ResourcesResolvedRequirementSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, ResourcesResolvedRequirementSelect>;
+  } & Omit<ListSelectionConfig<S, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourcesResolvedRequirementSelect>;
 }): Promise<{
-  resourcesResolvedRequirements: ConnectionResult<
-    InferSelectResult<ResourcesResolvedRequirementWithRelations, S>
-  >;
+  resourcesResolvedRequirements: ConnectionResult<InferSelectResult<ResourcesResolvedRequirementWithRelations, S>>;
 }>;
 export async function fetchResourcesResolvedRequirementsQuery(params: {
-  selection: ListSelectionConfig<
-    ResourcesResolvedRequirementSelect,
-    ResourcesResolvedRequirementFilter,
-    ResourcesResolvedRequirementOrderBy
-  >;
+  selection: ListSelectionConfig<ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    ResourcesResolvedRequirementSelect,
-    ResourcesResolvedRequirementFilter,
-    ResourcesResolvedRequirementOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>(params.selection);
   return getClient().resourcesResolvedRequirement.findMany(args).unwrap();
 }
 /**
  * Prefetch ResourcesResolvedRequirement list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchResourcesResolvedRequirementsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchResourcesResolvedRequirementsQuery<
-  S extends ResourcesResolvedRequirementSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<
-        S,
-        ResourcesResolvedRequirementFilter,
-        ResourcesResolvedRequirementOrderBy
-      >,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, ResourcesResolvedRequirementSelect>;
-  }
-): Promise<void>;
-export async function prefetchResourcesResolvedRequirementsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      ResourcesResolvedRequirementSelect,
-      ResourcesResolvedRequirementFilter,
-      ResourcesResolvedRequirementOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    ResourcesResolvedRequirementSelect,
-    ResourcesResolvedRequirementFilter,
-    ResourcesResolvedRequirementOrderBy
-  >(params.selection);
+export async function prefetchResourcesResolvedRequirementsQuery<S extends ResourcesResolvedRequirementSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourcesResolvedRequirementSelect>;
+}): Promise<void>;
+export async function prefetchResourcesResolvedRequirementsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ResourcesResolvedRequirementSelect, ResourcesResolvedRequirementFilter, ResourcesResolvedRequirementOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourcesResolvedRequirementKeys.list(args),
-    queryFn: () => getClient().resourcesResolvedRequirement.findMany(args).unwrap(),
+    queryFn: () => getClient().resourcesResolvedRequirement.findMany(args).unwrap()
   });
 }

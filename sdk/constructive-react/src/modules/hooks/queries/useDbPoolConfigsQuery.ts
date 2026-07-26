@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { dbPoolConfigKeys } from '../query-keys';
-import type {
-  DbPoolConfigSelect,
-  DbPoolConfigWithRelations,
-  DbPoolConfigFilter,
-  DbPoolConfigOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  DbPoolConfigSelect,
-  DbPoolConfigWithRelations,
-  DbPoolConfigFilter,
-  DbPoolConfigOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { dbPoolConfigKeys } from "../query-keys";
+import type { DbPoolConfigSelect, DbPoolConfigWithRelations, DbPoolConfigFilter, DbPoolConfigOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { DbPoolConfigSelect, DbPoolConfigWithRelations, DbPoolConfigFilter, DbPoolConfigOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const dbPoolConfigsQueryKey = dbPoolConfigKeys.list;
 /**
  * Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDbPoolConfigsQuery({
@@ -45,47 +30,33 @@ export const dbPoolConfigsQueryKey = dbPoolConfigKeys.list;
  * });
  * ```
  */
-export function useDbPoolConfigsQuery<
-  S extends DbPoolConfigSelect,
-  TData = {
-    dbPoolConfigs: ConnectionResult<InferSelectResult<DbPoolConfigWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, DbPoolConfigFilter, DbPoolConfigOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        dbPoolConfigs: ConnectionResult<InferSelectResult<DbPoolConfigWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDbPoolConfigsQuery(
-  params: {
-    selection: ListSelectionConfig<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useDbPoolConfigsQuery<S extends DbPoolConfigSelect, TData = {
+  dbPoolConfigs: ConnectionResult<InferSelectResult<DbPoolConfigWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DbPoolConfigFilter, DbPoolConfigOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
+} & Omit<UseQueryOptions<{
+  dbPoolConfigs: ConnectionResult<InferSelectResult<DbPoolConfigWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDbPoolConfigsQuery(params: {
+  selection: ListSelectionConfig<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: dbPoolConfigKeys.list(args),
     queryFn: () => getClient().dbPoolConfig.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDbPoolConfigsQuery({
@@ -99,47 +70,35 @@ export function useDbPoolConfigsQuery(
 export async function fetchDbPoolConfigsQuery<S extends DbPoolConfigSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, DbPoolConfigFilter, DbPoolConfigOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
+  } & Omit<ListSelectionConfig<S, DbPoolConfigFilter, DbPoolConfigOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
 }): Promise<{
   dbPoolConfigs: ConnectionResult<InferSelectResult<DbPoolConfigWithRelations, S>>;
 }>;
 export async function fetchDbPoolConfigsQuery(params: {
   selection: ListSelectionConfig<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>;
 }) {
-  const args = buildListSelectionArgs<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>(params.selection);
   return getClient().dbPoolConfig.findMany(args).unwrap();
 }
 /**
  * Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases.
- *
+ * 
  * @example
  * ```ts
  * await prefetchDbPoolConfigsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchDbPoolConfigsQuery<S extends DbPoolConfigSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, DbPoolConfigFilter, DbPoolConfigOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
-  }
-): Promise<void>;
-export async function prefetchDbPoolConfigsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>(
-    params.selection
-  );
+export async function prefetchDbPoolConfigsQuery<S extends DbPoolConfigSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, DbPoolConfigFilter, DbPoolConfigOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, DbPoolConfigSelect>;
+}): Promise<void>;
+export async function prefetchDbPoolConfigsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<DbPoolConfigSelect, DbPoolConfigFilter, DbPoolConfigOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: dbPoolConfigKeys.list(args),
-    queryFn: () => getClient().dbPoolConfig.findMany(args).unwrap(),
+    queryFn: () => getClient().dbPoolConfig.findMany(args).unwrap()
   });
 }

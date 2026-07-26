@@ -4,88 +4,62 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { realtimeModuleKeys } from '../query-keys';
-import { realtimeModuleMutationKeys } from '../mutation-keys';
-import type {
-  RealtimeModuleSelect,
-  RealtimeModuleWithRelations,
-  CreateRealtimeModuleInput,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  RealtimeModuleSelect,
-  RealtimeModuleWithRelations,
-  CreateRealtimeModuleInput,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { realtimeModuleKeys } from "../query-keys";
+import { realtimeModuleMutationKeys } from "../mutation-keys";
+import type { RealtimeModuleSelect, RealtimeModuleWithRelations, CreateRealtimeModuleInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RealtimeModuleSelect, RealtimeModuleWithRelations, CreateRealtimeModuleInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a RealtimeModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useCreateRealtimeModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ name: 'New item' });
  * ```
  */
-export function useCreateRealtimeModuleMutation<S extends RealtimeModuleSelect>(
-  params: {
-    selection: {
-      fields: S & RealtimeModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        createRealtimeModule: {
-          realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
-        };
-      },
-      Error,
-      CreateRealtimeModuleInput['realtimeModule']
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    createRealtimeModule: {
-      realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
-    };
-  },
-  Error,
-  CreateRealtimeModuleInput['realtimeModule']
->;
-export function useCreateRealtimeModuleMutation(
-  params: {
-    selection: SelectionConfig<RealtimeModuleSelect>;
-  } & Omit<
-    UseMutationOptions<any, Error, CreateRealtimeModuleInput['realtimeModule']>,
-    'mutationFn'
-  >
-) {
+export function useCreateRealtimeModuleMutation<S extends RealtimeModuleSelect>(params: {
+  selection: ({
+    fields: S & RealtimeModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>);
+} & Omit<UseMutationOptions<{
+  createRealtimeModule: {
+    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
+  };
+}, Error, CreateRealtimeModuleInput["realtimeModule"]>, "mutationFn">): UseMutationResult<{
+  createRealtimeModule: {
+    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
+  };
+}, Error, CreateRealtimeModuleInput["realtimeModule"]>;
+export function useCreateRealtimeModuleMutation(params: {
+  selection: SelectionConfig<RealtimeModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateRealtimeModuleInput["realtimeModule"]>, "mutationFn">) {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: realtimeModuleMutationKeys.create(),
-    mutationFn: (data: CreateRealtimeModuleInput['realtimeModule']) =>
-      getClient()
-        .realtimeModule.create({
-          data,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: (data: CreateRealtimeModuleInput["realtimeModule"]) => getClient().realtimeModule.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.lists(),
+        queryKey: realtimeModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

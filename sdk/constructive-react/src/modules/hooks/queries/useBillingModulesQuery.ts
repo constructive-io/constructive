@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { billingModuleKeys } from '../query-keys';
-import type {
-  BillingModuleSelect,
-  BillingModuleWithRelations,
-  BillingModuleFilter,
-  BillingModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  BillingModuleSelect,
-  BillingModuleWithRelations,
-  BillingModuleFilter,
-  BillingModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { billingModuleKeys } from "../query-keys";
+import type { BillingModuleSelect, BillingModuleWithRelations, BillingModuleFilter, BillingModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { BillingModuleSelect, BillingModuleWithRelations, BillingModuleFilter, BillingModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const billingModulesQueryKey = billingModuleKeys.list;
 /**
  * Query hook for fetching BillingModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useBillingModulesQuery({
@@ -45,49 +30,33 @@ export const billingModulesQueryKey = billingModuleKeys.list;
  * });
  * ```
  */
-export function useBillingModulesQuery<
-  S extends BillingModuleSelect,
-  TData = {
-    billingModules: ConnectionResult<InferSelectResult<BillingModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, BillingModuleFilter, BillingModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        billingModules: ConnectionResult<InferSelectResult<BillingModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useBillingModulesQuery(
-  params: {
-    selection: ListSelectionConfig<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    BillingModuleSelect,
-    BillingModuleFilter,
-    BillingModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useBillingModulesQuery<S extends BillingModuleSelect, TData = {
+  billingModules: ConnectionResult<InferSelectResult<BillingModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, BillingModuleFilter, BillingModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
+} & Omit<UseQueryOptions<{
+  billingModules: ConnectionResult<InferSelectResult<BillingModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useBillingModulesQuery(params: {
+  selection: ListSelectionConfig<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: billingModuleKeys.list(args),
     queryFn: () => getClient().billingModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch BillingModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchBillingModulesQuery({
@@ -101,51 +70,35 @@ export function useBillingModulesQuery(
 export async function fetchBillingModulesQuery<S extends BillingModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, BillingModuleFilter, BillingModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
+  } & Omit<ListSelectionConfig<S, BillingModuleFilter, BillingModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
 }): Promise<{
   billingModules: ConnectionResult<InferSelectResult<BillingModuleWithRelations, S>>;
 }>;
 export async function fetchBillingModulesQuery(params: {
   selection: ListSelectionConfig<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    BillingModuleSelect,
-    BillingModuleFilter,
-    BillingModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>(params.selection);
   return getClient().billingModule.findMany(args).unwrap();
 }
 /**
  * Prefetch BillingModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchBillingModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchBillingModulesQuery<S extends BillingModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, BillingModuleFilter, BillingModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchBillingModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    BillingModuleSelect,
-    BillingModuleFilter,
-    BillingModuleOrderBy
-  >(params.selection);
+export async function prefetchBillingModulesQuery<S extends BillingModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, BillingModuleFilter, BillingModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, BillingModuleSelect>;
+}): Promise<void>;
+export async function prefetchBillingModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<BillingModuleSelect, BillingModuleFilter, BillingModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: billingModuleKeys.list(args),
-    queryFn: () => getClient().billingModule.findMany(args).unwrap(),
+    queryFn: () => getClient().billingModule.findMany(args).unwrap()
   });
 }

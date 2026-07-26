@@ -4,645 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type {
-  AppAdminGrant,
-  AppClaimedInvite,
-  AppGrant,
-  AppInvite,
-  AppMembership,
-  AppMembershipDefault,
-  AppOwnerGrant,
-  AppPermission,
-  AppPermissionDefault,
-  AppPermissionDefaultGrant,
-  AppPermissionDefaultPermission,
-  MembershipType,
-  OrgAdminGrant,
-  OrgChartEdge,
-  OrgChartEdgeGrant,
-  OrgClaimedInvite,
-  OrgGetManagersRecord,
-  OrgGetSubordinatesRecord,
-  OrgGrant,
-  OrgInvite,
-  OrgMember,
-  OrgMemberProfile,
-  OrgMembership,
-  OrgMembershipDefault,
-  OrgMembershipSetting,
-  OrgOwnerGrant,
-  OrgPermission,
-  OrgPermissionDefault,
-  OrgPermissionDefaultGrant,
-  OrgPermissionDefaultPermission,
-  BigFloatFilter,
-  BigIntFilter,
-  BitStringFilter,
-  BooleanFilter,
-  DateFilter,
-  DatetimeFilter,
-  FloatFilter,
-  FullTextFilter,
-  IntFilter,
-  IntListFilter,
-  InternetAddressFilter,
-  JSONFilter,
-  StringFilter,
-  StringListFilter,
-  UUIDFilter,
-  UUIDListFilter,
-  VectorFilter,
-} from './types';
+import type { AppAdminGrant, AppClaimedInvite, AppGrant, AppInvite, AppMembership, AppMembershipDefault, AppOwnerGrant, AppPermission, AppPermissionDefault, AppPermissionDefaultGrant, AppPermissionDefaultPermission, MembershipType, OrgAdminGrant, OrgClaimedInvite, OrgGrant, OrgInvite, OrgMember, OrgMemberProfile, OrgMembership, OrgMembershipDefault, OrgMembershipSetting, OrgOwnerGrant, OrgPermission, OrgPermissionDefault, OrgPermissionDefaultGrant, OrgPermissionDefaultPermission, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 /** Methods to use when ordering `AppAdminGrant`. */
-export type AppAdminGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppAdminGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppClaimedInvite`. */
-export type AppClaimedInviteOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppClaimedInviteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppGrant`. */
-export type AppGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppInvite`. */
-export type AppInviteOrderBy =
-  | 'CHANNEL_ASC'
-  | 'CHANNEL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'NATURAL'
-  | 'PHONE_ASC'
-  | 'PHONE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppInviteOrderBy = "CHANNEL_ASC" | "CHANNEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_COUNT_ASC" | "INVITE_COUNT_DESC" | "INVITE_LIMIT_ASC" | "INVITE_LIMIT_DESC" | "INVITE_TOKEN_ASC" | "INVITE_TOKEN_DESC" | "INVITE_VALID_ASC" | "INVITE_VALID_DESC" | "MULTIPLE_ASC" | "MULTIPLE_DESC" | "NATURAL" | "PHONE_ASC" | "PHONE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppMembershipDefault`. */
-export type AppMembershipDefaultOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type AppMembershipDefaultOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ID_ASC" | "ID_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `AppMembership`. */
-export type AppMembershipOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_OWNER_ASC'
-  | 'IS_OWNER_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type AppMembershipOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "GRANTED_ASC" | "GRANTED_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_BANNED_ASC" | "IS_BANNED_DESC" | "IS_DISABLED_ASC" | "IS_DISABLED_DESC" | "IS_OWNER_ASC" | "IS_OWNER_DESC" | "IS_VERIFIED_ASC" | "IS_VERIFIED_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `AppOwnerGrant`. */
-export type AppOwnerGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppOwnerGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppPermissionDefaultGrant`. */
-export type AppPermissionDefaultGrantOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppPermissionDefaultGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppPermissionDefault`. */
-export type AppPermissionDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppPermissionDefaultOrderBy = "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `AppPermissionDefaultPermission`. */
-export type AppPermissionDefaultPermissionOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type AppPermissionDefaultPermissionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `AppPermission`. */
-export type AppPermissionOrderBy =
-  | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppPermissionOrderBy = "BITNUM_ASC" | "BITNUM_DESC" | "BITSTR_ASC" | "BITSTR_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `MembershipType`. */
-export type MembershipTypeOrderBy =
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'HAS_USERS_TABLE_ENTRY_ASC'
-  | 'HAS_USERS_TABLE_ENTRY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PARENT_MEMBERSHIP_TYPE_ASC'
-  | 'PARENT_MEMBERSHIP_TYPE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
+export type MembershipTypeOrderBy = "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "HAS_USERS_TABLE_ENTRY_ASC" | "HAS_USERS_TABLE_ENTRY_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARENT_MEMBERSHIP_TYPE_ASC" | "PARENT_MEMBERSHIP_TYPE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
 /** Methods to use when ordering `OrgAdminGrant`. */
-export type OrgAdminGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `OrgChartEdgeGrant`. */
-export type OrgChartEdgeGrantOrderBy =
-  | 'CHILD_ID_ASC'
-  | 'CHILD_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-/** Methods to use when ordering `OrgChartEdge`. */
-export type OrgChartEdgeOrderBy =
-  | 'CHILD_ID_ASC'
-  | 'CHILD_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgAdminGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgClaimedInvite`. */
-export type OrgClaimedInviteOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgClaimedInviteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgGrant`. */
-export type OrgGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgInvite`. */
-export type OrgInviteOrderBy =
-  | 'CHANNEL_ASC'
-  | 'CHANNEL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'IS_READ_ONLY_ASC'
-  | 'IS_READ_ONLY_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'NATURAL'
-  | 'PHONE_ASC'
-  | 'PHONE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgInviteOrderBy = "CHANNEL_ASC" | "CHANNEL_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_COUNT_ASC" | "INVITE_COUNT_DESC" | "INVITE_LIMIT_ASC" | "INVITE_LIMIT_DESC" | "INVITE_TOKEN_ASC" | "INVITE_TOKEN_DESC" | "INVITE_VALID_ASC" | "INVITE_VALID_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "MULTIPLE_ASC" | "MULTIPLE_DESC" | "NATURAL" | "PHONE_ASC" | "PHONE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "RECEIVER_ID_ASC" | "RECEIVER_ID_DESC" | "SENDER_ID_ASC" | "SENDER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgMember`. */
-export type OrgMemberOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type OrgMemberOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `OrgMemberProfile`. */
-export type OrgMemberProfileOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'BIO_ASC'
-  | 'BIO_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MEMBERSHIP_ID_ASC'
-  | 'MEMBERSHIP_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_PICTURE_ASC'
-  | 'PROFILE_PICTURE_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgMemberProfileOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "BIO_ASC" | "BIO_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MEMBERSHIP_ID_ASC" | "MEMBERSHIP_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_PICTURE_ASC" | "PROFILE_PICTURE_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgMembershipDefault`. */
-export type OrgMembershipDefaultOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type OrgMembershipDefaultOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `OrgMembership`. */
-export type OrgMembershipOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_EXTERNAL_ASC'
-  | 'IS_EXTERNAL_DESC'
-  | 'IS_OWNER_ASC'
-  | 'IS_OWNER_DESC'
-  | 'IS_READ_ONLY_ASC'
-  | 'IS_READ_ONLY_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROFILE_ID_ASC'
-  | 'PROFILE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type OrgMembershipOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTED_ASC" | "GRANTED_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_ADMIN_ASC" | "IS_ADMIN_DESC" | "IS_APPROVED_ASC" | "IS_APPROVED_DESC" | "IS_BANNED_ASC" | "IS_BANNED_DESC" | "IS_DISABLED_ASC" | "IS_DISABLED_DESC" | "IS_EXTERNAL_ASC" | "IS_EXTERNAL_DESC" | "IS_OWNER_ASC" | "IS_OWNER_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROFILE_ID_ASC" | "PROFILE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `OrgMembershipSetting`. */
-export type OrgMembershipSettingOrderBy =
-  | 'ALLOW_EXTERNAL_MEMBERS_ASC'
-  | 'ALLOW_EXTERNAL_MEMBERS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATE_CHILD_CASCADE_ADMINS_ASC'
-  | 'CREATE_CHILD_CASCADE_ADMINS_DESC'
-  | 'CREATE_CHILD_CASCADE_MEMBERS_ASC'
-  | 'CREATE_CHILD_CASCADE_MEMBERS_DESC'
-  | 'CREATE_CHILD_CASCADE_OWNERS_ASC'
-  | 'CREATE_CHILD_CASCADE_OWNERS_DESC'
-  | 'DELETE_MEMBER_CASCADE_CHILDREN_ASC'
-  | 'DELETE_MEMBER_CASCADE_CHILDREN_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITE_PROFILE_ASSIGNMENT_MODE_ASC'
-  | 'INVITE_PROFILE_ASSIGNMENT_MODE_DESC'
-  | 'LIMIT_ALLOCATION_MODE_ASC'
-  | 'LIMIT_ALLOCATION_MODE_DESC'
-  | 'NATURAL'
-  | 'POPULATE_MEMBER_EMAIL_ASC'
-  | 'POPULATE_MEMBER_EMAIL_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+export type OrgMembershipSettingOrderBy = "ALLOW_EXTERNAL_MEMBERS_ASC" | "ALLOW_EXTERNAL_MEMBERS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "CREATE_CHILD_CASCADE_ADMINS_ASC" | "CREATE_CHILD_CASCADE_ADMINS_DESC" | "CREATE_CHILD_CASCADE_MEMBERS_ASC" | "CREATE_CHILD_CASCADE_MEMBERS_DESC" | "CREATE_CHILD_CASCADE_OWNERS_ASC" | "CREATE_CHILD_CASCADE_OWNERS_DESC" | "DELETE_MEMBER_CASCADE_CHILDREN_ASC" | "DELETE_MEMBER_CASCADE_CHILDREN_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVITE_PROFILE_ASSIGNMENT_MODE_ASC" | "INVITE_PROFILE_ASSIGNMENT_MODE_DESC" | "LIMIT_ALLOCATION_MODE_ASC" | "LIMIT_ALLOCATION_MODE_DESC" | "NATURAL" | "POPULATE_MEMBER_EMAIL_ASC" | "POPULATE_MEMBER_EMAIL_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
 /** Methods to use when ordering `OrgOwnerGrant`. */
-export type OrgOwnerGrantOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgOwnerGrantOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgPermissionDefaultGrant`. */
-export type OrgPermissionDefaultGrantOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgPermissionDefaultGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "GRANTOR_ID_ASC" | "GRANTOR_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgPermissionDefault`. */
-export type OrgPermissionDefaultOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type OrgPermissionDefaultOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSIONS_ASC" | "PERMISSIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `OrgPermissionDefaultPermission`. */
-export type OrgPermissionDefaultPermissionOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSION_ID_ASC'
-  | 'PERMISSION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type OrgPermissionDefaultPermissionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PERMISSION_ID_ASC" | "PERMISSION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 /** Methods to use when ordering `OrgPermission`. */
-export type OrgPermissionOrderBy =
-  | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type OrgPermissionOrderBy = "BITNUM_ASC" | "BITNUM_DESC" | "BITSTR_ASC" | "BITSTR_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** A filter to be used against `AppAdminGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface AppAdminGrantFilter {
   /** Filter by the object’s `actorId` field. */
@@ -1406,16 +822,6 @@ export interface CreateOrgAdminGrantInput {
   /** The `OrgAdminGrant` to be created by this mutation. */
   orgAdminGrant: OrgAdminGrantInput;
 }
-export interface CreateOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  /** The `OrgChartEdgeGrant` to be created by this mutation. */
-  orgChartEdgeGrant: OrgChartEdgeGrantInput;
-}
-export interface CreateOrgChartEdgeInput {
-  clientMutationId?: string;
-  /** The `OrgChartEdge` to be created by this mutation. */
-  orgChartEdge: OrgChartEdgeInput;
-}
 export interface CreateOrgClaimedInviteInput {
   clientMutationId?: string;
   /** The `OrgClaimedInvite` to be created by this mutation. */
@@ -1531,14 +937,6 @@ export interface DeleteMembershipTypeInput {
   id: number;
 }
 export interface DeleteOrgAdminGrantInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgChartEdgeInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1692,130 +1090,6 @@ export interface OrgAdminGrantPatch {
   id?: string;
   /** True to grant admin, false to revoke admin */
   isGrant?: boolean;
-  updatedAt?: string;
-}
-/** A filter to be used against `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgChartEdgeFilter {
-  /** Checks for all expressions in this list. */
-  and?: OrgChartEdgeFilter[];
-  /** Filter by the object’s `childId` field. */
-  childId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: OrgChartEdgeFilter;
-  /** Checks for any expressions in this list. */
-  or?: OrgChartEdgeFilter[];
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `positionLevel` field. */
-  positionLevel?: IntFilter;
-  /** Filter by the object’s `positionTitle` field. */
-  positionTitle?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgChartEdgeGrantFilter {
-  /** Checks for all expressions in this list. */
-  and?: OrgChartEdgeGrantFilter[];
-  /** Filter by the object’s `childId` field. */
-  childId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `grantorId` field. */
-  grantorId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isGrant` field. */
-  isGrant?: BooleanFilter;
-  /** Negates the expression. */
-  not?: OrgChartEdgeGrantFilter;
-  /** Checks for any expressions in this list. */
-  or?: OrgChartEdgeGrantFilter[];
-  /** Filter by the object’s `parentId` field. */
-  parentId?: UUIDFilter;
-  /** Filter by the object’s `positionLevel` field. */
-  positionLevel?: IntFilter;
-  /** Filter by the object’s `positionTitle` field. */
-  positionTitle?: StringFilter;
-}
-/** An input for mutations affecting `OrgChartEdgeGrant` */
-export interface OrgChartEdgeGrantInput {
-  /** User ID of the subordinate being placed in the hierarchy */
-  childId: string;
-  /** Timestamp when this grant or revocation was recorded */
-  createdAt?: string;
-  /** Organization this grant applies to */
-  entityId: string;
-  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
-  grantorId?: string;
-  id?: string;
-  /** TRUE to add/update the edge, FALSE to remove it */
-  isGrant?: boolean;
-  /** User ID of the manager being assigned; NULL for top-level positions */
-  parentId?: string;
-  /** Numeric seniority level being assigned in this grant */
-  positionLevel?: number;
-  /** Job title or role name being assigned in this grant */
-  positionTitle?: string;
-}
-/** Represents an update to a `OrgChartEdgeGrant`. Fields that are set will be updated. */
-export interface OrgChartEdgeGrantPatch {
-  /** User ID of the subordinate being placed in the hierarchy */
-  childId?: string;
-  /** Timestamp when this grant or revocation was recorded */
-  createdAt?: string;
-  /** Organization this grant applies to */
-  entityId?: string;
-  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
-  grantorId?: string;
-  id?: string;
-  /** TRUE to add/update the edge, FALSE to remove it */
-  isGrant?: boolean;
-  /** User ID of the manager being assigned; NULL for top-level positions */
-  parentId?: string;
-  /** Numeric seniority level being assigned in this grant */
-  positionLevel?: number;
-  /** Job title or role name being assigned in this grant */
-  positionTitle?: string;
-}
-/** An input for mutations affecting `OrgChartEdge` */
-export interface OrgChartEdgeInput {
-  /** User ID of the subordinate (employee) in this reporting relationship */
-  childId: string;
-  createdAt?: string;
-  /** Organization this hierarchy edge belongs to */
-  entityId: string;
-  id?: string;
-  /** User ID of the manager; NULL indicates a top-level position with no direct report */
-  parentId?: string;
-  /** Numeric seniority level for this position (higher = more senior) */
-  positionLevel?: number;
-  /** Job title or role name for this position in the org chart */
-  positionTitle?: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `OrgChartEdge`. Fields that are set will be updated. */
-export interface OrgChartEdgePatch {
-  /** User ID of the subordinate (employee) in this reporting relationship */
-  childId?: string;
-  createdAt?: string;
-  /** Organization this hierarchy edge belongs to */
-  entityId?: string;
-  id?: string;
-  /** User ID of the manager; NULL indicates a top-level position with no direct report */
-  parentId?: string;
-  /** Numeric seniority level for this position (higher = more senior) */
-  positionLevel?: number;
-  /** Job title or role name for this position in the org chart */
-  positionTitle?: string;
   updatedAt?: string;
 }
 /** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
@@ -2737,18 +2011,6 @@ export interface UpdateOrgAdminGrantInput {
   /** An object where the defined keys will be set on the `OrgAdminGrant` being updated. */
   orgAdminGrantPatch: OrgAdminGrantPatch;
 }
-export interface UpdateOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgChartEdgeGrant` being updated. */
-  orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch;
-}
-export interface UpdateOrgChartEdgeInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgChartEdge` being updated. */
-  orgChartEdgePatch: OrgChartEdgePatch;
-}
 export interface UpdateOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
@@ -2922,38 +2184,10 @@ export interface OrgAdminGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgChartEdgeGrant` values. */
-export interface OrgChartEdgeGrantConnection {
-  edges: OrgChartEdgeGrantEdge[];
-  nodes: OrgChartEdgeGrant[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgChartEdge` values. */
-export interface OrgChartEdgeConnection {
-  edges: OrgChartEdgeEdge[];
-  nodes: OrgChartEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `OrgClaimedInvite` values. */
 export interface OrgClaimedInviteConnection {
   edges: OrgClaimedInviteEdge[];
   nodes: OrgClaimedInvite[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgGetManagersRecord` values. */
-export interface OrgGetManagersConnection {
-  edges: OrgGetManagersEdge[];
-  nodes: OrgGetManagersRecord[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgGetSubordinatesRecord` values. */
-export interface OrgGetSubordinatesConnection {
-  edges: OrgGetSubordinatesEdge[];
-  nodes: OrgGetSubordinatesRecord[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -3119,18 +2353,6 @@ export interface CreateOrgAdminGrantPayload {
   orgAdminGrant?: OrgAdminGrant | null;
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
 }
-export interface CreateOrgChartEdgePayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdge` that was created by this mutation. */
-  orgChartEdge?: OrgChartEdge | null;
-  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
-}
-export interface CreateOrgChartEdgeGrantPayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdgeGrant` that was created by this mutation. */
-  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
-  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
-}
 export interface CreateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was created by this mutation. */
@@ -3286,18 +2508,6 @@ export interface DeleteOrgAdminGrantPayload {
   /** The `OrgAdminGrant` that was deleted by this mutation. */
   orgAdminGrant?: OrgAdminGrant | null;
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
-}
-export interface DeleteOrgChartEdgePayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdge` that was deleted by this mutation. */
-  orgChartEdge?: OrgChartEdge | null;
-  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
-}
-export interface DeleteOrgChartEdgeGrantPayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdgeGrant` that was deleted by this mutation. */
-  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
-  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
 }
 export interface DeleteOrgClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -3477,18 +2687,6 @@ export interface UpdateOrgAdminGrantPayload {
   orgAdminGrant?: OrgAdminGrant | null;
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
 }
-export interface UpdateOrgChartEdgePayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdge` that was updated by this mutation. */
-  orgChartEdge?: OrgChartEdge | null;
-  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
-}
-export interface UpdateOrgChartEdgeGrantPayload {
-  clientMutationId?: string | null;
-  /** The `OrgChartEdgeGrant` that was updated by this mutation. */
-  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
-  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
-}
 export interface UpdateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was updated by this mutation. */
@@ -3583,6 +2781,8 @@ export interface MetaTable {
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
+  /** Provisioning scope metadata (null if no @scope tag) */
+  scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
@@ -3678,35 +2878,11 @@ export interface OrgAdminGrantEdge {
   /** The `OrgAdminGrant` at the end of the edge. */
   node?: OrgAdminGrant | null;
 }
-/** A `OrgChartEdgeGrant` edge in the connection. */
-export interface OrgChartEdgeGrantEdge {
-  cursor?: string | null;
-  /** The `OrgChartEdgeGrant` at the end of the edge. */
-  node?: OrgChartEdgeGrant | null;
-}
-/** A `OrgChartEdge` edge in the connection. */
-export interface OrgChartEdgeEdge {
-  cursor?: string | null;
-  /** The `OrgChartEdge` at the end of the edge. */
-  node?: OrgChartEdge | null;
-}
 /** A `OrgClaimedInvite` edge in the connection. */
 export interface OrgClaimedInviteEdge {
   cursor?: string | null;
   /** The `OrgClaimedInvite` at the end of the edge. */
   node?: OrgClaimedInvite | null;
-}
-/** A `OrgGetManagersRecord` edge in the connection. */
-export interface OrgGetManagersEdge {
-  cursor?: string | null;
-  /** The `OrgGetManagersRecord` at the end of the edge. */
-  node?: OrgGetManagersRecord | null;
-}
-/** A `OrgGetSubordinatesRecord` edge in the connection. */
-export interface OrgGetSubordinatesEdge {
-  cursor?: string | null;
-  /** The `OrgGetSubordinatesRecord` at the end of the edge. */
-  node?: OrgGetSubordinatesRecord | null;
 }
 /** A `OrgGrant` edge in the connection. */
 export interface OrgGrantEdge {
@@ -3863,6 +3039,19 @@ export interface MetaRelations {
   hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
 }
+/** Provisioning scope metadata for a table */
+export interface MetaScope {
+  /** SQL name of the entity table for entity scopes, else null */
+  entityTable?: string | null;
+  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  keyColumn?: string | null;
+  /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
+  scope: string;
+  /** Provenance of the scope metadata (always 'smartTag') */
+  source: string;
+  /** Coarse bucket: 'global', 'database', or 'entity' */
+  tier: string;
+}
 /** Search metadata for a table */
 export interface MetaSearch {
   /** Active search algorithms on this table */
@@ -3895,6 +3084,8 @@ export interface MetaEnum {
 }
 /** Information about a PostgreSQL type */
 export interface MetaType {
+  /** Scalar serialization contract (null for plain scalars) */
+  encoding?: MetaScalarEncoding | null;
   gqlType: string;
   hasDefault?: boolean | null;
   isArray: boolean;
@@ -3959,4 +3150,19 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+export interface MetaScalarEncoding {
+  /** For 'vector': declared length, else null. */
+  dimensions?: number | null;
+  /** For 'ltree': values are dot-separated path strings. */
+  dotPath?: boolean | null;
+  /** For 'vector': element scalar (e.g. 'float'). */
+  elementType?: string | null;
+  /** For 'geojson': Point/LineString/Polygon/…, else null. */
+  geometrySubtype?: string | null;
+  /** Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite. */
+  kind: string;
+  /** For 'geojson': spatial reference id, else null. */
+  srid?: number | null;
 }

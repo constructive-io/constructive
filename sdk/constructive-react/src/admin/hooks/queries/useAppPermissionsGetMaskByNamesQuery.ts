@@ -4,76 +4,57 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customQueryKeys } from '../query-keys';
-import type { AppPermissionsGetMaskByNamesVariables } from '../../orm/query';
-export type { AppPermissionsGetMaskByNamesVariables } from '../../orm/query';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customQueryKeys } from "../query-keys";
+import type { AppPermissionsGetMaskByNamesVariables } from "../../orm/query";
+export type { AppPermissionsGetMaskByNamesVariables } from "../../orm/query";
 /** Query key factory - re-exported from query-keys.ts */
 export const appPermissionsGetMaskByNamesQueryKey = customQueryKeys.appPermissionsGetMaskByNames;
 /**
  * Query hook for appPermissionsGetMaskByNames
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppPermissionsGetMaskByNamesQuery({ variables: { names } });
- *
+ * 
  * if (data?.appPermissionsGetMaskByNames) {
  *   console.log(data.appPermissionsGetMaskByNames);
  * }
  * ```
  */
-export function useAppPermissionsGetMaskByNamesQuery<
-  TData = {
-    appPermissionsGetMaskByNames: string | null;
-  },
->(
-  params?: {
-    variables?: AppPermissionsGetMaskByNamesVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appPermissionsGetMaskByNames: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppPermissionsGetMaskByNamesQuery<
-  TData = {
-    appPermissionsGetMaskByNames: string | null;
-  },
->(
-  params?: {
-    variables?: AppPermissionsGetMaskByNamesVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appPermissionsGetMaskByNames: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData> {
+export function useAppPermissionsGetMaskByNamesQuery<TData = {
+  appPermissionsGetMaskByNames: string | null;
+}>(params?: {
+  variables?: AppPermissionsGetMaskByNamesVariables;
+} & Omit<UseQueryOptions<{
+  appPermissionsGetMaskByNames: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppPermissionsGetMaskByNamesQuery<TData = {
+  appPermissionsGetMaskByNames: string | null;
+}>(params?: {
+  variables?: AppPermissionsGetMaskByNamesVariables;
+} & Omit<UseQueryOptions<{
+  appPermissionsGetMaskByNames: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const { variables: _variables, ...queryOptions } = params ?? {};
+  const {
+    variables: _variables,
+    ...queryOptions
+  } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: appPermissionsGetMaskByNamesQueryKey(variables),
     queryFn: () => getClient().query.appPermissionsGetMaskByNames(variables).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch appPermissionsGetMaskByNames without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppPermissionsGetMaskByNamesQuery({ variables: { names } });
@@ -87,21 +68,18 @@ export async function fetchAppPermissionsGetMaskByNamesQuery(params?: {
 }
 /**
  * Prefetch appPermissionsGetMaskByNames for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppPermissionsGetMaskByNamesQuery(queryClient, { variables: { names } });
  * ```
  */
-export async function prefetchAppPermissionsGetMaskByNamesQuery(
-  queryClient: QueryClient,
-  params?: {
-    variables?: AppPermissionsGetMaskByNamesVariables;
-  }
-): Promise<void> {
+export async function prefetchAppPermissionsGetMaskByNamesQuery(queryClient: QueryClient, params?: {
+  variables?: AppPermissionsGetMaskByNamesVariables;
+}): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: appPermissionsGetMaskByNamesQueryKey(variables),
-    queryFn: () => getClient().query.appPermissionsGetMaskByNames(variables).unwrap(),
+    queryFn: () => getClient().query.appPermissionsGetMaskByNames(variables).unwrap()
   });
 }

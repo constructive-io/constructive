@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformFunctionDefinitionKeys } from '../query-keys';
-import type {
-  PlatformFunctionDefinitionSelect,
-  PlatformFunctionDefinitionWithRelations,
-  PlatformFunctionDefinitionFilter,
-  PlatformFunctionDefinitionOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformFunctionDefinitionSelect,
-  PlatformFunctionDefinitionWithRelations,
-  PlatformFunctionDefinitionFilter,
-  PlatformFunctionDefinitionOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformFunctionDefinitionKeys } from "../query-keys";
+import type { PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionWithRelations, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionWithRelations, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformFunctionDefinitionsQueryKey = platformFunctionDefinitionKeys.list;
 /**
  * Function definitions — registered cloud functions with routing, queue, and retry configuration
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformFunctionDefinitionsQuery({
@@ -45,60 +30,33 @@ export const platformFunctionDefinitionsQueryKey = platformFunctionDefinitionKey
  * });
  * ```
  */
-export function usePlatformFunctionDefinitionsQuery<
-  S extends PlatformFunctionDefinitionSelect,
-  TData = {
-    platformFunctionDefinitions: ConnectionResult<
-      InferSelectResult<PlatformFunctionDefinitionWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformFunctionDefinitions: ConnectionResult<
-          InferSelectResult<PlatformFunctionDefinitionWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformFunctionDefinitionsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformFunctionDefinitionSelect,
-      PlatformFunctionDefinitionFilter,
-      PlatformFunctionDefinitionOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformFunctionDefinitionSelect,
-    PlatformFunctionDefinitionFilter,
-    PlatformFunctionDefinitionOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformFunctionDefinitionsQuery<S extends PlatformFunctionDefinitionSelect, TData = {
+  platformFunctionDefinitions: ConnectionResult<InferSelectResult<PlatformFunctionDefinitionWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
+} & Omit<UseQueryOptions<{
+  platformFunctionDefinitions: ConnectionResult<InferSelectResult<PlatformFunctionDefinitionWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformFunctionDefinitionsQuery(params: {
+  selection: ListSelectionConfig<PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformFunctionDefinitionKeys.list(args),
     queryFn: () => getClient().platformFunctionDefinition.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Function definitions — registered cloud functions with routing, queue, and retry configuration
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformFunctionDefinitionsQuery({
@@ -109,74 +67,38 @@ export function usePlatformFunctionDefinitionsQuery(
  * });
  * ```
  */
-export async function fetchPlatformFunctionDefinitionsQuery<
-  S extends PlatformFunctionDefinitionSelect,
->(params: {
+export async function fetchPlatformFunctionDefinitionsQuery<S extends PlatformFunctionDefinitionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
 }): Promise<{
-  platformFunctionDefinitions: ConnectionResult<
-    InferSelectResult<PlatformFunctionDefinitionWithRelations, S>
-  >;
+  platformFunctionDefinitions: ConnectionResult<InferSelectResult<PlatformFunctionDefinitionWithRelations, S>>;
 }>;
 export async function fetchPlatformFunctionDefinitionsQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformFunctionDefinitionSelect,
-    PlatformFunctionDefinitionFilter,
-    PlatformFunctionDefinitionOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformFunctionDefinitionSelect,
-    PlatformFunctionDefinitionFilter,
-    PlatformFunctionDefinitionOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>(params.selection);
   return getClient().platformFunctionDefinition.findMany(args).unwrap();
 }
 /**
  * Function definitions — registered cloud functions with routing, queue, and retry configuration
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformFunctionDefinitionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformFunctionDefinitionsQuery<
-  S extends PlatformFunctionDefinitionSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformFunctionDefinitionsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformFunctionDefinitionSelect,
-      PlatformFunctionDefinitionFilter,
-      PlatformFunctionDefinitionOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformFunctionDefinitionSelect,
-    PlatformFunctionDefinitionFilter,
-    PlatformFunctionDefinitionOrderBy
-  >(params.selection);
+export async function prefetchPlatformFunctionDefinitionsQuery<S extends PlatformFunctionDefinitionSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformFunctionDefinitionSelect>;
+}): Promise<void>;
+export async function prefetchPlatformFunctionDefinitionsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformFunctionDefinitionSelect, PlatformFunctionDefinitionFilter, PlatformFunctionDefinitionOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformFunctionDefinitionKeys.list(args),
-    queryFn: () => getClient().platformFunctionDefinition.findMany(args).unwrap(),
+    queryFn: () => getClient().platformFunctionDefinition.findMany(args).unwrap()
   });
 }

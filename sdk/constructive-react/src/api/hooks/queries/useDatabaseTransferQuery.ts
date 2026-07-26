@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { databaseTransferKeys } from '../query-keys';
-import type { DatabaseTransferSelect, DatabaseTransferWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { DatabaseTransferSelect, DatabaseTransferWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { databaseTransferKeys } from "../query-keys";
+import type { DatabaseTransferSelect, DatabaseTransferWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { DatabaseTransferSelect, DatabaseTransferWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const databaseTransferQueryKey = databaseTransferKeys.detail;
 /**
  * Query hook for fetching a single DatabaseTransfer
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDatabaseTransferQuery({
@@ -26,52 +26,38 @@ export const databaseTransferQueryKey = databaseTransferKeys.detail;
  * });
  * ```
  */
-export function useDatabaseTransferQuery<
-  S extends DatabaseTransferSelect,
-  TData = {
-    databaseTransfer: InferSelectResult<DatabaseTransferWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DatabaseTransferSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        databaseTransfer: InferSelectResult<DatabaseTransferWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDatabaseTransferQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<DatabaseTransferSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useDatabaseTransferQuery<S extends DatabaseTransferSelect, TData = {
+  databaseTransfer: InferSelectResult<DatabaseTransferWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DatabaseTransferSelect>;
+} & Omit<UseQueryOptions<{
+  databaseTransfer: InferSelectResult<DatabaseTransferWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDatabaseTransferQuery(params: {
+  id: string;
+  selection: SelectionConfig<DatabaseTransferSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<DatabaseTransferSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: databaseTransferKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .databaseTransfer.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().databaseTransfer.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single DatabaseTransfer without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDatabaseTransferQuery({
@@ -93,46 +79,35 @@ export async function fetchDatabaseTransferQuery(params: {
   selection: SelectionConfig<DatabaseTransferSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DatabaseTransferSelect>(params.selection);
-  return getClient()
-    .databaseTransfer.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().databaseTransfer.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single DatabaseTransfer for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDatabaseTransferQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDatabaseTransferQuery<S extends DatabaseTransferSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DatabaseTransferSelect>;
-  }
-): Promise<void>;
-export async function prefetchDatabaseTransferQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<DatabaseTransferSelect>;
-  }
-): Promise<void> {
+export async function prefetchDatabaseTransferQuery<S extends DatabaseTransferSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DatabaseTransferSelect>;
+}): Promise<void>;
+export async function prefetchDatabaseTransferQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<DatabaseTransferSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<DatabaseTransferSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: databaseTransferKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .databaseTransfer.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().databaseTransfer.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

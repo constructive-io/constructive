@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { sessionSecretsModuleKeys } from '../query-keys';
-import type {
-  SessionSecretsModuleSelect,
-  SessionSecretsModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  SessionSecretsModuleSelect,
-  SessionSecretsModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { sessionSecretsModuleKeys } from "../query-keys";
+import type { SessionSecretsModuleSelect, SessionSecretsModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { SessionSecretsModuleSelect, SessionSecretsModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const sessionSecretsModuleQueryKey = sessionSecretsModuleKeys.detail;
 /**
  * Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useSessionSecretsModuleQuery({
@@ -32,52 +26,38 @@ export const sessionSecretsModuleQueryKey = sessionSecretsModuleKeys.detail;
  * });
  * ```
  */
-export function useSessionSecretsModuleQuery<
-  S extends SessionSecretsModuleSelect,
-  TData = {
-    sessionSecretsModule: InferSelectResult<SessionSecretsModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, SessionSecretsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        sessionSecretsModule: InferSelectResult<SessionSecretsModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useSessionSecretsModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<SessionSecretsModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useSessionSecretsModuleQuery<S extends SessionSecretsModuleSelect, TData = {
+  sessionSecretsModule: InferSelectResult<SessionSecretsModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, SessionSecretsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  sessionSecretsModule: InferSelectResult<SessionSecretsModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useSessionSecretsModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<SessionSecretsModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<SessionSecretsModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: sessionSecretsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .sessionSecretsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().sessionSecretsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchSessionSecretsModuleQuery({
@@ -99,46 +79,35 @@ export async function fetchSessionSecretsModuleQuery(params: {
   selection: SelectionConfig<SessionSecretsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<SessionSecretsModuleSelect>(params.selection);
-  return getClient()
-    .sessionSecretsModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().sessionSecretsModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users.
- *
+ * 
  * @example
  * ```ts
  * await prefetchSessionSecretsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchSessionSecretsModuleQuery<S extends SessionSecretsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, SessionSecretsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchSessionSecretsModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<SessionSecretsModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchSessionSecretsModuleQuery<S extends SessionSecretsModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, SessionSecretsModuleSelect>;
+}): Promise<void>;
+export async function prefetchSessionSecretsModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<SessionSecretsModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<SessionSecretsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: sessionSecretsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .sessionSecretsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().sessionSecretsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

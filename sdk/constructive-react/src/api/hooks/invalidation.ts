@@ -13,56 +13,8 @@
 // - Remove helpers for delete operations
 // ============================================================================
 
-import type { QueryClient } from '@tanstack/react-query';
-import {
-  apiKeys,
-  apiModuleKeys,
-  apiSchemaKeys,
-  apiSettingKeys,
-  appKeys,
-  astMigrationKeys,
-  checkConstraintKeys,
-  compositeTypeKeys,
-  corsSettingKeys,
-  databaseKeys,
-  databaseSettingKeys,
-  databaseTransferKeys,
-  defaultPrivilegeKeys,
-  domainKeys,
-  embeddingChunkKeys,
-  enumKeys,
-  fieldKeys,
-  foreignKeyConstraintKeys,
-  fullTextSearchKeys,
-  functionKeys,
-  httpRouteKeys,
-  indexKeys,
-  managedDomainKeys,
-  nodeTypeRegistryKeys,
-  partitionKeys,
-  policyKeys,
-  primaryKeyConstraintKeys,
-  pubkeySettingKeys,
-  rlsSettingKeys,
-  schemaKeys,
-  schemaGrantKeys,
-  siteKeys,
-  siteMetadatumKeys,
-  siteModuleKeys,
-  siteThemeKeys,
-  spatialRelationKeys,
-  sqlActionKeys,
-  tableKeys,
-  tableGrantKeys,
-  triggerKeys,
-  triggerFunctionKeys,
-  uniqueConstraintKeys,
-  viewKeys,
-  viewGrantKeys,
-  viewRuleKeys,
-  viewTableKeys,
-  webauthnSettingKeys,
-} from './query-keys';
+import type { QueryClient } from "@tanstack/react-query";
+import { apiKeys, apiModuleKeys, apiSchemaKeys, apiSettingKeys, astMigrationKeys, checkConstraintKeys, compositeTypeKeys, corsSettingKeys, databaseKeys, databaseSettingKeys, databaseTransferKeys, defaultPrivilegeKeys, domainKeys, domainEventKeys, domainVerificationKeys, embeddingChunkKeys, enumKeys, exclusionConstraintKeys, fieldKeys, foreignKeyConstraintKeys, fullTextSearchKeys, functionKeys, hostnameBindingKeys, httpRouteKeys, indexKeys, managedDomainKeys, nodeTypeRegistryKeys, partitionKeys, platformApiKeys, platformApiModuleKeys, platformApiSchemaKeys, platformApiSettingKeys, platformCorsSettingKeys, platformDomainKeys, platformDomainEventKeys, platformDomainVerificationKeys, platformManagedDomainKeys, platformSiteKeys, platformSiteMetadatumKeys, platformSiteModuleKeys, platformSiteThemeKeys, policyKeys, primaryKeyConstraintKeys, pubkeySettingKeys, rlsSettingKeys, routeBindingKeys, routeKeys, schemaKeys, schemaGrantKeys, siteKeys, siteMetadatumKeys, siteModuleKeys, siteThemeKeys, spatialRelationKeys, sqlActionKeys, tableKeys, tableGrantKeys, triggerKeys, triggerFunctionKeys, uniqueConstraintKeys, viewKeys, viewGrantKeys, viewRuleKeys, viewTableKeys, webauthnSettingKeys } from "./query-keys";
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -83,760 +35,721 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate api queries */ api: {
-    /** Invalidate all api queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiKeys.all,
-      }),
-    /** Invalidate api list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiKeys.lists(),
-      }),
-    /** Invalidate a specific api */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: apiKeys.detail(id),
-      }),
+  /** Invalidate api queries */api: {
+    /** Invalidate all api queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiKeys.all
+    }),
+    /** Invalidate api list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiKeys.lists()
+    }),
+    /** Invalidate a specific api */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: apiKeys.detail(id)
+    })
   },
-  /** Invalidate apiModule queries */ apiModule: {
-    /** Invalidate all apiModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiModuleKeys.all,
-      }),
-    /** Invalidate apiModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiModuleKeys.lists(),
-      }),
-    /** Invalidate a specific apiModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: apiModuleKeys.detail(id),
-      }),
+  /** Invalidate apiModule queries */apiModule: {
+    /** Invalidate all apiModule queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiModuleKeys.all
+    }),
+    /** Invalidate apiModule list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiModuleKeys.lists()
+    }),
+    /** Invalidate a specific apiModule */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: apiModuleKeys.detail(id)
+    })
   },
-  /** Invalidate apiSchema queries */ apiSchema: {
-    /** Invalidate all apiSchema queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiSchemaKeys.all,
-      }),
-    /** Invalidate apiSchema list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiSchemaKeys.lists(),
-      }),
-    /** Invalidate a specific apiSchema */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: apiSchemaKeys.detail(id),
-      }),
+  /** Invalidate apiSchema queries */apiSchema: {
+    /** Invalidate all apiSchema queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiSchemaKeys.all
+    }),
+    /** Invalidate apiSchema list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiSchemaKeys.lists()
+    }),
+    /** Invalidate a specific apiSchema */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: apiSchemaKeys.detail(id)
+    })
   },
-  /** Invalidate apiSetting queries */ apiSetting: {
-    /** Invalidate all apiSetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiSettingKeys.all,
-      }),
-    /** Invalidate apiSetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiSettingKeys.lists(),
-      }),
-    /** Invalidate a specific apiSetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: apiSettingKeys.detail(id),
-      }),
+  /** Invalidate apiSetting queries */apiSetting: {
+    /** Invalidate all apiSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiSettingKeys.all
+    }),
+    /** Invalidate apiSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: apiSettingKeys.lists()
+    }),
+    /** Invalidate a specific apiSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: apiSettingKeys.detail(id)
+    })
   },
-  /** Invalidate app queries */ app: {
-    /** Invalidate all app queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appKeys.all,
-      }),
-    /** Invalidate app list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appKeys.lists(),
-      }),
-    /** Invalidate a specific app */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: appKeys.detail(id),
-      }),
+  /** Invalidate astMigration queries */astMigration: {
+    /** Invalidate all astMigration queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: astMigrationKeys.all
+    }),
+    /** Invalidate astMigration list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: astMigrationKeys.lists()
+    }),
+    /** Invalidate a specific astMigration */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: astMigrationKeys.detail(id)
+    })
   },
-  /** Invalidate astMigration queries */ astMigration: {
-    /** Invalidate all astMigration queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: astMigrationKeys.all,
-      }),
-    /** Invalidate astMigration list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: astMigrationKeys.lists(),
-      }),
-    /** Invalidate a specific astMigration */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: astMigrationKeys.detail(id),
-      }),
+  /** Invalidate checkConstraint queries */checkConstraint: {
+    /** Invalidate all checkConstraint queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: checkConstraintKeys.all
+    }),
+    /** Invalidate checkConstraint list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: checkConstraintKeys.lists()
+    }),
+    /** Invalidate a specific checkConstraint */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: checkConstraintKeys.detail(id)
+    })
   },
-  /** Invalidate checkConstraint queries */ checkConstraint: {
-    /** Invalidate all checkConstraint queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: checkConstraintKeys.all,
-      }),
-    /** Invalidate checkConstraint list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: checkConstraintKeys.lists(),
-      }),
-    /** Invalidate a specific checkConstraint */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: checkConstraintKeys.detail(id),
-      }),
+  /** Invalidate compositeType queries */compositeType: {
+    /** Invalidate all compositeType queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: compositeTypeKeys.all
+    }),
+    /** Invalidate compositeType list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: compositeTypeKeys.lists()
+    }),
+    /** Invalidate a specific compositeType */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: compositeTypeKeys.detail(id)
+    })
   },
-  /** Invalidate compositeType queries */ compositeType: {
-    /** Invalidate all compositeType queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: compositeTypeKeys.all,
-      }),
-    /** Invalidate compositeType list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: compositeTypeKeys.lists(),
-      }),
-    /** Invalidate a specific compositeType */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: compositeTypeKeys.detail(id),
-      }),
+  /** Invalidate corsSetting queries */corsSetting: {
+    /** Invalidate all corsSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: corsSettingKeys.all
+    }),
+    /** Invalidate corsSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: corsSettingKeys.lists()
+    }),
+    /** Invalidate a specific corsSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: corsSettingKeys.detail(id)
+    })
   },
-  /** Invalidate corsSetting queries */ corsSetting: {
-    /** Invalidate all corsSetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: corsSettingKeys.all,
-      }),
-    /** Invalidate corsSetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: corsSettingKeys.lists(),
-      }),
-    /** Invalidate a specific corsSetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: corsSettingKeys.detail(id),
-      }),
+  /** Invalidate database queries */database: {
+    /** Invalidate all database queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: databaseKeys.all
+    }),
+    /** Invalidate database list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: databaseKeys.lists()
+    }),
+    /** Invalidate a specific database */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: databaseKeys.detail(id)
+    })
   },
-  /** Invalidate database queries */ database: {
-    /** Invalidate all database queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseKeys.all,
-      }),
-    /** Invalidate database list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseKeys.lists(),
-      }),
-    /** Invalidate a specific database */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseKeys.detail(id),
-      }),
+  /** Invalidate databaseSetting queries */databaseSetting: {
+    /** Invalidate all databaseSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: databaseSettingKeys.all
+    }),
+    /** Invalidate databaseSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: databaseSettingKeys.lists()
+    }),
+    /** Invalidate a specific databaseSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: databaseSettingKeys.detail(id)
+    })
   },
-  /** Invalidate databaseSetting queries */ databaseSetting: {
-    /** Invalidate all databaseSetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseSettingKeys.all,
-      }),
-    /** Invalidate databaseSetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseSettingKeys.lists(),
-      }),
-    /** Invalidate a specific databaseSetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseSettingKeys.detail(id),
-      }),
+  /** Invalidate databaseTransfer queries */databaseTransfer: {
+    /** Invalidate all databaseTransfer queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: databaseTransferKeys.all
+    }),
+    /** Invalidate databaseTransfer list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: databaseTransferKeys.lists()
+    }),
+    /** Invalidate a specific databaseTransfer */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: databaseTransferKeys.detail(id)
+    })
   },
-  /** Invalidate databaseTransfer queries */ databaseTransfer: {
-    /** Invalidate all databaseTransfer queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseTransferKeys.all,
-      }),
-    /** Invalidate databaseTransfer list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseTransferKeys.lists(),
-      }),
-    /** Invalidate a specific databaseTransfer */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: databaseTransferKeys.detail(id),
-      }),
+  /** Invalidate defaultPrivilege queries */defaultPrivilege: {
+    /** Invalidate all defaultPrivilege queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: defaultPrivilegeKeys.all
+    }),
+    /** Invalidate defaultPrivilege list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: defaultPrivilegeKeys.lists()
+    }),
+    /** Invalidate a specific defaultPrivilege */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: defaultPrivilegeKeys.detail(id)
+    })
   },
-  /** Invalidate defaultPrivilege queries */ defaultPrivilege: {
-    /** Invalidate all defaultPrivilege queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: defaultPrivilegeKeys.all,
-      }),
-    /** Invalidate defaultPrivilege list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: defaultPrivilegeKeys.lists(),
-      }),
-    /** Invalidate a specific defaultPrivilege */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: defaultPrivilegeKeys.detail(id),
-      }),
+  /** Invalidate domain queries */domain: {
+    /** Invalidate all domain queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: domainKeys.all
+    }),
+    /** Invalidate domain list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: domainKeys.lists()
+    }),
+    /** Invalidate a specific domain */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: domainKeys.detail(id)
+    })
   },
-  /** Invalidate domain queries */ domain: {
-    /** Invalidate all domain queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: domainKeys.all,
-      }),
-    /** Invalidate domain list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: domainKeys.lists(),
-      }),
-    /** Invalidate a specific domain */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: domainKeys.detail(id),
-      }),
+  /** Invalidate domainEvent queries */domainEvent: {
+    /** Invalidate all domainEvent queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: domainEventKeys.all
+    }),
+    /** Invalidate domainEvent list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: domainEventKeys.lists()
+    }),
+    /** Invalidate a specific domainEvent */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: domainEventKeys.detail(id)
+    })
   },
-  /** Invalidate embeddingChunk queries */ embeddingChunk: {
-    /** Invalidate all embeddingChunk queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: embeddingChunkKeys.all,
-      }),
-    /** Invalidate embeddingChunk list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: embeddingChunkKeys.lists(),
-      }),
-    /** Invalidate a specific embeddingChunk */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: embeddingChunkKeys.detail(id),
-      }),
+  /** Invalidate domainVerification queries */domainVerification: {
+    /** Invalidate all domainVerification queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: domainVerificationKeys.all
+    }),
+    /** Invalidate domainVerification list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: domainVerificationKeys.lists()
+    }),
+    /** Invalidate a specific domainVerification */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: domainVerificationKeys.detail(id)
+    })
   },
-  /** Invalidate enum queries */ enum: {
-    /** Invalidate all enum queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: enumKeys.all,
-      }),
-    /** Invalidate enum list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: enumKeys.lists(),
-      }),
-    /** Invalidate a specific enum */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: enumKeys.detail(id),
-      }),
+  /** Invalidate embeddingChunk queries */embeddingChunk: {
+    /** Invalidate all embeddingChunk queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: embeddingChunkKeys.all
+    }),
+    /** Invalidate embeddingChunk list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: embeddingChunkKeys.lists()
+    }),
+    /** Invalidate a specific embeddingChunk */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: embeddingChunkKeys.detail(id)
+    })
   },
-  /** Invalidate field queries */ field: {
-    /** Invalidate all field queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: fieldKeys.all,
-      }),
-    /** Invalidate field list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: fieldKeys.lists(),
-      }),
-    /** Invalidate a specific field */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: fieldKeys.detail(id),
-      }),
+  /** Invalidate enum queries */enum: {
+    /** Invalidate all enum queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: enumKeys.all
+    }),
+    /** Invalidate enum list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: enumKeys.lists()
+    }),
+    /** Invalidate a specific enum */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: enumKeys.detail(id)
+    })
   },
-  /** Invalidate foreignKeyConstraint queries */ foreignKeyConstraint: {
-    /** Invalidate all foreignKeyConstraint queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: foreignKeyConstraintKeys.all,
-      }),
-    /** Invalidate foreignKeyConstraint list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: foreignKeyConstraintKeys.lists(),
-      }),
-    /** Invalidate a specific foreignKeyConstraint */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: foreignKeyConstraintKeys.detail(id),
-      }),
+  /** Invalidate exclusionConstraint queries */exclusionConstraint: {
+    /** Invalidate all exclusionConstraint queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: exclusionConstraintKeys.all
+    }),
+    /** Invalidate exclusionConstraint list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: exclusionConstraintKeys.lists()
+    }),
+    /** Invalidate a specific exclusionConstraint */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: exclusionConstraintKeys.detail(id)
+    })
   },
-  /** Invalidate fullTextSearch queries */ fullTextSearch: {
-    /** Invalidate all fullTextSearch queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: fullTextSearchKeys.all,
-      }),
-    /** Invalidate fullTextSearch list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: fullTextSearchKeys.lists(),
-      }),
-    /** Invalidate a specific fullTextSearch */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: fullTextSearchKeys.detail(id),
-      }),
+  /** Invalidate field queries */field: {
+    /** Invalidate all field queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: fieldKeys.all
+    }),
+    /** Invalidate field list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: fieldKeys.lists()
+    }),
+    /** Invalidate a specific field */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: fieldKeys.detail(id)
+    })
   },
-  /** Invalidate function queries */ function: {
-    /** Invalidate all function queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionKeys.all,
-      }),
-    /** Invalidate function list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionKeys.lists(),
-      }),
-    /** Invalidate a specific function */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: functionKeys.detail(id),
-      }),
+  /** Invalidate foreignKeyConstraint queries */foreignKeyConstraint: {
+    /** Invalidate all foreignKeyConstraint queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: foreignKeyConstraintKeys.all
+    }),
+    /** Invalidate foreignKeyConstraint list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: foreignKeyConstraintKeys.lists()
+    }),
+    /** Invalidate a specific foreignKeyConstraint */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: foreignKeyConstraintKeys.detail(id)
+    })
   },
-  /** Invalidate httpRoute queries */ httpRoute: {
-    /** Invalidate all httpRoute queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: httpRouteKeys.all,
-      }),
-    /** Invalidate httpRoute list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: httpRouteKeys.lists(),
-      }),
-    /** Invalidate a specific httpRoute */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: httpRouteKeys.detail(id),
-      }),
+  /** Invalidate fullTextSearch queries */fullTextSearch: {
+    /** Invalidate all fullTextSearch queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: fullTextSearchKeys.all
+    }),
+    /** Invalidate fullTextSearch list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: fullTextSearchKeys.lists()
+    }),
+    /** Invalidate a specific fullTextSearch */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: fullTextSearchKeys.detail(id)
+    })
   },
-  /** Invalidate index queries */ index: {
-    /** Invalidate all index queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: indexKeys.all,
-      }),
-    /** Invalidate index list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: indexKeys.lists(),
-      }),
-    /** Invalidate a specific index */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: indexKeys.detail(id),
-      }),
+  /** Invalidate function queries */function: {
+    /** Invalidate all function queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: functionKeys.all
+    }),
+    /** Invalidate function list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: functionKeys.lists()
+    }),
+    /** Invalidate a specific function */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: functionKeys.detail(id)
+    })
   },
-  /** Invalidate managedDomain queries */ managedDomain: {
-    /** Invalidate all managedDomain queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: managedDomainKeys.all,
-      }),
-    /** Invalidate managedDomain list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: managedDomainKeys.lists(),
-      }),
-    /** Invalidate a specific managedDomain */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: managedDomainKeys.detail(id),
-      }),
+  /** Invalidate hostnameBinding queries */hostnameBinding: {
+    /** Invalidate all hostnameBinding queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: hostnameBindingKeys.all
+    }),
+    /** Invalidate hostnameBinding list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: hostnameBindingKeys.lists()
+    }),
+    /** Invalidate a specific hostnameBinding */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: hostnameBindingKeys.detail(id)
+    })
   },
-  /** Invalidate nodeTypeRegistry queries */ nodeTypeRegistry: {
-    /** Invalidate all nodeTypeRegistry queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: nodeTypeRegistryKeys.all,
-      }),
-    /** Invalidate nodeTypeRegistry list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: nodeTypeRegistryKeys.lists(),
-      }),
-    /** Invalidate a specific nodeTypeRegistry */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: nodeTypeRegistryKeys.detail(id),
-      }),
+  /** Invalidate httpRoute queries */httpRoute: {
+    /** Invalidate all httpRoute queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: httpRouteKeys.all
+    }),
+    /** Invalidate httpRoute list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: httpRouteKeys.lists()
+    }),
+    /** Invalidate a specific httpRoute */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: httpRouteKeys.detail(id)
+    })
   },
-  /** Invalidate partition queries */ partition: {
-    /** Invalidate all partition queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: partitionKeys.all,
-      }),
-    /** Invalidate partition list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: partitionKeys.lists(),
-      }),
-    /** Invalidate a specific partition */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: partitionKeys.detail(id),
-      }),
+  /** Invalidate index queries */index: {
+    /** Invalidate all index queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: indexKeys.all
+    }),
+    /** Invalidate index list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: indexKeys.lists()
+    }),
+    /** Invalidate a specific index */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: indexKeys.detail(id)
+    })
   },
-  /** Invalidate policy queries */ policy: {
-    /** Invalidate all policy queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: policyKeys.all,
-      }),
-    /** Invalidate policy list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: policyKeys.lists(),
-      }),
-    /** Invalidate a specific policy */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: policyKeys.detail(id),
-      }),
+  /** Invalidate managedDomain queries */managedDomain: {
+    /** Invalidate all managedDomain queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: managedDomainKeys.all
+    }),
+    /** Invalidate managedDomain list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: managedDomainKeys.lists()
+    }),
+    /** Invalidate a specific managedDomain */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: managedDomainKeys.detail(id)
+    })
   },
-  /** Invalidate primaryKeyConstraint queries */ primaryKeyConstraint: {
-    /** Invalidate all primaryKeyConstraint queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: primaryKeyConstraintKeys.all,
-      }),
-    /** Invalidate primaryKeyConstraint list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: primaryKeyConstraintKeys.lists(),
-      }),
-    /** Invalidate a specific primaryKeyConstraint */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: primaryKeyConstraintKeys.detail(id),
-      }),
+  /** Invalidate nodeTypeRegistry queries */nodeTypeRegistry: {
+    /** Invalidate all nodeTypeRegistry queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: nodeTypeRegistryKeys.all
+    }),
+    /** Invalidate nodeTypeRegistry list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: nodeTypeRegistryKeys.lists()
+    }),
+    /** Invalidate a specific nodeTypeRegistry */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: nodeTypeRegistryKeys.detail(id)
+    })
   },
-  /** Invalidate pubkeySetting queries */ pubkeySetting: {
-    /** Invalidate all pubkeySetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: pubkeySettingKeys.all,
-      }),
-    /** Invalidate pubkeySetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: pubkeySettingKeys.lists(),
-      }),
-    /** Invalidate a specific pubkeySetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: pubkeySettingKeys.detail(id),
-      }),
+  /** Invalidate partition queries */partition: {
+    /** Invalidate all partition queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: partitionKeys.all
+    }),
+    /** Invalidate partition list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: partitionKeys.lists()
+    }),
+    /** Invalidate a specific partition */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: partitionKeys.detail(id)
+    })
   },
-  /** Invalidate rlsSetting queries */ rlsSetting: {
-    /** Invalidate all rlsSetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rlsSettingKeys.all,
-      }),
-    /** Invalidate rlsSetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rlsSettingKeys.lists(),
-      }),
-    /** Invalidate a specific rlsSetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: rlsSettingKeys.detail(id),
-      }),
+  /** Invalidate platformApi queries */platformApi: {
+    /** Invalidate all platformApi queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiKeys.all
+    }),
+    /** Invalidate platformApi list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiKeys.lists()
+    }),
+    /** Invalidate a specific platformApi */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformApiKeys.detail(id)
+    })
   },
-  /** Invalidate schema queries */ schema: {
-    /** Invalidate all schema queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: schemaKeys.all,
-      }),
-    /** Invalidate schema list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: schemaKeys.lists(),
-      }),
-    /** Invalidate a specific schema */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: schemaKeys.detail(id),
-      }),
+  /** Invalidate platformApiModule queries */platformApiModule: {
+    /** Invalidate all platformApiModule queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiModuleKeys.all
+    }),
+    /** Invalidate platformApiModule list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiModuleKeys.lists()
+    }),
+    /** Invalidate a specific platformApiModule */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformApiModuleKeys.detail(id)
+    })
   },
-  /** Invalidate schemaGrant queries */ schemaGrant: {
-    /** Invalidate all schemaGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: schemaGrantKeys.all,
-      }),
-    /** Invalidate schemaGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: schemaGrantKeys.lists(),
-      }),
-    /** Invalidate a specific schemaGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: schemaGrantKeys.detail(id),
-      }),
+  /** Invalidate platformApiSchema queries */platformApiSchema: {
+    /** Invalidate all platformApiSchema queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiSchemaKeys.all
+    }),
+    /** Invalidate platformApiSchema list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiSchemaKeys.lists()
+    }),
+    /** Invalidate a specific platformApiSchema */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformApiSchemaKeys.detail(id)
+    })
   },
-  /** Invalidate site queries */ site: {
-    /** Invalidate all site queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteKeys.all,
-      }),
-    /** Invalidate site list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteKeys.lists(),
-      }),
-    /** Invalidate a specific site */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: siteKeys.detail(id),
-      }),
+  /** Invalidate platformApiSetting queries */platformApiSetting: {
+    /** Invalidate all platformApiSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiSettingKeys.all
+    }),
+    /** Invalidate platformApiSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformApiSettingKeys.lists()
+    }),
+    /** Invalidate a specific platformApiSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformApiSettingKeys.detail(id)
+    })
   },
-  /** Invalidate siteMetadatum queries */ siteMetadatum: {
-    /** Invalidate all siteMetadatum queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteMetadatumKeys.all,
-      }),
-    /** Invalidate siteMetadatum list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteMetadatumKeys.lists(),
-      }),
-    /** Invalidate a specific siteMetadatum */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: siteMetadatumKeys.detail(id),
-      }),
+  /** Invalidate platformCorsSetting queries */platformCorsSetting: {
+    /** Invalidate all platformCorsSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformCorsSettingKeys.all
+    }),
+    /** Invalidate platformCorsSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformCorsSettingKeys.lists()
+    }),
+    /** Invalidate a specific platformCorsSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformCorsSettingKeys.detail(id)
+    })
   },
-  /** Invalidate siteModule queries */ siteModule: {
-    /** Invalidate all siteModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteModuleKeys.all,
-      }),
-    /** Invalidate siteModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteModuleKeys.lists(),
-      }),
-    /** Invalidate a specific siteModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: siteModuleKeys.detail(id),
-      }),
+  /** Invalidate platformDomain queries */platformDomain: {
+    /** Invalidate all platformDomain queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformDomainKeys.all
+    }),
+    /** Invalidate platformDomain list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformDomainKeys.lists()
+    }),
+    /** Invalidate a specific platformDomain */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformDomainKeys.detail(id)
+    })
   },
-  /** Invalidate siteTheme queries */ siteTheme: {
-    /** Invalidate all siteTheme queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteThemeKeys.all,
-      }),
-    /** Invalidate siteTheme list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: siteThemeKeys.lists(),
-      }),
-    /** Invalidate a specific siteTheme */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: siteThemeKeys.detail(id),
-      }),
+  /** Invalidate platformDomainEvent queries */platformDomainEvent: {
+    /** Invalidate all platformDomainEvent queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformDomainEventKeys.all
+    }),
+    /** Invalidate platformDomainEvent list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformDomainEventKeys.lists()
+    }),
+    /** Invalidate a specific platformDomainEvent */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformDomainEventKeys.detail(id)
+    })
   },
-  /** Invalidate spatialRelation queries */ spatialRelation: {
-    /** Invalidate all spatialRelation queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: spatialRelationKeys.all,
-      }),
-    /** Invalidate spatialRelation list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: spatialRelationKeys.lists(),
-      }),
-    /** Invalidate a specific spatialRelation */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: spatialRelationKeys.detail(id),
-      }),
+  /** Invalidate platformDomainVerification queries */platformDomainVerification: {
+    /** Invalidate all platformDomainVerification queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformDomainVerificationKeys.all
+    }),
+    /** Invalidate platformDomainVerification list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformDomainVerificationKeys.lists()
+    }),
+    /** Invalidate a specific platformDomainVerification */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformDomainVerificationKeys.detail(id)
+    })
   },
-  /** Invalidate sqlAction queries */ sqlAction: {
-    /** Invalidate all sqlAction queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: sqlActionKeys.all,
-      }),
-    /** Invalidate sqlAction list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: sqlActionKeys.lists(),
-      }),
-    /** Invalidate a specific sqlAction */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: sqlActionKeys.detail(id),
-      }),
+  /** Invalidate platformManagedDomain queries */platformManagedDomain: {
+    /** Invalidate all platformManagedDomain queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformManagedDomainKeys.all
+    }),
+    /** Invalidate platformManagedDomain list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformManagedDomainKeys.lists()
+    }),
+    /** Invalidate a specific platformManagedDomain */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformManagedDomainKeys.detail(id)
+    })
   },
-  /** Invalidate table queries */ table: {
-    /** Invalidate all table queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.all,
-      }),
-    /** Invalidate table list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.lists(),
-      }),
-    /** Invalidate a specific table */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.detail(id),
-      }),
+  /** Invalidate platformSite queries */platformSite: {
+    /** Invalidate all platformSite queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteKeys.all
+    }),
+    /** Invalidate platformSite list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteKeys.lists()
+    }),
+    /** Invalidate a specific platformSite */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformSiteKeys.detail(id)
+    })
   },
-  /** Invalidate tableGrant queries */ tableGrant: {
-    /** Invalidate all tableGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: tableGrantKeys.all,
-      }),
-    /** Invalidate tableGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: tableGrantKeys.lists(),
-      }),
-    /** Invalidate a specific tableGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: tableGrantKeys.detail(id),
-      }),
+  /** Invalidate platformSiteMetadatum queries */platformSiteMetadatum: {
+    /** Invalidate all platformSiteMetadatum queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteMetadatumKeys.all
+    }),
+    /** Invalidate platformSiteMetadatum list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteMetadatumKeys.lists()
+    }),
+    /** Invalidate a specific platformSiteMetadatum */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformSiteMetadatumKeys.detail(id)
+    })
   },
-  /** Invalidate trigger queries */ trigger: {
-    /** Invalidate all trigger queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: triggerKeys.all,
-      }),
-    /** Invalidate trigger list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: triggerKeys.lists(),
-      }),
-    /** Invalidate a specific trigger */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: triggerKeys.detail(id),
-      }),
+  /** Invalidate platformSiteModule queries */platformSiteModule: {
+    /** Invalidate all platformSiteModule queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteModuleKeys.all
+    }),
+    /** Invalidate platformSiteModule list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteModuleKeys.lists()
+    }),
+    /** Invalidate a specific platformSiteModule */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformSiteModuleKeys.detail(id)
+    })
   },
-  /** Invalidate triggerFunction queries */ triggerFunction: {
-    /** Invalidate all triggerFunction queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: triggerFunctionKeys.all,
-      }),
-    /** Invalidate triggerFunction list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: triggerFunctionKeys.lists(),
-      }),
-    /** Invalidate a specific triggerFunction */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: triggerFunctionKeys.detail(id),
-      }),
+  /** Invalidate platformSiteTheme queries */platformSiteTheme: {
+    /** Invalidate all platformSiteTheme queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteThemeKeys.all
+    }),
+    /** Invalidate platformSiteTheme list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: platformSiteThemeKeys.lists()
+    }),
+    /** Invalidate a specific platformSiteTheme */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: platformSiteThemeKeys.detail(id)
+    })
   },
-  /** Invalidate uniqueConstraint queries */ uniqueConstraint: {
-    /** Invalidate all uniqueConstraint queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: uniqueConstraintKeys.all,
-      }),
-    /** Invalidate uniqueConstraint list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: uniqueConstraintKeys.lists(),
-      }),
-    /** Invalidate a specific uniqueConstraint */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: uniqueConstraintKeys.detail(id),
-      }),
+  /** Invalidate policy queries */policy: {
+    /** Invalidate all policy queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: policyKeys.all
+    }),
+    /** Invalidate policy list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: policyKeys.lists()
+    }),
+    /** Invalidate a specific policy */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: policyKeys.detail(id)
+    })
   },
-  /** Invalidate view queries */ view: {
-    /** Invalidate all view queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewKeys.all,
-      }),
-    /** Invalidate view list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewKeys.lists(),
-      }),
-    /** Invalidate a specific view */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: viewKeys.detail(id),
-      }),
+  /** Invalidate primaryKeyConstraint queries */primaryKeyConstraint: {
+    /** Invalidate all primaryKeyConstraint queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: primaryKeyConstraintKeys.all
+    }),
+    /** Invalidate primaryKeyConstraint list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: primaryKeyConstraintKeys.lists()
+    }),
+    /** Invalidate a specific primaryKeyConstraint */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: primaryKeyConstraintKeys.detail(id)
+    })
   },
-  /** Invalidate viewGrant queries */ viewGrant: {
-    /** Invalidate all viewGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewGrantKeys.all,
-      }),
-    /** Invalidate viewGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewGrantKeys.lists(),
-      }),
-    /** Invalidate a specific viewGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: viewGrantKeys.detail(id),
-      }),
+  /** Invalidate pubkeySetting queries */pubkeySetting: {
+    /** Invalidate all pubkeySetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: pubkeySettingKeys.all
+    }),
+    /** Invalidate pubkeySetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: pubkeySettingKeys.lists()
+    }),
+    /** Invalidate a specific pubkeySetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: pubkeySettingKeys.detail(id)
+    })
   },
-  /** Invalidate viewRule queries */ viewRule: {
-    /** Invalidate all viewRule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewRuleKeys.all,
-      }),
-    /** Invalidate viewRule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewRuleKeys.lists(),
-      }),
-    /** Invalidate a specific viewRule */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: viewRuleKeys.detail(id),
-      }),
+  /** Invalidate rlsSetting queries */rlsSetting: {
+    /** Invalidate all rlsSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: rlsSettingKeys.all
+    }),
+    /** Invalidate rlsSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: rlsSettingKeys.lists()
+    }),
+    /** Invalidate a specific rlsSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: rlsSettingKeys.detail(id)
+    })
   },
-  /** Invalidate viewTable queries */ viewTable: {
-    /** Invalidate all viewTable queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewTableKeys.all,
-      }),
-    /** Invalidate viewTable list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: viewTableKeys.lists(),
-      }),
-    /** Invalidate a specific viewTable */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: viewTableKeys.detail(id),
-      }),
+  /** Invalidate routeBinding queries */routeBinding: {
+    /** Invalidate all routeBinding queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: routeBindingKeys.all
+    }),
+    /** Invalidate routeBinding list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: routeBindingKeys.lists()
+    }),
+    /** Invalidate a specific routeBinding */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: routeBindingKeys.detail(id)
+    })
   },
-  /** Invalidate webauthnSetting queries */ webauthnSetting: {
-    /** Invalidate all webauthnSetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.all,
-      }),
-    /** Invalidate webauthnSetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.lists(),
-      }),
-    /** Invalidate a specific webauthnSetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.detail(id),
-      }),
+  /** Invalidate route queries */route: {
+    /** Invalidate all route queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: routeKeys.all
+    }),
+    /** Invalidate route list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: routeKeys.lists()
+    }),
+    /** Invalidate a specific route */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: routeKeys.detail(id)
+    })
   },
+  /** Invalidate schema queries */schema: {
+    /** Invalidate all schema queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: schemaKeys.all
+    }),
+    /** Invalidate schema list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: schemaKeys.lists()
+    }),
+    /** Invalidate a specific schema */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: schemaKeys.detail(id)
+    })
+  },
+  /** Invalidate schemaGrant queries */schemaGrant: {
+    /** Invalidate all schemaGrant queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: schemaGrantKeys.all
+    }),
+    /** Invalidate schemaGrant list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: schemaGrantKeys.lists()
+    }),
+    /** Invalidate a specific schemaGrant */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: schemaGrantKeys.detail(id)
+    })
+  },
+  /** Invalidate site queries */site: {
+    /** Invalidate all site queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteKeys.all
+    }),
+    /** Invalidate site list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteKeys.lists()
+    }),
+    /** Invalidate a specific site */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: siteKeys.detail(id)
+    })
+  },
+  /** Invalidate siteMetadatum queries */siteMetadatum: {
+    /** Invalidate all siteMetadatum queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteMetadatumKeys.all
+    }),
+    /** Invalidate siteMetadatum list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteMetadatumKeys.lists()
+    }),
+    /** Invalidate a specific siteMetadatum */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: siteMetadatumKeys.detail(id)
+    })
+  },
+  /** Invalidate siteModule queries */siteModule: {
+    /** Invalidate all siteModule queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteModuleKeys.all
+    }),
+    /** Invalidate siteModule list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteModuleKeys.lists()
+    }),
+    /** Invalidate a specific siteModule */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: siteModuleKeys.detail(id)
+    })
+  },
+  /** Invalidate siteTheme queries */siteTheme: {
+    /** Invalidate all siteTheme queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteThemeKeys.all
+    }),
+    /** Invalidate siteTheme list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: siteThemeKeys.lists()
+    }),
+    /** Invalidate a specific siteTheme */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: siteThemeKeys.detail(id)
+    })
+  },
+  /** Invalidate spatialRelation queries */spatialRelation: {
+    /** Invalidate all spatialRelation queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: spatialRelationKeys.all
+    }),
+    /** Invalidate spatialRelation list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: spatialRelationKeys.lists()
+    }),
+    /** Invalidate a specific spatialRelation */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: spatialRelationKeys.detail(id)
+    })
+  },
+  /** Invalidate sqlAction queries */sqlAction: {
+    /** Invalidate all sqlAction queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: sqlActionKeys.all
+    }),
+    /** Invalidate sqlAction list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: sqlActionKeys.lists()
+    }),
+    /** Invalidate a specific sqlAction */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: sqlActionKeys.detail(id)
+    })
+  },
+  /** Invalidate table queries */table: {
+    /** Invalidate all table queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: tableKeys.all
+    }),
+    /** Invalidate table list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: tableKeys.lists()
+    }),
+    /** Invalidate a specific table */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: tableKeys.detail(id)
+    })
+  },
+  /** Invalidate tableGrant queries */tableGrant: {
+    /** Invalidate all tableGrant queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: tableGrantKeys.all
+    }),
+    /** Invalidate tableGrant list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: tableGrantKeys.lists()
+    }),
+    /** Invalidate a specific tableGrant */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: tableGrantKeys.detail(id)
+    })
+  },
+  /** Invalidate trigger queries */trigger: {
+    /** Invalidate all trigger queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: triggerKeys.all
+    }),
+    /** Invalidate trigger list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: triggerKeys.lists()
+    }),
+    /** Invalidate a specific trigger */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: triggerKeys.detail(id)
+    })
+  },
+  /** Invalidate triggerFunction queries */triggerFunction: {
+    /** Invalidate all triggerFunction queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: triggerFunctionKeys.all
+    }),
+    /** Invalidate triggerFunction list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: triggerFunctionKeys.lists()
+    }),
+    /** Invalidate a specific triggerFunction */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: triggerFunctionKeys.detail(id)
+    })
+  },
+  /** Invalidate uniqueConstraint queries */uniqueConstraint: {
+    /** Invalidate all uniqueConstraint queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: uniqueConstraintKeys.all
+    }),
+    /** Invalidate uniqueConstraint list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: uniqueConstraintKeys.lists()
+    }),
+    /** Invalidate a specific uniqueConstraint */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: uniqueConstraintKeys.detail(id)
+    })
+  },
+  /** Invalidate view queries */view: {
+    /** Invalidate all view queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewKeys.all
+    }),
+    /** Invalidate view list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewKeys.lists()
+    }),
+    /** Invalidate a specific view */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: viewKeys.detail(id)
+    })
+  },
+  /** Invalidate viewGrant queries */viewGrant: {
+    /** Invalidate all viewGrant queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewGrantKeys.all
+    }),
+    /** Invalidate viewGrant list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewGrantKeys.lists()
+    }),
+    /** Invalidate a specific viewGrant */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: viewGrantKeys.detail(id)
+    })
+  },
+  /** Invalidate viewRule queries */viewRule: {
+    /** Invalidate all viewRule queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewRuleKeys.all
+    }),
+    /** Invalidate viewRule list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewRuleKeys.lists()
+    }),
+    /** Invalidate a specific viewRule */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: viewRuleKeys.detail(id)
+    })
+  },
+  /** Invalidate viewTable queries */viewTable: {
+    /** Invalidate all viewTable queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewTableKeys.all
+    }),
+    /** Invalidate viewTable list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: viewTableKeys.lists()
+    }),
+    /** Invalidate a specific viewTable */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: viewTableKeys.detail(id)
+    })
+  },
+  /** Invalidate webauthnSetting queries */webauthnSetting: {
+    /** Invalidate all webauthnSetting queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: webauthnSettingKeys.all
+    }),
+    /** Invalidate webauthnSetting list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: webauthnSettingKeys.lists()
+    }),
+    /** Invalidate a specific webauthnSetting */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: webauthnSettingKeys.detail(id)
+    })
+  }
 } as const;
 /**
 
@@ -850,311 +763,329 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove api from cache */ api: (queryClient: QueryClient, id: string | number) => {
+  /** Remove api from cache */api: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: apiKeys.detail(id),
+      queryKey: apiKeys.detail(id)
     });
   },
-  /** Remove apiModule from cache */ apiModule: (queryClient: QueryClient, id: string | number) => {
+  /** Remove apiModule from cache */apiModule: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: apiModuleKeys.detail(id),
+      queryKey: apiModuleKeys.detail(id)
     });
   },
-  /** Remove apiSchema from cache */ apiSchema: (queryClient: QueryClient, id: string | number) => {
+  /** Remove apiSchema from cache */apiSchema: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: apiSchemaKeys.detail(id),
+      queryKey: apiSchemaKeys.detail(id)
     });
   },
-  /** Remove apiSetting from cache */ apiSetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove apiSetting from cache */apiSetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: apiSettingKeys.detail(id),
+      queryKey: apiSettingKeys.detail(id)
     });
   },
-  /** Remove app from cache */ app: (queryClient: QueryClient, id: string | number) => {
+  /** Remove astMigration from cache */astMigration: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: appKeys.detail(id),
+      queryKey: astMigrationKeys.detail(id)
     });
   },
-  /** Remove astMigration from cache */ astMigration: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove checkConstraint from cache */checkConstraint: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: astMigrationKeys.detail(id),
+      queryKey: checkConstraintKeys.detail(id)
     });
   },
-  /** Remove checkConstraint from cache */ checkConstraint: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove compositeType from cache */compositeType: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: checkConstraintKeys.detail(id),
+      queryKey: compositeTypeKeys.detail(id)
     });
   },
-  /** Remove compositeType from cache */ compositeType: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove corsSetting from cache */corsSetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: compositeTypeKeys.detail(id),
+      queryKey: corsSettingKeys.detail(id)
     });
   },
-  /** Remove corsSetting from cache */ corsSetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove database from cache */database: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: corsSettingKeys.detail(id),
+      queryKey: databaseKeys.detail(id)
     });
   },
-  /** Remove database from cache */ database: (queryClient: QueryClient, id: string | number) => {
+  /** Remove databaseSetting from cache */databaseSetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: databaseKeys.detail(id),
+      queryKey: databaseSettingKeys.detail(id)
     });
   },
-  /** Remove databaseSetting from cache */ databaseSetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove databaseTransfer from cache */databaseTransfer: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: databaseSettingKeys.detail(id),
+      queryKey: databaseTransferKeys.detail(id)
     });
   },
-  /** Remove databaseTransfer from cache */ databaseTransfer: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove defaultPrivilege from cache */defaultPrivilege: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: databaseTransferKeys.detail(id),
+      queryKey: defaultPrivilegeKeys.detail(id)
     });
   },
-  /** Remove defaultPrivilege from cache */ defaultPrivilege: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove domain from cache */domain: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: defaultPrivilegeKeys.detail(id),
+      queryKey: domainKeys.detail(id)
     });
   },
-  /** Remove domain from cache */ domain: (queryClient: QueryClient, id: string | number) => {
+  /** Remove domainEvent from cache */domainEvent: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: domainKeys.detail(id),
+      queryKey: domainEventKeys.detail(id)
     });
   },
-  /** Remove embeddingChunk from cache */ embeddingChunk: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove domainVerification from cache */domainVerification: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: embeddingChunkKeys.detail(id),
+      queryKey: domainVerificationKeys.detail(id)
     });
   },
-  /** Remove enum from cache */ enum: (queryClient: QueryClient, id: string | number) => {
+  /** Remove embeddingChunk from cache */embeddingChunk: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: enumKeys.detail(id),
+      queryKey: embeddingChunkKeys.detail(id)
     });
   },
-  /** Remove field from cache */ field: (queryClient: QueryClient, id: string | number) => {
+  /** Remove enum from cache */enum: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: fieldKeys.detail(id),
+      queryKey: enumKeys.detail(id)
     });
   },
-  /** Remove foreignKeyConstraint from cache */ foreignKeyConstraint: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove exclusionConstraint from cache */exclusionConstraint: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: foreignKeyConstraintKeys.detail(id),
+      queryKey: exclusionConstraintKeys.detail(id)
     });
   },
-  /** Remove fullTextSearch from cache */ fullTextSearch: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove field from cache */field: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: fullTextSearchKeys.detail(id),
+      queryKey: fieldKeys.detail(id)
     });
   },
-  /** Remove function from cache */ function: (queryClient: QueryClient, id: string | number) => {
+  /** Remove foreignKeyConstraint from cache */foreignKeyConstraint: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: functionKeys.detail(id),
+      queryKey: foreignKeyConstraintKeys.detail(id)
     });
   },
-  /** Remove httpRoute from cache */ httpRoute: (queryClient: QueryClient, id: string | number) => {
+  /** Remove fullTextSearch from cache */fullTextSearch: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: httpRouteKeys.detail(id),
+      queryKey: fullTextSearchKeys.detail(id)
     });
   },
-  /** Remove index from cache */ index: (queryClient: QueryClient, id: string | number) => {
+  /** Remove function from cache */function: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: indexKeys.detail(id),
+      queryKey: functionKeys.detail(id)
     });
   },
-  /** Remove managedDomain from cache */ managedDomain: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove hostnameBinding from cache */hostnameBinding: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: managedDomainKeys.detail(id),
+      queryKey: hostnameBindingKeys.detail(id)
     });
   },
-  /** Remove nodeTypeRegistry from cache */ nodeTypeRegistry: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove httpRoute from cache */httpRoute: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: nodeTypeRegistryKeys.detail(id),
+      queryKey: httpRouteKeys.detail(id)
     });
   },
-  /** Remove partition from cache */ partition: (queryClient: QueryClient, id: string | number) => {
+  /** Remove index from cache */index: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: partitionKeys.detail(id),
+      queryKey: indexKeys.detail(id)
     });
   },
-  /** Remove policy from cache */ policy: (queryClient: QueryClient, id: string | number) => {
+  /** Remove managedDomain from cache */managedDomain: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: policyKeys.detail(id),
+      queryKey: managedDomainKeys.detail(id)
     });
   },
-  /** Remove primaryKeyConstraint from cache */ primaryKeyConstraint: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove nodeTypeRegistry from cache */nodeTypeRegistry: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: primaryKeyConstraintKeys.detail(id),
+      queryKey: nodeTypeRegistryKeys.detail(id)
     });
   },
-  /** Remove pubkeySetting from cache */ pubkeySetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove partition from cache */partition: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: pubkeySettingKeys.detail(id),
+      queryKey: partitionKeys.detail(id)
     });
   },
-  /** Remove rlsSetting from cache */ rlsSetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformApi from cache */platformApi: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: rlsSettingKeys.detail(id),
+      queryKey: platformApiKeys.detail(id)
     });
   },
-  /** Remove schema from cache */ schema: (queryClient: QueryClient, id: string | number) => {
+  /** Remove platformApiModule from cache */platformApiModule: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: schemaKeys.detail(id),
+      queryKey: platformApiModuleKeys.detail(id)
     });
   },
-  /** Remove schemaGrant from cache */ schemaGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformApiSchema from cache */platformApiSchema: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: schemaGrantKeys.detail(id),
+      queryKey: platformApiSchemaKeys.detail(id)
     });
   },
-  /** Remove site from cache */ site: (queryClient: QueryClient, id: string | number) => {
+  /** Remove platformApiSetting from cache */platformApiSetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: siteKeys.detail(id),
+      queryKey: platformApiSettingKeys.detail(id)
     });
   },
-  /** Remove siteMetadatum from cache */ siteMetadatum: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformCorsSetting from cache */platformCorsSetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: siteMetadatumKeys.detail(id),
+      queryKey: platformCorsSettingKeys.detail(id)
     });
   },
-  /** Remove siteModule from cache */ siteModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformDomain from cache */platformDomain: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: siteModuleKeys.detail(id),
+      queryKey: platformDomainKeys.detail(id)
     });
   },
-  /** Remove siteTheme from cache */ siteTheme: (queryClient: QueryClient, id: string | number) => {
+  /** Remove platformDomainEvent from cache */platformDomainEvent: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: siteThemeKeys.detail(id),
+      queryKey: platformDomainEventKeys.detail(id)
     });
   },
-  /** Remove spatialRelation from cache */ spatialRelation: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformDomainVerification from cache */platformDomainVerification: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: spatialRelationKeys.detail(id),
+      queryKey: platformDomainVerificationKeys.detail(id)
     });
   },
-  /** Remove sqlAction from cache */ sqlAction: (queryClient: QueryClient, id: string | number) => {
+  /** Remove platformManagedDomain from cache */platformManagedDomain: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: sqlActionKeys.detail(id),
+      queryKey: platformManagedDomainKeys.detail(id)
     });
   },
-  /** Remove table from cache */ table: (queryClient: QueryClient, id: string | number) => {
+  /** Remove platformSite from cache */platformSite: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: tableKeys.detail(id),
+      queryKey: platformSiteKeys.detail(id)
     });
   },
-  /** Remove tableGrant from cache */ tableGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformSiteMetadatum from cache */platformSiteMetadatum: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: tableGrantKeys.detail(id),
+      queryKey: platformSiteMetadatumKeys.detail(id)
     });
   },
-  /** Remove trigger from cache */ trigger: (queryClient: QueryClient, id: string | number) => {
+  /** Remove platformSiteModule from cache */platformSiteModule: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: triggerKeys.detail(id),
+      queryKey: platformSiteModuleKeys.detail(id)
     });
   },
-  /** Remove triggerFunction from cache */ triggerFunction: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove platformSiteTheme from cache */platformSiteTheme: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: triggerFunctionKeys.detail(id),
+      queryKey: platformSiteThemeKeys.detail(id)
     });
   },
-  /** Remove uniqueConstraint from cache */ uniqueConstraint: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove policy from cache */policy: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: uniqueConstraintKeys.detail(id),
+      queryKey: policyKeys.detail(id)
     });
   },
-  /** Remove view from cache */ view: (queryClient: QueryClient, id: string | number) => {
+  /** Remove primaryKeyConstraint from cache */primaryKeyConstraint: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: viewKeys.detail(id),
+      queryKey: primaryKeyConstraintKeys.detail(id)
     });
   },
-  /** Remove viewGrant from cache */ viewGrant: (queryClient: QueryClient, id: string | number) => {
+  /** Remove pubkeySetting from cache */pubkeySetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: viewGrantKeys.detail(id),
+      queryKey: pubkeySettingKeys.detail(id)
     });
   },
-  /** Remove viewRule from cache */ viewRule: (queryClient: QueryClient, id: string | number) => {
+  /** Remove rlsSetting from cache */rlsSetting: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: viewRuleKeys.detail(id),
+      queryKey: rlsSettingKeys.detail(id)
     });
   },
-  /** Remove viewTable from cache */ viewTable: (queryClient: QueryClient, id: string | number) => {
+  /** Remove routeBinding from cache */routeBinding: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: viewTableKeys.detail(id),
+      queryKey: routeBindingKeys.detail(id)
     });
   },
-  /** Remove webauthnSetting from cache */ webauthnSetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove route from cache */route: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: webauthnSettingKeys.detail(id),
+      queryKey: routeKeys.detail(id)
     });
   },
+  /** Remove schema from cache */schema: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: schemaKeys.detail(id)
+    });
+  },
+  /** Remove schemaGrant from cache */schemaGrant: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: schemaGrantKeys.detail(id)
+    });
+  },
+  /** Remove site from cache */site: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: siteKeys.detail(id)
+    });
+  },
+  /** Remove siteMetadatum from cache */siteMetadatum: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: siteMetadatumKeys.detail(id)
+    });
+  },
+  /** Remove siteModule from cache */siteModule: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: siteModuleKeys.detail(id)
+    });
+  },
+  /** Remove siteTheme from cache */siteTheme: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: siteThemeKeys.detail(id)
+    });
+  },
+  /** Remove spatialRelation from cache */spatialRelation: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: spatialRelationKeys.detail(id)
+    });
+  },
+  /** Remove sqlAction from cache */sqlAction: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: sqlActionKeys.detail(id)
+    });
+  },
+  /** Remove table from cache */table: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: tableKeys.detail(id)
+    });
+  },
+  /** Remove tableGrant from cache */tableGrant: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: tableGrantKeys.detail(id)
+    });
+  },
+  /** Remove trigger from cache */trigger: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: triggerKeys.detail(id)
+    });
+  },
+  /** Remove triggerFunction from cache */triggerFunction: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: triggerFunctionKeys.detail(id)
+    });
+  },
+  /** Remove uniqueConstraint from cache */uniqueConstraint: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: uniqueConstraintKeys.detail(id)
+    });
+  },
+  /** Remove view from cache */view: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: viewKeys.detail(id)
+    });
+  },
+  /** Remove viewGrant from cache */viewGrant: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: viewGrantKeys.detail(id)
+    });
+  },
+  /** Remove viewRule from cache */viewRule: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: viewRuleKeys.detail(id)
+    });
+  },
+  /** Remove viewTable from cache */viewTable: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: viewTableKeys.detail(id)
+    });
+  },
+  /** Remove webauthnSetting from cache */webauthnSetting: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: webauthnSettingKeys.detail(id)
+    });
+  }
 } as const;

@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { billingProviderModuleKeys } from '../query-keys';
-import type {
-  BillingProviderModuleSelect,
-  BillingProviderModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  BillingProviderModuleSelect,
-  BillingProviderModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { billingProviderModuleKeys } from "../query-keys";
+import type { BillingProviderModuleSelect, BillingProviderModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { BillingProviderModuleSelect, BillingProviderModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const billingProviderModuleQueryKey = billingProviderModuleKeys.detail;
 /**
  * Query hook for fetching a single BillingProviderModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useBillingProviderModuleQuery({
@@ -32,52 +26,38 @@ export const billingProviderModuleQueryKey = billingProviderModuleKeys.detail;
  * });
  * ```
  */
-export function useBillingProviderModuleQuery<
-  S extends BillingProviderModuleSelect,
-  TData = {
-    billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useBillingProviderModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<BillingProviderModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useBillingProviderModuleQuery<S extends BillingProviderModuleSelect, TData = {
+  billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>;
+} & Omit<UseQueryOptions<{
+  billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useBillingProviderModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<BillingProviderModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<BillingProviderModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: billingProviderModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .billingProviderModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().billingProviderModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single BillingProviderModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchBillingProviderModuleQuery({
@@ -86,9 +66,7 @@ export function useBillingProviderModuleQuery(
  * });
  * ```
  */
-export async function fetchBillingProviderModuleQuery<
-  S extends BillingProviderModuleSelect,
->(params: {
+export async function fetchBillingProviderModuleQuery<S extends BillingProviderModuleSelect>(params: {
   id: string;
   selection: {
     fields: S;
@@ -101,46 +79,35 @@ export async function fetchBillingProviderModuleQuery(params: {
   selection: SelectionConfig<BillingProviderModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<BillingProviderModuleSelect>(params.selection);
-  return getClient()
-    .billingProviderModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().billingProviderModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single BillingProviderModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchBillingProviderModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchBillingProviderModuleQuery<S extends BillingProviderModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchBillingProviderModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<BillingProviderModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchBillingProviderModuleQuery<S extends BillingProviderModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, BillingProviderModuleSelect>;
+}): Promise<void>;
+export async function prefetchBillingProviderModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<BillingProviderModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<BillingProviderModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: billingProviderModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .billingProviderModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().billingProviderModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

@@ -4,107 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { namespaceKeys } from '../query-keys';
-import { namespaceMutationKeys } from '../mutation-keys';
-import type {
-  NamespaceSelect,
-  NamespaceWithRelations,
-  NamespacePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  NamespaceSelect,
-  NamespaceWithRelations,
-  NamespacePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { namespaceKeys } from "../query-keys";
+import { namespaceMutationKeys } from "../mutation-keys";
+import type { NamespaceSelect, NamespaceWithRelations, NamespacePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { NamespaceSelect, NamespaceWithRelations, NamespacePatch } from "../../orm/input-types";
 /**
  * Logical namespace containers for grouping secrets, config, functions, and other resources
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateNamespaceMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', namespacePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateNamespaceMutation<S extends NamespaceSelect>(
-  params: {
-    selection: {
-      fields: S & NamespaceSelect;
-    } & HookStrictSelect<NoInfer<S>, NamespaceSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateNamespace: {
-          namespace: InferSelectResult<NamespaceWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        namespacePatch: NamespacePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateNamespace: {
-      namespace: InferSelectResult<NamespaceWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    namespacePatch: NamespacePatch;
-  }
->;
-export function useUpdateNamespaceMutation(
-  params: {
-    selection: SelectionConfig<NamespaceSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        namespacePatch: NamespacePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateNamespaceMutation<S extends NamespaceSelect>(params: {
+  selection: ({
+    fields: S & NamespaceSelect;
+  } & HookStrictSelect<NoInfer<S>, NamespaceSelect>);
+} & Omit<UseMutationOptions<{
+  updateNamespace: {
+    namespace: InferSelectResult<NamespaceWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  namespacePatch: NamespacePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateNamespace: {
+    namespace: InferSelectResult<NamespaceWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  namespacePatch: NamespacePatch;
+}>;
+export function useUpdateNamespaceMutation(params: {
+  selection: SelectionConfig<NamespaceSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  namespacePatch: NamespacePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<NamespaceSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: namespaceMutationKeys.all,
-    mutationFn: ({ id, namespacePatch }: { id: string; namespacePatch: NamespacePatch }) =>
-      getClient()
-        .namespace.update({
-          where: {
-            id,
-          },
-          data: namespacePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      namespacePatch
+    }: {
+      id: string;
+      namespacePatch: NamespacePatch;
+    }) => getClient().namespace.update({
+      where: {
+        id
+      },
+      data: namespacePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: namespaceKeys.detail(variables.id),
+        queryKey: namespaceKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: namespaceKeys.lists(),
+        queryKey: namespaceKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

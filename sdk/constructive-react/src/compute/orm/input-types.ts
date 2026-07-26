@@ -260,21 +260,6 @@ export interface DbPreset {
   /** Timestamp of last modification */
   updatedAt?: string | null;
 }
-export interface DeclaredCapacity {
-  cpuLimitMillicores?: string | null;
-  cpuRequestMillicores?: string | null;
-  installationId?: string | null;
-  isTransient?: boolean | null;
-  kind?: string | null;
-  memoryLimitBytes?: string | null;
-  memoryRequestBytes?: string | null;
-  namespaceId?: string | null;
-  podCountMax?: number | null;
-  podCountMin?: number | null;
-  source?: string | null;
-  sourceId?: string | null;
-  storageSizeBytes?: string | null;
-}
 /** Join table binding function definitions to API endpoints with per-binding alias and config */
 export interface FunctionApiBinding {
   /** Binding alias (e.g. default, staging, production) */
@@ -365,7 +350,7 @@ export interface FunctionDefinition {
   targetFunction?: string | null;
   /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
   targetSchema?: string | null;
-  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
+  /** Routing slug generated as category || ':' || name (used by the Knative job worker for dispatch) */
   taskIdentifier?: string | null;
   /** Knative request timeout in seconds */
   timeoutSeconds?: number | null;
@@ -659,6 +644,35 @@ export interface FunctionGraphStore {
   /** Opaque store partition key for the global tier */
   scopeId?: string | null;
 }
+/** Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail */
+export interface FunctionInvocationAttempt {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string | null;
+  /** 1-based attempt number for this invocation */
+  attempt?: number | null;
+  /** When the attempt result was recorded (partition key) */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Wall-clock attempt time in milliseconds */
+  durationMs?: number | null;
+  /** Error message when the attempt failed */
+  error?: string | null;
+  /** Structured error context (stack, code, provider response) */
+  errorDetail?: Record<string, unknown> | null;
+  /** Unique attempt identifier */
+  id: string;
+  /** created_at of the referenced invocation (partition-pruned lookups against the invocations PK) */
+  invocationCreatedAt?: string | null;
+  /** Invocation this attempt belongs to (soft reference paired with invocation_created_at) */
+  invocationId?: string | null;
+  /** When the attempt began executing */
+  startedAt?: string | null;
+  /** Whether this attempt completed successfully */
+  success?: boolean | null;
+  /** Function routing slug (denormalized from the invocation) */
+  taskIdentifier?: string | null;
+}
 /** Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. */
 export interface FunctionInvocation {
   /** Who triggered the invocation (NULL for system/cron) */
@@ -677,7 +691,7 @@ export interface FunctionInvocation {
   definitionScope?: string | null;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number | null;
-  /** Error message when status is failed */
+  /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string | null;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
   functionDefinitionId?: string | null;
@@ -697,7 +711,7 @@ export interface FunctionInvocation {
   result?: Record<string, unknown> | null;
   /** When execution started */
   startedAt?: string | null;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
+  /** Lifecycle: pending → running → completed/failed/cancelled; skipped = never ran (a gate rejected the intended run) */
   status?: string | null;
   /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
   taskIdentifier?: string | null;
@@ -841,21 +855,6 @@ export interface NamespaceEvent {
   /** Namespace this event belongs to */
   namespaceId?: string | null;
 }
-export interface PlatformDeclaredCapacity {
-  cpuLimitMillicores?: string | null;
-  cpuRequestMillicores?: string | null;
-  installationId?: string | null;
-  isTransient?: boolean | null;
-  kind?: string | null;
-  memoryLimitBytes?: string | null;
-  memoryRequestBytes?: string | null;
-  namespaceId?: string | null;
-  podCountMax?: number | null;
-  podCountMin?: number | null;
-  source?: string | null;
-  sourceId?: string | null;
-  storageSizeBytes?: string | null;
-}
 /** Join table binding function definitions to API endpoints with per-binding alias and config */
 export interface PlatformFunctionApiBinding {
   /** Binding alias (e.g. default, staging, production) */
@@ -872,6 +871,8 @@ export interface PlatformFunctionApiBinding {
 export interface PlatformFunctionDefinition {
   /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[] | null;
+  /** Whether executions are metered through the invocation ledger and billing quota gate */
+  billable?: boolean | null;
   /** Function task category (e.g. email, embed, chunk, custom) */
   category?: string | null;
   /** Knative containerConcurrency — max concurrent requests per pod instance */
@@ -940,11 +941,13 @@ export interface PlatformFunctionDefinition {
   scaleMax?: number | null;
   /** Minimum pod count for Knative autoscaling (minScale) */
   scaleMin?: number | null;
+  /** Platform system definition: its task_identifier cannot be shadowed by non-platform registration */
+  system?: boolean | null;
   /** Name of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
   targetFunction?: string | null;
   /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
   targetSchema?: string | null;
-  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
+  /** Routing slug generated as category || ':' || name (used by the Knative job worker for dispatch) */
   taskIdentifier?: string | null;
   /** Knative request timeout in seconds */
   timeoutSeconds?: number | null;
@@ -1030,6 +1033,33 @@ export interface PlatformFunctionExecutionLog {
   /** Function routing key (NULL for generic job logs) */
   taskIdentifier?: string | null;
 }
+/** Function invocation attempts — one row per worker attempt (including failed retries) with duration and error detail */
+export interface PlatformFunctionInvocationAttempt {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string | null;
+  /** 1-based attempt number for this invocation */
+  attempt?: number | null;
+  /** When the attempt result was recorded (partition key) */
+  createdAt?: string | null;
+  /** Wall-clock attempt time in milliseconds */
+  durationMs?: number | null;
+  /** Error message when the attempt failed */
+  error?: string | null;
+  /** Structured error context (stack, code, provider response) */
+  errorDetail?: Record<string, unknown> | null;
+  /** Unique attempt identifier */
+  id: string;
+  /** created_at of the referenced invocation (partition-pruned lookups against the invocations PK) */
+  invocationCreatedAt?: string | null;
+  /** Invocation this attempt belongs to (soft reference paired with invocation_created_at) */
+  invocationId?: string | null;
+  /** When the attempt began executing */
+  startedAt?: string | null;
+  /** Whether this attempt completed successfully */
+  success?: boolean | null;
+  /** Function routing slug (denormalized from the invocation) */
+  taskIdentifier?: string | null;
+}
 /** Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug. */
 export interface PlatformFunctionInvocation {
   /** Who triggered the invocation (NULL for system/cron) */
@@ -1046,7 +1076,7 @@ export interface PlatformFunctionInvocation {
   definitionScope?: string | null;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number | null;
-  /** Error message when status is failed */
+  /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string | null;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
   functionDefinitionId?: string | null;
@@ -1066,7 +1096,7 @@ export interface PlatformFunctionInvocation {
   result?: Record<string, unknown> | null;
   /** When execution started */
   startedAt?: string | null;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
+  /** Lifecycle: pending → running → completed/failed/cancelled; skipped = never ran (a gate rejected the intended run) */
   status?: string | null;
   /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
   taskIdentifier?: string | null;
@@ -1195,7 +1225,7 @@ export interface PlatformResource {
   installationId?: string | null;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[] | null;
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer */
   kind?: string | null;
   /** Key/value pairs for selecting and filtering resources */
   labels?: Record<string, unknown> | null;
@@ -1234,6 +1264,21 @@ export interface PlatformResource {
   updatedAt?: string | null;
   updatedBy?: string | null;
 }
+export interface PlatformResourceDeclaredCapacity {
+  cpuLimitMillicores?: string | null;
+  cpuRequestMillicores?: string | null;
+  installationId?: string | null;
+  isTransient?: boolean | null;
+  kind?: string | null;
+  memoryLimitBytes?: string | null;
+  memoryRequestBytes?: string | null;
+  namespaceId?: string | null;
+  podCountMax?: number | null;
+  podCountMin?: number | null;
+  source?: string | null;
+  sourceId?: string | null;
+  storageSizeBytes?: string | null;
+}
 /** Resource definitions — templates for resource kinds declaring default spec and secret/config requirements */
 export interface PlatformResourceDefinition {
   /** Freeform metadata for tooling and operational notes */
@@ -1247,7 +1292,7 @@ export interface PlatformResourceDefinition {
   id: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[] | null;
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer, or custom kinds */
   kind?: string | null;
   /** Key/value pairs for selecting and filtering definitions */
   labels?: Record<string, unknown> | null;
@@ -1324,7 +1369,7 @@ export interface PlatformResourceStatusCheck {
   /** Check lifecycle: pending, running, completed, failed */
   status?: string | null;
 }
-/** Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) */
+/** Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) */
 export interface PlatformResourceUsageLog {
   /** CPU gauge in millicores at sample time (NULL when unknown) */
   cpuMillicores?: string | null;
@@ -1342,7 +1387,7 @@ export interface PlatformResourceUsageLog {
   resourceId?: string | null;
   /** Sample timestamp (partition key) — end of the measured interval */
   sampledAt?: string | null;
-  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  /** Sample producer: self (workload heartbeat), observer (reconciler), or prometheus (namespace-grain usage collector) */
   source?: string | null;
 }
 /** Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals */
@@ -1366,7 +1411,7 @@ export interface PlatformResourceUsageSummary {
   /** Number of raw samples aggregated into this summary */
   sampleCount?: number | null;
 }
-export interface PlatformResourceUtilizationDaily {
+export interface PlatformResourceUtilization {
   avgMemoryBytes?: string | null;
   cpuLimitMillicores?: string | null;
   cpuPeakUtilization?: string | null;
@@ -1507,7 +1552,7 @@ export interface Resource {
   installationId?: string | null;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[] | null;
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer */
   kind?: string | null;
   /** Key/value pairs for selecting and filtering resources */
   labels?: Record<string, unknown> | null;
@@ -1546,6 +1591,21 @@ export interface Resource {
   updatedAt?: string | null;
   updatedBy?: string | null;
 }
+export interface ResourceDeclaredCapacity {
+  cpuLimitMillicores?: string | null;
+  cpuRequestMillicores?: string | null;
+  installationId?: string | null;
+  isTransient?: boolean | null;
+  kind?: string | null;
+  memoryLimitBytes?: string | null;
+  memoryRequestBytes?: string | null;
+  namespaceId?: string | null;
+  podCountMax?: number | null;
+  podCountMin?: number | null;
+  source?: string | null;
+  sourceId?: string | null;
+  storageSizeBytes?: string | null;
+}
 /** Resource definitions — templates for resource kinds declaring default spec and secret/config requirements */
 export interface ResourceDefinition {
   /** Freeform metadata for tooling and operational notes */
@@ -1561,7 +1621,7 @@ export interface ResourceDefinition {
   id: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[] | null;
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer, or custom kinds */
   kind?: string | null;
   /** Key/value pairs for selecting and filtering definitions */
   labels?: Record<string, unknown> | null;
@@ -1644,7 +1704,7 @@ export interface ResourceStatusCheck {
   /** Check lifecycle: pending, running, completed, failed */
   status?: string | null;
 }
-/** Raw resource usage log — interval-accounting measurements from heartbeats (self) and the reconciler (observer) */
+/** Raw resource usage log — interval-accounting measurements from heartbeats (self), the reconciler (observer), and the namespace-grain collector (prometheus) */
 export interface ResourceUsageLog {
   /** CPU gauge in millicores at sample time (NULL when unknown) */
   cpuMillicores?: string | null;
@@ -1664,7 +1724,7 @@ export interface ResourceUsageLog {
   resourceId?: string | null;
   /** Sample timestamp (partition key) — end of the measured interval */
   sampledAt?: string | null;
-  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  /** Sample producer: self (workload heartbeat), observer (reconciler), or prometheus (namespace-grain usage collector) */
   source?: string | null;
 }
 /** Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals */
@@ -1690,7 +1750,7 @@ export interface ResourceUsageSummary {
   /** Number of raw samples aggregated into this summary */
   sampleCount?: number | null;
 }
-export interface ResourceUtilizationDaily {
+export interface ResourceUtilization {
   avgMemoryBytes?: string | null;
   cpuLimitMillicores?: string | null;
   cpuPeakUtilization?: string | null;
@@ -1831,7 +1891,6 @@ export interface PageInfo {
 }
 // ============ Entity Relation Types ============
 export interface DbPresetRelations {}
-export interface DeclaredCapacityRelations {}
 export interface FunctionApiBindingRelations {
   functionDefinition?: FunctionDefinition | null;
   functionInvocationsByApiBindingId?: ConnectionResult<FunctionInvocation>;
@@ -1858,6 +1917,7 @@ export interface FunctionGraphExecutionOutputRelations {}
 export interface FunctionGraphObjectRelations {}
 export interface FunctionGraphRefRelations {}
 export interface FunctionGraphStoreRelations {}
+export interface FunctionInvocationAttemptRelations {}
 export interface FunctionInvocationRelations {
   apiBinding?: FunctionApiBinding | null;
 }
@@ -1876,7 +1936,6 @@ export interface NamespaceRelations {
   webhookEndpoints?: ConnectionResult<WebhookEndpoint>;
 }
 export interface NamespaceEventRelations {}
-export interface PlatformDeclaredCapacityRelations {}
 export interface PlatformFunctionApiBindingRelations {
   functionDefinition?: PlatformFunctionDefinition | null;
   platformFunctionInvocationsByApiBindingId?: ConnectionResult<PlatformFunctionInvocation>;
@@ -1891,6 +1950,7 @@ export interface PlatformFunctionDeploymentRelations {
 }
 export interface PlatformFunctionDeploymentEventRelations {}
 export interface PlatformFunctionExecutionLogRelations {}
+export interface PlatformFunctionInvocationAttemptRelations {}
 export interface PlatformFunctionInvocationRelations {
   apiBinding?: PlatformFunctionApiBinding | null;
 }
@@ -1913,6 +1973,7 @@ export interface PlatformResourceRelations {
   resourceDefinition?: PlatformResourceDefinition | null;
   platformResourceStatusChecksByResourceId?: ConnectionResult<PlatformResourceStatusCheck>;
 }
+export interface PlatformResourceDeclaredCapacityRelations {}
 export interface PlatformResourceDefinitionRelations {
   namespace?: PlatformNamespace | null;
   platformResourcesByResourceDefinitionId?: ConnectionResult<PlatformResource>;
@@ -1927,7 +1988,7 @@ export interface PlatformResourceStatusCheckRelations {
 }
 export interface PlatformResourceUsageLogRelations {}
 export interface PlatformResourceUsageSummaryRelations {}
-export interface PlatformResourceUtilizationDailyRelations {}
+export interface PlatformResourceUtilizationRelations {}
 export interface PlatformResourcesHealthRelations {}
 export interface PlatformResourcesRequirementsStateRelations {}
 export interface PlatformResourcesResolvedRequirementRelations {}
@@ -1945,6 +2006,7 @@ export interface ResourceRelations {
   resourceDefinition?: ResourceDefinition | null;
   resourceStatusChecks?: ConnectionResult<ResourceStatusCheck>;
 }
+export interface ResourceDeclaredCapacityRelations {}
 export interface ResourceDefinitionRelations {
   namespace?: Namespace | null;
   resources?: ConnectionResult<Resource>;
@@ -1959,7 +2021,7 @@ export interface ResourceStatusCheckRelations {
 }
 export interface ResourceUsageLogRelations {}
 export interface ResourceUsageSummaryRelations {}
-export interface ResourceUtilizationDailyRelations {}
+export interface ResourceUtilizationRelations {}
 export interface ResourcesHealthRelations {}
 export interface ResourcesRequirementsStateRelations {}
 export interface ResourcesResolvedRequirementRelations {}
@@ -1973,101 +2035,70 @@ export interface WebhookEventRelations {
 }
 // ============ Entity Types With Relations ============
 export type DbPresetWithRelations = DbPreset & DbPresetRelations;
-export type DeclaredCapacityWithRelations = DeclaredCapacity & DeclaredCapacityRelations;
 export type FunctionApiBindingWithRelations = FunctionApiBinding & FunctionApiBindingRelations;
 export type FunctionDefinitionWithRelations = FunctionDefinition & FunctionDefinitionRelations;
 export type FunctionDeploymentWithRelations = FunctionDeployment & FunctionDeploymentRelations;
-export type FunctionDeploymentEventWithRelations = FunctionDeploymentEvent &
-  FunctionDeploymentEventRelations;
-export type FunctionExecutionLogWithRelations = FunctionExecutionLog &
-  FunctionExecutionLogRelations;
+export type FunctionDeploymentEventWithRelations = FunctionDeploymentEvent & FunctionDeploymentEventRelations;
+export type FunctionExecutionLogWithRelations = FunctionExecutionLog & FunctionExecutionLogRelations;
 export type FunctionGraphCommitWithRelations = FunctionGraphCommit & FunctionGraphCommitRelations;
 export type FunctionGraphWithRelations = FunctionGraph & FunctionGraphRelations;
-export type FunctionGraphExecutionWithRelations = FunctionGraphExecution &
-  FunctionGraphExecutionRelations;
-export type FunctionGraphExecutionNodeStateWithRelations = FunctionGraphExecutionNodeState &
-  FunctionGraphExecutionNodeStateRelations;
-export type FunctionGraphExecutionOutputWithRelations = FunctionGraphExecutionOutput &
-  FunctionGraphExecutionOutputRelations;
+export type FunctionGraphExecutionWithRelations = FunctionGraphExecution & FunctionGraphExecutionRelations;
+export type FunctionGraphExecutionNodeStateWithRelations = FunctionGraphExecutionNodeState & FunctionGraphExecutionNodeStateRelations;
+export type FunctionGraphExecutionOutputWithRelations = FunctionGraphExecutionOutput & FunctionGraphExecutionOutputRelations;
 export type FunctionGraphObjectWithRelations = FunctionGraphObject & FunctionGraphObjectRelations;
 export type FunctionGraphRefWithRelations = FunctionGraphRef & FunctionGraphRefRelations;
 export type FunctionGraphStoreWithRelations = FunctionGraphStore & FunctionGraphStoreRelations;
+export type FunctionInvocationAttemptWithRelations = FunctionInvocationAttempt & FunctionInvocationAttemptRelations;
 export type FunctionInvocationWithRelations = FunctionInvocation & FunctionInvocationRelations;
-export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord &
-  GetAllTreeNodesRecordRelations;
+export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord & GetAllTreeNodesRecordRelations;
 export type InfraCommitWithRelations = InfraCommit & InfraCommitRelations;
-export type InfraGetAllTreeNodesRecordWithRelations = InfraGetAllTreeNodesRecord &
-  InfraGetAllTreeNodesRecordRelations;
+export type InfraGetAllTreeNodesRecordWithRelations = InfraGetAllTreeNodesRecord & InfraGetAllTreeNodesRecordRelations;
 export type InfraObjectWithRelations = InfraObject & InfraObjectRelations;
 export type InfraRefWithRelations = InfraRef & InfraRefRelations;
 export type InfraStoreWithRelations = InfraStore & InfraStoreRelations;
 export type IntegrationProviderWithRelations = IntegrationProvider & IntegrationProviderRelations;
 export type NamespaceWithRelations = Namespace & NamespaceRelations;
 export type NamespaceEventWithRelations = NamespaceEvent & NamespaceEventRelations;
-export type PlatformDeclaredCapacityWithRelations = PlatformDeclaredCapacity &
-  PlatformDeclaredCapacityRelations;
-export type PlatformFunctionApiBindingWithRelations = PlatformFunctionApiBinding &
-  PlatformFunctionApiBindingRelations;
-export type PlatformFunctionDefinitionWithRelations = PlatformFunctionDefinition &
-  PlatformFunctionDefinitionRelations;
-export type PlatformFunctionDeploymentWithRelations = PlatformFunctionDeployment &
-  PlatformFunctionDeploymentRelations;
-export type PlatformFunctionDeploymentEventWithRelations = PlatformFunctionDeploymentEvent &
-  PlatformFunctionDeploymentEventRelations;
-export type PlatformFunctionExecutionLogWithRelations = PlatformFunctionExecutionLog &
-  PlatformFunctionExecutionLogRelations;
-export type PlatformFunctionInvocationWithRelations = PlatformFunctionInvocation &
-  PlatformFunctionInvocationRelations;
+export type PlatformFunctionApiBindingWithRelations = PlatformFunctionApiBinding & PlatformFunctionApiBindingRelations;
+export type PlatformFunctionDefinitionWithRelations = PlatformFunctionDefinition & PlatformFunctionDefinitionRelations;
+export type PlatformFunctionDeploymentWithRelations = PlatformFunctionDeployment & PlatformFunctionDeploymentRelations;
+export type PlatformFunctionDeploymentEventWithRelations = PlatformFunctionDeploymentEvent & PlatformFunctionDeploymentEventRelations;
+export type PlatformFunctionExecutionLogWithRelations = PlatformFunctionExecutionLog & PlatformFunctionExecutionLogRelations;
+export type PlatformFunctionInvocationAttemptWithRelations = PlatformFunctionInvocationAttempt & PlatformFunctionInvocationAttemptRelations;
+export type PlatformFunctionInvocationWithRelations = PlatformFunctionInvocation & PlatformFunctionInvocationRelations;
 export type PlatformInfraCommitWithRelations = PlatformInfraCommit & PlatformInfraCommitRelations;
-export type PlatformInfraGetAllTreeNodesRecordWithRelations = PlatformInfraGetAllTreeNodesRecord &
-  PlatformInfraGetAllTreeNodesRecordRelations;
+export type PlatformInfraGetAllTreeNodesRecordWithRelations = PlatformInfraGetAllTreeNodesRecord & PlatformInfraGetAllTreeNodesRecordRelations;
 export type PlatformInfraObjectWithRelations = PlatformInfraObject & PlatformInfraObjectRelations;
 export type PlatformInfraRefWithRelations = PlatformInfraRef & PlatformInfraRefRelations;
 export type PlatformInfraStoreWithRelations = PlatformInfraStore & PlatformInfraStoreRelations;
 export type PlatformNamespaceWithRelations = PlatformNamespace & PlatformNamespaceRelations;
-export type PlatformNamespaceEventWithRelations = PlatformNamespaceEvent &
-  PlatformNamespaceEventRelations;
+export type PlatformNamespaceEventWithRelations = PlatformNamespaceEvent & PlatformNamespaceEventRelations;
 export type PlatformResourceWithRelations = PlatformResource & PlatformResourceRelations;
-export type PlatformResourceDefinitionWithRelations = PlatformResourceDefinition &
-  PlatformResourceDefinitionRelations;
-export type PlatformResourceEventWithRelations = PlatformResourceEvent &
-  PlatformResourceEventRelations;
-export type PlatformResourceInstallationWithRelations = PlatformResourceInstallation &
-  PlatformResourceInstallationRelations;
-export type PlatformResourceStatusCheckWithRelations = PlatformResourceStatusCheck &
-  PlatformResourceStatusCheckRelations;
-export type PlatformResourceUsageLogWithRelations = PlatformResourceUsageLog &
-  PlatformResourceUsageLogRelations;
-export type PlatformResourceUsageSummaryWithRelations = PlatformResourceUsageSummary &
-  PlatformResourceUsageSummaryRelations;
-export type PlatformResourceUtilizationDailyWithRelations = PlatformResourceUtilizationDaily &
-  PlatformResourceUtilizationDailyRelations;
-export type PlatformResourcesHealthWithRelations = PlatformResourcesHealth &
-  PlatformResourcesHealthRelations;
-export type PlatformResourcesRequirementsStateWithRelations = PlatformResourcesRequirementsState &
-  PlatformResourcesRequirementsStateRelations;
-export type PlatformResourcesResolvedRequirementWithRelations =
-  PlatformResourcesResolvedRequirement & PlatformResourcesResolvedRequirementRelations;
-export type PlatformWebhookEndpointWithRelations = PlatformWebhookEndpoint &
-  PlatformWebhookEndpointRelations;
-export type PlatformWebhookEventWithRelations = PlatformWebhookEvent &
-  PlatformWebhookEventRelations;
+export type PlatformResourceDeclaredCapacityWithRelations = PlatformResourceDeclaredCapacity & PlatformResourceDeclaredCapacityRelations;
+export type PlatformResourceDefinitionWithRelations = PlatformResourceDefinition & PlatformResourceDefinitionRelations;
+export type PlatformResourceEventWithRelations = PlatformResourceEvent & PlatformResourceEventRelations;
+export type PlatformResourceInstallationWithRelations = PlatformResourceInstallation & PlatformResourceInstallationRelations;
+export type PlatformResourceStatusCheckWithRelations = PlatformResourceStatusCheck & PlatformResourceStatusCheckRelations;
+export type PlatformResourceUsageLogWithRelations = PlatformResourceUsageLog & PlatformResourceUsageLogRelations;
+export type PlatformResourceUsageSummaryWithRelations = PlatformResourceUsageSummary & PlatformResourceUsageSummaryRelations;
+export type PlatformResourceUtilizationWithRelations = PlatformResourceUtilization & PlatformResourceUtilizationRelations;
+export type PlatformResourcesHealthWithRelations = PlatformResourcesHealth & PlatformResourcesHealthRelations;
+export type PlatformResourcesRequirementsStateWithRelations = PlatformResourcesRequirementsState & PlatformResourcesRequirementsStateRelations;
+export type PlatformResourcesResolvedRequirementWithRelations = PlatformResourcesResolvedRequirement & PlatformResourcesResolvedRequirementRelations;
+export type PlatformWebhookEndpointWithRelations = PlatformWebhookEndpoint & PlatformWebhookEndpointRelations;
+export type PlatformWebhookEventWithRelations = PlatformWebhookEvent & PlatformWebhookEventRelations;
 export type ResourceWithRelations = Resource & ResourceRelations;
+export type ResourceDeclaredCapacityWithRelations = ResourceDeclaredCapacity & ResourceDeclaredCapacityRelations;
 export type ResourceDefinitionWithRelations = ResourceDefinition & ResourceDefinitionRelations;
 export type ResourceEventWithRelations = ResourceEvent & ResourceEventRelations;
-export type ResourceInstallationWithRelations = ResourceInstallation &
-  ResourceInstallationRelations;
+export type ResourceInstallationWithRelations = ResourceInstallation & ResourceInstallationRelations;
 export type ResourceStatusCheckWithRelations = ResourceStatusCheck & ResourceStatusCheckRelations;
 export type ResourceUsageLogWithRelations = ResourceUsageLog & ResourceUsageLogRelations;
-export type ResourceUsageSummaryWithRelations = ResourceUsageSummary &
-  ResourceUsageSummaryRelations;
-export type ResourceUtilizationDailyWithRelations = ResourceUtilizationDaily &
-  ResourceUtilizationDailyRelations;
+export type ResourceUsageSummaryWithRelations = ResourceUsageSummary & ResourceUsageSummaryRelations;
+export type ResourceUtilizationWithRelations = ResourceUtilization & ResourceUtilizationRelations;
 export type ResourcesHealthWithRelations = ResourcesHealth & ResourcesHealthRelations;
-export type ResourcesRequirementsStateWithRelations = ResourcesRequirementsState &
-  ResourcesRequirementsStateRelations;
-export type ResourcesResolvedRequirementWithRelations = ResourcesResolvedRequirement &
-  ResourcesResolvedRequirementRelations;
+export type ResourcesRequirementsStateWithRelations = ResourcesRequirementsState & ResourcesRequirementsStateRelations;
+export type ResourcesResolvedRequirementWithRelations = ResourcesResolvedRequirement & ResourcesResolvedRequirementRelations;
 export type WebhookEndpointWithRelations = WebhookEndpoint & WebhookEndpointRelations;
 export type WebhookEventWithRelations = WebhookEvent & WebhookEventRelations;
 // ============ Entity Select Types ============
@@ -2083,21 +2114,6 @@ export type DbPresetSelect = {
   slug?: boolean;
   storeId?: boolean;
   updatedAt?: boolean;
-};
-export type DeclaredCapacitySelect = {
-  cpuLimitMillicores?: boolean;
-  cpuRequestMillicores?: boolean;
-  installationId?: boolean;
-  isTransient?: boolean;
-  kind?: boolean;
-  memoryLimitBytes?: boolean;
-  memoryRequestBytes?: boolean;
-  namespaceId?: boolean;
-  podCountMax?: boolean;
-  podCountMin?: boolean;
-  source?: boolean;
-  sourceId?: boolean;
-  storageSizeBytes?: boolean;
 };
 export type FunctionApiBindingSelect = {
   alias?: boolean;
@@ -2340,6 +2356,21 @@ export type FunctionGraphStoreSelect = {
   name?: boolean;
   scopeId?: boolean;
 };
+export type FunctionInvocationAttemptSelect = {
+  actorId?: boolean;
+  attempt?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  durationMs?: boolean;
+  error?: boolean;
+  errorDetail?: boolean;
+  id?: boolean;
+  invocationCreatedAt?: boolean;
+  invocationId?: boolean;
+  startedAt?: boolean;
+  success?: boolean;
+  taskIdentifier?: boolean;
+};
 export type FunctionInvocationSelect = {
   actorId?: boolean;
   apiBindingId?: boolean;
@@ -2475,21 +2506,6 @@ export type NamespaceEventSelect = {
   metadata?: boolean;
   namespaceId?: boolean;
 };
-export type PlatformDeclaredCapacitySelect = {
-  cpuLimitMillicores?: boolean;
-  cpuRequestMillicores?: boolean;
-  installationId?: boolean;
-  isTransient?: boolean;
-  kind?: boolean;
-  memoryLimitBytes?: boolean;
-  memoryRequestBytes?: boolean;
-  namespaceId?: boolean;
-  podCountMax?: boolean;
-  podCountMin?: boolean;
-  source?: boolean;
-  sourceId?: boolean;
-  storageSizeBytes?: boolean;
-};
 export type PlatformFunctionApiBindingSelect = {
   alias?: boolean;
   apiId?: boolean;
@@ -2508,6 +2524,7 @@ export type PlatformFunctionApiBindingSelect = {
 };
 export type PlatformFunctionDefinitionSelect = {
   accessChannels?: boolean;
+  billable?: boolean;
   category?: boolean;
   concurrency?: boolean;
   cpuLimitMillicores?: boolean;
@@ -2543,6 +2560,7 @@ export type PlatformFunctionDefinitionSelect = {
   runtime?: boolean;
   scaleMax?: boolean;
   scaleMin?: boolean;
+  system?: boolean;
   targetFunction?: boolean;
   targetSchema?: boolean;
   taskIdentifier?: boolean;
@@ -2608,6 +2626,20 @@ export type PlatformFunctionExecutionLogSelect = {
   logLevel?: boolean;
   message?: boolean;
   metadata?: boolean;
+  taskIdentifier?: boolean;
+};
+export type PlatformFunctionInvocationAttemptSelect = {
+  actorId?: boolean;
+  attempt?: boolean;
+  createdAt?: boolean;
+  durationMs?: boolean;
+  error?: boolean;
+  errorDetail?: boolean;
+  id?: boolean;
+  invocationCreatedAt?: boolean;
+  invocationId?: boolean;
+  startedAt?: boolean;
+  success?: boolean;
   taskIdentifier?: boolean;
 };
 export type PlatformFunctionInvocationSelect = {
@@ -2770,6 +2802,21 @@ export type PlatformResourceSelect = {
     orderBy?: PlatformResourceStatusCheckOrderBy[];
   };
 };
+export type PlatformResourceDeclaredCapacitySelect = {
+  cpuLimitMillicores?: boolean;
+  cpuRequestMillicores?: boolean;
+  installationId?: boolean;
+  isTransient?: boolean;
+  kind?: boolean;
+  memoryLimitBytes?: boolean;
+  memoryRequestBytes?: boolean;
+  namespaceId?: boolean;
+  podCountMax?: boolean;
+  podCountMin?: boolean;
+  source?: boolean;
+  sourceId?: boolean;
+  storageSizeBytes?: boolean;
+};
 export type PlatformResourceDefinitionSelect = {
   annotations?: boolean;
   createdAt?: boolean;
@@ -2865,7 +2912,7 @@ export type PlatformResourceUsageSummarySelect = {
   runtimeSeconds?: boolean;
   sampleCount?: boolean;
 };
-export type PlatformResourceUtilizationDailySelect = {
+export type PlatformResourceUtilizationSelect = {
   avgMemoryBytes?: boolean;
   cpuLimitMillicores?: boolean;
   cpuPeakUtilization?: boolean;
@@ -3030,6 +3077,21 @@ export type ResourceSelect = {
     orderBy?: ResourceStatusCheckOrderBy[];
   };
 };
+export type ResourceDeclaredCapacitySelect = {
+  cpuLimitMillicores?: boolean;
+  cpuRequestMillicores?: boolean;
+  installationId?: boolean;
+  isTransient?: boolean;
+  kind?: boolean;
+  memoryLimitBytes?: boolean;
+  memoryRequestBytes?: boolean;
+  namespaceId?: boolean;
+  podCountMax?: boolean;
+  podCountMin?: boolean;
+  source?: boolean;
+  sourceId?: boolean;
+  storageSizeBytes?: boolean;
+};
 export type ResourceDefinitionSelect = {
   annotations?: boolean;
   createdAt?: boolean;
@@ -3131,7 +3193,7 @@ export type ResourceUsageSummarySelect = {
   runtimeSeconds?: boolean;
   sampleCount?: boolean;
 };
-export type ResourceUtilizationDailySelect = {
+export type ResourceUtilizationSelect = {
   avgMemoryBytes?: boolean;
   cpuLimitMillicores?: boolean;
   cpuPeakUtilization?: boolean;
@@ -3282,40 +3344,6 @@ export interface DbPresetFilter {
   storeId?: UUIDFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-}
-export interface DeclaredCapacityFilter {
-  /** Checks for all expressions in this list. */
-  and?: DeclaredCapacityFilter[];
-  /** Filter by the object’s `cpuLimitMillicores` field. */
-  cpuLimitMillicores?: BigIntFilter;
-  /** Filter by the object’s `cpuRequestMillicores` field. */
-  cpuRequestMillicores?: BigIntFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `isTransient` field. */
-  isTransient?: BooleanFilter;
-  /** Filter by the object’s `kind` field. */
-  kind?: StringFilter;
-  /** Filter by the object’s `memoryLimitBytes` field. */
-  memoryLimitBytes?: BigIntFilter;
-  /** Filter by the object’s `memoryRequestBytes` field. */
-  memoryRequestBytes?: BigIntFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: DeclaredCapacityFilter;
-  /** Checks for any expressions in this list. */
-  or?: DeclaredCapacityFilter[];
-  /** Filter by the object’s `podCountMax` field. */
-  podCountMax?: IntFilter;
-  /** Filter by the object’s `podCountMin` field. */
-  podCountMin?: IntFilter;
-  /** Filter by the object’s `source` field. */
-  source?: StringFilter;
-  /** Filter by the object’s `sourceId` field. */
-  sourceId?: UUIDFilter;
-  /** Filter by the object’s `storageSizeBytes` field. */
-  storageSizeBytes?: BigIntFilter;
 }
 export interface FunctionApiBindingFilter {
   /** Filter by the object’s `alias` field. */
@@ -3795,6 +3823,40 @@ export interface FunctionGraphStoreFilter {
   /** Filter by the object’s `scopeId` field. */
   scopeId?: UUIDFilter;
 }
+export interface FunctionInvocationAttemptFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionInvocationAttemptFilter[];
+  /** Filter by the object’s `attempt` field. */
+  attempt?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `durationMs` field. */
+  durationMs?: IntFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `errorDetail` field. */
+  errorDetail?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `invocationCreatedAt` field. */
+  invocationCreatedAt?: DatetimeFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: FunctionInvocationAttemptFilter;
+  /** Checks for any expressions in this list. */
+  or?: FunctionInvocationAttemptFilter[];
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `success` field. */
+  success?: BooleanFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+}
 export interface FunctionInvocationFilter {
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
@@ -4049,40 +4111,6 @@ export interface NamespaceEventFilter {
   /** Checks for any expressions in this list. */
   or?: NamespaceEventFilter[];
 }
-export interface PlatformDeclaredCapacityFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformDeclaredCapacityFilter[];
-  /** Filter by the object’s `cpuLimitMillicores` field. */
-  cpuLimitMillicores?: BigIntFilter;
-  /** Filter by the object’s `cpuRequestMillicores` field. */
-  cpuRequestMillicores?: BigIntFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `isTransient` field. */
-  isTransient?: BooleanFilter;
-  /** Filter by the object’s `kind` field. */
-  kind?: StringFilter;
-  /** Filter by the object’s `memoryLimitBytes` field. */
-  memoryLimitBytes?: BigIntFilter;
-  /** Filter by the object’s `memoryRequestBytes` field. */
-  memoryRequestBytes?: BigIntFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: PlatformDeclaredCapacityFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformDeclaredCapacityFilter[];
-  /** Filter by the object’s `podCountMax` field. */
-  podCountMax?: IntFilter;
-  /** Filter by the object’s `podCountMin` field. */
-  podCountMin?: IntFilter;
-  /** Filter by the object’s `source` field. */
-  source?: StringFilter;
-  /** Filter by the object’s `sourceId` field. */
-  sourceId?: UUIDFilter;
-  /** Filter by the object’s `storageSizeBytes` field. */
-  storageSizeBytes?: BigIntFilter;
-}
 export interface PlatformFunctionApiBindingFilter {
   /** Filter by the object’s `alias` field. */
   alias?: StringFilter;
@@ -4112,6 +4140,8 @@ export interface PlatformFunctionDefinitionFilter {
   accessChannels?: StringListFilter;
   /** Checks for all expressions in this list. */
   and?: PlatformFunctionDefinitionFilter[];
+  /** Filter by the object’s `billable` field. */
+  billable?: BooleanFilter;
   /** Filter by the object’s `category` field. */
   category?: StringFilter;
   /** Filter by the object’s `concurrency` field. */
@@ -4194,6 +4224,8 @@ export interface PlatformFunctionDefinitionFilter {
   scaleMax?: IntFilter;
   /** Filter by the object’s `scaleMin` field. */
   scaleMin?: IntFilter;
+  /** Filter by the object’s `system` field. */
+  system?: BooleanFilter;
   /** Filter by the object’s `targetFunction` field. */
   targetFunction?: StringFilter;
   /** Filter by the object’s `targetSchema` field. */
@@ -4302,6 +4334,38 @@ export interface PlatformFunctionExecutionLogFilter {
   not?: PlatformFunctionExecutionLogFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformFunctionExecutionLogFilter[];
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+}
+export interface PlatformFunctionInvocationAttemptFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformFunctionInvocationAttemptFilter[];
+  /** Filter by the object’s `attempt` field. */
+  attempt?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `durationMs` field. */
+  durationMs?: IntFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `errorDetail` field. */
+  errorDetail?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `invocationCreatedAt` field. */
+  invocationCreatedAt?: DatetimeFilter;
+  /** Filter by the object’s `invocationId` field. */
+  invocationId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformFunctionInvocationAttemptFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformFunctionInvocationAttemptFilter[];
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `success` field. */
+  success?: BooleanFilter;
   /** Filter by the object’s `taskIdentifier` field. */
   taskIdentifier?: StringFilter;
 }
@@ -4594,6 +4658,40 @@ export interface PlatformResourceFilter {
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
 }
+export interface PlatformResourceDeclaredCapacityFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformResourceDeclaredCapacityFilter[];
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isTransient` field. */
+  isTransient?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformResourceDeclaredCapacityFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformResourceDeclaredCapacityFilter[];
+  /** Filter by the object’s `podCountMax` field. */
+  podCountMax?: IntFilter;
+  /** Filter by the object’s `podCountMin` field. */
+  podCountMin?: IntFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `sourceId` field. */
+  sourceId?: UUIDFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+}
 export interface PlatformResourceDefinitionFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformResourceDefinitionFilter[];
@@ -4776,9 +4874,9 @@ export interface PlatformResourceUsageSummaryFilter {
   /** Filter by the object’s `sampleCount` field. */
   sampleCount?: IntFilter;
 }
-export interface PlatformResourceUtilizationDailyFilter {
+export interface PlatformResourceUtilizationFilter {
   /** Checks for all expressions in this list. */
-  and?: PlatformResourceUtilizationDailyFilter[];
+  and?: PlatformResourceUtilizationFilter[];
   /** Filter by the object’s `avgMemoryBytes` field. */
   avgMemoryBytes?: BigIntFilter;
   /** Filter by the object’s `cpuLimitMillicores` field. */
@@ -4810,9 +4908,9 @@ export interface PlatformResourceUtilizationDailyFilter {
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
-  not?: PlatformResourceUtilizationDailyFilter;
+  not?: PlatformResourceUtilizationFilter;
   /** Checks for any expressions in this list. */
-  or?: PlatformResourceUtilizationDailyFilter[];
+  or?: PlatformResourceUtilizationFilter[];
   /** Filter by the object’s `replicas` field. */
   replicas?: IntFilter;
   /** Filter by the object’s `resourceId` field. */
@@ -5090,6 +5188,40 @@ export interface ResourceFilter {
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
 }
+export interface ResourceDeclaredCapacityFilter {
+  /** Checks for all expressions in this list. */
+  and?: ResourceDeclaredCapacityFilter[];
+  /** Filter by the object’s `cpuLimitMillicores` field. */
+  cpuLimitMillicores?: BigIntFilter;
+  /** Filter by the object’s `cpuRequestMillicores` field. */
+  cpuRequestMillicores?: BigIntFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `isTransient` field. */
+  isTransient?: BooleanFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `memoryLimitBytes` field. */
+  memoryLimitBytes?: BigIntFilter;
+  /** Filter by the object’s `memoryRequestBytes` field. */
+  memoryRequestBytes?: BigIntFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ResourceDeclaredCapacityFilter;
+  /** Checks for any expressions in this list. */
+  or?: ResourceDeclaredCapacityFilter[];
+  /** Filter by the object’s `podCountMax` field. */
+  podCountMax?: IntFilter;
+  /** Filter by the object’s `podCountMin` field. */
+  podCountMin?: IntFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `sourceId` field. */
+  sourceId?: UUIDFilter;
+  /** Filter by the object’s `storageSizeBytes` field. */
+  storageSizeBytes?: BigIntFilter;
+}
 export interface ResourceDefinitionFilter {
   /** Checks for all expressions in this list. */
   and?: ResourceDefinitionFilter[];
@@ -5284,9 +5416,9 @@ export interface ResourceUsageSummaryFilter {
   /** Filter by the object’s `sampleCount` field. */
   sampleCount?: IntFilter;
 }
-export interface ResourceUtilizationDailyFilter {
+export interface ResourceUtilizationFilter {
   /** Checks for all expressions in this list. */
-  and?: ResourceUtilizationDailyFilter[];
+  and?: ResourceUtilizationFilter[];
   /** Filter by the object’s `avgMemoryBytes` field. */
   avgMemoryBytes?: BigIntFilter;
   /** Filter by the object’s `cpuLimitMillicores` field. */
@@ -5318,9 +5450,9 @@ export interface ResourceUtilizationDailyFilter {
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
-  not?: ResourceUtilizationDailyFilter;
+  not?: ResourceUtilizationFilter;
   /** Checks for any expressions in this list. */
-  or?: ResourceUtilizationDailyFilter[];
+  or?: ResourceUtilizationFilter[];
   /** Filter by the object’s `replicas` field. */
   replicas?: IntFilter;
   /** Filter by the object’s `resourceId` field. */
@@ -5527,1880 +5659,73 @@ export interface WebhookEventFilter {
   updatedAt?: DatetimeFilter;
 }
 // ============ OrderBy Types ============
-export type DbPresetOrderBy =
-  | 'ACTIVE_ASC'
-  | 'ACTIVE_DESC'
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DEFINITION_ASC'
-  | 'DEFINITION_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'MODULES_HASH_ASC'
-  | 'MODULES_HASH_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type DeclaredCapacityOrderBy =
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'IS_TRANSIENT_ASC'
-  | 'IS_TRANSIENT_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'POD_COUNT_MAX_ASC'
-  | 'POD_COUNT_MAX_DESC'
-  | 'POD_COUNT_MIN_ASC'
-  | 'POD_COUNT_MIN_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC'
-  | 'SOURCE_ID_ASC'
-  | 'SOURCE_ID_DESC'
-  | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC';
-export type FunctionApiBindingOrderBy =
-  | 'ALIAS_ASC'
-  | 'ALIAS_DESC'
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type FunctionDefinitionOrderBy =
-  | 'ACCESS_CHANNELS_ASC'
-  | 'ACCESS_CHANNELS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CONCURRENCY_ASC'
-  | 'CONCURRENCY_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FN_CATEGORY_ASC'
-  | 'FN_CATEGORY_DESC'
-  | 'FUNCTION_COLUMNS_ASC'
-  | 'FUNCTION_COLUMNS_DESC'
-  | 'GRAPH_ID_ASC'
-  | 'GRAPH_ID_DESC'
-  | 'ICON_ASC'
-  | 'ICON_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'INPUTS_ASC'
-  | 'INPUTS_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
-  | 'MAX_ATTEMPTS_ASC'
-  | 'MAX_ATTEMPTS_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'MODULE_TABLE_ASC'
-  | 'MODULE_TABLE_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OUTPUTS_ASC'
-  | 'OUTPUTS_DESC'
-  | 'PAYLOAD_ARGS_ASC'
-  | 'PAYLOAD_ARGS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIORITY_ASC'
-  | 'PRIORITY_DESC'
-  | 'PROPS_ASC'
-  | 'PROPS_DESC'
-  | 'PROTECTED_ASC'
-  | 'PROTECTED_DESC'
-  | 'PUBLISHED_AT_ASC'
-  | 'PUBLISHED_AT_DESC'
-  | 'QUEUE_NAME_ASC'
-  | 'QUEUE_NAME_DESC'
-  | 'REQUIRED_BUCKETS_ASC'
-  | 'REQUIRED_BUCKETS_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_MODELS_ASC'
-  | 'REQUIRED_MODELS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'RUNTIME_ASC'
-  | 'RUNTIME_DESC'
-  | 'SCALE_MAX_ASC'
-  | 'SCALE_MAX_DESC'
-  | 'SCALE_MIN_ASC'
-  | 'SCALE_MIN_DESC'
-  | 'TARGET_FUNCTION_ASC'
-  | 'TARGET_FUNCTION_DESC'
-  | 'TARGET_SCHEMA_ASC'
-  | 'TARGET_SCHEMA_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'TIMEOUT_SECONDS_ASC'
-  | 'TIMEOUT_SECONDS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'VOLATILE_ASC'
-  | 'VOLATILE_DESC';
-export type FunctionDeploymentOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CONCURRENCY_ASC'
-  | 'CONCURRENCY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'HANDLER_NAME_ASC'
-  | 'HANDLER_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'IMAGE_VERSION_ASC'
-  | 'IMAGE_VERSION_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_AT_ASC'
-  | 'LAST_ERROR_AT_DESC'
-  | 'LAST_ERROR_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'REVISION_ASC'
-  | 'REVISION_DESC'
-  | 'SCALE_MAX_ASC'
-  | 'SCALE_MAX_DESC'
-  | 'SCALE_MIN_ASC'
-  | 'SCALE_MIN_DESC'
-  | 'SERVICE_NAME_ASC'
-  | 'SERVICE_NAME_DESC'
-  | 'SERVICE_URL_ASC'
-  | 'SERVICE_URL_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TIMEOUT_SECONDS_ASC'
-  | 'TIMEOUT_SECONDS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type FunctionDeploymentEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEPLOYMENT_ID_ASC'
-  | 'DEPLOYMENT_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type FunctionExecutionLogOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'LOG_LEVEL_ASC'
-  | 'LOG_LEVEL_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC';
-export type FunctionGraphCommitOrderBy =
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'NATURAL'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC';
-export type FunctionGraphOrderBy =
-  | 'CONTEXT_ASC'
-  | 'CONTEXT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_VALID_ASC'
-  | 'IS_VALID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'VALIDATION_ERRORS_ASC'
-  | 'VALIDATION_ERRORS_DESC';
-export type FunctionGraphExecutionOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'CURRENT_WAVE_ASC'
-  | 'CURRENT_WAVE_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ERROR_CODE_ASC'
-  | 'ERROR_CODE_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC'
-  | 'EXECUTION_PLAN_ASC'
-  | 'EXECUTION_PLAN_DESC'
-  | 'GRAPH_ID_ASC'
-  | 'GRAPH_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INPUT_PAYLOAD_ASC'
-  | 'INPUT_PAYLOAD_DESC'
-  | 'INVOCATION_CREATED_AT_ASC'
-  | 'INVOCATION_CREATED_AT_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'LAST_PROGRESS_AT_ASC'
-  | 'LAST_PROGRESS_AT_DESC'
-  | 'MAX_PENDING_JOBS_ASC'
-  | 'MAX_PENDING_JOBS_DESC'
-  | 'MAX_TICKS_ASC'
-  | 'MAX_TICKS_DESC'
-  | 'NATURAL'
-  | 'NODE_OUTPUTS_ASC'
-  | 'NODE_OUTPUTS_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'OUTPUT_NAMES_ASC'
-  | 'OUTPUT_NAMES_DESC'
-  | 'OUTPUT_NODE_ASC'
-  | 'OUTPUT_NODE_DESC'
-  | 'OUTPUT_PAYLOAD_ASC'
-  | 'OUTPUT_PAYLOAD_DESC'
-  | 'OUTPUT_PORT_ASC'
-  | 'OUTPUT_PORT_DESC'
-  | 'PARENT_EXECUTION_ID_ASC'
-  | 'PARENT_EXECUTION_ID_DESC'
-  | 'PARENT_INVOCATION_ID_ASC'
-  | 'PARENT_INVOCATION_ID_DESC'
-  | 'PARENT_NODE_NAME_ASC'
-  | 'PARENT_NODE_NAME_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRINCIPAL_ID_ASC'
-  | 'PRINCIPAL_ID_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TICK_COUNT_ASC'
-  | 'TICK_COUNT_DESC'
-  | 'TIMEOUT_AT_ASC'
-  | 'TIMEOUT_AT_DESC';
-export type FunctionGraphExecutionNodeStateOrderBy =
-  | 'CALLBACK_INPUTS_ASC'
-  | 'CALLBACK_INPUTS_DESC'
-  | 'CALLBACK_META_ASC'
-  | 'CALLBACK_META_DESC'
-  | 'CALLBACK_TOKEN_HASH_ASC'
-  | 'CALLBACK_TOKEN_HASH_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ERROR_CODE_ASC'
-  | 'ERROR_CODE_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC'
-  | 'EXECUTION_ID_ASC'
-  | 'EXECUTION_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'NODE_NAME_ASC'
-  | 'NODE_NAME_DESC'
-  | 'NODE_PATH_ASC'
-  | 'NODE_PATH_DESC'
-  | 'OUTPUT_ID_ASC'
-  | 'OUTPUT_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC';
-export type FunctionGraphExecutionOutputOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
-export type FunctionGraphObjectOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
-export type FunctionGraphRefOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
-export type FunctionGraphStoreOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
-export type FunctionInvocationOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'API_BINDING_ID_ASC'
-  | 'API_BINDING_ID_DESC'
-  | 'CHANNEL_ASC'
-  | 'CHANNEL_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFINITION_SCOPE_ASC'
-  | 'DEFINITION_SCOPE_DESC'
-  | 'DURATION_MS_ASC'
-  | 'DURATION_MS_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'GRAPH_EXECUTION_ID_ASC'
-  | 'GRAPH_EXECUTION_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'JOB_ID_ASC'
-  | 'JOB_ID_DESC'
-  | 'NATURAL'
-  | 'PARENT_INVOCATION_ID_ASC'
-  | 'PARENT_INVOCATION_ID_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVENANCE_ASC'
-  | 'PROVENANCE_DESC'
-  | 'RESULT_ASC'
-  | 'RESULT_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC';
-export type GetAllTreeNodesRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'PATH_ASC'
-  | 'PATH_DESC';
-export type InfraCommitOrderBy =
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'NATURAL'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC';
-export type InfraGetAllTreeNodesRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'PATH_ASC'
-  | 'PATH_DESC';
-export type InfraObjectOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type InfraRefOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
-export type InfraStoreOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type IntegrationProviderOrderBy =
-  | 'BRAND_ASC'
-  | 'BRAND_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ICON_ASC'
-  | 'ICON_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LOGO_ASC'
-  | 'LOGO_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type NamespaceOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_MANAGED_ASC'
-  | 'IS_MANAGED_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'NAMESPACE_NAME_ASC'
-  | 'NAMESPACE_NAME_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type NamespaceEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type PlatformDeclaredCapacityOrderBy =
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'IS_TRANSIENT_ASC'
-  | 'IS_TRANSIENT_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'POD_COUNT_MAX_ASC'
-  | 'POD_COUNT_MAX_DESC'
-  | 'POD_COUNT_MIN_ASC'
-  | 'POD_COUNT_MIN_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC'
-  | 'SOURCE_ID_ASC'
-  | 'SOURCE_ID_DESC'
-  | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC';
-export type PlatformFunctionApiBindingOrderBy =
-  | 'ALIAS_ASC'
-  | 'ALIAS_DESC'
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'CONFIG_ASC'
-  | 'CONFIG_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type PlatformFunctionDefinitionOrderBy =
-  | 'ACCESS_CHANNELS_ASC'
-  | 'ACCESS_CHANNELS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CONCURRENCY_ASC'
-  | 'CONCURRENCY_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FN_CATEGORY_ASC'
-  | 'FN_CATEGORY_DESC'
-  | 'FUNCTION_COLUMNS_ASC'
-  | 'FUNCTION_COLUMNS_DESC'
-  | 'GRAPH_ID_ASC'
-  | 'GRAPH_ID_DESC'
-  | 'ICON_ASC'
-  | 'ICON_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'INPUTS_ASC'
-  | 'INPUTS_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'IS_PUBLISHED_ASC'
-  | 'IS_PUBLISHED_DESC'
-  | 'MAX_ATTEMPTS_ASC'
-  | 'MAX_ATTEMPTS_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'MODULE_TABLE_ASC'
-  | 'MODULE_TABLE_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OUTPUTS_ASC'
-  | 'OUTPUTS_DESC'
-  | 'PAYLOAD_ARGS_ASC'
-  | 'PAYLOAD_ARGS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIORITY_ASC'
-  | 'PRIORITY_DESC'
-  | 'PROPS_ASC'
-  | 'PROPS_DESC'
-  | 'PROTECTED_ASC'
-  | 'PROTECTED_DESC'
-  | 'PUBLISHED_AT_ASC'
-  | 'PUBLISHED_AT_DESC'
-  | 'QUEUE_NAME_ASC'
-  | 'QUEUE_NAME_DESC'
-  | 'REQUIRED_BUCKETS_ASC'
-  | 'REQUIRED_BUCKETS_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_MODELS_ASC'
-  | 'REQUIRED_MODELS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'RUNTIME_ASC'
-  | 'RUNTIME_DESC'
-  | 'SCALE_MAX_ASC'
-  | 'SCALE_MAX_DESC'
-  | 'SCALE_MIN_ASC'
-  | 'SCALE_MIN_DESC'
-  | 'TARGET_FUNCTION_ASC'
-  | 'TARGET_FUNCTION_DESC'
-  | 'TARGET_SCHEMA_ASC'
-  | 'TARGET_SCHEMA_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'TIMEOUT_SECONDS_ASC'
-  | 'TIMEOUT_SECONDS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'VOLATILE_ASC'
-  | 'VOLATILE_DESC';
-export type PlatformFunctionDeploymentOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CONCURRENCY_ASC'
-  | 'CONCURRENCY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'HANDLER_NAME_ASC'
-  | 'HANDLER_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'IMAGE_VERSION_ASC'
-  | 'IMAGE_VERSION_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_AT_ASC'
-  | 'LAST_ERROR_AT_DESC'
-  | 'LAST_ERROR_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'REVISION_ASC'
-  | 'REVISION_DESC'
-  | 'SCALE_MAX_ASC'
-  | 'SCALE_MAX_DESC'
-  | 'SCALE_MIN_ASC'
-  | 'SCALE_MIN_DESC'
-  | 'SERVICE_NAME_ASC'
-  | 'SERVICE_NAME_DESC'
-  | 'SERVICE_URL_ASC'
-  | 'SERVICE_URL_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TIMEOUT_SECONDS_ASC'
-  | 'TIMEOUT_SECONDS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type PlatformFunctionDeploymentEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DEPLOYMENT_ID_ASC'
-  | 'DEPLOYMENT_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type PlatformFunctionExecutionLogOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'LOG_LEVEL_ASC'
-  | 'LOG_LEVEL_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC';
-export type PlatformFunctionInvocationOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'API_BINDING_ID_ASC'
-  | 'API_BINDING_ID_DESC'
-  | 'CHANNEL_ASC'
-  | 'CHANNEL_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DEFINITION_SCOPE_ASC'
-  | 'DEFINITION_SCOPE_DESC'
-  | 'DURATION_MS_ASC'
-  | 'DURATION_MS_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'GRAPH_EXECUTION_ID_ASC'
-  | 'GRAPH_EXECUTION_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'JOB_ID_ASC'
-  | 'JOB_ID_DESC'
-  | 'NATURAL'
-  | 'PARENT_INVOCATION_ID_ASC'
-  | 'PARENT_INVOCATION_ID_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVENANCE_ASC'
-  | 'PROVENANCE_DESC'
-  | 'RESULT_ASC'
-  | 'RESULT_DESC'
-  | 'STARTED_AT_ASC'
-  | 'STARTED_AT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC';
-export type PlatformInfraCommitOrderBy =
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'NATURAL'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC';
-export type PlatformInfraGetAllTreeNodesRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'PATH_ASC'
-  | 'PATH_DESC';
-export type PlatformInfraObjectOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
-export type PlatformInfraRefOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
-export type PlatformInfraStoreOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
-export type PlatformNamespaceOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'IS_MANAGED_ASC'
-  | 'IS_MANAGED_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'NAMESPACE_NAME_ASC'
-  | 'NAMESPACE_NAME_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type PlatformNamespaceEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type PlatformResourceOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'LAST_HEARTBEAT_AT_ASC'
-  | 'LAST_HEARTBEAT_AT_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REPLICAS_ASC'
-  | 'REPLICAS_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'RESOURCE_DEFINITION_ID_ASC'
-  | 'RESOURCE_DEFINITION_ID_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'SPEC_ASC'
-  | 'SPEC_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STATUS_OBSERVED_ASC'
-  | 'STATUS_OBSERVED_DESC'
-  | 'STORAGE_CLASS_ASC'
-  | 'STORAGE_CLASS_DESC'
-  | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type PlatformResourceDefinitionOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DEFAULT_SPEC_ASC'
-  | 'DEFAULT_SPEC_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'STEP_UP_MIN_AGE_ASC'
-  | 'STEP_UP_MIN_AGE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type PlatformResourceEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC';
-export type PlatformResourceInstallationOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PARAMS_ASC'
-  | 'PARAMS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REVISION_ASC'
-  | 'REVISION_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type PlatformResourceStatusCheckOrderBy =
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUESTED_AT_ASC'
-  | 'REQUESTED_AT_DESC'
-  | 'REQUESTED_BY_ASC'
-  | 'REQUESTED_BY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'RESULT_ASC'
-  | 'RESULT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC';
-export type PlatformResourceUsageLogOrderBy =
-  | 'CPU_MILLICORES_ASC'
-  | 'CPU_MILLICORES_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_SECONDS_ASC'
-  | 'INTERVAL_SECONDS_DESC'
-  | 'MEMORY_BYTES_ASC'
-  | 'MEMORY_BYTES_DESC'
-  | 'METRICS_ASC'
-  | 'METRICS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'SAMPLED_AT_ASC'
-  | 'SAMPLED_AT_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC';
-export type PlatformResourceUsageSummaryOrderBy =
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'GB_SECONDS_ASC'
-  | 'GB_SECONDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_CPU_MILLICORES_ASC'
-  | 'MAX_CPU_MILLICORES_DESC'
-  | 'MAX_MEMORY_BYTES_ASC'
-  | 'MAX_MEMORY_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'RUNTIME_SECONDS_ASC'
-  | 'RUNTIME_SECONDS_DESC'
-  | 'SAMPLE_COUNT_ASC'
-  | 'SAMPLE_COUNT_DESC';
-export type PlatformResourceUtilizationDailyOrderBy =
-  | 'AVG_MEMORY_BYTES_ASC'
-  | 'AVG_MEMORY_BYTES_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_PEAK_UTILIZATION_ASC'
-  | 'CPU_PEAK_UTILIZATION_DESC'
-  | 'CPU_REQUEST_HEADROOM_MILLICORES_ASC'
-  | 'CPU_REQUEST_HEADROOM_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'GB_SECONDS_ASC'
-  | 'GB_SECONDS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'MAX_CPU_MILLICORES_ASC'
-  | 'MAX_CPU_MILLICORES_DESC'
-  | 'MAX_MEMORY_BYTES_ASC'
-  | 'MAX_MEMORY_BYTES_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_PEAK_UTILIZATION_ASC'
-  | 'MEMORY_PEAK_UTILIZATION_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'MEMORY_REQUEST_HEADROOM_BYTES_ASC'
-  | 'MEMORY_REQUEST_HEADROOM_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'REPLICAS_ASC'
-  | 'REPLICAS_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'RUNTIME_SECONDS_ASC'
-  | 'RUNTIME_SECONDS_DESC'
-  | 'SAMPLE_COUNT_ASC'
-  | 'SAMPLE_COUNT_DESC';
-export type PlatformResourcesHealthOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'LAST_HEARTBEAT_AT_ASC'
-  | 'LAST_HEARTBEAT_AT_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'REPLICAS_ASC'
-  | 'REPLICAS_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'RESOURCE_DEFINITION_ID_ASC'
-  | 'RESOURCE_DEFINITION_ID_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'SPEC_ASC'
-  | 'SPEC_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STATUS_DETAIL_ASC'
-  | 'STATUS_DETAIL_DESC'
-  | 'STATUS_OBSERVED_ASC'
-  | 'STATUS_OBSERVED_DESC'
-  | 'STORAGE_CLASS_ASC'
-  | 'STORAGE_CLASS_DESC'
-  | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type PlatformResourcesRequirementsStateOrderBy =
-  | 'CONFIG_HASH_ASC'
-  | 'CONFIG_HASH_DESC'
-  | 'CONFIG_OBJECT_NAME_ASC'
-  | 'CONFIG_OBJECT_NAME_DESC'
-  | 'NATURAL'
-  | 'REQUIREMENTS_HASH_ASC'
-  | 'REQUIREMENTS_HASH_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'SECRETS_HASH_ASC'
-  | 'SECRETS_HASH_DESC'
-  | 'SECRETS_OBJECT_NAME_ASC'
-  | 'SECRETS_OBJECT_NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC';
-export type PlatformResourcesResolvedRequirementOrderBy =
-  | 'ATOM_ID_ASC'
-  | 'ATOM_ID_DESC'
-  | 'CONFIG_OBJECT_NAME_ASC'
-  | 'CONFIG_OBJECT_NAME_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRESENT_ASC'
-  | 'PRESENT_DESC'
-  | 'REQUIRED_ASC'
-  | 'REQUIRED_DESC'
-  | 'REQUIREMENT_KIND_ASC'
-  | 'REQUIREMENT_KIND_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'SECRETS_OBJECT_NAME_ASC'
-  | 'SECRETS_OBJECT_NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC';
-export type PlatformWebhookEndpointOrderBy =
-  | 'ACTIVE_ASC'
-  | 'ACTIVE_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'HOST_ASC'
-  | 'HOST_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'REPLAY_WINDOW_SECONDS_ASC'
-  | 'REPLAY_WINDOW_SECONDS_DESC'
-  | 'SIGNING_SECRET_NAME_ASC'
-  | 'SIGNING_SECRET_NAME_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type PlatformWebhookEventOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ENDPOINT_ID_ASC'
-  | 'ENDPOINT_ID_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'EXTERNAL_EVENT_ID_ASC'
-  | 'EXTERNAL_EVENT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATION_CREATED_AT_ASC'
-  | 'INVOCATION_CREATED_AT_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'NATURAL'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'PROVIDER_TIMESTAMP_ASC'
-  | 'PROVIDER_TIMESTAMP_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type ResourceOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'LAST_HEARTBEAT_AT_ASC'
-  | 'LAST_HEARTBEAT_AT_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REPLICAS_ASC'
-  | 'REPLICAS_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'RESOURCE_DEFINITION_ID_ASC'
-  | 'RESOURCE_DEFINITION_ID_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'SPEC_ASC'
-  | 'SPEC_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STATUS_OBSERVED_ASC'
-  | 'STATUS_OBSERVED_DESC'
-  | 'STORAGE_CLASS_ASC'
-  | 'STORAGE_CLASS_DESC'
-  | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type ResourceDefinitionOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_SPEC_ASC'
-  | 'DEFAULT_SPEC_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'STEP_UP_MIN_AGE_ASC'
-  | 'STEP_UP_MIN_AGE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type ResourceEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC';
-export type ResourceInstallationOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PARAMS_ASC'
-  | 'PARAMS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REVISION_ASC'
-  | 'REVISION_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type ResourceStatusCheckOrderBy =
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUESTED_AT_ASC'
-  | 'REQUESTED_AT_DESC'
-  | 'REQUESTED_BY_ASC'
-  | 'REQUESTED_BY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'RESULT_ASC'
-  | 'RESULT_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC';
-export type ResourceUsageLogOrderBy =
-  | 'CPU_MILLICORES_ASC'
-  | 'CPU_MILLICORES_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_SECONDS_ASC'
-  | 'INTERVAL_SECONDS_DESC'
-  | 'MEMORY_BYTES_ASC'
-  | 'MEMORY_BYTES_DESC'
-  | 'METRICS_ASC'
-  | 'METRICS_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'SAMPLED_AT_ASC'
-  | 'SAMPLED_AT_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC';
-export type ResourceUsageSummaryOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'GB_SECONDS_ASC'
-  | 'GB_SECONDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_CPU_MILLICORES_ASC'
-  | 'MAX_CPU_MILLICORES_DESC'
-  | 'MAX_MEMORY_BYTES_ASC'
-  | 'MAX_MEMORY_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'RUNTIME_SECONDS_ASC'
-  | 'RUNTIME_SECONDS_DESC'
-  | 'SAMPLE_COUNT_ASC'
-  | 'SAMPLE_COUNT_DESC';
-export type ResourceUtilizationDailyOrderBy =
-  | 'AVG_MEMORY_BYTES_ASC'
-  | 'AVG_MEMORY_BYTES_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_PEAK_UTILIZATION_ASC'
-  | 'CPU_PEAK_UTILIZATION_DESC'
-  | 'CPU_REQUEST_HEADROOM_MILLICORES_ASC'
-  | 'CPU_REQUEST_HEADROOM_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'GB_SECONDS_ASC'
-  | 'GB_SECONDS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'MAX_CPU_MILLICORES_ASC'
-  | 'MAX_CPU_MILLICORES_DESC'
-  | 'MAX_MEMORY_BYTES_ASC'
-  | 'MAX_MEMORY_BYTES_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_PEAK_UTILIZATION_ASC'
-  | 'MEMORY_PEAK_UTILIZATION_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'MEMORY_REQUEST_HEADROOM_BYTES_ASC'
-  | 'MEMORY_REQUEST_HEADROOM_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'REPLICAS_ASC'
-  | 'REPLICAS_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'RUNTIME_SECONDS_ASC'
-  | 'RUNTIME_SECONDS_DESC'
-  | 'SAMPLE_COUNT_ASC'
-  | 'SAMPLE_COUNT_DESC';
-export type ResourcesHealthOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'CPU_LIMIT_MILLICORES_ASC'
-  | 'CPU_LIMIT_MILLICORES_DESC'
-  | 'CPU_REQUEST_MILLICORES_ASC'
-  | 'CPU_REQUEST_MILLICORES_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ERROR_COUNT_ASC'
-  | 'ERROR_COUNT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'INTEGRATIONS_ASC'
-  | 'INTEGRATIONS_DESC'
-  | 'KIND_ASC'
-  | 'KIND_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'LAST_HEARTBEAT_AT_ASC'
-  | 'LAST_HEARTBEAT_AT_DESC'
-  | 'MEMORY_LIMIT_BYTES_ASC'
-  | 'MEMORY_LIMIT_BYTES_DESC'
-  | 'MEMORY_REQUEST_BYTES_ASC'
-  | 'MEMORY_REQUEST_BYTES_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'REPLICAS_ASC'
-  | 'REPLICAS_DESC'
-  | 'REQUIRED_CONFIGS_ASC'
-  | 'REQUIRED_CONFIGS_DESC'
-  | 'REQUIRED_SECRETS_ASC'
-  | 'REQUIRED_SECRETS_DESC'
-  | 'RESOURCE_DEFINITION_ID_ASC'
-  | 'RESOURCE_DEFINITION_ID_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'SPEC_ASC'
-  | 'SPEC_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'STATUS_DETAIL_ASC'
-  | 'STATUS_DETAIL_DESC'
-  | 'STATUS_OBSERVED_ASC'
-  | 'STATUS_OBSERVED_DESC'
-  | 'STORAGE_CLASS_ASC'
-  | 'STORAGE_CLASS_DESC'
-  | 'STORAGE_SIZE_BYTES_ASC'
-  | 'STORAGE_SIZE_BYTES_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type ResourcesRequirementsStateOrderBy =
-  | 'CONFIG_HASH_ASC'
-  | 'CONFIG_HASH_DESC'
-  | 'CONFIG_OBJECT_NAME_ASC'
-  | 'CONFIG_OBJECT_NAME_DESC'
-  | 'NATURAL'
-  | 'REQUIREMENTS_HASH_ASC'
-  | 'REQUIREMENTS_HASH_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'SECRETS_HASH_ASC'
-  | 'SECRETS_HASH_DESC'
-  | 'SECRETS_OBJECT_NAME_ASC'
-  | 'SECRETS_OBJECT_NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC';
-export type ResourcesResolvedRequirementOrderBy =
-  | 'ATOM_ID_ASC'
-  | 'ATOM_ID_DESC'
-  | 'CONFIG_OBJECT_NAME_ASC'
-  | 'CONFIG_OBJECT_NAME_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRESENT_ASC'
-  | 'PRESENT_DESC'
-  | 'REQUIRED_ASC'
-  | 'REQUIRED_DESC'
-  | 'REQUIREMENT_KIND_ASC'
-  | 'REQUIREMENT_KIND_DESC'
-  | 'RESOURCE_ID_ASC'
-  | 'RESOURCE_ID_DESC'
-  | 'SECRETS_OBJECT_NAME_ASC'
-  | 'SECRETS_OBJECT_NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC';
-export type WebhookEndpointOrderBy =
-  | 'ACTIVE_ASC'
-  | 'ACTIVE_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FUNCTION_DEFINITION_ID_ASC'
-  | 'FUNCTION_DEFINITION_ID_DESC'
-  | 'HOST_ASC'
-  | 'HOST_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'REPLAY_WINDOW_SECONDS_ASC'
-  | 'REPLAY_WINDOW_SECONDS_DESC'
-  | 'SIGNING_SECRET_NAME_ASC'
-  | 'SIGNING_SECRET_NAME_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type WebhookEventOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENDPOINT_ID_ASC'
-  | 'ENDPOINT_ID_DESC'
-  | 'ERROR_ASC'
-  | 'ERROR_DESC'
-  | 'EXTERNAL_EVENT_ID_ASC'
-  | 'EXTERNAL_EVENT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATION_CREATED_AT_ASC'
-  | 'INVOCATION_CREATED_AT_DESC'
-  | 'INVOCATION_ID_ASC'
-  | 'INVOCATION_ID_DESC'
-  | 'NATURAL'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'PROVIDER_TIMESTAMP_ASC'
-  | 'PROVIDER_TIMESTAMP_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+export type DbPresetOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEFINITION_ASC" | "DEFINITION_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "MODULES_HASH_ASC" | "MODULES_HASH_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type FunctionApiBindingOrderBy = "ALIAS_ASC" | "ALIAS_DESC" | "API_ID_ASC" | "API_ID_DESC" | "CONFIG_ASC" | "CONFIG_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type FunctionDefinitionOrderBy = "ACCESS_CHANNELS_ASC" | "ACCESS_CHANNELS_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FN_CATEGORY_ASC" | "FN_CATEGORY_DESC" | "FUNCTION_COLUMNS_ASC" | "FUNCTION_COLUMNS_DESC" | "GRAPH_ID_ASC" | "GRAPH_ID_DESC" | "ICON_ASC" | "ICON_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "INPUTS_ASC" | "INPUTS_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "MAX_ATTEMPTS_ASC" | "MAX_ATTEMPTS_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MODULE_TABLE_ASC" | "MODULE_TABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OUTPUTS_ASC" | "OUTPUTS_DESC" | "PAYLOAD_ARGS_ASC" | "PAYLOAD_ARGS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "PROPS_ASC" | "PROPS_DESC" | "PROTECTED_ASC" | "PROTECTED_DESC" | "PUBLISHED_AT_ASC" | "PUBLISHED_AT_DESC" | "QUEUE_NAME_ASC" | "QUEUE_NAME_DESC" | "REQUIRED_BUCKETS_ASC" | "REQUIRED_BUCKETS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_MODELS_ASC" | "REQUIRED_MODELS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "RUNTIME_ASC" | "RUNTIME_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "TARGET_FUNCTION_ASC" | "TARGET_FUNCTION_DESC" | "TARGET_SCHEMA_ASC" | "TARGET_SCHEMA_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VOLATILE_ASC" | "VOLATILE_DESC";
+export type FunctionDeploymentOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "HANDLER_NAME_ASC" | "HANDLER_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "IMAGE_VERSION_ASC" | "IMAGE_VERSION_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_AT_ASC" | "LAST_ERROR_AT_DESC" | "LAST_ERROR_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "SERVICE_NAME_ASC" | "SERVICE_NAME_DESC" | "SERVICE_URL_ASC" | "SERVICE_URL_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type FunctionDeploymentEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOYMENT_ID_ASC" | "DEPLOYMENT_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type FunctionExecutionLogOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "LOG_LEVEL_ASC" | "LOG_LEVEL_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
+export type FunctionGraphCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
+export type FunctionGraphOrderBy = "CONTEXT_ASC" | "CONTEXT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DEFINITIONS_COMMIT_ID_ASC" | "DEFINITIONS_COMMIT_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_VALID_ASC" | "IS_VALID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VALIDATION_ERRORS_ASC" | "VALIDATION_ERRORS_DESC";
+export type FunctionGraphExecutionOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CURRENT_WAVE_ASC" | "CURRENT_WAVE_DESC" | "DEFINITIONS_COMMIT_ID_ASC" | "DEFINITIONS_COMMIT_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ERROR_CODE_ASC" | "ERROR_CODE_DESC" | "ERROR_MESSAGE_ASC" | "ERROR_MESSAGE_DESC" | "EXECUTION_PLAN_ASC" | "EXECUTION_PLAN_DESC" | "GRAPH_ID_ASC" | "GRAPH_ID_DESC" | "ID_ASC" | "ID_DESC" | "INPUT_PAYLOAD_ASC" | "INPUT_PAYLOAD_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "LAST_PROGRESS_AT_ASC" | "LAST_PROGRESS_AT_DESC" | "MAX_PENDING_JOBS_ASC" | "MAX_PENDING_JOBS_DESC" | "MAX_TICKS_ASC" | "MAX_TICKS_DESC" | "NATURAL" | "NODE_OUTPUTS_ASC" | "NODE_OUTPUTS_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "OUTPUT_NAMES_ASC" | "OUTPUT_NAMES_DESC" | "OUTPUT_NODE_ASC" | "OUTPUT_NODE_DESC" | "OUTPUT_PAYLOAD_ASC" | "OUTPUT_PAYLOAD_DESC" | "OUTPUT_PORT_ASC" | "OUTPUT_PORT_DESC" | "PARENT_EXECUTION_ID_ASC" | "PARENT_EXECUTION_ID_DESC" | "PARENT_INVOCATION_ID_ASC" | "PARENT_INVOCATION_ID_DESC" | "PARENT_NODE_NAME_ASC" | "PARENT_NODE_NAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRINCIPAL_ID_ASC" | "PRINCIPAL_ID_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TICK_COUNT_ASC" | "TICK_COUNT_DESC" | "TIMEOUT_AT_ASC" | "TIMEOUT_AT_DESC";
+export type FunctionGraphExecutionNodeStateOrderBy = "CALLBACK_INPUTS_ASC" | "CALLBACK_INPUTS_DESC" | "CALLBACK_META_ASC" | "CALLBACK_META_DESC" | "CALLBACK_TOKEN_HASH_ASC" | "CALLBACK_TOKEN_HASH_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ERROR_CODE_ASC" | "ERROR_CODE_DESC" | "ERROR_MESSAGE_ASC" | "ERROR_MESSAGE_DESC" | "EXECUTION_ID_ASC" | "EXECUTION_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "NODE_NAME_ASC" | "NODE_NAME_DESC" | "NODE_PATH_ASC" | "NODE_PATH_DESC" | "OUTPUT_ID_ASC" | "OUTPUT_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC";
+export type FunctionGraphExecutionOutputOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type FunctionGraphObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type FunctionGraphRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
+export type FunctionGraphStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type FunctionInvocationAttemptOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ATTEMPT_ASC" | "ATTEMPT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "ERROR_DETAIL_ASC" | "ERROR_DETAIL_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "SUCCESS_ASC" | "SUCCESS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
+export type FunctionInvocationOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "API_BINDING_ID_ASC" | "API_BINDING_ID_DESC" | "CHANNEL_ASC" | "CHANNEL_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFINITION_SCOPE_ASC" | "DEFINITION_SCOPE_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "GRAPH_EXECUTION_ID_ASC" | "GRAPH_EXECUTION_ID_DESC" | "ID_ASC" | "ID_DESC" | "JOB_ID_ASC" | "JOB_ID_DESC" | "NATURAL" | "PARENT_INVOCATION_ID_ASC" | "PARENT_INVOCATION_ID_DESC" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVENANCE_ASC" | "PROVENANCE_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
+export type GetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
+export type InfraCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
+export type InfraGetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
+export type InfraObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type InfraRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
+export type InfraStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type IntegrationProviderOrderBy = "BRAND_ASC" | "BRAND_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ICON_ASC" | "ICON_DESC" | "ID_ASC" | "ID_DESC" | "LOGO_ASC" | "LOGO_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "SLUG_ASC" | "SLUG_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type NamespaceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_MANAGED_ASC" | "IS_MANAGED_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "NAMESPACE_NAME_ASC" | "NAMESPACE_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type NamespaceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type PlatformFunctionApiBindingOrderBy = "ALIAS_ASC" | "ALIAS_DESC" | "API_ID_ASC" | "API_ID_DESC" | "CONFIG_ASC" | "CONFIG_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type PlatformFunctionDefinitionOrderBy = "ACCESS_CHANNELS_ASC" | "ACCESS_CHANNELS_DESC" | "BILLABLE_ASC" | "BILLABLE_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FN_CATEGORY_ASC" | "FN_CATEGORY_DESC" | "FUNCTION_COLUMNS_ASC" | "FUNCTION_COLUMNS_DESC" | "GRAPH_ID_ASC" | "GRAPH_ID_DESC" | "ICON_ASC" | "ICON_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "INPUTS_ASC" | "INPUTS_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "MAX_ATTEMPTS_ASC" | "MAX_ATTEMPTS_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MODULE_TABLE_ASC" | "MODULE_TABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OUTPUTS_ASC" | "OUTPUTS_DESC" | "PAYLOAD_ARGS_ASC" | "PAYLOAD_ARGS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "PROPS_ASC" | "PROPS_DESC" | "PROTECTED_ASC" | "PROTECTED_DESC" | "PUBLISHED_AT_ASC" | "PUBLISHED_AT_DESC" | "QUEUE_NAME_ASC" | "QUEUE_NAME_DESC" | "REQUIRED_BUCKETS_ASC" | "REQUIRED_BUCKETS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_MODELS_ASC" | "REQUIRED_MODELS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "RUNTIME_ASC" | "RUNTIME_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "SYSTEM_ASC" | "SYSTEM_DESC" | "TARGET_FUNCTION_ASC" | "TARGET_FUNCTION_DESC" | "TARGET_SCHEMA_ASC" | "TARGET_SCHEMA_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VOLATILE_ASC" | "VOLATILE_DESC";
+export type PlatformFunctionDeploymentOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CONCURRENCY_ASC" | "CONCURRENCY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "HANDLER_NAME_ASC" | "HANDLER_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IMAGE_ASC" | "IMAGE_DESC" | "IMAGE_VERSION_ASC" | "IMAGE_VERSION_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_AT_ASC" | "LAST_ERROR_AT_DESC" | "LAST_ERROR_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SCALE_MAX_ASC" | "SCALE_MAX_DESC" | "SCALE_MIN_ASC" | "SCALE_MIN_DESC" | "SERVICE_NAME_ASC" | "SERVICE_NAME_DESC" | "SERVICE_URL_ASC" | "SERVICE_URL_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TIMEOUT_SECONDS_ASC" | "TIMEOUT_SECONDS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformFunctionDeploymentEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEPLOYMENT_ID_ASC" | "DEPLOYMENT_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type PlatformFunctionExecutionLogOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "LOG_LEVEL_ASC" | "LOG_LEVEL_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
+export type PlatformFunctionInvocationAttemptOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ATTEMPT_ASC" | "ATTEMPT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "ERROR_DETAIL_ASC" | "ERROR_DETAIL_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "SUCCESS_ASC" | "SUCCESS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
+export type PlatformFunctionInvocationOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "API_BINDING_ID_ASC" | "API_BINDING_ID_DESC" | "CHANNEL_ASC" | "CHANNEL_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEFINITION_SCOPE_ASC" | "DEFINITION_SCOPE_DESC" | "DURATION_MS_ASC" | "DURATION_MS_DESC" | "ERROR_ASC" | "ERROR_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "GRAPH_EXECUTION_ID_ASC" | "GRAPH_EXECUTION_ID_DESC" | "ID_ASC" | "ID_DESC" | "JOB_ID_ASC" | "JOB_ID_DESC" | "NATURAL" | "PARENT_INVOCATION_ID_ASC" | "PARENT_INVOCATION_ID_DESC" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVENANCE_ASC" | "PROVENANCE_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STARTED_AT_ASC" | "STARTED_AT_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC";
+export type PlatformInfraCommitOrderBy = "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "COMMITTER_ID_ASC" | "COMMITTER_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "NATURAL" | "PARENT_IDS_ASC" | "PARENT_IDS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "TREE_ID_ASC" | "TREE_ID_DESC";
+export type PlatformInfraGetAllTreeNodesRecordsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "DATA_ASC" | "DATA_DESC" | "PATH_ASC" | "PATH_DESC";
+export type PlatformInfraObjectOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "KIDS_ASC" | "KIDS_DESC" | "KTREE_ASC" | "KTREE_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type PlatformInfraRefOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC";
+export type PlatformInfraStoreOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCOPE_ID_ASC" | "SCOPE_ID_DESC";
+export type PlatformNamespaceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "IS_MANAGED_ASC" | "IS_MANAGED_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "NAMESPACE_NAME_ASC" | "NAMESPACE_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformNamespaceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type PlatformResourceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type PlatformResourceDeclaredCapacityOrderBy = "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "IS_TRANSIENT_ASC" | "IS_TRANSIENT_DESC" | "KIND_ASC" | "KIND_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "POD_COUNT_MAX_ASC" | "POD_COUNT_MAX_DESC" | "POD_COUNT_MIN_ASC" | "POD_COUNT_MIN_DESC" | "SOURCE_ASC" | "SOURCE_DESC" | "SOURCE_ID_ASC" | "SOURCE_ID_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC";
+export type PlatformResourceDefinitionOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DEFAULT_SPEC_ASC" | "DEFAULT_SPEC_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STEP_UP_MIN_AGE_ASC" | "STEP_UP_MIN_AGE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type PlatformResourceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC";
+export type PlatformResourceInstallationOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARAMS_ASC" | "PARAMS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type PlatformResourceStatusCheckOrderBy = "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUESTED_AT_ASC" | "REQUESTED_AT_DESC" | "REQUESTED_BY_ASC" | "REQUESTED_BY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STATUS_ASC" | "STATUS_DESC";
+export type PlatformResourceUsageLogOrderBy = "CPU_MILLICORES_ASC" | "CPU_MILLICORES_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_SECONDS_ASC" | "INTERVAL_SECONDS_DESC" | "MEMORY_BYTES_ASC" | "MEMORY_BYTES_DESC" | "METRICS_ASC" | "METRICS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SAMPLED_AT_ASC" | "SAMPLED_AT_DESC" | "SOURCE_ASC" | "SOURCE_DESC";
+export type PlatformResourceUsageSummaryOrderBy = "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "ID_ASC" | "ID_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
+export type PlatformResourceUtilizationOrderBy = "AVG_MEMORY_BYTES_ASC" | "AVG_MEMORY_BYTES_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_PEAK_UTILIZATION_ASC" | "CPU_PEAK_UTILIZATION_DESC" | "CPU_REQUEST_HEADROOM_MILLICORES_ASC" | "CPU_REQUEST_HEADROOM_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "KIND_ASC" | "KIND_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_PEAK_UTILIZATION_ASC" | "MEMORY_PEAK_UTILIZATION_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MEMORY_REQUEST_HEADROOM_BYTES_ASC" | "MEMORY_REQUEST_HEADROOM_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
+export type PlatformResourcesHealthOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_DETAIL_ASC" | "STATUS_DETAIL_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type PlatformResourcesRequirementsStateOrderBy = "CONFIG_HASH_ASC" | "CONFIG_HASH_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NATURAL" | "REQUIREMENTS_HASH_ASC" | "REQUIREMENTS_HASH_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_HASH_ASC" | "SECRETS_HASH_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
+export type PlatformResourcesResolvedRequirementOrderBy = "ATOM_ID_ASC" | "ATOM_ID_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRESENT_ASC" | "PRESENT_DESC" | "REQUIRED_ASC" | "REQUIRED_DESC" | "REQUIREMENT_KIND_ASC" | "REQUIREMENT_KIND_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
+export type PlatformWebhookEndpointOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "HOST_ASC" | "HOST_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "REPLAY_WINDOW_SECONDS_ASC" | "REPLAY_WINDOW_SECONDS_DESC" | "SIGNING_SECRET_NAME_ASC" | "SIGNING_SECRET_NAME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type PlatformWebhookEventOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENDPOINT_ID_ASC" | "ENDPOINT_ID_DESC" | "ERROR_ASC" | "ERROR_DESC" | "EXTERNAL_EVENT_ID_ASC" | "EXTERNAL_EVENT_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "PROVIDER_TIMESTAMP_ASC" | "PROVIDER_TIMESTAMP_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type ResourceOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type ResourceDeclaredCapacityOrderBy = "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "IS_TRANSIENT_ASC" | "IS_TRANSIENT_DESC" | "KIND_ASC" | "KIND_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "POD_COUNT_MAX_ASC" | "POD_COUNT_MAX_DESC" | "POD_COUNT_MIN_ASC" | "POD_COUNT_MIN_DESC" | "SOURCE_ASC" | "SOURCE_DESC" | "SOURCE_ID_ASC" | "SOURCE_ID_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC";
+export type ResourceDefinitionOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_SPEC_ASC" | "DEFAULT_SPEC_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STEP_UP_MIN_AGE_ASC" | "STEP_UP_MIN_AGE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type ResourceEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC";
+export type ResourceInstallationOrderBy = "COMMIT_ID_ASC" | "COMMIT_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARAMS_ASC" | "PARAMS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REVISION_ASC" | "REVISION_DESC" | "SLUG_ASC" | "SLUG_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STORE_ID_ASC" | "STORE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type ResourceStatusCheckOrderBy = "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUESTED_AT_ASC" | "REQUESTED_AT_DESC" | "REQUESTED_BY_ASC" | "REQUESTED_BY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RESULT_ASC" | "RESULT_DESC" | "STATUS_ASC" | "STATUS_DESC";
+export type ResourceUsageLogOrderBy = "CPU_MILLICORES_ASC" | "CPU_MILLICORES_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_SECONDS_ASC" | "INTERVAL_SECONDS_DESC" | "MEMORY_BYTES_ASC" | "MEMORY_BYTES_DESC" | "METRICS_ASC" | "METRICS_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SAMPLED_AT_ASC" | "SAMPLED_AT_DESC" | "SOURCE_ASC" | "SOURCE_DESC";
+export type ResourceUsageSummaryOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "ID_ASC" | "ID_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
+export type ResourceUtilizationOrderBy = "AVG_MEMORY_BYTES_ASC" | "AVG_MEMORY_BYTES_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_PEAK_UTILIZATION_ASC" | "CPU_PEAK_UTILIZATION_DESC" | "CPU_REQUEST_HEADROOM_MILLICORES_ASC" | "CPU_REQUEST_HEADROOM_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "DATE_ASC" | "DATE_DESC" | "GB_SECONDS_ASC" | "GB_SECONDS_DESC" | "KIND_ASC" | "KIND_DESC" | "MAX_CPU_MILLICORES_ASC" | "MAX_CPU_MILLICORES_DESC" | "MAX_MEMORY_BYTES_ASC" | "MAX_MEMORY_BYTES_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_PEAK_UTILIZATION_ASC" | "MEMORY_PEAK_UTILIZATION_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "MEMORY_REQUEST_HEADROOM_BYTES_ASC" | "MEMORY_REQUEST_HEADROOM_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "RUNTIME_SECONDS_ASC" | "RUNTIME_SECONDS_DESC" | "SAMPLE_COUNT_ASC" | "SAMPLE_COUNT_DESC";
+export type ResourcesHealthOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CPU_LIMIT_MILLICORES_ASC" | "CPU_LIMIT_MILLICORES_DESC" | "CPU_REQUEST_MILLICORES_ASC" | "CPU_REQUEST_MILLICORES_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_COUNT_ASC" | "ERROR_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_ID_ASC" | "INSTALLATION_ID_DESC" | "INTEGRATIONS_ASC" | "INTEGRATIONS_DESC" | "KIND_ASC" | "KIND_DESC" | "LABELS_ASC" | "LABELS_DESC" | "LAST_ERROR_ASC" | "LAST_ERROR_DESC" | "LAST_HEARTBEAT_AT_ASC" | "LAST_HEARTBEAT_AT_DESC" | "MEMORY_LIMIT_BYTES_ASC" | "MEMORY_LIMIT_BYTES_DESC" | "MEMORY_REQUEST_BYTES_ASC" | "MEMORY_REQUEST_BYTES_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "REPLICAS_ASC" | "REPLICAS_DESC" | "REQUIRED_CONFIGS_ASC" | "REQUIRED_CONFIGS_DESC" | "REQUIRED_SECRETS_ASC" | "REQUIRED_SECRETS_DESC" | "RESOURCE_DEFINITION_ID_ASC" | "RESOURCE_DEFINITION_ID_DESC" | "SLUG_ASC" | "SLUG_DESC" | "SPEC_ASC" | "SPEC_DESC" | "STATUS_ASC" | "STATUS_DESC" | "STATUS_DETAIL_ASC" | "STATUS_DETAIL_DESC" | "STATUS_OBSERVED_ASC" | "STATUS_OBSERVED_DESC" | "STORAGE_CLASS_ASC" | "STORAGE_CLASS_DESC" | "STORAGE_SIZE_BYTES_ASC" | "STORAGE_SIZE_BYTES_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type ResourcesRequirementsStateOrderBy = "CONFIG_HASH_ASC" | "CONFIG_HASH_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NATURAL" | "REQUIREMENTS_HASH_ASC" | "REQUIREMENTS_HASH_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_HASH_ASC" | "SECRETS_HASH_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
+export type ResourcesResolvedRequirementOrderBy = "ATOM_ID_ASC" | "ATOM_ID_DESC" | "CONFIG_OBJECT_NAME_ASC" | "CONFIG_OBJECT_NAME_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRESENT_ASC" | "PRESENT_DESC" | "REQUIRED_ASC" | "REQUIRED_DESC" | "REQUIREMENT_KIND_ASC" | "REQUIREMENT_KIND_DESC" | "RESOURCE_ID_ASC" | "RESOURCE_ID_DESC" | "SECRETS_OBJECT_NAME_ASC" | "SECRETS_OBJECT_NAME_DESC" | "SLUG_ASC" | "SLUG_DESC";
+export type WebhookEndpointOrderBy = "ACTIVE_ASC" | "ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FUNCTION_DEFINITION_ID_ASC" | "FUNCTION_DEFINITION_ID_DESC" | "HOST_ASC" | "HOST_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_ID_ASC" | "NAMESPACE_ID_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "REPLAY_WINDOW_SECONDS_ASC" | "REPLAY_WINDOW_SECONDS_DESC" | "SIGNING_SECRET_NAME_ASC" | "SIGNING_SECRET_NAME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type WebhookEventOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENDPOINT_ID_ASC" | "ENDPOINT_ID_DESC" | "ERROR_ASC" | "ERROR_DESC" | "EXTERNAL_EVENT_ID_ASC" | "EXTERNAL_EVENT_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATION_CREATED_AT_ASC" | "INVOCATION_CREATED_AT_DESC" | "INVOCATION_ID_ASC" | "INVOCATION_ID_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "PROVIDER_TIMESTAMP_ASC" | "PROVIDER_TIMESTAMP_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
 // ============ CRUD Input Types ============
 export interface CreateDbPresetInput {
   clientMutationId?: string;
@@ -7431,48 +5756,6 @@ export interface UpdateDbPresetInput {
   dbPresetPatch: DbPresetPatch;
 }
 export interface DeleteDbPresetInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateDeclaredCapacityInput {
-  clientMutationId?: string;
-  declaredCapacity: {
-    cpuLimitMillicores?: string;
-    cpuRequestMillicores?: string;
-    installationId: string;
-    isTransient?: boolean;
-    kind?: string;
-    memoryLimitBytes?: string;
-    memoryRequestBytes?: string;
-    namespaceId: string;
-    podCountMax?: number;
-    podCountMin?: number;
-    source?: string;
-    sourceId: string;
-    storageSizeBytes?: string;
-  };
-}
-export interface DeclaredCapacityPatch {
-  cpuLimitMillicores?: string | null;
-  cpuRequestMillicores?: string | null;
-  installationId?: string | null;
-  isTransient?: boolean | null;
-  kind?: string | null;
-  memoryLimitBytes?: string | null;
-  memoryRequestBytes?: string | null;
-  namespaceId?: string | null;
-  podCountMax?: number | null;
-  podCountMin?: number | null;
-  source?: string | null;
-  sourceId?: string | null;
-  storageSizeBytes?: string | null;
-}
-export interface UpdateDeclaredCapacityInput {
-  clientMutationId?: string;
-  id: string;
-  declaredCapacityPatch: DeclaredCapacityPatch;
-}
-export interface DeleteDeclaredCapacityInput {
   clientMutationId?: string;
   id: string;
 }
@@ -7536,7 +5819,6 @@ export interface CreateFunctionDefinitionInput {
     scaleMin?: number;
     targetFunction?: string;
     targetSchema?: string;
-    taskIdentifier: string;
     timeoutSeconds?: number;
     volatile?: boolean;
   };
@@ -7575,7 +5857,6 @@ export interface FunctionDefinitionPatch {
   scaleMin?: number | null;
   targetFunction?: string | null;
   targetSchema?: string | null;
-  taskIdentifier?: string | null;
   timeoutSeconds?: number | null;
   volatile?: boolean | null;
 }
@@ -7978,6 +6259,44 @@ export interface DeleteFunctionGraphStoreInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateFunctionInvocationAttemptInput {
+  clientMutationId?: string;
+  functionInvocationAttempt: {
+    actorId?: string;
+    attempt: number;
+    databaseId: string;
+    durationMs?: number;
+    error?: string;
+    errorDetail?: Record<string, unknown>;
+    invocationCreatedAt: string;
+    invocationId: string;
+    startedAt?: string;
+    success: boolean;
+    taskIdentifier: string;
+  };
+}
+export interface FunctionInvocationAttemptPatch {
+  actorId?: string | null;
+  attempt?: number | null;
+  databaseId?: string | null;
+  durationMs?: number | null;
+  error?: string | null;
+  errorDetail?: Record<string, unknown> | null;
+  invocationCreatedAt?: string | null;
+  invocationId?: string | null;
+  startedAt?: string | null;
+  success?: boolean | null;
+  taskIdentifier?: string | null;
+}
+export interface UpdateFunctionInvocationAttemptInput {
+  clientMutationId?: string;
+  id: string;
+  functionInvocationAttemptPatch: FunctionInvocationAttemptPatch;
+}
+export interface DeleteFunctionInvocationAttemptInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionInvocationInput {
   clientMutationId?: string;
   functionInvocation: {
@@ -8271,48 +6590,6 @@ export interface DeleteNamespaceEventInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformDeclaredCapacityInput {
-  clientMutationId?: string;
-  platformDeclaredCapacity: {
-    cpuLimitMillicores?: string;
-    cpuRequestMillicores?: string;
-    installationId: string;
-    isTransient?: boolean;
-    kind?: string;
-    memoryLimitBytes?: string;
-    memoryRequestBytes?: string;
-    namespaceId: string;
-    podCountMax?: number;
-    podCountMin?: number;
-    source?: string;
-    sourceId: string;
-    storageSizeBytes?: string;
-  };
-}
-export interface PlatformDeclaredCapacityPatch {
-  cpuLimitMillicores?: string | null;
-  cpuRequestMillicores?: string | null;
-  installationId?: string | null;
-  isTransient?: boolean | null;
-  kind?: string | null;
-  memoryLimitBytes?: string | null;
-  memoryRequestBytes?: string | null;
-  namespaceId?: string | null;
-  podCountMax?: number | null;
-  podCountMin?: number | null;
-  source?: string | null;
-  sourceId?: string | null;
-  storageSizeBytes?: string | null;
-}
-export interface UpdatePlatformDeclaredCapacityInput {
-  clientMutationId?: string;
-  id: string;
-  platformDeclaredCapacityPatch: PlatformDeclaredCapacityPatch;
-}
-export interface DeletePlatformDeclaredCapacityInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreatePlatformFunctionApiBindingInput {
   clientMutationId?: string;
   platformFunctionApiBinding: {
@@ -8341,6 +6618,7 @@ export interface CreatePlatformFunctionDefinitionInput {
   clientMutationId?: string;
   platformFunctionDefinition: {
     accessChannels?: string[];
+    billable?: boolean;
     category: string;
     concurrency?: number;
     description?: string;
@@ -8370,15 +6648,16 @@ export interface CreatePlatformFunctionDefinitionInput {
     runtime?: string;
     scaleMax?: number;
     scaleMin?: number;
+    system?: boolean;
     targetFunction?: string;
     targetSchema?: string;
-    taskIdentifier: string;
     timeoutSeconds?: number;
     volatile?: boolean;
   };
 }
 export interface PlatformFunctionDefinitionPatch {
   accessChannels?: string[] | null;
+  billable?: boolean | null;
   category?: string | null;
   concurrency?: number | null;
   description?: string | null;
@@ -8408,9 +6687,9 @@ export interface PlatformFunctionDefinitionPatch {
   runtime?: string | null;
   scaleMax?: number | null;
   scaleMin?: number | null;
+  system?: boolean | null;
   targetFunction?: string | null;
   targetSchema?: string | null;
-  taskIdentifier?: string | null;
   timeoutSeconds?: number | null;
   volatile?: boolean | null;
 }
@@ -8526,6 +6805,42 @@ export interface UpdatePlatformFunctionExecutionLogInput {
   platformFunctionExecutionLogPatch: PlatformFunctionExecutionLogPatch;
 }
 export interface DeletePlatformFunctionExecutionLogInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformFunctionInvocationAttemptInput {
+  clientMutationId?: string;
+  platformFunctionInvocationAttempt: {
+    actorId?: string;
+    attempt: number;
+    durationMs?: number;
+    error?: string;
+    errorDetail?: Record<string, unknown>;
+    invocationCreatedAt: string;
+    invocationId: string;
+    startedAt?: string;
+    success: boolean;
+    taskIdentifier: string;
+  };
+}
+export interface PlatformFunctionInvocationAttemptPatch {
+  actorId?: string | null;
+  attempt?: number | null;
+  durationMs?: number | null;
+  error?: string | null;
+  errorDetail?: Record<string, unknown> | null;
+  invocationCreatedAt?: string | null;
+  invocationId?: string | null;
+  startedAt?: string | null;
+  success?: boolean | null;
+  taskIdentifier?: string | null;
+}
+export interface UpdatePlatformFunctionInvocationAttemptInput {
+  clientMutationId?: string;
+  id: string;
+  platformFunctionInvocationAttemptPatch: PlatformFunctionInvocationAttemptPatch;
+}
+export interface DeletePlatformFunctionInvocationAttemptInput {
   clientMutationId?: string;
   id: string;
 }
@@ -8815,6 +7130,48 @@ export interface DeletePlatformResourceInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePlatformResourceDeclaredCapacityInput {
+  clientMutationId?: string;
+  platformResourceDeclaredCapacity: {
+    cpuLimitMillicores?: string;
+    cpuRequestMillicores?: string;
+    installationId: string;
+    isTransient?: boolean;
+    kind?: string;
+    memoryLimitBytes?: string;
+    memoryRequestBytes?: string;
+    namespaceId: string;
+    podCountMax?: number;
+    podCountMin?: number;
+    source?: string;
+    sourceId: string;
+    storageSizeBytes?: string;
+  };
+}
+export interface PlatformResourceDeclaredCapacityPatch {
+  cpuLimitMillicores?: string | null;
+  cpuRequestMillicores?: string | null;
+  installationId?: string | null;
+  isTransient?: boolean | null;
+  kind?: string | null;
+  memoryLimitBytes?: string | null;
+  memoryRequestBytes?: string | null;
+  namespaceId?: string | null;
+  podCountMax?: number | null;
+  podCountMin?: number | null;
+  source?: string | null;
+  sourceId?: string | null;
+  storageSizeBytes?: string | null;
+}
+export interface UpdatePlatformResourceDeclaredCapacityInput {
+  clientMutationId?: string;
+  id: string;
+  platformResourceDeclaredCapacityPatch: PlatformResourceDeclaredCapacityPatch;
+}
+export interface DeletePlatformResourceDeclaredCapacityInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreatePlatformResourceDefinitionInput {
   clientMutationId?: string;
   platformResourceDefinition: {
@@ -9013,9 +7370,9 @@ export interface DeletePlatformResourceUsageSummaryInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformResourceUtilizationDailyInput {
+export interface CreatePlatformResourceUtilizationInput {
   clientMutationId?: string;
-  platformResourceUtilizationDaily: {
+  platformResourceUtilization: {
     avgMemoryBytes?: string;
     cpuLimitMillicores?: string;
     cpuPeakUtilization?: string;
@@ -9037,7 +7394,7 @@ export interface CreatePlatformResourceUtilizationDailyInput {
     sampleCount?: number;
   };
 }
-export interface PlatformResourceUtilizationDailyPatch {
+export interface PlatformResourceUtilizationPatch {
   avgMemoryBytes?: string | null;
   cpuLimitMillicores?: string | null;
   cpuPeakUtilization?: string | null;
@@ -9058,12 +7415,12 @@ export interface PlatformResourceUtilizationDailyPatch {
   runtimeSeconds?: string | null;
   sampleCount?: number | null;
 }
-export interface UpdatePlatformResourceUtilizationDailyInput {
+export interface UpdatePlatformResourceUtilizationInput {
   clientMutationId?: string;
   id: string;
-  platformResourceUtilizationDailyPatch: PlatformResourceUtilizationDailyPatch;
+  platformResourceUtilizationPatch: PlatformResourceUtilizationPatch;
 }
-export interface DeletePlatformResourceUtilizationDailyInput {
+export interface DeletePlatformResourceUtilizationInput {
   clientMutationId?: string;
   id: string;
 }
@@ -9329,6 +7686,48 @@ export interface DeleteResourceInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateResourceDeclaredCapacityInput {
+  clientMutationId?: string;
+  resourceDeclaredCapacity: {
+    cpuLimitMillicores?: string;
+    cpuRequestMillicores?: string;
+    installationId: string;
+    isTransient?: boolean;
+    kind?: string;
+    memoryLimitBytes?: string;
+    memoryRequestBytes?: string;
+    namespaceId: string;
+    podCountMax?: number;
+    podCountMin?: number;
+    source?: string;
+    sourceId: string;
+    storageSizeBytes?: string;
+  };
+}
+export interface ResourceDeclaredCapacityPatch {
+  cpuLimitMillicores?: string | null;
+  cpuRequestMillicores?: string | null;
+  installationId?: string | null;
+  isTransient?: boolean | null;
+  kind?: string | null;
+  memoryLimitBytes?: string | null;
+  memoryRequestBytes?: string | null;
+  namespaceId?: string | null;
+  podCountMax?: number | null;
+  podCountMin?: number | null;
+  source?: string | null;
+  sourceId?: string | null;
+  storageSizeBytes?: string | null;
+}
+export interface UpdateResourceDeclaredCapacityInput {
+  clientMutationId?: string;
+  id: string;
+  resourceDeclaredCapacityPatch: ResourceDeclaredCapacityPatch;
+}
+export interface DeleteResourceDeclaredCapacityInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateResourceDefinitionInput {
   clientMutationId?: string;
   resourceDefinition: {
@@ -9539,9 +7938,9 @@ export interface DeleteResourceUsageSummaryInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateResourceUtilizationDailyInput {
+export interface CreateResourceUtilizationInput {
   clientMutationId?: string;
-  resourceUtilizationDaily: {
+  resourceUtilization: {
     avgMemoryBytes?: string;
     cpuLimitMillicores?: string;
     cpuPeakUtilization?: string;
@@ -9563,7 +7962,7 @@ export interface CreateResourceUtilizationDailyInput {
     sampleCount?: number;
   };
 }
-export interface ResourceUtilizationDailyPatch {
+export interface ResourceUtilizationPatch {
   avgMemoryBytes?: string | null;
   cpuLimitMillicores?: string | null;
   cpuPeakUtilization?: string | null;
@@ -9584,12 +7983,12 @@ export interface ResourceUtilizationDailyPatch {
   runtimeSeconds?: string | null;
   sampleCount?: number | null;
 }
-export interface UpdateResourceUtilizationDailyInput {
+export interface UpdateResourceUtilizationInput {
   clientMutationId?: string;
   id: string;
-  resourceUtilizationDailyPatch: ResourceUtilizationDailyPatch;
+  resourceUtilizationPatch: ResourceUtilizationPatch;
 }
-export interface DeleteResourceUtilizationDailyInput {
+export interface DeleteResourceUtilizationInput {
   clientMutationId?: string;
   id: string;
 }
@@ -9807,62 +8206,62 @@ export interface DeleteWebhookEventInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  FunctionApiBinding: {
-    functionInvocationsByApiBindingId: 'FunctionInvocation',
+  "FunctionApiBinding": {
+    "functionInvocationsByApiBindingId": "FunctionInvocation"
   },
-  FunctionDefinition: {
-    functionApiBindings: 'FunctionApiBinding',
-    webhookEndpoints: 'WebhookEndpoint',
+  "FunctionDefinition": {
+    "functionApiBindings": "FunctionApiBinding",
+    "webhookEndpoints": "WebhookEndpoint"
   },
-  FunctionGraph: {
-    functionGraphExecutionsByGraphId: 'FunctionGraphExecution',
-    platformFunctionDefinitionsByGraphId: 'PlatformFunctionDefinition',
+  "FunctionGraph": {
+    "functionGraphExecutionsByGraphId": "FunctionGraphExecution",
+    "platformFunctionDefinitionsByGraphId": "PlatformFunctionDefinition"
   },
-  Namespace: {
-    functionDeployments: 'FunctionDeployment',
-    resourceDefinitions: 'ResourceDefinition',
-    resourceInstallations: 'ResourceInstallation',
-    resources: 'Resource',
-    webhookEndpoints: 'WebhookEndpoint',
+  "Namespace": {
+    "functionDeployments": "FunctionDeployment",
+    "resourceDefinitions": "ResourceDefinition",
+    "resourceInstallations": "ResourceInstallation",
+    "resources": "Resource",
+    "webhookEndpoints": "WebhookEndpoint"
   },
-  PlatformFunctionApiBinding: {
-    platformFunctionInvocationsByApiBindingId: 'PlatformFunctionInvocation',
+  "PlatformFunctionApiBinding": {
+    "platformFunctionInvocationsByApiBindingId": "PlatformFunctionInvocation"
   },
-  PlatformFunctionDefinition: {
-    platformFunctionApiBindingsByFunctionDefinitionId: 'PlatformFunctionApiBinding',
-    platformWebhookEndpointsByFunctionDefinitionId: 'PlatformWebhookEndpoint',
+  "PlatformFunctionDefinition": {
+    "platformFunctionApiBindingsByFunctionDefinitionId": "PlatformFunctionApiBinding",
+    "platformWebhookEndpointsByFunctionDefinitionId": "PlatformWebhookEndpoint"
   },
-  PlatformNamespace: {
-    platformFunctionDeploymentsByNamespaceId: 'PlatformFunctionDeployment',
-    platformResourceDefinitionsByNamespaceId: 'PlatformResourceDefinition',
-    platformResourceInstallationsByNamespaceId: 'PlatformResourceInstallation',
-    platformResourcesByNamespaceId: 'PlatformResource',
-    platformWebhookEndpointsByNamespaceId: 'PlatformWebhookEndpoint',
+  "PlatformNamespace": {
+    "platformFunctionDeploymentsByNamespaceId": "PlatformFunctionDeployment",
+    "platformResourceDefinitionsByNamespaceId": "PlatformResourceDefinition",
+    "platformResourceInstallationsByNamespaceId": "PlatformResourceInstallation",
+    "platformResourcesByNamespaceId": "PlatformResource",
+    "platformWebhookEndpointsByNamespaceId": "PlatformWebhookEndpoint"
   },
-  PlatformResource: {
-    platformResourceStatusChecksByResourceId: 'PlatformResourceStatusCheck',
+  "PlatformResource": {
+    "platformResourceStatusChecksByResourceId": "PlatformResourceStatusCheck"
   },
-  PlatformResourceDefinition: {
-    platformResourcesByResourceDefinitionId: 'PlatformResource',
+  "PlatformResourceDefinition": {
+    "platformResourcesByResourceDefinitionId": "PlatformResource"
   },
-  PlatformResourceInstallation: {
-    platformResourcesByInstallationId: 'PlatformResource',
+  "PlatformResourceInstallation": {
+    "platformResourcesByInstallationId": "PlatformResource"
   },
-  PlatformWebhookEndpoint: {
-    platformWebhookEventsByEndpointId: 'PlatformWebhookEvent',
+  "PlatformWebhookEndpoint": {
+    "platformWebhookEventsByEndpointId": "PlatformWebhookEvent"
   },
-  Resource: {
-    resourceStatusChecks: 'ResourceStatusCheck',
+  "Resource": {
+    "resourceStatusChecks": "ResourceStatusCheck"
   },
-  ResourceDefinition: {
-    resources: 'Resource',
+  "ResourceDefinition": {
+    "resources": "Resource"
   },
-  ResourceInstallation: {
-    resourcesByInstallationId: 'Resource',
+  "ResourceInstallation": {
+    "resourcesByInstallationId": "Resource"
   },
-  WebhookEndpoint: {
-    webhookEventsByEndpointId: 'WebhookEvent',
-  },
+  "WebhookEndpoint": {
+    "webhookEventsByEndpointId": "WebhookEvent"
+  }
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface AddEdgeInput {
@@ -9986,24 +8385,24 @@ export interface PlatformInfraSetDataAtPathInput {
 }
 export interface PlatformResourceInstallationsInstallInput {
   clientMutationId?: string;
-  pName?: string;
-  pNamespaceId?: string;
-  pParams?: Record<string, unknown>;
-  pSlug?: string;
+  name?: string;
+  namespaceId?: string;
+  newParams?: Record<string, unknown>;
+  slug?: string;
 }
 export interface PlatformResourceInstallationsRollbackInput {
   clientMutationId?: string;
-  pCommitId?: string;
-  pInstallationId?: string;
+  commitId?: string;
+  targetInstallationId?: string;
 }
 export interface PlatformResourceInstallationsUninstallInput {
   clientMutationId?: string;
-  pInstallationId?: string;
+  targetInstallationId?: string;
 }
 export interface PlatformResourceInstallationsUpgradeInput {
   clientMutationId?: string;
-  pInstallationId?: string;
-  pParams?: Record<string, unknown>;
+  newParams?: Record<string, unknown>;
+  targetInstallationId?: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -10016,24 +8415,24 @@ export interface ProvisionBucketInput {
 }
 export interface ResourceInstallationsInstallInput {
   clientMutationId?: string;
-  pName?: string;
-  pNamespaceId?: string;
-  pParams?: Record<string, unknown>;
-  pSlug?: string;
+  name?: string;
+  namespaceId?: string;
+  newParams?: Record<string, unknown>;
+  slug?: string;
 }
 export interface ResourceInstallationsRollbackInput {
   clientMutationId?: string;
-  pCommitId?: string;
-  pInstallationId?: string;
+  commitId?: string;
+  targetInstallationId?: string;
 }
 export interface ResourceInstallationsUninstallInput {
   clientMutationId?: string;
-  pInstallationId?: string;
+  targetInstallationId?: string;
 }
 export interface ResourceInstallationsUpgradeInput {
   clientMutationId?: string;
-  pInstallationId?: string;
-  pParams?: Record<string, unknown>;
+  newParams?: Record<string, unknown>;
+  targetInstallationId?: string;
 }
 export interface SaveGraphInput {
   clientMutationId?: string;
@@ -10483,8 +8882,6 @@ export interface FunctionDefinitionInput {
   targetFunction?: string;
   /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
   targetSchema?: string;
-  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
-  taskIdentifier: string;
   /** Knative request timeout in seconds */
   timeoutSeconds?: number;
   updatedAt?: string;
@@ -10756,6 +9153,35 @@ export interface FunctionGraphStoreInput {
   /** Opaque store partition key for the global tier */
   scopeId: string;
 }
+/** An input for mutations affecting `FunctionInvocationAttempt` */
+export interface FunctionInvocationAttemptInput {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string;
+  /** 1-based attempt number for this invocation */
+  attempt: number;
+  /** When the attempt result was recorded (partition key) */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Wall-clock attempt time in milliseconds */
+  durationMs?: number;
+  /** Error message when the attempt failed */
+  error?: string;
+  /** Structured error context (stack, code, provider response) */
+  errorDetail?: Record<string, unknown>;
+  /** Unique attempt identifier */
+  id?: string;
+  /** created_at of the referenced invocation (partition-pruned lookups against the invocations PK) */
+  invocationCreatedAt: string;
+  /** Invocation this attempt belongs to (soft reference paired with invocation_created_at) */
+  invocationId: string;
+  /** When the attempt began executing */
+  startedAt?: string;
+  /** Whether this attempt completed successfully */
+  success: boolean;
+  /** Function routing slug (denormalized from the invocation) */
+  taskIdentifier: string;
+}
 /** An input for mutations affecting `FunctionInvocation` */
 export interface FunctionInvocationInput {
   /** Who triggered the invocation (NULL for system/cron) */
@@ -10774,7 +9200,7 @@ export interface FunctionInvocationInput {
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number;
-  /** Error message when status is failed */
+  /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
   functionDefinitionId?: string;
@@ -10794,7 +9220,7 @@ export interface FunctionInvocationInput {
   result?: Record<string, unknown>;
   /** When execution started */
   startedAt?: string;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
+  /** Lifecycle: pending → running → completed/failed/cancelled; skipped = never ran (a gate rejected the intended run) */
   status?: string;
   /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
   taskIdentifier: string;
@@ -10946,6 +9372,8 @@ export interface PlatformFunctionApiBindingInput {
 export interface PlatformFunctionDefinitionInput {
   /** Invocation channels this function may be exposed through (api, graph, cron, sync, webhook). Internal worker dispatch is implicit and never listed. Default [] = worker only. */
   accessChannels?: string[];
+  /** Whether executions are metered through the invocation ledger and billing quota gate */
+  billable?: boolean;
   /** Function task category (e.g. email, embed, chunk, custom) */
   category: string;
   /** Knative containerConcurrency — max concurrent requests per pod instance */
@@ -11006,12 +9434,12 @@ export interface PlatformFunctionDefinitionInput {
   scaleMax?: number;
   /** Minimum pod count for Knative autoscaling (minScale) */
   scaleMin?: number;
+  /** Platform system definition: its task_identifier cannot be shadowed by non-platform registration */
+  system?: boolean;
   /** Name of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
   targetFunction?: string;
   /** Schema of the SQL function to invoke when runtime=sql (direct mode). NULL for module mode and other runtimes. */
   targetSchema?: string;
-  /** Computed routing slug: category:name (used by Knative job worker for dispatch) */
-  taskIdentifier: string;
   /** Knative request timeout in seconds */
   timeoutSeconds?: number;
   updatedAt?: string;
@@ -11096,6 +9524,33 @@ export interface PlatformFunctionExecutionLogInput {
   /** Function routing key (NULL for generic job logs) */
   taskIdentifier?: string;
 }
+/** An input for mutations affecting `PlatformFunctionInvocationAttempt` */
+export interface PlatformFunctionInvocationAttemptInput {
+  /** Who triggered the invocation (NULL for system/cron) */
+  actorId?: string;
+  /** 1-based attempt number for this invocation */
+  attempt: number;
+  /** When the attempt result was recorded (partition key) */
+  createdAt?: string;
+  /** Wall-clock attempt time in milliseconds */
+  durationMs?: number;
+  /** Error message when the attempt failed */
+  error?: string;
+  /** Structured error context (stack, code, provider response) */
+  errorDetail?: Record<string, unknown>;
+  /** Unique attempt identifier */
+  id?: string;
+  /** created_at of the referenced invocation (partition-pruned lookups against the invocations PK) */
+  invocationCreatedAt: string;
+  /** Invocation this attempt belongs to (soft reference paired with invocation_created_at) */
+  invocationId: string;
+  /** When the attempt began executing */
+  startedAt?: string;
+  /** Whether this attempt completed successfully */
+  success: boolean;
+  /** Function routing slug (denormalized from the invocation) */
+  taskIdentifier: string;
+}
 /** An input for mutations affecting `PlatformFunctionInvocation` */
 export interface PlatformFunctionInvocationInput {
   /** Who triggered the invocation (NULL for system/cron) */
@@ -11112,7 +9567,7 @@ export interface PlatformFunctionInvocationInput {
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
   durationMs?: number;
-  /** Error message when status is failed */
+  /** Error message when status is failed, or the reason the run was skipped when status is skipped */
   error?: string;
   /** Function definition this invocation ran (soft cross-scope ref; paired with definition_scope). task_identifier stays as the audit slug. */
   functionDefinitionId?: string;
@@ -11132,7 +9587,7 @@ export interface PlatformFunctionInvocationInput {
   result?: Record<string, unknown>;
   /** When execution started */
   startedAt?: string;
-  /** Lifecycle: pending → running → completed/failed/cancelled */
+  /** Lifecycle: pending → running → completed/failed/cancelled; skipped = never ran (a gate rejected the intended run) */
   status?: string;
   /** Function routing slug (category:name). Denormalized from the definition — must match the row referenced by function_definition_id when that is set. */
   taskIdentifier: string;
@@ -11253,7 +9708,7 @@ export interface PlatformResourceInput {
   installationId?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[];
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer */
   kind: string;
   /** Key/value pairs for selecting and filtering resources */
   labels?: Record<string, unknown>;
@@ -11295,7 +9750,7 @@ export interface PlatformResourceDefinitionInput {
   id?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[];
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer, or custom kinds */
   kind: string;
   /** Key/value pairs for selecting and filtering definitions */
   labels?: Record<string, unknown>;
@@ -11409,7 +9864,7 @@ export interface PlatformResourceUsageLogInput {
   resourceId?: string;
   /** Sample timestamp (partition key) — end of the measured interval */
   sampledAt?: string;
-  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  /** Sample producer: self (workload heartbeat), observer (reconciler), or prometheus (namespace-grain usage collector) */
   source: string;
 }
 /** An input for mutations affecting `PlatformResourceUsageSummary` */
@@ -11496,7 +9951,7 @@ export interface ResourceInput {
   installationId?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[];
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer */
   kind: string;
   /** Key/value pairs for selecting and filtering resources */
   labels?: Record<string, unknown>;
@@ -11540,7 +9995,7 @@ export interface ResourceDefinitionInput {
   id?: string;
   /** Provider slugs (e.g. mailgun, postgres) associated with this resource definition. The UI uses this to auto-fill required_secrets and required_configs from integration_providers. */
   integrations?: string[];
-  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, or custom kinds */
+  /** Resource kind: Deployment, StatefulSet, Job, Service, Ingress, Certificate, ClusterIssuer, or custom kinds */
   kind: string;
   /** Key/value pairs for selecting and filtering definitions */
   labels?: Record<string, unknown>;
@@ -11643,7 +10098,7 @@ export interface ResourceUsageLogInput {
   resourceId?: string;
   /** Sample timestamp (partition key) — end of the measured interval */
   sampledAt?: string;
-  /** Sample producer: self (workload heartbeat) or observer (reconciler) */
+  /** Sample producer: self (workload heartbeat), observer (reconciler), or prometheus (namespace-grain usage collector) */
   source: string;
 }
 /** An input for mutations affecting `ResourceUsageSummary` */
@@ -11925,6 +10380,8 @@ export interface PlatformFunctionDefinitionFilter {
   accessChannels?: StringListFilter;
   /** Checks for all expressions in this list. */
   and?: PlatformFunctionDefinitionFilter[];
+  /** Filter by the object’s `billable` field. */
+  billable?: BooleanFilter;
   /** Filter by the object’s `category` field. */
   category?: StringFilter;
   /** Filter by the object’s `concurrency` field. */
@@ -12007,6 +10464,8 @@ export interface PlatformFunctionDefinitionFilter {
   scaleMax?: IntFilter;
   /** Filter by the object’s `scaleMin` field. */
   scaleMin?: IntFilter;
+  /** Filter by the object’s `system` field. */
+  system?: BooleanFilter;
   /** Filter by the object’s `targetFunction` field. */
   targetFunction?: StringFilter;
   /** Filter by the object’s `targetSchema` field. */
@@ -14069,6 +12528,51 @@ export type DeleteFunctionGraphStorePayloadSelect = {
     select: FunctionGraphStoreEdgeSelect;
   };
 };
+export interface CreateFunctionInvocationAttemptPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionInvocationAttempt` that was created by this mutation. */
+  functionInvocationAttempt?: FunctionInvocationAttempt | null;
+  functionInvocationAttemptEdge?: FunctionInvocationAttemptEdge | null;
+}
+export type CreateFunctionInvocationAttemptPayloadSelect = {
+  clientMutationId?: boolean;
+  functionInvocationAttempt?: {
+    select: FunctionInvocationAttemptSelect;
+  };
+  functionInvocationAttemptEdge?: {
+    select: FunctionInvocationAttemptEdgeSelect;
+  };
+};
+export interface UpdateFunctionInvocationAttemptPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionInvocationAttempt` that was updated by this mutation. */
+  functionInvocationAttempt?: FunctionInvocationAttempt | null;
+  functionInvocationAttemptEdge?: FunctionInvocationAttemptEdge | null;
+}
+export type UpdateFunctionInvocationAttemptPayloadSelect = {
+  clientMutationId?: boolean;
+  functionInvocationAttempt?: {
+    select: FunctionInvocationAttemptSelect;
+  };
+  functionInvocationAttemptEdge?: {
+    select: FunctionInvocationAttemptEdgeSelect;
+  };
+};
+export interface DeleteFunctionInvocationAttemptPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionInvocationAttempt` that was deleted by this mutation. */
+  functionInvocationAttempt?: FunctionInvocationAttempt | null;
+  functionInvocationAttemptEdge?: FunctionInvocationAttemptEdge | null;
+}
+export type DeleteFunctionInvocationAttemptPayloadSelect = {
+  clientMutationId?: boolean;
+  functionInvocationAttempt?: {
+    select: FunctionInvocationAttemptSelect;
+  };
+  functionInvocationAttemptEdge?: {
+    select: FunctionInvocationAttemptEdgeSelect;
+  };
+};
 export interface CreateFunctionInvocationPayload {
   clientMutationId?: string | null;
   /** The `FunctionInvocation` that was created by this mutation. */
@@ -14652,6 +13156,51 @@ export type DeletePlatformFunctionExecutionLogPayloadSelect = {
   };
   platformFunctionExecutionLogEdge?: {
     select: PlatformFunctionExecutionLogEdgeSelect;
+  };
+};
+export interface CreatePlatformFunctionInvocationAttemptPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionInvocationAttempt` that was created by this mutation. */
+  platformFunctionInvocationAttempt?: PlatformFunctionInvocationAttempt | null;
+  platformFunctionInvocationAttemptEdge?: PlatformFunctionInvocationAttemptEdge | null;
+}
+export type CreatePlatformFunctionInvocationAttemptPayloadSelect = {
+  clientMutationId?: boolean;
+  platformFunctionInvocationAttempt?: {
+    select: PlatformFunctionInvocationAttemptSelect;
+  };
+  platformFunctionInvocationAttemptEdge?: {
+    select: PlatformFunctionInvocationAttemptEdgeSelect;
+  };
+};
+export interface UpdatePlatformFunctionInvocationAttemptPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionInvocationAttempt` that was updated by this mutation. */
+  platformFunctionInvocationAttempt?: PlatformFunctionInvocationAttempt | null;
+  platformFunctionInvocationAttemptEdge?: PlatformFunctionInvocationAttemptEdge | null;
+}
+export type UpdatePlatformFunctionInvocationAttemptPayloadSelect = {
+  clientMutationId?: boolean;
+  platformFunctionInvocationAttempt?: {
+    select: PlatformFunctionInvocationAttemptSelect;
+  };
+  platformFunctionInvocationAttemptEdge?: {
+    select: PlatformFunctionInvocationAttemptEdgeSelect;
+  };
+};
+export interface DeletePlatformFunctionInvocationAttemptPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformFunctionInvocationAttempt` that was deleted by this mutation. */
+  platformFunctionInvocationAttempt?: PlatformFunctionInvocationAttempt | null;
+  platformFunctionInvocationAttemptEdge?: PlatformFunctionInvocationAttemptEdge | null;
+}
+export type DeletePlatformFunctionInvocationAttemptPayloadSelect = {
+  clientMutationId?: boolean;
+  platformFunctionInvocationAttempt?: {
+    select: PlatformFunctionInvocationAttemptSelect;
+  };
+  platformFunctionInvocationAttemptEdge?: {
+    select: PlatformFunctionInvocationAttemptEdgeSelect;
   };
 };
 export interface CreatePlatformFunctionInvocationPayload {
@@ -15947,6 +14496,18 @@ export type FunctionGraphStoreEdgeSelect = {
     select: FunctionGraphStoreSelect;
   };
 };
+/** A `FunctionInvocationAttempt` edge in the connection. */
+export interface FunctionInvocationAttemptEdge {
+  cursor?: string | null;
+  /** The `FunctionInvocationAttempt` at the end of the edge. */
+  node?: FunctionInvocationAttempt | null;
+}
+export type FunctionInvocationAttemptEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: FunctionInvocationAttemptSelect;
+  };
+};
 /** A `FunctionInvocation` edge in the connection. */
 export interface FunctionInvocationEdge {
   cursor?: string | null;
@@ -16101,6 +14662,18 @@ export type PlatformFunctionExecutionLogEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformFunctionExecutionLogSelect;
+  };
+};
+/** A `PlatformFunctionInvocationAttempt` edge in the connection. */
+export interface PlatformFunctionInvocationAttemptEdge {
+  cursor?: string | null;
+  /** The `PlatformFunctionInvocationAttempt` at the end of the edge. */
+  node?: PlatformFunctionInvocationAttempt | null;
+}
+export type PlatformFunctionInvocationAttemptEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformFunctionInvocationAttemptSelect;
   };
 };
 /** A `PlatformFunctionInvocation` edge in the connection. */

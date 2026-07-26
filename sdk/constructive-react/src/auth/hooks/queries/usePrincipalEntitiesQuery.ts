@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { principalEntityKeys } from '../query-keys';
-import type {
-  PrincipalEntitySelect,
-  PrincipalEntityWithRelations,
-  PrincipalEntityFilter,
-  PrincipalEntityOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PrincipalEntitySelect,
-  PrincipalEntityWithRelations,
-  PrincipalEntityFilter,
-  PrincipalEntityOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { principalEntityKeys } from "../query-keys";
+import type { PrincipalEntitySelect, PrincipalEntityWithRelations, PrincipalEntityFilter, PrincipalEntityOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PrincipalEntitySelect, PrincipalEntityWithRelations, PrincipalEntityFilter, PrincipalEntityOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const principalEntitiesQueryKey = principalEntityKeys.list;
 /**
  * Association table scoping principals to specific organizations
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePrincipalEntitiesQuery({
@@ -45,53 +30,33 @@ export const principalEntitiesQueryKey = principalEntityKeys.list;
  * });
  * ```
  */
-export function usePrincipalEntitiesQuery<
-  S extends PrincipalEntitySelect,
-  TData = {
-    principalEntities: ConnectionResult<InferSelectResult<PrincipalEntityWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PrincipalEntityFilter, PrincipalEntityOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        principalEntities: ConnectionResult<InferSelectResult<PrincipalEntityWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePrincipalEntitiesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PrincipalEntitySelect,
-      PrincipalEntityFilter,
-      PrincipalEntityOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PrincipalEntitySelect,
-    PrincipalEntityFilter,
-    PrincipalEntityOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePrincipalEntitiesQuery<S extends PrincipalEntitySelect, TData = {
+  principalEntities: ConnectionResult<InferSelectResult<PrincipalEntityWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PrincipalEntityFilter, PrincipalEntityOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
+} & Omit<UseQueryOptions<{
+  principalEntities: ConnectionResult<InferSelectResult<PrincipalEntityWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePrincipalEntitiesQuery(params: {
+  selection: ListSelectionConfig<PrincipalEntitySelect, PrincipalEntityFilter, PrincipalEntityOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PrincipalEntitySelect, PrincipalEntityFilter, PrincipalEntityOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: principalEntityKeys.list(args),
     queryFn: () => getClient().principalEntity.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Association table scoping principals to specific organizations
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPrincipalEntitiesQuery({
@@ -105,59 +70,35 @@ export function usePrincipalEntitiesQuery(
 export async function fetchPrincipalEntitiesQuery<S extends PrincipalEntitySelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PrincipalEntityFilter, PrincipalEntityOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
+  } & Omit<ListSelectionConfig<S, PrincipalEntityFilter, PrincipalEntityOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
 }): Promise<{
   principalEntities: ConnectionResult<InferSelectResult<PrincipalEntityWithRelations, S>>;
 }>;
 export async function fetchPrincipalEntitiesQuery(params: {
-  selection: ListSelectionConfig<
-    PrincipalEntitySelect,
-    PrincipalEntityFilter,
-    PrincipalEntityOrderBy
-  >;
+  selection: ListSelectionConfig<PrincipalEntitySelect, PrincipalEntityFilter, PrincipalEntityOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PrincipalEntitySelect,
-    PrincipalEntityFilter,
-    PrincipalEntityOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PrincipalEntitySelect, PrincipalEntityFilter, PrincipalEntityOrderBy>(params.selection);
   return getClient().principalEntity.findMany(args).unwrap();
 }
 /**
  * Association table scoping principals to specific organizations
- *
+ * 
  * @example
  * ```ts
  * await prefetchPrincipalEntitiesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPrincipalEntitiesQuery<S extends PrincipalEntitySelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PrincipalEntityFilter, PrincipalEntityOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
-  }
-): Promise<void>;
-export async function prefetchPrincipalEntitiesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PrincipalEntitySelect,
-      PrincipalEntityFilter,
-      PrincipalEntityOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PrincipalEntitySelect,
-    PrincipalEntityFilter,
-    PrincipalEntityOrderBy
-  >(params.selection);
+export async function prefetchPrincipalEntitiesQuery<S extends PrincipalEntitySelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PrincipalEntityFilter, PrincipalEntityOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalEntitySelect>;
+}): Promise<void>;
+export async function prefetchPrincipalEntitiesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PrincipalEntitySelect, PrincipalEntityFilter, PrincipalEntityOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PrincipalEntitySelect, PrincipalEntityFilter, PrincipalEntityOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: principalEntityKeys.list(args),
-    queryFn: () => getClient().principalEntity.findMany(args).unwrap(),
+    queryFn: () => getClient().principalEntity.findMany(args).unwrap()
   });
 }

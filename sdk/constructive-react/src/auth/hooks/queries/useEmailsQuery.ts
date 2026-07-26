@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { emailKeys } from '../query-keys';
-import type {
-  EmailSelect,
-  EmailWithRelations,
-  EmailFilter,
-  EmailOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  EmailSelect,
-  EmailWithRelations,
-  EmailFilter,
-  EmailOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { emailKeys } from "../query-keys";
+import type { EmailSelect, EmailWithRelations, EmailFilter, EmailOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { EmailSelect, EmailWithRelations, EmailFilter, EmailOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const emailsQueryKey = emailKeys.list;
 /**
  * User email addresses with verification and primary-email management
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useEmailsQuery({
@@ -45,45 +30,33 @@ export const emailsQueryKey = emailKeys.list;
  * });
  * ```
  */
-export function useEmailsQuery<
-  S extends EmailSelect,
-  TData = {
-    emails: ConnectionResult<InferSelectResult<EmailWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, EmailFilter, EmailOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, EmailSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        emails: ConnectionResult<InferSelectResult<EmailWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useEmailsQuery(
-  params: {
-    selection: ListSelectionConfig<EmailSelect, EmailFilter, EmailOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useEmailsQuery<S extends EmailSelect, TData = {
+  emails: ConnectionResult<InferSelectResult<EmailWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, EmailFilter, EmailOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EmailSelect>;
+} & Omit<UseQueryOptions<{
+  emails: ConnectionResult<InferSelectResult<EmailWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useEmailsQuery(params: {
+  selection: ListSelectionConfig<EmailSelect, EmailFilter, EmailOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildListSelectionArgs<EmailSelect, EmailFilter, EmailOrderBy>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: emailKeys.list(args),
     queryFn: () => getClient().email.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * User email addresses with verification and primary-email management
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchEmailsQuery({
@@ -97,8 +70,7 @@ export function useEmailsQuery(
 export async function fetchEmailsQuery<S extends EmailSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, EmailFilter, EmailOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, EmailSelect>;
+  } & Omit<ListSelectionConfig<S, EmailFilter, EmailOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EmailSelect>;
 }): Promise<{
   emails: ConnectionResult<InferSelectResult<EmailWithRelations, S>>;
 }>;
@@ -110,30 +82,23 @@ export async function fetchEmailsQuery(params: {
 }
 /**
  * User email addresses with verification and primary-email management
- *
+ * 
  * @example
  * ```ts
  * await prefetchEmailsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchEmailsQuery<S extends EmailSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, EmailFilter, EmailOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, EmailSelect>;
-  }
-): Promise<void>;
-export async function prefetchEmailsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<EmailSelect, EmailFilter, EmailOrderBy>;
-  }
-): Promise<void> {
+export async function prefetchEmailsQuery<S extends EmailSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, EmailFilter, EmailOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, EmailSelect>;
+}): Promise<void>;
+export async function prefetchEmailsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<EmailSelect, EmailFilter, EmailOrderBy>;
+}): Promise<void> {
   const args = buildListSelectionArgs<EmailSelect, EmailFilter, EmailOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: emailKeys.list(args),
-    queryFn: () => getClient().email.findMany(args).unwrap(),
+    queryFn: () => getClient().email.findMany(args).unwrap()
   });
 }

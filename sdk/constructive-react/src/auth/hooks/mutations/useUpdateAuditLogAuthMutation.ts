@@ -4,88 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { auditLogAuthKeys } from '../query-keys';
-import { auditLogAuthMutationKeys } from '../mutation-keys';
-import type {
-  AuditLogAuthSelect,
-  AuditLogAuthWithRelations,
-  AuditLogAuthPatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  AuditLogAuthSelect,
-  AuditLogAuthWithRelations,
-  AuditLogAuthPatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { auditLogAuthKeys } from "../query-keys";
+import { auditLogAuthMutationKeys } from "../mutation-keys";
+import type { AuditLogAuthSelect, AuditLogAuthWithRelations, AuditLogAuthPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AuditLogAuthSelect, AuditLogAuthWithRelations, AuditLogAuthPatch } from "../../orm/input-types";
 /**
  * Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateAuditLogAuthMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', auditLogAuthPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateAuditLogAuthMutation<S extends AuditLogAuthSelect>(
-  params: {
-    selection: {
-      fields: S & AuditLogAuthSelect;
-    } & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateAuditLogAuth: {
-          auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        createdAt: string;
-        auditLogAuthPatch: AuditLogAuthPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateAuditLogAuth: {
-      auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    createdAt: string;
-    auditLogAuthPatch: AuditLogAuthPatch;
-  }
->;
-export function useUpdateAuditLogAuthMutation(
-  params: {
-    selection: SelectionConfig<AuditLogAuthSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        createdAt: string;
-        auditLogAuthPatch: AuditLogAuthPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateAuditLogAuthMutation<S extends AuditLogAuthSelect>(params: {
+  selection: ({
+    fields: S & AuditLogAuthSelect;
+  } & HookStrictSelect<NoInfer<S>, AuditLogAuthSelect>);
+} & Omit<UseMutationOptions<{
+  updateAuditLogAuth: {
+    auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+  auditLogAuthPatch: AuditLogAuthPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateAuditLogAuth: {
+    auditLogAuth: InferSelectResult<AuditLogAuthWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  createdAt: string;
+  auditLogAuthPatch: AuditLogAuthPatch;
+}>;
+export function useUpdateAuditLogAuthMutation(params: {
+  selection: SelectionConfig<AuditLogAuthSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  createdAt: string;
+  auditLogAuthPatch: AuditLogAuthPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<AuditLogAuthSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -93,30 +66,27 @@ export function useUpdateAuditLogAuthMutation(
     mutationFn: ({
       id,
       createdAt,
-      auditLogAuthPatch,
+      auditLogAuthPatch
     }: {
       id: string;
       createdAt: string;
       auditLogAuthPatch: AuditLogAuthPatch;
-    }) =>
-      getClient()
-        .auditLogAuth.update({
-          where: {
-            id,
-            createdAt,
-          },
-          data: auditLogAuthPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().auditLogAuth.update({
+      where: {
+        id,
+        createdAt
+      },
+      data: auditLogAuthPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: auditLogAuthKeys.detail(variables.id),
+        queryKey: auditLogAuthKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: auditLogAuthKeys.lists(),
+        queryKey: auditLogAuthKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

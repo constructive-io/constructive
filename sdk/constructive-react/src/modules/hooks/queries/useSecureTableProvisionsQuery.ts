@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { secureTableProvisionKeys } from '../query-keys';
-import type {
-  SecureTableProvisionSelect,
-  SecureTableProvisionWithRelations,
-  SecureTableProvisionFilter,
-  SecureTableProvisionOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  SecureTableProvisionSelect,
-  SecureTableProvisionWithRelations,
-  SecureTableProvisionFilter,
-  SecureTableProvisionOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { secureTableProvisionKeys } from "../query-keys";
+import type { SecureTableProvisionSelect, SecureTableProvisionWithRelations, SecureTableProvisionFilter, SecureTableProvisionOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { SecureTableProvisionSelect, SecureTableProvisionWithRelations, SecureTableProvisionFilter, SecureTableProvisionOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const secureTableProvisionsQueryKey = secureTableProvisionKeys.list;
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useSecureTableProvisionsQuery({
@@ -45,60 +30,33 @@ export const secureTableProvisionsQueryKey = secureTableProvisionKeys.list;
  * });
  * ```
  */
-export function useSecureTableProvisionsQuery<
-  S extends SecureTableProvisionSelect,
-  TData = {
-    secureTableProvisions: ConnectionResult<
-      InferSelectResult<SecureTableProvisionWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        secureTableProvisions: ConnectionResult<
-          InferSelectResult<SecureTableProvisionWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useSecureTableProvisionsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      SecureTableProvisionSelect,
-      SecureTableProvisionFilter,
-      SecureTableProvisionOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    SecureTableProvisionSelect,
-    SecureTableProvisionFilter,
-    SecureTableProvisionOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useSecureTableProvisionsQuery<S extends SecureTableProvisionSelect, TData = {
+  secureTableProvisions: ConnectionResult<InferSelectResult<SecureTableProvisionWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
+} & Omit<UseQueryOptions<{
+  secureTableProvisions: ConnectionResult<InferSelectResult<SecureTableProvisionWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useSecureTableProvisionsQuery(params: {
+  selection: ListSelectionConfig<SecureTableProvisionSelect, SecureTableProvisionFilter, SecureTableProvisionOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<SecureTableProvisionSelect, SecureTableProvisionFilter, SecureTableProvisionOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: secureTableProvisionKeys.list(args),
     queryFn: () => getClient().secureTableProvision.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchSecureTableProvisionsQuery({
@@ -109,70 +67,38 @@ export function useSecureTableProvisionsQuery(
  * });
  * ```
  */
-export async function fetchSecureTableProvisionsQuery<
-  S extends SecureTableProvisionSelect,
->(params: {
+export async function fetchSecureTableProvisionsQuery<S extends SecureTableProvisionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
+  } & Omit<ListSelectionConfig<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
 }): Promise<{
   secureTableProvisions: ConnectionResult<InferSelectResult<SecureTableProvisionWithRelations, S>>;
 }>;
 export async function fetchSecureTableProvisionsQuery(params: {
-  selection: ListSelectionConfig<
-    SecureTableProvisionSelect,
-    SecureTableProvisionFilter,
-    SecureTableProvisionOrderBy
-  >;
+  selection: ListSelectionConfig<SecureTableProvisionSelect, SecureTableProvisionFilter, SecureTableProvisionOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    SecureTableProvisionSelect,
-    SecureTableProvisionFilter,
-    SecureTableProvisionOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<SecureTableProvisionSelect, SecureTableProvisionFilter, SecureTableProvisionOrderBy>(params.selection);
   return getClient().secureTableProvision.findMany(args).unwrap();
 }
 /**
  * Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
- *
+ * 
  * @example
  * ```ts
  * await prefetchSecureTableProvisionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchSecureTableProvisionsQuery<S extends SecureTableProvisionSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
-  }
-): Promise<void>;
-export async function prefetchSecureTableProvisionsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      SecureTableProvisionSelect,
-      SecureTableProvisionFilter,
-      SecureTableProvisionOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    SecureTableProvisionSelect,
-    SecureTableProvisionFilter,
-    SecureTableProvisionOrderBy
-  >(params.selection);
+export async function prefetchSecureTableProvisionsQuery<S extends SecureTableProvisionSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, SecureTableProvisionSelect>;
+}): Promise<void>;
+export async function prefetchSecureTableProvisionsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<SecureTableProvisionSelect, SecureTableProvisionFilter, SecureTableProvisionOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<SecureTableProvisionSelect, SecureTableProvisionFilter, SecureTableProvisionOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: secureTableProvisionKeys.list(args),
-    queryFn: () => getClient().secureTableProvision.findMany(args).unwrap(),
+    queryFn: () => getClient().secureTableProvision.findMany(args).unwrap()
   });
 }

@@ -19,48 +19,34 @@
 // ============================================================================
 
 export const commitMutationKeys = {
-  /** All commit mutation keys */ all: ['mutation', 'commit'] as const,
-  /** Create commit mutation key */ create: () => ['mutation', 'commit', 'create'] as const,
-  /** Update commit mutation key */ update: (id: string | number) =>
-    ['mutation', 'commit', 'update', id] as const,
-  /** Delete commit mutation key */ delete: (id: string | number) =>
-    ['mutation', 'commit', 'delete', id] as const,
+  /** All commit mutation keys */all: ["mutation", "commit"] as const,
+  /** Create commit mutation key */create: () => ["mutation", "commit", "create"] as const,
+  /** Update commit mutation key */update: (id: string | number) => ["mutation", "commit", "update", id] as const,
+  /** Delete commit mutation key */delete: (id: string | number) => ["mutation", "commit", "delete", id] as const
 } as const;
 export const getAllTreeNodesRecordMutationKeys = {
-  /** All getAllTreeNodesRecord mutation keys */ all: [
-    'mutation',
-    'getalltreenodesrecord',
-  ] as const,
-  /** Create getAllTreeNodesRecord mutation key */ create: () =>
-    ['mutation', 'getalltreenodesrecord', 'create'] as const,
-  /** Update getAllTreeNodesRecord mutation key */ update: (id: string | number) =>
-    ['mutation', 'getalltreenodesrecord', 'update', id] as const,
-  /** Delete getAllTreeNodesRecord mutation key */ delete: (id: string | number) =>
-    ['mutation', 'getalltreenodesrecord', 'delete', id] as const,
+  /** All getAllTreeNodesRecord mutation keys */all: ["mutation", "getalltreenodesrecord"] as const,
+  /** Create getAllTreeNodesRecord mutation key */create: () => ["mutation", "getalltreenodesrecord", "create"] as const,
+  /** Update getAllTreeNodesRecord mutation key */update: (id: string | number) => ["mutation", "getalltreenodesrecord", "update", id] as const,
+  /** Delete getAllTreeNodesRecord mutation key */delete: (id: string | number) => ["mutation", "getalltreenodesrecord", "delete", id] as const
 } as const;
 export const objectMutationKeys = {
-  /** All object mutation keys */ all: ['mutation', 'object'] as const,
-  /** Create object mutation key */ create: () => ['mutation', 'object', 'create'] as const,
-  /** Update object mutation key */ update: (id: string | number) =>
-    ['mutation', 'object', 'update', id] as const,
-  /** Delete object mutation key */ delete: (id: string | number) =>
-    ['mutation', 'object', 'delete', id] as const,
+  /** All object mutation keys */all: ["mutation", "object"] as const,
+  /** Create object mutation key */create: () => ["mutation", "object", "create"] as const,
+  /** Update object mutation key */update: (id: string | number) => ["mutation", "object", "update", id] as const,
+  /** Delete object mutation key */delete: (id: string | number) => ["mutation", "object", "delete", id] as const
 } as const;
 export const refMutationKeys = {
-  /** All ref mutation keys */ all: ['mutation', 'ref'] as const,
-  /** Create ref mutation key */ create: () => ['mutation', 'ref', 'create'] as const,
-  /** Update ref mutation key */ update: (id: string | number) =>
-    ['mutation', 'ref', 'update', id] as const,
-  /** Delete ref mutation key */ delete: (id: string | number) =>
-    ['mutation', 'ref', 'delete', id] as const,
+  /** All ref mutation keys */all: ["mutation", "ref"] as const,
+  /** Create ref mutation key */create: () => ["mutation", "ref", "create"] as const,
+  /** Update ref mutation key */update: (id: string | number) => ["mutation", "ref", "update", id] as const,
+  /** Delete ref mutation key */delete: (id: string | number) => ["mutation", "ref", "delete", id] as const
 } as const;
 export const storeMutationKeys = {
-  /** All store mutation keys */ all: ['mutation', 'store'] as const,
-  /** Create store mutation key */ create: () => ['mutation', 'store', 'create'] as const,
-  /** Update store mutation key */ update: (id: string | number) =>
-    ['mutation', 'store', 'update', id] as const,
-  /** Delete store mutation key */ delete: (id: string | number) =>
-    ['mutation', 'store', 'delete', id] as const,
+  /** All store mutation keys */all: ["mutation", "store"] as const,
+  /** Create store mutation key */create: () => ["mutation", "store", "create"] as const,
+  /** Update store mutation key */update: (id: string | number) => ["mutation", "store", "update", id] as const,
+  /** Delete store mutation key */delete: (id: string | number) => ["mutation", "store", "delete", id] as const
 } as const;
 
 // ============================================================================
@@ -68,22 +54,10 @@ export const storeMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
-  /** Mutation key for initEmptyRepo */ initEmptyRepo: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'initEmptyRepo', identifier] as const)
-      : (['mutation', 'initEmptyRepo'] as const),
-  /** Mutation key for insertNodeAtPath */ insertNodeAtPath: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'insertNodeAtPath', identifier] as const)
-      : (['mutation', 'insertNodeAtPath'] as const),
-  /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'provisionBucket', identifier] as const)
-      : (['mutation', 'provisionBucket'] as const),
-  /** Mutation key for setDataAtPath */ setDataAtPath: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'setDataAtPath', identifier] as const)
-      : (['mutation', 'setDataAtPath'] as const),
+  /** Mutation key for initEmptyRepo */initEmptyRepo: (identifier?: string) => identifier ? ["mutation", "initEmptyRepo", identifier] as const : ["mutation", "initEmptyRepo"] as const,
+  /** Mutation key for insertNodeAtPath */insertNodeAtPath: (identifier?: string) => identifier ? ["mutation", "insertNodeAtPath", identifier] as const : ["mutation", "insertNodeAtPath"] as const,
+  /** Mutation key for provisionBucket */provisionBucket: (identifier?: string) => identifier ? ["mutation", "provisionBucket", identifier] as const : ["mutation", "provisionBucket"] as const,
+  /** Mutation key for setDataAtPath */setDataAtPath: (identifier?: string) => identifier ? ["mutation", "setDataAtPath", identifier] as const : ["mutation", "setDataAtPath"] as const
 } as const;
 /**
 
@@ -113,5 +87,5 @@ export const mutationKeys = {
   object: objectMutationKeys,
   ref: refMutationKeys,
   store: storeMutationKeys,
-  custom: customMutationKeys,
+  custom: customMutationKeys
 } as const;

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { viewRuleKeys } from '../query-keys';
-import type {
-  ViewRuleSelect,
-  ViewRuleWithRelations,
-  ViewRuleFilter,
-  ViewRuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ViewRuleSelect,
-  ViewRuleWithRelations,
-  ViewRuleFilter,
-  ViewRuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { viewRuleKeys } from "../query-keys";
+import type { ViewRuleSelect, ViewRuleWithRelations, ViewRuleFilter, ViewRuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ViewRuleSelect, ViewRuleWithRelations, ViewRuleFilter, ViewRuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const viewRulesQueryKey = viewRuleKeys.list;
 /**
  * DO INSTEAD rules for views (e.g., read-only enforcement)
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useViewRulesQuery({
@@ -45,47 +30,33 @@ export const viewRulesQueryKey = viewRuleKeys.list;
  * });
  * ```
  */
-export function useViewRulesQuery<
-  S extends ViewRuleSelect,
-  TData = {
-    viewRules: ConnectionResult<InferSelectResult<ViewRuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ViewRuleFilter, ViewRuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ViewRuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        viewRules: ConnectionResult<InferSelectResult<ViewRuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useViewRulesQuery(
-  params: {
-    selection: ListSelectionConfig<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useViewRulesQuery<S extends ViewRuleSelect, TData = {
+  viewRules: ConnectionResult<InferSelectResult<ViewRuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ViewRuleFilter, ViewRuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewRuleSelect>;
+} & Omit<UseQueryOptions<{
+  viewRules: ConnectionResult<InferSelectResult<ViewRuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useViewRulesQuery(params: {
+  selection: ListSelectionConfig<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: viewRuleKeys.list(args),
     queryFn: () => getClient().viewRule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * DO INSTEAD rules for views (e.g., read-only enforcement)
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchViewRulesQuery({
@@ -99,47 +70,35 @@ export function useViewRulesQuery(
 export async function fetchViewRulesQuery<S extends ViewRuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ViewRuleFilter, ViewRuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, ViewRuleSelect>;
+  } & Omit<ListSelectionConfig<S, ViewRuleFilter, ViewRuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewRuleSelect>;
 }): Promise<{
   viewRules: ConnectionResult<InferSelectResult<ViewRuleWithRelations, S>>;
 }>;
 export async function fetchViewRulesQuery(params: {
   selection: ListSelectionConfig<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>(params.selection);
   return getClient().viewRule.findMany(args).unwrap();
 }
 /**
  * DO INSTEAD rules for views (e.g., read-only enforcement)
- *
+ * 
  * @example
  * ```ts
  * await prefetchViewRulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchViewRulesQuery<S extends ViewRuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ViewRuleFilter, ViewRuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ViewRuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchViewRulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>(
-    params.selection
-  );
+export async function prefetchViewRulesQuery<S extends ViewRuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ViewRuleFilter, ViewRuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ViewRuleSelect>;
+}): Promise<void>;
+export async function prefetchViewRulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ViewRuleSelect, ViewRuleFilter, ViewRuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: viewRuleKeys.list(args),
-    queryFn: () => getClient().viewRule.findMany(args).unwrap(),
+    queryFn: () => getClient().viewRule.findMany(args).unwrap()
   });
 }

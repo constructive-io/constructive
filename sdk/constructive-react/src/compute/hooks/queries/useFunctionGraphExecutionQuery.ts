@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionGraphExecutionKeys } from '../query-keys';
-import type {
-  FunctionGraphExecutionSelect,
-  FunctionGraphExecutionWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionGraphExecutionSelect,
-  FunctionGraphExecutionWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionGraphExecutionKeys } from "../query-keys";
+import type { FunctionGraphExecutionSelect, FunctionGraphExecutionWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionGraphExecutionSelect, FunctionGraphExecutionWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const functionGraphExecutionQueryKey = functionGraphExecutionKeys.detail;
 /**
  * Ephemeral execution state for flow graph evaluation
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionGraphExecutionQuery({
@@ -32,52 +26,38 @@ export const functionGraphExecutionQueryKey = functionGraphExecutionKeys.detail;
  * });
  * ```
  */
-export function useFunctionGraphExecutionQuery<
-  S extends FunctionGraphExecutionSelect,
-  TData = {
-    functionGraphExecution: InferSelectResult<FunctionGraphExecutionWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        functionGraphExecution: InferSelectResult<FunctionGraphExecutionWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFunctionGraphExecutionQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionGraphExecutionSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useFunctionGraphExecutionQuery<S extends FunctionGraphExecutionSelect, TData = {
+  functionGraphExecution: InferSelectResult<FunctionGraphExecutionWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionSelect>;
+} & Omit<UseQueryOptions<{
+  functionGraphExecution: InferSelectResult<FunctionGraphExecutionWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFunctionGraphExecutionQuery(params: {
+  id: string;
+  selection: SelectionConfig<FunctionGraphExecutionSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<FunctionGraphExecutionSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionGraphExecutionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionGraphExecution.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().functionGraphExecution.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Ephemeral execution state for flow graph evaluation
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFunctionGraphExecutionQuery({
@@ -86,9 +66,7 @@ export function useFunctionGraphExecutionQuery(
  * });
  * ```
  */
-export async function fetchFunctionGraphExecutionQuery<
-  S extends FunctionGraphExecutionSelect,
->(params: {
+export async function fetchFunctionGraphExecutionQuery<S extends FunctionGraphExecutionSelect>(params: {
   id: string;
   selection: {
     fields: S;
@@ -101,46 +79,35 @@ export async function fetchFunctionGraphExecutionQuery(params: {
   selection: SelectionConfig<FunctionGraphExecutionSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionGraphExecutionSelect>(params.selection);
-  return getClient()
-    .functionGraphExecution.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().functionGraphExecution.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Ephemeral execution state for flow graph evaluation
- *
+ * 
  * @example
  * ```ts
  * await prefetchFunctionGraphExecutionQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionGraphExecutionQuery<S extends FunctionGraphExecutionSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionSelect>;
-  }
-): Promise<void>;
-export async function prefetchFunctionGraphExecutionQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionGraphExecutionSelect>;
-  }
-): Promise<void> {
+export async function prefetchFunctionGraphExecutionQuery<S extends FunctionGraphExecutionSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionGraphExecutionSelect>;
+}): Promise<void>;
+export async function prefetchFunctionGraphExecutionQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<FunctionGraphExecutionSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<FunctionGraphExecutionSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionGraphExecutionKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionGraphExecution.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().functionGraphExecution.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { computeLogModuleKeys } from '../query-keys';
-import type {
-  ComputeLogModuleSelect,
-  ComputeLogModuleWithRelations,
-  ComputeLogModuleFilter,
-  ComputeLogModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ComputeLogModuleSelect,
-  ComputeLogModuleWithRelations,
-  ComputeLogModuleFilter,
-  ComputeLogModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { computeLogModuleKeys } from "../query-keys";
+import type { ComputeLogModuleSelect, ComputeLogModuleWithRelations, ComputeLogModuleFilter, ComputeLogModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ComputeLogModuleSelect, ComputeLogModuleWithRelations, ComputeLogModuleFilter, ComputeLogModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const computeLogModulesQueryKey = computeLogModuleKeys.list;
 /**
  * Query hook for fetching ComputeLogModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useComputeLogModulesQuery({
@@ -45,53 +30,33 @@ export const computeLogModulesQueryKey = computeLogModuleKeys.list;
  * });
  * ```
  */
-export function useComputeLogModulesQuery<
-  S extends ComputeLogModuleSelect,
-  TData = {
-    computeLogModules: ConnectionResult<InferSelectResult<ComputeLogModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ComputeLogModuleFilter, ComputeLogModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        computeLogModules: ConnectionResult<InferSelectResult<ComputeLogModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useComputeLogModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      ComputeLogModuleSelect,
-      ComputeLogModuleFilter,
-      ComputeLogModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    ComputeLogModuleSelect,
-    ComputeLogModuleFilter,
-    ComputeLogModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useComputeLogModulesQuery<S extends ComputeLogModuleSelect, TData = {
+  computeLogModules: ConnectionResult<InferSelectResult<ComputeLogModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ComputeLogModuleFilter, ComputeLogModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
+} & Omit<UseQueryOptions<{
+  computeLogModules: ConnectionResult<InferSelectResult<ComputeLogModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useComputeLogModulesQuery(params: {
+  selection: ListSelectionConfig<ComputeLogModuleSelect, ComputeLogModuleFilter, ComputeLogModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ComputeLogModuleSelect, ComputeLogModuleFilter, ComputeLogModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: computeLogModuleKeys.list(args),
     queryFn: () => getClient().computeLogModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch ComputeLogModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchComputeLogModulesQuery({
@@ -105,59 +70,35 @@ export function useComputeLogModulesQuery(
 export async function fetchComputeLogModulesQuery<S extends ComputeLogModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ComputeLogModuleFilter, ComputeLogModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
+  } & Omit<ListSelectionConfig<S, ComputeLogModuleFilter, ComputeLogModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
 }): Promise<{
   computeLogModules: ConnectionResult<InferSelectResult<ComputeLogModuleWithRelations, S>>;
 }>;
 export async function fetchComputeLogModulesQuery(params: {
-  selection: ListSelectionConfig<
-    ComputeLogModuleSelect,
-    ComputeLogModuleFilter,
-    ComputeLogModuleOrderBy
-  >;
+  selection: ListSelectionConfig<ComputeLogModuleSelect, ComputeLogModuleFilter, ComputeLogModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    ComputeLogModuleSelect,
-    ComputeLogModuleFilter,
-    ComputeLogModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<ComputeLogModuleSelect, ComputeLogModuleFilter, ComputeLogModuleOrderBy>(params.selection);
   return getClient().computeLogModule.findMany(args).unwrap();
 }
 /**
  * Prefetch ComputeLogModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchComputeLogModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchComputeLogModulesQuery<S extends ComputeLogModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ComputeLogModuleFilter, ComputeLogModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchComputeLogModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      ComputeLogModuleSelect,
-      ComputeLogModuleFilter,
-      ComputeLogModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    ComputeLogModuleSelect,
-    ComputeLogModuleFilter,
-    ComputeLogModuleOrderBy
-  >(params.selection);
+export async function prefetchComputeLogModulesQuery<S extends ComputeLogModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ComputeLogModuleFilter, ComputeLogModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ComputeLogModuleSelect>;
+}): Promise<void>;
+export async function prefetchComputeLogModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ComputeLogModuleSelect, ComputeLogModuleFilter, ComputeLogModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ComputeLogModuleSelect, ComputeLogModuleFilter, ComputeLogModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: computeLogModuleKeys.list(args),
-    queryFn: () => getClient().computeLogModule.findMany(args).unwrap(),
+    queryFn: () => getClient().computeLogModule.findMany(args).unwrap()
   });
 }

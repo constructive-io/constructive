@@ -4,101 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { merkleStoreModuleKeys } from '../query-keys';
-import { merkleStoreModuleMutationKeys } from '../mutation-keys';
-import type {
-  MerkleStoreModuleSelect,
-  MerkleStoreModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  MerkleStoreModuleSelect,
-  MerkleStoreModuleWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { merkleStoreModuleKeys } from "../query-keys";
+import { merkleStoreModuleMutationKeys } from "../mutation-keys";
+import type { MerkleStoreModuleSelect, MerkleStoreModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { MerkleStoreModuleSelect, MerkleStoreModuleWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a MerkleStoreModule with typed selection
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteMerkleStoreModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteMerkleStoreModuleMutation<S extends MerkleStoreModuleSelect>(
-  params: {
-    selection: {
-      fields: S & MerkleStoreModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteMerkleStoreModule: {
-          merkleStoreModule: InferSelectResult<MerkleStoreModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteMerkleStoreModule: {
-      merkleStoreModule: InferSelectResult<MerkleStoreModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteMerkleStoreModuleMutation(
-  params: {
-    selection: SelectionConfig<MerkleStoreModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteMerkleStoreModuleMutation<S extends MerkleStoreModuleSelect>(params: {
+  selection: ({
+    fields: S & MerkleStoreModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>);
+} & Omit<UseMutationOptions<{
+  deleteMerkleStoreModule: {
+    merkleStoreModule: InferSelectResult<MerkleStoreModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteMerkleStoreModule: {
+    merkleStoreModule: InferSelectResult<MerkleStoreModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteMerkleStoreModuleMutation(params: {
+  selection: SelectionConfig<MerkleStoreModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<MerkleStoreModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: merkleStoreModuleMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .merkleStoreModule.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().merkleStoreModule.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: merkleStoreModuleKeys.detail(variables.id),
+        queryKey: merkleStoreModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.lists(),
+        queryKey: merkleStoreModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

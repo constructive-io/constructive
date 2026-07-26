@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { transferLogModuleKeys } from '../query-keys';
-import { transferLogModuleMutationKeys } from '../mutation-keys';
-import type {
-  TransferLogModuleSelect,
-  TransferLogModuleWithRelations,
-  TransferLogModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  TransferLogModuleSelect,
-  TransferLogModuleWithRelations,
-  TransferLogModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { transferLogModuleKeys } from "../query-keys";
+import { transferLogModuleMutationKeys } from "../mutation-keys";
+import type { TransferLogModuleSelect, TransferLogModuleWithRelations, TransferLogModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { TransferLogModuleSelect, TransferLogModuleWithRelations, TransferLogModulePatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a TransferLogModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateTransferLogModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', transferLogModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateTransferLogModuleMutation<S extends TransferLogModuleSelect>(
-  params: {
-    selection: {
-      fields: S & TransferLogModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateTransferLogModule: {
-          transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        transferLogModulePatch: TransferLogModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateTransferLogModule: {
-      transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    transferLogModulePatch: TransferLogModulePatch;
-  }
->;
-export function useUpdateTransferLogModuleMutation(
-  params: {
-    selection: SelectionConfig<TransferLogModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        transferLogModulePatch: TransferLogModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateTransferLogModuleMutation<S extends TransferLogModuleSelect>(params: {
+  selection: ({
+    fields: S & TransferLogModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, TransferLogModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateTransferLogModule: {
+    transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  transferLogModulePatch: TransferLogModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateTransferLogModule: {
+    transferLogModule: InferSelectResult<TransferLogModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  transferLogModulePatch: TransferLogModulePatch;
+}>;
+export function useUpdateTransferLogModuleMutation(params: {
+  selection: SelectionConfig<TransferLogModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  transferLogModulePatch: TransferLogModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<TransferLogModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: transferLogModuleMutationKeys.all,
     mutationFn: ({
       id,
-      transferLogModulePatch,
+      transferLogModulePatch
     }: {
       id: string;
       transferLogModulePatch: TransferLogModulePatch;
-    }) =>
-      getClient()
-        .transferLogModule.update({
-          where: {
-            id,
-          },
-          data: transferLogModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().transferLogModule.update({
+      where: {
+        id
+      },
+      data: transferLogModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: transferLogModuleKeys.detail(variables.id),
+        queryKey: transferLogModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: transferLogModuleKeys.lists(),
+        queryKey: transferLogModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

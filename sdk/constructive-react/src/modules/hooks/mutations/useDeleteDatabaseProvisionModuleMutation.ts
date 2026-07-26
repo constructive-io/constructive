@@ -4,101 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { databaseProvisionModuleKeys } from '../query-keys';
-import { databaseProvisionModuleMutationKeys } from '../mutation-keys';
-import type {
-  DatabaseProvisionModuleSelect,
-  DatabaseProvisionModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  DatabaseProvisionModuleSelect,
-  DatabaseProvisionModuleWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { databaseProvisionModuleKeys } from "../query-keys";
+import { databaseProvisionModuleMutationKeys } from "../mutation-keys";
+import type { DatabaseProvisionModuleSelect, DatabaseProvisionModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { DatabaseProvisionModuleSelect, DatabaseProvisionModuleWithRelations } from "../../orm/input-types";
 /**
  * Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteDatabaseProvisionModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteDatabaseProvisionModuleMutation<S extends DatabaseProvisionModuleSelect>(
-  params: {
-    selection: {
-      fields: S & DatabaseProvisionModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteDatabaseProvisionModule: {
-          databaseProvisionModule: InferSelectResult<DatabaseProvisionModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteDatabaseProvisionModule: {
-      databaseProvisionModule: InferSelectResult<DatabaseProvisionModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteDatabaseProvisionModuleMutation(
-  params: {
-    selection: SelectionConfig<DatabaseProvisionModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteDatabaseProvisionModuleMutation<S extends DatabaseProvisionModuleSelect>(params: {
+  selection: ({
+    fields: S & DatabaseProvisionModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, DatabaseProvisionModuleSelect>);
+} & Omit<UseMutationOptions<{
+  deleteDatabaseProvisionModule: {
+    databaseProvisionModule: InferSelectResult<DatabaseProvisionModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteDatabaseProvisionModule: {
+    databaseProvisionModule: InferSelectResult<DatabaseProvisionModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteDatabaseProvisionModuleMutation(params: {
+  selection: SelectionConfig<DatabaseProvisionModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<DatabaseProvisionModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: databaseProvisionModuleMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .databaseProvisionModule.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().databaseProvisionModule.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: databaseProvisionModuleKeys.detail(variables.id),
+        queryKey: databaseProvisionModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: databaseProvisionModuleKeys.lists(),
+        queryKey: databaseProvisionModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

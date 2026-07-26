@@ -1,16 +1,16 @@
 import { UUID } from "./_common";
-export interface inflection_rules {
+export interface InflectionRules {
   id: UUID;
   type: string | null;
   test: string | null;
   replacement: string | null;
 }
-export class inflection_rules implements inflection_rules {
+export class InflectionRules implements InflectionRules {
   id: UUID;
   type: string | null;
   test: string | null;
   replacement: string | null;
-  constructor(data: inflection_rules) {
+  constructor(data: InflectionRules) {
     this.id = data.id;
     this.type = data.type;
     this.test = data.test;

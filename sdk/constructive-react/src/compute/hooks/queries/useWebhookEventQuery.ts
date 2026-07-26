@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { webhookEventKeys } from '../query-keys';
-import type { WebhookEventSelect, WebhookEventWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { WebhookEventSelect, WebhookEventWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { webhookEventKeys } from "../query-keys";
+import type { WebhookEventSelect, WebhookEventWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebhookEventSelect, WebhookEventWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const webhookEventQueryKey = webhookEventKeys.detail;
 /**
  * Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useWebhookEventQuery({
@@ -26,52 +26,38 @@ export const webhookEventQueryKey = webhookEventKeys.detail;
  * });
  * ```
  */
-export function useWebhookEventQuery<
-  S extends WebhookEventSelect,
-  TData = {
-    webhookEvent: InferSelectResult<WebhookEventWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        webhookEvent: InferSelectResult<WebhookEventWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useWebhookEventQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<WebhookEventSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useWebhookEventQuery<S extends WebhookEventSelect, TData = {
+  webhookEvent: InferSelectResult<WebhookEventWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
+} & Omit<UseQueryOptions<{
+  webhookEvent: InferSelectResult<WebhookEventWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useWebhookEventQuery(params: {
+  id: string;
+  selection: SelectionConfig<WebhookEventSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<WebhookEventSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: webhookEventKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .webhookEvent.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().webhookEvent.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchWebhookEventQuery({
@@ -93,46 +79,35 @@ export async function fetchWebhookEventQuery(params: {
   selection: SelectionConfig<WebhookEventSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<WebhookEventSelect>(params.selection);
-  return getClient()
-    .webhookEvent.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().webhookEvent.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Durable webhook acceptance log — one row per accepted delivery, deduplicated on (endpoint_id, external_event_id), linked to the pending function invocation it enqueued
- *
+ * 
  * @example
  * ```ts
  * await prefetchWebhookEventQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchWebhookEventQuery<S extends WebhookEventSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
-  }
-): Promise<void>;
-export async function prefetchWebhookEventQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<WebhookEventSelect>;
-  }
-): Promise<void> {
+export async function prefetchWebhookEventQuery<S extends WebhookEventSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, WebhookEventSelect>;
+}): Promise<void>;
+export async function prefetchWebhookEventQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<WebhookEventSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<WebhookEventSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: webhookEventKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .webhookEvent.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().webhookEvent.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

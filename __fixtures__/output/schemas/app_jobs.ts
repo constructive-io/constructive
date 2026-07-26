@@ -1,25 +1,32 @@
 import { Timestamp, UUID } from "./_common";
-export interface job_queues {
+export interface JobQueues {
   queue_name: string;
   job_count: number;
   locked_at: Timestamp | null;
   locked_by: string | null;
 }
-export class job_queues implements job_queues {
+export class JobQueues implements JobQueues {
   queue_name: string;
   job_count: number;
   locked_at: Timestamp | null;
   locked_by: string | null;
-  constructor(data: job_queues) {
+  constructor(data: JobQueues) {
     this.queue_name = data.queue_name;
     this.job_count = data.job_count;
     this.locked_at = data.locked_at;
     this.locked_by = data.locked_by;
   }
 }
-export interface jobs {
+export interface Jobs {
   id: number;
-  database_id: UUID;
+  database_id: UUID | null;
+  actor_id: UUID | null;
+  principal_id: UUID | null;
+  entity_id: UUID | null;
+  organization_id: UUID | null;
+  entity_type: string | null;
+  function_definition_id: UUID | null;
+  definition_scope: string | null;
   queue_name: string | null;
   task_identifier: string;
   payload: any;
@@ -31,12 +38,20 @@ export interface jobs {
   last_error: string | null;
   locked_at: Timestamp | null;
   locked_by: string | null;
+  is_available: boolean;
   created_at: Timestamp | null;
   updated_at: Timestamp | null;
 }
-export class jobs implements jobs {
+export class Jobs implements Jobs {
   id: number;
-  database_id: UUID;
+  database_id: UUID | null;
+  actor_id: UUID | null;
+  principal_id: UUID | null;
+  entity_id: UUID | null;
+  organization_id: UUID | null;
+  entity_type: string | null;
+  function_definition_id: UUID | null;
+  definition_scope: string | null;
   queue_name: string | null;
   task_identifier: string;
   payload: any;
@@ -48,11 +63,19 @@ export class jobs implements jobs {
   last_error: string | null;
   locked_at: Timestamp | null;
   locked_by: string | null;
+  is_available: boolean;
   created_at: Timestamp | null;
   updated_at: Timestamp | null;
-  constructor(data: jobs) {
+  constructor(data: Jobs) {
     this.id = data.id;
     this.database_id = data.database_id;
+    this.actor_id = data.actor_id;
+    this.principal_id = data.principal_id;
+    this.entity_id = data.entity_id;
+    this.organization_id = data.organization_id;
+    this.entity_type = data.entity_type;
+    this.function_definition_id = data.function_definition_id;
+    this.definition_scope = data.definition_scope;
     this.queue_name = data.queue_name;
     this.task_identifier = data.task_identifier;
     this.payload = data.payload;
@@ -64,13 +87,16 @@ export class jobs implements jobs {
     this.last_error = data.last_error;
     this.locked_at = data.locked_at;
     this.locked_by = data.locked_by;
+    this.is_available = data.is_available;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
   }
 }
-export interface scheduled_jobs {
+export interface ScheduledJobs {
   id: number;
-  database_id: UUID;
+  database_id: UUID | null;
+  actor_id: UUID | null;
+  entity_id: UUID | null;
   queue_name: string | null;
   task_identifier: string;
   payload: any;
@@ -83,9 +109,11 @@ export interface scheduled_jobs {
   last_scheduled: Timestamp | null;
   last_scheduled_id: number | null;
 }
-export class scheduled_jobs implements scheduled_jobs {
+export class ScheduledJobs implements ScheduledJobs {
   id: number;
-  database_id: UUID;
+  database_id: UUID | null;
+  actor_id: UUID | null;
+  entity_id: UUID | null;
   queue_name: string | null;
   task_identifier: string;
   payload: any;
@@ -97,9 +125,11 @@ export class scheduled_jobs implements scheduled_jobs {
   schedule_info: any;
   last_scheduled: Timestamp | null;
   last_scheduled_id: number | null;
-  constructor(data: scheduled_jobs) {
+  constructor(data: ScheduledJobs) {
     this.id = data.id;
     this.database_id = data.database_id;
+    this.actor_id = data.actor_id;
+    this.entity_id = data.entity_id;
     this.queue_name = data.queue_name;
     this.task_identifier = data.task_identifier;
     this.payload = data.payload;

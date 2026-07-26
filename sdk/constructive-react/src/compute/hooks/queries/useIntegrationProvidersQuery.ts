@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { integrationProviderKeys } from '../query-keys';
-import type {
-  IntegrationProviderSelect,
-  IntegrationProviderWithRelations,
-  IntegrationProviderFilter,
-  IntegrationProviderOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  IntegrationProviderSelect,
-  IntegrationProviderWithRelations,
-  IntegrationProviderFilter,
-  IntegrationProviderOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { integrationProviderKeys } from "../query-keys";
+import type { IntegrationProviderSelect, IntegrationProviderWithRelations, IntegrationProviderFilter, IntegrationProviderOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { IntegrationProviderSelect, IntegrationProviderWithRelations, IntegrationProviderFilter, IntegrationProviderOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const integrationProvidersQueryKey = integrationProviderKeys.list;
 /**
  * Branded catalog of external service integrations and their canonical secret/config requirements. Each row defines a provider (e.g. Mailgun, Postgres) that function and resource definitions can reference by slug. The required_secrets/required_configs arrays are guidance that the UI can copy into a definition; the definition arrays remain the source of truth.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useIntegrationProvidersQuery({
@@ -45,58 +30,33 @@ export const integrationProvidersQueryKey = integrationProviderKeys.list;
  * });
  * ```
  */
-export function useIntegrationProvidersQuery<
-  S extends IntegrationProviderSelect,
-  TData = {
-    integrationProviders: ConnectionResult<InferSelectResult<IntegrationProviderWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, IntegrationProviderFilter, IntegrationProviderOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        integrationProviders: ConnectionResult<
-          InferSelectResult<IntegrationProviderWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useIntegrationProvidersQuery(
-  params: {
-    selection: ListSelectionConfig<
-      IntegrationProviderSelect,
-      IntegrationProviderFilter,
-      IntegrationProviderOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    IntegrationProviderSelect,
-    IntegrationProviderFilter,
-    IntegrationProviderOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useIntegrationProvidersQuery<S extends IntegrationProviderSelect, TData = {
+  integrationProviders: ConnectionResult<InferSelectResult<IntegrationProviderWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, IntegrationProviderFilter, IntegrationProviderOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
+} & Omit<UseQueryOptions<{
+  integrationProviders: ConnectionResult<InferSelectResult<IntegrationProviderWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useIntegrationProvidersQuery(params: {
+  selection: ListSelectionConfig<IntegrationProviderSelect, IntegrationProviderFilter, IntegrationProviderOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<IntegrationProviderSelect, IntegrationProviderFilter, IntegrationProviderOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: integrationProviderKeys.list(args),
     queryFn: () => getClient().integrationProvider.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Branded catalog of external service integrations and their canonical secret/config requirements. Each row defines a provider (e.g. Mailgun, Postgres) that function and resource definitions can reference by slug. The required_secrets/required_configs arrays are guidance that the UI can copy into a definition; the definition arrays remain the source of truth.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchIntegrationProvidersQuery({
@@ -110,65 +70,35 @@ export function useIntegrationProvidersQuery(
 export async function fetchIntegrationProvidersQuery<S extends IntegrationProviderSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, IntegrationProviderFilter, IntegrationProviderOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
+  } & Omit<ListSelectionConfig<S, IntegrationProviderFilter, IntegrationProviderOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
 }): Promise<{
   integrationProviders: ConnectionResult<InferSelectResult<IntegrationProviderWithRelations, S>>;
 }>;
 export async function fetchIntegrationProvidersQuery(params: {
-  selection: ListSelectionConfig<
-    IntegrationProviderSelect,
-    IntegrationProviderFilter,
-    IntegrationProviderOrderBy
-  >;
+  selection: ListSelectionConfig<IntegrationProviderSelect, IntegrationProviderFilter, IntegrationProviderOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    IntegrationProviderSelect,
-    IntegrationProviderFilter,
-    IntegrationProviderOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<IntegrationProviderSelect, IntegrationProviderFilter, IntegrationProviderOrderBy>(params.selection);
   return getClient().integrationProvider.findMany(args).unwrap();
 }
 /**
  * Branded catalog of external service integrations and their canonical secret/config requirements. Each row defines a provider (e.g. Mailgun, Postgres) that function and resource definitions can reference by slug. The required_secrets/required_configs arrays are guidance that the UI can copy into a definition; the definition arrays remain the source of truth.
- *
+ * 
  * @example
  * ```ts
  * await prefetchIntegrationProvidersQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchIntegrationProvidersQuery<S extends IntegrationProviderSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, IntegrationProviderFilter, IntegrationProviderOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
-  }
-): Promise<void>;
-export async function prefetchIntegrationProvidersQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      IntegrationProviderSelect,
-      IntegrationProviderFilter,
-      IntegrationProviderOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    IntegrationProviderSelect,
-    IntegrationProviderFilter,
-    IntegrationProviderOrderBy
-  >(params.selection);
+export async function prefetchIntegrationProvidersQuery<S extends IntegrationProviderSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, IntegrationProviderFilter, IntegrationProviderOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, IntegrationProviderSelect>;
+}): Promise<void>;
+export async function prefetchIntegrationProvidersQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<IntegrationProviderSelect, IntegrationProviderFilter, IntegrationProviderOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<IntegrationProviderSelect, IntegrationProviderFilter, IntegrationProviderOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: integrationProviderKeys.list(args),
-    queryFn: () => getClient().integrationProvider.findMany(args).unwrap(),
+    queryFn: () => getClient().integrationProvider.findMany(args).unwrap()
   });
 }

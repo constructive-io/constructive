@@ -4,99 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { objectKeys } from '../query-keys';
-import { objectMutationKeys } from '../mutation-keys';
-import type { ObjectSelect, ObjectWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { ObjectSelect, ObjectWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { objectKeys } from "../query-keys";
+import { objectMutationKeys } from "../mutation-keys";
+import type { ObjectSelect, ObjectWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { ObjectSelect, ObjectWithRelations } from "../../orm/input-types";
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteObjectMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteObjectMutation<S extends ObjectSelect>(
-  params: {
-    selection: {
-      fields: S & ObjectSelect;
-    } & HookStrictSelect<NoInfer<S>, ObjectSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteObject: {
-          object: InferSelectResult<ObjectWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        databaseId: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteObject: {
-      object: InferSelectResult<ObjectWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    databaseId: string;
-  }
->;
-export function useDeleteObjectMutation(
-  params: {
-    selection: SelectionConfig<ObjectSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        databaseId: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteObjectMutation<S extends ObjectSelect>(params: {
+  selection: ({
+    fields: S & ObjectSelect;
+  } & HookStrictSelect<NoInfer<S>, ObjectSelect>);
+} & Omit<UseMutationOptions<{
+  deleteObject: {
+    object: InferSelectResult<ObjectWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteObject: {
+    object: InferSelectResult<ObjectWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+}>;
+export function useDeleteObjectMutation(params: {
+  selection: SelectionConfig<ObjectSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  databaseId: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<ObjectSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: objectMutationKeys.all,
-    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
-      getClient()
-        .object.delete({
-          where: {
-            id,
-            databaseId,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      databaseId
+    }: {
+      id: string;
+      databaseId: string;
+    }) => getClient().object.delete({
+      where: {
+        id,
+        databaseId
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: objectKeys.detail(variables.id),
+        queryKey: objectKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: objectKeys.lists(),
+        queryKey: objectKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { infraSecretsModuleKeys } from '../query-keys';
-import type {
-  InfraSecretsModuleSelect,
-  InfraSecretsModuleWithRelations,
-  InfraSecretsModuleFilter,
-  InfraSecretsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  InfraSecretsModuleSelect,
-  InfraSecretsModuleWithRelations,
-  InfraSecretsModuleFilter,
-  InfraSecretsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { infraSecretsModuleKeys } from "../query-keys";
+import type { InfraSecretsModuleSelect, InfraSecretsModuleWithRelations, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { InfraSecretsModuleSelect, InfraSecretsModuleWithRelations, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const infraSecretsModulesQueryKey = infraSecretsModuleKeys.list;
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useInfraSecretsModulesQuery({
@@ -45,58 +30,33 @@ export const infraSecretsModulesQueryKey = infraSecretsModuleKeys.list;
  * });
  * ```
  */
-export function useInfraSecretsModulesQuery<
-  S extends InfraSecretsModuleSelect,
-  TData = {
-    infraSecretsModules: ConnectionResult<InferSelectResult<InfraSecretsModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        infraSecretsModules: ConnectionResult<
-          InferSelectResult<InfraSecretsModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useInfraSecretsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      InfraSecretsModuleSelect,
-      InfraSecretsModuleFilter,
-      InfraSecretsModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    InfraSecretsModuleSelect,
-    InfraSecretsModuleFilter,
-    InfraSecretsModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useInfraSecretsModulesQuery<S extends InfraSecretsModuleSelect, TData = {
+  infraSecretsModules: ConnectionResult<InferSelectResult<InfraSecretsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  infraSecretsModules: ConnectionResult<InferSelectResult<InfraSecretsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useInfraSecretsModulesQuery(params: {
+  selection: ListSelectionConfig<InfraSecretsModuleSelect, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<InfraSecretsModuleSelect, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: infraSecretsModuleKeys.list(args),
     queryFn: () => getClient().infraSecretsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchInfraSecretsModulesQuery({
@@ -110,62 +70,35 @@ export function useInfraSecretsModulesQuery(
 export async function fetchInfraSecretsModulesQuery<S extends InfraSecretsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
 }): Promise<{
   infraSecretsModules: ConnectionResult<InferSelectResult<InfraSecretsModuleWithRelations, S>>;
 }>;
 export async function fetchInfraSecretsModulesQuery(params: {
-  selection: ListSelectionConfig<
-    InfraSecretsModuleSelect,
-    InfraSecretsModuleFilter,
-    InfraSecretsModuleOrderBy
-  >;
+  selection: ListSelectionConfig<InfraSecretsModuleSelect, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    InfraSecretsModuleSelect,
-    InfraSecretsModuleFilter,
-    InfraSecretsModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<InfraSecretsModuleSelect, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>(params.selection);
   return getClient().infraSecretsModule.findMany(args).unwrap();
 }
 /**
  * Namespace-backed PGP-encrypted key-value secrets module. Requires namespace_module and emits namespace:sync_secrets job triggers for K8s Secret synchronization.
- *
+ * 
  * @example
  * ```ts
  * await prefetchInfraSecretsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchInfraSecretsModulesQuery<S extends InfraSecretsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchInfraSecretsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      InfraSecretsModuleSelect,
-      InfraSecretsModuleFilter,
-      InfraSecretsModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    InfraSecretsModuleSelect,
-    InfraSecretsModuleFilter,
-    InfraSecretsModuleOrderBy
-  >(params.selection);
+export async function prefetchInfraSecretsModulesQuery<S extends InfraSecretsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, InfraSecretsModuleSelect>;
+}): Promise<void>;
+export async function prefetchInfraSecretsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<InfraSecretsModuleSelect, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<InfraSecretsModuleSelect, InfraSecretsModuleFilter, InfraSecretsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: infraSecretsModuleKeys.list(args),
-    queryFn: () => getClient().infraSecretsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().infraSecretsModule.findMany(args).unwrap()
   });
 }

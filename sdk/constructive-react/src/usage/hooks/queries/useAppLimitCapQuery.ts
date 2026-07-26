@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { appLimitCapKeys } from '../query-keys';
-import type { AppLimitCapSelect, AppLimitCapWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { AppLimitCapSelect, AppLimitCapWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { appLimitCapKeys } from "../query-keys";
+import type { AppLimitCapSelect, AppLimitCapWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppLimitCapSelect, AppLimitCapWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appLimitCapQueryKey = appLimitCapKeys.detail;
 /**
  * Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppLimitCapQuery({
@@ -26,52 +26,38 @@ export const appLimitCapQueryKey = appLimitCapKeys.detail;
  * });
  * ```
  */
-export function useAppLimitCapQuery<
-  S extends AppLimitCapSelect,
-  TData = {
-    appLimitCap: InferSelectResult<AppLimitCapWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AppLimitCapSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appLimitCap: InferSelectResult<AppLimitCapWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppLimitCapQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<AppLimitCapSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useAppLimitCapQuery<S extends AppLimitCapSelect, TData = {
+  appLimitCap: InferSelectResult<AppLimitCapWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AppLimitCapSelect>;
+} & Omit<UseQueryOptions<{
+  appLimitCap: InferSelectResult<AppLimitCapWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppLimitCapQuery(params: {
+  id: string;
+  selection: SelectionConfig<AppLimitCapSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<AppLimitCapSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appLimitCapKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .appLimitCap.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().appLimitCap.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppLimitCapQuery({
@@ -93,46 +79,35 @@ export async function fetchAppLimitCapQuery(params: {
   selection: SelectionConfig<AppLimitCapSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppLimitCapSelect>(params.selection);
-  return getClient()
-    .appLimitCap.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().appLimitCap.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default.
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppLimitCapQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppLimitCapQuery<S extends AppLimitCapSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AppLimitCapSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppLimitCapQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<AppLimitCapSelect>;
-  }
-): Promise<void> {
+export async function prefetchAppLimitCapQuery<S extends AppLimitCapSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AppLimitCapSelect>;
+}): Promise<void>;
+export async function prefetchAppLimitCapQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<AppLimitCapSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<AppLimitCapSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appLimitCapKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .appLimitCap.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().appLimitCap.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

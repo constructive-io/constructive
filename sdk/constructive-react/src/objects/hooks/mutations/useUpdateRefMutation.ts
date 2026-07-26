@@ -4,80 +4,61 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { refKeys } from '../query-keys';
-import { refMutationKeys } from '../mutation-keys';
-import type { RefSelect, RefWithRelations, RefPatch } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { RefSelect, RefWithRelations, RefPatch } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { refKeys } from "../query-keys";
+import { refMutationKeys } from "../mutation-keys";
+import type { RefSelect, RefWithRelations, RefPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RefSelect, RefWithRelations, RefPatch } from "../../orm/input-types";
 /**
  * Branch heads — mutable pointers into the commit chain
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateRefMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', refPatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateRefMutation<S extends RefSelect>(
-  params: {
-    selection: {
-      fields: S & RefSelect;
-    } & HookStrictSelect<NoInfer<S>, RefSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateRef: {
-          ref: InferSelectResult<RefWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        databaseId: string;
-        refPatch: RefPatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateRef: {
-      ref: InferSelectResult<RefWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    databaseId: string;
-    refPatch: RefPatch;
-  }
->;
-export function useUpdateRefMutation(
-  params: {
-    selection: SelectionConfig<RefSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        databaseId: string;
-        refPatch: RefPatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateRefMutation<S extends RefSelect>(params: {
+  selection: ({
+    fields: S & RefSelect;
+  } & HookStrictSelect<NoInfer<S>, RefSelect>);
+} & Omit<UseMutationOptions<{
+  updateRef: {
+    ref: InferSelectResult<RefWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+  refPatch: RefPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateRef: {
+    ref: InferSelectResult<RefWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+  refPatch: RefPatch;
+}>;
+export function useUpdateRefMutation(params: {
+  selection: SelectionConfig<RefSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  databaseId: string;
+  refPatch: RefPatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<RefSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
@@ -85,30 +66,27 @@ export function useUpdateRefMutation(
     mutationFn: ({
       id,
       databaseId,
-      refPatch,
+      refPatch
     }: {
       id: string;
       databaseId: string;
       refPatch: RefPatch;
-    }) =>
-      getClient()
-        .ref.update({
-          where: {
-            id,
-            databaseId,
-          },
-          data: refPatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().ref.update({
+      where: {
+        id,
+        databaseId
+      },
+      data: refPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: refKeys.detail(variables.id),
+        queryKey: refKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: refKeys.lists(),
+        queryKey: refKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

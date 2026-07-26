@@ -4,76 +4,57 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customQueryKeys } from '../query-keys';
-import type { ApplyRegistryDefaultsVariables } from '../../orm/query';
-export type { ApplyRegistryDefaultsVariables } from '../../orm/query';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customQueryKeys } from "../query-keys";
+import type { ApplyRegistryDefaultsVariables } from "../../orm/query";
+export type { ApplyRegistryDefaultsVariables } from "../../orm/query";
 /** Query key factory - re-exported from query-keys.ts */
 export const applyRegistryDefaultsQueryKey = customQueryKeys.applyRegistryDefaults;
 /**
  * Query hook for applyRegistryDefaults
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useApplyRegistryDefaultsQuery({ variables: { data, nodeType } });
- *
+ * 
  * if (data?.applyRegistryDefaults) {
  *   console.log(data.applyRegistryDefaults);
  * }
  * ```
  */
-export function useApplyRegistryDefaultsQuery<
-  TData = {
-    applyRegistryDefaults: unknown | null;
-  },
->(
-  params?: {
-    variables?: ApplyRegistryDefaultsVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        applyRegistryDefaults: unknown | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useApplyRegistryDefaultsQuery<
-  TData = {
-    applyRegistryDefaults: unknown | null;
-  },
->(
-  params?: {
-    variables?: ApplyRegistryDefaultsVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        applyRegistryDefaults: unknown | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData> {
+export function useApplyRegistryDefaultsQuery<TData = {
+  applyRegistryDefaults: unknown | null;
+}>(params?: {
+  variables?: ApplyRegistryDefaultsVariables;
+} & Omit<UseQueryOptions<{
+  applyRegistryDefaults: unknown | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useApplyRegistryDefaultsQuery<TData = {
+  applyRegistryDefaults: unknown | null;
+}>(params?: {
+  variables?: ApplyRegistryDefaultsVariables;
+} & Omit<UseQueryOptions<{
+  applyRegistryDefaults: unknown | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const { variables: _variables, ...queryOptions } = params ?? {};
+  const {
+    variables: _variables,
+    ...queryOptions
+  } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: applyRegistryDefaultsQueryKey(variables),
     queryFn: () => getClient().query.applyRegistryDefaults(variables).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch applyRegistryDefaults without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchApplyRegistryDefaultsQuery({ variables: { data, nodeType } });
@@ -87,21 +68,18 @@ export async function fetchApplyRegistryDefaultsQuery(params?: {
 }
 /**
  * Prefetch applyRegistryDefaults for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchApplyRegistryDefaultsQuery(queryClient, { variables: { data, nodeType } });
  * ```
  */
-export async function prefetchApplyRegistryDefaultsQuery(
-  queryClient: QueryClient,
-  params?: {
-    variables?: ApplyRegistryDefaultsVariables;
-  }
-): Promise<void> {
+export async function prefetchApplyRegistryDefaultsQuery(queryClient: QueryClient, params?: {
+  variables?: ApplyRegistryDefaultsVariables;
+}): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: applyRegistryDefaultsQueryKey(variables),
-    queryFn: () => getClient().query.applyRegistryDefaults(variables).unwrap(),
+    queryFn: () => getClient().query.applyRegistryDefaults(variables).unwrap()
   });
 }

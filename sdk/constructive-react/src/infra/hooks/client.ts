@@ -36,7 +36,9 @@ export function configure(config: OrmClientConfig): void {
  */
 export function getClient(): OrmClientInstance {
   if (!client) {
-    throw new Error('ORM client not configured. Call configure() before using hooks.');
+    throw new Error(
+      'ORM client not configured. Call configure() before using hooks.',
+    );
   }
   return client;
 }

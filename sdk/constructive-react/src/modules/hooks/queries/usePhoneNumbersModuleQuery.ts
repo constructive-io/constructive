@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { phoneNumbersModuleKeys } from '../query-keys';
-import type {
-  PhoneNumbersModuleSelect,
-  PhoneNumbersModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PhoneNumbersModuleSelect,
-  PhoneNumbersModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { phoneNumbersModuleKeys } from "../query-keys";
+import type { PhoneNumbersModuleSelect, PhoneNumbersModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PhoneNumbersModuleSelect, PhoneNumbersModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const phoneNumbersModuleQueryKey = phoneNumbersModuleKeys.detail;
 /**
  * Query hook for fetching a single PhoneNumbersModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePhoneNumbersModuleQuery({
@@ -32,52 +26,38 @@ export const phoneNumbersModuleQueryKey = phoneNumbersModuleKeys.detail;
  * });
  * ```
  */
-export function usePhoneNumbersModuleQuery<
-  S extends PhoneNumbersModuleSelect,
-  TData = {
-    phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePhoneNumbersModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<PhoneNumbersModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function usePhoneNumbersModuleQuery<S extends PhoneNumbersModuleSelect, TData = {
+  phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
+} & Omit<UseQueryOptions<{
+  phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePhoneNumbersModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<PhoneNumbersModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<PhoneNumbersModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: phoneNumbersModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .phoneNumbersModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().phoneNumbersModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single PhoneNumbersModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPhoneNumbersModuleQuery({
@@ -99,46 +79,35 @@ export async function fetchPhoneNumbersModuleQuery(params: {
   selection: SelectionConfig<PhoneNumbersModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PhoneNumbersModuleSelect>(params.selection);
-  return getClient()
-    .phoneNumbersModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().phoneNumbersModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single PhoneNumbersModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchPhoneNumbersModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPhoneNumbersModuleQuery<S extends PhoneNumbersModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchPhoneNumbersModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<PhoneNumbersModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchPhoneNumbersModuleQuery<S extends PhoneNumbersModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PhoneNumbersModuleSelect>;
+}): Promise<void>;
+export async function prefetchPhoneNumbersModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<PhoneNumbersModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<PhoneNumbersModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: phoneNumbersModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .phoneNumbersModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().phoneNumbersModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

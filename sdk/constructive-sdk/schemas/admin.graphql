@@ -2446,76 +2446,6 @@ type CreateOrgAdminGrantPayload {
   query: Query
 }
 
-"""All input for the create `OrgChartEdgeGrant` mutation."""
-input CreateOrgChartEdgeGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` to be created by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrantInput!
-}
-
-"""The output of our create `OrgChartEdgeGrant` mutation."""
-type CreateOrgChartEdgeGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` that was created by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
-
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `OrgChartEdge` mutation."""
-input CreateOrgChartEdgeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdge` to be created by this mutation."""
-  orgChartEdge: OrgChartEdgeInput!
-}
-
-"""The output of our create `OrgChartEdge` mutation."""
-type CreateOrgChartEdgePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdge` that was created by this mutation."""
-  orgChartEdge: OrgChartEdge
-
-  """An edge for our `OrgChartEdge`. May be used by Relay 1."""
-  orgChartEdgeEdge(
-    """The method to use when ordering `OrgChartEdge`."""
-    orderBy: [OrgChartEdgeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the create `OrgClaimedInvite` mutation."""
 input CreateOrgClaimedInviteInput {
   """
@@ -3466,72 +3396,6 @@ type DeleteOrgAdminGrantPayload {
   query: Query
 }
 
-"""All input for the `deleteOrgChartEdgeGrant` mutation."""
-input DeleteOrgChartEdgeGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `OrgChartEdgeGrant` mutation."""
-type DeleteOrgChartEdgeGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` that was deleted by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
-
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deleteOrgChartEdge` mutation."""
-input DeleteOrgChartEdgeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `OrgChartEdge` mutation."""
-type DeleteOrgChartEdgePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdge` that was deleted by this mutation."""
-  orgChartEdge: OrgChartEdge
-
-  """An edge for our `OrgChartEdge`. May be used by Relay 1."""
-  orgChartEdgeEdge(
-    """The method to use when ordering `OrgChartEdge`."""
-    orderBy: [OrgChartEdgeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `deleteOrgClaimedInvite` mutation."""
 input DeleteOrgClaimedInviteInput {
   """
@@ -4330,9 +4194,56 @@ type MetaRelations {
   manyToMany: [MetaManyToManyRelation!]!
 }
 
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
 """Root meta schema type"""
 type MetaSchema {
   tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
 }
 
 """Search metadata for a table"""
@@ -4402,6 +4313,9 @@ type MetaTable {
   relations: MetaRelations!
   schemaName: String!
 
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
   """Search metadata (null if no search configured)"""
   search: MetaSearch
 
@@ -4412,6 +4326,8 @@ type MetaTable {
 
 """Information about a PostgreSQL type"""
 type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
   gqlType: String!
   hasDefault: Boolean
   isArray: Boolean!
@@ -4533,22 +4449,6 @@ type Mutation {
     """
     input: CreateOrgAdminGrantInput!
   ): CreateOrgAdminGrantPayload
-
-  """Creates a single `OrgChartEdge`."""
-  createOrgChartEdge(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgChartEdgeInput!
-  ): CreateOrgChartEdgePayload
-
-  """Creates a single `OrgChartEdgeGrant`."""
-  createOrgChartEdgeGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgChartEdgeGrantInput!
-  ): CreateOrgChartEdgeGrantPayload
 
   """Creates a single `OrgClaimedInvite`."""
   createOrgClaimedInvite(
@@ -4757,22 +4657,6 @@ type Mutation {
     """
     input: DeleteOrgAdminGrantInput!
   ): DeleteOrgAdminGrantPayload
-
-  """Deletes a single `OrgChartEdge` using a unique key."""
-  deleteOrgChartEdge(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgChartEdgeInput!
-  ): DeleteOrgChartEdgePayload
-
-  """Deletes a single `OrgChartEdgeGrant` using a unique key."""
-  deleteOrgChartEdgeGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgChartEdgeGrantInput!
-  ): DeleteOrgChartEdgeGrantPayload
 
   """Deletes a single `OrgClaimedInvite` using a unique key."""
   deleteOrgClaimedInvite(
@@ -5014,22 +4898,6 @@ type Mutation {
     """
     input: UpdateOrgAdminGrantInput!
   ): UpdateOrgAdminGrantPayload
-
-  """Updates a single `OrgChartEdge` using a unique key and a patch."""
-  updateOrgChartEdge(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgChartEdgeInput!
-  ): UpdateOrgChartEdgePayload
-
-  """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
-  updateOrgChartEdgeGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgChartEdgeGrantInput!
-  ): UpdateOrgChartEdgeGrantPayload
 
   """Updates a single `OrgClaimedInvite` using a unique key and a patch."""
   updateOrgClaimedInvite(
@@ -5285,354 +5153,6 @@ input OrgAdminGrantPatch {
 }
 
 """
-Organizational chart edges defining parent-child reporting relationships between members within an entity
-"""
-type OrgChartEdge {
-  """User ID of the subordinate (employee) in this reporting relationship"""
-  childId: UUID!
-  createdAt: Datetime
-
-  """Organization this hierarchy edge belongs to"""
-  entityId: UUID!
-  id: UUID!
-
-  """
-  User ID of the manager; NULL indicates a top-level position with no direct report
-  """
-  parentId: UUID
-
-  """Numeric seniority level for this position (higher = more senior)"""
-  positionLevel: Int
-
-  """Job title or role name for this position in the org chart"""
-  positionTitle: String
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `OrgChartEdge` values."""
-type OrgChartEdgeConnection {
-  """
-  A list of edges which contains the `OrgChartEdge` and cursor to aid in pagination.
-  """
-  edges: [OrgChartEdgeEdge]!
-
-  """A list of `OrgChartEdge` objects."""
-  nodes: [OrgChartEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgChartEdge` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `OrgChartEdge` edge in the connection."""
-type OrgChartEdgeEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgChartEdge` at the end of the edge."""
-  node: OrgChartEdge
-}
-
-"""
-A filter to be used against `OrgChartEdge` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgChartEdgeFilter {
-  """Checks for all expressions in this list."""
-  and: [OrgChartEdgeFilter!]
-
-  """Filter by the object’s `childId` field."""
-  childId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Negates the expression."""
-  not: OrgChartEdgeFilter
-
-  """Checks for any expressions in this list."""
-  or: [OrgChartEdgeFilter!]
-
-  """Filter by the object’s `parentId` field."""
-  parentId: UUIDFilter
-
-  """Filter by the object’s `positionLevel` field."""
-  positionLevel: IntFilter
-
-  """Filter by the object’s `positionTitle` field."""
-  positionTitle: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""
-Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table
-"""
-type OrgChartEdgeGrant {
-  """User ID of the subordinate being placed in the hierarchy"""
-  childId: UUID!
-
-  """Timestamp when this grant or revocation was recorded"""
-  createdAt: Datetime!
-
-  """Organization this grant applies to"""
-  entityId: UUID!
-
-  """
-  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
-  """
-  grantorId: UUID
-  id: UUID!
-
-  """TRUE to add/update the edge, FALSE to remove it"""
-  isGrant: Boolean!
-
-  """User ID of the manager being assigned; NULL for top-level positions"""
-  parentId: UUID
-
-  """Numeric seniority level being assigned in this grant"""
-  positionLevel: Int
-
-  """Job title or role name being assigned in this grant"""
-  positionTitle: String
-}
-
-"""A connection to a list of `OrgChartEdgeGrant` values."""
-type OrgChartEdgeGrantConnection {
-  """
-  A list of edges which contains the `OrgChartEdgeGrant` and cursor to aid in pagination.
-  """
-  edges: [OrgChartEdgeGrantEdge]!
-
-  """A list of `OrgChartEdgeGrant` objects."""
-  nodes: [OrgChartEdgeGrant]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `OrgChartEdgeGrant` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `OrgChartEdgeGrant` edge in the connection."""
-type OrgChartEdgeGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgChartEdgeGrant` at the end of the edge."""
-  node: OrgChartEdgeGrant
-}
-
-"""
-A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgChartEdgeGrantFilter {
-  """Checks for all expressions in this list."""
-  and: [OrgChartEdgeGrantFilter!]
-
-  """Filter by the object’s `childId` field."""
-  childId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Negates the expression."""
-  not: OrgChartEdgeGrantFilter
-
-  """Checks for any expressions in this list."""
-  or: [OrgChartEdgeGrantFilter!]
-
-  """Filter by the object’s `parentId` field."""
-  parentId: UUIDFilter
-
-  """Filter by the object’s `positionLevel` field."""
-  positionLevel: IntFilter
-
-  """Filter by the object’s `positionTitle` field."""
-  positionTitle: StringFilter
-}
-
-"""An input for mutations affecting `OrgChartEdgeGrant`"""
-input OrgChartEdgeGrantInput {
-  """User ID of the subordinate being placed in the hierarchy"""
-  childId: UUID!
-
-  """Timestamp when this grant or revocation was recorded"""
-  createdAt: Datetime
-
-  """Organization this grant applies to"""
-  entityId: UUID!
-
-  """
-  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
-  """
-  grantorId: UUID
-  id: UUID
-
-  """TRUE to add/update the edge, FALSE to remove it"""
-  isGrant: Boolean
-
-  """User ID of the manager being assigned; NULL for top-level positions"""
-  parentId: UUID
-
-  """Numeric seniority level being assigned in this grant"""
-  positionLevel: Int
-
-  """Job title or role name being assigned in this grant"""
-  positionTitle: String
-}
-
-"""Methods to use when ordering `OrgChartEdgeGrant`."""
-enum OrgChartEdgeGrantOrderBy {
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  NATURAL
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  POSITION_LEVEL_ASC
-  POSITION_LEVEL_DESC
-  POSITION_TITLE_ASC
-  POSITION_TITLE_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-}
-
-"""
-Represents an update to a `OrgChartEdgeGrant`. Fields that are set will be updated.
-"""
-input OrgChartEdgeGrantPatch {
-  """User ID of the subordinate being placed in the hierarchy"""
-  childId: UUID
-
-  """Timestamp when this grant or revocation was recorded"""
-  createdAt: Datetime
-
-  """Organization this grant applies to"""
-  entityId: UUID
-
-  """
-  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
-  """
-  grantorId: UUID
-  id: UUID
-
-  """TRUE to add/update the edge, FALSE to remove it"""
-  isGrant: Boolean
-
-  """User ID of the manager being assigned; NULL for top-level positions"""
-  parentId: UUID
-
-  """Numeric seniority level being assigned in this grant"""
-  positionLevel: Int
-
-  """Job title or role name being assigned in this grant"""
-  positionTitle: String
-}
-
-"""An input for mutations affecting `OrgChartEdge`"""
-input OrgChartEdgeInput {
-  """User ID of the subordinate (employee) in this reporting relationship"""
-  childId: UUID!
-  createdAt: Datetime
-
-  """Organization this hierarchy edge belongs to"""
-  entityId: UUID!
-  id: UUID
-
-  """
-  User ID of the manager; NULL indicates a top-level position with no direct report
-  """
-  parentId: UUID
-
-  """Numeric seniority level for this position (higher = more senior)"""
-  positionLevel: Int
-
-  """Job title or role name for this position in the org chart"""
-  positionTitle: String
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `OrgChartEdge`."""
-enum OrgChartEdgeOrderBy {
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  ID_ASC
-  ID_DESC
-  NATURAL
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  POSITION_LEVEL_ASC
-  POSITION_LEVEL_DESC
-  POSITION_TITLE_ASC
-  POSITION_TITLE_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""
-Represents an update to a `OrgChartEdge`. Fields that are set will be updated.
-"""
-input OrgChartEdgePatch {
-  """User ID of the subordinate (employee) in this reporting relationship"""
-  childId: UUID
-  createdAt: Datetime
-
-  """Organization this hierarchy edge belongs to"""
-  entityId: UUID
-  id: UUID
-
-  """
-  User ID of the manager; NULL indicates a top-level position with no direct report
-  """
-  parentId: UUID
-
-  """Numeric seniority level for this position (higher = more senior)"""
-  positionLevel: Int
-
-  """Job title or role name for this position in the org chart"""
-  positionTitle: String
-  updatedAt: Datetime
-}
-
-"""
 Records of successfully claimed invitations, linking senders to receivers
 """
 type OrgClaimedInvite {
@@ -5766,72 +5286,6 @@ input OrgClaimedInvitePatch {
   """User ID of the original invitation sender"""
   senderId: UUID
   updatedAt: Datetime
-}
-
-"""A connection to a list of `OrgGetManagersRecord` values."""
-type OrgGetManagersConnection {
-  """
-  A list of edges which contains the `OrgGetManagersRecord` and cursor to aid in pagination.
-  """
-  edges: [OrgGetManagersEdge]!
-
-  """A list of `OrgGetManagersRecord` objects."""
-  nodes: [OrgGetManagersRecord]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `OrgGetManagersRecord` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `OrgGetManagersRecord` edge in the connection."""
-type OrgGetManagersEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgGetManagersRecord` at the end of the edge."""
-  node: OrgGetManagersRecord
-}
-
-type OrgGetManagersRecord {
-  depth: Int
-  userId: UUID
-}
-
-"""A connection to a list of `OrgGetSubordinatesRecord` values."""
-type OrgGetSubordinatesConnection {
-  """
-  A list of edges which contains the `OrgGetSubordinatesRecord` and cursor to aid in pagination.
-  """
-  edges: [OrgGetSubordinatesEdge]!
-
-  """A list of `OrgGetSubordinatesRecord` objects."""
-  nodes: [OrgGetSubordinatesRecord]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `OrgGetSubordinatesRecord` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `OrgGetSubordinatesRecord` edge in the connection."""
-type OrgGetSubordinatesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgGetSubordinatesRecord` at the end of the edge."""
-  node: OrgGetSubordinatesRecord
-}
-
-type OrgGetSubordinatesRecord {
-  depth: Int
-  userId: UUID
 }
 
 """
@@ -8537,64 +7991,6 @@ type Query {
     where: OrgAdminGrantFilter
   ): OrgAdminGrantConnection
 
-  """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
-  orgChartEdgeGrants(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgChartEdgeGrantFilter
-  ): OrgChartEdgeGrantConnection
-
-  """Reads and enables pagination through a set of `OrgChartEdge`."""
-  orgChartEdges(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `OrgChartEdge`."""
-    orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgChartEdgeFilter
-  ): OrgChartEdgeConnection
-
   """Reads and enables pagination through a set of `OrgClaimedInvite`."""
   orgClaimedInvites(
     """Read all values in the set after (below) this cursor."""
@@ -8623,44 +8019,6 @@ type Query {
     """
     where: OrgClaimedInviteFilter
   ): OrgClaimedInviteConnection
-
-  """Reads and enables pagination through a set of `OrgGetManagersRecord`."""
-  orgGetManagers(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-    pEntityId: UUID
-    pMaxDepth: Int
-    pUserId: UUID
-  ): OrgGetManagersConnection
-
-  """
-  Reads and enables pagination through a set of `OrgGetSubordinatesRecord`.
-  """
-  orgGetSubordinates(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-    pEntityId: UUID
-    pMaxDepth: Int
-    pUserId: UUID
-  ): OrgGetSubordinatesConnection
 
   """Reads and enables pagination through a set of `OrgGrant`."""
   orgGrants(
@@ -8719,7 +8077,6 @@ type Query {
     """
     where: OrgInviteFilter
   ): OrgInviteConnection
-  orgIsManagerOf(pEntityId: UUID, pManagerId: UUID, pMaxDepth: Int, pUserId: UUID): Boolean
 
   """Reads and enables pagination through a set of `OrgMemberProfile`."""
   orgMemberProfiles(
@@ -9759,82 +9116,6 @@ type UpdateOrgAdminGrantPayload {
     """The method to use when ordering `OrgAdminGrant`."""
     orderBy: [OrgAdminGrantOrderBy!]! = [PRIMARY_KEY_ASC]
   ): OrgAdminGrantEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateOrgChartEdgeGrant` mutation."""
-input UpdateOrgChartEdgeGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgChartEdgeGrant` being updated.
-  """
-  orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch!
-}
-
-"""The output of our update `OrgChartEdgeGrant` mutation."""
-type UpdateOrgChartEdgeGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` that was updated by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
-
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateOrgChartEdge` mutation."""
-input UpdateOrgChartEdgeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgChartEdge` being updated.
-  """
-  orgChartEdgePatch: OrgChartEdgePatch!
-}
-
-"""The output of our update `OrgChartEdge` mutation."""
-type UpdateOrgChartEdgePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdge` that was updated by this mutation."""
-  orgChartEdge: OrgChartEdge
-
-  """An edge for our `OrgChartEdge`. May be used by Relay 1."""
-  orgChartEdgeEdge(
-    """The method to use when ordering `OrgChartEdge`."""
-    orderBy: [OrgChartEdgeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

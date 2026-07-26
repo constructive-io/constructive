@@ -250,7 +250,6 @@ export interface SqlAction {
   actionId?: string | null;
   actionName?: string | null;
   actorId?: string | null;
-  category?: string | null;
   content?: string | null;
   createdAt?: string | null;
   databaseId?: string | null;
@@ -300,7 +299,6 @@ export type SqlActionSelect = {
   actionId?: boolean;
   actionName?: boolean;
   actorId?: boolean;
-  category?: boolean;
   content?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
@@ -356,8 +354,6 @@ export interface SqlActionFilter {
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: SqlActionFilter[];
-  /** Filter by the object’s `category` field. */
-  category?: StringFilter;
   /** Filter by the object’s `content` field. */
   content?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -382,64 +378,8 @@ export interface SqlActionFilter {
   verify?: StringFilter;
 }
 // ============ OrderBy Types ============
-export type AstMigrationOrderBy =
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTION_NAME_ASC'
-  | 'ACTION_NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEPLOYS_ASC'
-  | 'DEPLOYS_DESC'
-  | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'REQUIRES_ASC'
-  | 'REQUIRES_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC';
-export type SqlActionOrderBy =
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTION_NAME_ASC'
-  | 'ACTION_NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CONTENT_ASC'
-  | 'CONTENT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'DEPS_ASC'
-  | 'DEPS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC';
+export type AstMigrationOrderBy = "ACTION_ID_ASC" | "ACTION_ID_DESC" | "ACTION_NAME_ASC" | "ACTION_NAME_DESC" | "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOYS_ASC" | "DEPLOYS_DESC" | "DEPLOY_ASC" | "DEPLOY_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "REQUIRES_ASC" | "REQUIRES_DESC" | "REVERT_ASC" | "REVERT_DESC" | "VERIFY_ASC" | "VERIFY_DESC";
+export type SqlActionOrderBy = "ACTION_ID_ASC" | "ACTION_ID_DESC" | "ACTION_NAME_ASC" | "ACTION_NAME_DESC" | "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOY_ASC" | "DEPLOY_DESC" | "DEPS_ASC" | "DEPS_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "REVERT_ASC" | "REVERT_DESC" | "VERIFY_ASC" | "VERIFY_DESC";
 // ============ CRUD Input Types ============
 export interface CreateAstMigrationInput {
   clientMutationId?: string;
@@ -485,7 +425,6 @@ export interface CreateSqlActionInput {
     actionId: string;
     actionName?: string;
     actorId: string;
-    category?: string;
     content?: string;
     databaseId: string;
     deploy?: string;
@@ -500,7 +439,6 @@ export interface SqlActionPatch {
   actionId?: string | null;
   actionName?: string | null;
   actorId?: string | null;
-  category?: string | null;
   content?: string | null;
   databaseId?: string | null;
   deploy?: string | null;

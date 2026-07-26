@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries
+Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default
 
 ## Usage
 
 ```typescript
-useCorsSettingsQuery({ selection: { fields: { allowedOrigins: true, apiId: true, databaseId: true, id: true } } })
-useCorsSettingQuery({ id: '<UUID>', selection: { fields: { allowedOrigins: true, apiId: true, databaseId: true, id: true } } })
+useCorsSettingsQuery({ selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } } })
+useCorsSettingQuery({ id: '<UUID>', selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } } })
 useCreateCorsSettingMutation({ selection: { fields: { id: true } } })
 useUpdateCorsSettingMutation({ selection: { fields: { id: true } } })
 useDeleteCorsSettingMutation({})
@@ -20,7 +20,7 @@ useDeleteCorsSettingMutation({})
 
 ```typescript
 const { data, isLoading } = useCorsSettingsQuery({
-  selection: { fields: { allowedOrigins: true, apiId: true, databaseId: true, id: true } },
+  selection: { fields: { allowedOrigins: true, apiId: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
 });
 ```
 

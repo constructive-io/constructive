@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { dbUsageModuleKeys } from '../query-keys';
-import type { DbUsageModuleSelect, DbUsageModuleWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { DbUsageModuleSelect, DbUsageModuleWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { dbUsageModuleKeys } from "../query-keys";
+import type { DbUsageModuleSelect, DbUsageModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { DbUsageModuleSelect, DbUsageModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const dbUsageModuleQueryKey = dbUsageModuleKeys.detail;
 /**
  * Query hook for fetching a single DbUsageModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDbUsageModuleQuery({
@@ -26,52 +26,38 @@ export const dbUsageModuleQueryKey = dbUsageModuleKeys.detail;
  * });
  * ```
  */
-export function useDbUsageModuleQuery<
-  S extends DbUsageModuleSelect,
-  TData = {
-    dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDbUsageModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<DbUsageModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useDbUsageModuleQuery<S extends DbUsageModuleSelect, TData = {
+  dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
+} & Omit<UseQueryOptions<{
+  dbUsageModule: InferSelectResult<DbUsageModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDbUsageModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<DbUsageModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<DbUsageModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: dbUsageModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .dbUsageModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().dbUsageModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single DbUsageModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDbUsageModuleQuery({
@@ -93,46 +79,35 @@ export async function fetchDbUsageModuleQuery(params: {
   selection: SelectionConfig<DbUsageModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DbUsageModuleSelect>(params.selection);
-  return getClient()
-    .dbUsageModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().dbUsageModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single DbUsageModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDbUsageModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDbUsageModuleQuery<S extends DbUsageModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchDbUsageModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<DbUsageModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchDbUsageModuleQuery<S extends DbUsageModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DbUsageModuleSelect>;
+}): Promise<void>;
+export async function prefetchDbUsageModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<DbUsageModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<DbUsageModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: dbUsageModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .dbUsageModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().dbUsageModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

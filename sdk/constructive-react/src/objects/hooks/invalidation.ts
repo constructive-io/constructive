@@ -13,14 +13,8 @@
 // - Remove helpers for delete operations
 // ============================================================================
 
-import type { QueryClient } from '@tanstack/react-query';
-import {
-  commitKeys,
-  getAllTreeNodesRecordKeys,
-  objectKeys,
-  refKeys,
-  storeKeys,
-} from './query-keys';
+import type { QueryClient } from "@tanstack/react-query";
+import { commitKeys, getAllTreeNodesRecordKeys, objectKeys, refKeys, storeKeys } from "./query-keys";
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -41,79 +35,61 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate commit queries */ commit: {
-    /** Invalidate all commit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.all,
-      }),
-    /** Invalidate commit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.lists(),
-      }),
-    /** Invalidate a specific commit */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.detail(id),
-      }),
+  /** Invalidate commit queries */commit: {
+    /** Invalidate all commit queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: commitKeys.all
+    }),
+    /** Invalidate commit list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: commitKeys.lists()
+    }),
+    /** Invalidate a specific commit */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: commitKeys.detail(id)
+    })
   },
-  /** Invalidate getAllTreeNodesRecord queries */ getAllTreeNodesRecord: {
-    /** Invalidate all getAllTreeNodesRecord queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllTreeNodesRecordKeys.all,
-      }),
-    /** Invalidate getAllTreeNodesRecord list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllTreeNodesRecordKeys.lists(),
-      }),
-    /** Invalidate a specific getAllTreeNodesRecord */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllTreeNodesRecordKeys.detail(id),
-      }),
+  /** Invalidate getAllTreeNodesRecord queries */getAllTreeNodesRecord: {
+    /** Invalidate all getAllTreeNodesRecord queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: getAllTreeNodesRecordKeys.all
+    }),
+    /** Invalidate getAllTreeNodesRecord list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: getAllTreeNodesRecordKeys.lists()
+    }),
+    /** Invalidate a specific getAllTreeNodesRecord */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: getAllTreeNodesRecordKeys.detail(id)
+    })
   },
-  /** Invalidate object queries */ object: {
-    /** Invalidate all object queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.all,
-      }),
-    /** Invalidate object list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.lists(),
-      }),
-    /** Invalidate a specific object */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.detail(id),
-      }),
+  /** Invalidate object queries */object: {
+    /** Invalidate all object queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: objectKeys.all
+    }),
+    /** Invalidate object list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: objectKeys.lists()
+    }),
+    /** Invalidate a specific object */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: objectKeys.detail(id)
+    })
   },
-  /** Invalidate ref queries */ ref: {
-    /** Invalidate all ref queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: refKeys.all,
-      }),
-    /** Invalidate ref list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: refKeys.lists(),
-      }),
-    /** Invalidate a specific ref */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: refKeys.detail(id),
-      }),
+  /** Invalidate ref queries */ref: {
+    /** Invalidate all ref queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: refKeys.all
+    }),
+    /** Invalidate ref list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: refKeys.lists()
+    }),
+    /** Invalidate a specific ref */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: refKeys.detail(id)
+    })
   },
-  /** Invalidate store queries */ store: {
-    /** Invalidate all store queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: storeKeys.all,
-      }),
-    /** Invalidate store list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: storeKeys.lists(),
-      }),
-    /** Invalidate a specific store */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: storeKeys.detail(id),
-      }),
-  },
+  /** Invalidate store queries */store: {
+    /** Invalidate all store queries */all: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: storeKeys.all
+    }),
+    /** Invalidate store list queries */lists: (queryClient: QueryClient) => queryClient.invalidateQueries({
+      queryKey: storeKeys.lists()
+    }),
+    /** Invalidate a specific store */detail: (queryClient: QueryClient, id: string | number) => queryClient.invalidateQueries({
+      queryKey: storeKeys.detail(id)
+    })
+  }
 } as const;
 /**
 
@@ -127,32 +103,29 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
+  /** Remove commit from cache */commit: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: commitKeys.detail(id),
+      queryKey: commitKeys.detail(id)
     });
   },
-  /** Remove getAllTreeNodesRecord from cache */ getAllTreeNodesRecord: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove getAllTreeNodesRecord from cache */getAllTreeNodesRecord: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: getAllTreeNodesRecordKeys.detail(id),
+      queryKey: getAllTreeNodesRecordKeys.detail(id)
     });
   },
-  /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {
+  /** Remove object from cache */object: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: objectKeys.detail(id),
+      queryKey: objectKeys.detail(id)
     });
   },
-  /** Remove ref from cache */ ref: (queryClient: QueryClient, id: string | number) => {
+  /** Remove ref from cache */ref: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: refKeys.detail(id),
+      queryKey: refKeys.detail(id)
     });
   },
-  /** Remove store from cache */ store: (queryClient: QueryClient, id: string | number) => {
+  /** Remove store from cache */store: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: storeKeys.detail(id),
+      queryKey: storeKeys.detail(id)
     });
-  },
+  }
 } as const;

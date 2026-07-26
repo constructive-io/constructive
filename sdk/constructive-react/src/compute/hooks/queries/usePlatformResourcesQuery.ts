@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { platformResourceKeys } from '../query-keys';
-import type {
-  PlatformResourceSelect,
-  PlatformResourceWithRelations,
-  PlatformResourceFilter,
-  PlatformResourceOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PlatformResourceSelect,
-  PlatformResourceWithRelations,
-  PlatformResourceFilter,
-  PlatformResourceOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { platformResourceKeys } from "../query-keys";
+import type { PlatformResourceSelect, PlatformResourceWithRelations, PlatformResourceFilter, PlatformResourceOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourceSelect, PlatformResourceWithRelations, PlatformResourceFilter, PlatformResourceOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformResourcesQueryKey = platformResourceKeys.list;
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourcesQuery({
@@ -45,53 +30,33 @@ export const platformResourcesQueryKey = platformResourceKeys.list;
  * });
  * ```
  */
-export function usePlatformResourcesQuery<
-  S extends PlatformResourceSelect,
-  TData = {
-    platformResources: ConnectionResult<InferSelectResult<PlatformResourceWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PlatformResourceFilter, PlatformResourceOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformResources: ConnectionResult<InferSelectResult<PlatformResourceWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformResourcesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PlatformResourceSelect,
-      PlatformResourceFilter,
-      PlatformResourceOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PlatformResourceSelect,
-    PlatformResourceFilter,
-    PlatformResourceOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePlatformResourcesQuery<S extends PlatformResourceSelect, TData = {
+  platformResources: ConnectionResult<InferSelectResult<PlatformResourceWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformResourceFilter, PlatformResourceOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
+} & Omit<UseQueryOptions<{
+  platformResources: ConnectionResult<InferSelectResult<PlatformResourceWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformResourcesQuery(params: {
+  selection: ListSelectionConfig<PlatformResourceSelect, PlatformResourceFilter, PlatformResourceOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PlatformResourceSelect, PlatformResourceFilter, PlatformResourceOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourceKeys.list(args),
     queryFn: () => getClient().platformResource.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformResourcesQuery({
@@ -105,59 +70,35 @@ export function usePlatformResourcesQuery(
 export async function fetchPlatformResourcesQuery<S extends PlatformResourceSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PlatformResourceFilter, PlatformResourceOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
+  } & Omit<ListSelectionConfig<S, PlatformResourceFilter, PlatformResourceOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
 }): Promise<{
   platformResources: ConnectionResult<InferSelectResult<PlatformResourceWithRelations, S>>;
 }>;
 export async function fetchPlatformResourcesQuery(params: {
-  selection: ListSelectionConfig<
-    PlatformResourceSelect,
-    PlatformResourceFilter,
-    PlatformResourceOrderBy
-  >;
+  selection: ListSelectionConfig<PlatformResourceSelect, PlatformResourceFilter, PlatformResourceOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PlatformResourceSelect,
-    PlatformResourceFilter,
-    PlatformResourceOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PlatformResourceSelect, PlatformResourceFilter, PlatformResourceOrderBy>(params.selection);
   return getClient().platformResource.findMany(args).unwrap();
 }
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformResourcesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPlatformResourcesQuery<S extends PlatformResourceSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, PlatformResourceFilter, PlatformResourceOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformResourcesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PlatformResourceSelect,
-      PlatformResourceFilter,
-      PlatformResourceOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PlatformResourceSelect,
-    PlatformResourceFilter,
-    PlatformResourceOrderBy
-  >(params.selection);
+export async function prefetchPlatformResourcesQuery<S extends PlatformResourceSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PlatformResourceFilter, PlatformResourceOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
+}): Promise<void>;
+export async function prefetchPlatformResourcesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PlatformResourceSelect, PlatformResourceFilter, PlatformResourceOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PlatformResourceSelect, PlatformResourceFilter, PlatformResourceOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourceKeys.list(args),
-    queryFn: () => getClient().platformResource.findMany(args).unwrap(),
+    queryFn: () => getClient().platformResource.findMany(args).unwrap()
   });
 }

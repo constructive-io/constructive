@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { appLimitWarningKeys } from '../query-keys';
-import type {
-  AppLimitWarningSelect,
-  AppLimitWarningWithRelations,
-  AppLimitWarningFilter,
-  AppLimitWarningOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  AppLimitWarningSelect,
-  AppLimitWarningWithRelations,
-  AppLimitWarningFilter,
-  AppLimitWarningOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { appLimitWarningKeys } from "../query-keys";
+import type { AppLimitWarningSelect, AppLimitWarningWithRelations, AppLimitWarningFilter, AppLimitWarningOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppLimitWarningSelect, AppLimitWarningWithRelations, AppLimitWarningFilter, AppLimitWarningOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appLimitWarningsQueryKey = appLimitWarningKeys.list;
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppLimitWarningsQuery({
@@ -45,53 +30,33 @@ export const appLimitWarningsQueryKey = appLimitWarningKeys.list;
  * });
  * ```
  */
-export function useAppLimitWarningsQuery<
-  S extends AppLimitWarningSelect,
-  TData = {
-    appLimitWarnings: ConnectionResult<InferSelectResult<AppLimitWarningWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AppLimitWarningFilter, AppLimitWarningOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AppLimitWarningSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appLimitWarnings: ConnectionResult<InferSelectResult<AppLimitWarningWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppLimitWarningsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      AppLimitWarningSelect,
-      AppLimitWarningFilter,
-      AppLimitWarningOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    AppLimitWarningSelect,
-    AppLimitWarningFilter,
-    AppLimitWarningOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useAppLimitWarningsQuery<S extends AppLimitWarningSelect, TData = {
+  appLimitWarnings: ConnectionResult<InferSelectResult<AppLimitWarningWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppLimitWarningFilter, AppLimitWarningOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitWarningSelect>;
+} & Omit<UseQueryOptions<{
+  appLimitWarnings: ConnectionResult<InferSelectResult<AppLimitWarningWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppLimitWarningsQuery(params: {
+  selection: ListSelectionConfig<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appLimitWarningKeys.list(args),
     queryFn: () => getClient().appLimitWarning.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppLimitWarningsQuery({
@@ -105,59 +70,35 @@ export function useAppLimitWarningsQuery(
 export async function fetchAppLimitWarningsQuery<S extends AppLimitWarningSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, AppLimitWarningFilter, AppLimitWarningOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, AppLimitWarningSelect>;
+  } & Omit<ListSelectionConfig<S, AppLimitWarningFilter, AppLimitWarningOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitWarningSelect>;
 }): Promise<{
   appLimitWarnings: ConnectionResult<InferSelectResult<AppLimitWarningWithRelations, S>>;
 }>;
 export async function fetchAppLimitWarningsQuery(params: {
-  selection: ListSelectionConfig<
-    AppLimitWarningSelect,
-    AppLimitWarningFilter,
-    AppLimitWarningOrderBy
-  >;
+  selection: ListSelectionConfig<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    AppLimitWarningSelect,
-    AppLimitWarningFilter,
-    AppLimitWarningOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy>(params.selection);
   return getClient().appLimitWarning.findMany(args).unwrap();
 }
 /**
  * Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppLimitWarningsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppLimitWarningsQuery<S extends AppLimitWarningSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, AppLimitWarningFilter, AppLimitWarningOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, AppLimitWarningSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppLimitWarningsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      AppLimitWarningSelect,
-      AppLimitWarningFilter,
-      AppLimitWarningOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    AppLimitWarningSelect,
-    AppLimitWarningFilter,
-    AppLimitWarningOrderBy
-  >(params.selection);
+export async function prefetchAppLimitWarningsQuery<S extends AppLimitWarningSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppLimitWarningFilter, AppLimitWarningOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitWarningSelect>;
+}): Promise<void>;
+export async function prefetchAppLimitWarningsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<AppLimitWarningSelect, AppLimitWarningFilter, AppLimitWarningOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appLimitWarningKeys.list(args),
-    queryFn: () => getClient().appLimitWarning.findMany(args).unwrap(),
+    queryFn: () => getClient().appLimitWarning.findMany(args).unwrap()
   });
 }

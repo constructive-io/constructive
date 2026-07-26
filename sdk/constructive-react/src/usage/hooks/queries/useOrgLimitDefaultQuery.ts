@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { orgLimitDefaultKeys } from '../query-keys';
-import type { OrgLimitDefaultSelect, OrgLimitDefaultWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { OrgLimitDefaultSelect, OrgLimitDefaultWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { orgLimitDefaultKeys } from "../query-keys";
+import type { OrgLimitDefaultSelect, OrgLimitDefaultWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgLimitDefaultSelect, OrgLimitDefaultWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitDefaultQueryKey = orgLimitDefaultKeys.detail;
 /**
  * Default maximum values for each named limit, applied when no per-actor override exists
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitDefaultQuery({
@@ -26,52 +26,38 @@ export const orgLimitDefaultQueryKey = orgLimitDefaultKeys.detail;
  * });
  * ```
  */
-export function useOrgLimitDefaultQuery<
-  S extends OrgLimitDefaultSelect,
-  TData = {
-    orgLimitDefault: InferSelectResult<OrgLimitDefaultWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, OrgLimitDefaultSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        orgLimitDefault: InferSelectResult<OrgLimitDefaultWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useOrgLimitDefaultQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<OrgLimitDefaultSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useOrgLimitDefaultQuery<S extends OrgLimitDefaultSelect, TData = {
+  orgLimitDefault: InferSelectResult<OrgLimitDefaultWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, OrgLimitDefaultSelect>;
+} & Omit<UseQueryOptions<{
+  orgLimitDefault: InferSelectResult<OrgLimitDefaultWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useOrgLimitDefaultQuery(params: {
+  id: string;
+  selection: SelectionConfig<OrgLimitDefaultSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<OrgLimitDefaultSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitDefaultKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .orgLimitDefault.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().orgLimitDefault.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Default maximum values for each named limit, applied when no per-actor override exists
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchOrgLimitDefaultQuery({
@@ -93,46 +79,35 @@ export async function fetchOrgLimitDefaultQuery(params: {
   selection: SelectionConfig<OrgLimitDefaultSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgLimitDefaultSelect>(params.selection);
-  return getClient()
-    .orgLimitDefault.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().orgLimitDefault.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Default maximum values for each named limit, applied when no per-actor override exists
- *
+ * 
  * @example
  * ```ts
  * await prefetchOrgLimitDefaultQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgLimitDefaultQuery<S extends OrgLimitDefaultSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, OrgLimitDefaultSelect>;
-  }
-): Promise<void>;
-export async function prefetchOrgLimitDefaultQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<OrgLimitDefaultSelect>;
-  }
-): Promise<void> {
+export async function prefetchOrgLimitDefaultQuery<S extends OrgLimitDefaultSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, OrgLimitDefaultSelect>;
+}): Promise<void>;
+export async function prefetchOrgLimitDefaultQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<OrgLimitDefaultSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<OrgLimitDefaultSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitDefaultKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .orgLimitDefault.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().orgLimitDefault.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

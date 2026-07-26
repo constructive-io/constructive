@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { appLimitEventKeys } from '../query-keys';
-import type { AppLimitEventSelect, AppLimitEventWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { AppLimitEventSelect, AppLimitEventWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { appLimitEventKeys } from "../query-keys";
+import type { AppLimitEventSelect, AppLimitEventWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppLimitEventSelect, AppLimitEventWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appLimitEventQueryKey = appLimitEventKeys.detail;
 /**
  * Append-only log of limit events for historical reporting and audit
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppLimitEventQuery({
@@ -26,52 +26,38 @@ export const appLimitEventQueryKey = appLimitEventKeys.detail;
  * });
  * ```
  */
-export function useAppLimitEventQuery<
-  S extends AppLimitEventSelect,
-  TData = {
-    appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AppLimitEventSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppLimitEventQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<AppLimitEventSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useAppLimitEventQuery<S extends AppLimitEventSelect, TData = {
+  appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AppLimitEventSelect>;
+} & Omit<UseQueryOptions<{
+  appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppLimitEventQuery(params: {
+  id: string;
+  selection: SelectionConfig<AppLimitEventSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<AppLimitEventSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appLimitEventKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .appLimitEvent.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().appLimitEvent.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Append-only log of limit events for historical reporting and audit
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppLimitEventQuery({
@@ -93,46 +79,35 @@ export async function fetchAppLimitEventQuery(params: {
   selection: SelectionConfig<AppLimitEventSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppLimitEventSelect>(params.selection);
-  return getClient()
-    .appLimitEvent.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().appLimitEvent.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Append-only log of limit events for historical reporting and audit
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppLimitEventQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppLimitEventQuery<S extends AppLimitEventSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AppLimitEventSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppLimitEventQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<AppLimitEventSelect>;
-  }
-): Promise<void> {
+export async function prefetchAppLimitEventQuery<S extends AppLimitEventSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AppLimitEventSelect>;
+}): Promise<void>;
+export async function prefetchAppLimitEventQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<AppLimitEventSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<AppLimitEventSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appLimitEventKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .appLimitEvent.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().appLimitEvent.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

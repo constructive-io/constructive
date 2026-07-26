@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { appOwnerGrantKeys } from '../query-keys';
-import type { AppOwnerGrantSelect, AppOwnerGrantWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { AppOwnerGrantSelect, AppOwnerGrantWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { appOwnerGrantKeys } from "../query-keys";
+import type { AppOwnerGrantSelect, AppOwnerGrantWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppOwnerGrantSelect, AppOwnerGrantWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appOwnerGrantQueryKey = appOwnerGrantKeys.detail;
 /**
  * Records of ownership transfers and grants between members
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppOwnerGrantQuery({
@@ -26,52 +26,38 @@ export const appOwnerGrantQueryKey = appOwnerGrantKeys.detail;
  * });
  * ```
  */
-export function useAppOwnerGrantQuery<
-  S extends AppOwnerGrantSelect,
-  TData = {
-    appOwnerGrant: InferSelectResult<AppOwnerGrantWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AppOwnerGrantSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appOwnerGrant: InferSelectResult<AppOwnerGrantWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppOwnerGrantQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<AppOwnerGrantSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useAppOwnerGrantQuery<S extends AppOwnerGrantSelect, TData = {
+  appOwnerGrant: InferSelectResult<AppOwnerGrantWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AppOwnerGrantSelect>;
+} & Omit<UseQueryOptions<{
+  appOwnerGrant: InferSelectResult<AppOwnerGrantWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppOwnerGrantQuery(params: {
+  id: string;
+  selection: SelectionConfig<AppOwnerGrantSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<AppOwnerGrantSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appOwnerGrantKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .appOwnerGrant.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().appOwnerGrant.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Records of ownership transfers and grants between members
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppOwnerGrantQuery({
@@ -93,46 +79,35 @@ export async function fetchAppOwnerGrantQuery(params: {
   selection: SelectionConfig<AppOwnerGrantSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AppOwnerGrantSelect>(params.selection);
-  return getClient()
-    .appOwnerGrant.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().appOwnerGrant.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Records of ownership transfers and grants between members
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppOwnerGrantQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAppOwnerGrantQuery<S extends AppOwnerGrantSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AppOwnerGrantSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppOwnerGrantQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<AppOwnerGrantSelect>;
-  }
-): Promise<void> {
+export async function prefetchAppOwnerGrantQuery<S extends AppOwnerGrantSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AppOwnerGrantSelect>;
+}): Promise<void>;
+export async function prefetchAppOwnerGrantQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<AppOwnerGrantSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<AppOwnerGrantSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appOwnerGrantKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .appOwnerGrant.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().appOwnerGrant.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

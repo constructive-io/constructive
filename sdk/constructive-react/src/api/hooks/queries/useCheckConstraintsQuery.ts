@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { checkConstraintKeys } from '../query-keys';
-import type {
-  CheckConstraintSelect,
-  CheckConstraintWithRelations,
-  CheckConstraintFilter,
-  CheckConstraintOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  CheckConstraintSelect,
-  CheckConstraintWithRelations,
-  CheckConstraintFilter,
-  CheckConstraintOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { checkConstraintKeys } from "../query-keys";
+import type { CheckConstraintSelect, CheckConstraintWithRelations, CheckConstraintFilter, CheckConstraintOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { CheckConstraintSelect, CheckConstraintWithRelations, CheckConstraintFilter, CheckConstraintOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const checkConstraintsQueryKey = checkConstraintKeys.list;
 /**
  * Query hook for fetching CheckConstraint list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useCheckConstraintsQuery({
@@ -45,53 +30,33 @@ export const checkConstraintsQueryKey = checkConstraintKeys.list;
  * });
  * ```
  */
-export function useCheckConstraintsQuery<
-  S extends CheckConstraintSelect,
-  TData = {
-    checkConstraints: ConnectionResult<InferSelectResult<CheckConstraintWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, CheckConstraintFilter, CheckConstraintOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        checkConstraints: ConnectionResult<InferSelectResult<CheckConstraintWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useCheckConstraintsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      CheckConstraintSelect,
-      CheckConstraintFilter,
-      CheckConstraintOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    CheckConstraintSelect,
-    CheckConstraintFilter,
-    CheckConstraintOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useCheckConstraintsQuery<S extends CheckConstraintSelect, TData = {
+  checkConstraints: ConnectionResult<InferSelectResult<CheckConstraintWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, CheckConstraintFilter, CheckConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
+} & Omit<UseQueryOptions<{
+  checkConstraints: ConnectionResult<InferSelectResult<CheckConstraintWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useCheckConstraintsQuery(params: {
+  selection: ListSelectionConfig<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: checkConstraintKeys.list(args),
     queryFn: () => getClient().checkConstraint.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch CheckConstraint list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchCheckConstraintsQuery({
@@ -105,59 +70,35 @@ export function useCheckConstraintsQuery(
 export async function fetchCheckConstraintsQuery<S extends CheckConstraintSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, CheckConstraintFilter, CheckConstraintOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
+  } & Omit<ListSelectionConfig<S, CheckConstraintFilter, CheckConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
 }): Promise<{
   checkConstraints: ConnectionResult<InferSelectResult<CheckConstraintWithRelations, S>>;
 }>;
 export async function fetchCheckConstraintsQuery(params: {
-  selection: ListSelectionConfig<
-    CheckConstraintSelect,
-    CheckConstraintFilter,
-    CheckConstraintOrderBy
-  >;
+  selection: ListSelectionConfig<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    CheckConstraintSelect,
-    CheckConstraintFilter,
-    CheckConstraintOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy>(params.selection);
   return getClient().checkConstraint.findMany(args).unwrap();
 }
 /**
  * Prefetch CheckConstraint list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchCheckConstraintsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchCheckConstraintsQuery<S extends CheckConstraintSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, CheckConstraintFilter, CheckConstraintOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
-  }
-): Promise<void>;
-export async function prefetchCheckConstraintsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      CheckConstraintSelect,
-      CheckConstraintFilter,
-      CheckConstraintOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    CheckConstraintSelect,
-    CheckConstraintFilter,
-    CheckConstraintOrderBy
-  >(params.selection);
+export async function prefetchCheckConstraintsQuery<S extends CheckConstraintSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, CheckConstraintFilter, CheckConstraintOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CheckConstraintSelect>;
+}): Promise<void>;
+export async function prefetchCheckConstraintsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: checkConstraintKeys.list(args),
-    queryFn: () => getClient().checkConstraint.findMany(args).unwrap(),
+    queryFn: () => getClient().checkConstraint.findMany(args).unwrap()
   });
 }

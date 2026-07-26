@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformResourceInstallationKeys } from '../query-keys';
-import type {
-  PlatformResourceInstallationSelect,
-  PlatformResourceInstallationWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  PlatformResourceInstallationSelect,
-  PlatformResourceInstallationWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformResourceInstallationKeys } from "../query-keys";
+import type { PlatformResourceInstallationSelect, PlatformResourceInstallationWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourceInstallationSelect, PlatformResourceInstallationWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformResourceInstallationQueryKey = platformResourceInstallationKeys.detail;
 /**
  * Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourceInstallationQuery({
@@ -32,58 +26,38 @@ export const platformResourceInstallationQueryKey = platformResourceInstallation
  * });
  * ```
  */
-export function usePlatformResourceInstallationQuery<
-  S extends PlatformResourceInstallationSelect,
-  TData = {
-    platformResourceInstallation: InferSelectResult<
-      PlatformResourceInstallationWithRelations,
-      S
-    > | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourceInstallationSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformResourceInstallation: InferSelectResult<
-          PlatformResourceInstallationWithRelations,
-          S
-        > | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformResourceInstallationQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformResourceInstallationSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function usePlatformResourceInstallationQuery<S extends PlatformResourceInstallationSelect, TData = {
+  platformResourceInstallation: InferSelectResult<PlatformResourceInstallationWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourceInstallationSelect>;
+} & Omit<UseQueryOptions<{
+  platformResourceInstallation: InferSelectResult<PlatformResourceInstallationWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformResourceInstallationQuery(params: {
+  id: string;
+  selection: SelectionConfig<PlatformResourceInstallationSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<PlatformResourceInstallationSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourceInstallationKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformResourceInstallation.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().platformResourceInstallation.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformResourceInstallationQuery({
@@ -92,66 +66,48 @@ export function usePlatformResourceInstallationQuery(
  * });
  * ```
  */
-export async function fetchPlatformResourceInstallationQuery<
-  S extends PlatformResourceInstallationSelect,
->(params: {
+export async function fetchPlatformResourceInstallationQuery<S extends PlatformResourceInstallationSelect>(params: {
   id: string;
   selection: {
     fields: S;
   } & HookStrictSelect<NoInfer<S>, PlatformResourceInstallationSelect>;
 }): Promise<{
-  platformResourceInstallation: InferSelectResult<
-    PlatformResourceInstallationWithRelations,
-    S
-  > | null;
+  platformResourceInstallation: InferSelectResult<PlatformResourceInstallationWithRelations, S> | null;
 }>;
 export async function fetchPlatformResourceInstallationQuery(params: {
   id: string;
   selection: SelectionConfig<PlatformResourceInstallationSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformResourceInstallationSelect>(params.selection);
-  return getClient()
-    .platformResourceInstallation.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().platformResourceInstallation.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformResourceInstallationQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformResourceInstallationQuery<
-  S extends PlatformResourceInstallationSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourceInstallationSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformResourceInstallationQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformResourceInstallationSelect>;
-  }
-): Promise<void> {
+export async function prefetchPlatformResourceInstallationQuery<S extends PlatformResourceInstallationSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourceInstallationSelect>;
+}): Promise<void>;
+export async function prefetchPlatformResourceInstallationQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<PlatformResourceInstallationSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<PlatformResourceInstallationSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourceInstallationKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformResourceInstallation.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().platformResourceInstallation.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

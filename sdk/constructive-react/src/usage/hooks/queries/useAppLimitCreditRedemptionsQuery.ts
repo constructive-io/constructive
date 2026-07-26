@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { appLimitCreditRedemptionKeys } from '../query-keys';
-import type {
-  AppLimitCreditRedemptionSelect,
-  AppLimitCreditRedemptionWithRelations,
-  AppLimitCreditRedemptionFilter,
-  AppLimitCreditRedemptionOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  AppLimitCreditRedemptionSelect,
-  AppLimitCreditRedemptionWithRelations,
-  AppLimitCreditRedemptionFilter,
-  AppLimitCreditRedemptionOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { appLimitCreditRedemptionKeys } from "../query-keys";
+import type { AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionWithRelations, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionWithRelations, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const appLimitCreditRedemptionsQueryKey = appLimitCreditRedemptionKeys.list;
 /**
  * Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppLimitCreditRedemptionsQuery({
@@ -45,60 +30,33 @@ export const appLimitCreditRedemptionsQueryKey = appLimitCreditRedemptionKeys.li
  * });
  * ```
  */
-export function useAppLimitCreditRedemptionsQuery<
-  S extends AppLimitCreditRedemptionSelect,
-  TData = {
-    appLimitCreditRedemptions: ConnectionResult<
-      InferSelectResult<AppLimitCreditRedemptionWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, AppLimitCreditRedemptionSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appLimitCreditRedemptions: ConnectionResult<
-          InferSelectResult<AppLimitCreditRedemptionWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppLimitCreditRedemptionsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      AppLimitCreditRedemptionSelect,
-      AppLimitCreditRedemptionFilter,
-      AppLimitCreditRedemptionOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    AppLimitCreditRedemptionSelect,
-    AppLimitCreditRedemptionFilter,
-    AppLimitCreditRedemptionOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useAppLimitCreditRedemptionsQuery<S extends AppLimitCreditRedemptionSelect, TData = {
+  appLimitCreditRedemptions: ConnectionResult<InferSelectResult<AppLimitCreditRedemptionWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitCreditRedemptionSelect>;
+} & Omit<UseQueryOptions<{
+  appLimitCreditRedemptions: ConnectionResult<InferSelectResult<AppLimitCreditRedemptionWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppLimitCreditRedemptionsQuery(params: {
+  selection: ListSelectionConfig<AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: appLimitCreditRedemptionKeys.list(args),
     queryFn: () => getClient().appLimitCreditRedemption.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppLimitCreditRedemptionsQuery({
@@ -109,74 +67,38 @@ export function useAppLimitCreditRedemptionsQuery(
  * });
  * ```
  */
-export async function fetchAppLimitCreditRedemptionsQuery<
-  S extends AppLimitCreditRedemptionSelect,
->(params: {
+export async function fetchAppLimitCreditRedemptionsQuery<S extends AppLimitCreditRedemptionSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, AppLimitCreditRedemptionSelect>;
+  } & Omit<ListSelectionConfig<S, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitCreditRedemptionSelect>;
 }): Promise<{
-  appLimitCreditRedemptions: ConnectionResult<
-    InferSelectResult<AppLimitCreditRedemptionWithRelations, S>
-  >;
+  appLimitCreditRedemptions: ConnectionResult<InferSelectResult<AppLimitCreditRedemptionWithRelations, S>>;
 }>;
 export async function fetchAppLimitCreditRedemptionsQuery(params: {
-  selection: ListSelectionConfig<
-    AppLimitCreditRedemptionSelect,
-    AppLimitCreditRedemptionFilter,
-    AppLimitCreditRedemptionOrderBy
-  >;
+  selection: ListSelectionConfig<AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    AppLimitCreditRedemptionSelect,
-    AppLimitCreditRedemptionFilter,
-    AppLimitCreditRedemptionOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>(params.selection);
   return getClient().appLimitCreditRedemption.findMany(args).unwrap();
 }
 /**
  * Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppLimitCreditRedemptionsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchAppLimitCreditRedemptionsQuery<
-  S extends AppLimitCreditRedemptionSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, AppLimitCreditRedemptionSelect>;
-  }
-): Promise<void>;
-export async function prefetchAppLimitCreditRedemptionsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      AppLimitCreditRedemptionSelect,
-      AppLimitCreditRedemptionFilter,
-      AppLimitCreditRedemptionOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    AppLimitCreditRedemptionSelect,
-    AppLimitCreditRedemptionFilter,
-    AppLimitCreditRedemptionOrderBy
-  >(params.selection);
+export async function prefetchAppLimitCreditRedemptionsQuery<S extends AppLimitCreditRedemptionSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, AppLimitCreditRedemptionSelect>;
+}): Promise<void>;
+export async function prefetchAppLimitCreditRedemptionsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<AppLimitCreditRedemptionSelect, AppLimitCreditRedemptionFilter, AppLimitCreditRedemptionOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: appLimitCreditRedemptionKeys.list(args),
-    queryFn: () => getClient().appLimitCreditRedemption.findMany(args).unwrap(),
+    queryFn: () => getClient().appLimitCreditRedemption.findMany(args).unwrap()
   });
 }

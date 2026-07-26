@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { functionDeploymentModuleKeys } from '../query-keys';
-import type {
-  FunctionDeploymentModuleSelect,
-  FunctionDeploymentModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  FunctionDeploymentModuleSelect,
-  FunctionDeploymentModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { functionDeploymentModuleKeys } from "../query-keys";
+import type { FunctionDeploymentModuleSelect, FunctionDeploymentModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { FunctionDeploymentModuleSelect, FunctionDeploymentModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const functionDeploymentModuleQueryKey = functionDeploymentModuleKeys.detail;
 /**
  * Query hook for fetching a single FunctionDeploymentModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useFunctionDeploymentModuleQuery({
@@ -32,55 +26,38 @@ export const functionDeploymentModuleQueryKey = functionDeploymentModuleKeys.det
  * });
  * ```
  */
-export function useFunctionDeploymentModuleQuery<
-  S extends FunctionDeploymentModuleSelect,
-  TData = {
-    functionDeploymentModule: InferSelectResult<FunctionDeploymentModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionDeploymentModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        functionDeploymentModule: InferSelectResult<
-          FunctionDeploymentModuleWithRelations,
-          S
-        > | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useFunctionDeploymentModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionDeploymentModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useFunctionDeploymentModuleQuery<S extends FunctionDeploymentModuleSelect, TData = {
+  functionDeploymentModule: InferSelectResult<FunctionDeploymentModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionDeploymentModuleSelect>;
+} & Omit<UseQueryOptions<{
+  functionDeploymentModule: InferSelectResult<FunctionDeploymentModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useFunctionDeploymentModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<FunctionDeploymentModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<FunctionDeploymentModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: functionDeploymentModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionDeploymentModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().functionDeploymentModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single FunctionDeploymentModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchFunctionDeploymentModuleQuery({
@@ -89,9 +66,7 @@ export function useFunctionDeploymentModuleQuery(
  * });
  * ```
  */
-export async function fetchFunctionDeploymentModuleQuery<
-  S extends FunctionDeploymentModuleSelect,
->(params: {
+export async function fetchFunctionDeploymentModuleQuery<S extends FunctionDeploymentModuleSelect>(params: {
   id: string;
   selection: {
     fields: S;
@@ -104,48 +79,35 @@ export async function fetchFunctionDeploymentModuleQuery(params: {
   selection: SelectionConfig<FunctionDeploymentModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<FunctionDeploymentModuleSelect>(params.selection);
-  return getClient()
-    .functionDeploymentModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().functionDeploymentModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single FunctionDeploymentModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchFunctionDeploymentModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchFunctionDeploymentModuleQuery<
-  S extends FunctionDeploymentModuleSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, FunctionDeploymentModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchFunctionDeploymentModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<FunctionDeploymentModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchFunctionDeploymentModuleQuery<S extends FunctionDeploymentModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, FunctionDeploymentModuleSelect>;
+}): Promise<void>;
+export async function prefetchFunctionDeploymentModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<FunctionDeploymentModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<FunctionDeploymentModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: functionDeploymentModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .functionDeploymentModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().functionDeploymentModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

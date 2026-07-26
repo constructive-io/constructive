@@ -97,25 +97,11 @@ function App() {
 | `useCreateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useUpdateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
 | `useDeleteOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
-| `useOrgChartEdgesQuery` | Query | Organizational chart edges defining parent-child reporting relationships between members within an entity |
-| `useOrgChartEdgeQuery` | Query | Organizational chart edges defining parent-child reporting relationships between members within an entity |
-| `useCreateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
-| `useUpdateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
-| `useDeleteOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
-| `useOrgChartEdgeGrantsQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
-| `useOrgChartEdgeGrantQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
-| `useCreateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
-| `useUpdateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
-| `useDeleteOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useOrgClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
 | `useOrgClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
 | `useCreateOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useUpdateOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useDeleteOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useOrgGetManagersQuery` | Query | List all orgGetManagers |
-| `useCreateOrgGetManagersRecordMutation` | Mutation | Create a orgGetManagersRecord |
-| `useOrgGetSubordinatesQuery` | Query | List all orgGetSubordinates |
-| `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
 | `useOrgGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
 | `useOrgGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
 | `useCreateOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
@@ -180,7 +166,6 @@ function App() {
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
-| `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
 | `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
@@ -467,48 +452,6 @@ const { mutate: create } = useCreateOrgAdminGrantMutation({
 create({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```
 
-### OrgChartEdge
-
-```typescript
-// List all orgChartEdges
-const { data, isLoading } = useOrgChartEdgesQuery({
-  selection: { fields: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } },
-});
-
-// Get one orgChartEdge
-const { data: item } = useOrgChartEdgeQuery({
-  id: '<UUID>',
-  selection: { fields: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } },
-});
-
-// Create a orgChartEdge
-const { mutate: create } = useCreateOrgChartEdgeMutation({
-  selection: { fields: { id: true } },
-});
-create({ childId: '<UUID>', entityId: '<UUID>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' });
-```
-
-### OrgChartEdgeGrant
-
-```typescript
-// List all orgChartEdgeGrants
-const { data, isLoading } = useOrgChartEdgeGrantsQuery({
-  selection: { fields: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } },
-});
-
-// Get one orgChartEdgeGrant
-const { data: item } = useOrgChartEdgeGrantQuery({
-  id: '<UUID>',
-  selection: { fields: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } },
-});
-
-// Create a orgChartEdgeGrant
-const { mutate: create } = useCreateOrgChartEdgeGrantMutation({
-  selection: { fields: { id: true } },
-});
-create({ childId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' });
-```
-
 ### OrgClaimedInvite
 
 ```typescript
@@ -528,36 +471,6 @@ const { mutate: create } = useCreateOrgClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', entityId: '<UUID>', receiverId: '<UUID>', senderId: '<UUID>' });
-```
-
-### OrgGetManagersRecord
-
-```typescript
-// List all orgGetManagers
-const { data, isLoading } = useOrgGetManagersQuery({
-  selection: { fields: { depth: true, userId: true } },
-});
-
-// Create a orgGetManagersRecord
-const { mutate: create } = useCreateOrgGetManagersRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ depth: '<Int>', userId: '<UUID>' });
-```
-
-### OrgGetSubordinatesRecord
-
-```typescript
-// List all orgGetSubordinates
-const { data, isLoading } = useOrgGetSubordinatesQuery({
-  selection: { fields: { depth: true, userId: true } },
-});
-
-// Create a orgGetSubordinatesRecord
-const { mutate: create } = useCreateOrgGetSubordinatesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ depth: '<Int>', userId: '<UUID>' });
 ```
 
 ### OrgGrant
@@ -860,20 +773,6 @@ appPermissionsGetPaddedMask
   | Argument | Type |
   |----------|------|
   | `mask` | BitString |
-
-### `useOrgIsManagerOfQuery`
-
-orgIsManagerOf
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pMaxDepth` | Int |
-  | `pUserId` | UUID |
 
 ### `useOrgPermissionsGetByMaskQuery`
 

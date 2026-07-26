@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { objectKeys } from '../query-keys';
-import type {
-  ObjectSelect,
-  ObjectWithRelations,
-  ObjectFilter,
-  ObjectOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ObjectSelect,
-  ObjectWithRelations,
-  ObjectFilter,
-  ObjectOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { objectKeys } from "../query-keys";
+import type { ObjectSelect, ObjectWithRelations, ObjectFilter, ObjectOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ObjectSelect, ObjectWithRelations, ObjectFilter, ObjectOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const objectsQueryKey = objectKeys.list;
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useObjectsQuery({
@@ -45,45 +30,33 @@ export const objectsQueryKey = objectKeys.list;
  * });
  * ```
  */
-export function useObjectsQuery<
-  S extends ObjectSelect,
-  TData = {
-    objects: ConnectionResult<InferSelectResult<ObjectWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ObjectFilter, ObjectOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ObjectSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        objects: ConnectionResult<InferSelectResult<ObjectWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useObjectsQuery(
-  params: {
-    selection: ListSelectionConfig<ObjectSelect, ObjectFilter, ObjectOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useObjectsQuery<S extends ObjectSelect, TData = {
+  objects: ConnectionResult<InferSelectResult<ObjectWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ObjectFilter, ObjectOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ObjectSelect>;
+} & Omit<UseQueryOptions<{
+  objects: ConnectionResult<InferSelectResult<ObjectWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useObjectsQuery(params: {
+  selection: ListSelectionConfig<ObjectSelect, ObjectFilter, ObjectOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildListSelectionArgs<ObjectSelect, ObjectFilter, ObjectOrderBy>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: objectKeys.list(args),
     queryFn: () => getClient().object.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchObjectsQuery({
@@ -97,8 +70,7 @@ export function useObjectsQuery(
 export async function fetchObjectsQuery<S extends ObjectSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ObjectFilter, ObjectOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, ObjectSelect>;
+  } & Omit<ListSelectionConfig<S, ObjectFilter, ObjectOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ObjectSelect>;
 }): Promise<{
   objects: ConnectionResult<InferSelectResult<ObjectWithRelations, S>>;
 }>;
@@ -110,30 +82,23 @@ export async function fetchObjectsQuery(params: {
 }
 /**
  * Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
- *
+ * 
  * @example
  * ```ts
  * await prefetchObjectsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchObjectsQuery<S extends ObjectSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ObjectFilter, ObjectOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ObjectSelect>;
-  }
-): Promise<void>;
-export async function prefetchObjectsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<ObjectSelect, ObjectFilter, ObjectOrderBy>;
-  }
-): Promise<void> {
+export async function prefetchObjectsQuery<S extends ObjectSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ObjectFilter, ObjectOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ObjectSelect>;
+}): Promise<void>;
+export async function prefetchObjectsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ObjectSelect, ObjectFilter, ObjectOrderBy>;
+}): Promise<void> {
   const args = buildListSelectionArgs<ObjectSelect, ObjectFilter, ObjectOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: objectKeys.list(args),
-    queryFn: () => getClient().object.findMany(args).unwrap(),
+    queryFn: () => getClient().object.findMany(args).unwrap()
   });
 }

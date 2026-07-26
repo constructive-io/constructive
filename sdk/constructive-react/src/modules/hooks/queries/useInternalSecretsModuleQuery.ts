@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { internalSecretsModuleKeys } from '../query-keys';
-import type {
-  InternalSecretsModuleSelect,
-  InternalSecretsModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  InternalSecretsModuleSelect,
-  InternalSecretsModuleWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { internalSecretsModuleKeys } from "../query-keys";
+import type { InternalSecretsModuleSelect, InternalSecretsModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { InternalSecretsModuleSelect, InternalSecretsModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const internalSecretsModuleQueryKey = internalSecretsModuleKeys.detail;
 /**
  * App-scoped PGP-encrypted internal secrets store. No namespace_module dependency and no K8s synchronization. Used by identity_providers_module for OAuth2 client_secret storage.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useInternalSecretsModuleQuery({
@@ -32,52 +26,38 @@ export const internalSecretsModuleQueryKey = internalSecretsModuleKeys.detail;
  * });
  * ```
  */
-export function useInternalSecretsModuleQuery<
-  S extends InternalSecretsModuleSelect,
-  TData = {
-    internalSecretsModule: InferSelectResult<InternalSecretsModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, InternalSecretsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        internalSecretsModule: InferSelectResult<InternalSecretsModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useInternalSecretsModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<InternalSecretsModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useInternalSecretsModuleQuery<S extends InternalSecretsModuleSelect, TData = {
+  internalSecretsModule: InferSelectResult<InternalSecretsModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, InternalSecretsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  internalSecretsModule: InferSelectResult<InternalSecretsModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useInternalSecretsModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<InternalSecretsModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<InternalSecretsModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: internalSecretsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .internalSecretsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().internalSecretsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * App-scoped PGP-encrypted internal secrets store. No namespace_module dependency and no K8s synchronization. Used by identity_providers_module for OAuth2 client_secret storage.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchInternalSecretsModuleQuery({
@@ -86,9 +66,7 @@ export function useInternalSecretsModuleQuery(
  * });
  * ```
  */
-export async function fetchInternalSecretsModuleQuery<
-  S extends InternalSecretsModuleSelect,
->(params: {
+export async function fetchInternalSecretsModuleQuery<S extends InternalSecretsModuleSelect>(params: {
   id: string;
   selection: {
     fields: S;
@@ -101,46 +79,35 @@ export async function fetchInternalSecretsModuleQuery(params: {
   selection: SelectionConfig<InternalSecretsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<InternalSecretsModuleSelect>(params.selection);
-  return getClient()
-    .internalSecretsModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().internalSecretsModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * App-scoped PGP-encrypted internal secrets store. No namespace_module dependency and no K8s synchronization. Used by identity_providers_module for OAuth2 client_secret storage.
- *
+ * 
  * @example
  * ```ts
  * await prefetchInternalSecretsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchInternalSecretsModuleQuery<S extends InternalSecretsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, InternalSecretsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchInternalSecretsModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<InternalSecretsModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchInternalSecretsModuleQuery<S extends InternalSecretsModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, InternalSecretsModuleSelect>;
+}): Promise<void>;
+export async function prefetchInternalSecretsModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<InternalSecretsModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<InternalSecretsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: internalSecretsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .internalSecretsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().internalSecretsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

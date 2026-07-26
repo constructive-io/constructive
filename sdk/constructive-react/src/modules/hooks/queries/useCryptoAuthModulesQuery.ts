@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { cryptoAuthModuleKeys } from '../query-keys';
-import type {
-  CryptoAuthModuleSelect,
-  CryptoAuthModuleWithRelations,
-  CryptoAuthModuleFilter,
-  CryptoAuthModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  CryptoAuthModuleSelect,
-  CryptoAuthModuleWithRelations,
-  CryptoAuthModuleFilter,
-  CryptoAuthModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { cryptoAuthModuleKeys } from "../query-keys";
+import type { CryptoAuthModuleSelect, CryptoAuthModuleWithRelations, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { CryptoAuthModuleSelect, CryptoAuthModuleWithRelations, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const cryptoAuthModulesQueryKey = cryptoAuthModuleKeys.list;
 /**
  * Query hook for fetching CryptoAuthModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useCryptoAuthModulesQuery({
@@ -45,53 +30,33 @@ export const cryptoAuthModulesQueryKey = cryptoAuthModuleKeys.list;
  * });
  * ```
  */
-export function useCryptoAuthModulesQuery<
-  S extends CryptoAuthModuleSelect,
-  TData = {
-    cryptoAuthModules: ConnectionResult<InferSelectResult<CryptoAuthModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        cryptoAuthModules: ConnectionResult<InferSelectResult<CryptoAuthModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useCryptoAuthModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      CryptoAuthModuleSelect,
-      CryptoAuthModuleFilter,
-      CryptoAuthModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    CryptoAuthModuleSelect,
-    CryptoAuthModuleFilter,
-    CryptoAuthModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useCryptoAuthModulesQuery<S extends CryptoAuthModuleSelect, TData = {
+  cryptoAuthModules: ConnectionResult<InferSelectResult<CryptoAuthModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
+} & Omit<UseQueryOptions<{
+  cryptoAuthModules: ConnectionResult<InferSelectResult<CryptoAuthModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useCryptoAuthModulesQuery(params: {
+  selection: ListSelectionConfig<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: cryptoAuthModuleKeys.list(args),
     queryFn: () => getClient().cryptoAuthModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch CryptoAuthModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchCryptoAuthModulesQuery({
@@ -105,59 +70,35 @@ export function useCryptoAuthModulesQuery(
 export async function fetchCryptoAuthModulesQuery<S extends CryptoAuthModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
+  } & Omit<ListSelectionConfig<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
 }): Promise<{
   cryptoAuthModules: ConnectionResult<InferSelectResult<CryptoAuthModuleWithRelations, S>>;
 }>;
 export async function fetchCryptoAuthModulesQuery(params: {
-  selection: ListSelectionConfig<
-    CryptoAuthModuleSelect,
-    CryptoAuthModuleFilter,
-    CryptoAuthModuleOrderBy
-  >;
+  selection: ListSelectionConfig<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    CryptoAuthModuleSelect,
-    CryptoAuthModuleFilter,
-    CryptoAuthModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>(params.selection);
   return getClient().cryptoAuthModule.findMany(args).unwrap();
 }
 /**
  * Prefetch CryptoAuthModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchCryptoAuthModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchCryptoAuthModulesQuery<S extends CryptoAuthModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchCryptoAuthModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      CryptoAuthModuleSelect,
-      CryptoAuthModuleFilter,
-      CryptoAuthModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    CryptoAuthModuleSelect,
-    CryptoAuthModuleFilter,
-    CryptoAuthModuleOrderBy
-  >(params.selection);
+export async function prefetchCryptoAuthModulesQuery<S extends CryptoAuthModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, CryptoAuthModuleSelect>;
+}): Promise<void>;
+export async function prefetchCryptoAuthModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: cryptoAuthModuleKeys.list(args),
-    queryFn: () => getClient().cryptoAuthModule.findMany(args).unwrap(),
+    queryFn: () => getClient().cryptoAuthModule.findMany(args).unwrap()
   });
 }

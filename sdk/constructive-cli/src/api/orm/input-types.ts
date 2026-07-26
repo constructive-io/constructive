@@ -231,64 +231,63 @@ export interface UUIDListFilter {
   anyGreaterThanOrEqualTo?: string;
 }
 // ============ Enum Types ============
-export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
-export type ObjectCategory = 'APP' | 'AUTH' | 'CORE' | 'MEMBERSHIPS' | 'MODULE' | 'PERMISSIONS';
+export type ApiExposureLevel = "EXPOSABLE" | "INTERNAL_ONLY" | "NEVER_EXPOSE";
+export type ObjectCategory = "APP" | "AUTH" | "CORE" | "MEMBERSHIPS" | "MODULE" | "PERMISSIONS";
 // ============ Custom Scalar Types ============
-export type ConstructiveInternalTypeAttachment = unknown;
-export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
-export type ConstructiveInternalTypeUrl = unknown;
-/** API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings */
+/** API surfaces exposed by this scope; publication makes a surface bindable from other scopes */
 // ============ Entity Types ============
 export interface Api {
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: Record<string, unknown> | null;
-  /** PostgreSQL role used for anonymous/unauthenticated requests */
+  /** Anonymous role the API executes as */
   anonRole?: string | null;
-  /** Reference to the metaschema database this API serves */
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** PostgreSQL database name to connect to */
+  /** Database this API surface serves */
   dbname?: string | null;
-  /** Unique identifier for this API */
   id: string;
-  /** Whether this API is publicly accessible without authentication */
-  isPublic?: boolean | null;
-  /** Key/value pairs for selecting and filtering APIs */
-  labels?: Record<string, unknown> | null;
-  /** Unique name for this API within its database */
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean | null;
+  /** Owner-local API surface name */
   name?: string | null;
-  /** PostgreSQL role used for authenticated requests */
+  /** Authenticated role the API executes as */
   roleName?: string | null;
+  updatedAt?: string | null;
 }
-/** Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server */
+/** Server-side module configuration for an API surface; stores module name and JSON settings */
 export interface ApiModule {
-  /** API this module configuration belongs to */
+  /** API surface this module configuration belongs to */
   apiId?: string | null;
+  createdAt?: string | null;
   /** JSON configuration data for this module */
   data?: Record<string, unknown> | null;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this API module record */
   id: string;
   /** Module name (e.g. auth, uploads, webhooks) */
   name?: string | null;
+  updatedAt?: string | null;
 }
-/** Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API */
+/** Join table linking API surfaces to the metaschema schemas they expose */
 export interface ApiSchema {
-  /** API that exposes this schema */
+  /** API surface that exposes this schema */
   apiId?: string | null;
-  /** Reference to the metaschema database */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this API-schema mapping */
   id: string;
-  /** Metaschema schema being exposed through the API */
+  /** Metaschema schema exposed through the API surface */
   schemaId?: string | null;
+  updatedAt?: string | null;
 }
-/** Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default */
+/** Per-API feature flag overrides; NULL columns inherit from database_settings */
 export interface ApiSetting {
-  /** API these settings override for */
+  /** API surface these settings override for */
   apiId?: string | null;
-  /** Reference to the metaschema database */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
   /** Override: enable aggregate queries (NULL = inherit from database_settings) */
   enableAggregates?: boolean | null;
@@ -314,31 +313,10 @@ export interface ApiSetting {
   enableRealtime?: boolean | null;
   /** Override: enable unified search (NULL = inherit from database_settings) */
   enableSearch?: boolean | null;
-  /** Unique identifier for this API settings record */
   id: string;
   /** Extensible JSON for additional per-API settings that do not have dedicated columns */
   options?: Record<string, unknown> | null;
-}
-/** Mobile and native app configuration linked to a site, including store links and identifiers */
-export interface App {
-  /** Apple App ID prefix (Team ID) for universal links and associated domains */
-  appIdPrefix?: string | null;
-  /** App icon or promotional image */
-  appImage?: ConstructiveInternalTypeImage | null;
-  /** Apple App Store application identifier */
-  appStoreId?: string | null;
-  /** URL to the Apple App Store listing */
-  appStoreLink?: ConstructiveInternalTypeUrl | null;
-  /** Reference to the metaschema database this app belongs to */
-  databaseId?: string | null;
-  /** Unique identifier for this app */
-  id: string;
-  /** Display name of the app */
-  name?: string | null;
-  /** URL to the Google Play Store listing */
-  playStoreLink?: ConstructiveInternalTypeUrl | null;
-  /** Site this app is associated with (one app per site) */
-  siteId?: string | null;
+  updatedAt?: string | null;
 }
 export interface AstMigration {
   actionId?: string | null;
@@ -362,6 +340,8 @@ export interface CheckConstraint {
   expr?: Record<string, unknown> | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -381,16 +361,17 @@ export interface CompositeType {
   smartTags?: Record<string, unknown> | null;
   tags?: string[] | null;
 }
-/** Per-database and per-API CORS origin configuration; typed replacement for api_modules cors JSONB entries */
+/** Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default */
 export interface CorsSetting {
   /** Array of allowed CORS origins (e.g. https://example.com) */
   allowedOrigins?: string[] | null;
-  /** Optional API for per-API override; NULL means database-wide default */
+  /** Optional API surface for per-API override; NULL means scope-wide default */
   apiId?: string | null;
-  /** Reference to the metaschema database */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this CORS settings record */
   id: string;
+  updatedAt?: string | null;
 }
 export interface Database {
   createdAt?: string | null;
@@ -403,11 +384,12 @@ export interface Database {
   schemaHash?: string | null;
   updatedAt?: string | null;
 }
-/** Database-wide feature flags and settings; controls which platform features are available to all APIs in this database */
+/** Scope-wide feature flags and settings; controls which platform features are available to all APIs in this scope */
 export interface DatabaseSetting {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown> | null;
-  /** Reference to the metaschema database these settings apply to */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
   /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
   enableAggregates?: boolean | null;
@@ -433,12 +415,12 @@ export interface DatabaseSetting {
   enableRealtime?: boolean | null;
   /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
   enableSearch?: boolean | null;
-  /** Unique identifier for this settings record */
   id: string;
-  /** Key/value pairs for selecting and filtering database settings */
+  /** Key/value pairs for selecting and filtering settings */
   labels?: Record<string, unknown> | null;
   /** Extensible JSON for additional settings that do not have dedicated columns */
   options?: Record<string, unknown> | null;
+  updatedAt?: string | null;
 }
 export interface DatabaseTransfer {
   completedAt?: string | null;
@@ -465,26 +447,89 @@ export interface DefaultPrivilege {
   privilege?: string | null;
   schemaId?: string | null;
 }
-/** DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site */
+/** Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog */
 export interface Domain {
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: Record<string, unknown> | null;
-  /** API endpoint this domain routes to (mutually exclusive with site_id) */
-  apiId?: string | null;
-  /** Reference to the metaschema database this domain belongs to */
+  /** Module-specific configuration for this hostname */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Root domain of the hostname */
-  domain?: ConstructiveInternalTypeHostname | null;
-  /** Unique identifier for this domain record */
+  /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
+  hostname?: string | null;
   id: string;
-  /** Key/value pairs for selecting and filtering domains */
-  labels?: Record<string, unknown> | null;
-  /** Server deployment this domain routes to (mutually exclusive with api_id and site_id) */
-  serviceId?: string | null;
-  /** Site this domain routes to (mutually exclusive with api_id and service_id) */
-  siteId?: string | null;
-  /** Subdomain portion of the hostname */
-  subdomain?: ConstructiveInternalTypeHostname | null;
+  /** Whether other scopes may see and bind under this hostname */
+  isPublished?: boolean | null;
+  /** Whether this hostname is a *.parent wildcard claim */
+  isWildcard?: boolean | null;
+  /** Whether the platform drives this hostname's DNS verification and certificate lifecycle */
+  managed?: boolean | null;
+  /** Parent hostname a wildcard claim covers (example.com for *.example.com) */
+  parentHostname?: string | null;
+  /** When the certificate last became ready */
+  tlsReadyAt?: string | null;
+  /** Name of the TLS secret serving this hostname */
+  tlsSecretName?: string | null;
+  /** Certificate lifecycle state for this hostname */
+  tlsStatus?: string | null;
+  updatedAt?: string | null;
+  /** Ownership verification state of this hostname */
+  verificationStatus?: string | null;
+  /** When ownership verification last succeeded */
+  verifiedAt?: string | null;
+}
+/** Audit trail of domain lifecycle events */
+export interface DomainEvent {
+  /** User who triggered this event, if any */
+  actorId?: string | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Scoped domain this event belongs to */
+  domainId?: string | null;
+  /** Verification challenge this event relates to, if any */
+  domainVerificationId?: string | null;
+  /** Lifecycle event discriminator */
+  eventType?: string | null;
+  id: string;
+  /** Managed hostname this event belongs to */
+  managedDomainId?: string | null;
+  /** Human-readable event message */
+  message?: string | null;
+  /** Structured event metadata */
+  metadata?: Record<string, unknown> | null;
+  updatedAt?: string | null;
+}
+/** Ownership verification challenges issued for a domain */
+export interface DomainVerification {
+  /** How many times this challenge has been probed */
+  attempts?: number | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Scoped domain this verification challenge belongs to */
+  domainId?: string | null;
+  /** Last verification error, if any */
+  error?: string | null;
+  /** When this challenge expires */
+  expiresAt?: string | null;
+  id: string;
+  /** When this challenge was last probed */
+  lastCheckedAt?: string | null;
+  /** Managed hostname this verification challenge belongs to */
+  managedDomainId?: string | null;
+  /** Verification method (dns-txt, http-token, …) */
+  method?: string | null;
+  /** DNS record name the challenge expects */
+  recordName?: string | null;
+  /** DNS record type the challenge expects */
+  recordType?: string | null;
+  /** DNS record value the challenge expects */
+  recordValue?: string | null;
+  /** Challenge state */
+  status?: string | null;
+  updatedAt?: string | null;
+  /** When this challenge succeeded */
+  verifiedAt?: string | null;
 }
 export interface EmbeddingChunk {
   chunkOverlap?: number | null;
@@ -521,6 +566,23 @@ export interface Enum {
   tags?: string[] | null;
   values?: string[] | null;
 }
+export interface ExclusionConstraint {
+  accessMethod?: string | null;
+  category?: ObjectCategory | null;
+  createdAt?: string | null;
+  databaseId?: string | null;
+  elementExpr?: Record<string, unknown> | null;
+  fieldIds?: string[] | null;
+  id: string;
+  name?: string | null;
+  operators?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  tableId?: string | null;
+  tags?: string[] | null;
+  type?: string | null;
+  updatedAt?: string | null;
+  whereClause?: Record<string, unknown> | null;
+}
 export interface Field {
   apiRequired?: boolean | null;
   category?: ObjectCategory | null;
@@ -534,6 +596,8 @@ export interface Field {
   generationExpression?: Record<string, unknown> | null;
   generationType?: string | null;
   id: string;
+  identityGeneration?: string | null;
+  identityOptions?: Record<string, unknown> | null;
   isRequired?: boolean | null;
   label?: string | null;
   max?: number | null;
@@ -551,9 +615,12 @@ export interface ForeignKeyConstraint {
   createdAt?: string | null;
   databaseId?: string | null;
   deleteAction?: string | null;
+  deleteSetFieldIds?: string[] | null;
   description?: string | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   refFieldIds?: string[] | null;
   refTableId?: string | null;
@@ -563,6 +630,7 @@ export interface ForeignKeyConstraint {
   type?: string | null;
   updateAction?: string | null;
   updatedAt?: string | null;
+  withPeriod?: boolean | null;
 }
 export interface FullTextSearch {
   createdAt?: string | null;
@@ -582,13 +650,35 @@ export interface Function {
   name?: string | null;
   schemaId?: string | null;
 }
+/** Compiled hostname index maintained by domain sync triggers; read only through the resolver */
+export interface HostnameBinding {
+  /** Domain row this binding was compiled from */
+  domainId?: string | null;
+  /** Lowercase hostname (exact or *.parent wildcard) */
+  hostname?: string | null;
+  id: string;
+  /** Whether this binding is a wildcard claim */
+  isWildcard?: boolean | null;
+  /** Whether the platform drives this hostname's lifecycle */
+  managed?: boolean | null;
+  /** Parent hostname a wildcard binding covers */
+  parentHostname?: string | null;
+  /** TLS secret name compiled from the domain row */
+  tlsSecretName?: string | null;
+  /** Certificate lifecycle state compiled from the domain row */
+  tlsStatus?: string | null;
+  /** When this binding was last recompiled */
+  updatedAt?: string | null;
+  /** Ownership verification state compiled from the domain row */
+  verificationStatus?: string | null;
+}
 /** Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target */
 export interface HttpRoute {
   createdAt?: string | null;
   createdBy?: string | null;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Registered host in services_public.domains */
+  /** Registered host in the scoped routing domains table */
   domainId?: string | null;
   id: string;
   /** Whether the resolver may select this route */
@@ -625,25 +715,30 @@ export interface Index {
   updatedAt?: string | null;
   whereClause?: Record<string, unknown> | null;
 }
-/** One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) */
+/** Platform-operated hostnames whose DNS and certificate lifecycle the platform drives */
 export interface ManagedDomain {
-  /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
+  /** Whether tenants may claim subdomains under this managed hostname */
+  allowPublicUsage?: boolean | null;
+  /** Free-form operator annotations for this managed hostname */
   annotations?: Record<string, unknown> | null;
-  /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
+  /** Certificate issuance state for this managed hostname */
+  certStatus?: string | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
-  domain?: ConstructiveInternalTypeHostname | null;
-  /** Unique identifier for this managed domain record */
+  /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
+  domain?: string | null;
   id: string;
-  /** Whether the cert covers the wildcard *.domain (one wildcard cert covers every subdomain row sharing this root) */
+  /** Whether this managed hostname is a *.parent wildcard */
   isWildcard?: boolean | null;
-  /** When tls_status last became active */
+  /** When TLS last became ready */
   tlsReadyAt?: string | null;
-  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  /** TLS provisioning state for this managed hostname */
   tlsStatus?: string | null;
-  /** Domain ownership verification state: pending | verified | failed */
+  updatedAt?: string | null;
+  /** DNS ownership verification state of this managed hostname */
   verificationStatus?: string | null;
-  /** When verification_status last became verified */
+  /** When ownership verification last succeeded */
   verifiedAt?: string | null;
 }
 export interface NodeTypeRegistry {
@@ -668,6 +763,244 @@ export interface Partition {
   retentionKeepTable?: boolean | null;
   strategy?: string | null;
   tableId?: string | null;
+  updatedAt?: string | null;
+}
+/** API surfaces exposed by this scope; publication makes a surface bindable from other scopes */
+export interface PlatformApi {
+  /** Anonymous role the API executes as */
+  anonRole?: string | null;
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database this API surface serves */
+  dbname?: string | null;
+  id: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean | null;
+  /** Owner-local API surface name */
+  name?: string | null;
+  /** Authenticated role the API executes as */
+  roleName?: string | null;
+  updatedAt?: string | null;
+}
+/** Server-side module configuration for an API surface; stores module name and JSON settings */
+export interface PlatformApiModule {
+  /** API surface this module configuration belongs to */
+  apiId?: string | null;
+  createdAt?: string | null;
+  /** JSON configuration data for this module */
+  data?: Record<string, unknown> | null;
+  id: string;
+  /** Module name (e.g. auth, uploads, webhooks) */
+  name?: string | null;
+  updatedAt?: string | null;
+}
+/** Join table linking API surfaces to the metaschema schemas they expose */
+export interface PlatformApiSchema {
+  /** API surface that exposes this schema */
+  apiId?: string | null;
+  createdAt?: string | null;
+  id: string;
+  /** Metaschema schema exposed through the API surface */
+  schemaId?: string | null;
+  updatedAt?: string | null;
+}
+/** Per-API feature flag overrides; NULL columns inherit from database_settings */
+export interface PlatformApiSetting {
+  /** API surface these settings override for */
+  apiId?: string | null;
+  createdAt?: string | null;
+  /** Override: enable aggregate queries (NULL = inherit from database_settings) */
+  enableAggregates?: boolean | null;
+  /** Override: enable bulk mutations (NULL = inherit from database_settings) */
+  enableBulk?: boolean | null;
+  /** Override: enable connection filter (NULL = inherit from database_settings) */
+  enableConnectionFilter?: boolean | null;
+  /** Override: enable direct (multipart) file uploads (NULL = inherit from database_settings) */
+  enableDirectUploads?: boolean | null;
+  /** Override: enable internationalization plugin (NULL = inherit from database_settings) */
+  enableI18N?: boolean | null;
+  /** Override: enable LLM/AI integration features (NULL = inherit from database_settings) */
+  enableLlm?: boolean | null;
+  /** Override: enable ltree hierarchical data type (NULL = inherit from database_settings) */
+  enableLtree?: boolean | null;
+  /** Override: enable many-to-many relationships (NULL = inherit from database_settings) */
+  enableManyToMany?: boolean | null;
+  /** Override: enable PostGIS spatial types (NULL = inherit from database_settings) */
+  enablePostgis?: boolean | null;
+  /** Override: enable presigned URL upload flow (NULL = inherit from database_settings) */
+  enablePresignedUploads?: boolean | null;
+  /** Override: enable realtime subscriptions (NULL = inherit from database_settings) */
+  enableRealtime?: boolean | null;
+  /** Override: enable unified search (NULL = inherit from database_settings) */
+  enableSearch?: boolean | null;
+  id: string;
+  /** Extensible JSON for additional per-API settings that do not have dedicated columns */
+  options?: Record<string, unknown> | null;
+  updatedAt?: string | null;
+}
+/** Scope-wide and per-API CORS origin configuration; NULL api_id means scope-wide default */
+export interface PlatformCorsSetting {
+  /** Array of allowed CORS origins (e.g. https://example.com) */
+  allowedOrigins?: string[] | null;
+  /** Optional API surface for per-API override; NULL means scope-wide default */
+  apiId?: string | null;
+  createdAt?: string | null;
+  id: string;
+  updatedAt?: string | null;
+}
+/** Fully-qualified hostnames owned by this scope; each row claims its hostname globally through the catalog */
+export interface PlatformDomain {
+  /** Module-specific configuration for this hostname */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
+  hostname?: string | null;
+  id: string;
+  /** Whether other scopes may see and bind under this hostname */
+  isPublished?: boolean | null;
+  /** Whether this hostname is a *.parent wildcard claim */
+  isWildcard?: boolean | null;
+  /** Whether the platform drives this hostname's DNS verification and certificate lifecycle */
+  managed?: boolean | null;
+  /** Parent hostname a wildcard claim covers (example.com for *.example.com) */
+  parentHostname?: string | null;
+  /** When the certificate last became ready */
+  tlsReadyAt?: string | null;
+  /** Name of the TLS secret serving this hostname */
+  tlsSecretName?: string | null;
+  /** Certificate lifecycle state for this hostname */
+  tlsStatus?: string | null;
+  updatedAt?: string | null;
+  /** Ownership verification state of this hostname */
+  verificationStatus?: string | null;
+  /** When ownership verification last succeeded */
+  verifiedAt?: string | null;
+}
+/** Audit trail of domain lifecycle events */
+export interface PlatformDomainEvent {
+  /** User who triggered this event, if any */
+  actorId?: string | null;
+  createdAt?: string | null;
+  /** Scoped domain this event belongs to */
+  domainId?: string | null;
+  /** Verification challenge this event relates to, if any */
+  domainVerificationId?: string | null;
+  /** Lifecycle event discriminator */
+  eventType?: string | null;
+  id: string;
+  /** Managed hostname this event belongs to */
+  managedDomainId?: string | null;
+  /** Human-readable event message */
+  message?: string | null;
+  /** Structured event metadata */
+  metadata?: Record<string, unknown> | null;
+  updatedAt?: string | null;
+}
+/** Ownership verification challenges issued for a domain */
+export interface PlatformDomainVerification {
+  /** How many times this challenge has been probed */
+  attempts?: number | null;
+  createdAt?: string | null;
+  /** Scoped domain this verification challenge belongs to */
+  domainId?: string | null;
+  /** Last verification error, if any */
+  error?: string | null;
+  /** When this challenge expires */
+  expiresAt?: string | null;
+  id: string;
+  /** When this challenge was last probed */
+  lastCheckedAt?: string | null;
+  /** Managed hostname this verification challenge belongs to */
+  managedDomainId?: string | null;
+  /** Verification method (dns-txt, http-token, …) */
+  method?: string | null;
+  /** DNS record name the challenge expects */
+  recordName?: string | null;
+  /** DNS record type the challenge expects */
+  recordType?: string | null;
+  /** DNS record value the challenge expects */
+  recordValue?: string | null;
+  /** Challenge state */
+  status?: string | null;
+  updatedAt?: string | null;
+  /** When this challenge succeeded */
+  verifiedAt?: string | null;
+}
+/** Platform-operated hostnames whose DNS and certificate lifecycle the platform drives */
+export interface PlatformManagedDomain {
+  /** Whether tenants may claim subdomains under this managed hostname */
+  allowPublicUsage?: boolean | null;
+  /** Free-form operator annotations for this managed hostname */
+  annotations?: Record<string, unknown> | null;
+  /** Certificate issuance state for this managed hostname */
+  certStatus?: string | null;
+  createdAt?: string | null;
+  /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
+  domain?: string | null;
+  id: string;
+  /** Whether this managed hostname is a *.parent wildcard */
+  isWildcard?: boolean | null;
+  /** When TLS last became ready */
+  tlsReadyAt?: string | null;
+  /** TLS provisioning state for this managed hostname */
+  tlsStatus?: string | null;
+  updatedAt?: string | null;
+  /** DNS ownership verification state of this managed hostname */
+  verificationStatus?: string | null;
+  /** When ownership verification last succeeded */
+  verifiedAt?: string | null;
+}
+/** Site surfaces exposed by this scope; publication makes a surface bindable from other scopes */
+export interface PlatformSite {
+  /** Module-specific configuration for this site surface */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Human-readable site description */
+  description?: string | null;
+  id: string;
+  /** Whether other scopes may see and route to this site surface */
+  isPublished?: boolean | null;
+  /** Owner-local site surface name */
+  name?: string | null;
+  /** Human-readable site title */
+  title?: string | null;
+  updatedAt?: string | null;
+}
+/** SEO and social sharing metadata for a site surface */
+export interface PlatformSiteMetadatum {
+  createdAt?: string | null;
+  /** Meta description (max 120 characters) */
+  description?: string | null;
+  id: string;
+  /** Open Graph image used when sharing site links */
+  ogImage?: ConstructiveInternalTypeImage | null;
+  /** Site surface this metadata belongs to */
+  siteId?: string | null;
+  /** Meta title (max 120 characters) */
+  title?: string | null;
+  updatedAt?: string | null;
+}
+/** Frontend module configuration for a site surface; stores module name and JSON settings */
+export interface PlatformSiteModule {
+  createdAt?: string | null;
+  /** JSON configuration data for this module */
+  data?: Record<string, unknown> | null;
+  id: string;
+  /** Module name (e.g. navbar, footer, analytics) */
+  name?: string | null;
+  /** Site surface this module configuration belongs to */
+  siteId?: string | null;
+  updatedAt?: string | null;
+}
+/** Theme (colors, fonts, design tokens) for a site surface */
+export interface PlatformSiteTheme {
+  createdAt?: string | null;
+  id: string;
+  /** Site surface this theme belongs to */
+  siteId?: string | null;
+  /** Theme document (colors, fonts, design tokens) */
+  theme?: Record<string, unknown> | null;
   updatedAt?: string | null;
 }
 export interface Policy {
@@ -695,20 +1028,23 @@ export interface PrimaryKeyConstraint {
   databaseId?: string | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
   updatedAt?: string | null;
+  withoutOverlaps?: boolean | null;
 }
-/** Per-database public-key crypto auth runtime configuration; typed replacement for api_modules pubkey_challenge JSONB entries */
+/** Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing */
 export interface PubkeySetting {
+  createdAt?: string | null;
   /** Crypto network for key derivation (e.g. cosmos, ethereum) */
   cryptoNetwork?: string | null;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this pubkey settings record */
   id: string;
   /** Schema containing the crypto auth functions (FK to metaschema_public.schema) */
   schemaId?: string | null;
@@ -720,10 +1056,11 @@ export interface PubkeySetting {
   signInWithChallengeFunctionId?: string | null;
   /** Reference to the sign-up-with-key function (FK to metaschema_public.function) */
   signUpWithKeyFunctionId?: string | null;
+  updatedAt?: string | null;
   /** Field name used to identify the user in crypto auth functions */
   userField?: string | null;
 }
-/** Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries */
+/** RLS module runtime configuration; typed references to the authenticate/current_role function plumbing */
 export interface RlsSetting {
   /** Reference to the authenticate function (FK to metaschema_public.function) */
   authenticateFunctionId?: string | null;
@@ -731,6 +1068,7 @@ export interface RlsSetting {
   authenticateSchemaId?: string | null;
   /** Reference to the strict authenticate function (FK to metaschema_public.function) */
   authenticateStrictFunctionId?: string | null;
+  createdAt?: string | null;
   /** Reference to the current_ip_address function (FK to metaschema_public.function) */
   currentIpAddressFunctionId?: string | null;
   /** Reference to the current_role function (FK to metaschema_public.function) */
@@ -739,12 +1077,60 @@ export interface RlsSetting {
   currentRoleIdFunctionId?: string | null;
   /** Reference to the current_user_agent function (FK to metaschema_public.function) */
   currentUserAgentFunctionId?: string | null;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this RLS settings record */
   id: string;
   /** Schema containing current_role and related functions (FK to metaschema_public.schema) */
   roleSchemaId?: string | null;
+  updatedAt?: string | null;
+}
+/** Compiled route precedence index maintained by route sync triggers; carries typed target ids only, read through the resolver */
+export interface RouteBinding {
+  /** Domain row the source route binds */
+  domainId?: string | null;
+  id: string;
+  /** Active flag compiled from the source route */
+  isActive?: boolean | null;
+  /** HTTP method this binding matches; NULL matches any method */
+  method?: string | null;
+  /** Path prefix this binding matches */
+  path?: string | null;
+  /** Priority compiled from the source route */
+  priority?: number | null;
+  /** Api catalog row the source route targets */
+  targetApiId?: string | null;
+  /** Function catalog row the source route targets */
+  targetFunctionId?: string | null;
+  /** Site catalog row the source route targets */
+  targetSiteId?: string | null;
+  /** When this binding was last recompiled */
+  updatedAt?: string | null;
+}
+/** Routes binding a domain hostname and path to a typed catalog target */
+export interface Route {
+  /** Route metadata; target configuration is read live from the typed catalog, never copied here */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Domain whose hostname this route serves */
+  domainId?: string | null;
+  id: string;
+  /** Inactive routes are excluded from resolution */
+  isActive?: boolean | null;
+  /** Uppercase HTTP method this route matches; NULL matches any method */
+  method?: string | null;
+  /** Path prefix this route matches; must begin with / and carry no trailing slash */
+  path?: string | null;
+  /** Higher priority wins between otherwise-equal matches */
+  priority?: number | null;
+  /** Api catalog row this route targets; must be owner-matched or visible cross-scope */
+  targetApiId?: string | null;
+  /** Function catalog row this route targets; must be owner-matched or visible cross-scope */
+  targetFunctionId?: string | null;
+  /** Site catalog row this route targets; must be owner-matched or visible cross-scope */
+  targetSiteId?: string | null;
+  updatedAt?: string | null;
 }
 export interface Schema {
   apiExposure?: ApiExposureLevel | null;
@@ -769,69 +1155,65 @@ export interface SchemaGrant {
   schemaId?: string | null;
   updatedAt?: string | null;
 }
-/** Top-level site configuration: branding assets, title, and description for a deployed application */
+/** Site surfaces exposed by this scope; publication makes a surface bindable from other scopes */
 export interface Site {
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: Record<string, unknown> | null;
-  /** Apple touch icon for iOS home screen bookmarks */
-  appleTouchIcon?: ConstructiveInternalTypeImage | null;
-  /** Reference to the metaschema database this site belongs to */
+  /** Module-specific configuration for this site surface */
+  config?: Record<string, unknown> | null;
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** PostgreSQL database name this site connects to */
-  dbname?: string | null;
-  /** Short description of the site (max 120 characters) */
+  /** Human-readable site description */
   description?: string | null;
-  /** Browser favicon attachment */
-  favicon?: ConstructiveInternalTypeAttachment | null;
-  /** Unique identifier for this site */
   id: string;
-  /** Key/value pairs for selecting and filtering sites */
-  labels?: Record<string, unknown> | null;
-  /** Primary logo image for the site */
-  logo?: ConstructiveInternalTypeImage | null;
-  /** Open Graph image used for social media link previews */
-  ogImage?: ConstructiveInternalTypeImage | null;
-  /** Display title for the site (max 120 characters) */
+  /** Whether other scopes may see and route to this site surface */
+  isPublished?: boolean | null;
+  /** Owner-local site surface name */
+  name?: string | null;
+  /** Human-readable site title */
   title?: string | null;
+  updatedAt?: string | null;
 }
-/** SEO and social sharing metadata for a site: page title, description, and Open Graph image */
+/** SEO and social sharing metadata for a site surface */
 export interface SiteMetadatum {
-  /** Reference to the metaschema database */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Meta description for SEO and social sharing (max 120 characters) */
+  /** Meta description (max 120 characters) */
   description?: string | null;
-  /** Unique identifier for this metadata record */
   id: string;
-  /** Open Graph image for social media previews */
+  /** Open Graph image used when sharing site links */
   ogImage?: ConstructiveInternalTypeImage | null;
-  /** Site this metadata belongs to */
+  /** Site surface this metadata belongs to */
   siteId?: string | null;
-  /** Page title for SEO (max 120 characters) */
+  /** Meta title (max 120 characters) */
   title?: string | null;
+  updatedAt?: string | null;
 }
-/** Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site */
+/** Frontend module configuration for a site surface; stores module name and JSON settings */
 export interface SiteModule {
+  createdAt?: string | null;
   /** JSON configuration data for this module */
   data?: Record<string, unknown> | null;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this site module record */
   id: string;
-  /** Module name (e.g. user_auth_module, analytics) */
+  /** Module name (e.g. navbar, footer, analytics) */
   name?: string | null;
-  /** Site this module configuration belongs to */
+  /** Site surface this module configuration belongs to */
   siteId?: string | null;
+  updatedAt?: string | null;
 }
-/** Theme configuration for a site; stores design tokens, colors, and typography as JSONB */
+/** Theme (colors, fonts, design tokens) for a site surface */
 export interface SiteTheme {
-  /** Reference to the metaschema database */
+  createdAt?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this theme record */
   id: string;
-  /** Site this theme belongs to */
+  /** Site surface this theme belongs to */
   siteId?: string | null;
-  /** JSONB object containing theme tokens (colors, typography, spacing, etc.) */
+  /** Theme document (colors, fonts, design tokens) */
   theme?: Record<string, unknown> | null;
+  updatedAt?: string | null;
 }
 export interface SpatialRelation {
   category?: ObjectCategory | null;
@@ -927,15 +1309,19 @@ export interface UniqueConstraint {
   description?: string | null;
   fieldIds?: string[] | null;
   id: string;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
   updatedAt?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 export interface View {
   category?: ObjectCategory | null;
+  checkOption?: string | null;
   data?: Record<string, unknown> | null;
   databaseId?: string | null;
   filterData?: Record<string, unknown> | null;
@@ -944,6 +1330,7 @@ export interface View {
   isReadOnly?: boolean | null;
   name?: string | null;
   schemaId?: string | null;
+  securityBarrier?: boolean | null;
   securityInvoker?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -978,19 +1365,19 @@ export interface ViewTable {
   tableId?: string | null;
   viewId?: string | null;
 }
-/** Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries */
+/** WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage */
 export interface WebauthnSetting {
   /** Attestation conveyance preference (none, indirect, direct, enterprise) */
   attestationType?: string | null;
   /** Challenge TTL in seconds (default 300 = 5 minutes) */
   challengeExpirySeconds?: string | null;
+  createdAt?: string | null;
   /** Schema of the webauthn_credentials table (FK to metaschema_public.schema) */
   credentialsSchemaId?: string | null;
   /** Reference to the webauthn_credentials table (FK to metaschema_public.table) */
   credentialsTableId?: string | null;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
-  /** Unique identifier for this WebAuthn settings record */
   id: string;
   /** Allowed origins for WebAuthn registration and authentication */
   originAllowlist?: string[] | null;
@@ -1014,6 +1401,7 @@ export interface WebauthnSetting {
   sessionsSchemaId?: string | null;
   /** Reference to the sessions table (FK to metaschema_public.table) */
   sessionsTableId?: string | null;
+  updatedAt?: string | null;
   /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
   userFieldId?: string | null;
 }
@@ -1032,28 +1420,19 @@ export interface PageInfo {
 // ============ Entity Relation Types ============
 export interface ApiRelations {
   apiSetting?: ApiSetting | null;
-  database?: Database | null;
   apiModules?: ConnectionResult<ApiModule>;
   apiSchemas?: ConnectionResult<ApiSchema>;
   corsSettings?: ConnectionResult<CorsSetting>;
-  domains?: ConnectionResult<Domain>;
 }
 export interface ApiModuleRelations {
   api?: Api | null;
-  database?: Database | null;
 }
 export interface ApiSchemaRelations {
   api?: Api | null;
-  database?: Database | null;
   schema?: Schema | null;
 }
 export interface ApiSettingRelations {
   api?: Api | null;
-  database?: Database | null;
-}
-export interface AppRelations {
-  database?: Database | null;
-  site?: Site | null;
 }
 export interface AstMigrationRelations {}
 export interface CheckConstraintRelations {
@@ -1066,41 +1445,25 @@ export interface CompositeTypeRelations {
 }
 export interface CorsSettingRelations {
   api?: Api | null;
-  database?: Database | null;
 }
 export interface DatabaseRelations {
-  databaseSetting?: DatabaseSetting | null;
-  pubkeySetting?: PubkeySetting | null;
-  rlsSetting?: RlsSetting | null;
-  webauthnSetting?: WebauthnSetting | null;
-  apiModules?: ConnectionResult<ApiModule>;
-  apiSchemas?: ConnectionResult<ApiSchema>;
-  apiSettings?: ConnectionResult<ApiSetting>;
-  apis?: ConnectionResult<Api>;
-  apps?: ConnectionResult<App>;
   checkConstraints?: ConnectionResult<CheckConstraint>;
   compositeTypes?: ConnectionResult<CompositeType>;
-  corsSettings?: ConnectionResult<CorsSetting>;
   databaseTransfers?: ConnectionResult<DatabaseTransfer>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
-  domains?: ConnectionResult<Domain>;
   embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   enums?: ConnectionResult<Enum>;
+  exclusionConstraints?: ConnectionResult<ExclusionConstraint>;
   fields?: ConnectionResult<Field>;
   foreignKeyConstraints?: ConnectionResult<ForeignKeyConstraint>;
   fullTextSearches?: ConnectionResult<FullTextSearch>;
   functions?: ConnectionResult<Function>;
   indices?: ConnectionResult<Index>;
-  managedDomains?: ConnectionResult<ManagedDomain>;
   partitions?: ConnectionResult<Partition>;
   policies?: ConnectionResult<Policy>;
   primaryKeyConstraints?: ConnectionResult<PrimaryKeyConstraint>;
   schemaGrants?: ConnectionResult<SchemaGrant>;
   schemas?: ConnectionResult<Schema>;
-  siteMetadata?: ConnectionResult<SiteMetadatum>;
-  siteModules?: ConnectionResult<SiteModule>;
-  siteThemes?: ConnectionResult<SiteTheme>;
-  sites?: ConnectionResult<Site>;
   spatialRelations?: ConnectionResult<SpatialRelation>;
   tableGrants?: ConnectionResult<TableGrant>;
   tables?: ConnectionResult<Table>;
@@ -1112,9 +1475,7 @@ export interface DatabaseRelations {
   viewTables?: ConnectionResult<ViewTable>;
   views?: ConnectionResult<View>;
 }
-export interface DatabaseSettingRelations {
-  database?: Database | null;
-}
+export interface DatabaseSettingRelations {}
 export interface DatabaseTransferRelations {
   database?: Database | null;
 }
@@ -1123,10 +1484,19 @@ export interface DefaultPrivilegeRelations {
   schema?: Schema | null;
 }
 export interface DomainRelations {
-  api?: Api | null;
-  database?: Database | null;
-  site?: Site | null;
+  domainEvents?: ConnectionResult<DomainEvent>;
+  domainVerifications?: ConnectionResult<DomainVerification>;
   httpRoutes?: ConnectionResult<HttpRoute>;
+  routes?: ConnectionResult<Route>;
+}
+export interface DomainEventRelations {
+  domain?: Domain | null;
+  domainVerification?: DomainVerification | null;
+  managedDomain?: ManagedDomain | null;
+}
+export interface DomainVerificationRelations {
+  domain?: Domain | null;
+  managedDomain?: ManagedDomain | null;
 }
 export interface EmbeddingChunkRelations {
   chunksTable?: Table | null;
@@ -1138,6 +1508,10 @@ export interface EmbeddingChunkRelations {
 export interface EnumRelations {
   database?: Database | null;
   schema?: Schema | null;
+}
+export interface ExclusionConstraintRelations {
+  database?: Database | null;
+  table?: Table | null;
 }
 export interface FieldRelations {
   database?: Database | null;
@@ -1158,6 +1532,7 @@ export interface FunctionRelations {
   database?: Database | null;
   schema?: Schema | null;
 }
+export interface HostnameBindingRelations {}
 export interface HttpRouteRelations {
   domain?: Domain | null;
 }
@@ -1166,13 +1541,64 @@ export interface IndexRelations {
   table?: Table | null;
 }
 export interface ManagedDomainRelations {
-  database?: Database | null;
+  domainEvents?: ConnectionResult<DomainEvent>;
+  domainVerifications?: ConnectionResult<DomainVerification>;
 }
 export interface NodeTypeRegistryRelations {}
 export interface PartitionRelations {
   database?: Database | null;
   partitionKey?: Field | null;
   table?: Table | null;
+}
+export interface PlatformApiRelations {
+  platformApiSettingByApiId?: PlatformApiSetting | null;
+  platformCorsSettingByApiId?: PlatformCorsSetting | null;
+  platformApiModulesByApiId?: ConnectionResult<PlatformApiModule>;
+  platformApiSchemasByApiId?: ConnectionResult<PlatformApiSchema>;
+}
+export interface PlatformApiModuleRelations {
+  api?: PlatformApi | null;
+}
+export interface PlatformApiSchemaRelations {
+  api?: PlatformApi | null;
+  schema?: Schema | null;
+}
+export interface PlatformApiSettingRelations {
+  api?: PlatformApi | null;
+}
+export interface PlatformCorsSettingRelations {
+  api?: PlatformApi | null;
+}
+export interface PlatformDomainRelations {
+  platformDomainEventsByDomainId?: ConnectionResult<PlatformDomainEvent>;
+  platformDomainVerificationsByDomainId?: ConnectionResult<PlatformDomainVerification>;
+}
+export interface PlatformDomainEventRelations {
+  domain?: PlatformDomain | null;
+  domainVerification?: PlatformDomainVerification | null;
+  managedDomain?: PlatformManagedDomain | null;
+}
+export interface PlatformDomainVerificationRelations {
+  domain?: PlatformDomain | null;
+  managedDomain?: PlatformManagedDomain | null;
+}
+export interface PlatformManagedDomainRelations {
+  platformDomainEventsByManagedDomainId?: ConnectionResult<PlatformDomainEvent>;
+  platformDomainVerificationsByManagedDomainId?: ConnectionResult<PlatformDomainVerification>;
+}
+export interface PlatformSiteRelations {
+  platformSiteMetadataBySiteId?: ConnectionResult<PlatformSiteMetadatum>;
+  platformSiteModulesBySiteId?: ConnectionResult<PlatformSiteModule>;
+  platformSiteThemesBySiteId?: ConnectionResult<PlatformSiteTheme>;
+}
+export interface PlatformSiteMetadatumRelations {
+  site?: PlatformSite | null;
+}
+export interface PlatformSiteModuleRelations {
+  site?: PlatformSite | null;
+}
+export interface PlatformSiteThemeRelations {
+  site?: PlatformSite | null;
 }
 export interface PolicyRelations {
   database?: Database | null;
@@ -1183,7 +1609,6 @@ export interface PrimaryKeyConstraintRelations {
   table?: Table | null;
 }
 export interface PubkeySettingRelations {
-  database?: Database | null;
   schema?: Schema | null;
   signInRecordFailureFunction?: Function | null;
   signInRequestChallengeFunction?: Function | null;
@@ -1198,8 +1623,11 @@ export interface RlsSettingRelations {
   currentRoleFunction?: Function | null;
   currentRoleIdFunction?: Function | null;
   currentUserAgentFunction?: Function | null;
-  database?: Database | null;
   roleSchema?: Schema | null;
+}
+export interface RouteBindingRelations {}
+export interface RouteRelations {
+  domain?: Domain | null;
 }
 export interface SchemaRelations {
   database?: Database | null;
@@ -1208,6 +1636,7 @@ export interface SchemaRelations {
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
   enums?: ConnectionResult<Enum>;
   functions?: ConnectionResult<Function>;
+  platformApiSchemas?: ConnectionResult<PlatformApiSchema>;
   schemaGrants?: ConnectionResult<SchemaGrant>;
   tables?: ConnectionResult<Table>;
   views?: ConnectionResult<View>;
@@ -1217,23 +1646,17 @@ export interface SchemaGrantRelations {
   schema?: Schema | null;
 }
 export interface SiteRelations {
-  app?: App | null;
-  database?: Database | null;
-  domains?: ConnectionResult<Domain>;
   siteMetadata?: ConnectionResult<SiteMetadatum>;
   siteModules?: ConnectionResult<SiteModule>;
   siteThemes?: ConnectionResult<SiteTheme>;
 }
 export interface SiteMetadatumRelations {
-  database?: Database | null;
   site?: Site | null;
 }
 export interface SiteModuleRelations {
-  database?: Database | null;
   site?: Site | null;
 }
 export interface SiteThemeRelations {
-  database?: Database | null;
   site?: Site | null;
 }
 export interface SpatialRelationRelations {
@@ -1252,6 +1675,7 @@ export interface TableRelations {
   checkConstraints?: ConnectionResult<CheckConstraint>;
   embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   embeddingChunksByChunksTableId?: ConnectionResult<EmbeddingChunk>;
+  exclusionConstraints?: ConnectionResult<ExclusionConstraint>;
   fields?: ConnectionResult<Field>;
   foreignKeyConstraints?: ConnectionResult<ForeignKeyConstraint>;
   fullTextSearches?: ConnectionResult<FullTextSearch>;
@@ -1305,7 +1729,6 @@ export interface ViewTableRelations {
 export interface WebauthnSettingRelations {
   credentialsSchema?: Schema | null;
   credentialsTable?: Table | null;
-  database?: Database | null;
   schema?: Schema | null;
   sessionCredentialsTable?: Table | null;
   sessionSecretsSchema?: Schema | null;
@@ -1319,7 +1742,6 @@ export type ApiWithRelations = Api & ApiRelations;
 export type ApiModuleWithRelations = ApiModule & ApiModuleRelations;
 export type ApiSchemaWithRelations = ApiSchema & ApiSchemaRelations;
 export type ApiSettingWithRelations = ApiSetting & ApiSettingRelations;
-export type AppWithRelations = App & AppRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
 export type CheckConstraintWithRelations = CheckConstraint & CheckConstraintRelations;
 export type CompositeTypeWithRelations = CompositeType & CompositeTypeRelations;
@@ -1329,23 +1751,40 @@ export type DatabaseSettingWithRelations = DatabaseSetting & DatabaseSettingRela
 export type DatabaseTransferWithRelations = DatabaseTransfer & DatabaseTransferRelations;
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
 export type DomainWithRelations = Domain & DomainRelations;
+export type DomainEventWithRelations = DomainEvent & DomainEventRelations;
+export type DomainVerificationWithRelations = DomainVerification & DomainVerificationRelations;
 export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type EnumWithRelations = Enum & EnumRelations;
+export type ExclusionConstraintWithRelations = ExclusionConstraint & ExclusionConstraintRelations;
 export type FieldWithRelations = Field & FieldRelations;
-export type ForeignKeyConstraintWithRelations = ForeignKeyConstraint &
-  ForeignKeyConstraintRelations;
+export type ForeignKeyConstraintWithRelations = ForeignKeyConstraint & ForeignKeyConstraintRelations;
 export type FullTextSearchWithRelations = FullTextSearch & FullTextSearchRelations;
 export type FunctionWithRelations = Function & FunctionRelations;
+export type HostnameBindingWithRelations = HostnameBinding & HostnameBindingRelations;
 export type HttpRouteWithRelations = HttpRoute & HttpRouteRelations;
 export type IndexWithRelations = Index & IndexRelations;
 export type ManagedDomainWithRelations = ManagedDomain & ManagedDomainRelations;
 export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type PartitionWithRelations = Partition & PartitionRelations;
+export type PlatformApiWithRelations = PlatformApi & PlatformApiRelations;
+export type PlatformApiModuleWithRelations = PlatformApiModule & PlatformApiModuleRelations;
+export type PlatformApiSchemaWithRelations = PlatformApiSchema & PlatformApiSchemaRelations;
+export type PlatformApiSettingWithRelations = PlatformApiSetting & PlatformApiSettingRelations;
+export type PlatformCorsSettingWithRelations = PlatformCorsSetting & PlatformCorsSettingRelations;
+export type PlatformDomainWithRelations = PlatformDomain & PlatformDomainRelations;
+export type PlatformDomainEventWithRelations = PlatformDomainEvent & PlatformDomainEventRelations;
+export type PlatformDomainVerificationWithRelations = PlatformDomainVerification & PlatformDomainVerificationRelations;
+export type PlatformManagedDomainWithRelations = PlatformManagedDomain & PlatformManagedDomainRelations;
+export type PlatformSiteWithRelations = PlatformSite & PlatformSiteRelations;
+export type PlatformSiteMetadatumWithRelations = PlatformSiteMetadatum & PlatformSiteMetadatumRelations;
+export type PlatformSiteModuleWithRelations = PlatformSiteModule & PlatformSiteModuleRelations;
+export type PlatformSiteThemeWithRelations = PlatformSiteTheme & PlatformSiteThemeRelations;
 export type PolicyWithRelations = Policy & PolicyRelations;
-export type PrimaryKeyConstraintWithRelations = PrimaryKeyConstraint &
-  PrimaryKeyConstraintRelations;
+export type PrimaryKeyConstraintWithRelations = PrimaryKeyConstraint & PrimaryKeyConstraintRelations;
 export type PubkeySettingWithRelations = PubkeySetting & PubkeySettingRelations;
 export type RlsSettingWithRelations = RlsSetting & RlsSettingRelations;
+export type RouteBindingWithRelations = RouteBinding & RouteBindingRelations;
+export type RouteWithRelations = Route & RouteRelations;
 export type SchemaWithRelations = Schema & SchemaRelations;
 export type SchemaGrantWithRelations = SchemaGrant & SchemaGrantRelations;
 export type SiteWithRelations = Site & SiteRelations;
@@ -1366,20 +1805,18 @@ export type ViewTableWithRelations = ViewTable & ViewTableRelations;
 export type WebauthnSettingWithRelations = WebauthnSetting & WebauthnSettingRelations;
 // ============ Entity Select Types ============
 export type ApiSelect = {
-  annotations?: boolean;
   anonRole?: boolean;
+  config?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
   dbname?: boolean;
   id?: boolean;
-  isPublic?: boolean;
-  labels?: boolean;
+  isPublished?: boolean;
   name?: boolean;
   roleName?: boolean;
+  updatedAt?: boolean;
   apiSetting?: {
     select: ApiSettingSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
   };
   apiModules?: {
     select: ApiModuleSelect;
@@ -1399,36 +1836,28 @@ export type ApiSelect = {
     filter?: CorsSettingFilter;
     orderBy?: CorsSettingOrderBy[];
   };
-  domains?: {
-    select: DomainSelect;
-    first?: number;
-    filter?: DomainFilter;
-    orderBy?: DomainOrderBy[];
-  };
 };
 export type ApiModuleSelect = {
   apiId?: boolean;
+  createdAt?: boolean;
   data?: boolean;
   databaseId?: boolean;
   id?: boolean;
   name?: boolean;
+  updatedAt?: boolean;
   api?: {
     select: ApiSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
   };
 };
 export type ApiSchemaSelect = {
   apiId?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
   id?: boolean;
   schemaId?: boolean;
+  updatedAt?: boolean;
   api?: {
     select: ApiSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
   };
   schema?: {
     select: SchemaSelect;
@@ -1436,6 +1865,7 @@ export type ApiSchemaSelect = {
 };
 export type ApiSettingSelect = {
   apiId?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
   enableAggregates?: boolean;
   enableBulk?: boolean;
@@ -1451,28 +1881,9 @@ export type ApiSettingSelect = {
   enableSearch?: boolean;
   id?: boolean;
   options?: boolean;
+  updatedAt?: boolean;
   api?: {
     select: ApiSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
-  };
-};
-export type AppSelect = {
-  appIdPrefix?: boolean;
-  appImage?: boolean;
-  appStoreId?: boolean;
-  appStoreLink?: boolean;
-  databaseId?: boolean;
-  id?: boolean;
-  name?: boolean;
-  playStoreLink?: boolean;
-  siteId?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
-  site?: {
-    select: SiteSelect;
   };
 };
 export type AstMigrationSelect = {
@@ -1497,6 +1908,8 @@ export type CheckConstraintSelect = {
   expr?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
@@ -1531,13 +1944,12 @@ export type CompositeTypeSelect = {
 export type CorsSettingSelect = {
   allowedOrigins?: boolean;
   apiId?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
   id?: boolean;
+  updatedAt?: boolean;
   api?: {
     select: ApiSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
   };
 };
 export type DatabaseSelect = {
@@ -1550,48 +1962,6 @@ export type DatabaseSelect = {
   platform?: boolean;
   schemaHash?: boolean;
   updatedAt?: boolean;
-  databaseSetting?: {
-    select: DatabaseSettingSelect;
-  };
-  pubkeySetting?: {
-    select: PubkeySettingSelect;
-  };
-  rlsSetting?: {
-    select: RlsSettingSelect;
-  };
-  webauthnSetting?: {
-    select: WebauthnSettingSelect;
-  };
-  apiModules?: {
-    select: ApiModuleSelect;
-    first?: number;
-    filter?: ApiModuleFilter;
-    orderBy?: ApiModuleOrderBy[];
-  };
-  apiSchemas?: {
-    select: ApiSchemaSelect;
-    first?: number;
-    filter?: ApiSchemaFilter;
-    orderBy?: ApiSchemaOrderBy[];
-  };
-  apiSettings?: {
-    select: ApiSettingSelect;
-    first?: number;
-    filter?: ApiSettingFilter;
-    orderBy?: ApiSettingOrderBy[];
-  };
-  apis?: {
-    select: ApiSelect;
-    first?: number;
-    filter?: ApiFilter;
-    orderBy?: ApiOrderBy[];
-  };
-  apps?: {
-    select: AppSelect;
-    first?: number;
-    filter?: AppFilter;
-    orderBy?: AppOrderBy[];
-  };
   checkConstraints?: {
     select: CheckConstraintSelect;
     first?: number;
@@ -1603,12 +1973,6 @@ export type DatabaseSelect = {
     first?: number;
     filter?: CompositeTypeFilter;
     orderBy?: CompositeTypeOrderBy[];
-  };
-  corsSettings?: {
-    select: CorsSettingSelect;
-    first?: number;
-    filter?: CorsSettingFilter;
-    orderBy?: CorsSettingOrderBy[];
   };
   databaseTransfers?: {
     select: DatabaseTransferSelect;
@@ -1622,12 +1986,6 @@ export type DatabaseSelect = {
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
   };
-  domains?: {
-    select: DomainSelect;
-    first?: number;
-    filter?: DomainFilter;
-    orderBy?: DomainOrderBy[];
-  };
   embeddingChunks?: {
     select: EmbeddingChunkSelect;
     first?: number;
@@ -1639,6 +1997,12 @@ export type DatabaseSelect = {
     first?: number;
     filter?: EnumFilter;
     orderBy?: EnumOrderBy[];
+  };
+  exclusionConstraints?: {
+    select: ExclusionConstraintSelect;
+    first?: number;
+    filter?: ExclusionConstraintFilter;
+    orderBy?: ExclusionConstraintOrderBy[];
   };
   fields?: {
     select: FieldSelect;
@@ -1670,12 +2034,6 @@ export type DatabaseSelect = {
     filter?: IndexFilter;
     orderBy?: IndexOrderBy[];
   };
-  managedDomains?: {
-    select: ManagedDomainSelect;
-    first?: number;
-    filter?: ManagedDomainFilter;
-    orderBy?: ManagedDomainOrderBy[];
-  };
   partitions?: {
     select: PartitionSelect;
     first?: number;
@@ -1705,30 +2063,6 @@ export type DatabaseSelect = {
     first?: number;
     filter?: SchemaFilter;
     orderBy?: SchemaOrderBy[];
-  };
-  siteMetadata?: {
-    select: SiteMetadatumSelect;
-    first?: number;
-    filter?: SiteMetadatumFilter;
-    orderBy?: SiteMetadatumOrderBy[];
-  };
-  siteModules?: {
-    select: SiteModuleSelect;
-    first?: number;
-    filter?: SiteModuleFilter;
-    orderBy?: SiteModuleOrderBy[];
-  };
-  siteThemes?: {
-    select: SiteThemeSelect;
-    first?: number;
-    filter?: SiteThemeFilter;
-    orderBy?: SiteThemeOrderBy[];
-  };
-  sites?: {
-    select: SiteSelect;
-    first?: number;
-    filter?: SiteFilter;
-    orderBy?: SiteOrderBy[];
   };
   spatialRelations?: {
     select: SpatialRelationSelect;
@@ -1793,6 +2127,7 @@ export type DatabaseSelect = {
 };
 export type DatabaseSettingSelect = {
   annotations?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
   enableAggregates?: boolean;
   enableBulk?: boolean;
@@ -1809,9 +2144,7 @@ export type DatabaseSettingSelect = {
   id?: boolean;
   labels?: boolean;
   options?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
+  updatedAt?: boolean;
 };
 export type DatabaseTransferSelect = {
   completedAt?: boolean;
@@ -1848,29 +2181,90 @@ export type DefaultPrivilegeSelect = {
   };
 };
 export type DomainSelect = {
-  annotations?: boolean;
-  apiId?: boolean;
+  config?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
-  domain?: boolean;
+  hostname?: boolean;
   id?: boolean;
-  labels?: boolean;
-  serviceId?: boolean;
-  siteId?: boolean;
-  subdomain?: boolean;
-  api?: {
-    select: ApiSelect;
+  isPublished?: boolean;
+  isWildcard?: boolean;
+  managed?: boolean;
+  parentHostname?: boolean;
+  tlsReadyAt?: boolean;
+  tlsSecretName?: boolean;
+  tlsStatus?: boolean;
+  updatedAt?: boolean;
+  verificationStatus?: boolean;
+  verifiedAt?: boolean;
+  domainEvents?: {
+    select: DomainEventSelect;
+    first?: number;
+    filter?: DomainEventFilter;
+    orderBy?: DomainEventOrderBy[];
   };
-  database?: {
-    select: DatabaseSelect;
-  };
-  site?: {
-    select: SiteSelect;
+  domainVerifications?: {
+    select: DomainVerificationSelect;
+    first?: number;
+    filter?: DomainVerificationFilter;
+    orderBy?: DomainVerificationOrderBy[];
   };
   httpRoutes?: {
     select: HttpRouteSelect;
     first?: number;
     filter?: HttpRouteFilter;
     orderBy?: HttpRouteOrderBy[];
+  };
+  routes?: {
+    select: RouteSelect;
+    first?: number;
+    filter?: RouteFilter;
+    orderBy?: RouteOrderBy[];
+  };
+};
+export type DomainEventSelect = {
+  actorId?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  domainId?: boolean;
+  domainVerificationId?: boolean;
+  eventType?: boolean;
+  id?: boolean;
+  managedDomainId?: boolean;
+  message?: boolean;
+  metadata?: boolean;
+  updatedAt?: boolean;
+  domain?: {
+    select: DomainSelect;
+  };
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  managedDomain?: {
+    select: ManagedDomainSelect;
+  };
+};
+export type DomainVerificationSelect = {
+  attempts?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  domainId?: boolean;
+  error?: boolean;
+  expiresAt?: boolean;
+  id?: boolean;
+  lastCheckedAt?: boolean;
+  managedDomainId?: boolean;
+  method?: boolean;
+  recordName?: boolean;
+  recordType?: boolean;
+  recordValue?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  verifiedAt?: boolean;
+  domain?: {
+    select: DomainSelect;
+  };
+  managedDomain?: {
+    select: ManagedDomainSelect;
   };
 };
 export type EmbeddingChunkSelect = {
@@ -1929,6 +2323,29 @@ export type EnumSelect = {
     select: SchemaSelect;
   };
 };
+export type ExclusionConstraintSelect = {
+  accessMethod?: boolean;
+  category?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  elementExpr?: boolean;
+  fieldIds?: boolean;
+  id?: boolean;
+  name?: boolean;
+  operators?: boolean;
+  smartTags?: boolean;
+  tableId?: boolean;
+  tags?: boolean;
+  type?: boolean;
+  updatedAt?: boolean;
+  whereClause?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  table?: {
+    select: TableSelect;
+  };
+};
 export type FieldSelect = {
   apiRequired?: boolean;
   category?: boolean;
@@ -1942,6 +2359,8 @@ export type FieldSelect = {
   generationExpression?: boolean;
   generationType?: boolean;
   id?: boolean;
+  identityGeneration?: boolean;
+  identityOptions?: boolean;
   isRequired?: boolean;
   label?: boolean;
   max?: boolean;
@@ -1977,9 +2396,12 @@ export type ForeignKeyConstraintSelect = {
   createdAt?: boolean;
   databaseId?: boolean;
   deleteAction?: boolean;
+  deleteSetFieldIds?: boolean;
   description?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   refFieldIds?: boolean;
   refTableId?: boolean;
@@ -1989,6 +2411,7 @@ export type ForeignKeyConstraintSelect = {
   type?: boolean;
   updateAction?: boolean;
   updatedAt?: boolean;
+  withPeriod?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2028,6 +2451,18 @@ export type FunctionSelect = {
   schema?: {
     select: SchemaSelect;
   };
+};
+export type HostnameBindingSelect = {
+  domainId?: boolean;
+  hostname?: boolean;
+  id?: boolean;
+  isWildcard?: boolean;
+  managed?: boolean;
+  parentHostname?: boolean;
+  tlsSecretName?: boolean;
+  tlsStatus?: boolean;
+  updatedAt?: boolean;
+  verificationStatus?: boolean;
 };
 export type HttpRouteSelect = {
   createdAt?: boolean;
@@ -2073,17 +2508,30 @@ export type IndexSelect = {
   };
 };
 export type ManagedDomainSelect = {
+  allowPublicUsage?: boolean;
   annotations?: boolean;
+  certStatus?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
   domain?: boolean;
   id?: boolean;
   isWildcard?: boolean;
   tlsReadyAt?: boolean;
   tlsStatus?: boolean;
+  updatedAt?: boolean;
   verificationStatus?: boolean;
   verifiedAt?: boolean;
-  database?: {
-    select: DatabaseSelect;
+  domainEvents?: {
+    select: DomainEventSelect;
+    first?: number;
+    filter?: DomainEventFilter;
+    orderBy?: DomainEventOrderBy[];
+  };
+  domainVerifications?: {
+    select: DomainVerificationSelect;
+    first?: number;
+    filter?: DomainVerificationFilter;
+    orderBy?: DomainVerificationOrderBy[];
   };
 };
 export type NodeTypeRegistrySelect = {
@@ -2119,6 +2567,250 @@ export type PartitionSelect = {
     select: TableSelect;
   };
 };
+export type PlatformApiSelect = {
+  anonRole?: boolean;
+  config?: boolean;
+  createdAt?: boolean;
+  dbname?: boolean;
+  id?: boolean;
+  isPublished?: boolean;
+  name?: boolean;
+  roleName?: boolean;
+  updatedAt?: boolean;
+  platformApiSettingByApiId?: {
+    select: PlatformApiSettingSelect;
+  };
+  platformCorsSettingByApiId?: {
+    select: PlatformCorsSettingSelect;
+  };
+  platformApiModulesByApiId?: {
+    select: PlatformApiModuleSelect;
+    first?: number;
+    filter?: PlatformApiModuleFilter;
+    orderBy?: PlatformApiModuleOrderBy[];
+  };
+  platformApiSchemasByApiId?: {
+    select: PlatformApiSchemaSelect;
+    first?: number;
+    filter?: PlatformApiSchemaFilter;
+    orderBy?: PlatformApiSchemaOrderBy[];
+  };
+};
+export type PlatformApiModuleSelect = {
+  apiId?: boolean;
+  createdAt?: boolean;
+  data?: boolean;
+  id?: boolean;
+  name?: boolean;
+  updatedAt?: boolean;
+  api?: {
+    select: PlatformApiSelect;
+  };
+};
+export type PlatformApiSchemaSelect = {
+  apiId?: boolean;
+  createdAt?: boolean;
+  id?: boolean;
+  schemaId?: boolean;
+  updatedAt?: boolean;
+  api?: {
+    select: PlatformApiSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
+};
+export type PlatformApiSettingSelect = {
+  apiId?: boolean;
+  createdAt?: boolean;
+  enableAggregates?: boolean;
+  enableBulk?: boolean;
+  enableConnectionFilter?: boolean;
+  enableDirectUploads?: boolean;
+  enableI18N?: boolean;
+  enableLlm?: boolean;
+  enableLtree?: boolean;
+  enableManyToMany?: boolean;
+  enablePostgis?: boolean;
+  enablePresignedUploads?: boolean;
+  enableRealtime?: boolean;
+  enableSearch?: boolean;
+  id?: boolean;
+  options?: boolean;
+  updatedAt?: boolean;
+  api?: {
+    select: PlatformApiSelect;
+  };
+};
+export type PlatformCorsSettingSelect = {
+  allowedOrigins?: boolean;
+  apiId?: boolean;
+  createdAt?: boolean;
+  id?: boolean;
+  updatedAt?: boolean;
+  api?: {
+    select: PlatformApiSelect;
+  };
+};
+export type PlatformDomainSelect = {
+  config?: boolean;
+  createdAt?: boolean;
+  hostname?: boolean;
+  id?: boolean;
+  isPublished?: boolean;
+  isWildcard?: boolean;
+  managed?: boolean;
+  parentHostname?: boolean;
+  tlsReadyAt?: boolean;
+  tlsSecretName?: boolean;
+  tlsStatus?: boolean;
+  updatedAt?: boolean;
+  verificationStatus?: boolean;
+  verifiedAt?: boolean;
+  platformDomainEventsByDomainId?: {
+    select: PlatformDomainEventSelect;
+    first?: number;
+    filter?: PlatformDomainEventFilter;
+    orderBy?: PlatformDomainEventOrderBy[];
+  };
+  platformDomainVerificationsByDomainId?: {
+    select: PlatformDomainVerificationSelect;
+    first?: number;
+    filter?: PlatformDomainVerificationFilter;
+    orderBy?: PlatformDomainVerificationOrderBy[];
+  };
+};
+export type PlatformDomainEventSelect = {
+  actorId?: boolean;
+  createdAt?: boolean;
+  domainId?: boolean;
+  domainVerificationId?: boolean;
+  eventType?: boolean;
+  id?: boolean;
+  managedDomainId?: boolean;
+  message?: boolean;
+  metadata?: boolean;
+  updatedAt?: boolean;
+  domain?: {
+    select: PlatformDomainSelect;
+  };
+  domainVerification?: {
+    select: PlatformDomainVerificationSelect;
+  };
+  managedDomain?: {
+    select: PlatformManagedDomainSelect;
+  };
+};
+export type PlatformDomainVerificationSelect = {
+  attempts?: boolean;
+  createdAt?: boolean;
+  domainId?: boolean;
+  error?: boolean;
+  expiresAt?: boolean;
+  id?: boolean;
+  lastCheckedAt?: boolean;
+  managedDomainId?: boolean;
+  method?: boolean;
+  recordName?: boolean;
+  recordType?: boolean;
+  recordValue?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  verifiedAt?: boolean;
+  domain?: {
+    select: PlatformDomainSelect;
+  };
+  managedDomain?: {
+    select: PlatformManagedDomainSelect;
+  };
+};
+export type PlatformManagedDomainSelect = {
+  allowPublicUsage?: boolean;
+  annotations?: boolean;
+  certStatus?: boolean;
+  createdAt?: boolean;
+  domain?: boolean;
+  id?: boolean;
+  isWildcard?: boolean;
+  tlsReadyAt?: boolean;
+  tlsStatus?: boolean;
+  updatedAt?: boolean;
+  verificationStatus?: boolean;
+  verifiedAt?: boolean;
+  platformDomainEventsByManagedDomainId?: {
+    select: PlatformDomainEventSelect;
+    first?: number;
+    filter?: PlatformDomainEventFilter;
+    orderBy?: PlatformDomainEventOrderBy[];
+  };
+  platformDomainVerificationsByManagedDomainId?: {
+    select: PlatformDomainVerificationSelect;
+    first?: number;
+    filter?: PlatformDomainVerificationFilter;
+    orderBy?: PlatformDomainVerificationOrderBy[];
+  };
+};
+export type PlatformSiteSelect = {
+  config?: boolean;
+  createdAt?: boolean;
+  description?: boolean;
+  id?: boolean;
+  isPublished?: boolean;
+  name?: boolean;
+  title?: boolean;
+  updatedAt?: boolean;
+  platformSiteMetadataBySiteId?: {
+    select: PlatformSiteMetadatumSelect;
+    first?: number;
+    filter?: PlatformSiteMetadatumFilter;
+    orderBy?: PlatformSiteMetadatumOrderBy[];
+  };
+  platformSiteModulesBySiteId?: {
+    select: PlatformSiteModuleSelect;
+    first?: number;
+    filter?: PlatformSiteModuleFilter;
+    orderBy?: PlatformSiteModuleOrderBy[];
+  };
+  platformSiteThemesBySiteId?: {
+    select: PlatformSiteThemeSelect;
+    first?: number;
+    filter?: PlatformSiteThemeFilter;
+    orderBy?: PlatformSiteThemeOrderBy[];
+  };
+};
+export type PlatformSiteMetadatumSelect = {
+  createdAt?: boolean;
+  description?: boolean;
+  id?: boolean;
+  ogImage?: boolean;
+  siteId?: boolean;
+  title?: boolean;
+  updatedAt?: boolean;
+  site?: {
+    select: PlatformSiteSelect;
+  };
+};
+export type PlatformSiteModuleSelect = {
+  createdAt?: boolean;
+  data?: boolean;
+  id?: boolean;
+  name?: boolean;
+  siteId?: boolean;
+  updatedAt?: boolean;
+  site?: {
+    select: PlatformSiteSelect;
+  };
+};
+export type PlatformSiteThemeSelect = {
+  createdAt?: boolean;
+  id?: boolean;
+  siteId?: boolean;
+  theme?: boolean;
+  updatedAt?: boolean;
+  site?: {
+    select: PlatformSiteSelect;
+  };
+};
 export type PolicySelect = {
   category?: boolean;
   createdAt?: boolean;
@@ -2149,12 +2841,15 @@ export type PrimaryKeyConstraintSelect = {
   databaseId?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
   tags?: boolean;
   type?: boolean;
   updatedAt?: boolean;
+  withoutOverlaps?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2163,6 +2858,7 @@ export type PrimaryKeyConstraintSelect = {
   };
 };
 export type PubkeySettingSelect = {
+  createdAt?: boolean;
   cryptoNetwork?: boolean;
   databaseId?: boolean;
   id?: boolean;
@@ -2171,10 +2867,8 @@ export type PubkeySettingSelect = {
   signInRequestChallengeFunctionId?: boolean;
   signInWithChallengeFunctionId?: boolean;
   signUpWithKeyFunctionId?: boolean;
+  updatedAt?: boolean;
   userField?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
   schema?: {
     select: SchemaSelect;
   };
@@ -2195,6 +2889,7 @@ export type RlsSettingSelect = {
   authenticateFunctionId?: boolean;
   authenticateSchemaId?: boolean;
   authenticateStrictFunctionId?: boolean;
+  createdAt?: boolean;
   currentIpAddressFunctionId?: boolean;
   currentRoleFunctionId?: boolean;
   currentRoleIdFunctionId?: boolean;
@@ -2202,6 +2897,7 @@ export type RlsSettingSelect = {
   databaseId?: boolean;
   id?: boolean;
   roleSchemaId?: boolean;
+  updatedAt?: boolean;
   authenticateFunction?: {
     select: FunctionSelect;
   };
@@ -2223,11 +2919,38 @@ export type RlsSettingSelect = {
   currentUserAgentFunction?: {
     select: FunctionSelect;
   };
-  database?: {
-    select: DatabaseSelect;
-  };
   roleSchema?: {
     select: SchemaSelect;
+  };
+};
+export type RouteBindingSelect = {
+  domainId?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  method?: boolean;
+  path?: boolean;
+  priority?: boolean;
+  targetApiId?: boolean;
+  targetFunctionId?: boolean;
+  targetSiteId?: boolean;
+  updatedAt?: boolean;
+};
+export type RouteSelect = {
+  config?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  domainId?: boolean;
+  id?: boolean;
+  isActive?: boolean;
+  method?: boolean;
+  path?: boolean;
+  priority?: boolean;
+  targetApiId?: boolean;
+  targetFunctionId?: boolean;
+  targetSiteId?: boolean;
+  updatedAt?: boolean;
+  domain?: {
+    select: DomainSelect;
   };
 };
 export type SchemaSelect = {
@@ -2277,6 +3000,12 @@ export type SchemaSelect = {
     filter?: FunctionFilter;
     orderBy?: FunctionOrderBy[];
   };
+  platformApiSchemas?: {
+    select: PlatformApiSchemaSelect;
+    first?: number;
+    filter?: PlatformApiSchemaFilter;
+    orderBy?: PlatformApiSchemaOrderBy[];
+  };
   schemaGrants?: {
     select: SchemaGrantSelect;
     first?: number;
@@ -2311,29 +3040,15 @@ export type SchemaGrantSelect = {
   };
 };
 export type SiteSelect = {
-  annotations?: boolean;
-  appleTouchIcon?: boolean;
+  config?: boolean;
+  createdAt?: boolean;
   databaseId?: boolean;
-  dbname?: boolean;
   description?: boolean;
-  favicon?: boolean;
   id?: boolean;
-  labels?: boolean;
-  logo?: boolean;
-  ogImage?: boolean;
+  isPublished?: boolean;
+  name?: boolean;
   title?: boolean;
-  app?: {
-    select: AppSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
-  };
-  domains?: {
-    select: DomainSelect;
-    first?: number;
-    filter?: DomainFilter;
-    orderBy?: DomainOrderBy[];
-  };
+  updatedAt?: boolean;
   siteMetadata?: {
     select: SiteMetadatumSelect;
     first?: number;
@@ -2354,40 +3069,37 @@ export type SiteSelect = {
   };
 };
 export type SiteMetadatumSelect = {
+  createdAt?: boolean;
   databaseId?: boolean;
   description?: boolean;
   id?: boolean;
   ogImage?: boolean;
   siteId?: boolean;
   title?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
+  updatedAt?: boolean;
   site?: {
     select: SiteSelect;
   };
 };
 export type SiteModuleSelect = {
+  createdAt?: boolean;
   data?: boolean;
   databaseId?: boolean;
   id?: boolean;
   name?: boolean;
   siteId?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
+  updatedAt?: boolean;
   site?: {
     select: SiteSelect;
   };
 };
 export type SiteThemeSelect = {
+  createdAt?: boolean;
   databaseId?: boolean;
   id?: boolean;
   siteId?: boolean;
   theme?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
+  updatedAt?: boolean;
   site?: {
     select: SiteSelect;
   };
@@ -2489,6 +3201,12 @@ export type TableSelect = {
     first?: number;
     filter?: EmbeddingChunkFilter;
     orderBy?: EmbeddingChunkOrderBy[];
+  };
+  exclusionConstraints?: {
+    select: ExclusionConstraintSelect;
+    first?: number;
+    filter?: ExclusionConstraintFilter;
+    orderBy?: ExclusionConstraintOrderBy[];
   };
   fields?: {
     select: FieldSelect;
@@ -2623,12 +3341,15 @@ export type UniqueConstraintSelect = {
   description?: boolean;
   fieldIds?: boolean;
   id?: boolean;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
   tags?: boolean;
   type?: boolean;
   updatedAt?: boolean;
+  withoutOverlaps?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2638,6 +3359,7 @@ export type UniqueConstraintSelect = {
 };
 export type ViewSelect = {
   category?: boolean;
+  checkOption?: boolean;
   data?: boolean;
   databaseId?: boolean;
   filterData?: boolean;
@@ -2646,6 +3368,7 @@ export type ViewSelect = {
   isReadOnly?: boolean;
   name?: boolean;
   schemaId?: boolean;
+  securityBarrier?: boolean;
   securityInvoker?: boolean;
   smartTags?: boolean;
   tableId?: boolean;
@@ -2727,6 +3450,7 @@ export type ViewTableSelect = {
 export type WebauthnSettingSelect = {
   attestationType?: boolean;
   challengeExpirySeconds?: boolean;
+  createdAt?: boolean;
   credentialsSchemaId?: boolean;
   credentialsTableId?: boolean;
   databaseId?: boolean;
@@ -2742,15 +3466,13 @@ export type WebauthnSettingSelect = {
   sessionSecretsTableId?: boolean;
   sessionsSchemaId?: boolean;
   sessionsTableId?: boolean;
+  updatedAt?: boolean;
   userFieldId?: boolean;
   credentialsSchema?: {
     select: SchemaSelect;
   };
   credentialsTable?: {
     select: TableSelect;
-  };
-  database?: {
-    select: DatabaseSelect;
   };
   schema?: {
     select: SchemaSelect;
@@ -2778,8 +3500,6 @@ export type WebauthnSettingSelect = {
 export interface ApiFilter {
   /** Checks for all expressions in this list. */
   and?: ApiFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
   /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
   /** Filter by the object’s `apiModules` relation. */
@@ -2794,26 +3514,22 @@ export interface ApiFilter {
   apiSetting?: ApiSettingFilter;
   /** A related `apiSetting` exists. */
   apiSettingExists?: boolean;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
   /** Filter by the object’s `corsSettings` relation. */
   corsSettings?: ApiToManyCorsSettingFilter;
   /** `corsSettings` exist. */
   corsSettingsExist?: boolean;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
-  /** Filter by the object’s `domains` relation. */
-  domains?: ApiToManyDomainFilter;
-  /** `domains` exist. */
-  domainsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `isPublic` field. */
-  isPublic?: BooleanFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -2822,6 +3538,8 @@ export interface ApiFilter {
   or?: ApiFilter[];
   /** Filter by the object’s `roleName` field. */
   roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface ApiModuleFilter {
   /** Checks for all expressions in this list. */
@@ -2830,8 +3548,8 @@ export interface ApiModuleFilter {
   api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -2842,6 +3560,8 @@ export interface ApiModuleFilter {
   not?: ApiModuleFilter;
   /** Checks for any expressions in this list. */
   or?: ApiModuleFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface ApiSchemaFilter {
   /** Checks for all expressions in this list. */
@@ -2850,8 +3570,8 @@ export interface ApiSchemaFilter {
   api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -2864,6 +3584,8 @@ export interface ApiSchemaFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface ApiSettingFilter {
   /** Checks for all expressions in this list. */
@@ -2872,8 +3594,8 @@ export interface ApiSettingFilter {
   api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `enableAggregates` field. */
@@ -2908,36 +3630,8 @@ export interface ApiSettingFilter {
   options?: JSONFilter;
   /** Checks for any expressions in this list. */
   or?: ApiSettingFilter[];
-}
-export interface AppFilter {
-  /** Checks for all expressions in this list. */
-  and?: AppFilter[];
-  /** Filter by the object’s `appIdPrefix` field. */
-  appIdPrefix?: StringFilter;
-  /** Filter by the object’s `appImage` field. */
-  appImage?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `appStoreId` field. */
-  appStoreId?: StringFilter;
-  /** Filter by the object’s `appStoreLink` field. */
-  appStoreLink?: ConstructiveInternalTypeUrlFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: AppFilter;
-  /** Checks for any expressions in this list. */
-  or?: AppFilter[];
-  /** Filter by the object’s `playStoreLink` field. */
-  playStoreLink?: ConstructiveInternalTypeUrlFilter;
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface AstMigrationFilter {
   /** Filter by the object’s `actionId` field. */
@@ -2990,6 +3684,10 @@ export interface CheckConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3052,8 +3750,8 @@ export interface CorsSettingFilter {
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -3062,30 +3760,12 @@ export interface CorsSettingFilter {
   not?: CorsSettingFilter;
   /** Checks for any expressions in this list. */
   or?: CorsSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface DatabaseFilter {
   /** Checks for all expressions in this list. */
   and?: DatabaseFilter[];
-  /** Filter by the object’s `apiModules` relation. */
-  apiModules?: DatabaseToManyApiModuleFilter;
-  /** `apiModules` exist. */
-  apiModulesExist?: boolean;
-  /** Filter by the object’s `apiSchemas` relation. */
-  apiSchemas?: DatabaseToManyApiSchemaFilter;
-  /** `apiSchemas` exist. */
-  apiSchemasExist?: boolean;
-  /** Filter by the object’s `apiSettings` relation. */
-  apiSettings?: DatabaseToManyApiSettingFilter;
-  /** `apiSettings` exist. */
-  apiSettingsExist?: boolean;
-  /** Filter by the object’s `apis` relation. */
-  apis?: DatabaseToManyApiFilter;
-  /** `apis` exist. */
-  apisExist?: boolean;
-  /** Filter by the object’s `apps` relation. */
-  apps?: DatabaseToManyAppFilter;
-  /** `apps` exist. */
-  appsExist?: boolean;
   /** Filter by the object’s `checkConstraints` relation. */
   checkConstraints?: DatabaseToManyCheckConstraintFilter;
   /** `checkConstraints` exist. */
@@ -3094,16 +3774,8 @@ export interface DatabaseFilter {
   compositeTypes?: DatabaseToManyCompositeTypeFilter;
   /** `compositeTypes` exist. */
   compositeTypesExist?: boolean;
-  /** Filter by the object’s `corsSettings` relation. */
-  corsSettings?: DatabaseToManyCorsSettingFilter;
-  /** `corsSettings` exist. */
-  corsSettingsExist?: boolean;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseSetting` relation. */
-  databaseSetting?: DatabaseSettingFilter;
-  /** A related `databaseSetting` exists. */
-  databaseSettingExists?: boolean;
   /** Filter by the object’s `databaseTransfers` relation. */
   databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
   /** `databaseTransfers` exist. */
@@ -3112,10 +3784,6 @@ export interface DatabaseFilter {
   defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
   /** `defaultPrivileges` exist. */
   defaultPrivilegesExist?: boolean;
-  /** Filter by the object’s `domains` relation. */
-  domains?: DatabaseToManyDomainFilter;
-  /** `domains` exist. */
-  domainsExist?: boolean;
   /** Filter by the object’s `embeddingChunks` relation. */
   embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
   /** `embeddingChunks` exist. */
@@ -3124,6 +3792,10 @@ export interface DatabaseFilter {
   enums?: DatabaseToManyEnumFilter;
   /** `enums` exist. */
   enumsExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: DatabaseToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: DatabaseToManyFieldFilter;
   /** `fields` exist. */
@@ -3150,10 +3822,6 @@ export interface DatabaseFilter {
   indicesExist?: boolean;
   /** Filter by the object’s `label` field. */
   label?: StringFilter;
-  /** Filter by the object’s `managedDomains` relation. */
-  managedDomains?: DatabaseToManyManagedDomainFilter;
-  /** `managedDomains` exist. */
-  managedDomainsExist?: boolean;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3176,14 +3844,6 @@ export interface DatabaseFilter {
   primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
   /** `primaryKeyConstraints` exist. */
   primaryKeyConstraintsExist?: boolean;
-  /** Filter by the object’s `pubkeySetting` relation. */
-  pubkeySetting?: PubkeySettingFilter;
-  /** A related `pubkeySetting` exists. */
-  pubkeySettingExists?: boolean;
-  /** Filter by the object’s `rlsSetting` relation. */
-  rlsSetting?: RlsSettingFilter;
-  /** A related `rlsSetting` exists. */
-  rlsSettingExists?: boolean;
   /** Filter by the object’s `schemaGrants` relation. */
   schemaGrants?: DatabaseToManySchemaGrantFilter;
   /** `schemaGrants` exist. */
@@ -3194,22 +3854,6 @@ export interface DatabaseFilter {
   schemas?: DatabaseToManySchemaFilter;
   /** `schemas` exist. */
   schemasExist?: boolean;
-  /** Filter by the object’s `siteMetadata` relation. */
-  siteMetadata?: DatabaseToManySiteMetadatumFilter;
-  /** `siteMetadata` exist. */
-  siteMetadataExist?: boolean;
-  /** Filter by the object’s `siteModules` relation. */
-  siteModules?: DatabaseToManySiteModuleFilter;
-  /** `siteModules` exist. */
-  siteModulesExist?: boolean;
-  /** Filter by the object’s `siteThemes` relation. */
-  siteThemes?: DatabaseToManySiteThemeFilter;
-  /** `siteThemes` exist. */
-  siteThemesExist?: boolean;
-  /** Filter by the object’s `sites` relation. */
-  sites?: DatabaseToManySiteFilter;
-  /** `sites` exist. */
-  sitesExist?: boolean;
   /** Filter by the object’s `spatialRelations` relation. */
   spatialRelations?: DatabaseToManySpatialRelationFilter;
   /** `spatialRelations` exist. */
@@ -3252,18 +3896,14 @@ export interface DatabaseFilter {
   views?: DatabaseToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
-  /** Filter by the object’s `webauthnSetting` relation. */
-  webauthnSetting?: WebauthnSettingFilter;
-  /** A related `webauthnSetting` exists. */
-  webauthnSettingExists?: boolean;
 }
 export interface DatabaseSettingFilter {
   /** Checks for all expressions in this list. */
   and?: DatabaseSettingFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `enableAggregates` field. */
@@ -3300,6 +3940,8 @@ export interface DatabaseSettingFilter {
   options?: JSONFilter;
   /** Checks for any expressions in this list. */
   or?: DatabaseSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface DatabaseTransferFilter {
   /** Checks for all expressions in this list. */
@@ -3368,42 +4010,146 @@ export interface DefaultPrivilegeFilter {
 export interface DomainFilter {
   /** Checks for all expressions in this list. */
   and?: DomainFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `api` relation. */
-  api?: ApiFilter;
-  /** A related `api` exists. */
-  apiExists?: boolean;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `domain` field. */
-  domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: DomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: DomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
+  /** Filter by the object’s `hostname` field. */
+  hostname?: StringFilter;
   /** Filter by the object’s `httpRoutes` relation. */
   httpRoutes?: DomainToManyHttpRouteFilter;
   /** `httpRoutes` exist. */
   httpRoutesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Filter by the object’s `managed` field. */
+  managed?: BooleanFilter;
   /** Negates the expression. */
   not?: DomainFilter;
   /** Checks for any expressions in this list. */
   or?: DomainFilter[];
-  /** Filter by the object’s `serviceId` field. */
-  serviceId?: UUIDFilter;
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** A related `site` exists. */
-  siteExists?: boolean;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-  /** Filter by the object’s `subdomain` field. */
-  subdomain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `parentHostname` field. */
+  parentHostname?: StringFilter;
+  /** Filter by the object’s `routes` relation. */
+  routes?: DomainToManyRouteFilter;
+  /** `routes` exist. */
+  routesExist?: boolean;
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsSecretName` field. */
+  tlsSecretName?: StringFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+export interface DomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: DomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: DomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainEventFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface DomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainVerificationFilter[];
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
 }
 export interface EmbeddingChunkFilter {
   /** Checks for all expressions in this list. */
@@ -3503,6 +4249,48 @@ export interface EnumFilter {
   /** Filter by the object’s `values` field. */
   values?: StringListFilter;
 }
+export interface ExclusionConstraintFilter {
+  /** Filter by the object’s `accessMethod` field. */
+  accessMethod?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `elementExpr` field. */
+  elementExpr?: JSONFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ExclusionConstraintFilter;
+  /** Filter by the object’s `operators` field. */
+  operators?: StringListFilter;
+  /** Checks for any expressions in this list. */
+  or?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `whereClause` field. */
+  whereClause?: JSONFilter;
+}
 export interface FieldFilter {
   /** Checks for all expressions in this list. */
   and?: FieldFilter[];
@@ -3532,6 +4320,10 @@ export interface FieldFilter {
   generationType?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `identityGeneration` field. */
+  identityGeneration?: StringFilter;
+  /** Filter by the object’s `identityOptions` field. */
+  identityOptions?: JSONFilter;
   /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
   /** Filter by the object’s `label` field. */
@@ -3582,12 +4374,18 @@ export interface ForeignKeyConstraintFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `deleteSetFieldIds` field. */
+  deleteSetFieldIds?: UUIDListFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3614,6 +4412,8 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withPeriod` field. */
+  withPeriod?: BooleanFilter;
 }
 export interface FullTextSearchFilter {
   /** Checks for all expressions in this list. */
@@ -3666,6 +4466,34 @@ export interface FunctionFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+}
+export interface HostnameBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: HostnameBindingFilter[];
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `hostname` field. */
+  hostname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Filter by the object’s `managed` field. */
+  managed?: BooleanFilter;
+  /** Negates the expression. */
+  not?: HostnameBindingFilter;
+  /** Checks for any expressions in this list. */
+  or?: HostnameBindingFilter[];
+  /** Filter by the object’s `parentHostname` field. */
+  parentHostname?: StringFilter;
+  /** Filter by the object’s `tlsSecretName` field. */
+  tlsSecretName?: StringFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
 }
 export interface HttpRouteFilter {
   /** Checks for all expressions in this list. */
@@ -3750,16 +4578,28 @@ export interface IndexFilter {
   whereClause?: JSONFilter;
 }
 export interface ManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: ManagedDomainFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
-  domain?: ConstructiveInternalTypeHostnameFilter;
+  domain?: StringFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: ManagedDomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: ManagedDomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isWildcard` field. */
@@ -3772,6 +4612,8 @@ export interface ManagedDomainFilter {
   tlsReadyAt?: DatetimeFilter;
   /** Filter by the object’s `tlsStatus` field. */
   tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
   /** Filter by the object’s `verificationStatus` field. */
   verificationStatus?: StringFilter;
   /** Filter by the object’s `verifiedAt` field. */
@@ -3839,6 +4681,426 @@ export interface PartitionFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
+export interface PlatformApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiFilter[];
+  /** Filter by the object’s `platformApiModulesByApiId` relation. */
+  platformApiModulesByApiId?: PlatformApiToManyPlatformApiModuleFilter;
+  /** `platformApiModulesByApiId` exist. */
+  platformApiModulesByApiIdExist?: boolean;
+  /** Filter by the object’s `platformApiSchemasByApiId` relation. */
+  platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
+  /** `platformApiSchemasByApiId` exist. */
+  platformApiSchemasByApiIdExist?: boolean;
+  /** Filter by the object’s `platformApiSettingByApiId` relation. */
+  platformApiSettingByApiId?: PlatformApiSettingFilter;
+  /** A related `platformApiSettingByApiId` exists. */
+  platformApiSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `platformCorsSettingByApiId` relation. */
+  platformCorsSettingByApiId?: PlatformCorsSettingFilter;
+  /** A related `platformCorsSettingByApiId` exists. */
+  platformCorsSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformApiModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiModuleFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformApiModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiModuleFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformApiSchemaFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiSchemaFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformApiSchemaFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiSchemaFilter[];
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformApiSettingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiSettingFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `enableAggregates` field. */
+  enableAggregates?: BooleanFilter;
+  /** Filter by the object’s `enableBulk` field. */
+  enableBulk?: BooleanFilter;
+  /** Filter by the object’s `enableConnectionFilter` field. */
+  enableConnectionFilter?: BooleanFilter;
+  /** Filter by the object’s `enableDirectUploads` field. */
+  enableDirectUploads?: BooleanFilter;
+  /** Filter by the object’s `enableI18N` field. */
+  enableI18N?: BooleanFilter;
+  /** Filter by the object’s `enableLlm` field. */
+  enableLlm?: BooleanFilter;
+  /** Filter by the object’s `enableLtree` field. */
+  enableLtree?: BooleanFilter;
+  /** Filter by the object’s `enableManyToMany` field. */
+  enableManyToMany?: BooleanFilter;
+  /** Filter by the object’s `enablePostgis` field. */
+  enablePostgis?: BooleanFilter;
+  /** Filter by the object’s `enablePresignedUploads` field. */
+  enablePresignedUploads?: BooleanFilter;
+  /** Filter by the object’s `enableRealtime` field. */
+  enableRealtime?: BooleanFilter;
+  /** Filter by the object’s `enableSearch` field. */
+  enableSearch?: BooleanFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformApiSettingFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformCorsSettingFilter {
+  /** Filter by the object’s `allowedOrigins` field. */
+  allowedOrigins?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformCorsSettingFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformCorsSettingFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformCorsSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformDomainFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformDomainFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `hostname` field. */
+  hostname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Filter by the object’s `managed` field. */
+  managed?: BooleanFilter;
+  /** Negates the expression. */
+  not?: PlatformDomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDomainFilter[];
+  /** Filter by the object’s `parentHostname` field. */
+  parentHostname?: StringFilter;
+  /** Filter by the object’s `platformDomainEventsByDomainId` relation. */
+  platformDomainEventsByDomainId?: PlatformDomainToManyPlatformDomainEventFilter;
+  /** `platformDomainEventsByDomainId` exist. */
+  platformDomainEventsByDomainIdExist?: boolean;
+  /** Filter by the object’s `platformDomainVerificationsByDomainId` relation. */
+  platformDomainVerificationsByDomainId?: PlatformDomainToManyPlatformDomainVerificationFilter;
+  /** `platformDomainVerificationsByDomainId` exist. */
+  platformDomainVerificationsByDomainIdExist?: boolean;
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsSecretName` field. */
+  tlsSecretName?: StringFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+export interface PlatformDomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformDomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: PlatformDomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: PlatformDomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: PlatformManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformDomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDomainEventFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformDomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformDomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: PlatformDomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: PlatformManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformDomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDomainVerificationFilter[];
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+export interface PlatformManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformManagedDomainFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Negates the expression. */
+  not?: PlatformManagedDomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformManagedDomainFilter[];
+  /** Filter by the object’s `platformDomainEventsByManagedDomainId` relation. */
+  platformDomainEventsByManagedDomainId?: PlatformManagedDomainToManyPlatformDomainEventFilter;
+  /** `platformDomainEventsByManagedDomainId` exist. */
+  platformDomainEventsByManagedDomainIdExist?: boolean;
+  /** Filter by the object’s `platformDomainVerificationsByManagedDomainId` relation. */
+  platformDomainVerificationsByManagedDomainId?: PlatformManagedDomainToManyPlatformDomainVerificationFilter;
+  /** `platformDomainVerificationsByManagedDomainId` exist. */
+  platformDomainVerificationsByManagedDomainIdExist?: boolean;
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+export interface PlatformSiteFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteFilter[];
+  /** Filter by the object’s `platformSiteMetadataBySiteId` relation. */
+  platformSiteMetadataBySiteId?: PlatformSiteToManyPlatformSiteMetadatumFilter;
+  /** `platformSiteMetadataBySiteId` exist. */
+  platformSiteMetadataBySiteIdExist?: boolean;
+  /** Filter by the object’s `platformSiteModulesBySiteId` relation. */
+  platformSiteModulesBySiteId?: PlatformSiteToManyPlatformSiteModuleFilter;
+  /** `platformSiteModulesBySiteId` exist. */
+  platformSiteModulesBySiteIdExist?: boolean;
+  /** Filter by the object’s `platformSiteThemesBySiteId` relation. */
+  platformSiteThemesBySiteId?: PlatformSiteToManyPlatformSiteThemeFilter;
+  /** `platformSiteThemesBySiteId` exist. */
+  platformSiteThemesBySiteIdExist?: boolean;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformSiteMetadatumFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteMetadatumFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteMetadatumFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteMetadatumFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformSiteModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteModuleFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteModuleFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface PlatformSiteThemeFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteThemeFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteThemeFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteThemeFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
+  theme?: JSONFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 export interface PolicyFilter {
   /** Checks for all expressions in this list. */
   and?: PolicyFilter[];
@@ -3898,6 +5160,10 @@ export interface PrimaryKeyConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -3916,14 +5182,16 @@ export interface PrimaryKeyConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 export interface PubkeySettingFilter {
   /** Checks for all expressions in this list. */
   and?: PubkeySettingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `cryptoNetwork` field. */
   cryptoNetwork?: StringFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -3962,6 +5230,8 @@ export interface PubkeySettingFilter {
   signUpWithKeyFunctionExists?: boolean;
   /** Filter by the object’s `signUpWithKeyFunctionId` field. */
   signUpWithKeyFunctionId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
   /** Filter by the object’s `userField` field. */
   userField?: StringFilter;
 }
@@ -3986,6 +5256,8 @@ export interface RlsSettingFilter {
   authenticateStrictFunctionExists?: boolean;
   /** Filter by the object’s `authenticateStrictFunctionId` field. */
   authenticateStrictFunctionId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `currentIpAddressFunction` relation. */
   currentIpAddressFunction?: FunctionFilter;
   /** A related `currentIpAddressFunction` exists. */
@@ -4010,8 +5282,6 @@ export interface RlsSettingFilter {
   currentUserAgentFunctionExists?: boolean;
   /** Filter by the object’s `currentUserAgentFunctionId` field. */
   currentUserAgentFunctionId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -4026,6 +5296,72 @@ export interface RlsSettingFilter {
   roleSchemaExists?: boolean;
   /** Filter by the object’s `roleSchemaId` field. */
   roleSchemaId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface RouteBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: RouteBindingFilter[];
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: RouteBindingFilter;
+  /** Checks for any expressions in this list. */
+  or?: RouteBindingFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `targetApiId` field. */
+  targetApiId?: UUIDFilter;
+  /** Filter by the object’s `targetFunctionId` field. */
+  targetFunctionId?: UUIDFilter;
+  /** Filter by the object’s `targetSiteId` field. */
+  targetSiteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+export interface RouteFilter {
+  /** Checks for all expressions in this list. */
+  and?: RouteFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: RouteFilter;
+  /** Checks for any expressions in this list. */
+  or?: RouteFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `targetApiId` field. */
+  targetApiId?: UUIDFilter;
+  /** Filter by the object’s `targetFunctionId` field. */
+  targetFunctionId?: UUIDFilter;
+  /** Filter by the object’s `targetSiteId` field. */
+  targetSiteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface SchemaFilter {
   /** Checks for all expressions in this list. */
@@ -4074,6 +5410,10 @@ export interface SchemaFilter {
   not?: SchemaFilter;
   /** Checks for any expressions in this list. */
   or?: SchemaFilter[];
+  /** Filter by the object’s `platformApiSchemas` relation. */
+  platformApiSchemas?: SchemaToManyPlatformApiSchemaFilter;
+  /** `platformApiSchemas` exist. */
+  platformApiSchemasExist?: boolean;
   /** Filter by the object’s `schemaGrants` relation. */
   schemaGrants?: SchemaToManySchemaGrantFilter;
   /** `schemaGrants` exist. */
@@ -4122,38 +5462,22 @@ export interface SchemaGrantFilter {
 export interface SiteFilter {
   /** Checks for all expressions in this list. */
   and?: SiteFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `app` relation. */
-  app?: AppFilter;
-  /** A related `app` exists. */
-  appExists?: boolean;
-  /** Filter by the object’s `appleTouchIcon` field. */
-  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  /** Filter by the object’s `domains` relation. */
-  domains?: SiteToManyDomainFilter;
-  /** `domains` exist. */
-  domainsExist?: boolean;
-  /** Filter by the object’s `favicon` field. */
-  favicon?: ConstructiveInternalTypeAttachmentFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `logo` field. */
-  logo?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Negates the expression. */
   not?: SiteFilter;
-  /** Filter by the object’s `ogImage` field. */
-  ogImage?: ConstructiveInternalTypeImageFilter;
   /** Checks for any expressions in this list. */
   or?: SiteFilter[];
   /** Filter by the object’s `siteMetadata` relation. */
@@ -4170,12 +5494,14 @@ export interface SiteFilter {
   siteThemesExist?: boolean;
   /** Filter by the object’s `title` field. */
   title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface SiteMetadatumFilter {
   /** Checks for all expressions in this list. */
   and?: SiteMetadatumFilter[];
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -4194,12 +5520,14 @@ export interface SiteMetadatumFilter {
   siteId?: UUIDFilter;
   /** Filter by the object’s `title` field. */
   title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface SiteModuleFilter {
   /** Checks for all expressions in this list. */
   and?: SiteModuleFilter[];
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -4214,12 +5542,14 @@ export interface SiteModuleFilter {
   site?: SiteFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface SiteThemeFilter {
   /** Checks for all expressions in this list. */
   and?: SiteThemeFilter[];
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -4234,6 +5564,8 @@ export interface SiteThemeFilter {
   siteId?: UUIDFilter;
   /** Filter by the object’s `theme` field. */
   theme?: JSONFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface SpatialRelationFilter {
   /** Checks for all expressions in this list. */
@@ -4336,6 +5668,10 @@ export interface TableFilter {
   embeddingChunksByChunksTableIdExist?: boolean;
   /** `embeddingChunks` exist. */
   embeddingChunksExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: TableToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: TableToManyFieldFilter;
   /** `fields` exist. */
@@ -4542,6 +5878,10 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -4560,12 +5900,16 @@ export interface UniqueConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 export interface ViewFilter {
   /** Checks for all expressions in this list. */
   and?: ViewFilter[];
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
+  /** Filter by the object’s `checkOption` field. */
+  checkOption?: StringFilter;
   /** Filter by the object’s `data` field. */
   data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
@@ -4590,6 +5934,8 @@ export interface ViewFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `securityBarrier` field. */
+  securityBarrier?: BooleanFilter;
   /** Filter by the object’s `securityInvoker` field. */
   securityInvoker?: BooleanFilter;
   /** Filter by the object’s `smartTags` field. */
@@ -4698,6 +6044,8 @@ export interface WebauthnSettingFilter {
   attestationType?: StringFilter;
   /** Filter by the object’s `challengeExpirySeconds` field. */
   challengeExpirySeconds?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `credentialsSchema` relation. */
   credentialsSchema?: SchemaFilter;
   /** A related `credentialsSchema` exists. */
@@ -4710,8 +6058,6 @@ export interface WebauthnSettingFilter {
   credentialsTableExists?: boolean;
   /** Filter by the object’s `credentialsTableId` field. */
   credentialsTableId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -4766,6 +6112,8 @@ export interface WebauthnSettingFilter {
   sessionsTableExists?: boolean;
   /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
   /** Filter by the object’s `userField` relation. */
   userField?: FieldFilter;
   /** A related `userField` exists. */
@@ -4774,1227 +6122,90 @@ export interface WebauthnSettingFilter {
   userFieldId?: UUIDFilter;
 }
 // ============ OrderBy Types ============
-export type ApiOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'ANON_ROLE_ASC'
-  | 'ANON_ROLE_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLIC_ASC'
-  | 'IS_PUBLIC_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ROLE_NAME_ASC'
-  | 'ROLE_NAME_DESC';
-export type ApiModuleOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type ApiSchemaOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC';
-export type ApiSettingOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENABLE_AGGREGATES_ASC'
-  | 'ENABLE_AGGREGATES_DESC'
-  | 'ENABLE_BULK_ASC'
-  | 'ENABLE_BULK_DESC'
-  | 'ENABLE_CONNECTION_FILTER_ASC'
-  | 'ENABLE_CONNECTION_FILTER_DESC'
-  | 'ENABLE_DIRECT_UPLOADS_ASC'
-  | 'ENABLE_DIRECT_UPLOADS_DESC'
-  | 'ENABLE_I18N_ASC'
-  | 'ENABLE_I18N_DESC'
-  | 'ENABLE_LLM_ASC'
-  | 'ENABLE_LLM_DESC'
-  | 'ENABLE_LTREE_ASC'
-  | 'ENABLE_LTREE_DESC'
-  | 'ENABLE_MANY_TO_MANY_ASC'
-  | 'ENABLE_MANY_TO_MANY_DESC'
-  | 'ENABLE_POSTGIS_ASC'
-  | 'ENABLE_POSTGIS_DESC'
-  | 'ENABLE_PRESIGNED_UPLOADS_ASC'
-  | 'ENABLE_PRESIGNED_UPLOADS_DESC'
-  | 'ENABLE_REALTIME_ASC'
-  | 'ENABLE_REALTIME_DESC'
-  | 'ENABLE_SEARCH_ASC'
-  | 'ENABLE_SEARCH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type AppOrderBy =
-  | 'APP_ID_PREFIX_ASC'
-  | 'APP_ID_PREFIX_DESC'
-  | 'APP_IMAGE_ASC'
-  | 'APP_IMAGE_DESC'
-  | 'APP_STORE_ID_ASC'
-  | 'APP_STORE_ID_DESC'
-  | 'APP_STORE_LINK_ASC'
-  | 'APP_STORE_LINK_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PLAY_STORE_LINK_ASC'
-  | 'PLAY_STORE_LINK_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC';
-export type AstMigrationOrderBy =
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTION_NAME_ASC'
-  | 'ACTION_NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEPLOYS_ASC'
-  | 'DEPLOYS_DESC'
-  | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'REQUIRES_ASC'
-  | 'REQUIRES_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC';
-export type CheckConstraintOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EXPR_ASC'
-  | 'EXPR_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type CompositeTypeOrderBy =
-  | 'ATTRIBUTES_ASC'
-  | 'ATTRIBUTES_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC';
-export type CorsSettingOrderBy =
-  | 'ALLOWED_ORIGINS_ASC'
-  | 'ALLOWED_ORIGINS_DESC'
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type DatabaseOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PLATFORM_ASC'
-  | 'PLATFORM_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_HASH_ASC'
-  | 'SCHEMA_HASH_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type DatabaseSettingOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENABLE_AGGREGATES_ASC'
-  | 'ENABLE_AGGREGATES_DESC'
-  | 'ENABLE_BULK_ASC'
-  | 'ENABLE_BULK_DESC'
-  | 'ENABLE_CONNECTION_FILTER_ASC'
-  | 'ENABLE_CONNECTION_FILTER_DESC'
-  | 'ENABLE_DIRECT_UPLOADS_ASC'
-  | 'ENABLE_DIRECT_UPLOADS_DESC'
-  | 'ENABLE_I18N_ASC'
-  | 'ENABLE_I18N_DESC'
-  | 'ENABLE_LLM_ASC'
-  | 'ENABLE_LLM_DESC'
-  | 'ENABLE_LTREE_ASC'
-  | 'ENABLE_LTREE_DESC'
-  | 'ENABLE_MANY_TO_MANY_ASC'
-  | 'ENABLE_MANY_TO_MANY_DESC'
-  | 'ENABLE_POSTGIS_ASC'
-  | 'ENABLE_POSTGIS_DESC'
-  | 'ENABLE_PRESIGNED_UPLOADS_ASC'
-  | 'ENABLE_PRESIGNED_UPLOADS_DESC'
-  | 'ENABLE_REALTIME_ASC'
-  | 'ENABLE_REALTIME_DESC'
-  | 'ENABLE_SEARCH_ASC'
-  | 'ENABLE_SEARCH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NATURAL'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type DatabaseTransferOrderBy =
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INITIATED_BY_ASC'
-  | 'INITIATED_BY_DESC'
-  | 'NATURAL'
-  | 'NOTES_ASC'
-  | 'NOTES_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOURCE_APPROVED_ASC'
-  | 'SOURCE_APPROVED_AT_ASC'
-  | 'SOURCE_APPROVED_AT_DESC'
-  | 'SOURCE_APPROVED_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TARGET_APPROVED_ASC'
-  | 'TARGET_APPROVED_AT_ASC'
-  | 'TARGET_APPROVED_AT_DESC'
-  | 'TARGET_APPROVED_DESC'
-  | 'TARGET_OWNER_ID_ASC'
-  | 'TARGET_OWNER_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type DefaultPrivilegeOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'OBJECT_TYPE_ASC'
-  | 'OBJECT_TYPE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVILEGE_ASC'
-  | 'PRIVILEGE_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC';
-export type DomainOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SERVICE_ID_ASC'
-  | 'SERVICE_ID_DESC'
-  | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'SUBDOMAIN_ASC'
-  | 'SUBDOMAIN_DESC';
-export type EmbeddingChunkOrderBy =
-  | 'CHUNKING_TASK_NAME_ASC'
-  | 'CHUNKING_TASK_NAME_DESC'
-  | 'CHUNKS_TABLE_ID_ASC'
-  | 'CHUNKS_TABLE_ID_DESC'
-  | 'CHUNKS_TABLE_NAME_ASC'
-  | 'CHUNKS_TABLE_NAME_DESC'
-  | 'CHUNK_OVERLAP_ASC'
-  | 'CHUNK_OVERLAP_DESC'
-  | 'CHUNK_SIZE_ASC'
-  | 'CHUNK_SIZE_DESC'
-  | 'CHUNK_STRATEGY_ASC'
-  | 'CHUNK_STRATEGY_DESC'
-  | 'CONTENT_FIELD_NAME_ASC'
-  | 'CONTENT_FIELD_NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DIMENSIONS_ASC'
-  | 'DIMENSIONS_DESC'
-  | 'EMBEDDING_FIELD_ID_ASC'
-  | 'EMBEDDING_FIELD_ID_DESC'
-  | 'EMBEDDING_MODEL_ASC'
-  | 'EMBEDDING_MODEL_DESC'
-  | 'EMBEDDING_PROVIDER_ASC'
-  | 'EMBEDDING_PROVIDER_DESC'
-  | 'ENQUEUE_CHUNKING_JOB_ASC'
-  | 'ENQUEUE_CHUNKING_JOB_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'METADATA_FIELDS_ASC'
-  | 'METADATA_FIELDS_DESC'
-  | 'METRIC_ASC'
-  | 'METRIC_DESC'
-  | 'NATURAL'
-  | 'PARENT_FK_FIELD_ID_ASC'
-  | 'PARENT_FK_FIELD_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SEARCH_INDEXES_ASC'
-  | 'SEARCH_INDEXES_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type EnumOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'VALUES_ASC'
-  | 'VALUES_DESC';
-export type FieldOrderBy =
-  | 'API_REQUIRED_ASC'
-  | 'API_REQUIRED_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CHK_ASC'
-  | 'CHK_DESC'
-  | 'CHK_EXPR_ASC'
-  | 'CHK_EXPR_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_VALUE_ASC'
-  | 'DEFAULT_VALUE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FIELD_ORDER_ASC'
-  | 'FIELD_ORDER_DESC'
-  | 'GENERATION_EXPRESSION_ASC'
-  | 'GENERATION_EXPRESSION_DESC'
-  | 'GENERATION_TYPE_ASC'
-  | 'GENERATION_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_REQUIRED_ASC'
-  | 'IS_REQUIRED_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'MIN_ASC'
-  | 'MIN_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REGEXP_ASC'
-  | 'REGEXP_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type ForeignKeyConstraintOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DELETE_ACTION_ASC'
-  | 'DELETE_ACTION_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REF_FIELD_IDS_ASC'
-  | 'REF_FIELD_IDS_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATE_ACTION_ASC'
-  | 'UPDATE_ACTION_DESC';
-export type FullTextSearchOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'FIELD_ID_ASC'
-  | 'FIELD_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LANGS_ASC'
-  | 'LANGS_DESC'
-  | 'LANG_COLUMN_ASC'
-  | 'LANG_COLUMN_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'WEIGHTS_ASC'
-  | 'WEIGHTS_DESC';
-export type FunctionOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC';
-export type HttpRouteOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DOMAIN_ID_ASC'
-  | 'DOMAIN_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
-  | 'METHOD_ASC'
-  | 'METHOD_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIORITY_ASC'
-  | 'PRIORITY_DESC'
-  | 'TARGET_ID_ASC'
-  | 'TARGET_ID_DESC'
-  | 'TARGET_KIND_ASC'
-  | 'TARGET_KIND_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
-export type IndexOrderBy =
-  | 'ACCESS_METHOD_ASC'
-  | 'ACCESS_METHOD_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INCLUDE_FIELD_IDS_ASC'
-  | 'INCLUDE_FIELD_IDS_DESC'
-  | 'INDEX_PARAMS_ASC'
-  | 'INDEX_PARAMS_DESC'
-  | 'IS_UNIQUE_ASC'
-  | 'IS_UNIQUE_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC'
-  | 'OP_CLASSES_ASC'
-  | 'OP_CLASSES_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'WHERE_CLAUSE_ASC'
-  | 'WHERE_CLAUSE_DESC';
-export type ManagedDomainOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_WILDCARD_ASC'
-  | 'IS_WILDCARD_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TLS_READY_AT_ASC'
-  | 'TLS_READY_AT_DESC'
-  | 'TLS_STATUS_ASC'
-  | 'TLS_STATUS_DESC'
-  | 'VERIFICATION_STATUS_ASC'
-  | 'VERIFICATION_STATUS_DESC'
-  | 'VERIFIED_AT_ASC'
-  | 'VERIFIED_AT_DESC';
-export type NodeTypeRegistryOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PARAMETER_SCHEMA_ASC'
-  | 'PARAMETER_SCHEMA_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC';
-export type PartitionOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'IS_PARENTED_ASC'
-  | 'IS_PARENTED_DESC'
-  | 'NAMING_PATTERN_ASC'
-  | 'NAMING_PATTERN_DESC'
-  | 'NATURAL'
-  | 'PARTITION_KEY_ID_ASC'
-  | 'PARTITION_KEY_ID_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'RETENTION_KEEP_TABLE_ASC'
-  | 'RETENTION_KEEP_TABLE_DESC'
-  | 'STRATEGY_ASC'
-  | 'STRATEGY_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type PolicyOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'DISABLED_ASC'
-  | 'DISABLED_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PERMISSIVE_ASC'
-  | 'PERMISSIVE_DESC'
-  | 'POLICY_TYPE_ASC'
-  | 'POLICY_TYPE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVILEGE_ASC'
-  | 'PRIVILEGE_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'WITH_CHECK_ASC'
-  | 'WITH_CHECK_DESC';
-export type PrimaryKeyConstraintOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type PubkeySettingOrderBy =
-  | 'CRYPTO_NETWORK_ASC'
-  | 'CRYPTO_NETWORK_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SIGN_IN_RECORD_FAILURE_FUNCTION_ID_ASC'
-  | 'SIGN_IN_RECORD_FAILURE_FUNCTION_ID_DESC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_FUNCTION_ID_ASC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_FUNCTION_ID_DESC'
-  | 'SIGN_IN_WITH_CHALLENGE_FUNCTION_ID_ASC'
-  | 'SIGN_IN_WITH_CHALLENGE_FUNCTION_ID_DESC'
-  | 'SIGN_UP_WITH_KEY_FUNCTION_ID_ASC'
-  | 'SIGN_UP_WITH_KEY_FUNCTION_ID_DESC'
-  | 'USER_FIELD_ASC'
-  | 'USER_FIELD_DESC';
-export type RlsSettingOrderBy =
-  | 'AUTHENTICATE_FUNCTION_ID_ASC'
-  | 'AUTHENTICATE_FUNCTION_ID_DESC'
-  | 'AUTHENTICATE_SCHEMA_ID_ASC'
-  | 'AUTHENTICATE_SCHEMA_ID_DESC'
-  | 'AUTHENTICATE_STRICT_FUNCTION_ID_ASC'
-  | 'AUTHENTICATE_STRICT_FUNCTION_ID_DESC'
-  | 'CURRENT_IP_ADDRESS_FUNCTION_ID_ASC'
-  | 'CURRENT_IP_ADDRESS_FUNCTION_ID_DESC'
-  | 'CURRENT_ROLE_FUNCTION_ID_ASC'
-  | 'CURRENT_ROLE_FUNCTION_ID_DESC'
-  | 'CURRENT_ROLE_ID_FUNCTION_ID_ASC'
-  | 'CURRENT_ROLE_ID_FUNCTION_ID_DESC'
-  | 'CURRENT_USER_AGENT_FUNCTION_ID_ASC'
-  | 'CURRENT_USER_AGENT_FUNCTION_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ROLE_SCHEMA_ID_ASC'
-  | 'ROLE_SCHEMA_ID_DESC';
-export type SchemaOrderBy =
-  | 'API_EXPOSURE_ASC'
-  | 'API_EXPOSURE_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_PUBLIC_ASC'
-  | 'IS_PUBLIC_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_NAME_ASC'
-  | 'SCHEMA_NAME_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type SchemaGrantOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type SiteOrderBy =
-  | 'ANNOTATIONS_ASC'
-  | 'ANNOTATIONS_DESC'
-  | 'APPLE_TOUCH_ICON_ASC'
-  | 'APPLE_TOUCH_ICON_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FAVICON_ASC'
-  | 'FAVICON_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LABELS_ASC'
-  | 'LABELS_DESC'
-  | 'LOGO_ASC'
-  | 'LOGO_DESC'
-  | 'NATURAL'
-  | 'OG_IMAGE_ASC'
-  | 'OG_IMAGE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC';
-export type SiteMetadatumOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OG_IMAGE_ASC'
-  | 'OG_IMAGE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC';
-export type SiteModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC';
-export type SiteThemeOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'THEME_ASC'
-  | 'THEME_DESC';
-export type SpatialRelationOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELD_ID_ASC'
-  | 'FIELD_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OPERATOR_ASC'
-  | 'OPERATOR_DESC'
-  | 'PARAM_NAME_ASC'
-  | 'PARAM_NAME_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REF_FIELD_ID_ASC'
-  | 'REF_FIELD_ID_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type SqlActionOrderBy =
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTION_NAME_ASC'
-  | 'ACTION_NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CONTENT_ASC'
-  | 'CONTENT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'DEPS_ASC'
-  | 'DEPS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC';
-export type TableOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INHERITS_ID_ASC'
-  | 'INHERITS_ID_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PARTITIONED_ASC'
-  | 'PARTITIONED_DESC'
-  | 'PARTITION_KEY_NAMES_ASC'
-  | 'PARTITION_KEY_NAMES_DESC'
-  | 'PARTITION_KEY_TYPES_ASC'
-  | 'PARTITION_KEY_TYPES_DESC'
-  | 'PARTITION_STRATEGY_ASC'
-  | 'PARTITION_STRATEGY_DESC'
-  | 'PEOPLESTAMPS_ASC'
-  | 'PEOPLESTAMPS_DESC'
-  | 'PLURAL_NAME_ASC'
-  | 'PLURAL_NAME_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SINGULAR_NAME_ASC'
-  | 'SINGULAR_NAME_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'STEP_UP_ASC'
-  | 'STEP_UP_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TIMESTAMPS_ASC'
-  | 'TIMESTAMPS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'USE_RLS_ASC'
-  | 'USE_RLS_DESC';
-export type TableGrantOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVILEGE_ASC'
-  | 'PRIVILEGE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type TriggerOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EVENT_ASC'
-  | 'EVENT_DESC'
-  | 'FUNCTION_NAME_ASC'
-  | 'FUNCTION_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type TriggerFunctionOrderBy =
-  | 'CODE_ASC'
-  | 'CODE_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type UniqueConstraintOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type ViewOrderBy =
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'FILTER_DATA_ASC'
-  | 'FILTER_DATA_DESC'
-  | 'FILTER_TYPE_ASC'
-  | 'FILTER_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_READ_ONLY_ASC'
-  | 'IS_READ_ONLY_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SECURITY_INVOKER_ASC'
-  | 'SECURITY_INVOKER_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'VIEW_TYPE_ASC'
-  | 'VIEW_TYPE_DESC';
-export type ViewGrantOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVILEGE_ASC'
-  | 'PRIVILEGE_DESC'
-  | 'VIEW_ID_ASC'
-  | 'VIEW_ID_DESC'
-  | 'WITH_GRANT_OPTION_ASC'
-  | 'WITH_GRANT_OPTION_DESC';
-export type ViewRuleOrderBy =
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EVENT_ASC'
-  | 'EVENT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'VIEW_ID_ASC'
-  | 'VIEW_ID_DESC';
-export type ViewTableOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'JOIN_ORDER_ASC'
-  | 'JOIN_ORDER_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'VIEW_ID_ASC'
-  | 'VIEW_ID_DESC';
-export type WebauthnSettingOrderBy =
-  | 'ATTESTATION_TYPE_ASC'
-  | 'ATTESTATION_TYPE_DESC'
-  | 'CHALLENGE_EXPIRY_SECONDS_ASC'
-  | 'CHALLENGE_EXPIRY_SECONDS_DESC'
-  | 'CREDENTIALS_SCHEMA_ID_ASC'
-  | 'CREDENTIALS_SCHEMA_ID_DESC'
-  | 'CREDENTIALS_TABLE_ID_ASC'
-  | 'CREDENTIALS_TABLE_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORIGIN_ALLOWLIST_ASC'
-  | 'ORIGIN_ALLOWLIST_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUIRE_USER_VERIFICATION_ASC'
-  | 'REQUIRE_USER_VERIFICATION_DESC'
-  | 'RESIDENT_KEY_ASC'
-  | 'RESIDENT_KEY_DESC'
-  | 'RP_ID_ASC'
-  | 'RP_ID_DESC'
-  | 'RP_NAME_ASC'
-  | 'RP_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_SCHEMA_ID_ASC'
-  | 'SESSIONS_SCHEMA_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'SESSION_SECRETS_SCHEMA_ID_ASC'
-  | 'SESSION_SECRETS_SCHEMA_ID_DESC'
-  | 'SESSION_SECRETS_TABLE_ID_ASC'
-  | 'SESSION_SECRETS_TABLE_ID_DESC'
-  | 'USER_FIELD_ID_ASC'
-  | 'USER_FIELD_ID_DESC';
+export type ApiOrderBy = "ANON_ROLE_ASC" | "ANON_ROLE_DESC" | "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DBNAME_ASC" | "DBNAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "ROLE_NAME_ASC" | "ROLE_NAME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type ApiModuleOrderBy = "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type ApiSchemaOrderBy = "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type ApiSettingOrderBy = "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENABLE_AGGREGATES_ASC" | "ENABLE_AGGREGATES_DESC" | "ENABLE_BULK_ASC" | "ENABLE_BULK_DESC" | "ENABLE_CONNECTION_FILTER_ASC" | "ENABLE_CONNECTION_FILTER_DESC" | "ENABLE_DIRECT_UPLOADS_ASC" | "ENABLE_DIRECT_UPLOADS_DESC" | "ENABLE_I18N_ASC" | "ENABLE_I18N_DESC" | "ENABLE_LLM_ASC" | "ENABLE_LLM_DESC" | "ENABLE_LTREE_ASC" | "ENABLE_LTREE_DESC" | "ENABLE_MANY_TO_MANY_ASC" | "ENABLE_MANY_TO_MANY_DESC" | "ENABLE_POSTGIS_ASC" | "ENABLE_POSTGIS_DESC" | "ENABLE_PRESIGNED_UPLOADS_ASC" | "ENABLE_PRESIGNED_UPLOADS_DESC" | "ENABLE_REALTIME_ASC" | "ENABLE_REALTIME_DESC" | "ENABLE_SEARCH_ASC" | "ENABLE_SEARCH_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OPTIONS_ASC" | "OPTIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type AstMigrationOrderBy = "ACTION_ID_ASC" | "ACTION_ID_DESC" | "ACTION_NAME_ASC" | "ACTION_NAME_DESC" | "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOYS_ASC" | "DEPLOYS_DESC" | "DEPLOY_ASC" | "DEPLOY_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "REQUIRES_ASC" | "REQUIRES_DESC" | "REVERT_ASC" | "REVERT_DESC" | "VERIFY_ASC" | "VERIFY_DESC";
+export type CheckConstraintOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EXPR_ASC" | "EXPR_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "ID_ASC" | "ID_DESC" | "INITIALLY_DEFERRED_ASC" | "INITIALLY_DEFERRED_DESC" | "IS_DEFERRABLE_ASC" | "IS_DEFERRABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type CompositeTypeOrderBy = "ATTRIBUTES_ASC" | "ATTRIBUTES_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TAGS_ASC" | "TAGS_DESC";
+export type CorsSettingOrderBy = "ALLOWED_ORIGINS_ASC" | "ALLOWED_ORIGINS_DESC" | "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DatabaseOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HASH_ASC" | "HASH_DESC" | "ID_ASC" | "ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PLATFORM_ASC" | "PLATFORM_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_HASH_ASC" | "SCHEMA_HASH_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DatabaseSettingOrderBy = "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENABLE_AGGREGATES_ASC" | "ENABLE_AGGREGATES_DESC" | "ENABLE_BULK_ASC" | "ENABLE_BULK_DESC" | "ENABLE_CONNECTION_FILTER_ASC" | "ENABLE_CONNECTION_FILTER_DESC" | "ENABLE_DIRECT_UPLOADS_ASC" | "ENABLE_DIRECT_UPLOADS_DESC" | "ENABLE_I18N_ASC" | "ENABLE_I18N_DESC" | "ENABLE_LLM_ASC" | "ENABLE_LLM_DESC" | "ENABLE_LTREE_ASC" | "ENABLE_LTREE_DESC" | "ENABLE_MANY_TO_MANY_ASC" | "ENABLE_MANY_TO_MANY_DESC" | "ENABLE_POSTGIS_ASC" | "ENABLE_POSTGIS_DESC" | "ENABLE_PRESIGNED_UPLOADS_ASC" | "ENABLE_PRESIGNED_UPLOADS_DESC" | "ENABLE_REALTIME_ASC" | "ENABLE_REALTIME_DESC" | "ENABLE_SEARCH_ASC" | "ENABLE_SEARCH_DESC" | "ID_ASC" | "ID_DESC" | "LABELS_ASC" | "LABELS_DESC" | "NATURAL" | "OPTIONS_ASC" | "OPTIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DatabaseTransferOrderBy = "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "INITIATED_BY_ASC" | "INITIATED_BY_DESC" | "NATURAL" | "NOTES_ASC" | "NOTES_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOURCE_APPROVED_ASC" | "SOURCE_APPROVED_AT_ASC" | "SOURCE_APPROVED_AT_DESC" | "SOURCE_APPROVED_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TARGET_APPROVED_ASC" | "TARGET_APPROVED_AT_ASC" | "TARGET_APPROVED_AT_DESC" | "TARGET_APPROVED_DESC" | "TARGET_OWNER_ID_ASC" | "TARGET_OWNER_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DefaultPrivilegeOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "GRANTEE_NAME_ASC" | "GRANTEE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "OBJECT_TYPE_ASC" | "OBJECT_TYPE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVILEGE_ASC" | "PRIVILEGE_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC";
+export type DomainOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "HOSTNAME_ASC" | "HOSTNAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "IS_WILDCARD_ASC" | "IS_WILDCARD_DESC" | "MANAGED_ASC" | "MANAGED_DESC" | "NATURAL" | "PARENT_HOSTNAME_ASC" | "PARENT_HOSTNAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TLS_READY_AT_ASC" | "TLS_READY_AT_DESC" | "TLS_SECRET_NAME_ASC" | "TLS_SECRET_NAME_DESC" | "TLS_STATUS_ASC" | "TLS_STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFICATION_STATUS_ASC" | "VERIFICATION_STATUS_DESC" | "VERIFIED_AT_ASC" | "VERIFIED_AT_DESC";
+export type DomainEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "DOMAIN_VERIFICATION_ID_ASC" | "DOMAIN_VERIFICATION_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MANAGED_DOMAIN_ID_ASC" | "MANAGED_DOMAIN_ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DomainVerificationOrderBy = "ATTEMPTS_ASC" | "ATTEMPTS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "ERROR_ASC" | "ERROR_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LAST_CHECKED_AT_ASC" | "LAST_CHECKED_AT_DESC" | "MANAGED_DOMAIN_ID_ASC" | "MANAGED_DOMAIN_ID_DESC" | "METHOD_ASC" | "METHOD_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECORD_NAME_ASC" | "RECORD_NAME_DESC" | "RECORD_TYPE_ASC" | "RECORD_TYPE_DESC" | "RECORD_VALUE_ASC" | "RECORD_VALUE_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFIED_AT_ASC" | "VERIFIED_AT_DESC";
+export type EmbeddingChunkOrderBy = "CHUNKING_TASK_NAME_ASC" | "CHUNKING_TASK_NAME_DESC" | "CHUNKS_TABLE_ID_ASC" | "CHUNKS_TABLE_ID_DESC" | "CHUNKS_TABLE_NAME_ASC" | "CHUNKS_TABLE_NAME_DESC" | "CHUNK_OVERLAP_ASC" | "CHUNK_OVERLAP_DESC" | "CHUNK_SIZE_ASC" | "CHUNK_SIZE_DESC" | "CHUNK_STRATEGY_ASC" | "CHUNK_STRATEGY_DESC" | "CONTENT_FIELD_NAME_ASC" | "CONTENT_FIELD_NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DIMENSIONS_ASC" | "DIMENSIONS_DESC" | "EMBEDDING_FIELD_ID_ASC" | "EMBEDDING_FIELD_ID_DESC" | "EMBEDDING_MODEL_ASC" | "EMBEDDING_MODEL_DESC" | "EMBEDDING_PROVIDER_ASC" | "EMBEDDING_PROVIDER_DESC" | "ENQUEUE_CHUNKING_JOB_ASC" | "ENQUEUE_CHUNKING_JOB_DESC" | "ID_ASC" | "ID_DESC" | "METADATA_FIELDS_ASC" | "METADATA_FIELDS_DESC" | "METRIC_ASC" | "METRIC_DESC" | "NATURAL" | "PARENT_FK_FIELD_ID_ASC" | "PARENT_FK_FIELD_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SEARCH_INDEXES_ASC" | "SEARCH_INDEXES_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type EnumOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TAGS_ASC" | "TAGS_DESC" | "VALUES_ASC" | "VALUES_DESC";
+export type ExclusionConstraintOrderBy = "ACCESS_METHOD_ASC" | "ACCESS_METHOD_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ELEMENT_EXPR_ASC" | "ELEMENT_EXPR_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OPERATORS_ASC" | "OPERATORS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WHERE_CLAUSE_ASC" | "WHERE_CLAUSE_DESC";
+export type FieldOrderBy = "API_REQUIRED_ASC" | "API_REQUIRED_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CHK_ASC" | "CHK_DESC" | "CHK_EXPR_ASC" | "CHK_EXPR_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_VALUE_ASC" | "DEFAULT_VALUE_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FIELD_ORDER_ASC" | "FIELD_ORDER_DESC" | "GENERATION_EXPRESSION_ASC" | "GENERATION_EXPRESSION_DESC" | "GENERATION_TYPE_ASC" | "GENERATION_TYPE_DESC" | "IDENTITY_GENERATION_ASC" | "IDENTITY_GENERATION_DESC" | "IDENTITY_OPTIONS_ASC" | "IDENTITY_OPTIONS_DESC" | "ID_ASC" | "ID_DESC" | "IS_REQUIRED_ASC" | "IS_REQUIRED_DESC" | "LABEL_ASC" | "LABEL_DESC" | "MAX_ASC" | "MAX_DESC" | "MIN_ASC" | "MIN_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REGEXP_ASC" | "REGEXP_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type ForeignKeyConstraintOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DELETE_ACTION_ASC" | "DELETE_ACTION_DESC" | "DELETE_SET_FIELD_IDS_ASC" | "DELETE_SET_FIELD_IDS_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "ID_ASC" | "ID_DESC" | "INITIALLY_DEFERRED_ASC" | "INITIALLY_DEFERRED_DESC" | "IS_DEFERRABLE_ASC" | "IS_DEFERRABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REF_FIELD_IDS_ASC" | "REF_FIELD_IDS_DESC" | "REF_TABLE_ID_ASC" | "REF_TABLE_ID_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATE_ACTION_ASC" | "UPDATE_ACTION_DESC" | "WITH_PERIOD_ASC" | "WITH_PERIOD_DESC";
+export type FullTextSearchOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "FIELD_ID_ASC" | "FIELD_ID_DESC" | "ID_ASC" | "ID_DESC" | "LANGS_ASC" | "LANGS_DESC" | "LANG_COLUMN_ASC" | "LANG_COLUMN_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WEIGHTS_ASC" | "WEIGHTS_DESC";
+export type FunctionOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC";
+export type HostnameBindingOrderBy = "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "HOSTNAME_ASC" | "HOSTNAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_WILDCARD_ASC" | "IS_WILDCARD_DESC" | "MANAGED_ASC" | "MANAGED_DESC" | "NATURAL" | "PARENT_HOSTNAME_ASC" | "PARENT_HOSTNAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TLS_SECRET_NAME_ASC" | "TLS_SECRET_NAME_DESC" | "TLS_STATUS_ASC" | "TLS_STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFICATION_STATUS_ASC" | "VERIFICATION_STATUS_DESC";
+export type HttpRouteOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREATED_BY_ASC" | "CREATED_BY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "METHOD_ASC" | "METHOD_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "TARGET_ID_ASC" | "TARGET_ID_DESC" | "TARGET_KIND_ASC" | "TARGET_KIND_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "UPDATED_BY_ASC" | "UPDATED_BY_DESC";
+export type IndexOrderBy = "ACCESS_METHOD_ASC" | "ACCESS_METHOD_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "ID_ASC" | "ID_DESC" | "INCLUDE_FIELD_IDS_ASC" | "INCLUDE_FIELD_IDS_DESC" | "INDEX_PARAMS_ASC" | "INDEX_PARAMS_DESC" | "IS_UNIQUE_ASC" | "IS_UNIQUE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OPTIONS_ASC" | "OPTIONS_DESC" | "OP_CLASSES_ASC" | "OP_CLASSES_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WHERE_CLAUSE_ASC" | "WHERE_CLAUSE_DESC";
+export type ManagedDomainOrderBy = "ALLOW_PUBLIC_USAGE_ASC" | "ALLOW_PUBLIC_USAGE_DESC" | "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CERT_STATUS_ASC" | "CERT_STATUS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DOMAIN_ASC" | "DOMAIN_DESC" | "ID_ASC" | "ID_DESC" | "IS_WILDCARD_ASC" | "IS_WILDCARD_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TLS_READY_AT_ASC" | "TLS_READY_AT_DESC" | "TLS_STATUS_ASC" | "TLS_STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFICATION_STATUS_ASC" | "VERIFICATION_STATUS_DESC" | "VERIFIED_AT_ASC" | "VERIFIED_AT_DESC";
+export type NodeTypeRegistryOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARAMETER_SCHEMA_ASC" | "PARAMETER_SCHEMA_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SLUG_ASC" | "SLUG_DESC" | "TAGS_ASC" | "TAGS_DESC";
+export type PartitionOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "IS_PARENTED_ASC" | "IS_PARENTED_DESC" | "NAMING_PATTERN_ASC" | "NAMING_PATTERN_DESC" | "NATURAL" | "PARTITION_KEY_ID_ASC" | "PARTITION_KEY_ID_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "RETENTION_KEEP_TABLE_ASC" | "RETENTION_KEEP_TABLE_DESC" | "STRATEGY_ASC" | "STRATEGY_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformApiOrderBy = "ANON_ROLE_ASC" | "ANON_ROLE_DESC" | "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DBNAME_ASC" | "DBNAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "ROLE_NAME_ASC" | "ROLE_NAME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformApiModuleOrderBy = "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformApiSchemaOrderBy = "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformApiSettingOrderBy = "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ENABLE_AGGREGATES_ASC" | "ENABLE_AGGREGATES_DESC" | "ENABLE_BULK_ASC" | "ENABLE_BULK_DESC" | "ENABLE_CONNECTION_FILTER_ASC" | "ENABLE_CONNECTION_FILTER_DESC" | "ENABLE_DIRECT_UPLOADS_ASC" | "ENABLE_DIRECT_UPLOADS_DESC" | "ENABLE_I18N_ASC" | "ENABLE_I18N_DESC" | "ENABLE_LLM_ASC" | "ENABLE_LLM_DESC" | "ENABLE_LTREE_ASC" | "ENABLE_LTREE_DESC" | "ENABLE_MANY_TO_MANY_ASC" | "ENABLE_MANY_TO_MANY_DESC" | "ENABLE_POSTGIS_ASC" | "ENABLE_POSTGIS_DESC" | "ENABLE_PRESIGNED_UPLOADS_ASC" | "ENABLE_PRESIGNED_UPLOADS_DESC" | "ENABLE_REALTIME_ASC" | "ENABLE_REALTIME_DESC" | "ENABLE_SEARCH_ASC" | "ENABLE_SEARCH_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OPTIONS_ASC" | "OPTIONS_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformCorsSettingOrderBy = "ALLOWED_ORIGINS_ASC" | "ALLOWED_ORIGINS_DESC" | "API_ID_ASC" | "API_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformDomainOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "HOSTNAME_ASC" | "HOSTNAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "IS_WILDCARD_ASC" | "IS_WILDCARD_DESC" | "MANAGED_ASC" | "MANAGED_DESC" | "NATURAL" | "PARENT_HOSTNAME_ASC" | "PARENT_HOSTNAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TLS_READY_AT_ASC" | "TLS_READY_AT_DESC" | "TLS_SECRET_NAME_ASC" | "TLS_SECRET_NAME_DESC" | "TLS_STATUS_ASC" | "TLS_STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFICATION_STATUS_ASC" | "VERIFICATION_STATUS_DESC" | "VERIFIED_AT_ASC" | "VERIFIED_AT_DESC";
+export type PlatformDomainEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "DOMAIN_VERIFICATION_ID_ASC" | "DOMAIN_VERIFICATION_ID_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MANAGED_DOMAIN_ID_ASC" | "MANAGED_DOMAIN_ID_DESC" | "MESSAGE_ASC" | "MESSAGE_DESC" | "METADATA_ASC" | "METADATA_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformDomainVerificationOrderBy = "ATTEMPTS_ASC" | "ATTEMPTS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "ERROR_ASC" | "ERROR_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "LAST_CHECKED_AT_ASC" | "LAST_CHECKED_AT_DESC" | "MANAGED_DOMAIN_ID_ASC" | "MANAGED_DOMAIN_ID_DESC" | "METHOD_ASC" | "METHOD_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RECORD_NAME_ASC" | "RECORD_NAME_DESC" | "RECORD_TYPE_ASC" | "RECORD_TYPE_DESC" | "RECORD_VALUE_ASC" | "RECORD_VALUE_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFIED_AT_ASC" | "VERIFIED_AT_DESC";
+export type PlatformManagedDomainOrderBy = "ALLOW_PUBLIC_USAGE_ASC" | "ALLOW_PUBLIC_USAGE_DESC" | "ANNOTATIONS_ASC" | "ANNOTATIONS_DESC" | "CERT_STATUS_ASC" | "CERT_STATUS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DOMAIN_ASC" | "DOMAIN_DESC" | "ID_ASC" | "ID_DESC" | "IS_WILDCARD_ASC" | "IS_WILDCARD_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TLS_READY_AT_ASC" | "TLS_READY_AT_DESC" | "TLS_STATUS_ASC" | "TLS_STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERIFICATION_STATUS_ASC" | "VERIFICATION_STATUS_DESC" | "VERIFIED_AT_ASC" | "VERIFIED_AT_DESC";
+export type PlatformSiteOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformSiteMetadatumOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OG_IMAGE_ASC" | "OG_IMAGE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SITE_ID_ASC" | "SITE_ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformSiteModuleOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SITE_ID_ASC" | "SITE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PlatformSiteThemeOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SITE_ID_ASC" | "SITE_ID_DESC" | "THEME_ASC" | "THEME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type PolicyOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "DISABLED_ASC" | "DISABLED_DESC" | "GRANTEE_NAME_ASC" | "GRANTEE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PERMISSIVE_ASC" | "PERMISSIVE_DESC" | "POLICY_TYPE_ASC" | "POLICY_TYPE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVILEGE_ASC" | "PRIVILEGE_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WITH_CHECK_ASC" | "WITH_CHECK_DESC";
+export type PrimaryKeyConstraintOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "ID_ASC" | "ID_DESC" | "INITIALLY_DEFERRED_ASC" | "INITIALLY_DEFERRED_DESC" | "IS_DEFERRABLE_ASC" | "IS_DEFERRABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WITHOUT_OVERLAPS_ASC" | "WITHOUT_OVERLAPS_DESC";
+export type PubkeySettingOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CRYPTO_NETWORK_ASC" | "CRYPTO_NETWORK_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SIGN_IN_RECORD_FAILURE_FUNCTION_ID_ASC" | "SIGN_IN_RECORD_FAILURE_FUNCTION_ID_DESC" | "SIGN_IN_REQUEST_CHALLENGE_FUNCTION_ID_ASC" | "SIGN_IN_REQUEST_CHALLENGE_FUNCTION_ID_DESC" | "SIGN_IN_WITH_CHALLENGE_FUNCTION_ID_ASC" | "SIGN_IN_WITH_CHALLENGE_FUNCTION_ID_DESC" | "SIGN_UP_WITH_KEY_FUNCTION_ID_ASC" | "SIGN_UP_WITH_KEY_FUNCTION_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "USER_FIELD_ASC" | "USER_FIELD_DESC";
+export type RlsSettingOrderBy = "AUTHENTICATE_FUNCTION_ID_ASC" | "AUTHENTICATE_FUNCTION_ID_DESC" | "AUTHENTICATE_SCHEMA_ID_ASC" | "AUTHENTICATE_SCHEMA_ID_DESC" | "AUTHENTICATE_STRICT_FUNCTION_ID_ASC" | "AUTHENTICATE_STRICT_FUNCTION_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CURRENT_IP_ADDRESS_FUNCTION_ID_ASC" | "CURRENT_IP_ADDRESS_FUNCTION_ID_DESC" | "CURRENT_ROLE_FUNCTION_ID_ASC" | "CURRENT_ROLE_FUNCTION_ID_DESC" | "CURRENT_ROLE_ID_FUNCTION_ID_ASC" | "CURRENT_ROLE_ID_FUNCTION_ID_DESC" | "CURRENT_USER_AGENT_FUNCTION_ID_ASC" | "CURRENT_USER_AGENT_FUNCTION_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "ROLE_SCHEMA_ID_ASC" | "ROLE_SCHEMA_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type RouteBindingOrderBy = "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "METHOD_ASC" | "METHOD_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "TARGET_API_ID_ASC" | "TARGET_API_ID_DESC" | "TARGET_FUNCTION_ID_ASC" | "TARGET_FUNCTION_ID_DESC" | "TARGET_SITE_ID_ASC" | "TARGET_SITE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type RouteOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DOMAIN_ID_ASC" | "DOMAIN_ID_DESC" | "ID_ASC" | "ID_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "METHOD_ASC" | "METHOD_DESC" | "NATURAL" | "PATH_ASC" | "PATH_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIORITY_ASC" | "PRIORITY_DESC" | "TARGET_API_ID_ASC" | "TARGET_API_ID_DESC" | "TARGET_FUNCTION_ID_ASC" | "TARGET_FUNCTION_ID_DESC" | "TARGET_SITE_ID_ASC" | "TARGET_SITE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SchemaOrderBy = "API_EXPOSURE_ASC" | "API_EXPOSURE_DESC" | "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLIC_ASC" | "IS_PUBLIC_DESC" | "LABEL_ASC" | "LABEL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_NAME_ASC" | "SCHEMA_NAME_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TAGS_ASC" | "TAGS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SchemaGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "GRANTEE_NAME_ASC" | "GRANTEE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SiteOrderBy = "CONFIG_ASC" | "CONFIG_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "IS_PUBLISHED_ASC" | "IS_PUBLISHED_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SiteMetadatumOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OG_IMAGE_ASC" | "OG_IMAGE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SITE_ID_ASC" | "SITE_ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SiteModuleOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SITE_ID_ASC" | "SITE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SiteThemeOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SITE_ID_ASC" | "SITE_ID_DESC" | "THEME_ASC" | "THEME_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SpatialRelationOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELD_ID_ASC" | "FIELD_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OPERATOR_ASC" | "OPERATOR_DESC" | "PARAM_NAME_ASC" | "PARAM_NAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REF_FIELD_ID_ASC" | "REF_FIELD_ID_DESC" | "REF_TABLE_ID_ASC" | "REF_TABLE_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type SqlActionOrderBy = "ACTION_ID_ASC" | "ACTION_ID_DESC" | "ACTION_NAME_ASC" | "ACTION_NAME_DESC" | "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEPLOY_ASC" | "DEPLOY_DESC" | "DEPS_ASC" | "DEPS_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PAYLOAD_ASC" | "PAYLOAD_DESC" | "REVERT_ASC" | "REVERT_DESC" | "VERIFY_ASC" | "VERIFY_DESC";
+export type TableOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "ID_ASC" | "ID_DESC" | "INHERITS_ID_ASC" | "INHERITS_ID_DESC" | "LABEL_ASC" | "LABEL_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PARTITIONED_ASC" | "PARTITIONED_DESC" | "PARTITION_KEY_NAMES_ASC" | "PARTITION_KEY_NAMES_DESC" | "PARTITION_KEY_TYPES_ASC" | "PARTITION_KEY_TYPES_DESC" | "PARTITION_STRATEGY_ASC" | "PARTITION_STRATEGY_DESC" | "PEOPLESTAMPS_ASC" | "PEOPLESTAMPS_DESC" | "PLURAL_NAME_ASC" | "PLURAL_NAME_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SINGULAR_NAME_ASC" | "SINGULAR_NAME_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "STEP_UP_ASC" | "STEP_UP_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TIMESTAMPS_ASC" | "TIMESTAMPS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "USE_RLS_ASC" | "USE_RLS_DESC";
+export type TableGrantOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "GRANTEE_NAME_ASC" | "GRANTEE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVILEGE_ASC" | "PRIVILEGE_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type TriggerOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_ASC" | "EVENT_DESC" | "FUNCTION_NAME_ASC" | "FUNCTION_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type TriggerFunctionOrderBy = "CODE_ASC" | "CODE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type UniqueConstraintOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FIELD_IDS_ASC" | "FIELD_IDS_DESC" | "ID_ASC" | "ID_DESC" | "INITIALLY_DEFERRED_ASC" | "INITIALLY_DEFERRED_DESC" | "IS_DEFERRABLE_ASC" | "IS_DEFERRABLE_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "TYPE_ASC" | "TYPE_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WITHOUT_OVERLAPS_ASC" | "WITHOUT_OVERLAPS_DESC";
+export type ViewOrderBy = "CATEGORY_ASC" | "CATEGORY_DESC" | "CHECK_OPTION_ASC" | "CHECK_OPTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATA_ASC" | "DATA_DESC" | "FILTER_DATA_ASC" | "FILTER_DATA_DESC" | "FILTER_TYPE_ASC" | "FILTER_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "IS_READ_ONLY_ASC" | "IS_READ_ONLY_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SECURITY_BARRIER_ASC" | "SECURITY_BARRIER_DESC" | "SECURITY_INVOKER_ASC" | "SECURITY_INVOKER_DESC" | "SMART_TAGS_ASC" | "SMART_TAGS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TAGS_ASC" | "TAGS_DESC" | "VIEW_TYPE_ASC" | "VIEW_TYPE_DESC";
+export type ViewGrantOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "GRANTEE_NAME_ASC" | "GRANTEE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_GRANT_ASC" | "IS_GRANT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVILEGE_ASC" | "PRIVILEGE_DESC" | "VIEW_ID_ASC" | "VIEW_ID_DESC" | "WITH_GRANT_OPTION_ASC" | "WITH_GRANT_OPTION_DESC";
+export type ViewRuleOrderBy = "ACTION_ASC" | "ACTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EVENT_ASC" | "EVENT_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "VIEW_ID_ASC" | "VIEW_ID_DESC";
+export type ViewTableOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "JOIN_ORDER_ASC" | "JOIN_ORDER_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "VIEW_ID_ASC" | "VIEW_ID_DESC";
+export type WebauthnSettingOrderBy = "ATTESTATION_TYPE_ASC" | "ATTESTATION_TYPE_DESC" | "CHALLENGE_EXPIRY_SECONDS_ASC" | "CHALLENGE_EXPIRY_SECONDS_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "CREDENTIALS_SCHEMA_ID_ASC" | "CREDENTIALS_SCHEMA_ID_DESC" | "CREDENTIALS_TABLE_ID_ASC" | "CREDENTIALS_TABLE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORIGIN_ALLOWLIST_ASC" | "ORIGIN_ALLOWLIST_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRE_USER_VERIFICATION_ASC" | "REQUIRE_USER_VERIFICATION_DESC" | "RESIDENT_KEY_ASC" | "RESIDENT_KEY_DESC" | "RP_ID_ASC" | "RP_ID_DESC" | "RP_NAME_ASC" | "RP_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SESSIONS_SCHEMA_ID_ASC" | "SESSIONS_SCHEMA_ID_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "SESSION_SECRETS_SCHEMA_ID_ASC" | "SESSION_SECRETS_SCHEMA_ID_DESC" | "SESSION_SECRETS_TABLE_ID_ASC" | "SESSION_SECRETS_TABLE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "USER_FIELD_ID_ASC" | "USER_FIELD_ID_DESC";
 // ============ CRUD Input Types ============
 export interface CreateApiInput {
   clientMutationId?: string;
   api: {
-    annotations?: Record<string, unknown>;
     anonRole?: string;
+    config?: Record<string, unknown>;
     databaseId: string;
     dbname?: string;
-    isPublic?: boolean;
-    labels?: Record<string, unknown>;
+    isPublished?: boolean;
     name: string;
     roleName?: string;
   };
 }
 export interface ApiPatch {
-  annotations?: Record<string, unknown> | null;
   anonRole?: string | null;
+  config?: Record<string, unknown> | null;
   databaseId?: string | null;
   dbname?: string | null;
-  isPublic?: boolean | null;
-  labels?: Record<string, unknown> | null;
+  isPublished?: boolean | null;
   name?: string | null;
   roleName?: string | null;
 }
@@ -6099,39 +6310,6 @@ export interface DeleteApiSettingInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAppInput {
-  clientMutationId?: string;
-  app: {
-    appIdPrefix?: string;
-    appImage?: ConstructiveInternalTypeImage;
-    appStoreId?: string;
-    appStoreLink?: ConstructiveInternalTypeUrl;
-    databaseId: string;
-    name?: string;
-    playStoreLink?: ConstructiveInternalTypeUrl;
-    siteId: string;
-  };
-}
-export interface AppPatch {
-  appIdPrefix?: string | null;
-  appImage?: ConstructiveInternalTypeImage | null;
-  appImageUpload?: File | null;
-  appStoreId?: string | null;
-  appStoreLink?: ConstructiveInternalTypeUrl | null;
-  databaseId?: string | null;
-  name?: string | null;
-  playStoreLink?: ConstructiveInternalTypeUrl | null;
-  siteId?: string | null;
-}
-export interface UpdateAppInput {
-  clientMutationId?: string;
-  id: string;
-  appPatch: AppPatch;
-}
-export interface DeleteAppInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAstMigrationInput {
   clientMutationId?: string;
   astMigration: {
@@ -6177,6 +6355,8 @@ export interface CreateCheckConstraintInput {
     databaseId?: string;
     expr?: Record<string, unknown>;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
@@ -6189,6 +6369,8 @@ export interface CheckConstraintPatch {
   databaseId?: string | null;
   expr?: Record<string, unknown> | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -6405,25 +6587,33 @@ export interface DeleteDefaultPrivilegeInput {
 export interface CreateDomainInput {
   clientMutationId?: string;
   domain: {
-    annotations?: Record<string, unknown>;
-    apiId?: string;
+    config?: Record<string, unknown>;
     databaseId: string;
-    domain?: ConstructiveInternalTypeHostname;
-    labels?: Record<string, unknown>;
-    serviceId?: string;
-    siteId?: string;
-    subdomain?: ConstructiveInternalTypeHostname;
+    hostname: string;
+    isPublished?: boolean;
+    isWildcard?: boolean;
+    managed?: boolean;
+    parentHostname?: string;
+    tlsReadyAt?: string;
+    tlsSecretName?: string;
+    tlsStatus?: string;
+    verificationStatus?: string;
+    verifiedAt?: string;
   };
 }
 export interface DomainPatch {
-  annotations?: Record<string, unknown> | null;
-  apiId?: string | null;
+  config?: Record<string, unknown> | null;
   databaseId?: string | null;
-  domain?: ConstructiveInternalTypeHostname | null;
-  labels?: Record<string, unknown> | null;
-  serviceId?: string | null;
-  siteId?: string | null;
-  subdomain?: ConstructiveInternalTypeHostname | null;
+  hostname?: string | null;
+  isPublished?: boolean | null;
+  isWildcard?: boolean | null;
+  managed?: boolean | null;
+  parentHostname?: string | null;
+  tlsReadyAt?: string | null;
+  tlsSecretName?: string | null;
+  tlsStatus?: string | null;
+  verificationStatus?: string | null;
+  verifiedAt?: string | null;
 }
 export interface UpdateDomainInput {
   clientMutationId?: string;
@@ -6431,6 +6621,80 @@ export interface UpdateDomainInput {
   domainPatch: DomainPatch;
 }
 export interface DeleteDomainInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDomainEventInput {
+  clientMutationId?: string;
+  domainEvent: {
+    actorId?: string;
+    databaseId: string;
+    domainId?: string;
+    domainVerificationId?: string;
+    eventType: string;
+    managedDomainId?: string;
+    message?: string;
+    metadata?: Record<string, unknown>;
+  };
+}
+export interface DomainEventPatch {
+  actorId?: string | null;
+  databaseId?: string | null;
+  domainId?: string | null;
+  domainVerificationId?: string | null;
+  eventType?: string | null;
+  managedDomainId?: string | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+export interface UpdateDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+  domainEventPatch: DomainEventPatch;
+}
+export interface DeleteDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDomainVerificationInput {
+  clientMutationId?: string;
+  domainVerification: {
+    attempts?: number;
+    databaseId: string;
+    domainId?: string;
+    error?: string;
+    expiresAt?: string;
+    lastCheckedAt?: string;
+    managedDomainId?: string;
+    method: string;
+    recordName?: string;
+    recordType?: string;
+    recordValue?: string;
+    status?: string;
+    verifiedAt?: string;
+  };
+}
+export interface DomainVerificationPatch {
+  attempts?: number | null;
+  databaseId?: string | null;
+  domainId?: string | null;
+  error?: string | null;
+  expiresAt?: string | null;
+  lastCheckedAt?: string | null;
+  managedDomainId?: string | null;
+  method?: string | null;
+  recordName?: string | null;
+  recordType?: string | null;
+  recordValue?: string | null;
+  status?: string | null;
+  verifiedAt?: string | null;
+}
+export interface UpdateDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+  domainVerificationPatch: DomainVerificationPatch;
+}
+export interface DeleteDomainVerificationInput {
   clientMutationId?: string;
   id: string;
 }
@@ -6520,6 +6784,46 @@ export interface DeleteEnumInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateExclusionConstraintInput {
+  clientMutationId?: string;
+  exclusionConstraint: {
+    accessMethod?: string;
+    category?: ObjectCategory;
+    databaseId?: string;
+    elementExpr?: Record<string, unknown>;
+    fieldIds?: string[];
+    name?: string;
+    operators?: string[];
+    smartTags?: Record<string, unknown>;
+    tableId: string;
+    tags?: string[];
+    type?: string;
+    whereClause?: Record<string, unknown>;
+  };
+}
+export interface ExclusionConstraintPatch {
+  accessMethod?: string | null;
+  category?: ObjectCategory | null;
+  databaseId?: string | null;
+  elementExpr?: Record<string, unknown> | null;
+  fieldIds?: string[] | null;
+  name?: string | null;
+  operators?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  tableId?: string | null;
+  tags?: string[] | null;
+  type?: string | null;
+  whereClause?: Record<string, unknown> | null;
+}
+export interface UpdateExclusionConstraintInput {
+  clientMutationId?: string;
+  id: string;
+  exclusionConstraintPatch: ExclusionConstraintPatch;
+}
+export interface DeleteExclusionConstraintInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFieldInput {
   clientMutationId?: string;
   field: {
@@ -6533,6 +6837,8 @@ export interface CreateFieldInput {
     fieldOrder?: number;
     generationExpression?: Record<string, unknown>;
     generationType?: string;
+    identityGeneration?: string;
+    identityOptions?: Record<string, unknown>;
     isRequired?: boolean;
     label?: string;
     max?: number;
@@ -6556,6 +6862,8 @@ export interface FieldPatch {
   fieldOrder?: number | null;
   generationExpression?: Record<string, unknown> | null;
   generationType?: string | null;
+  identityGeneration?: string | null;
+  identityOptions?: Record<string, unknown> | null;
   isRequired?: boolean | null;
   label?: string | null;
   max?: number | null;
@@ -6582,8 +6890,11 @@ export interface CreateForeignKeyConstraintInput {
     category?: ObjectCategory;
     databaseId?: string;
     deleteAction?: string;
+    deleteSetFieldIds?: string[];
     description?: string;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     refFieldIds: string[];
     refTableId: string;
@@ -6592,14 +6903,18 @@ export interface CreateForeignKeyConstraintInput {
     tags?: string[];
     type?: string;
     updateAction?: string;
+    withPeriod?: boolean;
   };
 }
 export interface ForeignKeyConstraintPatch {
   category?: ObjectCategory | null;
   databaseId?: string | null;
   deleteAction?: string | null;
+  deleteSetFieldIds?: string[] | null;
   description?: string | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   refFieldIds?: string[] | null;
   refTableId?: string | null;
@@ -6608,6 +6923,7 @@ export interface ForeignKeyConstraintPatch {
   tags?: string[] | null;
   type?: string | null;
   updateAction?: string | null;
+  withPeriod?: boolean | null;
 }
 export interface UpdateForeignKeyConstraintInput {
   clientMutationId?: string;
@@ -6667,6 +6983,38 @@ export interface UpdateFunctionInput {
   functionPatch: FunctionPatch;
 }
 export interface DeleteFunctionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateHostnameBindingInput {
+  clientMutationId?: string;
+  hostnameBinding: {
+    domainId: string;
+    hostname: string;
+    isWildcard?: boolean;
+    managed?: boolean;
+    parentHostname?: string;
+    tlsSecretName?: string;
+    tlsStatus?: string;
+    verificationStatus?: string;
+  };
+}
+export interface HostnameBindingPatch {
+  domainId?: string | null;
+  hostname?: string | null;
+  isWildcard?: boolean | null;
+  managed?: boolean | null;
+  parentHostname?: string | null;
+  tlsSecretName?: string | null;
+  tlsStatus?: string | null;
+  verificationStatus?: string | null;
+}
+export interface UpdateHostnameBindingInput {
+  clientMutationId?: string;
+  id: string;
+  hostnameBindingPatch: HostnameBindingPatch;
+}
+export interface DeleteHostnameBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -6753,9 +7101,11 @@ export interface DeleteIndexInput {
 export interface CreateManagedDomainInput {
   clientMutationId?: string;
   managedDomain: {
+    allowPublicUsage?: boolean;
     annotations?: Record<string, unknown>;
+    certStatus?: string;
     databaseId: string;
-    domain: ConstructiveInternalTypeHostname;
+    domain: string;
     isWildcard?: boolean;
     tlsReadyAt?: string;
     tlsStatus?: string;
@@ -6764,9 +7114,11 @@ export interface CreateManagedDomainInput {
   };
 }
 export interface ManagedDomainPatch {
+  allowPublicUsage?: boolean | null;
   annotations?: Record<string, unknown> | null;
+  certStatus?: string | null;
   databaseId?: string | null;
-  domain?: ConstructiveInternalTypeHostname | null;
+  domain?: string | null;
   isWildcard?: boolean | null;
   tlsReadyAt?: string | null;
   tlsStatus?: string | null;
@@ -6848,6 +7200,375 @@ export interface DeletePartitionInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePlatformApiInput {
+  clientMutationId?: string;
+  platformApi: {
+    anonRole?: string;
+    config?: Record<string, unknown>;
+    dbname?: string;
+    isPublished?: boolean;
+    name: string;
+    roleName?: string;
+  };
+}
+export interface PlatformApiPatch {
+  anonRole?: string | null;
+  config?: Record<string, unknown> | null;
+  dbname?: string | null;
+  isPublished?: boolean | null;
+  name?: string | null;
+  roleName?: string | null;
+}
+export interface UpdatePlatformApiInput {
+  clientMutationId?: string;
+  id: string;
+  platformApiPatch: PlatformApiPatch;
+}
+export interface DeletePlatformApiInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformApiModuleInput {
+  clientMutationId?: string;
+  platformApiModule: {
+    apiId: string;
+    data: Record<string, unknown>;
+    name: string;
+  };
+}
+export interface PlatformApiModulePatch {
+  apiId?: string | null;
+  data?: Record<string, unknown> | null;
+  name?: string | null;
+}
+export interface UpdatePlatformApiModuleInput {
+  clientMutationId?: string;
+  id: string;
+  platformApiModulePatch: PlatformApiModulePatch;
+}
+export interface DeletePlatformApiModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformApiSchemaInput {
+  clientMutationId?: string;
+  platformApiSchema: {
+    apiId: string;
+    schemaId: string;
+  };
+}
+export interface PlatformApiSchemaPatch {
+  apiId?: string | null;
+  schemaId?: string | null;
+}
+export interface UpdatePlatformApiSchemaInput {
+  clientMutationId?: string;
+  id: string;
+  platformApiSchemaPatch: PlatformApiSchemaPatch;
+}
+export interface DeletePlatformApiSchemaInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformApiSettingInput {
+  clientMutationId?: string;
+  platformApiSetting: {
+    apiId: string;
+    enableAggregates?: boolean;
+    enableBulk?: boolean;
+    enableConnectionFilter?: boolean;
+    enableDirectUploads?: boolean;
+    enableI18N?: boolean;
+    enableLlm?: boolean;
+    enableLtree?: boolean;
+    enableManyToMany?: boolean;
+    enablePostgis?: boolean;
+    enablePresignedUploads?: boolean;
+    enableRealtime?: boolean;
+    enableSearch?: boolean;
+    options?: Record<string, unknown>;
+  };
+}
+export interface PlatformApiSettingPatch {
+  apiId?: string | null;
+  enableAggregates?: boolean | null;
+  enableBulk?: boolean | null;
+  enableConnectionFilter?: boolean | null;
+  enableDirectUploads?: boolean | null;
+  enableI18N?: boolean | null;
+  enableLlm?: boolean | null;
+  enableLtree?: boolean | null;
+  enableManyToMany?: boolean | null;
+  enablePostgis?: boolean | null;
+  enablePresignedUploads?: boolean | null;
+  enableRealtime?: boolean | null;
+  enableSearch?: boolean | null;
+  options?: Record<string, unknown> | null;
+}
+export interface UpdatePlatformApiSettingInput {
+  clientMutationId?: string;
+  id: string;
+  platformApiSettingPatch: PlatformApiSettingPatch;
+}
+export interface DeletePlatformApiSettingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformCorsSettingInput {
+  clientMutationId?: string;
+  platformCorsSetting: {
+    allowedOrigins?: string[];
+    apiId?: string;
+  };
+}
+export interface PlatformCorsSettingPatch {
+  allowedOrigins?: string[] | null;
+  apiId?: string | null;
+}
+export interface UpdatePlatformCorsSettingInput {
+  clientMutationId?: string;
+  id: string;
+  platformCorsSettingPatch: PlatformCorsSettingPatch;
+}
+export interface DeletePlatformCorsSettingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformDomainInput {
+  clientMutationId?: string;
+  platformDomain: {
+    config?: Record<string, unknown>;
+    hostname: string;
+    isPublished?: boolean;
+    isWildcard?: boolean;
+    managed?: boolean;
+    parentHostname?: string;
+    tlsReadyAt?: string;
+    tlsSecretName?: string;
+    tlsStatus?: string;
+    verificationStatus?: string;
+    verifiedAt?: string;
+  };
+}
+export interface PlatformDomainPatch {
+  config?: Record<string, unknown> | null;
+  hostname?: string | null;
+  isPublished?: boolean | null;
+  isWildcard?: boolean | null;
+  managed?: boolean | null;
+  parentHostname?: string | null;
+  tlsReadyAt?: string | null;
+  tlsSecretName?: string | null;
+  tlsStatus?: string | null;
+  verificationStatus?: string | null;
+  verifiedAt?: string | null;
+}
+export interface UpdatePlatformDomainInput {
+  clientMutationId?: string;
+  id: string;
+  platformDomainPatch: PlatformDomainPatch;
+}
+export interface DeletePlatformDomainInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformDomainEventInput {
+  clientMutationId?: string;
+  platformDomainEvent: {
+    actorId?: string;
+    domainId?: string;
+    domainVerificationId?: string;
+    eventType: string;
+    managedDomainId?: string;
+    message?: string;
+    metadata?: Record<string, unknown>;
+  };
+}
+export interface PlatformDomainEventPatch {
+  actorId?: string | null;
+  domainId?: string | null;
+  domainVerificationId?: string | null;
+  eventType?: string | null;
+  managedDomainId?: string | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+export interface UpdatePlatformDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+  platformDomainEventPatch: PlatformDomainEventPatch;
+}
+export interface DeletePlatformDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformDomainVerificationInput {
+  clientMutationId?: string;
+  platformDomainVerification: {
+    attempts?: number;
+    domainId?: string;
+    error?: string;
+    expiresAt?: string;
+    lastCheckedAt?: string;
+    managedDomainId?: string;
+    method: string;
+    recordName?: string;
+    recordType?: string;
+    recordValue?: string;
+    status?: string;
+    verifiedAt?: string;
+  };
+}
+export interface PlatformDomainVerificationPatch {
+  attempts?: number | null;
+  domainId?: string | null;
+  error?: string | null;
+  expiresAt?: string | null;
+  lastCheckedAt?: string | null;
+  managedDomainId?: string | null;
+  method?: string | null;
+  recordName?: string | null;
+  recordType?: string | null;
+  recordValue?: string | null;
+  status?: string | null;
+  verifiedAt?: string | null;
+}
+export interface UpdatePlatformDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+  platformDomainVerificationPatch: PlatformDomainVerificationPatch;
+}
+export interface DeletePlatformDomainVerificationInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformManagedDomainInput {
+  clientMutationId?: string;
+  platformManagedDomain: {
+    allowPublicUsage?: boolean;
+    annotations?: Record<string, unknown>;
+    certStatus?: string;
+    domain: string;
+    isWildcard?: boolean;
+    tlsReadyAt?: string;
+    tlsStatus?: string;
+    verificationStatus?: string;
+    verifiedAt?: string;
+  };
+}
+export interface PlatformManagedDomainPatch {
+  allowPublicUsage?: boolean | null;
+  annotations?: Record<string, unknown> | null;
+  certStatus?: string | null;
+  domain?: string | null;
+  isWildcard?: boolean | null;
+  tlsReadyAt?: string | null;
+  tlsStatus?: string | null;
+  verificationStatus?: string | null;
+  verifiedAt?: string | null;
+}
+export interface UpdatePlatformManagedDomainInput {
+  clientMutationId?: string;
+  id: string;
+  platformManagedDomainPatch: PlatformManagedDomainPatch;
+}
+export interface DeletePlatformManagedDomainInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformSiteInput {
+  clientMutationId?: string;
+  platformSite: {
+    config?: Record<string, unknown>;
+    description?: string;
+    isPublished?: boolean;
+    name: string;
+    title?: string;
+  };
+}
+export interface PlatformSitePatch {
+  config?: Record<string, unknown> | null;
+  description?: string | null;
+  isPublished?: boolean | null;
+  name?: string | null;
+  title?: string | null;
+}
+export interface UpdatePlatformSiteInput {
+  clientMutationId?: string;
+  id: string;
+  platformSitePatch: PlatformSitePatch;
+}
+export interface DeletePlatformSiteInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformSiteMetadatumInput {
+  clientMutationId?: string;
+  platformSiteMetadatum: {
+    description?: string;
+    ogImage?: ConstructiveInternalTypeImage;
+    siteId: string;
+    title?: string;
+  };
+}
+export interface PlatformSiteMetadatumPatch {
+  description?: string | null;
+  ogImage?: ConstructiveInternalTypeImage | null;
+  ogImageUpload?: File | null;
+  siteId?: string | null;
+  title?: string | null;
+}
+export interface UpdatePlatformSiteMetadatumInput {
+  clientMutationId?: string;
+  id: string;
+  platformSiteMetadatumPatch: PlatformSiteMetadatumPatch;
+}
+export interface DeletePlatformSiteMetadatumInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformSiteModuleInput {
+  clientMutationId?: string;
+  platformSiteModule: {
+    data: Record<string, unknown>;
+    name: string;
+    siteId: string;
+  };
+}
+export interface PlatformSiteModulePatch {
+  data?: Record<string, unknown> | null;
+  name?: string | null;
+  siteId?: string | null;
+}
+export interface UpdatePlatformSiteModuleInput {
+  clientMutationId?: string;
+  id: string;
+  platformSiteModulePatch: PlatformSiteModulePatch;
+}
+export interface DeletePlatformSiteModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformSiteThemeInput {
+  clientMutationId?: string;
+  platformSiteTheme: {
+    siteId: string;
+    theme: Record<string, unknown>;
+  };
+}
+export interface PlatformSiteThemePatch {
+  siteId?: string | null;
+  theme?: Record<string, unknown> | null;
+}
+export interface UpdatePlatformSiteThemeInput {
+  clientMutationId?: string;
+  id: string;
+  platformSiteThemePatch: PlatformSiteThemePatch;
+}
+export interface DeletePlatformSiteThemeInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreatePolicyInput {
   clientMutationId?: string;
   policy: {
@@ -6896,22 +7617,28 @@ export interface CreatePrimaryKeyConstraintInput {
     category?: ObjectCategory;
     databaseId?: string;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
     tags?: string[];
     type?: string;
+    withoutOverlaps?: boolean;
   };
 }
 export interface PrimaryKeyConstraintPatch {
   category?: ObjectCategory | null;
   databaseId?: string | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 export interface UpdatePrimaryKeyConstraintInput {
   clientMutationId?: string;
@@ -6988,6 +7715,74 @@ export interface DeleteRlsSettingInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateRouteBindingInput {
+  clientMutationId?: string;
+  routeBinding: {
+    domainId: string;
+    isActive?: boolean;
+    method?: string;
+    path: string;
+    priority?: number;
+    targetApiId?: string;
+    targetFunctionId?: string;
+    targetSiteId?: string;
+  };
+}
+export interface RouteBindingPatch {
+  domainId?: string | null;
+  isActive?: boolean | null;
+  method?: string | null;
+  path?: string | null;
+  priority?: number | null;
+  targetApiId?: string | null;
+  targetFunctionId?: string | null;
+  targetSiteId?: string | null;
+}
+export interface UpdateRouteBindingInput {
+  clientMutationId?: string;
+  id: string;
+  routeBindingPatch: RouteBindingPatch;
+}
+export interface DeleteRouteBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateRouteInput {
+  clientMutationId?: string;
+  route: {
+    config?: Record<string, unknown>;
+    databaseId: string;
+    domainId: string;
+    isActive?: boolean;
+    method?: string;
+    path?: string;
+    priority?: number;
+    targetApiId?: string;
+    targetFunctionId?: string;
+    targetSiteId?: string;
+  };
+}
+export interface RoutePatch {
+  config?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  domainId?: string | null;
+  isActive?: boolean | null;
+  method?: string | null;
+  path?: string | null;
+  priority?: number | null;
+  targetApiId?: string | null;
+  targetFunctionId?: string | null;
+  targetSiteId?: string | null;
+}
+export interface UpdateRouteInput {
+  clientMutationId?: string;
+  id: string;
+  routePatch: RoutePatch;
+}
+export interface DeleteRouteInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateSchemaInput {
   clientMutationId?: string;
   schema: {
@@ -7049,32 +7844,20 @@ export interface DeleteSchemaGrantInput {
 export interface CreateSiteInput {
   clientMutationId?: string;
   site: {
-    annotations?: Record<string, unknown>;
-    appleTouchIcon?: ConstructiveInternalTypeImage;
+    config?: Record<string, unknown>;
     databaseId: string;
-    dbname?: string;
     description?: string;
-    favicon?: ConstructiveInternalTypeAttachment;
-    labels?: Record<string, unknown>;
-    logo?: ConstructiveInternalTypeImage;
-    ogImage?: ConstructiveInternalTypeImage;
+    isPublished?: boolean;
+    name: string;
     title?: string;
   };
 }
 export interface SitePatch {
-  annotations?: Record<string, unknown> | null;
-  appleTouchIcon?: ConstructiveInternalTypeImage | null;
-  appleTouchIconUpload?: File | null;
+  config?: Record<string, unknown> | null;
   databaseId?: string | null;
-  dbname?: string | null;
   description?: string | null;
-  favicon?: ConstructiveInternalTypeAttachment | null;
-  faviconUpload?: File | null;
-  labels?: Record<string, unknown> | null;
-  logo?: ConstructiveInternalTypeImage | null;
-  logoUpload?: File | null;
-  ogImage?: ConstructiveInternalTypeImage | null;
-  ogImageUpload?: File | null;
+  isPublished?: boolean | null;
+  name?: string | null;
   title?: string | null;
 }
 export interface UpdateSiteInput {
@@ -7376,11 +8159,14 @@ export interface CreateUniqueConstraintInput {
     databaseId?: string;
     description?: string;
     fieldIds: string[];
+    initiallyDeferred?: boolean;
+    isDeferrable?: boolean;
     name?: string;
     smartTags?: Record<string, unknown>;
     tableId: string;
     tags?: string[];
     type?: string;
+    withoutOverlaps?: boolean;
   };
 }
 export interface UniqueConstraintPatch {
@@ -7388,11 +8174,14 @@ export interface UniqueConstraintPatch {
   databaseId?: string | null;
   description?: string | null;
   fieldIds?: string[] | null;
+  initiallyDeferred?: boolean | null;
+  isDeferrable?: boolean | null;
   name?: string | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
   tags?: string[] | null;
   type?: string | null;
+  withoutOverlaps?: boolean | null;
 }
 export interface UpdateUniqueConstraintInput {
   clientMutationId?: string;
@@ -7407,6 +8196,7 @@ export interface CreateViewInput {
   clientMutationId?: string;
   view: {
     category?: ObjectCategory;
+    checkOption?: string;
     data?: Record<string, unknown>;
     databaseId?: string;
     filterData?: Record<string, unknown>;
@@ -7414,6 +8204,7 @@ export interface CreateViewInput {
     isReadOnly?: boolean;
     name: string;
     schemaId: string;
+    securityBarrier?: boolean;
     securityInvoker?: boolean;
     smartTags?: Record<string, unknown>;
     tableId?: string;
@@ -7423,6 +8214,7 @@ export interface CreateViewInput {
 }
 export interface ViewPatch {
   category?: ObjectCategory | null;
+  checkOption?: string | null;
   data?: Record<string, unknown> | null;
   databaseId?: string | null;
   filterData?: Record<string, unknown> | null;
@@ -7430,6 +8222,7 @@ export interface ViewPatch {
   isReadOnly?: boolean | null;
   name?: string | null;
   schemaId?: string | null;
+  securityBarrier?: boolean | null;
   securityInvoker?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   tableId?: string | null;
@@ -7575,98 +8368,111 @@ export interface DeleteWebauthnSettingInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  Api: {
-    apiModules: 'ApiModule',
-    apiSchemas: 'ApiSchema',
-    corsSettings: 'CorsSetting',
-    domains: 'Domain',
+  "Api": {
+    "apiModules": "ApiModule",
+    "apiSchemas": "ApiSchema",
+    "corsSettings": "CorsSetting"
   },
-  Database: {
-    apiModules: 'ApiModule',
-    apiSchemas: 'ApiSchema',
-    apiSettings: 'ApiSetting',
-    apis: 'Api',
-    apps: 'App',
-    checkConstraints: 'CheckConstraint',
-    compositeTypes: 'CompositeType',
-    corsSettings: 'CorsSetting',
-    databaseTransfers: 'DatabaseTransfer',
-    defaultPrivileges: 'DefaultPrivilege',
-    domains: 'Domain',
-    embeddingChunks: 'EmbeddingChunk',
-    enums: 'Enum',
-    fields: 'Field',
-    foreignKeyConstraints: 'ForeignKeyConstraint',
-    fullTextSearches: 'FullTextSearch',
-    functions: 'Function',
-    indices: 'Index',
-    managedDomains: 'ManagedDomain',
-    partitions: 'Partition',
-    policies: 'Policy',
-    primaryKeyConstraints: 'PrimaryKeyConstraint',
-    schemaGrants: 'SchemaGrant',
-    schemas: 'Schema',
-    siteMetadata: 'SiteMetadatum',
-    siteModules: 'SiteModule',
-    siteThemes: 'SiteTheme',
-    sites: 'Site',
-    spatialRelations: 'SpatialRelation',
-    tableGrants: 'TableGrant',
-    tables: 'Table',
-    triggerFunctions: 'TriggerFunction',
-    triggers: 'Trigger',
-    uniqueConstraints: 'UniqueConstraint',
-    viewGrants: 'ViewGrant',
-    viewRules: 'ViewRule',
-    viewTables: 'ViewTable',
-    views: 'View',
+  "Database": {
+    "checkConstraints": "CheckConstraint",
+    "compositeTypes": "CompositeType",
+    "databaseTransfers": "DatabaseTransfer",
+    "defaultPrivileges": "DefaultPrivilege",
+    "embeddingChunks": "EmbeddingChunk",
+    "enums": "Enum",
+    "exclusionConstraints": "ExclusionConstraint",
+    "fields": "Field",
+    "foreignKeyConstraints": "ForeignKeyConstraint",
+    "fullTextSearches": "FullTextSearch",
+    "functions": "Function",
+    "indices": "Index",
+    "partitions": "Partition",
+    "policies": "Policy",
+    "primaryKeyConstraints": "PrimaryKeyConstraint",
+    "schemaGrants": "SchemaGrant",
+    "schemas": "Schema",
+    "spatialRelations": "SpatialRelation",
+    "tableGrants": "TableGrant",
+    "tables": "Table",
+    "triggerFunctions": "TriggerFunction",
+    "triggers": "Trigger",
+    "uniqueConstraints": "UniqueConstraint",
+    "viewGrants": "ViewGrant",
+    "viewRules": "ViewRule",
+    "viewTables": "ViewTable",
+    "views": "View"
   },
-  Domain: {
-    httpRoutes: 'HttpRoute',
+  "Domain": {
+    "domainEvents": "DomainEvent",
+    "domainVerifications": "DomainVerification",
+    "httpRoutes": "HttpRoute",
+    "routes": "Route"
   },
-  Field: {
-    spatialRelations: 'SpatialRelation',
-    spatialRelationsByRefFieldId: 'SpatialRelation',
+  "Field": {
+    "spatialRelations": "SpatialRelation",
+    "spatialRelationsByRefFieldId": "SpatialRelation"
   },
-  Schema: {
-    apiSchemas: 'ApiSchema',
-    compositeTypes: 'CompositeType',
-    defaultPrivileges: 'DefaultPrivilege',
-    enums: 'Enum',
-    functions: 'Function',
-    schemaGrants: 'SchemaGrant',
-    tables: 'Table',
-    views: 'View',
+  "ManagedDomain": {
+    "domainEvents": "DomainEvent",
+    "domainVerifications": "DomainVerification"
   },
-  Site: {
-    domains: 'Domain',
-    siteMetadata: 'SiteMetadatum',
-    siteModules: 'SiteModule',
-    siteThemes: 'SiteTheme',
+  "PlatformApi": {
+    "platformApiModulesByApiId": "PlatformApiModule",
+    "platformApiSchemasByApiId": "PlatformApiSchema"
   },
-  Table: {
-    checkConstraints: 'CheckConstraint',
-    embeddingChunks: 'EmbeddingChunk',
-    embeddingChunksByChunksTableId: 'EmbeddingChunk',
-    fields: 'Field',
-    foreignKeyConstraints: 'ForeignKeyConstraint',
-    fullTextSearches: 'FullTextSearch',
-    indices: 'Index',
-    policies: 'Policy',
-    primaryKeyConstraints: 'PrimaryKeyConstraint',
-    spatialRelations: 'SpatialRelation',
-    spatialRelationsByRefTableId: 'SpatialRelation',
-    tableGrants: 'TableGrant',
-    triggers: 'Trigger',
-    uniqueConstraints: 'UniqueConstraint',
-    viewTables: 'ViewTable',
-    views: 'View',
+  "PlatformDomain": {
+    "platformDomainEventsByDomainId": "PlatformDomainEvent",
+    "platformDomainVerificationsByDomainId": "PlatformDomainVerification"
   },
-  View: {
-    viewGrants: 'ViewGrant',
-    viewRules: 'ViewRule',
-    viewTables: 'ViewTable',
+  "PlatformManagedDomain": {
+    "platformDomainEventsByManagedDomainId": "PlatformDomainEvent",
+    "platformDomainVerificationsByManagedDomainId": "PlatformDomainVerification"
   },
+  "PlatformSite": {
+    "platformSiteMetadataBySiteId": "PlatformSiteMetadatum",
+    "platformSiteModulesBySiteId": "PlatformSiteModule",
+    "platformSiteThemesBySiteId": "PlatformSiteTheme"
+  },
+  "Schema": {
+    "apiSchemas": "ApiSchema",
+    "compositeTypes": "CompositeType",
+    "defaultPrivileges": "DefaultPrivilege",
+    "enums": "Enum",
+    "functions": "Function",
+    "platformApiSchemas": "PlatformApiSchema",
+    "schemaGrants": "SchemaGrant",
+    "tables": "Table",
+    "views": "View"
+  },
+  "Site": {
+    "siteMetadata": "SiteMetadatum",
+    "siteModules": "SiteModule",
+    "siteThemes": "SiteTheme"
+  },
+  "Table": {
+    "checkConstraints": "CheckConstraint",
+    "embeddingChunks": "EmbeddingChunk",
+    "embeddingChunksByChunksTableId": "EmbeddingChunk",
+    "exclusionConstraints": "ExclusionConstraint",
+    "fields": "Field",
+    "foreignKeyConstraints": "ForeignKeyConstraint",
+    "fullTextSearches": "FullTextSearch",
+    "indices": "Index",
+    "policies": "Policy",
+    "primaryKeyConstraints": "PrimaryKeyConstraint",
+    "spatialRelations": "SpatialRelation",
+    "spatialRelationsByRefTableId": "SpatialRelation",
+    "tableGrants": "TableGrant",
+    "triggers": "Trigger",
+    "uniqueConstraints": "UniqueConstraint",
+    "viewTables": "ViewTable",
+    "views": "View"
+  },
+  "View": {
+    "viewGrants": "ViewGrant",
+    "viewRules": "ViewRule",
+    "viewTables": "ViewTable"
+  }
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface AcceptDatabaseTransferInput {
@@ -7740,127 +8546,6 @@ export interface ApiToManyCorsSettingFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: CorsSettingFilter;
 }
-/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiToManyDomainFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: DomainFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: DomainFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: DomainFilter;
-}
-/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeImageFilter {
-  /** Contained by the specified JSON. */
-  containedBy?: ConstructiveInternalTypeImage;
-  /** Contains the specified JSON. */
-  contains?: ConstructiveInternalTypeImage;
-  /** Contains all of the specified keys. */
-  containsAllKeys?: string[];
-  /** Contains any of the specified keys. */
-  containsAnyKeys?: string[];
-  /** Contains the specified key. */
-  containsKey?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeImage;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeImage;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeImage;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeImage[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeImage;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeImage;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeImage;
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeImage[];
-}
-/** A filter to be used against ConstructiveInternalTypeUrl fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeUrlFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeUrl;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: ConstructiveInternalTypeUrl;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: ConstructiveInternalTypeUrl;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeUrl;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeUrl;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeUrl;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeUrl[];
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Contains the specified string (case-sensitive). */
-  includes?: ConstructiveInternalTypeUrl;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: ConstructiveInternalTypeUrl;
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeUrl;
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeUrl;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: ConstructiveInternalTypeUrl;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: ConstructiveInternalTypeUrl;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeUrl;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: ConstructiveInternalTypeUrl;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: ConstructiveInternalTypeUrl;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeUrl;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeUrl[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: ConstructiveInternalTypeUrl;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: ConstructiveInternalTypeUrl;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: ConstructiveInternalTypeUrl;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: ConstructiveInternalTypeUrl;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: ConstructiveInternalTypeUrl;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: ConstructiveInternalTypeUrl;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: ConstructiveInternalTypeUrl;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: ConstructiveInternalTypeUrl;
-}
 /** A filter to be used against ObjectCategory fields. All fields are combined with a logical ‘and.’ */
 export interface ObjectCategoryFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -7886,51 +8571,6 @@ export interface ObjectCategoryFilter {
   /** Not included in the specified list. */
   notIn?: ObjectCategory[];
 }
-/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyApiModuleFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ApiModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ApiModuleFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ApiModuleFilter;
-}
-/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyApiSchemaFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ApiSchemaFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ApiSchemaFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ApiSchemaFilter;
-}
-/** A filter to be used against many `ApiSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyApiSettingFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ApiSettingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ApiSettingFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ApiSettingFilter;
-}
-/** A filter to be used against many `Api` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyApiFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ApiFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ApiFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ApiFilter;
-}
-/** A filter to be used against many `App` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyAppFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: AppFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AppFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppFilter;
-}
 /** A filter to be used against many `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyCheckConstraintFilter {
   /** Filters to entities where every related entity matches. */
@@ -7948,15 +8588,6 @@ export interface DatabaseToManyCompositeTypeFilter {
   none?: CompositeTypeFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: CompositeTypeFilter;
-}
-/** A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyCorsSettingFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: CorsSettingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: CorsSettingFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: CorsSettingFilter;
 }
 /** A filter to be used against many `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseTransferFilter {
@@ -7976,15 +8607,6 @@ export interface DatabaseToManyDefaultPrivilegeFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: DefaultPrivilegeFilter;
 }
-/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyDomainFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: DomainFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: DomainFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: DomainFilter;
-}
 /** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyEmbeddingChunkFilter {
   /** Filters to entities where every related entity matches. */
@@ -8002,6 +8624,15 @@ export interface DatabaseToManyEnumFilter {
   none?: EnumFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: EnumFilter;
+}
+/** A filter to be used against many `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyExclusionConstraintFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ExclusionConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ExclusionConstraintFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ExclusionConstraintFilter;
 }
 /** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyFieldFilter {
@@ -8048,15 +8679,6 @@ export interface DatabaseToManyIndexFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: IndexFilter;
 }
-/** A filter to be used against many `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyManagedDomainFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ManagedDomainFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ManagedDomainFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ManagedDomainFilter;
-}
 /** A filter to be used against many `Partition` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyPartitionFilter {
   /** Filters to entities where every related entity matches. */
@@ -8101,42 +8723,6 @@ export interface DatabaseToManySchemaFilter {
   none?: SchemaFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: SchemaFilter;
-}
-/** A filter to be used against many `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManySiteMetadatumFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: SiteMetadatumFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: SiteMetadatumFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: SiteMetadatumFilter;
-}
-/** A filter to be used against many `SiteModule` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManySiteModuleFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: SiteModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: SiteModuleFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: SiteModuleFilter;
-}
-/** A filter to be used against many `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManySiteThemeFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: SiteThemeFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: SiteThemeFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: SiteThemeFilter;
-}
-/** A filter to be used against many `Site` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManySiteFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: SiteFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: SiteFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: SiteFilter;
 }
 /** A filter to be used against many `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManySpatialRelationFilter {
@@ -8228,82 +8814,23 @@ export interface DatabaseToManyViewFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: ViewFilter;
 }
-/** A filter to be used against ConstructiveInternalTypeHostname fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeHostnameFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeHostname;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: ConstructiveInternalTypeHostname;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: ConstructiveInternalTypeHostname;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeHostname;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeHostname;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeHostname;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeHostname[];
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Contains the specified string (case-sensitive). */
-  includes?: ConstructiveInternalTypeHostname;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: ConstructiveInternalTypeHostname;
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeHostname;
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeHostname;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: ConstructiveInternalTypeHostname;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: ConstructiveInternalTypeHostname;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeHostname;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: ConstructiveInternalTypeHostname;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: ConstructiveInternalTypeHostname;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeHostname;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeHostname[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: ConstructiveInternalTypeHostname;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: ConstructiveInternalTypeHostname;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: ConstructiveInternalTypeHostname;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: ConstructiveInternalTypeHostname;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: ConstructiveInternalTypeHostname;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: ConstructiveInternalTypeHostname;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: ConstructiveInternalTypeHostname;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: ConstructiveInternalTypeHostname;
+/** A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainToManyDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainEventFilter;
+}
+/** A filter to be used against many `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainToManyDomainVerificationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainVerificationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainVerificationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainVerificationFilter;
 }
 /** A filter to be used against many `HttpRoute` object types. All fields are combined with a logical ‘and.’ */
 export interface DomainToManyHttpRouteFilter {
@@ -8314,6 +8841,15 @@ export interface DomainToManyHttpRouteFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: HttpRouteFilter;
 }
+/** A filter to be used against many `Route` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainToManyRouteFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RouteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RouteFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RouteFilter;
+}
 /** A filter to be used against many `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldToManySpatialRelationFilter {
   /** Filters to entities where every related entity matches. */
@@ -8322,6 +8858,140 @@ export interface FieldToManySpatialRelationFilter {
   none?: SpatialRelationFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: SpatialRelationFilter;
+}
+/** A filter to be used against many `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainToManyDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainEventFilter;
+}
+/** A filter to be used against many `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainToManyDomainVerificationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainVerificationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainVerificationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainVerificationFilter;
+}
+/** A filter to be used against many `PlatformApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiToManyPlatformApiModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformApiModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformApiModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformApiModuleFilter;
+}
+/** A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiToManyPlatformApiSchemaFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformApiSchemaFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformApiSchemaFilter;
+}
+/** A filter to be used against many `PlatformDomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformDomainToManyPlatformDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformDomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformDomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformDomainEventFilter;
+}
+/** A filter to be used against many `PlatformDomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformDomainToManyPlatformDomainVerificationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformDomainVerificationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformDomainVerificationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformDomainVerificationFilter;
+}
+/** A filter to be used against many `PlatformDomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformManagedDomainToManyPlatformDomainEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformDomainEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformDomainEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformDomainEventFilter;
+}
+/** A filter to be used against many `PlatformDomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformManagedDomainToManyPlatformDomainVerificationFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformDomainVerificationFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformDomainVerificationFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformDomainVerificationFilter;
+}
+/** A filter to be used against many `PlatformSiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteToManyPlatformSiteMetadatumFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformSiteMetadatumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformSiteMetadatumFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformSiteMetadatumFilter;
+}
+/** A filter to be used against many `PlatformSiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteToManyPlatformSiteModuleFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformSiteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformSiteModuleFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformSiteModuleFilter;
+}
+/** A filter to be used against many `PlatformSiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteToManyPlatformSiteThemeFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformSiteThemeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformSiteThemeFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformSiteThemeFilter;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
 }
 /** A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’ */
 export interface ApiExposureLevelFilter {
@@ -8393,6 +9063,15 @@ export interface SchemaToManyFunctionFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: FunctionFilter;
 }
+/** A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyPlatformApiSchemaFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformApiSchemaFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformApiSchemaFilter;
+}
 /** A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManySchemaGrantFilter {
   /** Filters to entities where every related entity matches. */
@@ -8419,92 +9098,6 @@ export interface SchemaToManyViewFilter {
   none?: ViewFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: ViewFilter;
-}
-/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteToManyDomainFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: DomainFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: DomainFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: DomainFilter;
-}
-/** A filter to be used against ConstructiveInternalTypeAttachment fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeAttachmentFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeAttachment;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: ConstructiveInternalTypeAttachment;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeAttachment;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeAttachment;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeAttachment;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeAttachment[];
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Contains the specified string (case-sensitive). */
-  includes?: ConstructiveInternalTypeAttachment;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeAttachment;
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeAttachment;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: ConstructiveInternalTypeAttachment;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeAttachment;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: ConstructiveInternalTypeAttachment;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeAttachment;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeAttachment[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: ConstructiveInternalTypeAttachment;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: ConstructiveInternalTypeAttachment;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: ConstructiveInternalTypeAttachment;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: ConstructiveInternalTypeAttachment;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: ConstructiveInternalTypeAttachment;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: ConstructiveInternalTypeAttachment;
 }
 /** A filter to be used against many `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
 export interface SiteToManySiteMetadatumFilter {
@@ -8550,6 +9143,15 @@ export interface TableToManyEmbeddingChunkFilter {
   none?: EmbeddingChunkFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: EmbeddingChunkFilter;
+}
+/** A filter to be used against many `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyExclusionConstraintFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ExclusionConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ExclusionConstraintFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ExclusionConstraintFilter;
 }
 /** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
 export interface TableToManyFieldFilter {
@@ -8688,54 +9290,56 @@ export interface ViewToManyViewTableFilter {
 }
 /** An input for mutations affecting `Api` */
 export interface ApiInput {
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: Record<string, unknown>;
-  /** PostgreSQL role used for anonymous/unauthenticated requests */
+  /** Anonymous role the API executes as */
   anonRole?: string;
-  /** Reference to the metaschema database this API serves */
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** PostgreSQL database name to connect to */
+  /** Database this API surface serves */
   dbname?: string;
-  /** Unique identifier for this API */
   id?: string;
-  /** Whether this API is publicly accessible without authentication */
-  isPublic?: boolean;
-  /** Key/value pairs for selecting and filtering APIs */
-  labels?: Record<string, unknown>;
-  /** Unique name for this API within its database */
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
   name: string;
-  /** PostgreSQL role used for authenticated requests */
+  /** Authenticated role the API executes as */
   roleName?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `ApiModule` */
 export interface ApiModuleInput {
-  /** API this module configuration belongs to */
+  /** API surface this module configuration belongs to */
   apiId: string;
+  createdAt?: string;
   /** JSON configuration data for this module */
   data: Record<string, unknown>;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this API module record */
   id?: string;
   /** Module name (e.g. auth, uploads, webhooks) */
   name: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `ApiSchema` */
 export interface ApiSchemaInput {
-  /** API that exposes this schema */
+  /** API surface that exposes this schema */
   apiId: string;
-  /** Reference to the metaschema database */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this API-schema mapping */
   id?: string;
-  /** Metaschema schema being exposed through the API */
+  /** Metaschema schema exposed through the API surface */
   schemaId: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `ApiSetting` */
 export interface ApiSettingInput {
-  /** API these settings override for */
+  /** API surface these settings override for */
   apiId: string;
-  /** Reference to the metaschema database */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Override: enable aggregate queries (NULL = inherit from database_settings) */
   enableAggregates?: boolean;
@@ -8761,31 +9365,10 @@ export interface ApiSettingInput {
   enableRealtime?: boolean;
   /** Override: enable unified search (NULL = inherit from database_settings) */
   enableSearch?: boolean;
-  /** Unique identifier for this API settings record */
   id?: string;
   /** Extensible JSON for additional per-API settings that do not have dedicated columns */
   options?: Record<string, unknown>;
-}
-/** An input for mutations affecting `App` */
-export interface AppInput {
-  /** Apple App ID prefix (Team ID) for universal links and associated domains */
-  appIdPrefix?: string;
-  /** App icon or promotional image */
-  appImage?: ConstructiveInternalTypeImage;
-  /** Apple App Store application identifier */
-  appStoreId?: string;
-  /** URL to the Apple App Store listing */
-  appStoreLink?: ConstructiveInternalTypeUrl;
-  /** Reference to the metaschema database this app belongs to */
-  databaseId: string;
-  /** Unique identifier for this app */
-  id?: string;
-  /** Display name of the app */
-  name?: string;
-  /** URL to the Google Play Store listing */
-  playStoreLink?: ConstructiveInternalTypeUrl;
-  /** Site this app is associated with (one app per site) */
-  siteId: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `CheckConstraint` */
 export interface CheckConstraintInput {
@@ -8795,6 +9378,8 @@ export interface CheckConstraintInput {
   expr?: Record<string, unknown>;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
@@ -8819,12 +9404,13 @@ export interface CompositeTypeInput {
 export interface CorsSettingInput {
   /** Array of allowed CORS origins (e.g. https://example.com) */
   allowedOrigins?: string[];
-  /** Optional API for per-API override; NULL means database-wide default */
+  /** Optional API surface for per-API override; NULL means scope-wide default */
   apiId?: string;
-  /** Reference to the metaschema database */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this CORS settings record */
   id?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `Database` */
 export interface DatabaseInput {
@@ -8842,7 +9428,8 @@ export interface DatabaseInput {
 export interface DatabaseSettingInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown>;
-  /** Reference to the metaschema database these settings apply to */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
   enableAggregates?: boolean;
@@ -8868,12 +9455,12 @@ export interface DatabaseSettingInput {
   enableRealtime?: boolean;
   /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
   enableSearch?: boolean;
-  /** Unique identifier for this settings record */
   id?: string;
-  /** Key/value pairs for selecting and filtering database settings */
+  /** Key/value pairs for selecting and filtering settings */
   labels?: Record<string, unknown>;
   /** Extensible JSON for additional settings that do not have dedicated columns */
   options?: Record<string, unknown>;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `DatabaseTransfer` */
 export interface DatabaseTransferInput {
@@ -8904,24 +9491,87 @@ export interface DefaultPrivilegeInput {
 }
 /** An input for mutations affecting `Domain` */
 export interface DomainInput {
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: Record<string, unknown>;
-  /** API endpoint this domain routes to (mutually exclusive with site_id) */
-  apiId?: string;
-  /** Reference to the metaschema database this domain belongs to */
+  /** Module-specific configuration for this hostname */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Root domain of the hostname */
-  domain?: ConstructiveInternalTypeHostname;
-  /** Unique identifier for this domain record */
+  /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
+  hostname: string;
   id?: string;
-  /** Key/value pairs for selecting and filtering domains */
-  labels?: Record<string, unknown>;
-  /** Server deployment this domain routes to (mutually exclusive with api_id and site_id) */
-  serviceId?: string;
-  /** Site this domain routes to (mutually exclusive with api_id and service_id) */
-  siteId?: string;
-  /** Subdomain portion of the hostname */
-  subdomain?: ConstructiveInternalTypeHostname;
+  /** Whether other scopes may see and bind under this hostname */
+  isPublished?: boolean;
+  /** Whether this hostname is a *.parent wildcard claim */
+  isWildcard?: boolean;
+  /** Whether the platform drives this hostname's DNS verification and certificate lifecycle */
+  managed?: boolean;
+  /** Parent hostname a wildcard claim covers (example.com for *.example.com) */
+  parentHostname?: string;
+  /** When the certificate last became ready */
+  tlsReadyAt?: string;
+  /** Name of the TLS secret serving this hostname */
+  tlsSecretName?: string;
+  /** Certificate lifecycle state for this hostname */
+  tlsStatus?: string;
+  updatedAt?: string;
+  /** Ownership verification state of this hostname */
+  verificationStatus?: string;
+  /** When ownership verification last succeeded */
+  verifiedAt?: string;
+}
+/** An input for mutations affecting `DomainEvent` */
+export interface DomainEventInput {
+  /** User who triggered this event, if any */
+  actorId?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Scoped domain this event belongs to */
+  domainId?: string;
+  /** Verification challenge this event relates to, if any */
+  domainVerificationId?: string;
+  /** Lifecycle event discriminator */
+  eventType: string;
+  id?: string;
+  /** Managed hostname this event belongs to */
+  managedDomainId?: string;
+  /** Human-readable event message */
+  message?: string;
+  /** Structured event metadata */
+  metadata?: Record<string, unknown>;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `DomainVerification` */
+export interface DomainVerificationInput {
+  /** How many times this challenge has been probed */
+  attempts?: number;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Scoped domain this verification challenge belongs to */
+  domainId?: string;
+  /** Last verification error, if any */
+  error?: string;
+  /** When this challenge expires */
+  expiresAt?: string;
+  id?: string;
+  /** When this challenge was last probed */
+  lastCheckedAt?: string;
+  /** Managed hostname this verification challenge belongs to */
+  managedDomainId?: string;
+  /** Verification method (dns-txt, http-token, …) */
+  method: string;
+  /** DNS record name the challenge expects */
+  recordName?: string;
+  /** DNS record type the challenge expects */
+  recordType?: string;
+  /** DNS record value the challenge expects */
+  recordValue?: string;
+  /** Challenge state */
+  status?: string;
+  updatedAt?: string;
+  /** When this challenge succeeded */
+  verifiedAt?: string;
 }
 /** An input for mutations affecting `EmbeddingChunk` */
 export interface EmbeddingChunkInput {
@@ -8960,6 +9610,24 @@ export interface EnumInput {
   tags?: string[];
   values?: string[];
 }
+/** An input for mutations affecting `ExclusionConstraint` */
+export interface ExclusionConstraintInput {
+  accessMethod?: string;
+  category?: ObjectCategory;
+  createdAt?: string;
+  databaseId?: string;
+  elementExpr?: Record<string, unknown>;
+  fieldIds?: string[];
+  id?: string;
+  name?: string;
+  operators?: string[];
+  smartTags?: Record<string, unknown>;
+  tableId: string;
+  tags?: string[];
+  type?: string;
+  updatedAt?: string;
+  whereClause?: Record<string, unknown>;
+}
 /** An input for mutations affecting `Field` */
 export interface FieldInput {
   apiRequired?: boolean;
@@ -8974,6 +9642,8 @@ export interface FieldInput {
   generationExpression?: Record<string, unknown>;
   generationType?: string;
   id?: string;
+  identityGeneration?: string;
+  identityOptions?: Record<string, unknown>;
   isRequired?: boolean;
   label?: string;
   max?: number;
@@ -8992,9 +9662,12 @@ export interface ForeignKeyConstraintInput {
   createdAt?: string;
   databaseId?: string;
   deleteAction?: string;
+  deleteSetFieldIds?: string[];
   description?: string;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   refFieldIds: string[];
   refTableId: string;
@@ -9004,6 +9677,7 @@ export interface ForeignKeyConstraintInput {
   type?: string;
   updateAction?: string;
   updatedAt?: string;
+  withPeriod?: boolean;
 }
 /** An input for mutations affecting `FullTextSearch` */
 export interface FullTextSearchInput {
@@ -9025,13 +9699,35 @@ export interface FunctionInput {
   name: string;
   schemaId: string;
 }
+/** An input for mutations affecting `HostnameBinding` */
+export interface HostnameBindingInput {
+  /** Domain row this binding was compiled from */
+  domainId: string;
+  /** Lowercase hostname (exact or *.parent wildcard) */
+  hostname: string;
+  id?: string;
+  /** Whether this binding is a wildcard claim */
+  isWildcard?: boolean;
+  /** Whether the platform drives this hostname's lifecycle */
+  managed?: boolean;
+  /** Parent hostname a wildcard binding covers */
+  parentHostname?: string;
+  /** TLS secret name compiled from the domain row */
+  tlsSecretName?: string;
+  /** Certificate lifecycle state compiled from the domain row */
+  tlsStatus?: string;
+  /** When this binding was last recompiled */
+  updatedAt?: string;
+  /** Ownership verification state compiled from the domain row */
+  verificationStatus?: string;
+}
 /** An input for mutations affecting `HttpRoute` */
 export interface HttpRouteInput {
   createdAt?: string;
   createdBy?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Registered host in services_public.domains */
+  /** Registered host in the scoped routing domains table */
   domainId: string;
   id?: string;
   /** Whether the resolver may select this route */
@@ -9071,23 +9767,28 @@ export interface IndexInput {
 }
 /** An input for mutations affecting `ManagedDomain` */
 export interface ManagedDomainInput {
-  /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
+  /** Whether tenants may claim subdomains under this managed hostname */
+  allowPublicUsage?: boolean;
+  /** Free-form operator annotations for this managed hostname */
   annotations?: Record<string, unknown>;
-  /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
+  /** Certificate issuance state for this managed hostname */
+  certStatus?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
-  domain: ConstructiveInternalTypeHostname;
-  /** Unique identifier for this managed domain record */
+  /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
+  domain: string;
   id?: string;
-  /** Whether the cert covers the wildcard *.domain (one wildcard cert covers every subdomain row sharing this root) */
+  /** Whether this managed hostname is a *.parent wildcard */
   isWildcard?: boolean;
-  /** When tls_status last became active */
+  /** When TLS last became ready */
   tlsReadyAt?: string;
-  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  /** TLS provisioning state for this managed hostname */
   tlsStatus?: string;
-  /** Domain ownership verification state: pending | verified | failed */
+  updatedAt?: string;
+  /** DNS ownership verification state of this managed hostname */
   verificationStatus?: string;
-  /** When verification_status last became verified */
+  /** When ownership verification last succeeded */
   verifiedAt?: string;
 }
 /** An input for mutations affecting `NodeTypeRegistry` */
@@ -9114,6 +9815,244 @@ export interface PartitionInput {
   retentionKeepTable?: boolean;
   strategy: string;
   tableId: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformApi` */
+export interface PlatformApiInput {
+  /** Anonymous role the API executes as */
+  anonRole?: string;
+  /** Module-specific configuration for this API surface */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database this API surface serves */
+  dbname?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this API surface */
+  isPublished?: boolean;
+  /** Owner-local API surface name */
+  name: string;
+  /** Authenticated role the API executes as */
+  roleName?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformApiModule` */
+export interface PlatformApiModuleInput {
+  /** API surface this module configuration belongs to */
+  apiId: string;
+  createdAt?: string;
+  /** JSON configuration data for this module */
+  data: Record<string, unknown>;
+  id?: string;
+  /** Module name (e.g. auth, uploads, webhooks) */
+  name: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformApiSchema` */
+export interface PlatformApiSchemaInput {
+  /** API surface that exposes this schema */
+  apiId: string;
+  createdAt?: string;
+  id?: string;
+  /** Metaschema schema exposed through the API surface */
+  schemaId: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformApiSetting` */
+export interface PlatformApiSettingInput {
+  /** API surface these settings override for */
+  apiId: string;
+  createdAt?: string;
+  /** Override: enable aggregate queries (NULL = inherit from database_settings) */
+  enableAggregates?: boolean;
+  /** Override: enable bulk mutations (NULL = inherit from database_settings) */
+  enableBulk?: boolean;
+  /** Override: enable connection filter (NULL = inherit from database_settings) */
+  enableConnectionFilter?: boolean;
+  /** Override: enable direct (multipart) file uploads (NULL = inherit from database_settings) */
+  enableDirectUploads?: boolean;
+  /** Override: enable internationalization plugin (NULL = inherit from database_settings) */
+  enableI18N?: boolean;
+  /** Override: enable LLM/AI integration features (NULL = inherit from database_settings) */
+  enableLlm?: boolean;
+  /** Override: enable ltree hierarchical data type (NULL = inherit from database_settings) */
+  enableLtree?: boolean;
+  /** Override: enable many-to-many relationships (NULL = inherit from database_settings) */
+  enableManyToMany?: boolean;
+  /** Override: enable PostGIS spatial types (NULL = inherit from database_settings) */
+  enablePostgis?: boolean;
+  /** Override: enable presigned URL upload flow (NULL = inherit from database_settings) */
+  enablePresignedUploads?: boolean;
+  /** Override: enable realtime subscriptions (NULL = inherit from database_settings) */
+  enableRealtime?: boolean;
+  /** Override: enable unified search (NULL = inherit from database_settings) */
+  enableSearch?: boolean;
+  id?: string;
+  /** Extensible JSON for additional per-API settings that do not have dedicated columns */
+  options?: Record<string, unknown>;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformCorsSetting` */
+export interface PlatformCorsSettingInput {
+  /** Array of allowed CORS origins (e.g. https://example.com) */
+  allowedOrigins?: string[];
+  /** Optional API surface for per-API override; NULL means scope-wide default */
+  apiId?: string;
+  createdAt?: string;
+  id?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformDomain` */
+export interface PlatformDomainInput {
+  /** Module-specific configuration for this hostname */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Lowercase fully-qualified hostname; wildcards use the *.parent form */
+  hostname: string;
+  id?: string;
+  /** Whether other scopes may see and bind under this hostname */
+  isPublished?: boolean;
+  /** Whether this hostname is a *.parent wildcard claim */
+  isWildcard?: boolean;
+  /** Whether the platform drives this hostname's DNS verification and certificate lifecycle */
+  managed?: boolean;
+  /** Parent hostname a wildcard claim covers (example.com for *.example.com) */
+  parentHostname?: string;
+  /** When the certificate last became ready */
+  tlsReadyAt?: string;
+  /** Name of the TLS secret serving this hostname */
+  tlsSecretName?: string;
+  /** Certificate lifecycle state for this hostname */
+  tlsStatus?: string;
+  updatedAt?: string;
+  /** Ownership verification state of this hostname */
+  verificationStatus?: string;
+  /** When ownership verification last succeeded */
+  verifiedAt?: string;
+}
+/** An input for mutations affecting `PlatformDomainEvent` */
+export interface PlatformDomainEventInput {
+  /** User who triggered this event, if any */
+  actorId?: string;
+  createdAt?: string;
+  /** Scoped domain this event belongs to */
+  domainId?: string;
+  /** Verification challenge this event relates to, if any */
+  domainVerificationId?: string;
+  /** Lifecycle event discriminator */
+  eventType: string;
+  id?: string;
+  /** Managed hostname this event belongs to */
+  managedDomainId?: string;
+  /** Human-readable event message */
+  message?: string;
+  /** Structured event metadata */
+  metadata?: Record<string, unknown>;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformDomainVerification` */
+export interface PlatformDomainVerificationInput {
+  /** How many times this challenge has been probed */
+  attempts?: number;
+  createdAt?: string;
+  /** Scoped domain this verification challenge belongs to */
+  domainId?: string;
+  /** Last verification error, if any */
+  error?: string;
+  /** When this challenge expires */
+  expiresAt?: string;
+  id?: string;
+  /** When this challenge was last probed */
+  lastCheckedAt?: string;
+  /** Managed hostname this verification challenge belongs to */
+  managedDomainId?: string;
+  /** Verification method (dns-txt, http-token, …) */
+  method: string;
+  /** DNS record name the challenge expects */
+  recordName?: string;
+  /** DNS record type the challenge expects */
+  recordType?: string;
+  /** DNS record value the challenge expects */
+  recordValue?: string;
+  /** Challenge state */
+  status?: string;
+  updatedAt?: string;
+  /** When this challenge succeeded */
+  verifiedAt?: string;
+}
+/** An input for mutations affecting `PlatformManagedDomain` */
+export interface PlatformManagedDomainInput {
+  /** Whether tenants may claim subdomains under this managed hostname */
+  allowPublicUsage?: boolean;
+  /** Free-form operator annotations for this managed hostname */
+  annotations?: Record<string, unknown>;
+  /** Certificate issuance state for this managed hostname */
+  certStatus?: string;
+  createdAt?: string;
+  /** Lowercase fully-qualified managed hostname; wildcards use the *.parent form */
+  domain: string;
+  id?: string;
+  /** Whether this managed hostname is a *.parent wildcard */
+  isWildcard?: boolean;
+  /** When TLS last became ready */
+  tlsReadyAt?: string;
+  /** TLS provisioning state for this managed hostname */
+  tlsStatus?: string;
+  updatedAt?: string;
+  /** DNS ownership verification state of this managed hostname */
+  verificationStatus?: string;
+  /** When ownership verification last succeeded */
+  verifiedAt?: string;
+}
+/** An input for mutations affecting `PlatformSite` */
+export interface PlatformSiteInput {
+  /** Module-specific configuration for this site surface */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Human-readable site description */
+  description?: string;
+  id?: string;
+  /** Whether other scopes may see and route to this site surface */
+  isPublished?: boolean;
+  /** Owner-local site surface name */
+  name: string;
+  /** Human-readable site title */
+  title?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformSiteMetadatum` */
+export interface PlatformSiteMetadatumInput {
+  createdAt?: string;
+  /** Meta description (max 120 characters) */
+  description?: string;
+  id?: string;
+  /** Open Graph image used when sharing site links */
+  ogImage?: ConstructiveInternalTypeImage;
+  /** Site surface this metadata belongs to */
+  siteId: string;
+  /** Meta title (max 120 characters) */
+  title?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformSiteModule` */
+export interface PlatformSiteModuleInput {
+  createdAt?: string;
+  /** JSON configuration data for this module */
+  data: Record<string, unknown>;
+  id?: string;
+  /** Module name (e.g. navbar, footer, analytics) */
+  name: string;
+  /** Site surface this module configuration belongs to */
+  siteId: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformSiteTheme` */
+export interface PlatformSiteThemeInput {
+  createdAt?: string;
+  id?: string;
+  /** Site surface this theme belongs to */
+  siteId: string;
+  /** Theme document (colors, fonts, design tokens) */
+  theme: Record<string, unknown>;
   updatedAt?: string;
 }
 /** An input for mutations affecting `Policy` */
@@ -9143,20 +10082,23 @@ export interface PrimaryKeyConstraintInput {
   databaseId?: string;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
   tags?: string[];
   type?: string;
   updatedAt?: string;
+  withoutOverlaps?: boolean;
 }
 /** An input for mutations affecting `PubkeySetting` */
 export interface PubkeySettingInput {
+  createdAt?: string;
   /** Crypto network for key derivation (e.g. cosmos, ethereum) */
   cryptoNetwork?: string;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this pubkey settings record */
   id?: string;
   /** Schema containing the crypto auth functions (FK to metaschema_public.schema) */
   schemaId?: string;
@@ -9168,6 +10110,7 @@ export interface PubkeySettingInput {
   signInWithChallengeFunctionId?: string;
   /** Reference to the sign-up-with-key function (FK to metaschema_public.function) */
   signUpWithKeyFunctionId?: string;
+  updatedAt?: string;
   /** Field name used to identify the user in crypto auth functions */
   userField?: string;
 }
@@ -9179,6 +10122,7 @@ export interface RlsSettingInput {
   authenticateSchemaId?: string;
   /** Reference to the strict authenticate function (FK to metaschema_public.function) */
   authenticateStrictFunctionId?: string;
+  createdAt?: string;
   /** Reference to the current_ip_address function (FK to metaschema_public.function) */
   currentIpAddressFunctionId?: string;
   /** Reference to the current_role function (FK to metaschema_public.function) */
@@ -9187,12 +10131,60 @@ export interface RlsSettingInput {
   currentRoleIdFunctionId?: string;
   /** Reference to the current_user_agent function (FK to metaschema_public.function) */
   currentUserAgentFunctionId?: string;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this RLS settings record */
   id?: string;
   /** Schema containing current_role and related functions (FK to metaschema_public.schema) */
   roleSchemaId?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `RouteBinding` */
+export interface RouteBindingInput {
+  /** Domain row the source route binds */
+  domainId: string;
+  id?: string;
+  /** Active flag compiled from the source route */
+  isActive?: boolean;
+  /** HTTP method this binding matches; NULL matches any method */
+  method?: string;
+  /** Path prefix this binding matches */
+  path: string;
+  /** Priority compiled from the source route */
+  priority?: number;
+  /** Api catalog row the source route targets */
+  targetApiId?: string;
+  /** Function catalog row the source route targets */
+  targetFunctionId?: string;
+  /** Site catalog row the source route targets */
+  targetSiteId?: string;
+  /** When this binding was last recompiled */
+  updatedAt?: string;
+}
+/** An input for mutations affecting `Route` */
+export interface RouteInput {
+  /** Route metadata; target configuration is read live from the typed catalog, never copied here */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Domain whose hostname this route serves */
+  domainId: string;
+  id?: string;
+  /** Inactive routes are excluded from resolution */
+  isActive?: boolean;
+  /** Uppercase HTTP method this route matches; NULL matches any method */
+  method?: string;
+  /** Path prefix this route matches; must begin with / and carry no trailing slash */
+  path?: string;
+  /** Higher priority wins between otherwise-equal matches */
+  priority?: number;
+  /** Api catalog row this route targets; must be owner-matched or visible cross-scope */
+  targetApiId?: string;
+  /** Function catalog row this route targets; must be owner-matched or visible cross-scope */
+  targetFunctionId?: string;
+  /** Site catalog row this route targets; must be owner-matched or visible cross-scope */
+  targetSiteId?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `Schema` */
 export interface SchemaInput {
@@ -9221,67 +10213,63 @@ export interface SchemaGrantInput {
 }
 /** An input for mutations affecting `Site` */
 export interface SiteInput {
-  /** Freeform metadata for tooling and operational notes */
-  annotations?: Record<string, unknown>;
-  /** Apple touch icon for iOS home screen bookmarks */
-  appleTouchIcon?: ConstructiveInternalTypeImage;
-  /** Reference to the metaschema database this site belongs to */
+  /** Module-specific configuration for this site surface */
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** PostgreSQL database name this site connects to */
-  dbname?: string;
-  /** Short description of the site (max 120 characters) */
+  /** Human-readable site description */
   description?: string;
-  /** Browser favicon attachment */
-  favicon?: ConstructiveInternalTypeAttachment;
-  /** Unique identifier for this site */
   id?: string;
-  /** Key/value pairs for selecting and filtering sites */
-  labels?: Record<string, unknown>;
-  /** Primary logo image for the site */
-  logo?: ConstructiveInternalTypeImage;
-  /** Open Graph image used for social media link previews */
-  ogImage?: ConstructiveInternalTypeImage;
-  /** Display title for the site (max 120 characters) */
+  /** Whether other scopes may see and route to this site surface */
+  isPublished?: boolean;
+  /** Owner-local site surface name */
+  name: string;
+  /** Human-readable site title */
   title?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `SiteMetadatum` */
 export interface SiteMetadatumInput {
-  /** Reference to the metaschema database */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Meta description for SEO and social sharing (max 120 characters) */
+  /** Meta description (max 120 characters) */
   description?: string;
-  /** Unique identifier for this metadata record */
   id?: string;
-  /** Open Graph image for social media previews */
+  /** Open Graph image used when sharing site links */
   ogImage?: ConstructiveInternalTypeImage;
-  /** Site this metadata belongs to */
+  /** Site surface this metadata belongs to */
   siteId: string;
-  /** Page title for SEO (max 120 characters) */
+  /** Meta title (max 120 characters) */
   title?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `SiteModule` */
 export interface SiteModuleInput {
+  createdAt?: string;
   /** JSON configuration data for this module */
   data: Record<string, unknown>;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this site module record */
   id?: string;
-  /** Module name (e.g. user_auth_module, analytics) */
+  /** Module name (e.g. navbar, footer, analytics) */
   name: string;
-  /** Site this module configuration belongs to */
+  /** Site surface this module configuration belongs to */
   siteId: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `SiteTheme` */
 export interface SiteThemeInput {
-  /** Reference to the metaschema database */
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this theme record */
   id?: string;
-  /** Site this theme belongs to */
+  /** Site surface this theme belongs to */
   siteId: string;
-  /** JSONB object containing theme tokens (colors, typography, spacing, etc.) */
+  /** Theme document (colors, fonts, design tokens) */
   theme: Record<string, unknown>;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `SpatialRelation` */
 export interface SpatialRelationInput {
@@ -9368,16 +10356,20 @@ export interface UniqueConstraintInput {
   description?: string;
   fieldIds: string[];
   id?: string;
+  initiallyDeferred?: boolean;
+  isDeferrable?: boolean;
   name?: string;
   smartTags?: Record<string, unknown>;
   tableId: string;
   tags?: string[];
   type?: string;
   updatedAt?: string;
+  withoutOverlaps?: boolean;
 }
 /** An input for mutations affecting `View` */
 export interface ViewInput {
   category?: ObjectCategory;
+  checkOption?: string;
   data?: Record<string, unknown>;
   databaseId?: string;
   filterData?: Record<string, unknown>;
@@ -9386,6 +10378,7 @@ export interface ViewInput {
   isReadOnly?: boolean;
   name: string;
   schemaId: string;
+  securityBarrier?: boolean;
   securityInvoker?: boolean;
   smartTags?: Record<string, unknown>;
   tableId?: string;
@@ -9427,13 +10420,13 @@ export interface WebauthnSettingInput {
   attestationType?: string;
   /** Challenge TTL in seconds (default 300 = 5 minutes) */
   challengeExpirySeconds?: string;
+  createdAt?: string;
   /** Schema of the webauthn_credentials table (FK to metaschema_public.schema) */
   credentialsSchemaId?: string;
   /** Reference to the webauthn_credentials table (FK to metaschema_public.table) */
   credentialsTableId?: string;
-  /** Reference to the metaschema database */
+  /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Unique identifier for this WebAuthn settings record */
   id?: string;
   /** Allowed origins for WebAuthn registration and authentication */
   originAllowlist?: string[];
@@ -9457,6 +10450,7 @@ export interface WebauthnSettingInput {
   sessionsSchemaId?: string;
   /** Reference to the sessions table (FK to metaschema_public.table) */
   sessionsTableId?: string;
+  updatedAt?: string;
   /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
   userFieldId?: string;
 }
@@ -9468,8 +10462,8 @@ export interface ApiModuleFilter {
   api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -9480,6 +10474,8 @@ export interface ApiModuleFilter {
   not?: ApiModuleFilter;
   /** Checks for any expressions in this list. */
   or?: ApiModuleFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiSchemaFilter {
@@ -9489,8 +10485,8 @@ export interface ApiSchemaFilter {
   api?: ApiFilter;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -9503,6 +10499,8 @@ export interface ApiSchemaFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
 export interface CorsSettingFilter {
@@ -9516,8 +10514,8 @@ export interface CorsSettingFilter {
   apiExists?: boolean;
   /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -9526,172 +10524,8 @@ export interface CorsSettingFilter {
   not?: CorsSettingFilter;
   /** Checks for any expressions in this list. */
   or?: CorsSettingFilter[];
-}
-/** A filter to be used against `Domain` object types. All fields are combined with a logical ‘and.’ */
-export interface DomainFilter {
-  /** Checks for all expressions in this list. */
-  and?: DomainFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `api` relation. */
-  api?: ApiFilter;
-  /** A related `api` exists. */
-  apiExists?: boolean;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `domain` field. */
-  domain?: ConstructiveInternalTypeHostnameFilter;
-  /** Filter by the object’s `httpRoutes` relation. */
-  httpRoutes?: DomainToManyHttpRouteFilter;
-  /** `httpRoutes` exist. */
-  httpRoutesExist?: boolean;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Negates the expression. */
-  not?: DomainFilter;
-  /** Checks for any expressions in this list. */
-  or?: DomainFilter[];
-  /** Filter by the object’s `serviceId` field. */
-  serviceId?: UUIDFilter;
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** A related `site` exists. */
-  siteExists?: boolean;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-  /** Filter by the object’s `subdomain` field. */
-  subdomain?: ConstructiveInternalTypeHostnameFilter;
-}
-/** A filter to be used against `ApiSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiSettingFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApiSettingFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: ApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `enableAggregates` field. */
-  enableAggregates?: BooleanFilter;
-  /** Filter by the object’s `enableBulk` field. */
-  enableBulk?: BooleanFilter;
-  /** Filter by the object’s `enableConnectionFilter` field. */
-  enableConnectionFilter?: BooleanFilter;
-  /** Filter by the object’s `enableDirectUploads` field. */
-  enableDirectUploads?: BooleanFilter;
-  /** Filter by the object’s `enableI18N` field. */
-  enableI18N?: BooleanFilter;
-  /** Filter by the object’s `enableLlm` field. */
-  enableLlm?: BooleanFilter;
-  /** Filter by the object’s `enableLtree` field. */
-  enableLtree?: BooleanFilter;
-  /** Filter by the object’s `enableManyToMany` field. */
-  enableManyToMany?: BooleanFilter;
-  /** Filter by the object’s `enablePostgis` field. */
-  enablePostgis?: BooleanFilter;
-  /** Filter by the object’s `enablePresignedUploads` field. */
-  enablePresignedUploads?: BooleanFilter;
-  /** Filter by the object’s `enableRealtime` field. */
-  enableRealtime?: BooleanFilter;
-  /** Filter by the object’s `enableSearch` field. */
-  enableSearch?: BooleanFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: ApiSettingFilter;
-  /** Filter by the object’s `options` field. */
-  options?: JSONFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApiSettingFilter[];
-}
-/** A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApiFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `anonRole` field. */
-  anonRole?: StringFilter;
-  /** Filter by the object’s `apiModules` relation. */
-  apiModules?: ApiToManyApiModuleFilter;
-  /** `apiModules` exist. */
-  apiModulesExist?: boolean;
-  /** Filter by the object’s `apiSchemas` relation. */
-  apiSchemas?: ApiToManyApiSchemaFilter;
-  /** `apiSchemas` exist. */
-  apiSchemasExist?: boolean;
-  /** Filter by the object’s `apiSetting` relation. */
-  apiSetting?: ApiSettingFilter;
-  /** A related `apiSetting` exists. */
-  apiSettingExists?: boolean;
-  /** Filter by the object’s `corsSettings` relation. */
-  corsSettings?: ApiToManyCorsSettingFilter;
-  /** `corsSettings` exist. */
-  corsSettingsExist?: boolean;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
-  /** Filter by the object’s `domains` relation. */
-  domains?: ApiToManyDomainFilter;
-  /** `domains` exist. */
-  domainsExist?: boolean;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isPublic` field. */
-  isPublic?: BooleanFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: ApiFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApiFilter[];
-  /** Filter by the object’s `roleName` field. */
-  roleName?: StringFilter;
-}
-/** A filter to be used against `App` object types. All fields are combined with a logical ‘and.’ */
-export interface AppFilter {
-  /** Checks for all expressions in this list. */
-  and?: AppFilter[];
-  /** Filter by the object’s `appIdPrefix` field. */
-  appIdPrefix?: StringFilter;
-  /** Filter by the object’s `appImage` field. */
-  appImage?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `appStoreId` field. */
-  appStoreId?: StringFilter;
-  /** Filter by the object’s `appStoreLink` field. */
-  appStoreLink?: ConstructiveInternalTypeUrlFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: AppFilter;
-  /** Checks for any expressions in this list. */
-  or?: AppFilter[];
-  /** Filter by the object’s `playStoreLink` field. */
-  playStoreLink?: ConstructiveInternalTypeUrlFilter;
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
 export interface CheckConstraintFilter {
@@ -9711,6 +10545,10 @@ export interface CheckConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -9929,6 +10767,49 @@ export interface EnumFilter {
   /** Filter by the object’s `values` field. */
   values?: StringListFilter;
 }
+/** A filter to be used against `ExclusionConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface ExclusionConstraintFilter {
+  /** Filter by the object’s `accessMethod` field. */
+  accessMethod?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `elementExpr` field. */
+  elementExpr?: JSONFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ExclusionConstraintFilter;
+  /** Filter by the object’s `operators` field. */
+  operators?: StringListFilter;
+  /** Checks for any expressions in this list. */
+  or?: ExclusionConstraintFilter[];
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `whereClause` field. */
+  whereClause?: JSONFilter;
+}
 /** A filter to be used against `Field` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldFilter {
   /** Checks for all expressions in this list. */
@@ -9959,6 +10840,10 @@ export interface FieldFilter {
   generationType?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `identityGeneration` field. */
+  identityGeneration?: StringFilter;
+  /** Filter by the object’s `identityOptions` field. */
+  identityOptions?: JSONFilter;
   /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
   /** Filter by the object’s `label` field. */
@@ -10010,12 +10895,18 @@ export interface ForeignKeyConstraintFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `deleteSetFieldIds` field. */
+  deleteSetFieldIds?: UUIDListFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -10042,6 +10933,8 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withPeriod` field. */
+  withPeriod?: BooleanFilter;
 }
 /** A filter to be used against `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
 export interface FullTextSearchFilter {
@@ -10143,35 +11036,6 @@ export interface IndexFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `whereClause` field. */
   whereClause?: JSONFilter;
-}
-/** A filter to be used against `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
-export interface ManagedDomainFilter {
-  /** Checks for all expressions in this list. */
-  and?: ManagedDomainFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `domain` field. */
-  domain?: ConstructiveInternalTypeHostnameFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `isWildcard` field. */
-  isWildcard?: BooleanFilter;
-  /** Negates the expression. */
-  not?: ManagedDomainFilter;
-  /** Checks for any expressions in this list. */
-  or?: ManagedDomainFilter[];
-  /** Filter by the object’s `tlsReadyAt` field. */
-  tlsReadyAt?: DatetimeFilter;
-  /** Filter by the object’s `tlsStatus` field. */
-  tlsStatus?: StringFilter;
-  /** Filter by the object’s `verificationStatus` field. */
-  verificationStatus?: StringFilter;
-  /** Filter by the object’s `verifiedAt` field. */
-  verifiedAt?: DatetimeFilter;
 }
 /** A filter to be used against `Partition` object types. All fields are combined with a logical ‘and.’ */
 export interface PartitionFilter {
@@ -10275,6 +11139,10 @@ export interface PrimaryKeyConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -10293,6 +11161,8 @@ export interface PrimaryKeyConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 /** A filter to be used against `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaGrantFilter {
@@ -10367,6 +11237,10 @@ export interface SchemaFilter {
   not?: SchemaFilter;
   /** Checks for any expressions in this list. */
   or?: SchemaFilter[];
+  /** Filter by the object’s `platformApiSchemas` relation. */
+  platformApiSchemas?: SchemaToManyPlatformApiSchemaFilter;
+  /** `platformApiSchemas` exist. */
+  platformApiSchemasExist?: boolean;
   /** Filter by the object’s `schemaGrants` relation. */
   schemaGrants?: SchemaToManySchemaGrantFilter;
   /** `schemaGrants` exist. */
@@ -10387,126 +11261,6 @@ export interface SchemaFilter {
   views?: SchemaToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
-}
-/** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteMetadatumFilter {
-  /** Checks for all expressions in this list. */
-  and?: SiteMetadatumFilter[];
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: SiteMetadatumFilter;
-  /** Filter by the object’s `ogImage` field. */
-  ogImage?: ConstructiveInternalTypeImageFilter;
-  /** Checks for any expressions in this list. */
-  or?: SiteMetadatumFilter[];
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
-}
-/** A filter to be used against `SiteModule` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: SiteModuleFilter[];
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: SiteModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: SiteModuleFilter[];
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-}
-/** A filter to be used against `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteThemeFilter {
-  /** Checks for all expressions in this list. */
-  and?: SiteThemeFilter[];
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: SiteThemeFilter;
-  /** Checks for any expressions in this list. */
-  or?: SiteThemeFilter[];
-  /** Filter by the object’s `site` relation. */
-  site?: SiteFilter;
-  /** Filter by the object’s `siteId` field. */
-  siteId?: UUIDFilter;
-  /** Filter by the object’s `theme` field. */
-  theme?: JSONFilter;
-}
-/** A filter to be used against `Site` object types. All fields are combined with a logical ‘and.’ */
-export interface SiteFilter {
-  /** Checks for all expressions in this list. */
-  and?: SiteFilter[];
-  /** Filter by the object’s `annotations` field. */
-  annotations?: JSONFilter;
-  /** Filter by the object’s `app` relation. */
-  app?: AppFilter;
-  /** A related `app` exists. */
-  appExists?: boolean;
-  /** Filter by the object’s `appleTouchIcon` field. */
-  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `domains` relation. */
-  domains?: SiteToManyDomainFilter;
-  /** `domains` exist. */
-  domainsExist?: boolean;
-  /** Filter by the object’s `favicon` field. */
-  favicon?: ConstructiveInternalTypeAttachmentFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
-  /** Filter by the object’s `logo` field. */
-  logo?: ConstructiveInternalTypeImageFilter;
-  /** Negates the expression. */
-  not?: SiteFilter;
-  /** Filter by the object’s `ogImage` field. */
-  ogImage?: ConstructiveInternalTypeImageFilter;
-  /** Checks for any expressions in this list. */
-  or?: SiteFilter[];
-  /** Filter by the object’s `siteMetadata` relation. */
-  siteMetadata?: SiteToManySiteMetadatumFilter;
-  /** `siteMetadata` exist. */
-  siteMetadataExist?: boolean;
-  /** Filter by the object’s `siteModules` relation. */
-  siteModules?: SiteToManySiteModuleFilter;
-  /** `siteModules` exist. */
-  siteModulesExist?: boolean;
-  /** Filter by the object’s `siteThemes` relation. */
-  siteThemes?: SiteToManySiteThemeFilter;
-  /** `siteThemes` exist. */
-  siteThemesExist?: boolean;
-  /** Filter by the object’s `title` field. */
-  title?: StringFilter;
 }
 /** A filter to be used against `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface SpatialRelationFilter {
@@ -10610,6 +11364,10 @@ export interface TableFilter {
   embeddingChunksByChunksTableIdExist?: boolean;
   /** `embeddingChunks` exist. */
   embeddingChunksExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: TableToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
   /** Filter by the object’s `fields` relation. */
   fields?: TableToManyFieldFilter;
   /** `fields` exist. */
@@ -10789,6 +11547,10 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `initiallyDeferred` field. */
+  initiallyDeferred?: BooleanFilter;
+  /** Filter by the object’s `isDeferrable` field. */
+  isDeferrable?: BooleanFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -10807,6 +11569,8 @@ export interface UniqueConstraintFilter {
   type?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `withoutOverlaps` field. */
+  withoutOverlaps?: BooleanFilter;
 }
 /** A filter to be used against `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface ViewGrantFilter {
@@ -10891,6 +11655,8 @@ export interface ViewFilter {
   and?: ViewFilter[];
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
+  /** Filter by the object’s `checkOption` field. */
+  checkOption?: StringFilter;
   /** Filter by the object’s `data` field. */
   data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
@@ -10915,6 +11681,8 @@ export interface ViewFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `securityBarrier` field. */
+  securityBarrier?: BooleanFilter;
   /** Filter by the object’s `securityInvoker` field. */
   securityInvoker?: BooleanFilter;
   /** Filter by the object’s `smartTags` field. */
@@ -10941,6 +11709,98 @@ export interface ViewFilter {
   viewTablesExist?: boolean;
   /** Filter by the object’s `viewType` field. */
   viewType?: StringFilter;
+}
+/** A filter to be used against `DomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: DomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: DomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainEventFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `DomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: ManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainVerificationFilter[];
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
 }
 /** A filter to be used against `HttpRoute` object types. All fields are combined with a logical ‘and.’ */
 export interface HttpRouteFilter {
@@ -10979,6 +11839,360 @@ export interface HttpRouteFilter {
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
 }
+/** A filter to be used against `Route` object types. All fields are combined with a logical ‘and.’ */
+export interface RouteFilter {
+  /** Checks for all expressions in this list. */
+  and?: RouteFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: RouteFilter;
+  /** Checks for any expressions in this list. */
+  or?: RouteFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `targetApiId` field. */
+  targetApiId?: UUIDFilter;
+  /** Filter by the object’s `targetFunctionId` field. */
+  targetFunctionId?: UUIDFilter;
+  /** Filter by the object’s `targetSiteId` field. */
+  targetSiteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiModuleFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformApiModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiModuleFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiSchemaFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiSchemaFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformApiSchemaFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiSchemaFilter[];
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformDomainEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformDomainEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformDomainEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: PlatformDomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `domainVerification` relation. */
+  domainVerification?: PlatformDomainVerificationFilter;
+  /** A related `domainVerification` exists. */
+  domainVerificationExists?: boolean;
+  /** Filter by the object’s `domainVerificationId` field. */
+  domainVerificationId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: PlatformManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformDomainEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDomainEventFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformDomainVerification` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformDomainVerificationFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformDomainVerificationFilter[];
+  /** Filter by the object’s `attempts` field. */
+  attempts?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: PlatformDomainFilter;
+  /** A related `domain` exists. */
+  domainExists?: boolean;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastCheckedAt` field. */
+  lastCheckedAt?: DatetimeFilter;
+  /** Filter by the object’s `managedDomain` relation. */
+  managedDomain?: PlatformManagedDomainFilter;
+  /** A related `managedDomain` exists. */
+  managedDomainExists?: boolean;
+  /** Filter by the object’s `managedDomainId` field. */
+  managedDomainId?: UUIDFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformDomainVerificationFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDomainVerificationFilter[];
+  /** Filter by the object’s `recordName` field. */
+  recordName?: StringFilter;
+  /** Filter by the object’s `recordType` field. */
+  recordType?: StringFilter;
+  /** Filter by the object’s `recordValue` field. */
+  recordValue?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformSiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteMetadatumFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteMetadatumFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteMetadatumFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteMetadatumFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformSiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteModuleFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteModuleFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformSiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteThemeFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteThemeFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteThemeFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteThemeFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: PlatformSiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
+  theme?: JSONFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteMetadatumFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteMetadatumFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: SiteMetadatumFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteMetadatumFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteModuleFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: SiteModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteModuleFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteThemeFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteThemeFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: SiteThemeFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteThemeFilter[];
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
+  theme?: JSONFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: ApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: ApiToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `apiSetting` relation. */
+  apiSetting?: ApiSettingFilter;
+  /** A related `apiSetting` exists. */
+  apiSettingExists?: boolean;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `corsSettings` relation. */
+  corsSettings?: ApiToManyCorsSettingFilter;
+  /** `corsSettings` exist. */
+  corsSettingsExist?: boolean;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: ApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: ApiFilter[];
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -11004,200 +12218,30 @@ export interface UUIDFilter {
   /** Not included in the specified list. */
   notIn?: string[];
 }
-/** A filter to be used against `Database` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseFilter {
-  /** Checks for all expressions in this list. */
-  and?: DatabaseFilter[];
-  /** Filter by the object’s `apiModules` relation. */
-  apiModules?: DatabaseToManyApiModuleFilter;
-  /** `apiModules` exist. */
-  apiModulesExist?: boolean;
-  /** Filter by the object’s `apiSchemas` relation. */
-  apiSchemas?: DatabaseToManyApiSchemaFilter;
-  /** `apiSchemas` exist. */
-  apiSchemasExist?: boolean;
-  /** Filter by the object’s `apiSettings` relation. */
-  apiSettings?: DatabaseToManyApiSettingFilter;
-  /** `apiSettings` exist. */
-  apiSettingsExist?: boolean;
-  /** Filter by the object’s `apis` relation. */
-  apis?: DatabaseToManyApiFilter;
-  /** `apis` exist. */
-  apisExist?: boolean;
-  /** Filter by the object’s `apps` relation. */
-  apps?: DatabaseToManyAppFilter;
-  /** `apps` exist. */
-  appsExist?: boolean;
-  /** Filter by the object’s `checkConstraints` relation. */
-  checkConstraints?: DatabaseToManyCheckConstraintFilter;
-  /** `checkConstraints` exist. */
-  checkConstraintsExist?: boolean;
-  /** Filter by the object’s `compositeTypes` relation. */
-  compositeTypes?: DatabaseToManyCompositeTypeFilter;
-  /** `compositeTypes` exist. */
-  compositeTypesExist?: boolean;
-  /** Filter by the object’s `corsSettings` relation. */
-  corsSettings?: DatabaseToManyCorsSettingFilter;
-  /** `corsSettings` exist. */
-  corsSettingsExist?: boolean;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseSetting` relation. */
-  databaseSetting?: DatabaseSettingFilter;
-  /** A related `databaseSetting` exists. */
-  databaseSettingExists?: boolean;
-  /** Filter by the object’s `databaseTransfers` relation. */
-  databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
-  /** `databaseTransfers` exist. */
-  databaseTransfersExist?: boolean;
-  /** Filter by the object’s `defaultPrivileges` relation. */
-  defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
-  /** `defaultPrivileges` exist. */
-  defaultPrivilegesExist?: boolean;
-  /** Filter by the object’s `domains` relation. */
-  domains?: DatabaseToManyDomainFilter;
-  /** `domains` exist. */
-  domainsExist?: boolean;
-  /** Filter by the object’s `embeddingChunks` relation. */
-  embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
-  /** `embeddingChunks` exist. */
-  embeddingChunksExist?: boolean;
-  /** Filter by the object’s `enums` relation. */
-  enums?: DatabaseToManyEnumFilter;
-  /** `enums` exist. */
-  enumsExist?: boolean;
-  /** Filter by the object’s `fields` relation. */
-  fields?: DatabaseToManyFieldFilter;
-  /** `fields` exist. */
-  fieldsExist?: boolean;
-  /** Filter by the object’s `foreignKeyConstraints` relation. */
-  foreignKeyConstraints?: DatabaseToManyForeignKeyConstraintFilter;
-  /** `foreignKeyConstraints` exist. */
-  foreignKeyConstraintsExist?: boolean;
-  /** Filter by the object’s `fullTextSearches` relation. */
-  fullTextSearches?: DatabaseToManyFullTextSearchFilter;
-  /** `fullTextSearches` exist. */
-  fullTextSearchesExist?: boolean;
-  /** Filter by the object’s `functions` relation. */
-  functions?: DatabaseToManyFunctionFilter;
-  /** `functions` exist. */
-  functionsExist?: boolean;
-  /** Filter by the object’s `hash` field. */
-  hash?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `indices` relation. */
-  indices?: DatabaseToManyIndexFilter;
-  /** `indices` exist. */
-  indicesExist?: boolean;
-  /** Filter by the object’s `label` field. */
-  label?: StringFilter;
-  /** Filter by the object’s `managedDomains` relation. */
-  managedDomains?: DatabaseToManyManagedDomainFilter;
-  /** `managedDomains` exist. */
-  managedDomainsExist?: boolean;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: DatabaseFilter;
-  /** Checks for any expressions in this list. */
-  or?: DatabaseFilter[];
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `partitions` relation. */
-  partitions?: DatabaseToManyPartitionFilter;
-  /** `partitions` exist. */
-  partitionsExist?: boolean;
-  /** Filter by the object’s `platform` field. */
-  platform?: BooleanFilter;
-  /** Filter by the object’s `policies` relation. */
-  policies?: DatabaseToManyPolicyFilter;
-  /** `policies` exist. */
-  policiesExist?: boolean;
-  /** Filter by the object’s `primaryKeyConstraints` relation. */
-  primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
-  /** `primaryKeyConstraints` exist. */
-  primaryKeyConstraintsExist?: boolean;
-  /** Filter by the object’s `pubkeySetting` relation. */
-  pubkeySetting?: PubkeySettingFilter;
-  /** A related `pubkeySetting` exists. */
-  pubkeySettingExists?: boolean;
-  /** Filter by the object’s `rlsSetting` relation. */
-  rlsSetting?: RlsSettingFilter;
-  /** A related `rlsSetting` exists. */
-  rlsSettingExists?: boolean;
-  /** Filter by the object’s `schemaGrants` relation. */
-  schemaGrants?: DatabaseToManySchemaGrantFilter;
-  /** `schemaGrants` exist. */
-  schemaGrantsExist?: boolean;
-  /** Filter by the object’s `schemaHash` field. */
-  schemaHash?: StringFilter;
-  /** Filter by the object’s `schemas` relation. */
-  schemas?: DatabaseToManySchemaFilter;
-  /** `schemas` exist. */
-  schemasExist?: boolean;
-  /** Filter by the object’s `siteMetadata` relation. */
-  siteMetadata?: DatabaseToManySiteMetadatumFilter;
-  /** `siteMetadata` exist. */
-  siteMetadataExist?: boolean;
-  /** Filter by the object’s `siteModules` relation. */
-  siteModules?: DatabaseToManySiteModuleFilter;
-  /** `siteModules` exist. */
-  siteModulesExist?: boolean;
-  /** Filter by the object’s `siteThemes` relation. */
-  siteThemes?: DatabaseToManySiteThemeFilter;
-  /** `siteThemes` exist. */
-  siteThemesExist?: boolean;
-  /** Filter by the object’s `sites` relation. */
-  sites?: DatabaseToManySiteFilter;
-  /** `sites` exist. */
-  sitesExist?: boolean;
-  /** Filter by the object’s `spatialRelations` relation. */
-  spatialRelations?: DatabaseToManySpatialRelationFilter;
-  /** `spatialRelations` exist. */
-  spatialRelationsExist?: boolean;
-  /** Filter by the object’s `tableGrants` relation. */
-  tableGrants?: DatabaseToManyTableGrantFilter;
-  /** `tableGrants` exist. */
-  tableGrantsExist?: boolean;
-  /** Filter by the object’s `tables` relation. */
-  tables?: DatabaseToManyTableFilter;
-  /** `tables` exist. */
-  tablesExist?: boolean;
-  /** Filter by the object’s `triggerFunctions` relation. */
-  triggerFunctions?: DatabaseToManyTriggerFunctionFilter;
-  /** `triggerFunctions` exist. */
-  triggerFunctionsExist?: boolean;
-  /** Filter by the object’s `triggers` relation. */
-  triggers?: DatabaseToManyTriggerFilter;
-  /** `triggers` exist. */
-  triggersExist?: boolean;
-  /** Filter by the object’s `uniqueConstraints` relation. */
-  uniqueConstraints?: DatabaseToManyUniqueConstraintFilter;
-  /** `uniqueConstraints` exist. */
-  uniqueConstraintsExist?: boolean;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `viewGrants` relation. */
-  viewGrants?: DatabaseToManyViewGrantFilter;
-  /** `viewGrants` exist. */
-  viewGrantsExist?: boolean;
-  /** Filter by the object’s `viewRules` relation. */
-  viewRules?: DatabaseToManyViewRuleFilter;
-  /** `viewRules` exist. */
-  viewRulesExist?: boolean;
-  /** Filter by the object’s `viewTables` relation. */
-  viewTables?: DatabaseToManyViewTableFilter;
-  /** `viewTables` exist. */
-  viewTablesExist?: boolean;
-  /** Filter by the object’s `views` relation. */
-  views?: DatabaseToManyViewFilter;
-  /** `views` exist. */
-  viewsExist?: boolean;
-  /** Filter by the object’s `webauthnSetting` relation. */
-  webauthnSetting?: WebauthnSettingFilter;
-  /** A related `webauthnSetting` exists. */
-  webauthnSettingExists?: boolean;
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
 }
 /** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
 export interface StringFilter {
@@ -11315,6 +12359,141 @@ export interface StringListFilter {
   /** Overlaps the specified list of values. */
   overlaps?: string[];
 }
+/** A filter to be used against `Database` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFilter[];
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: DatabaseToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: DatabaseToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseTransfers` relation. */
+  databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
+  /** `databaseTransfers` exist. */
+  databaseTransfersExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: DatabaseToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `exclusionConstraints` relation. */
+  exclusionConstraints?: DatabaseToManyExclusionConstraintFilter;
+  /** `exclusionConstraints` exist. */
+  exclusionConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: DatabaseToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: DatabaseToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: DatabaseToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `functions` relation. */
+  functions?: DatabaseToManyFunctionFilter;
+  /** `functions` exist. */
+  functionsExist?: boolean;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `indices` relation. */
+  indices?: DatabaseToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: DatabaseFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `partitions` relation. */
+  partitions?: DatabaseToManyPartitionFilter;
+  /** `partitions` exist. */
+  partitionsExist?: boolean;
+  /** Filter by the object’s `platform` field. */
+  platform?: BooleanFilter;
+  /** Filter by the object’s `policies` relation. */
+  policies?: DatabaseToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: DatabaseToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `schemaHash` field. */
+  schemaHash?: StringFilter;
+  /** Filter by the object’s `schemas` relation. */
+  schemas?: DatabaseToManySchemaFilter;
+  /** `schemas` exist. */
+  schemasExist?: boolean;
+  /** Filter by the object’s `spatialRelations` relation. */
+  spatialRelations?: DatabaseToManySpatialRelationFilter;
+  /** `spatialRelations` exist. */
+  spatialRelationsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: DatabaseToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `tables` relation. */
+  tables?: DatabaseToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `triggerFunctions` relation. */
+  triggerFunctions?: DatabaseToManyTriggerFunctionFilter;
+  /** `triggerFunctions` exist. */
+  triggerFunctionsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: DatabaseToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: DatabaseToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: DatabaseToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: DatabaseToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: DatabaseToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: DatabaseToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+}
 /** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
 export interface JSONFilter {
   /** Contained by the specified JSON. */
@@ -11349,56 +12528,6 @@ export interface JSONFilter {
   notEqualTo?: Record<string, unknown>;
   /** Not included in the specified list. */
   notIn?: Record<string, unknown>[];
-}
-/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
-export interface BooleanFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: boolean;
-  /** Greater than the specified value. */
-  greaterThan?: boolean;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: boolean;
-  /** Included in the specified list. */
-  in?: boolean[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: boolean;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: boolean;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: boolean;
-  /** Not equal to the specified value. */
-  notEqualTo?: boolean;
-  /** Not included in the specified list. */
-  notIn?: boolean[];
-}
-/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
-export interface DatetimeFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not included in the specified list. */
-  notIn?: string[];
 }
 /** A filter to be used against UUID List fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDListFilter {
@@ -11438,6 +12567,31 @@ export interface UUIDListFilter {
   notEqualTo?: string[];
   /** Overlaps the specified list of values. */
   overlaps?: string[];
+}
+/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
+export interface BooleanFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: boolean;
+  /** Greater than the specified value. */
+  greaterThan?: boolean;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: boolean;
+  /** Included in the specified list. */
+  in?: boolean[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: boolean;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: boolean;
+  /** Not equal to the specified value. */
+  notEqualTo?: boolean;
+  /** Not included in the specified list. */
+  notIn?: boolean[];
 }
 /** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
 export interface IntFilter {
@@ -11489,14 +12643,319 @@ export interface FloatFilter {
   /** Not included in the specified list. */
   notIn?: number[];
 }
-/** A filter to be used against `DatabaseSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseSettingFilter {
+/** A filter to be used against `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainFilter {
   /** Checks for all expressions in this list. */
-  and?: DatabaseSettingFilter[];
+  and?: DomainFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: DomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: DomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
+  /** Filter by the object’s `hostname` field. */
+  hostname?: StringFilter;
+  /** Filter by the object’s `httpRoutes` relation. */
+  httpRoutes?: DomainToManyHttpRouteFilter;
+  /** `httpRoutes` exist. */
+  httpRoutesExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Filter by the object’s `managed` field. */
+  managed?: BooleanFilter;
+  /** Negates the expression. */
+  not?: DomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainFilter[];
+  /** Filter by the object’s `parentHostname` field. */
+  parentHostname?: StringFilter;
+  /** Filter by the object’s `routes` relation. */
+  routes?: DomainToManyRouteFilter;
+  /** `routes` exist. */
+  routesExist?: boolean;
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsSecretName` field. */
+  tlsSecretName?: StringFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+/** A filter to be used against `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ManagedDomainFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: StringFilter;
+  /** Filter by the object’s `domainEvents` relation. */
+  domainEvents?: ManagedDomainToManyDomainEventFilter;
+  /** `domainEvents` exist. */
+  domainEventsExist?: boolean;
+  /** Filter by the object’s `domainVerifications` relation. */
+  domainVerifications?: ManagedDomainToManyDomainVerificationFilter;
+  /** `domainVerifications` exist. */
+  domainVerificationsExist?: boolean;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Negates the expression. */
+  not?: ManagedDomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: ManagedDomainFilter[];
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformApi` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformApiFilter[];
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformApiFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformApiFilter[];
+  /** Filter by the object’s `platformApiModulesByApiId` relation. */
+  platformApiModulesByApiId?: PlatformApiToManyPlatformApiModuleFilter;
+  /** `platformApiModulesByApiId` exist. */
+  platformApiModulesByApiIdExist?: boolean;
+  /** Filter by the object’s `platformApiSchemasByApiId` relation. */
+  platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
+  /** `platformApiSchemasByApiId` exist. */
+  platformApiSchemasByApiIdExist?: boolean;
+  /** Filter by the object’s `platformApiSettingByApiId` relation. */
+  platformApiSettingByApiId?: PlatformApiSettingFilter;
+  /** A related `platformApiSettingByApiId` exists. */
+  platformApiSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `platformCorsSettingByApiId` relation. */
+  platformCorsSettingByApiId?: PlatformCorsSettingFilter;
+  /** A related `platformCorsSettingByApiId` exists. */
+  platformCorsSettingByApiIdExists?: boolean;
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformDomain` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformDomainFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformDomainFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `hostname` field. */
+  hostname?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Filter by the object’s `managed` field. */
+  managed?: BooleanFilter;
+  /** Negates the expression. */
+  not?: PlatformDomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformDomainFilter[];
+  /** Filter by the object’s `parentHostname` field. */
+  parentHostname?: StringFilter;
+  /** Filter by the object’s `platformDomainEventsByDomainId` relation. */
+  platformDomainEventsByDomainId?: PlatformDomainToManyPlatformDomainEventFilter;
+  /** `platformDomainEventsByDomainId` exist. */
+  platformDomainEventsByDomainIdExist?: boolean;
+  /** Filter by the object’s `platformDomainVerificationsByDomainId` relation. */
+  platformDomainVerificationsByDomainId?: PlatformDomainToManyPlatformDomainVerificationFilter;
+  /** `platformDomainVerificationsByDomainId` exist. */
+  platformDomainVerificationsByDomainIdExist?: boolean;
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsSecretName` field. */
+  tlsSecretName?: StringFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformManagedDomain` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformManagedDomainFilter {
+  /** Filter by the object’s `allowPublicUsage` field. */
+  allowPublicUsage?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformManagedDomainFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `certStatus` field. */
+  certStatus?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
+  /** Negates the expression. */
+  not?: PlatformManagedDomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformManagedDomainFilter[];
+  /** Filter by the object’s `platformDomainEventsByManagedDomainId` relation. */
+  platformDomainEventsByManagedDomainId?: PlatformManagedDomainToManyPlatformDomainEventFilter;
+  /** `platformDomainEventsByManagedDomainId` exist. */
+  platformDomainEventsByManagedDomainIdExist?: boolean;
+  /** Filter by the object’s `platformDomainVerificationsByManagedDomainId` relation. */
+  platformDomainVerificationsByManagedDomainId?: PlatformManagedDomainToManyPlatformDomainVerificationFilter;
+  /** `platformDomainVerificationsByManagedDomainId` exist. */
+  platformDomainVerificationsByManagedDomainIdExist?: boolean;
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
+}
+/** A filter to be used against `PlatformSite` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformSiteFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformSiteFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformSiteFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformSiteFilter[];
+  /** Filter by the object’s `platformSiteMetadataBySiteId` relation. */
+  platformSiteMetadataBySiteId?: PlatformSiteToManyPlatformSiteMetadatumFilter;
+  /** `platformSiteMetadataBySiteId` exist. */
+  platformSiteMetadataBySiteIdExist?: boolean;
+  /** Filter by the object’s `platformSiteModulesBySiteId` relation. */
+  platformSiteModulesBySiteId?: PlatformSiteToManyPlatformSiteModuleFilter;
+  /** `platformSiteModulesBySiteId` exist. */
+  platformSiteModulesBySiteIdExist?: boolean;
+  /** Filter by the object’s `platformSiteThemesBySiteId` relation. */
+  platformSiteThemesBySiteId?: PlatformSiteToManyPlatformSiteThemeFilter;
+  /** `platformSiteThemesBySiteId` exist. */
+  platformSiteThemesBySiteIdExist?: boolean;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `Site` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isPublished` field. */
+  isPublished?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: SiteFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteFilter[];
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: SiteToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: SiteToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: SiteToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `ApiSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiSettingFilter {
+  /** Checks for all expressions in this list. */
+  and?: ApiSettingFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `enableAggregates` field. */
@@ -11525,234 +12984,82 @@ export interface DatabaseSettingFilter {
   enableSearch?: BooleanFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `labels` field. */
-  labels?: JSONFilter;
   /** Negates the expression. */
-  not?: DatabaseSettingFilter;
+  not?: ApiSettingFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
   /** Checks for any expressions in this list. */
-  or?: DatabaseSettingFilter[];
+  or?: ApiSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
-/** A filter to be used against `PubkeySetting` object types. All fields are combined with a logical ‘and.’ */
-export interface PubkeySettingFilter {
+/** A filter to be used against `PlatformApiSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformApiSettingFilter {
   /** Checks for all expressions in this list. */
-  and?: PubkeySettingFilter[];
-  /** Filter by the object’s `cryptoNetwork` field. */
-  cryptoNetwork?: StringFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
+  and?: PlatformApiSettingFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `enableAggregates` field. */
+  enableAggregates?: BooleanFilter;
+  /** Filter by the object’s `enableBulk` field. */
+  enableBulk?: BooleanFilter;
+  /** Filter by the object’s `enableConnectionFilter` field. */
+  enableConnectionFilter?: BooleanFilter;
+  /** Filter by the object’s `enableDirectUploads` field. */
+  enableDirectUploads?: BooleanFilter;
+  /** Filter by the object’s `enableI18N` field. */
+  enableI18N?: BooleanFilter;
+  /** Filter by the object’s `enableLlm` field. */
+  enableLlm?: BooleanFilter;
+  /** Filter by the object’s `enableLtree` field. */
+  enableLtree?: BooleanFilter;
+  /** Filter by the object’s `enableManyToMany` field. */
+  enableManyToMany?: BooleanFilter;
+  /** Filter by the object’s `enablePostgis` field. */
+  enablePostgis?: BooleanFilter;
+  /** Filter by the object’s `enablePresignedUploads` field. */
+  enablePresignedUploads?: BooleanFilter;
+  /** Filter by the object’s `enableRealtime` field. */
+  enableRealtime?: BooleanFilter;
+  /** Filter by the object’s `enableSearch` field. */
+  enableSearch?: BooleanFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
-  not?: PubkeySettingFilter;
+  not?: PlatformApiSettingFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
   /** Checks for any expressions in this list. */
-  or?: PubkeySettingFilter[];
-  /** Filter by the object’s `schema` relation. */
-  schema?: SchemaFilter;
-  /** A related `schema` exists. */
-  schemaExists?: boolean;
-  /** Filter by the object’s `schemaId` field. */
-  schemaId?: UUIDFilter;
-  /** Filter by the object’s `signInRecordFailureFunction` relation. */
-  signInRecordFailureFunction?: FunctionFilter;
-  /** A related `signInRecordFailureFunction` exists. */
-  signInRecordFailureFunctionExists?: boolean;
-  /** Filter by the object’s `signInRecordFailureFunctionId` field. */
-  signInRecordFailureFunctionId?: UUIDFilter;
-  /** Filter by the object’s `signInRequestChallengeFunction` relation. */
-  signInRequestChallengeFunction?: FunctionFilter;
-  /** A related `signInRequestChallengeFunction` exists. */
-  signInRequestChallengeFunctionExists?: boolean;
-  /** Filter by the object’s `signInRequestChallengeFunctionId` field. */
-  signInRequestChallengeFunctionId?: UUIDFilter;
-  /** Filter by the object’s `signInWithChallengeFunction` relation. */
-  signInWithChallengeFunction?: FunctionFilter;
-  /** A related `signInWithChallengeFunction` exists. */
-  signInWithChallengeFunctionExists?: boolean;
-  /** Filter by the object’s `signInWithChallengeFunctionId` field. */
-  signInWithChallengeFunctionId?: UUIDFilter;
-  /** Filter by the object’s `signUpWithKeyFunction` relation. */
-  signUpWithKeyFunction?: FunctionFilter;
-  /** A related `signUpWithKeyFunction` exists. */
-  signUpWithKeyFunctionExists?: boolean;
-  /** Filter by the object’s `signUpWithKeyFunctionId` field. */
-  signUpWithKeyFunctionId?: UUIDFilter;
-  /** Filter by the object’s `userField` field. */
-  userField?: StringFilter;
+  or?: PlatformApiSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
-/** A filter to be used against `RlsSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface RlsSettingFilter {
+/** A filter to be used against `PlatformCorsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformCorsSettingFilter {
+  /** Filter by the object’s `allowedOrigins` field. */
+  allowedOrigins?: StringListFilter;
   /** Checks for all expressions in this list. */
-  and?: RlsSettingFilter[];
-  /** Filter by the object’s `authenticateFunction` relation. */
-  authenticateFunction?: FunctionFilter;
-  /** A related `authenticateFunction` exists. */
-  authenticateFunctionExists?: boolean;
-  /** Filter by the object’s `authenticateFunctionId` field. */
-  authenticateFunctionId?: UUIDFilter;
-  /** Filter by the object’s `authenticateSchema` relation. */
-  authenticateSchema?: SchemaFilter;
-  /** A related `authenticateSchema` exists. */
-  authenticateSchemaExists?: boolean;
-  /** Filter by the object’s `authenticateSchemaId` field. */
-  authenticateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `authenticateStrictFunction` relation. */
-  authenticateStrictFunction?: FunctionFilter;
-  /** A related `authenticateStrictFunction` exists. */
-  authenticateStrictFunctionExists?: boolean;
-  /** Filter by the object’s `authenticateStrictFunctionId` field. */
-  authenticateStrictFunctionId?: UUIDFilter;
-  /** Filter by the object’s `currentIpAddressFunction` relation. */
-  currentIpAddressFunction?: FunctionFilter;
-  /** A related `currentIpAddressFunction` exists. */
-  currentIpAddressFunctionExists?: boolean;
-  /** Filter by the object’s `currentIpAddressFunctionId` field. */
-  currentIpAddressFunctionId?: UUIDFilter;
-  /** Filter by the object’s `currentRoleFunction` relation. */
-  currentRoleFunction?: FunctionFilter;
-  /** A related `currentRoleFunction` exists. */
-  currentRoleFunctionExists?: boolean;
-  /** Filter by the object’s `currentRoleFunctionId` field. */
-  currentRoleFunctionId?: UUIDFilter;
-  /** Filter by the object’s `currentRoleIdFunction` relation. */
-  currentRoleIdFunction?: FunctionFilter;
-  /** A related `currentRoleIdFunction` exists. */
-  currentRoleIdFunctionExists?: boolean;
-  /** Filter by the object’s `currentRoleIdFunctionId` field. */
-  currentRoleIdFunctionId?: UUIDFilter;
-  /** Filter by the object’s `currentUserAgentFunction` relation. */
-  currentUserAgentFunction?: FunctionFilter;
-  /** A related `currentUserAgentFunction` exists. */
-  currentUserAgentFunctionExists?: boolean;
-  /** Filter by the object’s `currentUserAgentFunctionId` field. */
-  currentUserAgentFunctionId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
+  and?: PlatformCorsSettingFilter[];
+  /** Filter by the object’s `api` relation. */
+  api?: PlatformApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
-  not?: RlsSettingFilter;
+  not?: PlatformCorsSettingFilter;
   /** Checks for any expressions in this list. */
-  or?: RlsSettingFilter[];
-  /** Filter by the object’s `roleSchema` relation. */
-  roleSchema?: SchemaFilter;
-  /** A related `roleSchema` exists. */
-  roleSchemaExists?: boolean;
-  /** Filter by the object’s `roleSchemaId` field. */
-  roleSchemaId?: UUIDFilter;
-}
-/** A filter to be used against `WebauthnSetting` object types. All fields are combined with a logical ‘and.’ */
-export interface WebauthnSettingFilter {
-  /** Checks for all expressions in this list. */
-  and?: WebauthnSettingFilter[];
-  /** Filter by the object’s `attestationType` field. */
-  attestationType?: StringFilter;
-  /** Filter by the object’s `challengeExpirySeconds` field. */
-  challengeExpirySeconds?: BigIntFilter;
-  /** Filter by the object’s `credentialsSchema` relation. */
-  credentialsSchema?: SchemaFilter;
-  /** A related `credentialsSchema` exists. */
-  credentialsSchemaExists?: boolean;
-  /** Filter by the object’s `credentialsSchemaId` field. */
-  credentialsSchemaId?: UUIDFilter;
-  /** Filter by the object’s `credentialsTable` relation. */
-  credentialsTable?: TableFilter;
-  /** A related `credentialsTable` exists. */
-  credentialsTableExists?: boolean;
-  /** Filter by the object’s `credentialsTableId` field. */
-  credentialsTableId?: UUIDFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Negates the expression. */
-  not?: WebauthnSettingFilter;
-  /** Checks for any expressions in this list. */
-  or?: WebauthnSettingFilter[];
-  /** Filter by the object’s `originAllowlist` field. */
-  originAllowlist?: StringListFilter;
-  /** Filter by the object’s `requireUserVerification` field. */
-  requireUserVerification?: BooleanFilter;
-  /** Filter by the object’s `residentKey` field. */
-  residentKey?: StringFilter;
-  /** Filter by the object’s `rpId` field. */
-  rpId?: StringFilter;
-  /** Filter by the object’s `rpName` field. */
-  rpName?: StringFilter;
-  /** Filter by the object’s `schema` relation. */
-  schema?: SchemaFilter;
-  /** A related `schema` exists. */
-  schemaExists?: boolean;
-  /** Filter by the object’s `schemaId` field. */
-  schemaId?: UUIDFilter;
-  /** Filter by the object’s `sessionCredentialsTable` relation. */
-  sessionCredentialsTable?: TableFilter;
-  /** A related `sessionCredentialsTable` exists. */
-  sessionCredentialsTableExists?: boolean;
-  /** Filter by the object’s `sessionCredentialsTableId` field. */
-  sessionCredentialsTableId?: UUIDFilter;
-  /** Filter by the object’s `sessionSecretsSchema` relation. */
-  sessionSecretsSchema?: SchemaFilter;
-  /** A related `sessionSecretsSchema` exists. */
-  sessionSecretsSchemaExists?: boolean;
-  /** Filter by the object’s `sessionSecretsSchemaId` field. */
-  sessionSecretsSchemaId?: UUIDFilter;
-  /** Filter by the object’s `sessionSecretsTable` relation. */
-  sessionSecretsTable?: TableFilter;
-  /** A related `sessionSecretsTable` exists. */
-  sessionSecretsTableExists?: boolean;
-  /** Filter by the object’s `sessionSecretsTableId` field. */
-  sessionSecretsTableId?: UUIDFilter;
-  /** Filter by the object’s `sessionsSchema` relation. */
-  sessionsSchema?: SchemaFilter;
-  /** A related `sessionsSchema` exists. */
-  sessionsSchemaExists?: boolean;
-  /** Filter by the object’s `sessionsSchemaId` field. */
-  sessionsSchemaId?: UUIDFilter;
-  /** Filter by the object’s `sessionsTable` relation. */
-  sessionsTable?: TableFilter;
-  /** A related `sessionsTable` exists. */
-  sessionsTableExists?: boolean;
-  /** Filter by the object’s `sessionsTableId` field. */
-  sessionsTableId?: UUIDFilter;
-  /** Filter by the object’s `userField` relation. */
-  userField?: FieldFilter;
-  /** A related `userField` exists. */
-  userFieldExists?: boolean;
-  /** Filter by the object’s `userFieldId` field. */
-  userFieldId?: UUIDFilter;
-}
-/** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
-export interface BigIntFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not included in the specified list. */
-  notIn?: string[];
+  or?: PlatformCorsSettingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ResolveHttpRouteRecord {
@@ -11772,6 +13079,42 @@ export type ResolveHttpRouteRecordSelect = {
   routeId?: boolean;
   targetId?: boolean;
   targetKind?: boolean;
+};
+export interface ResolveRouteRecord {
+  domainId?: string | null;
+  hostname?: string | null;
+  matchedPath?: string | null;
+  matchedWildcard?: boolean | null;
+  method?: string | null;
+  priority?: number | null;
+  resolvedConfig?: Record<string, unknown> | null;
+  routeBindingId?: string | null;
+  targetCatalogId?: string | null;
+  targetModule?: string | null;
+  targetOwnerKey?: string | null;
+  targetOwnerScope?: string | null;
+  targetSourceId?: string | null;
+  tlsSecretName?: string | null;
+  tlsStatus?: string | null;
+  verificationStatus?: string | null;
+}
+export type ResolveRouteRecordSelect = {
+  domainId?: boolean;
+  hostname?: boolean;
+  matchedPath?: boolean;
+  matchedWildcard?: boolean;
+  method?: boolean;
+  priority?: boolean;
+  resolvedConfig?: boolean;
+  routeBindingId?: boolean;
+  targetCatalogId?: boolean;
+  targetModule?: boolean;
+  targetOwnerKey?: boolean;
+  targetOwnerScope?: boolean;
+  targetSourceId?: boolean;
+  tlsSecretName?: boolean;
+  tlsStatus?: boolean;
+  verificationStatus?: boolean;
 };
 export interface AcceptDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -12018,51 +13361,6 @@ export type DeleteApiSettingPayloadSelect = {
   };
   apiSettingEdge?: {
     select: ApiSettingEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface CreateAppPayload {
-  /** The `App` that was created by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
-  clientMutationId?: string | null;
-}
-export type CreateAppPayloadSelect = {
-  app?: {
-    select: AppSelect;
-  };
-  appEdge?: {
-    select: AppEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface UpdateAppPayload {
-  /** The `App` that was updated by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
-  clientMutationId?: string | null;
-}
-export type UpdateAppPayloadSelect = {
-  app?: {
-    select: AppSelect;
-  };
-  appEdge?: {
-    select: AppEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface DeleteAppPayload {
-  /** The `App` that was deleted by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
-  clientMutationId?: string | null;
-}
-export type DeleteAppPayloadSelect = {
-  app?: {
-    select: AppSelect;
-  };
-  appEdge?: {
-    select: AppEdgeSelect;
   };
   clientMutationId?: boolean;
 };
@@ -12426,6 +13724,96 @@ export type DeleteDomainPayloadSelect = {
     select: DomainEdgeSelect;
   };
 };
+export interface CreateDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was created by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type CreateDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface UpdateDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was updated by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type UpdateDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface DeleteDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `DomainEvent` that was deleted by this mutation. */
+  domainEvent?: DomainEvent | null;
+  domainEventEdge?: DomainEventEdge | null;
+}
+export type DeleteDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  domainEvent?: {
+    select: DomainEventSelect;
+  };
+  domainEventEdge?: {
+    select: DomainEventEdgeSelect;
+  };
+};
+export interface CreateDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was created by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type CreateDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
+export interface UpdateDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was updated by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type UpdateDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
+export interface DeleteDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `DomainVerification` that was deleted by this mutation. */
+  domainVerification?: DomainVerification | null;
+  domainVerificationEdge?: DomainVerificationEdge | null;
+}
+export type DeleteDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  domainVerification?: {
+    select: DomainVerificationSelect;
+  };
+  domainVerificationEdge?: {
+    select: DomainVerificationEdgeSelect;
+  };
+};
 export interface CreateEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was created by this mutation. */
@@ -12514,6 +13902,51 @@ export type DeleteEnumPayloadSelect = {
   };
   enumEdge?: {
     select: EnumEdgeSelect;
+  };
+};
+export interface CreateExclusionConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ExclusionConstraint` that was created by this mutation. */
+  exclusionConstraint?: ExclusionConstraint | null;
+  exclusionConstraintEdge?: ExclusionConstraintEdge | null;
+}
+export type CreateExclusionConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+  exclusionConstraint?: {
+    select: ExclusionConstraintSelect;
+  };
+  exclusionConstraintEdge?: {
+    select: ExclusionConstraintEdgeSelect;
+  };
+};
+export interface UpdateExclusionConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ExclusionConstraint` that was updated by this mutation. */
+  exclusionConstraint?: ExclusionConstraint | null;
+  exclusionConstraintEdge?: ExclusionConstraintEdge | null;
+}
+export type UpdateExclusionConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+  exclusionConstraint?: {
+    select: ExclusionConstraintSelect;
+  };
+  exclusionConstraintEdge?: {
+    select: ExclusionConstraintEdgeSelect;
+  };
+};
+export interface DeleteExclusionConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ExclusionConstraint` that was deleted by this mutation. */
+  exclusionConstraint?: ExclusionConstraint | null;
+  exclusionConstraintEdge?: ExclusionConstraintEdge | null;
+}
+export type DeleteExclusionConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+  exclusionConstraint?: {
+    select: ExclusionConstraintSelect;
+  };
+  exclusionConstraintEdge?: {
+    select: ExclusionConstraintEdgeSelect;
   };
 };
 export interface CreateFieldPayload {
@@ -12694,6 +14127,51 @@ export type DeleteFunctionPayloadSelect = {
   };
   functionEdge?: {
     select: FunctionEdgeSelect;
+  };
+};
+export interface CreateHostnameBindingPayload {
+  clientMutationId?: string | null;
+  /** The `HostnameBinding` that was created by this mutation. */
+  hostnameBinding?: HostnameBinding | null;
+  hostnameBindingEdge?: HostnameBindingEdge | null;
+}
+export type CreateHostnameBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  hostnameBinding?: {
+    select: HostnameBindingSelect;
+  };
+  hostnameBindingEdge?: {
+    select: HostnameBindingEdgeSelect;
+  };
+};
+export interface UpdateHostnameBindingPayload {
+  clientMutationId?: string | null;
+  /** The `HostnameBinding` that was updated by this mutation. */
+  hostnameBinding?: HostnameBinding | null;
+  hostnameBindingEdge?: HostnameBindingEdge | null;
+}
+export type UpdateHostnameBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  hostnameBinding?: {
+    select: HostnameBindingSelect;
+  };
+  hostnameBindingEdge?: {
+    select: HostnameBindingEdgeSelect;
+  };
+};
+export interface DeleteHostnameBindingPayload {
+  clientMutationId?: string | null;
+  /** The `HostnameBinding` that was deleted by this mutation. */
+  hostnameBinding?: HostnameBinding | null;
+  hostnameBindingEdge?: HostnameBindingEdge | null;
+}
+export type DeleteHostnameBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  hostnameBinding?: {
+    select: HostnameBindingSelect;
+  };
+  hostnameBindingEdge?: {
+    select: HostnameBindingEdgeSelect;
   };
 };
 export interface CreateHttpRoutePayload {
@@ -12921,6 +14399,591 @@ export type DeletePartitionPayloadSelect = {
     select: PartitionEdgeSelect;
   };
 };
+export interface CreatePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was created by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
+export type CreatePlatformApiPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApi?: {
+    select: PlatformApiSelect;
+  };
+  platformApiEdge?: {
+    select: PlatformApiEdgeSelect;
+  };
+};
+export interface UpdatePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was updated by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
+export type UpdatePlatformApiPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApi?: {
+    select: PlatformApiSelect;
+  };
+  platformApiEdge?: {
+    select: PlatformApiEdgeSelect;
+  };
+};
+export interface DeletePlatformApiPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApi` that was deleted by this mutation. */
+  platformApi?: PlatformApi | null;
+  platformApiEdge?: PlatformApiEdge | null;
+}
+export type DeletePlatformApiPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApi?: {
+    select: PlatformApiSelect;
+  };
+  platformApiEdge?: {
+    select: PlatformApiEdgeSelect;
+  };
+};
+export interface CreatePlatformApiModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiModule` that was created by this mutation. */
+  platformApiModule?: PlatformApiModule | null;
+  platformApiModuleEdge?: PlatformApiModuleEdge | null;
+}
+export type CreatePlatformApiModulePayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiModule?: {
+    select: PlatformApiModuleSelect;
+  };
+  platformApiModuleEdge?: {
+    select: PlatformApiModuleEdgeSelect;
+  };
+};
+export interface UpdatePlatformApiModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiModule` that was updated by this mutation. */
+  platformApiModule?: PlatformApiModule | null;
+  platformApiModuleEdge?: PlatformApiModuleEdge | null;
+}
+export type UpdatePlatformApiModulePayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiModule?: {
+    select: PlatformApiModuleSelect;
+  };
+  platformApiModuleEdge?: {
+    select: PlatformApiModuleEdgeSelect;
+  };
+};
+export interface DeletePlatformApiModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiModule` that was deleted by this mutation. */
+  platformApiModule?: PlatformApiModule | null;
+  platformApiModuleEdge?: PlatformApiModuleEdge | null;
+}
+export type DeletePlatformApiModulePayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiModule?: {
+    select: PlatformApiModuleSelect;
+  };
+  platformApiModuleEdge?: {
+    select: PlatformApiModuleEdgeSelect;
+  };
+};
+export interface CreatePlatformApiSchemaPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiSchema` that was created by this mutation. */
+  platformApiSchema?: PlatformApiSchema | null;
+  platformApiSchemaEdge?: PlatformApiSchemaEdge | null;
+}
+export type CreatePlatformApiSchemaPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiSchema?: {
+    select: PlatformApiSchemaSelect;
+  };
+  platformApiSchemaEdge?: {
+    select: PlatformApiSchemaEdgeSelect;
+  };
+};
+export interface UpdatePlatformApiSchemaPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiSchema` that was updated by this mutation. */
+  platformApiSchema?: PlatformApiSchema | null;
+  platformApiSchemaEdge?: PlatformApiSchemaEdge | null;
+}
+export type UpdatePlatformApiSchemaPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiSchema?: {
+    select: PlatformApiSchemaSelect;
+  };
+  platformApiSchemaEdge?: {
+    select: PlatformApiSchemaEdgeSelect;
+  };
+};
+export interface DeletePlatformApiSchemaPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiSchema` that was deleted by this mutation. */
+  platformApiSchema?: PlatformApiSchema | null;
+  platformApiSchemaEdge?: PlatformApiSchemaEdge | null;
+}
+export type DeletePlatformApiSchemaPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiSchema?: {
+    select: PlatformApiSchemaSelect;
+  };
+  platformApiSchemaEdge?: {
+    select: PlatformApiSchemaEdgeSelect;
+  };
+};
+export interface CreatePlatformApiSettingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiSetting` that was created by this mutation. */
+  platformApiSetting?: PlatformApiSetting | null;
+  platformApiSettingEdge?: PlatformApiSettingEdge | null;
+}
+export type CreatePlatformApiSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiSetting?: {
+    select: PlatformApiSettingSelect;
+  };
+  platformApiSettingEdge?: {
+    select: PlatformApiSettingEdgeSelect;
+  };
+};
+export interface UpdatePlatformApiSettingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiSetting` that was updated by this mutation. */
+  platformApiSetting?: PlatformApiSetting | null;
+  platformApiSettingEdge?: PlatformApiSettingEdge | null;
+}
+export type UpdatePlatformApiSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiSetting?: {
+    select: PlatformApiSettingSelect;
+  };
+  platformApiSettingEdge?: {
+    select: PlatformApiSettingEdgeSelect;
+  };
+};
+export interface DeletePlatformApiSettingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformApiSetting` that was deleted by this mutation. */
+  platformApiSetting?: PlatformApiSetting | null;
+  platformApiSettingEdge?: PlatformApiSettingEdge | null;
+}
+export type DeletePlatformApiSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformApiSetting?: {
+    select: PlatformApiSettingSelect;
+  };
+  platformApiSettingEdge?: {
+    select: PlatformApiSettingEdgeSelect;
+  };
+};
+export interface CreatePlatformCorsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformCorsSetting` that was created by this mutation. */
+  platformCorsSetting?: PlatformCorsSetting | null;
+  platformCorsSettingEdge?: PlatformCorsSettingEdge | null;
+}
+export type CreatePlatformCorsSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformCorsSetting?: {
+    select: PlatformCorsSettingSelect;
+  };
+  platformCorsSettingEdge?: {
+    select: PlatformCorsSettingEdgeSelect;
+  };
+};
+export interface UpdatePlatformCorsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformCorsSetting` that was updated by this mutation. */
+  platformCorsSetting?: PlatformCorsSetting | null;
+  platformCorsSettingEdge?: PlatformCorsSettingEdge | null;
+}
+export type UpdatePlatformCorsSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformCorsSetting?: {
+    select: PlatformCorsSettingSelect;
+  };
+  platformCorsSettingEdge?: {
+    select: PlatformCorsSettingEdgeSelect;
+  };
+};
+export interface DeletePlatformCorsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformCorsSetting` that was deleted by this mutation. */
+  platformCorsSetting?: PlatformCorsSetting | null;
+  platformCorsSettingEdge?: PlatformCorsSettingEdge | null;
+}
+export type DeletePlatformCorsSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformCorsSetting?: {
+    select: PlatformCorsSettingSelect;
+  };
+  platformCorsSettingEdge?: {
+    select: PlatformCorsSettingEdgeSelect;
+  };
+};
+export interface CreatePlatformDomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomain` that was created by this mutation. */
+  platformDomain?: PlatformDomain | null;
+  platformDomainEdge?: PlatformDomainEdge | null;
+}
+export type CreatePlatformDomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomain?: {
+    select: PlatformDomainSelect;
+  };
+  platformDomainEdge?: {
+    select: PlatformDomainEdgeSelect;
+  };
+};
+export interface UpdatePlatformDomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomain` that was updated by this mutation. */
+  platformDomain?: PlatformDomain | null;
+  platformDomainEdge?: PlatformDomainEdge | null;
+}
+export type UpdatePlatformDomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomain?: {
+    select: PlatformDomainSelect;
+  };
+  platformDomainEdge?: {
+    select: PlatformDomainEdgeSelect;
+  };
+};
+export interface DeletePlatformDomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomain` that was deleted by this mutation. */
+  platformDomain?: PlatformDomain | null;
+  platformDomainEdge?: PlatformDomainEdge | null;
+}
+export type DeletePlatformDomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomain?: {
+    select: PlatformDomainSelect;
+  };
+  platformDomainEdge?: {
+    select: PlatformDomainEdgeSelect;
+  };
+};
+export interface CreatePlatformDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomainEvent` that was created by this mutation. */
+  platformDomainEvent?: PlatformDomainEvent | null;
+  platformDomainEventEdge?: PlatformDomainEventEdge | null;
+}
+export type CreatePlatformDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomainEvent?: {
+    select: PlatformDomainEventSelect;
+  };
+  platformDomainEventEdge?: {
+    select: PlatformDomainEventEdgeSelect;
+  };
+};
+export interface UpdatePlatformDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomainEvent` that was updated by this mutation. */
+  platformDomainEvent?: PlatformDomainEvent | null;
+  platformDomainEventEdge?: PlatformDomainEventEdge | null;
+}
+export type UpdatePlatformDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomainEvent?: {
+    select: PlatformDomainEventSelect;
+  };
+  platformDomainEventEdge?: {
+    select: PlatformDomainEventEdgeSelect;
+  };
+};
+export interface DeletePlatformDomainEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomainEvent` that was deleted by this mutation. */
+  platformDomainEvent?: PlatformDomainEvent | null;
+  platformDomainEventEdge?: PlatformDomainEventEdge | null;
+}
+export type DeletePlatformDomainEventPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomainEvent?: {
+    select: PlatformDomainEventSelect;
+  };
+  platformDomainEventEdge?: {
+    select: PlatformDomainEventEdgeSelect;
+  };
+};
+export interface CreatePlatformDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomainVerification` that was created by this mutation. */
+  platformDomainVerification?: PlatformDomainVerification | null;
+  platformDomainVerificationEdge?: PlatformDomainVerificationEdge | null;
+}
+export type CreatePlatformDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomainVerification?: {
+    select: PlatformDomainVerificationSelect;
+  };
+  platformDomainVerificationEdge?: {
+    select: PlatformDomainVerificationEdgeSelect;
+  };
+};
+export interface UpdatePlatformDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomainVerification` that was updated by this mutation. */
+  platformDomainVerification?: PlatformDomainVerification | null;
+  platformDomainVerificationEdge?: PlatformDomainVerificationEdge | null;
+}
+export type UpdatePlatformDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomainVerification?: {
+    select: PlatformDomainVerificationSelect;
+  };
+  platformDomainVerificationEdge?: {
+    select: PlatformDomainVerificationEdgeSelect;
+  };
+};
+export interface DeletePlatformDomainVerificationPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformDomainVerification` that was deleted by this mutation. */
+  platformDomainVerification?: PlatformDomainVerification | null;
+  platformDomainVerificationEdge?: PlatformDomainVerificationEdge | null;
+}
+export type DeletePlatformDomainVerificationPayloadSelect = {
+  clientMutationId?: boolean;
+  platformDomainVerification?: {
+    select: PlatformDomainVerificationSelect;
+  };
+  platformDomainVerificationEdge?: {
+    select: PlatformDomainVerificationEdgeSelect;
+  };
+};
+export interface CreatePlatformManagedDomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformManagedDomain` that was created by this mutation. */
+  platformManagedDomain?: PlatformManagedDomain | null;
+  platformManagedDomainEdge?: PlatformManagedDomainEdge | null;
+}
+export type CreatePlatformManagedDomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformManagedDomain?: {
+    select: PlatformManagedDomainSelect;
+  };
+  platformManagedDomainEdge?: {
+    select: PlatformManagedDomainEdgeSelect;
+  };
+};
+export interface UpdatePlatformManagedDomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformManagedDomain` that was updated by this mutation. */
+  platformManagedDomain?: PlatformManagedDomain | null;
+  platformManagedDomainEdge?: PlatformManagedDomainEdge | null;
+}
+export type UpdatePlatformManagedDomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformManagedDomain?: {
+    select: PlatformManagedDomainSelect;
+  };
+  platformManagedDomainEdge?: {
+    select: PlatformManagedDomainEdgeSelect;
+  };
+};
+export interface DeletePlatformManagedDomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformManagedDomain` that was deleted by this mutation. */
+  platformManagedDomain?: PlatformManagedDomain | null;
+  platformManagedDomainEdge?: PlatformManagedDomainEdge | null;
+}
+export type DeletePlatformManagedDomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformManagedDomain?: {
+    select: PlatformManagedDomainSelect;
+  };
+  platformManagedDomainEdge?: {
+    select: PlatformManagedDomainEdgeSelect;
+  };
+};
+export interface CreatePlatformSitePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSite` that was created by this mutation. */
+  platformSite?: PlatformSite | null;
+  platformSiteEdge?: PlatformSiteEdge | null;
+}
+export type CreatePlatformSitePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSite?: {
+    select: PlatformSiteSelect;
+  };
+  platformSiteEdge?: {
+    select: PlatformSiteEdgeSelect;
+  };
+};
+export interface UpdatePlatformSitePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSite` that was updated by this mutation. */
+  platformSite?: PlatformSite | null;
+  platformSiteEdge?: PlatformSiteEdge | null;
+}
+export type UpdatePlatformSitePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSite?: {
+    select: PlatformSiteSelect;
+  };
+  platformSiteEdge?: {
+    select: PlatformSiteEdgeSelect;
+  };
+};
+export interface DeletePlatformSitePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSite` that was deleted by this mutation. */
+  platformSite?: PlatformSite | null;
+  platformSiteEdge?: PlatformSiteEdge | null;
+}
+export type DeletePlatformSitePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSite?: {
+    select: PlatformSiteSelect;
+  };
+  platformSiteEdge?: {
+    select: PlatformSiteEdgeSelect;
+  };
+};
+export interface CreatePlatformSiteMetadatumPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteMetadatum` that was created by this mutation. */
+  platformSiteMetadatum?: PlatformSiteMetadatum | null;
+  platformSiteMetadatumEdge?: PlatformSiteMetadatumEdge | null;
+}
+export type CreatePlatformSiteMetadatumPayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteMetadatum?: {
+    select: PlatformSiteMetadatumSelect;
+  };
+  platformSiteMetadatumEdge?: {
+    select: PlatformSiteMetadatumEdgeSelect;
+  };
+};
+export interface UpdatePlatformSiteMetadatumPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteMetadatum` that was updated by this mutation. */
+  platformSiteMetadatum?: PlatformSiteMetadatum | null;
+  platformSiteMetadatumEdge?: PlatformSiteMetadatumEdge | null;
+}
+export type UpdatePlatformSiteMetadatumPayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteMetadatum?: {
+    select: PlatformSiteMetadatumSelect;
+  };
+  platformSiteMetadatumEdge?: {
+    select: PlatformSiteMetadatumEdgeSelect;
+  };
+};
+export interface DeletePlatformSiteMetadatumPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteMetadatum` that was deleted by this mutation. */
+  platformSiteMetadatum?: PlatformSiteMetadatum | null;
+  platformSiteMetadatumEdge?: PlatformSiteMetadatumEdge | null;
+}
+export type DeletePlatformSiteMetadatumPayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteMetadatum?: {
+    select: PlatformSiteMetadatumSelect;
+  };
+  platformSiteMetadatumEdge?: {
+    select: PlatformSiteMetadatumEdgeSelect;
+  };
+};
+export interface CreatePlatformSiteModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteModule` that was created by this mutation. */
+  platformSiteModule?: PlatformSiteModule | null;
+  platformSiteModuleEdge?: PlatformSiteModuleEdge | null;
+}
+export type CreatePlatformSiteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteModule?: {
+    select: PlatformSiteModuleSelect;
+  };
+  platformSiteModuleEdge?: {
+    select: PlatformSiteModuleEdgeSelect;
+  };
+};
+export interface UpdatePlatformSiteModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteModule` that was updated by this mutation. */
+  platformSiteModule?: PlatformSiteModule | null;
+  platformSiteModuleEdge?: PlatformSiteModuleEdge | null;
+}
+export type UpdatePlatformSiteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteModule?: {
+    select: PlatformSiteModuleSelect;
+  };
+  platformSiteModuleEdge?: {
+    select: PlatformSiteModuleEdgeSelect;
+  };
+};
+export interface DeletePlatformSiteModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteModule` that was deleted by this mutation. */
+  platformSiteModule?: PlatformSiteModule | null;
+  platformSiteModuleEdge?: PlatformSiteModuleEdge | null;
+}
+export type DeletePlatformSiteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteModule?: {
+    select: PlatformSiteModuleSelect;
+  };
+  platformSiteModuleEdge?: {
+    select: PlatformSiteModuleEdgeSelect;
+  };
+};
+export interface CreatePlatformSiteThemePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteTheme` that was created by this mutation. */
+  platformSiteTheme?: PlatformSiteTheme | null;
+  platformSiteThemeEdge?: PlatformSiteThemeEdge | null;
+}
+export type CreatePlatformSiteThemePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteTheme?: {
+    select: PlatformSiteThemeSelect;
+  };
+  platformSiteThemeEdge?: {
+    select: PlatformSiteThemeEdgeSelect;
+  };
+};
+export interface UpdatePlatformSiteThemePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteTheme` that was updated by this mutation. */
+  platformSiteTheme?: PlatformSiteTheme | null;
+  platformSiteThemeEdge?: PlatformSiteThemeEdge | null;
+}
+export type UpdatePlatformSiteThemePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteTheme?: {
+    select: PlatformSiteThemeSelect;
+  };
+  platformSiteThemeEdge?: {
+    select: PlatformSiteThemeEdgeSelect;
+  };
+};
+export interface DeletePlatformSiteThemePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformSiteTheme` that was deleted by this mutation. */
+  platformSiteTheme?: PlatformSiteTheme | null;
+  platformSiteThemeEdge?: PlatformSiteThemeEdge | null;
+}
+export type DeletePlatformSiteThemePayloadSelect = {
+  clientMutationId?: boolean;
+  platformSiteTheme?: {
+    select: PlatformSiteThemeSelect;
+  };
+  platformSiteThemeEdge?: {
+    select: PlatformSiteThemeEdgeSelect;
+  };
+};
 export interface CreatePolicyPayload {
   clientMutationId?: string | null;
   /** The `Policy` that was created by this mutation. */
@@ -13099,6 +15162,96 @@ export type DeleteRlsSettingPayloadSelect = {
   };
   rlsSettingEdge?: {
     select: RlsSettingEdgeSelect;
+  };
+};
+export interface CreateRouteBindingPayload {
+  clientMutationId?: string | null;
+  /** The `RouteBinding` that was created by this mutation. */
+  routeBinding?: RouteBinding | null;
+  routeBindingEdge?: RouteBindingEdge | null;
+}
+export type CreateRouteBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  routeBinding?: {
+    select: RouteBindingSelect;
+  };
+  routeBindingEdge?: {
+    select: RouteBindingEdgeSelect;
+  };
+};
+export interface UpdateRouteBindingPayload {
+  clientMutationId?: string | null;
+  /** The `RouteBinding` that was updated by this mutation. */
+  routeBinding?: RouteBinding | null;
+  routeBindingEdge?: RouteBindingEdge | null;
+}
+export type UpdateRouteBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  routeBinding?: {
+    select: RouteBindingSelect;
+  };
+  routeBindingEdge?: {
+    select: RouteBindingEdgeSelect;
+  };
+};
+export interface DeleteRouteBindingPayload {
+  clientMutationId?: string | null;
+  /** The `RouteBinding` that was deleted by this mutation. */
+  routeBinding?: RouteBinding | null;
+  routeBindingEdge?: RouteBindingEdge | null;
+}
+export type DeleteRouteBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  routeBinding?: {
+    select: RouteBindingSelect;
+  };
+  routeBindingEdge?: {
+    select: RouteBindingEdgeSelect;
+  };
+};
+export interface CreateRoutePayload {
+  clientMutationId?: string | null;
+  /** The `Route` that was created by this mutation. */
+  route?: Route | null;
+  routeEdge?: RouteEdge | null;
+}
+export type CreateRoutePayloadSelect = {
+  clientMutationId?: boolean;
+  route?: {
+    select: RouteSelect;
+  };
+  routeEdge?: {
+    select: RouteEdgeSelect;
+  };
+};
+export interface UpdateRoutePayload {
+  clientMutationId?: string | null;
+  /** The `Route` that was updated by this mutation. */
+  route?: Route | null;
+  routeEdge?: RouteEdge | null;
+}
+export type UpdateRoutePayloadSelect = {
+  clientMutationId?: boolean;
+  route?: {
+    select: RouteSelect;
+  };
+  routeEdge?: {
+    select: RouteEdgeSelect;
+  };
+};
+export interface DeleteRoutePayload {
+  clientMutationId?: string | null;
+  /** The `Route` that was deleted by this mutation. */
+  route?: Route | null;
+  routeEdge?: RouteEdge | null;
+}
+export type DeleteRoutePayloadSelect = {
+  clientMutationId?: boolean;
+  route?: {
+    select: RouteSelect;
+  };
+  routeEdge?: {
+    select: RouteEdgeSelect;
   };
 };
 export interface CreateSchemaPayload {
@@ -13868,6 +16021,8 @@ export type DeleteWebauthnSettingPayloadSelect = {
 };
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
+  /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
+  async: boolean;
   /** Error message from the most recent failed bootstrap attempt */
   bootstrapError?: string | null;
   /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
@@ -13901,6 +16056,7 @@ export interface DatabaseProvisionModule {
   updatedAt: string;
 }
 export type DatabaseProvisionModuleSelect = {
+  async?: boolean;
   bootstrapError?: boolean;
   bootstrapStatus?: boolean;
   bootstrapUser?: boolean;
@@ -13966,18 +16122,6 @@ export type ApiSettingEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: ApiSettingSelect;
-  };
-};
-/** A `App` edge in the connection. */
-export interface AppEdge {
-  cursor?: string | null;
-  /** The `App` at the end of the edge. */
-  node?: App | null;
-}
-export type AppEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppSelect;
   };
 };
 /** A `CheckConstraint` edge in the connection. */
@@ -14076,6 +16220,30 @@ export type DomainEdgeSelect = {
     select: DomainSelect;
   };
 };
+/** A `DomainEvent` edge in the connection. */
+export interface DomainEventEdge {
+  cursor?: string | null;
+  /** The `DomainEvent` at the end of the edge. */
+  node?: DomainEvent | null;
+}
+export type DomainEventEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainEventSelect;
+  };
+};
+/** A `DomainVerification` edge in the connection. */
+export interface DomainVerificationEdge {
+  cursor?: string | null;
+  /** The `DomainVerification` at the end of the edge. */
+  node?: DomainVerification | null;
+}
+export type DomainVerificationEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainVerificationSelect;
+  };
+};
 /** A `EmbeddingChunk` edge in the connection. */
 export interface EmbeddingChunkEdge {
   cursor?: string | null;
@@ -14098,6 +16266,18 @@ export type EnumEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: EnumSelect;
+  };
+};
+/** A `ExclusionConstraint` edge in the connection. */
+export interface ExclusionConstraintEdge {
+  cursor?: string | null;
+  /** The `ExclusionConstraint` at the end of the edge. */
+  node?: ExclusionConstraint | null;
+}
+export type ExclusionConstraintEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ExclusionConstraintSelect;
   };
 };
 /** A `Field` edge in the connection. */
@@ -14146,6 +16326,18 @@ export type FunctionEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: FunctionSelect;
+  };
+};
+/** A `HostnameBinding` edge in the connection. */
+export interface HostnameBindingEdge {
+  cursor?: string | null;
+  /** The `HostnameBinding` at the end of the edge. */
+  node?: HostnameBinding | null;
+}
+export type HostnameBindingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: HostnameBindingSelect;
   };
 };
 /** A `HttpRoute` edge in the connection. */
@@ -14208,6 +16400,162 @@ export type PartitionEdgeSelect = {
     select: PartitionSelect;
   };
 };
+/** A `PlatformApi` edge in the connection. */
+export interface PlatformApiEdge {
+  cursor?: string | null;
+  /** The `PlatformApi` at the end of the edge. */
+  node?: PlatformApi | null;
+}
+export type PlatformApiEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformApiSelect;
+  };
+};
+/** A `PlatformApiModule` edge in the connection. */
+export interface PlatformApiModuleEdge {
+  cursor?: string | null;
+  /** The `PlatformApiModule` at the end of the edge. */
+  node?: PlatformApiModule | null;
+}
+export type PlatformApiModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformApiModuleSelect;
+  };
+};
+/** A `PlatformApiSchema` edge in the connection. */
+export interface PlatformApiSchemaEdge {
+  cursor?: string | null;
+  /** The `PlatformApiSchema` at the end of the edge. */
+  node?: PlatformApiSchema | null;
+}
+export type PlatformApiSchemaEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformApiSchemaSelect;
+  };
+};
+/** A `PlatformApiSetting` edge in the connection. */
+export interface PlatformApiSettingEdge {
+  cursor?: string | null;
+  /** The `PlatformApiSetting` at the end of the edge. */
+  node?: PlatformApiSetting | null;
+}
+export type PlatformApiSettingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformApiSettingSelect;
+  };
+};
+/** A `PlatformCorsSetting` edge in the connection. */
+export interface PlatformCorsSettingEdge {
+  cursor?: string | null;
+  /** The `PlatformCorsSetting` at the end of the edge. */
+  node?: PlatformCorsSetting | null;
+}
+export type PlatformCorsSettingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformCorsSettingSelect;
+  };
+};
+/** A `PlatformDomain` edge in the connection. */
+export interface PlatformDomainEdge {
+  cursor?: string | null;
+  /** The `PlatformDomain` at the end of the edge. */
+  node?: PlatformDomain | null;
+}
+export type PlatformDomainEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformDomainSelect;
+  };
+};
+/** A `PlatformDomainEvent` edge in the connection. */
+export interface PlatformDomainEventEdge {
+  cursor?: string | null;
+  /** The `PlatformDomainEvent` at the end of the edge. */
+  node?: PlatformDomainEvent | null;
+}
+export type PlatformDomainEventEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformDomainEventSelect;
+  };
+};
+/** A `PlatformDomainVerification` edge in the connection. */
+export interface PlatformDomainVerificationEdge {
+  cursor?: string | null;
+  /** The `PlatformDomainVerification` at the end of the edge. */
+  node?: PlatformDomainVerification | null;
+}
+export type PlatformDomainVerificationEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformDomainVerificationSelect;
+  };
+};
+/** A `PlatformManagedDomain` edge in the connection. */
+export interface PlatformManagedDomainEdge {
+  cursor?: string | null;
+  /** The `PlatformManagedDomain` at the end of the edge. */
+  node?: PlatformManagedDomain | null;
+}
+export type PlatformManagedDomainEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformManagedDomainSelect;
+  };
+};
+/** A `PlatformSite` edge in the connection. */
+export interface PlatformSiteEdge {
+  cursor?: string | null;
+  /** The `PlatformSite` at the end of the edge. */
+  node?: PlatformSite | null;
+}
+export type PlatformSiteEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformSiteSelect;
+  };
+};
+/** A `PlatformSiteMetadatum` edge in the connection. */
+export interface PlatformSiteMetadatumEdge {
+  cursor?: string | null;
+  /** The `PlatformSiteMetadatum` at the end of the edge. */
+  node?: PlatformSiteMetadatum | null;
+}
+export type PlatformSiteMetadatumEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformSiteMetadatumSelect;
+  };
+};
+/** A `PlatformSiteModule` edge in the connection. */
+export interface PlatformSiteModuleEdge {
+  cursor?: string | null;
+  /** The `PlatformSiteModule` at the end of the edge. */
+  node?: PlatformSiteModule | null;
+}
+export type PlatformSiteModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformSiteModuleSelect;
+  };
+};
+/** A `PlatformSiteTheme` edge in the connection. */
+export interface PlatformSiteThemeEdge {
+  cursor?: string | null;
+  /** The `PlatformSiteTheme` at the end of the edge. */
+  node?: PlatformSiteTheme | null;
+}
+export type PlatformSiteThemeEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformSiteThemeSelect;
+  };
+};
 /** A `Policy` edge in the connection. */
 export interface PolicyEdge {
   cursor?: string | null;
@@ -14254,6 +16602,30 @@ export type RlsSettingEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: RlsSettingSelect;
+  };
+};
+/** A `RouteBinding` edge in the connection. */
+export interface RouteBindingEdge {
+  cursor?: string | null;
+  /** The `RouteBinding` at the end of the edge. */
+  node?: RouteBinding | null;
+}
+export type RouteBindingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RouteBindingSelect;
+  };
+};
+/** A `Route` edge in the connection. */
+export interface RouteEdge {
+  cursor?: string | null;
+  /** The `Route` at the end of the edge. */
+  node?: Route | null;
+}
+export type RouteEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RouteSelect;
   };
 };
 /** A `Schema` edge in the connection. */

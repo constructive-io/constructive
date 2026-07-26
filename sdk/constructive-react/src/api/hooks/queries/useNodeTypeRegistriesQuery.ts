@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { nodeTypeRegistryKeys } from '../query-keys';
-import type {
-  NodeTypeRegistrySelect,
-  NodeTypeRegistryWithRelations,
-  NodeTypeRegistryFilter,
-  NodeTypeRegistryOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  NodeTypeRegistrySelect,
-  NodeTypeRegistryWithRelations,
-  NodeTypeRegistryFilter,
-  NodeTypeRegistryOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { nodeTypeRegistryKeys } from "../query-keys";
+import type { NodeTypeRegistrySelect, NodeTypeRegistryWithRelations, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { NodeTypeRegistrySelect, NodeTypeRegistryWithRelations, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const nodeTypeRegistriesQueryKey = nodeTypeRegistryKeys.list;
 /**
  * Query hook for fetching NodeTypeRegistry list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useNodeTypeRegistriesQuery({
@@ -45,53 +30,33 @@ export const nodeTypeRegistriesQueryKey = nodeTypeRegistryKeys.list;
  * });
  * ```
  */
-export function useNodeTypeRegistriesQuery<
-  S extends NodeTypeRegistrySelect,
-  TData = {
-    nodeTypeRegistries: ConnectionResult<InferSelectResult<NodeTypeRegistryWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, NodeTypeRegistrySelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        nodeTypeRegistries: ConnectionResult<InferSelectResult<NodeTypeRegistryWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useNodeTypeRegistriesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      NodeTypeRegistrySelect,
-      NodeTypeRegistryFilter,
-      NodeTypeRegistryOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    NodeTypeRegistrySelect,
-    NodeTypeRegistryFilter,
-    NodeTypeRegistryOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useNodeTypeRegistriesQuery<S extends NodeTypeRegistrySelect, TData = {
+  nodeTypeRegistries: ConnectionResult<InferSelectResult<NodeTypeRegistryWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NodeTypeRegistrySelect>;
+} & Omit<UseQueryOptions<{
+  nodeTypeRegistries: ConnectionResult<InferSelectResult<NodeTypeRegistryWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useNodeTypeRegistriesQuery(params: {
+  selection: ListSelectionConfig<NodeTypeRegistrySelect, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<NodeTypeRegistrySelect, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: nodeTypeRegistryKeys.list(args),
     queryFn: () => getClient().nodeTypeRegistry.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch NodeTypeRegistry list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchNodeTypeRegistriesQuery({
@@ -105,59 +70,35 @@ export function useNodeTypeRegistriesQuery(
 export async function fetchNodeTypeRegistriesQuery<S extends NodeTypeRegistrySelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, NodeTypeRegistrySelect>;
+  } & Omit<ListSelectionConfig<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NodeTypeRegistrySelect>;
 }): Promise<{
   nodeTypeRegistries: ConnectionResult<InferSelectResult<NodeTypeRegistryWithRelations, S>>;
 }>;
 export async function fetchNodeTypeRegistriesQuery(params: {
-  selection: ListSelectionConfig<
-    NodeTypeRegistrySelect,
-    NodeTypeRegistryFilter,
-    NodeTypeRegistryOrderBy
-  >;
+  selection: ListSelectionConfig<NodeTypeRegistrySelect, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    NodeTypeRegistrySelect,
-    NodeTypeRegistryFilter,
-    NodeTypeRegistryOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<NodeTypeRegistrySelect, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>(params.selection);
   return getClient().nodeTypeRegistry.findMany(args).unwrap();
 }
 /**
  * Prefetch NodeTypeRegistry list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchNodeTypeRegistriesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchNodeTypeRegistriesQuery<S extends NodeTypeRegistrySelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, NodeTypeRegistrySelect>;
-  }
-): Promise<void>;
-export async function prefetchNodeTypeRegistriesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      NodeTypeRegistrySelect,
-      NodeTypeRegistryFilter,
-      NodeTypeRegistryOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    NodeTypeRegistrySelect,
-    NodeTypeRegistryFilter,
-    NodeTypeRegistryOrderBy
-  >(params.selection);
+export async function prefetchNodeTypeRegistriesQuery<S extends NodeTypeRegistrySelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, NodeTypeRegistrySelect>;
+}): Promise<void>;
+export async function prefetchNodeTypeRegistriesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<NodeTypeRegistrySelect, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<NodeTypeRegistrySelect, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: nodeTypeRegistryKeys.list(args),
-    queryFn: () => getClient().nodeTypeRegistry.findMany(args).unwrap(),
+    queryFn: () => getClient().nodeTypeRegistry.findMany(args).unwrap()
   });
 }

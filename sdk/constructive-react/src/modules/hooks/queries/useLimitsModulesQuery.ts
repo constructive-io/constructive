@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { limitsModuleKeys } from '../query-keys';
-import type {
-  LimitsModuleSelect,
-  LimitsModuleWithRelations,
-  LimitsModuleFilter,
-  LimitsModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  LimitsModuleSelect,
-  LimitsModuleWithRelations,
-  LimitsModuleFilter,
-  LimitsModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { limitsModuleKeys } from "../query-keys";
+import type { LimitsModuleSelect, LimitsModuleWithRelations, LimitsModuleFilter, LimitsModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { LimitsModuleSelect, LimitsModuleWithRelations, LimitsModuleFilter, LimitsModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const limitsModulesQueryKey = limitsModuleKeys.list;
 /**
  * Query hook for fetching LimitsModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useLimitsModulesQuery({
@@ -45,47 +30,33 @@ export const limitsModulesQueryKey = limitsModuleKeys.list;
  * });
  * ```
  */
-export function useLimitsModulesQuery<
-  S extends LimitsModuleSelect,
-  TData = {
-    limitsModules: ConnectionResult<InferSelectResult<LimitsModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, LimitsModuleFilter, LimitsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        limitsModules: ConnectionResult<InferSelectResult<LimitsModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useLimitsModulesQuery(
-  params: {
-    selection: ListSelectionConfig<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>(
-    params.selection
-  );
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useLimitsModulesQuery<S extends LimitsModuleSelect, TData = {
+  limitsModules: ConnectionResult<InferSelectResult<LimitsModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, LimitsModuleFilter, LimitsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  limitsModules: ConnectionResult<InferSelectResult<LimitsModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useLimitsModulesQuery(params: {
+  selection: ListSelectionConfig<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: limitsModuleKeys.list(args),
     queryFn: () => getClient().limitsModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch LimitsModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchLimitsModulesQuery({
@@ -99,47 +70,35 @@ export function useLimitsModulesQuery(
 export async function fetchLimitsModulesQuery<S extends LimitsModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, LimitsModuleFilter, LimitsModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
+  } & Omit<ListSelectionConfig<S, LimitsModuleFilter, LimitsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
 }): Promise<{
   limitsModules: ConnectionResult<InferSelectResult<LimitsModuleWithRelations, S>>;
 }>;
 export async function fetchLimitsModulesQuery(params: {
   selection: ListSelectionConfig<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>(
-    params.selection
-  );
+  const args = buildListSelectionArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>(params.selection);
   return getClient().limitsModule.findMany(args).unwrap();
 }
 /**
  * Prefetch LimitsModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchLimitsModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchLimitsModulesQuery<S extends LimitsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, LimitsModuleFilter, LimitsModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchLimitsModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>(
-    params.selection
-  );
+export async function prefetchLimitsModulesQuery<S extends LimitsModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, LimitsModuleFilter, LimitsModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
+}): Promise<void>;
+export async function prefetchLimitsModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: limitsModuleKeys.list(args),
-    queryFn: () => getClient().limitsModule.findMany(args).unwrap(),
+    queryFn: () => getClient().limitsModule.findMany(args).unwrap()
   });
 }

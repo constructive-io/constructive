@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { resourcesHealthKeys } from '../query-keys';
-import type {
-  ResourcesHealthSelect,
-  ResourcesHealthWithRelations,
-  ResourcesHealthFilter,
-  ResourcesHealthOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ResourcesHealthSelect,
-  ResourcesHealthWithRelations,
-  ResourcesHealthFilter,
-  ResourcesHealthOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { resourcesHealthKeys } from "../query-keys";
+import type { ResourcesHealthSelect, ResourcesHealthWithRelations, ResourcesHealthFilter, ResourcesHealthOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ResourcesHealthSelect, ResourcesHealthWithRelations, ResourcesHealthFilter, ResourcesHealthOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const resourcesHealthsQueryKey = resourcesHealthKeys.list;
 /**
  * Query hook for fetching ResourcesHealth list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useResourcesHealthsQuery({
@@ -45,53 +30,33 @@ export const resourcesHealthsQueryKey = resourcesHealthKeys.list;
  * });
  * ```
  */
-export function useResourcesHealthsQuery<
-  S extends ResourcesHealthSelect,
-  TData = {
-    resourcesHealths: ConnectionResult<InferSelectResult<ResourcesHealthWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ResourcesHealthFilter, ResourcesHealthOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ResourcesHealthSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resourcesHealths: ConnectionResult<InferSelectResult<ResourcesHealthWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useResourcesHealthsQuery(
-  params: {
-    selection: ListSelectionConfig<
-      ResourcesHealthSelect,
-      ResourcesHealthFilter,
-      ResourcesHealthOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    ResourcesHealthSelect,
-    ResourcesHealthFilter,
-    ResourcesHealthOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useResourcesHealthsQuery<S extends ResourcesHealthSelect, TData = {
+  resourcesHealths: ConnectionResult<InferSelectResult<ResourcesHealthWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ResourcesHealthFilter, ResourcesHealthOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourcesHealthSelect>;
+} & Omit<UseQueryOptions<{
+  resourcesHealths: ConnectionResult<InferSelectResult<ResourcesHealthWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useResourcesHealthsQuery(params: {
+  selection: ListSelectionConfig<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourcesHealthKeys.list(args),
     queryFn: () => getClient().resourcesHealth.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch ResourcesHealth list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchResourcesHealthsQuery({
@@ -105,59 +70,35 @@ export function useResourcesHealthsQuery(
 export async function fetchResourcesHealthsQuery<S extends ResourcesHealthSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, ResourcesHealthFilter, ResourcesHealthOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, ResourcesHealthSelect>;
+  } & Omit<ListSelectionConfig<S, ResourcesHealthFilter, ResourcesHealthOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourcesHealthSelect>;
 }): Promise<{
   resourcesHealths: ConnectionResult<InferSelectResult<ResourcesHealthWithRelations, S>>;
 }>;
 export async function fetchResourcesHealthsQuery(params: {
-  selection: ListSelectionConfig<
-    ResourcesHealthSelect,
-    ResourcesHealthFilter,
-    ResourcesHealthOrderBy
-  >;
+  selection: ListSelectionConfig<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    ResourcesHealthSelect,
-    ResourcesHealthFilter,
-    ResourcesHealthOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy>(params.selection);
   return getClient().resourcesHealth.findMany(args).unwrap();
 }
 /**
  * Prefetch ResourcesHealth list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchResourcesHealthsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchResourcesHealthsQuery<S extends ResourcesHealthSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, ResourcesHealthFilter, ResourcesHealthOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, ResourcesHealthSelect>;
-  }
-): Promise<void>;
-export async function prefetchResourcesHealthsQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      ResourcesHealthSelect,
-      ResourcesHealthFilter,
-      ResourcesHealthOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    ResourcesHealthSelect,
-    ResourcesHealthFilter,
-    ResourcesHealthOrderBy
-  >(params.selection);
+export async function prefetchResourcesHealthsQuery<S extends ResourcesHealthSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ResourcesHealthFilter, ResourcesHealthOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ResourcesHealthSelect>;
+}): Promise<void>;
+export async function prefetchResourcesHealthsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourcesHealthKeys.list(args),
-    queryFn: () => getClient().resourcesHealth.findMany(args).unwrap(),
+    queryFn: () => getClient().resourcesHealth.findMany(args).unwrap()
   });
 }

@@ -4,76 +4,57 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customQueryKeys } from '../query-keys';
-import type { AppPermissionsGetPaddedMaskVariables } from '../../orm/query';
-export type { AppPermissionsGetPaddedMaskVariables } from '../../orm/query';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customQueryKeys } from "../query-keys";
+import type { AppPermissionsGetPaddedMaskVariables } from "../../orm/query";
+export type { AppPermissionsGetPaddedMaskVariables } from "../../orm/query";
 /** Query key factory - re-exported from query-keys.ts */
 export const appPermissionsGetPaddedMaskQueryKey = customQueryKeys.appPermissionsGetPaddedMask;
 /**
  * Query hook for appPermissionsGetPaddedMask
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAppPermissionsGetPaddedMaskQuery({ variables: { mask } });
- *
+ * 
  * if (data?.appPermissionsGetPaddedMask) {
  *   console.log(data.appPermissionsGetPaddedMask);
  * }
  * ```
  */
-export function useAppPermissionsGetPaddedMaskQuery<
-  TData = {
-    appPermissionsGetPaddedMask: string | null;
-  },
->(
-  params?: {
-    variables?: AppPermissionsGetPaddedMaskVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appPermissionsGetPaddedMask: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAppPermissionsGetPaddedMaskQuery<
-  TData = {
-    appPermissionsGetPaddedMask: string | null;
-  },
->(
-  params?: {
-    variables?: AppPermissionsGetPaddedMaskVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        appPermissionsGetPaddedMask: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData> {
+export function useAppPermissionsGetPaddedMaskQuery<TData = {
+  appPermissionsGetPaddedMask: string | null;
+}>(params?: {
+  variables?: AppPermissionsGetPaddedMaskVariables;
+} & Omit<UseQueryOptions<{
+  appPermissionsGetPaddedMask: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAppPermissionsGetPaddedMaskQuery<TData = {
+  appPermissionsGetPaddedMask: string | null;
+}>(params?: {
+  variables?: AppPermissionsGetPaddedMaskVariables;
+} & Omit<UseQueryOptions<{
+  appPermissionsGetPaddedMask: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const { variables: _variables, ...queryOptions } = params ?? {};
+  const {
+    variables: _variables,
+    ...queryOptions
+  } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: appPermissionsGetPaddedMaskQueryKey(variables),
     queryFn: () => getClient().query.appPermissionsGetPaddedMask(variables).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch appPermissionsGetPaddedMask without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAppPermissionsGetPaddedMaskQuery({ variables: { mask } });
@@ -87,21 +68,18 @@ export async function fetchAppPermissionsGetPaddedMaskQuery(params?: {
 }
 /**
  * Prefetch appPermissionsGetPaddedMask for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchAppPermissionsGetPaddedMaskQuery(queryClient, { variables: { mask } });
  * ```
  */
-export async function prefetchAppPermissionsGetPaddedMaskQuery(
-  queryClient: QueryClient,
-  params?: {
-    variables?: AppPermissionsGetPaddedMaskVariables;
-  }
-): Promise<void> {
+export async function prefetchAppPermissionsGetPaddedMaskQuery(queryClient: QueryClient, params?: {
+  variables?: AppPermissionsGetPaddedMaskVariables;
+}): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: appPermissionsGetPaddedMaskQueryKey(variables),
-    queryFn: () => getClient().query.appPermissionsGetPaddedMask(variables).unwrap(),
+    queryFn: () => getClient().query.appPermissionsGetPaddedMask(variables).unwrap()
   });
 }

@@ -8,22 +8,16 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { integrationProvidersModuleKeys } from '../query-keys';
-import { integrationProvidersModuleMutationKeys } from '../mutation-keys';
-import type {
-  IntegrationProvidersModuleSelect,
-  IntegrationProvidersModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  IntegrationProvidersModuleSelect,
-  IntegrationProvidersModuleWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { integrationProvidersModuleKeys } from "../query-keys";
+import { integrationProvidersModuleMutationKeys } from "../mutation-keys";
+import type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations } from "../../orm/input-types";
 /**
  * Config row for the integration_providers_module, which provisions a per-database
      integration_providers table holding branded, reusable service definitions.
@@ -40,75 +34,55 @@ export type {
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteIntegrationProvidersModuleMutation<
-  S extends IntegrationProvidersModuleSelect,
->(
-  params: {
-    selection: {
-      fields: S & IntegrationProvidersModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteIntegrationProvidersModule: {
-          integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteIntegrationProvidersModule: {
-      integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteIntegrationProvidersModuleMutation(
-  params: {
-    selection: SelectionConfig<IntegrationProvidersModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteIntegrationProvidersModuleMutation<S extends IntegrationProvidersModuleSelect>(params: {
+  selection: ({
+    fields: S & IntegrationProvidersModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>);
+} & Omit<UseMutationOptions<{
+  deleteIntegrationProvidersModule: {
+    integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteIntegrationProvidersModule: {
+    integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteIntegrationProvidersModuleMutation(params: {
+  selection: SelectionConfig<IntegrationProvidersModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<IntegrationProvidersModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: integrationProvidersModuleMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .integrationProvidersModule.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().integrationProvidersModule.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: integrationProvidersModuleKeys.detail(variables.id),
+        queryKey: integrationProvidersModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: integrationProvidersModuleKeys.lists(),
+        queryKey: integrationProvidersModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

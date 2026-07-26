@@ -4,76 +4,57 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customQueryKeys } from '../query-keys';
-import type { ResolveBlueprintTableVariables } from '../../orm/query';
-export type { ResolveBlueprintTableVariables } from '../../orm/query';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customQueryKeys } from "../query-keys";
+import type { ResolveBlueprintTableVariables } from "../../orm/query";
+export type { ResolveBlueprintTableVariables } from "../../orm/query";
 /** Query key factory - re-exported from query-keys.ts */
 export const resolveBlueprintTableQueryKey = customQueryKeys.resolveBlueprintTable;
 /**
  * Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useResolveBlueprintTableQuery({ variables: { databaseId, defaultSchemaId, schemaName, tableMap, tableName } });
- *
+ * 
  * if (data?.resolveBlueprintTable) {
  *   console.log(data.resolveBlueprintTable);
  * }
  * ```
  */
-export function useResolveBlueprintTableQuery<
-  TData = {
-    resolveBlueprintTable: string | null;
-  },
->(
-  params?: {
-    variables?: ResolveBlueprintTableVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resolveBlueprintTable: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useResolveBlueprintTableQuery<
-  TData = {
-    resolveBlueprintTable: string | null;
-  },
->(
-  params?: {
-    variables?: ResolveBlueprintTableVariables;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resolveBlueprintTable: string | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData> {
+export function useResolveBlueprintTableQuery<TData = {
+  resolveBlueprintTable: string | null;
+}>(params?: {
+  variables?: ResolveBlueprintTableVariables;
+} & Omit<UseQueryOptions<{
+  resolveBlueprintTable: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useResolveBlueprintTableQuery<TData = {
+  resolveBlueprintTable: string | null;
+}>(params?: {
+  variables?: ResolveBlueprintTableVariables;
+} & Omit<UseQueryOptions<{
+  resolveBlueprintTable: string | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData> {
   const variables = params?.variables ?? {};
-  const { variables: _variables, ...queryOptions } = params ?? {};
+  const {
+    variables: _variables,
+    ...queryOptions
+  } = params ?? {};
   void _variables;
   return useQuery({
     queryKey: resolveBlueprintTableQueryKey(variables),
     queryFn: () => getClient().query.resolveBlueprintTable(variables).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch resolveBlueprintTable without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchResolveBlueprintTableQuery({ variables: { databaseId, defaultSchemaId, schemaName, tableMap, tableName } });
@@ -87,21 +68,18 @@ export async function fetchResolveBlueprintTableQuery(params?: {
 }
 /**
  * Prefetch resolveBlueprintTable for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchResolveBlueprintTableQuery(queryClient, { variables: { databaseId, defaultSchemaId, schemaName, tableMap, tableName } });
  * ```
  */
-export async function prefetchResolveBlueprintTableQuery(
-  queryClient: QueryClient,
-  params?: {
-    variables?: ResolveBlueprintTableVariables;
-  }
-): Promise<void> {
+export async function prefetchResolveBlueprintTableQuery(queryClient: QueryClient, params?: {
+  variables?: ResolveBlueprintTableVariables;
+}): Promise<void> {
   const variables = params?.variables ?? {};
   await queryClient.prefetchQuery({
     queryKey: resolveBlueprintTableQueryKey(variables),
-    queryFn: () => getClient().query.resolveBlueprintTable(variables).unwrap(),
+    queryFn: () => getClient().query.resolveBlueprintTable(variables).unwrap()
   });
 }

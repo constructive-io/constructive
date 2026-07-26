@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { orgLimitAggregateKeys } from '../query-keys';
-import type {
-  OrgLimitAggregateSelect,
-  OrgLimitAggregateWithRelations,
-  OrgLimitAggregateFilter,
-  OrgLimitAggregateOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  OrgLimitAggregateSelect,
-  OrgLimitAggregateWithRelations,
-  OrgLimitAggregateFilter,
-  OrgLimitAggregateOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { orgLimitAggregateKeys } from "../query-keys";
+import type { OrgLimitAggregateSelect, OrgLimitAggregateWithRelations, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgLimitAggregateSelect, OrgLimitAggregateWithRelations, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const orgLimitAggregatesQueryKey = orgLimitAggregateKeys.list;
 /**
  * Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgLimitAggregatesQuery({
@@ -45,53 +30,33 @@ export const orgLimitAggregatesQueryKey = orgLimitAggregateKeys.list;
  * });
  * ```
  */
-export function useOrgLimitAggregatesQuery<
-  S extends OrgLimitAggregateSelect,
-  TData = {
-    orgLimitAggregates: ConnectionResult<InferSelectResult<OrgLimitAggregateWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        orgLimitAggregates: ConnectionResult<InferSelectResult<OrgLimitAggregateWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useOrgLimitAggregatesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      OrgLimitAggregateSelect,
-      OrgLimitAggregateFilter,
-      OrgLimitAggregateOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    OrgLimitAggregateSelect,
-    OrgLimitAggregateFilter,
-    OrgLimitAggregateOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useOrgLimitAggregatesQuery<S extends OrgLimitAggregateSelect, TData = {
+  orgLimitAggregates: ConnectionResult<InferSelectResult<OrgLimitAggregateWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
+} & Omit<UseQueryOptions<{
+  orgLimitAggregates: ConnectionResult<InferSelectResult<OrgLimitAggregateWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useOrgLimitAggregatesQuery(params: {
+  selection: ListSelectionConfig<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgLimitAggregateKeys.list(args),
     queryFn: () => getClient().orgLimitAggregate.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchOrgLimitAggregatesQuery({
@@ -105,59 +70,35 @@ export function useOrgLimitAggregatesQuery(
 export async function fetchOrgLimitAggregatesQuery<S extends OrgLimitAggregateSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
+  } & Omit<ListSelectionConfig<S, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
 }): Promise<{
   orgLimitAggregates: ConnectionResult<InferSelectResult<OrgLimitAggregateWithRelations, S>>;
 }>;
 export async function fetchOrgLimitAggregatesQuery(params: {
-  selection: ListSelectionConfig<
-    OrgLimitAggregateSelect,
-    OrgLimitAggregateFilter,
-    OrgLimitAggregateOrderBy
-  >;
+  selection: ListSelectionConfig<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    OrgLimitAggregateSelect,
-    OrgLimitAggregateFilter,
-    OrgLimitAggregateOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>(params.selection);
   return getClient().orgLimitAggregate.findMany(args).unwrap();
 }
 /**
  * Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
- *
+ * 
  * @example
  * ```ts
  * await prefetchOrgLimitAggregatesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchOrgLimitAggregatesQuery<S extends OrgLimitAggregateSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
-  }
-): Promise<void>;
-export async function prefetchOrgLimitAggregatesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      OrgLimitAggregateSelect,
-      OrgLimitAggregateFilter,
-      OrgLimitAggregateOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    OrgLimitAggregateSelect,
-    OrgLimitAggregateFilter,
-    OrgLimitAggregateOrderBy
-  >(params.selection);
+export async function prefetchOrgLimitAggregatesQuery<S extends OrgLimitAggregateSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, OrgLimitAggregateSelect>;
+}): Promise<void>;
+export async function prefetchOrgLimitAggregatesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgLimitAggregateKeys.list(args),
-    queryFn: () => getClient().orgLimitAggregate.findMany(args).unwrap(),
+    queryFn: () => getClient().orgLimitAggregate.findMany(args).unwrap()
   });
 }

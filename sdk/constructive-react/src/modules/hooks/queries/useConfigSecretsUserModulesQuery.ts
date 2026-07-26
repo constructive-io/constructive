@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { configSecretsUserModuleKeys } from '../query-keys';
-import type {
-  ConfigSecretsUserModuleSelect,
-  ConfigSecretsUserModuleWithRelations,
-  ConfigSecretsUserModuleFilter,
-  ConfigSecretsUserModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  ConfigSecretsUserModuleSelect,
-  ConfigSecretsUserModuleWithRelations,
-  ConfigSecretsUserModuleFilter,
-  ConfigSecretsUserModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { configSecretsUserModuleKeys } from "../query-keys";
+import type { ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleWithRelations, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleWithRelations, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const configSecretsUserModulesQueryKey = configSecretsUserModuleKeys.list;
 /**
  * Query hook for fetching ConfigSecretsUserModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useConfigSecretsUserModulesQuery({
@@ -45,60 +30,33 @@ export const configSecretsUserModulesQueryKey = configSecretsUserModuleKeys.list
  * });
  * ```
  */
-export function useConfigSecretsUserModulesQuery<
-  S extends ConfigSecretsUserModuleSelect,
-  TData = {
-    configSecretsUserModules: ConnectionResult<
-      InferSelectResult<ConfigSecretsUserModuleWithRelations, S>
-    >;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        configSecretsUserModules: ConnectionResult<
-          InferSelectResult<ConfigSecretsUserModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useConfigSecretsUserModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      ConfigSecretsUserModuleSelect,
-      ConfigSecretsUserModuleFilter,
-      ConfigSecretsUserModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    ConfigSecretsUserModuleSelect,
-    ConfigSecretsUserModuleFilter,
-    ConfigSecretsUserModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useConfigSecretsUserModulesQuery<S extends ConfigSecretsUserModuleSelect, TData = {
+  configSecretsUserModules: ConnectionResult<InferSelectResult<ConfigSecretsUserModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
+} & Omit<UseQueryOptions<{
+  configSecretsUserModules: ConnectionResult<InferSelectResult<ConfigSecretsUserModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useConfigSecretsUserModulesQuery(params: {
+  selection: ListSelectionConfig<ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: configSecretsUserModuleKeys.list(args),
     queryFn: () => getClient().configSecretsUserModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch ConfigSecretsUserModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchConfigSecretsUserModulesQuery({
@@ -109,74 +67,38 @@ export function useConfigSecretsUserModulesQuery(
  * });
  * ```
  */
-export async function fetchConfigSecretsUserModulesQuery<
-  S extends ConfigSecretsUserModuleSelect,
->(params: {
+export async function fetchConfigSecretsUserModulesQuery<S extends ConfigSecretsUserModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
+  } & Omit<ListSelectionConfig<S, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
 }): Promise<{
-  configSecretsUserModules: ConnectionResult<
-    InferSelectResult<ConfigSecretsUserModuleWithRelations, S>
-  >;
+  configSecretsUserModules: ConnectionResult<InferSelectResult<ConfigSecretsUserModuleWithRelations, S>>;
 }>;
 export async function fetchConfigSecretsUserModulesQuery(params: {
-  selection: ListSelectionConfig<
-    ConfigSecretsUserModuleSelect,
-    ConfigSecretsUserModuleFilter,
-    ConfigSecretsUserModuleOrderBy
-  >;
+  selection: ListSelectionConfig<ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    ConfigSecretsUserModuleSelect,
-    ConfigSecretsUserModuleFilter,
-    ConfigSecretsUserModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>(params.selection);
   return getClient().configSecretsUserModule.findMany(args).unwrap();
 }
 /**
  * Prefetch ConfigSecretsUserModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchConfigSecretsUserModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchConfigSecretsUserModulesQuery<
-  S extends ConfigSecretsUserModuleSelect,
->(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchConfigSecretsUserModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      ConfigSecretsUserModuleSelect,
-      ConfigSecretsUserModuleFilter,
-      ConfigSecretsUserModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    ConfigSecretsUserModuleSelect,
-    ConfigSecretsUserModuleFilter,
-    ConfigSecretsUserModuleOrderBy
-  >(params.selection);
+export async function prefetchConfigSecretsUserModulesQuery<S extends ConfigSecretsUserModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, ConfigSecretsUserModuleSelect>;
+}): Promise<void>;
+export async function prefetchConfigSecretsUserModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<ConfigSecretsUserModuleSelect, ConfigSecretsUserModuleFilter, ConfigSecretsUserModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: configSecretsUserModuleKeys.list(args),
-    queryFn: () => getClient().configSecretsUserModule.findMany(args).unwrap(),
+    queryFn: () => getClient().configSecretsUserModule.findMany(args).unwrap()
   });
 }

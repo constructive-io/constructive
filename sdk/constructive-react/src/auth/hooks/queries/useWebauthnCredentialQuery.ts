@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { webauthnCredentialKeys } from '../query-keys';
-import type {
-  WebauthnCredentialSelect,
-  WebauthnCredentialWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  WebauthnCredentialSelect,
-  WebauthnCredentialWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { webauthnCredentialKeys } from "../query-keys";
+import type { WebauthnCredentialSelect, WebauthnCredentialWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebauthnCredentialSelect, WebauthnCredentialWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const webauthnCredentialQueryKey = webauthnCredentialKeys.detail;
 /**
  * WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useWebauthnCredentialQuery({
@@ -32,52 +26,38 @@ export const webauthnCredentialQueryKey = webauthnCredentialKeys.detail;
  * });
  * ```
  */
-export function useWebauthnCredentialQuery<
-  S extends WebauthnCredentialSelect,
-  TData = {
-    webauthnCredential: InferSelectResult<WebauthnCredentialWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, WebauthnCredentialSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        webauthnCredential: InferSelectResult<WebauthnCredentialWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useWebauthnCredentialQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<WebauthnCredentialSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useWebauthnCredentialQuery<S extends WebauthnCredentialSelect, TData = {
+  webauthnCredential: InferSelectResult<WebauthnCredentialWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, WebauthnCredentialSelect>;
+} & Omit<UseQueryOptions<{
+  webauthnCredential: InferSelectResult<WebauthnCredentialWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useWebauthnCredentialQuery(params: {
+  id: string;
+  selection: SelectionConfig<WebauthnCredentialSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<WebauthnCredentialSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: webauthnCredentialKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .webauthnCredential.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().webauthnCredential.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchWebauthnCredentialQuery({
@@ -99,46 +79,35 @@ export async function fetchWebauthnCredentialQuery(params: {
   selection: SelectionConfig<WebauthnCredentialSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<WebauthnCredentialSelect>(params.selection);
-  return getClient()
-    .webauthnCredential.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().webauthnCredential.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object.
- *
+ * 
  * @example
  * ```ts
  * await prefetchWebauthnCredentialQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchWebauthnCredentialQuery<S extends WebauthnCredentialSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, WebauthnCredentialSelect>;
-  }
-): Promise<void>;
-export async function prefetchWebauthnCredentialQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<WebauthnCredentialSelect>;
-  }
-): Promise<void> {
+export async function prefetchWebauthnCredentialQuery<S extends WebauthnCredentialSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, WebauthnCredentialSelect>;
+}): Promise<void>;
+export async function prefetchWebauthnCredentialQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<WebauthnCredentialSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<WebauthnCredentialSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: webauthnCredentialKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .webauthnCredential.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().webauthnCredential.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

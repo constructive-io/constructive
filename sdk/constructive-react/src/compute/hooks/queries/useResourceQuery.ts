@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { resourceKeys } from '../query-keys';
-import type { ResourceSelect, ResourceWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { ResourceSelect, ResourceWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { resourceKeys } from "../query-keys";
+import type { ResourceSelect, ResourceWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { ResourceSelect, ResourceWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const resourceQueryKey = resourceKeys.detail;
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useResourceQuery({
@@ -26,52 +26,38 @@ export const resourceQueryKey = resourceKeys.detail;
  * });
  * ```
  */
-export function useResourceQuery<
-  S extends ResourceSelect,
-  TData = {
-    resource: InferSelectResult<ResourceWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, ResourceSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        resource: InferSelectResult<ResourceWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useResourceQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<ResourceSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useResourceQuery<S extends ResourceSelect, TData = {
+  resource: InferSelectResult<ResourceWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, ResourceSelect>;
+} & Omit<UseQueryOptions<{
+  resource: InferSelectResult<ResourceWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useResourceQuery(params: {
+  id: string;
+  selection: SelectionConfig<ResourceSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<ResourceSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: resourceKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .resource.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().resource.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchResourceQuery({
@@ -93,46 +79,35 @@ export async function fetchResourceQuery(params: {
   selection: SelectionConfig<ResourceSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<ResourceSelect>(params.selection);
-  return getClient()
-    .resource.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().resource.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```ts
  * await prefetchResourceQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchResourceQuery<S extends ResourceSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, ResourceSelect>;
-  }
-): Promise<void>;
-export async function prefetchResourceQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<ResourceSelect>;
-  }
-): Promise<void> {
+export async function prefetchResourceQuery<S extends ResourceSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, ResourceSelect>;
+}): Promise<void>;
+export async function prefetchResourceQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<ResourceSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<ResourceSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: resourceKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .resource.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().resource.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

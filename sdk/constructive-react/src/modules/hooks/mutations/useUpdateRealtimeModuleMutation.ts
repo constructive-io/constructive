@@ -4,113 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { realtimeModuleKeys } from '../query-keys';
-import { realtimeModuleMutationKeys } from '../mutation-keys';
-import type {
-  RealtimeModuleSelect,
-  RealtimeModuleWithRelations,
-  RealtimeModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  RealtimeModuleSelect,
-  RealtimeModuleWithRelations,
-  RealtimeModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { realtimeModuleKeys } from "../query-keys";
+import { realtimeModuleMutationKeys } from "../mutation-keys";
+import type { RealtimeModuleSelect, RealtimeModuleWithRelations, RealtimeModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { RealtimeModuleSelect, RealtimeModuleWithRelations, RealtimeModulePatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a RealtimeModule
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateRealtimeModuleMutation({
  *   selection: { fields: { id: true, name: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-here', realtimeModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateRealtimeModuleMutation<S extends RealtimeModuleSelect>(
-  params: {
-    selection: {
-      fields: S & RealtimeModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateRealtimeModule: {
-          realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        realtimeModulePatch: RealtimeModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateRealtimeModule: {
-      realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    realtimeModulePatch: RealtimeModulePatch;
-  }
->;
-export function useUpdateRealtimeModuleMutation(
-  params: {
-    selection: SelectionConfig<RealtimeModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        realtimeModulePatch: RealtimeModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateRealtimeModuleMutation<S extends RealtimeModuleSelect>(params: {
+  selection: ({
+    fields: S & RealtimeModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, RealtimeModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateRealtimeModule: {
+    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  realtimeModulePatch: RealtimeModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateRealtimeModule: {
+    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  realtimeModulePatch: RealtimeModulePatch;
+}>;
+export function useUpdateRealtimeModuleMutation(params: {
+  selection: SelectionConfig<RealtimeModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  realtimeModulePatch: RealtimeModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: realtimeModuleMutationKeys.all,
     mutationFn: ({
       id,
-      realtimeModulePatch,
+      realtimeModulePatch
     }: {
       id: string;
       realtimeModulePatch: RealtimeModulePatch;
-    }) =>
-      getClient()
-        .realtimeModule.update({
-          where: {
-            id,
-          },
-          data: realtimeModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().realtimeModule.update({
+      where: {
+        id
+      },
+      data: realtimeModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.detail(variables.id),
+        queryKey: realtimeModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: realtimeModuleKeys.lists(),
+        queryKey: realtimeModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

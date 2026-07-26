@@ -1,5 +1,5 @@
 import { Timestamp } from "./_common";
-export interface pg_aggregate {
+export interface PgAggregate {
   aggfnoid: any;
   aggkind: any;
   aggnumdirectargs: number;
@@ -23,7 +23,7 @@ export interface pg_aggregate {
   agginitval: string | null;
   aggminitval: string | null;
 }
-export class pg_aggregate implements pg_aggregate {
+export class PgAggregate implements PgAggregate {
   aggfnoid: any;
   aggkind: any;
   aggnumdirectargs: number;
@@ -46,7 +46,7 @@ export class pg_aggregate implements pg_aggregate {
   aggmtransspace: number;
   agginitval: string | null;
   aggminitval: string | null;
-  constructor(data: pg_aggregate) {
+  constructor(data: PgAggregate) {
     this.aggfnoid = data.aggfnoid;
     this.aggkind = data.aggkind;
     this.aggnumdirectargs = data.aggnumdirectargs;
@@ -71,25 +71,25 @@ export class pg_aggregate implements pg_aggregate {
     this.aggminitval = data.aggminitval;
   }
 }
-export interface pg_am {
+export interface PgAm {
   oid: any;
   amname: any;
   amhandler: any;
   amtype: any;
 }
-export class pg_am implements pg_am {
+export class PgAm implements PgAm {
   oid: any;
   amname: any;
   amhandler: any;
   amtype: any;
-  constructor(data: pg_am) {
+  constructor(data: PgAm) {
     this.oid = data.oid;
     this.amname = data.amname;
     this.amhandler = data.amhandler;
     this.amtype = data.amtype;
   }
 }
-export interface pg_amop {
+export interface PgAmop {
   oid: any;
   amopfamily: any;
   amoplefttype: any;
@@ -100,7 +100,7 @@ export interface pg_amop {
   amopmethod: any;
   amopsortfamily: any;
 }
-export class pg_amop implements pg_amop {
+export class PgAmop implements PgAmop {
   oid: any;
   amopfamily: any;
   amoplefttype: any;
@@ -110,7 +110,7 @@ export class pg_amop implements pg_amop {
   amopopr: any;
   amopmethod: any;
   amopsortfamily: any;
-  constructor(data: pg_amop) {
+  constructor(data: PgAmop) {
     this.oid = data.oid;
     this.amopfamily = data.amopfamily;
     this.amoplefttype = data.amoplefttype;
@@ -122,7 +122,7 @@ export class pg_amop implements pg_amop {
     this.amopsortfamily = data.amopsortfamily;
   }
 }
-export interface pg_amproc {
+export interface PgAmproc {
   oid: any;
   amprocfamily: any;
   amproclefttype: any;
@@ -130,14 +130,14 @@ export interface pg_amproc {
   amprocnum: number;
   amproc: any;
 }
-export class pg_amproc implements pg_amproc {
+export class PgAmproc implements PgAmproc {
   oid: any;
   amprocfamily: any;
   amproclefttype: any;
   amprocrighttype: any;
   amprocnum: number;
   amproc: any;
-  constructor(data: pg_amproc) {
+  constructor(data: PgAmproc) {
     this.oid = data.oid;
     this.amprocfamily = data.amprocfamily;
     this.amproclefttype = data.amproclefttype;
@@ -146,37 +146,36 @@ export class pg_amproc implements pg_amproc {
     this.amproc = data.amproc;
   }
 }
-export interface pg_attrdef {
+export interface PgAttrdef {
   oid: any;
   adrelid: any;
   adnum: number;
   adbin: any;
 }
-export class pg_attrdef implements pg_attrdef {
+export class PgAttrdef implements PgAttrdef {
   oid: any;
   adrelid: any;
   adnum: number;
   adbin: any;
-  constructor(data: pg_attrdef) {
+  constructor(data: PgAttrdef) {
     this.oid = data.oid;
     this.adrelid = data.adrelid;
     this.adnum = data.adnum;
     this.adbin = data.adbin;
   }
 }
-export interface pg_attribute {
+export interface PgAttribute {
   attrelid: any;
   attname: any;
   atttypid: any;
-  attstattarget: number;
   attlen: number;
   attnum: number;
-  attndims: number;
-  attcacheoff: number;
   atttypmod: number;
+  attndims: number;
   attbyval: boolean;
-  attstorage: any;
   attalign: any;
+  attstorage: any;
+  attcompression: any;
   attnotnull: boolean;
   atthasdef: boolean;
   atthasmissing: boolean;
@@ -186,24 +185,24 @@ export interface pg_attribute {
   attislocal: boolean;
   attinhcount: number;
   attcollation: any;
+  attstattarget: number | null;
   attacl: any | null;
   attoptions: any | null;
   attfdwoptions: any | null;
   attmissingval: any | null;
 }
-export class pg_attribute implements pg_attribute {
+export class PgAttribute implements PgAttribute {
   attrelid: any;
   attname: any;
   atttypid: any;
-  attstattarget: number;
   attlen: number;
   attnum: number;
-  attndims: number;
-  attcacheoff: number;
   atttypmod: number;
+  attndims: number;
   attbyval: boolean;
-  attstorage: any;
   attalign: any;
+  attstorage: any;
+  attcompression: any;
   attnotnull: boolean;
   atthasdef: boolean;
   atthasmissing: boolean;
@@ -213,23 +212,23 @@ export class pg_attribute implements pg_attribute {
   attislocal: boolean;
   attinhcount: number;
   attcollation: any;
+  attstattarget: number | null;
   attacl: any | null;
   attoptions: any | null;
   attfdwoptions: any | null;
   attmissingval: any | null;
-  constructor(data: pg_attribute) {
+  constructor(data: PgAttribute) {
     this.attrelid = data.attrelid;
     this.attname = data.attname;
     this.atttypid = data.atttypid;
-    this.attstattarget = data.attstattarget;
     this.attlen = data.attlen;
     this.attnum = data.attnum;
-    this.attndims = data.attndims;
-    this.attcacheoff = data.attcacheoff;
     this.atttypmod = data.atttypmod;
+    this.attndims = data.attndims;
     this.attbyval = data.attbyval;
-    this.attstorage = data.attstorage;
     this.attalign = data.attalign;
+    this.attstorage = data.attstorage;
+    this.attcompression = data.attcompression;
     this.attnotnull = data.attnotnull;
     this.atthasdef = data.atthasdef;
     this.atthasmissing = data.atthasmissing;
@@ -239,31 +238,41 @@ export class pg_attribute implements pg_attribute {
     this.attislocal = data.attislocal;
     this.attinhcount = data.attinhcount;
     this.attcollation = data.attcollation;
+    this.attstattarget = data.attstattarget;
     this.attacl = data.attacl;
     this.attoptions = data.attoptions;
     this.attfdwoptions = data.attfdwoptions;
     this.attmissingval = data.attmissingval;
   }
 }
-export interface pg_auth_members {
+export interface PgAuthMembers {
+  oid: any;
   roleid: any;
   member: any;
   grantor: any;
   admin_option: boolean;
+  inherit_option: boolean;
+  set_option: boolean;
 }
-export class pg_auth_members implements pg_auth_members {
+export class PgAuthMembers implements PgAuthMembers {
+  oid: any;
   roleid: any;
   member: any;
   grantor: any;
   admin_option: boolean;
-  constructor(data: pg_auth_members) {
+  inherit_option: boolean;
+  set_option: boolean;
+  constructor(data: PgAuthMembers) {
+    this.oid = data.oid;
     this.roleid = data.roleid;
     this.member = data.member;
     this.grantor = data.grantor;
     this.admin_option = data.admin_option;
+    this.inherit_option = data.inherit_option;
+    this.set_option = data.set_option;
   }
 }
-export interface pg_authid {
+export interface PgAuthid {
   oid: any;
   rolname: any;
   rolsuper: boolean;
@@ -277,7 +286,7 @@ export interface pg_authid {
   rolpassword: string | null;
   rolvaliduntil: Timestamp | null;
 }
-export class pg_authid implements pg_authid {
+export class PgAuthid implements PgAuthid {
   oid: any;
   rolname: any;
   rolsuper: boolean;
@@ -290,7 +299,7 @@ export class pg_authid implements pg_authid {
   rolconnlimit: number;
   rolpassword: string | null;
   rolvaliduntil: Timestamp | null;
-  constructor(data: pg_authid) {
+  constructor(data: PgAuthid) {
     this.oid = data.oid;
     this.rolname = data.rolname;
     this.rolsuper = data.rolsuper;
@@ -305,7 +314,7 @@ export class pg_authid implements pg_authid {
     this.rolvaliduntil = data.rolvaliduntil;
   }
 }
-export interface pg_cast {
+export interface PgCast {
   oid: any;
   castsource: any;
   casttarget: any;
@@ -313,14 +322,14 @@ export interface pg_cast {
   castcontext: any;
   castmethod: any;
 }
-export class pg_cast implements pg_cast {
+export class PgCast implements PgCast {
   oid: any;
   castsource: any;
   casttarget: any;
   castfunc: any;
   castcontext: any;
   castmethod: any;
-  constructor(data: pg_cast) {
+  constructor(data: PgCast) {
     this.oid = data.oid;
     this.castsource = data.castsource;
     this.casttarget = data.casttarget;
@@ -329,7 +338,7 @@ export class pg_cast implements pg_cast {
     this.castmethod = data.castmethod;
   }
 }
-export interface pg_class {
+export interface PgClass {
   oid: any;
   relname: any;
   relnamespace: any;
@@ -342,6 +351,7 @@ export interface pg_class {
   relpages: number;
   reltuples: any;
   relallvisible: number;
+  relallfrozen: number;
   reltoastrelid: any;
   relhasindex: boolean;
   relisshared: boolean;
@@ -364,7 +374,7 @@ export interface pg_class {
   reloptions: any | null;
   relpartbound: any | null;
 }
-export class pg_class implements pg_class {
+export class PgClass implements PgClass {
   oid: any;
   relname: any;
   relnamespace: any;
@@ -377,6 +387,7 @@ export class pg_class implements pg_class {
   relpages: number;
   reltuples: any;
   relallvisible: number;
+  relallfrozen: number;
   reltoastrelid: any;
   relhasindex: boolean;
   relisshared: boolean;
@@ -398,7 +409,7 @@ export class pg_class implements pg_class {
   relacl: any | null;
   reloptions: any | null;
   relpartbound: any | null;
-  constructor(data: pg_class) {
+  constructor(data: PgClass) {
     this.oid = data.oid;
     this.relname = data.relname;
     this.relnamespace = data.relnamespace;
@@ -411,6 +422,7 @@ export class pg_class implements pg_class {
     this.relpages = data.relpages;
     this.reltuples = data.reltuples;
     this.relallvisible = data.relallvisible;
+    this.relallfrozen = data.relallfrozen;
     this.reltoastrelid = data.reltoastrelid;
     this.relhasindex = data.relhasindex;
     this.relisshared = data.relisshared;
@@ -434,7 +446,7 @@ export class pg_class implements pg_class {
     this.relpartbound = data.relpartbound;
   }
 }
-export interface pg_collation {
+export interface PgCollation {
   oid: any;
   collname: any;
   collnamespace: any;
@@ -442,11 +454,13 @@ export interface pg_collation {
   collprovider: any;
   collisdeterministic: boolean;
   collencoding: number;
-  collcollate: any;
-  collctype: any;
+  collcollate: string | null;
+  collctype: string | null;
+  colllocale: string | null;
+  collicurules: string | null;
   collversion: string | null;
 }
-export class pg_collation implements pg_collation {
+export class PgCollation implements PgCollation {
   oid: any;
   collname: any;
   collnamespace: any;
@@ -454,10 +468,12 @@ export class pg_collation implements pg_collation {
   collprovider: any;
   collisdeterministic: boolean;
   collencoding: number;
-  collcollate: any;
-  collctype: any;
+  collcollate: string | null;
+  collctype: string | null;
+  colllocale: string | null;
+  collicurules: string | null;
   collversion: string | null;
-  constructor(data: pg_collation) {
+  constructor(data: PgCollation) {
     this.oid = data.oid;
     this.collname = data.collname;
     this.collnamespace = data.collnamespace;
@@ -467,16 +483,19 @@ export class pg_collation implements pg_collation {
     this.collencoding = data.collencoding;
     this.collcollate = data.collcollate;
     this.collctype = data.collctype;
+    this.colllocale = data.colllocale;
+    this.collicurules = data.collicurules;
     this.collversion = data.collversion;
   }
 }
-export interface pg_constraint {
+export interface PgConstraint {
   oid: any;
   conname: any;
   connamespace: any;
   contype: any;
   condeferrable: boolean;
   condeferred: boolean;
+  conenforced: boolean;
   convalidated: boolean;
   conrelid: any;
   contypid: any;
@@ -489,21 +508,24 @@ export interface pg_constraint {
   conislocal: boolean;
   coninhcount: number;
   connoinherit: boolean;
+  conperiod: boolean;
   conkey: any | null;
   confkey: any | null;
   conpfeqop: any | null;
   conppeqop: any | null;
   conffeqop: any | null;
+  confdelsetcols: any | null;
   conexclop: any | null;
   conbin: any | null;
 }
-export class pg_constraint implements pg_constraint {
+export class PgConstraint implements PgConstraint {
   oid: any;
   conname: any;
   connamespace: any;
   contype: any;
   condeferrable: boolean;
   condeferred: boolean;
+  conenforced: boolean;
   convalidated: boolean;
   conrelid: any;
   contypid: any;
@@ -516,20 +538,23 @@ export class pg_constraint implements pg_constraint {
   conislocal: boolean;
   coninhcount: number;
   connoinherit: boolean;
+  conperiod: boolean;
   conkey: any | null;
   confkey: any | null;
   conpfeqop: any | null;
   conppeqop: any | null;
   conffeqop: any | null;
+  confdelsetcols: any | null;
   conexclop: any | null;
   conbin: any | null;
-  constructor(data: pg_constraint) {
+  constructor(data: PgConstraint) {
     this.oid = data.oid;
     this.conname = data.conname;
     this.connamespace = data.connamespace;
     this.contype = data.contype;
     this.condeferrable = data.condeferrable;
     this.condeferred = data.condeferred;
+    this.conenforced = data.conenforced;
     this.convalidated = data.convalidated;
     this.conrelid = data.conrelid;
     this.contypid = data.contypid;
@@ -542,16 +567,18 @@ export class pg_constraint implements pg_constraint {
     this.conislocal = data.conislocal;
     this.coninhcount = data.coninhcount;
     this.connoinherit = data.connoinherit;
+    this.conperiod = data.conperiod;
     this.conkey = data.conkey;
     this.confkey = data.confkey;
     this.conpfeqop = data.conpfeqop;
     this.conppeqop = data.conppeqop;
     this.conffeqop = data.conffeqop;
+    this.confdelsetcols = data.confdelsetcols;
     this.conexclop = data.conexclop;
     this.conbin = data.conbin;
   }
 }
-export interface pg_conversion {
+export interface PgConversion {
   oid: any;
   conname: any;
   connamespace: any;
@@ -561,7 +588,7 @@ export interface pg_conversion {
   conproc: any;
   condefault: boolean;
 }
-export class pg_conversion implements pg_conversion {
+export class PgConversion implements PgConversion {
   oid: any;
   conname: any;
   connamespace: any;
@@ -570,7 +597,7 @@ export class pg_conversion implements pg_conversion {
   contoencoding: number;
   conproc: any;
   condefault: boolean;
-  constructor(data: pg_conversion) {
+  constructor(data: PgConversion) {
     this.oid = data.oid;
     this.conname = data.conname;
     this.connamespace = data.connamespace;
@@ -581,83 +608,95 @@ export class pg_conversion implements pg_conversion {
     this.condefault = data.condefault;
   }
 }
-export interface pg_database {
+export interface PgDatabase {
   oid: any;
   datname: any;
   datdba: any;
   encoding: number;
-  datcollate: any;
-  datctype: any;
+  datlocprovider: any;
   datistemplate: boolean;
   datallowconn: boolean;
+  dathasloginevt: boolean;
   datconnlimit: number;
-  datlastsysoid: any;
   datfrozenxid: any;
   datminmxid: any;
   dattablespace: any;
+  datcollate: string;
+  datctype: string;
+  datlocale: string | null;
+  daticurules: string | null;
+  datcollversion: string | null;
   datacl: any | null;
 }
-export class pg_database implements pg_database {
+export class PgDatabase implements PgDatabase {
   oid: any;
   datname: any;
   datdba: any;
   encoding: number;
-  datcollate: any;
-  datctype: any;
+  datlocprovider: any;
   datistemplate: boolean;
   datallowconn: boolean;
+  dathasloginevt: boolean;
   datconnlimit: number;
-  datlastsysoid: any;
   datfrozenxid: any;
   datminmxid: any;
   dattablespace: any;
+  datcollate: string;
+  datctype: string;
+  datlocale: string | null;
+  daticurules: string | null;
+  datcollversion: string | null;
   datacl: any | null;
-  constructor(data: pg_database) {
+  constructor(data: PgDatabase) {
     this.oid = data.oid;
     this.datname = data.datname;
     this.datdba = data.datdba;
     this.encoding = data.encoding;
-    this.datcollate = data.datcollate;
-    this.datctype = data.datctype;
+    this.datlocprovider = data.datlocprovider;
     this.datistemplate = data.datistemplate;
     this.datallowconn = data.datallowconn;
+    this.dathasloginevt = data.dathasloginevt;
     this.datconnlimit = data.datconnlimit;
-    this.datlastsysoid = data.datlastsysoid;
     this.datfrozenxid = data.datfrozenxid;
     this.datminmxid = data.datminmxid;
     this.dattablespace = data.dattablespace;
+    this.datcollate = data.datcollate;
+    this.datctype = data.datctype;
+    this.datlocale = data.datlocale;
+    this.daticurules = data.daticurules;
+    this.datcollversion = data.datcollversion;
     this.datacl = data.datacl;
   }
 }
-export interface pg_db_role_setting {
+export interface PgDbRoleSetting {
   setdatabase: any;
   setrole: any;
   setconfig: any | null;
 }
-export class pg_db_role_setting implements pg_db_role_setting {
+export class PgDbRoleSetting implements PgDbRoleSetting {
   setdatabase: any;
   setrole: any;
   setconfig: any | null;
-  constructor(data: pg_db_role_setting) {
+  constructor(data: PgDbRoleSetting) {
     this.setdatabase = data.setdatabase;
     this.setrole = data.setrole;
     this.setconfig = data.setconfig;
   }
 }
-export interface pg_default_acl {
+export interface PgDefaultAcl {
   oid: any;
   defaclrole: any;
   defaclnamespace: any;
   defaclobjtype: any;
   defaclacl: any;
 }
-export class pg_default_acl implements pg_default_acl {
+export class PgDefaultAcl implements PgDefaultAcl {
   oid: any;
   defaclrole: any;
   defaclnamespace: any;
   defaclobjtype: any;
   defaclacl: any;
-  constructor(data: pg_default_acl) {
+  constructor(data: PgDefaultAcl) {
     this.oid = data.oid;
     this.defaclrole = data.defaclrole;
     this.defaclnamespace = data.defaclnamespace;
@@ -665,7 +704,7 @@ export class pg_default_acl implements pg_default_acl {
     this.defaclacl = data.defaclacl;
   }
 }
-export interface pg_depend {
+export interface PgDepend {
   classid: any;
   objid: any;
   objsubid: number;
@@ -674,7 +713,7 @@ export interface pg_depend {
   refobjsubid: number;
   deptype: any;
 }
-export class pg_depend implements pg_depend {
+export class PgDepend implements PgDepend {
   classid: any;
   objid: any;
   objsubid: number;
@@ -682,7 +721,7 @@ export class pg_depend implements pg_depend {
   refobjid: any;
   refobjsubid: number;
   deptype: any;
-  constructor(data: pg_depend) {
+  constructor(data: PgDepend) {
     this.classid = data.classid;
     this.objid = data.objid;
     this.objsubid = data.objsubid;
@@ -692,43 +731,43 @@ export class pg_depend implements pg_depend {
     this.deptype = data.deptype;
   }
 }
-export interface pg_description {
+export interface PgDescription {
   objoid: any;
   classoid: any;
   objsubid: number;
   description: string;
 }
-export class pg_description implements pg_description {
+export class PgDescription implements PgDescription {
   objoid: any;
   classoid: any;
   objsubid: number;
   description: string;
-  constructor(data: pg_description) {
+  constructor(data: PgDescription) {
     this.objoid = data.objoid;
     this.classoid = data.classoid;
     this.objsubid = data.objsubid;
     this.description = data.description;
   }
 }
-export interface pg_enum {
+export interface PgEnum {
   oid: any;
   enumtypid: any;
   enumsortorder: any;
   enumlabel: any;
 }
-export class pg_enum implements pg_enum {
+export class PgEnum implements PgEnum {
   oid: any;
   enumtypid: any;
   enumsortorder: any;
   enumlabel: any;
-  constructor(data: pg_enum) {
+  constructor(data: PgEnum) {
     this.oid = data.oid;
     this.enumtypid = data.enumtypid;
     this.enumsortorder = data.enumsortorder;
     this.enumlabel = data.enumlabel;
   }
 }
-export interface pg_event_trigger {
+export interface PgEventTrigger {
   oid: any;
   evtname: any;
   evtevent: any;
@@ -737,7 +776,7 @@ export interface pg_event_trigger {
   evtenabled: any;
   evttags: any | null;
 }
-export class pg_event_trigger implements pg_event_trigger {
+export class PgEventTrigger implements PgEventTrigger {
   oid: any;
   evtname: any;
   evtevent: any;
@@ -745,7 +784,7 @@ export class pg_event_trigger implements pg_event_trigger {
   evtfoid: any;
   evtenabled: any;
   evttags: any | null;
-  constructor(data: pg_event_trigger) {
+  constructor(data: PgEventTrigger) {
     this.oid = data.oid;
     this.evtname = data.evtname;
     this.evtevent = data.evtevent;
@@ -755,7 +794,7 @@ export class pg_event_trigger implements pg_event_trigger {
     this.evttags = data.evttags;
   }
 }
-export interface pg_extension {
+export interface PgExtension {
   oid: any;
   extname: any;
   extowner: any;
@@ -765,7 +804,7 @@ export interface pg_extension {
   extconfig: any | null;
   extcondition: any | null;
 }
-export class pg_extension implements pg_extension {
+export class PgExtension implements PgExtension {
   oid: any;
   extname: any;
   extowner: any;
@@ -774,7 +813,7 @@ export class pg_extension implements pg_extension {
   extversion: string;
   extconfig: any | null;
   extcondition: any | null;
-  constructor(data: pg_extension) {
+  constructor(data: PgExtension) {
     this.oid = data.oid;
     this.extname = data.extname;
     this.extowner = data.extowner;
@@ -785,7 +824,7 @@ export class pg_extension implements pg_extension {
     this.extcondition = data.extcondition;
   }
 }
-export interface pg_foreign_data_wrapper {
+export interface PgForeignDataWrapper {
   oid: any;
   fdwname: any;
   fdwowner: any;
@@ -794,7 +833,7 @@ export interface pg_foreign_data_wrapper {
   fdwacl: any | null;
   fdwoptions: any | null;
 }
-export class pg_foreign_data_wrapper implements pg_foreign_data_wrapper {
+export class PgForeignDataWrapper implements PgForeignDataWrapper {
   oid: any;
   fdwname: any;
   fdwowner: any;
@@ -802,7 +841,7 @@ export class pg_foreign_data_wrapper implements pg_foreign_data_wrapper {
   fdwvalidator: any;
   fdwacl: any | null;
   fdwoptions: any | null;
-  constructor(data: pg_foreign_data_wrapper) {
+  constructor(data: PgForeignDataWrapper) {
     this.oid = data.oid;
     this.fdwname = data.fdwname;
     this.fdwowner = data.fdwowner;
@@ -812,7 +851,7 @@ export class pg_foreign_data_wrapper implements pg_foreign_data_wrapper {
     this.fdwoptions = data.fdwoptions;
   }
 }
-export interface pg_foreign_server {
+export interface PgForeignServer {
   oid: any;
   srvname: any;
   srvowner: any;
@@ -822,7 +861,7 @@ export interface pg_foreign_server {
   srvacl: any | null;
   srvoptions: any | null;
 }
-export class pg_foreign_server implements pg_foreign_server {
+export class PgForeignServer implements PgForeignServer {
   oid: any;
   srvname: any;
   srvowner: any;
@@ -831,7 +870,7 @@ export class pg_foreign_server implements pg_foreign_server {
   srvversion: string | null;
   srvacl: any | null;
   srvoptions: any | null;
-  constructor(data: pg_foreign_server) {
+  constructor(data: PgForeignServer) {
     this.oid = data.oid;
     this.srvname = data.srvname;
     this.srvowner = data.srvowner;
@@ -842,27 +881,28 @@ export class pg_foreign_server implements pg_foreign_server {
     this.srvoptions = data.srvoptions;
   }
 }
-export interface pg_foreign_table {
+export interface PgForeignTable {
   ftrelid: any;
   ftserver: any;
   ftoptions: any | null;
 }
-export class pg_foreign_table implements pg_foreign_table {
+export class PgForeignTable implements PgForeignTable {
   ftrelid: any;
   ftserver: any;
   ftoptions: any | null;
-  constructor(data: pg_foreign_table) {
+  constructor(data: PgForeignTable) {
     this.ftrelid = data.ftrelid;
     this.ftserver = data.ftserver;
     this.ftoptions = data.ftoptions;
   }
 }
-export interface pg_index {
+export interface PgIndex {
   indexrelid: any;
   indrelid: any;
   indnatts: number;
   indnkeyatts: number;
   indisunique: boolean;
+  indnullsnotdistinct: boolean;
   indisprimary: boolean;
   indisexclusion: boolean;
   indimmediate: boolean;
@@ -879,12 +919,13 @@ export interface pg_index {
   indexprs: any | null;
   indpred: any | null;
 }
-export class pg_index implements pg_index {
+export class PgIndex implements PgIndex {
   indexrelid: any;
   indrelid: any;
   indnatts: number;
   indnkeyatts: number;
   indisunique: boolean;
+  indnullsnotdistinct: boolean;
   indisprimary: boolean;
   indisexclusion: boolean;
   indimmediate: boolean;
@@ -900,12 +941,13 @@ export class pg_index implements pg_index {
   indoption: any;
   indexprs: any | null;
   indpred: any | null;
-  constructor(data: pg_index) {
+  constructor(data: PgIndex) {
     this.indexrelid = data.indexrelid;
     this.indrelid = data.indrelid;
     this.indnatts = data.indnatts;
     this.indnkeyatts = data.indnkeyatts;
     this.indisunique = data.indisunique;
+    this.indnullsnotdistinct = data.indnullsnotdistinct;
     this.indisprimary = data.indisprimary;
     this.indisexclusion = data.indisexclusion;
     this.indimmediate = data.indimmediate;
@@ -923,35 +965,38 @@ export class pg_index implements pg_index {
     this.indpred = data.indpred;
   }
 }
-export interface pg_inherits {
+export interface PgInherits {
   inhrelid: any;
   inhparent: any;
   inhseqno: number;
+  inhdetachpending: boolean;
 }
-export class pg_inherits implements pg_inherits {
+export class PgInherits implements PgInherits {
   inhrelid: any;
   inhparent: any;
   inhseqno: number;
-  constructor(data: pg_inherits) {
+  inhdetachpending: boolean;
+  constructor(data: PgInherits) {
     this.inhrelid = data.inhrelid;
     this.inhparent = data.inhparent;
     this.inhseqno = data.inhseqno;
+    this.inhdetachpending = data.inhdetachpending;
   }
 }
-export interface pg_init_privs {
+export interface PgInitPrivs {
   objoid: any;
   classoid: any;
   objsubid: number;
   privtype: any;
   initprivs: any;
 }
-export class pg_init_privs implements pg_init_privs {
+export class PgInitPrivs implements PgInitPrivs {
   objoid: any;
   classoid: any;
   objsubid: number;
   privtype: any;
   initprivs: any;
-  constructor(data: pg_init_privs) {
+  constructor(data: PgInitPrivs) {
     this.objoid = data.objoid;
     this.classoid = data.classoid;
     this.objsubid = data.objsubid;
@@ -959,7 +1004,7 @@ export class pg_init_privs implements pg_init_privs {
     this.initprivs = data.initprivs;
   }
 }
-export interface pg_language {
+export interface PgLanguage {
   oid: any;
   lanname: any;
   lanowner: any;
@@ -970,7 +1015,7 @@ export interface pg_language {
   lanvalidator: any;
   lanacl: any | null;
 }
-export class pg_language implements pg_language {
+export class PgLanguage implements PgLanguage {
   oid: any;
   lanname: any;
   lanowner: any;
@@ -980,7 +1025,7 @@ export class pg_language implements pg_language {
   laninline: any;
   lanvalidator: any;
   lanacl: any | null;
-  constructor(data: pg_language) {
+  constructor(data: PgLanguage) {
     this.oid = data.oid;
     this.lanname = data.lanname;
     this.lanowner = data.lanowner;
@@ -992,55 +1037,55 @@ export class pg_language implements pg_language {
     this.lanacl = data.lanacl;
   }
 }
-export interface pg_largeobject {
+export interface PgLargeobject {
   loid: any;
   pageno: number;
   data: any;
 }
-export class pg_largeobject implements pg_largeobject {
+export class PgLargeobject implements PgLargeobject {
   loid: any;
   pageno: number;
   data: any;
-  constructor(data: pg_largeobject) {
+  constructor(data: PgLargeobject) {
     this.loid = data.loid;
     this.pageno = data.pageno;
     this.data = data.data;
   }
 }
-export interface pg_largeobject_metadata {
+export interface PgLargeobjectMetadata {
   oid: any;
   lomowner: any;
   lomacl: any | null;
 }
-export class pg_largeobject_metadata implements pg_largeobject_metadata {
+export class PgLargeobjectMetadata implements PgLargeobjectMetadata {
   oid: any;
   lomowner: any;
   lomacl: any | null;
-  constructor(data: pg_largeobject_metadata) {
+  constructor(data: PgLargeobjectMetadata) {
     this.oid = data.oid;
     this.lomowner = data.lomowner;
     this.lomacl = data.lomacl;
   }
 }
-export interface pg_namespace {
+export interface PgNamespace {
   oid: any;
   nspname: any;
   nspowner: any;
   nspacl: any | null;
 }
-export class pg_namespace implements pg_namespace {
+export class PgNamespace implements PgNamespace {
   oid: any;
   nspname: any;
   nspowner: any;
   nspacl: any | null;
-  constructor(data: pg_namespace) {
+  constructor(data: PgNamespace) {
     this.oid = data.oid;
     this.nspname = data.nspname;
     this.nspowner = data.nspowner;
     this.nspacl = data.nspacl;
   }
 }
-export interface pg_opclass {
+export interface PgOpclass {
   oid: any;
   opcmethod: any;
   opcname: any;
@@ -1051,7 +1096,7 @@ export interface pg_opclass {
   opcdefault: boolean;
   opckeytype: any;
 }
-export class pg_opclass implements pg_opclass {
+export class PgOpclass implements PgOpclass {
   oid: any;
   opcmethod: any;
   opcname: any;
@@ -1061,7 +1106,7 @@ export class pg_opclass implements pg_opclass {
   opcintype: any;
   opcdefault: boolean;
   opckeytype: any;
-  constructor(data: pg_opclass) {
+  constructor(data: PgOpclass) {
     this.oid = data.oid;
     this.opcmethod = data.opcmethod;
     this.opcname = data.opcname;
@@ -1073,7 +1118,7 @@ export class pg_opclass implements pg_opclass {
     this.opckeytype = data.opckeytype;
   }
 }
-export interface pg_operator {
+export interface PgOperator {
   oid: any;
   oprname: any;
   oprnamespace: any;
@@ -1090,7 +1135,7 @@ export interface pg_operator {
   oprrest: any;
   oprjoin: any;
 }
-export class pg_operator implements pg_operator {
+export class PgOperator implements PgOperator {
   oid: any;
   oprname: any;
   oprnamespace: any;
@@ -1106,7 +1151,7 @@ export class pg_operator implements pg_operator {
   oprcode: any;
   oprrest: any;
   oprjoin: any;
-  constructor(data: pg_operator) {
+  constructor(data: PgOperator) {
     this.oid = data.oid;
     this.oprname = data.oprname;
     this.oprnamespace = data.oprnamespace;
@@ -1124,20 +1169,20 @@ export class pg_operator implements pg_operator {
     this.oprjoin = data.oprjoin;
   }
 }
-export interface pg_opfamily {
+export interface PgOpfamily {
   oid: any;
   opfmethod: any;
   opfname: any;
   opfnamespace: any;
   opfowner: any;
 }
-export class pg_opfamily implements pg_opfamily {
+export class PgOpfamily implements PgOpfamily {
   oid: any;
   opfmethod: any;
   opfname: any;
   opfnamespace: any;
   opfowner: any;
-  constructor(data: pg_opfamily) {
+  constructor(data: PgOpfamily) {
     this.oid = data.oid;
     this.opfmethod = data.opfmethod;
     this.opfname = data.opfname;
@@ -1145,7 +1190,22 @@ export class pg_opfamily implements pg_opfamily {
     this.opfowner = data.opfowner;
   }
 }
-export interface pg_partitioned_table {
+export interface PgParameterAcl {
+  oid: any;
+  parname: string;
+  paracl: any | null;
+}
+export class PgParameterAcl implements PgParameterAcl {
+  oid: any;
+  parname: string;
+  paracl: any | null;
+  constructor(data: PgParameterAcl) {
+    this.oid = data.oid;
+    this.parname = data.parname;
+    this.paracl = data.paracl;
+  }
+}
+export interface PgPartitionedTable {
   partrelid: any;
   partstrat: any;
   partnatts: number;
@@ -1155,7 +1215,7 @@ export interface pg_partitioned_table {
   partcollation: any;
   partexprs: any | null;
 }
-export class pg_partitioned_table implements pg_partitioned_table {
+export class PgPartitionedTable implements PgPartitionedTable {
   partrelid: any;
   partstrat: any;
   partnatts: number;
@@ -1164,7 +1224,7 @@ export class pg_partitioned_table implements pg_partitioned_table {
   partclass: any;
   partcollation: any;
   partexprs: any | null;
-  constructor(data: pg_partitioned_table) {
+  constructor(data: PgPartitionedTable) {
     this.partrelid = data.partrelid;
     this.partstrat = data.partstrat;
     this.partnatts = data.partnatts;
@@ -1175,37 +1235,7 @@ export class pg_partitioned_table implements pg_partitioned_table {
     this.partexprs = data.partexprs;
   }
 }
-export interface pg_pltemplate {
-  tmplname: any;
-  tmpltrusted: boolean;
-  tmpldbacreate: boolean;
-  tmplhandler: string;
-  tmplinline: string | null;
-  tmplvalidator: string | null;
-  tmpllibrary: string;
-  tmplacl: any | null;
-}
-export class pg_pltemplate implements pg_pltemplate {
-  tmplname: any;
-  tmpltrusted: boolean;
-  tmpldbacreate: boolean;
-  tmplhandler: string;
-  tmplinline: string | null;
-  tmplvalidator: string | null;
-  tmpllibrary: string;
-  tmplacl: any | null;
-  constructor(data: pg_pltemplate) {
-    this.tmplname = data.tmplname;
-    this.tmpltrusted = data.tmpltrusted;
-    this.tmpldbacreate = data.tmpldbacreate;
-    this.tmplhandler = data.tmplhandler;
-    this.tmplinline = data.tmplinline;
-    this.tmplvalidator = data.tmplvalidator;
-    this.tmpllibrary = data.tmpllibrary;
-    this.tmplacl = data.tmplacl;
-  }
-}
-export interface pg_policy {
+export interface PgPolicy {
   oid: any;
   polname: any;
   polrelid: any;
@@ -1215,7 +1245,7 @@ export interface pg_policy {
   polqual: any | null;
   polwithcheck: any | null;
 }
-export class pg_policy implements pg_policy {
+export class PgPolicy implements PgPolicy {
   oid: any;
   polname: any;
   polrelid: any;
@@ -1224,7 +1254,7 @@ export class pg_policy implements pg_policy {
   polroles: any;
   polqual: any | null;
   polwithcheck: any | null;
-  constructor(data: pg_policy) {
+  constructor(data: PgPolicy) {
     this.oid = data.oid;
     this.polname = data.polname;
     this.polrelid = data.polrelid;
@@ -1235,7 +1265,7 @@ export class pg_policy implements pg_policy {
     this.polwithcheck = data.polwithcheck;
   }
 }
-export interface pg_proc {
+export interface PgProc {
   oid: any;
   proname: any;
   pronamespace: any;
@@ -1263,10 +1293,11 @@ export interface pg_proc {
   protrftypes: any | null;
   prosrc: string;
   probin: string | null;
+  prosqlbody: any | null;
   proconfig: any | null;
   proacl: any | null;
 }
-export class pg_proc implements pg_proc {
+export class PgProc implements PgProc {
   oid: any;
   proname: any;
   pronamespace: any;
@@ -1294,9 +1325,10 @@ export class pg_proc implements pg_proc {
   protrftypes: any | null;
   prosrc: string;
   probin: string | null;
+  prosqlbody: any | null;
   proconfig: any | null;
   proacl: any | null;
-  constructor(data: pg_proc) {
+  constructor(data: PgProc) {
     this.oid = data.oid;
     this.proname = data.proname;
     this.pronamespace = data.pronamespace;
@@ -1324,11 +1356,12 @@ export class pg_proc implements pg_proc {
     this.protrftypes = data.protrftypes;
     this.prosrc = data.prosrc;
     this.probin = data.probin;
+    this.prosqlbody = data.prosqlbody;
     this.proconfig = data.proconfig;
     this.proacl = data.proacl;
   }
 }
-export interface pg_publication {
+export interface PgPublication {
   oid: any;
   pubname: any;
   pubowner: any;
@@ -1337,8 +1370,10 @@ export interface pg_publication {
   pubupdate: boolean;
   pubdelete: boolean;
   pubtruncate: boolean;
+  pubviaroot: boolean;
+  pubgencols: any;
 }
-export class pg_publication implements pg_publication {
+export class PgPublication implements PgPublication {
   oid: any;
   pubname: any;
   pubowner: any;
@@ -1347,7 +1382,9 @@ export class pg_publication implements pg_publication {
   pubupdate: boolean;
   pubdelete: boolean;
   pubtruncate: boolean;
-  constructor(data: pg_publication) {
+  pubviaroot: boolean;
+  pubgencols: any;
+  constructor(data: PgPublication) {
     this.oid = data.oid;
     this.pubname = data.pubname;
     this.pubowner = data.pubowner;
@@ -1356,60 +1393,86 @@ export class pg_publication implements pg_publication {
     this.pubupdate = data.pubupdate;
     this.pubdelete = data.pubdelete;
     this.pubtruncate = data.pubtruncate;
+    this.pubviaroot = data.pubviaroot;
+    this.pubgencols = data.pubgencols;
   }
 }
-export interface pg_publication_rel {
+export interface PgPublicationNamespace {
   oid: any;
-  prpubid: any;
-  prrelid: any;
+  pnpubid: any;
+  pnnspid: any;
 }
-export class pg_publication_rel implements pg_publication_rel {
+export class PgPublicationNamespace implements PgPublicationNamespace {
+  oid: any;
+  pnpubid: any;
+  pnnspid: any;
+  constructor(data: PgPublicationNamespace) {
+    this.oid = data.oid;
+    this.pnpubid = data.pnpubid;
+    this.pnnspid = data.pnnspid;
+  }
+}
+export interface PgPublicationRel {
   oid: any;
   prpubid: any;
   prrelid: any;
-  constructor(data: pg_publication_rel) {
+  prqual: any | null;
+  prattrs: any | null;
+}
+export class PgPublicationRel implements PgPublicationRel {
+  oid: any;
+  prpubid: any;
+  prrelid: any;
+  prqual: any | null;
+  prattrs: any | null;
+  constructor(data: PgPublicationRel) {
     this.oid = data.oid;
     this.prpubid = data.prpubid;
     this.prrelid = data.prrelid;
+    this.prqual = data.prqual;
+    this.prattrs = data.prattrs;
   }
 }
-export interface pg_range {
+export interface PgRange {
   rngtypid: any;
   rngsubtype: any;
+  rngmultitypid: any;
   rngcollation: any;
   rngsubopc: any;
   rngcanonical: any;
   rngsubdiff: any;
 }
-export class pg_range implements pg_range {
+export class PgRange implements PgRange {
   rngtypid: any;
   rngsubtype: any;
+  rngmultitypid: any;
   rngcollation: any;
   rngsubopc: any;
   rngcanonical: any;
   rngsubdiff: any;
-  constructor(data: pg_range) {
+  constructor(data: PgRange) {
     this.rngtypid = data.rngtypid;
     this.rngsubtype = data.rngsubtype;
+    this.rngmultitypid = data.rngmultitypid;
     this.rngcollation = data.rngcollation;
     this.rngsubopc = data.rngsubopc;
     this.rngcanonical = data.rngcanonical;
     this.rngsubdiff = data.rngsubdiff;
   }
 }
-export interface pg_replication_origin {
+export interface PgReplicationOrigin {
   roident: any;
   roname: string;
 }
-export class pg_replication_origin implements pg_replication_origin {
+export class PgReplicationOrigin implements PgReplicationOrigin {
   roident: any;
   roname: string;
-  constructor(data: pg_replication_origin) {
+  constructor(data: PgReplicationOrigin) {
     this.roident = data.roident;
     this.roname = data.roname;
   }
 }
-export interface pg_rewrite {
+export interface PgRewrite {
   oid: any;
   rulename: any;
   ev_class: any;
@@ -1419,7 +1482,7 @@ export interface pg_rewrite {
   ev_qual: any;
   ev_action: any;
 }
-export class pg_rewrite implements pg_rewrite {
+export class PgRewrite implements PgRewrite {
   oid: any;
   rulename: any;
   ev_class: any;
@@ -1428,7 +1491,7 @@ export class pg_rewrite implements pg_rewrite {
   is_instead: boolean;
   ev_qual: any;
   ev_action: any;
-  constructor(data: pg_rewrite) {
+  constructor(data: PgRewrite) {
     this.oid = data.oid;
     this.rulename = data.rulename;
     this.ev_class = data.ev_class;
@@ -1439,20 +1502,20 @@ export class pg_rewrite implements pg_rewrite {
     this.ev_action = data.ev_action;
   }
 }
-export interface pg_seclabel {
+export interface PgSeclabel {
   objoid: any;
   classoid: any;
   objsubid: number;
   provider: string;
   label: string;
 }
-export class pg_seclabel implements pg_seclabel {
+export class PgSeclabel implements PgSeclabel {
   objoid: any;
   classoid: any;
   objsubid: number;
   provider: string;
   label: string;
-  constructor(data: pg_seclabel) {
+  constructor(data: PgSeclabel) {
     this.objoid = data.objoid;
     this.classoid = data.classoid;
     this.objsubid = data.objsubid;
@@ -1460,7 +1523,7 @@ export class pg_seclabel implements pg_seclabel {
     this.label = data.label;
   }
 }
-export interface pg_sequence {
+export interface PgSequence {
   seqrelid: any;
   seqtypid: any;
   seqstart: number;
@@ -1470,7 +1533,7 @@ export interface pg_sequence {
   seqcache: number;
   seqcycle: boolean;
 }
-export class pg_sequence implements pg_sequence {
+export class PgSequence implements PgSequence {
   seqrelid: any;
   seqtypid: any;
   seqstart: number;
@@ -1479,7 +1542,7 @@ export class pg_sequence implements pg_sequence {
   seqmin: number;
   seqcache: number;
   seqcycle: boolean;
-  constructor(data: pg_sequence) {
+  constructor(data: PgSequence) {
     this.seqrelid = data.seqrelid;
     this.seqtypid = data.seqtypid;
     this.seqstart = data.seqstart;
@@ -1490,7 +1553,7 @@ export class pg_sequence implements pg_sequence {
     this.seqcycle = data.seqcycle;
   }
 }
-export interface pg_shdepend {
+export interface PgShdepend {
   dbid: any;
   classid: any;
   objid: any;
@@ -1499,7 +1562,7 @@ export interface pg_shdepend {
   refobjid: any;
   deptype: any;
 }
-export class pg_shdepend implements pg_shdepend {
+export class PgShdepend implements PgShdepend {
   dbid: any;
   classid: any;
   objid: any;
@@ -1507,7 +1570,7 @@ export class pg_shdepend implements pg_shdepend {
   refclassid: any;
   refobjid: any;
   deptype: any;
-  constructor(data: pg_shdepend) {
+  constructor(data: PgShdepend) {
     this.dbid = data.dbid;
     this.classid = data.classid;
     this.objid = data.objid;
@@ -1517,40 +1580,40 @@ export class pg_shdepend implements pg_shdepend {
     this.deptype = data.deptype;
   }
 }
-export interface pg_shdescription {
+export interface PgShdescription {
   objoid: any;
   classoid: any;
   description: string;
 }
-export class pg_shdescription implements pg_shdescription {
+export class PgShdescription implements PgShdescription {
   objoid: any;
   classoid: any;
   description: string;
-  constructor(data: pg_shdescription) {
+  constructor(data: PgShdescription) {
     this.objoid = data.objoid;
     this.classoid = data.classoid;
     this.description = data.description;
   }
 }
-export interface pg_shseclabel {
+export interface PgShseclabel {
   objoid: any;
   classoid: any;
   provider: string;
   label: string;
 }
-export class pg_shseclabel implements pg_shseclabel {
+export class PgShseclabel implements PgShseclabel {
   objoid: any;
   classoid: any;
   provider: string;
   label: string;
-  constructor(data: pg_shseclabel) {
+  constructor(data: PgShseclabel) {
     this.objoid = data.objoid;
     this.classoid = data.classoid;
     this.provider = data.provider;
     this.label = data.label;
   }
 }
-export interface pg_statistic {
+export interface PgStatistic {
   starelid: any;
   staattnum: number;
   stainherit: boolean;
@@ -1583,7 +1646,7 @@ export interface pg_statistic {
   stavalues4: any | null;
   stavalues5: any | null;
 }
-export class pg_statistic implements pg_statistic {
+export class PgStatistic implements PgStatistic {
   starelid: any;
   staattnum: number;
   stainherit: boolean;
@@ -1615,7 +1678,7 @@ export class pg_statistic implements pg_statistic {
   stavalues3: any | null;
   stavalues4: any | null;
   stavalues5: any | null;
-  constructor(data: pg_statistic) {
+  constructor(data: PgStatistic) {
     this.starelid = data.starelid;
     this.staattnum = data.staattnum;
     this.stainherit = data.stainherit;
@@ -1649,116 +1712,155 @@ export class pg_statistic implements pg_statistic {
     this.stavalues5 = data.stavalues5;
   }
 }
-export interface pg_statistic_ext {
+export interface PgStatisticExt {
   oid: any;
   stxrelid: any;
   stxname: any;
   stxnamespace: any;
   stxowner: any;
   stxkeys: any;
+  stxstattarget: number | null;
   stxkind: any;
+  stxexprs: any | null;
 }
-export class pg_statistic_ext implements pg_statistic_ext {
+export class PgStatisticExt implements PgStatisticExt {
   oid: any;
   stxrelid: any;
   stxname: any;
   stxnamespace: any;
   stxowner: any;
   stxkeys: any;
+  stxstattarget: number | null;
   stxkind: any;
-  constructor(data: pg_statistic_ext) {
+  stxexprs: any | null;
+  constructor(data: PgStatisticExt) {
     this.oid = data.oid;
     this.stxrelid = data.stxrelid;
     this.stxname = data.stxname;
     this.stxnamespace = data.stxnamespace;
     this.stxowner = data.stxowner;
     this.stxkeys = data.stxkeys;
+    this.stxstattarget = data.stxstattarget;
     this.stxkind = data.stxkind;
+    this.stxexprs = data.stxexprs;
   }
 }
-export interface pg_statistic_ext_data {
+export interface PgStatisticExtData {
   stxoid: any;
+  stxdinherit: boolean;
   stxdndistinct: any | null;
   stxddependencies: any | null;
   stxdmcv: any | null;
+  stxdexpr: any | null;
 }
-export class pg_statistic_ext_data implements pg_statistic_ext_data {
+export class PgStatisticExtData implements PgStatisticExtData {
   stxoid: any;
+  stxdinherit: boolean;
   stxdndistinct: any | null;
   stxddependencies: any | null;
   stxdmcv: any | null;
-  constructor(data: pg_statistic_ext_data) {
+  stxdexpr: any | null;
+  constructor(data: PgStatisticExtData) {
     this.stxoid = data.stxoid;
+    this.stxdinherit = data.stxdinherit;
     this.stxdndistinct = data.stxdndistinct;
     this.stxddependencies = data.stxddependencies;
     this.stxdmcv = data.stxdmcv;
+    this.stxdexpr = data.stxdexpr;
   }
 }
-export interface pg_subscription {
+export interface PgSubscription {
   oid: any;
   subdbid: any;
+  subskiplsn: any;
   subname: any;
   subowner: any;
   subenabled: boolean;
+  subbinary: boolean;
+  substream: any;
+  subtwophasestate: any;
+  subdisableonerr: boolean;
+  subpasswordrequired: boolean;
+  subrunasowner: boolean;
+  subfailover: boolean;
   subconninfo: string;
-  subslotname: any;
+  subslotname: any | null;
   subsynccommit: string;
   subpublications: any;
+  suborigin: string | null;
 }
-export class pg_subscription implements pg_subscription {
+export class PgSubscription implements PgSubscription {
   oid: any;
   subdbid: any;
+  subskiplsn: any;
   subname: any;
   subowner: any;
   subenabled: boolean;
+  subbinary: boolean;
+  substream: any;
+  subtwophasestate: any;
+  subdisableonerr: boolean;
+  subpasswordrequired: boolean;
+  subrunasowner: boolean;
+  subfailover: boolean;
   subconninfo: string;
-  subslotname: any;
+  subslotname: any | null;
   subsynccommit: string;
   subpublications: any;
-  constructor(data: pg_subscription) {
+  suborigin: string | null;
+  constructor(data: PgSubscription) {
     this.oid = data.oid;
     this.subdbid = data.subdbid;
+    this.subskiplsn = data.subskiplsn;
     this.subname = data.subname;
     this.subowner = data.subowner;
     this.subenabled = data.subenabled;
+    this.subbinary = data.subbinary;
+    this.substream = data.substream;
+    this.subtwophasestate = data.subtwophasestate;
+    this.subdisableonerr = data.subdisableonerr;
+    this.subpasswordrequired = data.subpasswordrequired;
+    this.subrunasowner = data.subrunasowner;
+    this.subfailover = data.subfailover;
     this.subconninfo = data.subconninfo;
     this.subslotname = data.subslotname;
     this.subsynccommit = data.subsynccommit;
     this.subpublications = data.subpublications;
+    this.suborigin = data.suborigin;
   }
 }
-export interface pg_subscription_rel {
+export interface PgSubscriptionRel {
   srsubid: any;
   srrelid: any;
   srsubstate: any;
-  srsublsn: any;
+  srsublsn: any | null;
 }
-export class pg_subscription_rel implements pg_subscription_rel {
+export class PgSubscriptionRel implements PgSubscriptionRel {
   srsubid: any;
   srrelid: any;
   srsubstate: any;
-  srsublsn: any;
-  constructor(data: pg_subscription_rel) {
+  srsublsn: any | null;
+  constructor(data: PgSubscriptionRel) {
     this.srsubid = data.srsubid;
     this.srrelid = data.srrelid;
     this.srsubstate = data.srsubstate;
     this.srsublsn = data.srsublsn;
   }
 }
-export interface pg_tablespace {
+export interface PgTablespace {
   oid: any;
   spcname: any;
   spcowner: any;
   spcacl: any | null;
   spcoptions: any | null;
 }
-export class pg_tablespace implements pg_tablespace {
+export class PgTablespace implements PgTablespace {
   oid: any;
   spcname: any;
   spcowner: any;
   spcacl: any | null;
   spcoptions: any | null;
-  constructor(data: pg_tablespace) {
+  constructor(data: PgTablespace) {
     this.oid = data.oid;
     this.spcname = data.spcname;
     this.spcowner = data.spcowner;
@@ -1766,20 +1868,20 @@ export class pg_tablespace implements pg_tablespace {
     this.spcoptions = data.spcoptions;
   }
 }
-export interface pg_transform {
+export interface PgTransform {
   oid: any;
   trftype: any;
   trflang: any;
   trffromsql: any;
   trftosql: any;
 }
-export class pg_transform implements pg_transform {
+export class PgTransform implements PgTransform {
   oid: any;
   trftype: any;
   trflang: any;
   trffromsql: any;
   trftosql: any;
-  constructor(data: pg_transform) {
+  constructor(data: PgTransform) {
     this.oid = data.oid;
     this.trftype = data.trftype;
     this.trflang = data.trflang;
@@ -1787,9 +1889,10 @@ export class pg_transform implements pg_transform {
     this.trftosql = data.trftosql;
   }
 }
-export interface pg_trigger {
+export interface PgTrigger {
   oid: any;
   tgrelid: any;
+  tgparentid: any;
   tgname: any;
   tgfoid: any;
   tgtype: number;
@@ -1807,9 +1910,10 @@ export interface pg_trigger {
   tgoldtable: any | null;
   tgnewtable: any | null;
 }
-export class pg_trigger implements pg_trigger {
+export class PgTrigger implements PgTrigger {
   oid: any;
   tgrelid: any;
+  tgparentid: any;
   tgname: any;
   tgfoid: any;
   tgtype: number;
@@ -1826,9 +1930,10 @@ export class pg_trigger implements pg_trigger {
   tgqual: any | null;
   tgoldtable: any | null;
   tgnewtable: any | null;
-  constructor(data: pg_trigger) {
+  constructor(data: PgTrigger) {
     this.oid = data.oid;
     this.tgrelid = data.tgrelid;
+    this.tgparentid = data.tgparentid;
     this.tgname = data.tgname;
     this.tgfoid = data.tgfoid;
     this.tgtype = data.tgtype;
@@ -1847,20 +1952,20 @@ export class pg_trigger implements pg_trigger {
     this.tgnewtable = data.tgnewtable;
   }
 }
-export interface pg_ts_config {
+export interface PgTsConfig {
   oid: any;
   cfgname: any;
   cfgnamespace: any;
   cfgowner: any;
   cfgparser: any;
 }
-export class pg_ts_config implements pg_ts_config {
+export class PgTsConfig implements PgTsConfig {
   oid: any;
   cfgname: any;
   cfgnamespace: any;
   cfgowner: any;
   cfgparser: any;
-  constructor(data: pg_ts_config) {
+  constructor(data: PgTsConfig) {
     this.oid = data.oid;
     this.cfgname = data.cfgname;
     this.cfgnamespace = data.cfgnamespace;
@@ -1868,25 +1973,25 @@ export class pg_ts_config implements pg_ts_config {
     this.cfgparser = data.cfgparser;
   }
 }
-export interface pg_ts_config_map {
+export interface PgTsConfigMap {
   mapcfg: any;
   maptokentype: number;
   mapseqno: number;
   mapdict: any;
 }
-export class pg_ts_config_map implements pg_ts_config_map {
+export class PgTsConfigMap implements PgTsConfigMap {
   mapcfg: any;
   maptokentype: number;
   mapseqno: number;
   mapdict: any;
-  constructor(data: pg_ts_config_map) {
+  constructor(data: PgTsConfigMap) {
     this.mapcfg = data.mapcfg;
     this.maptokentype = data.maptokentype;
     this.mapseqno = data.mapseqno;
     this.mapdict = data.mapdict;
   }
 }
-export interface pg_ts_dict {
+export interface PgTsDict {
   oid: any;
   dictname: any;
   dictnamespace: any;
@@ -1894,14 +1999,14 @@ export interface pg_ts_dict {
   dicttemplate: any;
   dictinitoption: string | null;
 }
-export class pg_ts_dict implements pg_ts_dict {
+export class PgTsDict implements PgTsDict {
   oid: any;
   dictname: any;
   dictnamespace: any;
   dictowner: any;
   dicttemplate: any;
   dictinitoption: string | null;
-  constructor(data: pg_ts_dict) {
+  constructor(data: PgTsDict) {
     this.oid = data.oid;
     this.dictname = data.dictname;
     this.dictnamespace = data.dictnamespace;
@@ -1910,7 +2015,7 @@ export class pg_ts_dict implements pg_ts_dict {
     this.dictinitoption = data.dictinitoption;
   }
 }
-export interface pg_ts_parser {
+export interface PgTsParser {
   oid: any;
   prsname: any;
   prsnamespace: any;
@@ -1920,7 +2025,7 @@ export interface pg_ts_parser {
   prsheadline: any;
   prslextype: any;
 }
-export class pg_ts_parser implements pg_ts_parser {
+export class PgTsParser implements PgTsParser {
   oid: any;
   prsname: any;
   prsnamespace: any;
@@ -1929,7 +2034,7 @@ export class pg_ts_parser implements pg_ts_parser {
   prsend: any;
   prsheadline: any;
   prslextype: any;
-  constructor(data: pg_ts_parser) {
+  constructor(data: PgTsParser) {
     this.oid = data.oid;
     this.prsname = data.prsname;
     this.prsnamespace = data.prsnamespace;
@@ -1940,20 +2045,20 @@ export class pg_ts_parser implements pg_ts_parser {
     this.prslextype = data.prslextype;
   }
 }
-export interface pg_ts_template {
+export interface PgTsTemplate {
   oid: any;
   tmplname: any;
   tmplnamespace: any;
   tmplinit: any;
   tmpllexize: any;
 }
-export class pg_ts_template implements pg_ts_template {
+export class PgTsTemplate implements PgTsTemplate {
   oid: any;
   tmplname: any;
   tmplnamespace: any;
   tmplinit: any;
   tmpllexize: any;
-  constructor(data: pg_ts_template) {
+  constructor(data: PgTsTemplate) {
     this.oid = data.oid;
     this.tmplname = data.tmplname;
     this.tmplnamespace = data.tmplnamespace;
@@ -1961,7 +2066,7 @@ export class pg_ts_template implements pg_ts_template {
     this.tmpllexize = data.tmpllexize;
   }
 }
-export interface pg_type {
+export interface PgType {
   oid: any;
   typname: any;
   typnamespace: any;
@@ -1974,6 +2079,7 @@ export interface pg_type {
   typisdefined: boolean;
   typdelim: any;
   typrelid: any;
+  typsubscript: any;
   typelem: any;
   typarray: any;
   typinput: any;
@@ -1994,7 +2100,7 @@ export interface pg_type {
   typdefault: string | null;
   typacl: any | null;
 }
-export class pg_type implements pg_type {
+export class PgType implements PgType {
   oid: any;
   typname: any;
   typnamespace: any;
@@ -2007,6 +2113,7 @@ export class pg_type implements pg_type {
   typisdefined: boolean;
   typdelim: any;
   typrelid: any;
+  typsubscript: any;
   typelem: any;
   typarray: any;
   typinput: any;
@@ -2026,7 +2133,7 @@ export class pg_type implements pg_type {
   typdefaultbin: any | null;
   typdefault: string | null;
   typacl: any | null;
-  constructor(data: pg_type) {
+  constructor(data: PgType) {
     this.oid = data.oid;
     this.typname = data.typname;
     this.typnamespace = data.typnamespace;
@@ -2039,6 +2146,7 @@ export class pg_type implements pg_type {
     this.typisdefined = data.typisdefined;
     this.typdelim = data.typdelim;
     this.typrelid = data.typrelid;
+    this.typsubscript = data.typsubscript;
     this.typelem = data.typelem;
     this.typarray = data.typarray;
     this.typinput = data.typinput;
@@ -2060,18 +2168,18 @@ export class pg_type implements pg_type {
     this.typacl = data.typacl;
   }
 }
-export interface pg_user_mapping {
+export interface PgUserMapping {
   oid: any;
   umuser: any;
   umserver: any;
   umoptions: any | null;
 }
-export class pg_user_mapping implements pg_user_mapping {
+export class PgUserMapping implements PgUserMapping {
   oid: any;
   umuser: any;
   umserver: any;
   umoptions: any | null;
-  constructor(data: pg_user_mapping) {
+  constructor(data: PgUserMapping) {
     this.oid = data.oid;
     this.umuser = data.umuser;
     this.umserver = data.umserver;

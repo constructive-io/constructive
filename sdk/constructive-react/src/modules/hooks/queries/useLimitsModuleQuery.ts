@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { limitsModuleKeys } from '../query-keys';
-import type { LimitsModuleSelect, LimitsModuleWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { LimitsModuleSelect, LimitsModuleWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { limitsModuleKeys } from "../query-keys";
+import type { LimitsModuleSelect, LimitsModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { LimitsModuleSelect, LimitsModuleWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const limitsModuleQueryKey = limitsModuleKeys.detail;
 /**
  * Query hook for fetching a single LimitsModule
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useLimitsModuleQuery({
@@ -26,52 +26,38 @@ export const limitsModuleQueryKey = limitsModuleKeys.detail;
  * });
  * ```
  */
-export function useLimitsModuleQuery<
-  S extends LimitsModuleSelect,
-  TData = {
-    limitsModule: InferSelectResult<LimitsModuleWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        limitsModule: InferSelectResult<LimitsModuleWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useLimitsModuleQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<LimitsModuleSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useLimitsModuleQuery<S extends LimitsModuleSelect, TData = {
+  limitsModule: InferSelectResult<LimitsModuleWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
+} & Omit<UseQueryOptions<{
+  limitsModule: InferSelectResult<LimitsModuleWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useLimitsModuleQuery(params: {
+  id: string;
+  selection: SelectionConfig<LimitsModuleSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<LimitsModuleSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: limitsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .limitsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().limitsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single LimitsModule without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchLimitsModuleQuery({
@@ -93,46 +79,35 @@ export async function fetchLimitsModuleQuery(params: {
   selection: SelectionConfig<LimitsModuleSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<LimitsModuleSelect>(params.selection);
-  return getClient()
-    .limitsModule.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().limitsModule.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single LimitsModule for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchLimitsModuleQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchLimitsModuleQuery<S extends LimitsModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchLimitsModuleQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<LimitsModuleSelect>;
-  }
-): Promise<void> {
+export async function prefetchLimitsModuleQuery<S extends LimitsModuleSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, LimitsModuleSelect>;
+}): Promise<void>;
+export async function prefetchLimitsModuleQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<LimitsModuleSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<LimitsModuleSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: limitsModuleKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .limitsModule.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().limitsModule.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

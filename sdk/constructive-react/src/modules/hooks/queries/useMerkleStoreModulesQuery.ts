@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { merkleStoreModuleKeys } from '../query-keys';
-import type {
-  MerkleStoreModuleSelect,
-  MerkleStoreModuleWithRelations,
-  MerkleStoreModuleFilter,
-  MerkleStoreModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  MerkleStoreModuleSelect,
-  MerkleStoreModuleWithRelations,
-  MerkleStoreModuleFilter,
-  MerkleStoreModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { merkleStoreModuleKeys } from "../query-keys";
+import type { MerkleStoreModuleSelect, MerkleStoreModuleWithRelations, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { MerkleStoreModuleSelect, MerkleStoreModuleWithRelations, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const merkleStoreModulesQueryKey = merkleStoreModuleKeys.list;
 /**
  * Query hook for fetching MerkleStoreModule list
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useMerkleStoreModulesQuery({
@@ -45,53 +30,33 @@ export const merkleStoreModulesQueryKey = merkleStoreModuleKeys.list;
  * });
  * ```
  */
-export function useMerkleStoreModulesQuery<
-  S extends MerkleStoreModuleSelect,
-  TData = {
-    merkleStoreModules: ConnectionResult<InferSelectResult<MerkleStoreModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        merkleStoreModules: ConnectionResult<InferSelectResult<MerkleStoreModuleWithRelations, S>>;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useMerkleStoreModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      MerkleStoreModuleSelect,
-      MerkleStoreModuleFilter,
-      MerkleStoreModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    MerkleStoreModuleSelect,
-    MerkleStoreModuleFilter,
-    MerkleStoreModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function useMerkleStoreModulesQuery<S extends MerkleStoreModuleSelect, TData = {
+  merkleStoreModules: ConnectionResult<InferSelectResult<MerkleStoreModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
+} & Omit<UseQueryOptions<{
+  merkleStoreModules: ConnectionResult<InferSelectResult<MerkleStoreModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useMerkleStoreModulesQuery(params: {
+  selection: ListSelectionConfig<MerkleStoreModuleSelect, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<MerkleStoreModuleSelect, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: merkleStoreModuleKeys.list(args),
     queryFn: () => getClient().merkleStoreModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Fetch MerkleStoreModule list without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchMerkleStoreModulesQuery({
@@ -105,59 +70,35 @@ export function useMerkleStoreModulesQuery(
 export async function fetchMerkleStoreModulesQuery<S extends MerkleStoreModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>, 'fields'> &
-    HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
+  } & Omit<ListSelectionConfig<S, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
 }): Promise<{
   merkleStoreModules: ConnectionResult<InferSelectResult<MerkleStoreModuleWithRelations, S>>;
 }>;
 export async function fetchMerkleStoreModulesQuery(params: {
-  selection: ListSelectionConfig<
-    MerkleStoreModuleSelect,
-    MerkleStoreModuleFilter,
-    MerkleStoreModuleOrderBy
-  >;
+  selection: ListSelectionConfig<MerkleStoreModuleSelect, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    MerkleStoreModuleSelect,
-    MerkleStoreModuleFilter,
-    MerkleStoreModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<MerkleStoreModuleSelect, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>(params.selection);
   return getClient().merkleStoreModule.findMany(args).unwrap();
 }
 /**
  * Prefetch MerkleStoreModule list for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchMerkleStoreModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchMerkleStoreModulesQuery<S extends MerkleStoreModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<ListSelectionConfig<S, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>, 'fields'> &
-      HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchMerkleStoreModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      MerkleStoreModuleSelect,
-      MerkleStoreModuleFilter,
-      MerkleStoreModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    MerkleStoreModuleSelect,
-    MerkleStoreModuleFilter,
-    MerkleStoreModuleOrderBy
-  >(params.selection);
+export async function prefetchMerkleStoreModulesQuery<S extends MerkleStoreModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, MerkleStoreModuleSelect>;
+}): Promise<void>;
+export async function prefetchMerkleStoreModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<MerkleStoreModuleSelect, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<MerkleStoreModuleSelect, MerkleStoreModuleFilter, MerkleStoreModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: merkleStoreModuleKeys.list(args),
-    queryFn: () => getClient().merkleStoreModule.findMany(args).unwrap(),
+    queryFn: () => getClient().merkleStoreModule.findMany(args).unwrap()
   });
 }

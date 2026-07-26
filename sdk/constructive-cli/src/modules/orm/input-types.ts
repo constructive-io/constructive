@@ -269,6 +269,54 @@ export interface AgentModule {
   threadTableId?: string | null;
   threadTableName?: string | null;
 }
+export interface ApiSurfaceModule {
+  apiModulesTableId?: string | null;
+  apiModulesTableName?: string | null;
+  apiName?: string | null;
+  apiSchemasTableId?: string | null;
+  apiSchemasTableName?: string | null;
+  apiSettingsTableId?: string | null;
+  apiSettingsTableName?: string | null;
+  apisTableId?: string | null;
+  apisTableName?: string | null;
+  catalogModuleId?: string | null;
+  corsSettingsTableId?: string | null;
+  corsSettingsTableName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
+export interface AppModule {
+  apiName?: string | null;
+  appComponentsTableId?: string | null;
+  appComponentsTableName?: string | null;
+  appsTableId?: string | null;
+  appsTableName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
 export interface BillingModule {
   apiName?: string | null;
   balancesTableId?: string | null;
@@ -417,6 +465,37 @@ export interface BlueprintTemplate {
   /** Access control for the template. private: only the owner can see and copy. public: anyone can browse and copy from the marketplace. Defaults to private. */
   visibility?: string | null;
 }
+export interface CatalogModule {
+  apiName?: string | null;
+  apisTableId?: string | null;
+  apisTableName?: string | null;
+  appsTableId?: string | null;
+  appsTableName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  domainsTableId?: string | null;
+  domainsTableName?: string | null;
+  entityTableId?: string | null;
+  functionsTableId?: string | null;
+  functionsTableName?: string | null;
+  id: string;
+  namespacesTableId?: string | null;
+  namespacesTableName?: string | null;
+  policies?: Record<string, unknown> | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  resourceDefinitionsTableId?: string | null;
+  resourceDefinitionsTableName?: string | null;
+  resourceInstallationsTableId?: string | null;
+  resourceInstallationsTableName?: string | null;
+  resourcesTableId?: string | null;
+  resourcesTableName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  sitesTableId?: string | null;
+  sitesTableName?: string | null;
+}
 export interface ComputeLogModule {
   actorFkTableId?: string | null;
   apiName?: string | null;
@@ -490,6 +569,8 @@ export interface CryptoAuthModule {
 }
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
+  /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
+  async?: boolean | null;
   /** Error message from the most recent failed bootstrap attempt */
   bootstrapError?: string | null;
   /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
@@ -521,6 +602,29 @@ export interface DatabaseProvisionModule {
   /** Subdomain prefix for the database. If null, auto-generated using unique_names + random chars */
   subdomain?: string | null;
   updatedAt?: string | null;
+}
+export interface DatabaseSettingsModule {
+  apiName?: string | null;
+  databaseId?: string | null;
+  databaseSettingsTableId?: string | null;
+  databaseSettingsTableName?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  pubkeySettingsTableId?: string | null;
+  pubkeySettingsTableName?: string | null;
+  publicSchemaName?: string | null;
+  rlsSettingsTableId?: string | null;
+  rlsSettingsTableName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  webauthnSettingsTableId?: string | null;
+  webauthnSettingsTableName?: string | null;
 }
 /** Per-preset configuration for the warm database pool: sizing, TTL, and the platform service org that owns unclaimed warm databases. */
 export interface DbPoolConfig {
@@ -638,6 +742,32 @@ export interface DevicesModule {
   schemaId?: string | null;
   userDevicesTableId?: string | null;
   userDevicesTableName?: string | null;
+}
+export interface DomainModule {
+  apiName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  domainEventsTableId?: string | null;
+  domainEventsTableName?: string | null;
+  domainVerificationsTableId?: string | null;
+  domainVerificationsTableName?: string | null;
+  domainsTableId?: string | null;
+  domainsTableName?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  managedDomainsTableId?: string | null;
+  managedDomainsTableName?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
 }
 export interface EmailsModule {
   apiName?: string | null;
@@ -982,6 +1112,8 @@ export interface FunctionDeploymentModule {
 }
 export interface FunctionInvocationModule {
   apiName?: string | null;
+  attemptsTableId?: string | null;
+  attemptsTableName?: string | null;
   databaseId?: string | null;
   defaultPermissions?: string[] | null;
   entityField?: string | null;
@@ -1772,6 +1904,32 @@ export interface RlsModule {
   sessionsTableId?: string | null;
   usersTableId?: string | null;
 }
+export interface RouteModule {
+  apiName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  domainModuleId?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  hostnameBindingsTableId?: string | null;
+  hostnameBindingsTableName?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  resolverFunctionName?: string | null;
+  routeBindingsTableId?: string | null;
+  routeBindingsTableName?: string | null;
+  routesTableId?: string | null;
+  routesTableName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
 /** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
 export interface SecureTableProvision {
   /** The database this provision belongs to. Required. */
@@ -1819,6 +1977,30 @@ export interface SessionsModule {
   sessionsTableId?: string | null;
   sessionsTableName?: string | null;
   usersTableId?: string | null;
+}
+export interface SiteSurfaceModule {
+  apiName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  siteMetadataTableId?: string | null;
+  siteMetadataTableName?: string | null;
+  siteModulesTableId?: string | null;
+  siteModulesTableName?: string | null;
+  siteThemesTableId?: string | null;
+  siteThemesTableName?: string | null;
+  sitesTableId?: string | null;
+  sitesTableName?: string | null;
 }
 export interface StorageLogModule {
   actorFkTableId?: string | null;
@@ -2048,6 +2230,12 @@ export interface PageInfo {
 }
 // ============ Entity Relation Types ============
 export interface AgentModuleRelations {}
+export interface ApiSurfaceModuleRelations {
+  catalogModule?: CatalogModule | null;
+}
+export interface AppModuleRelations {
+  catalogModule?: CatalogModule | null;
+}
 export interface BillingModuleRelations {}
 export interface BillingProviderModuleRelations {}
 export interface BlueprintRelations {
@@ -2062,12 +2250,14 @@ export interface BlueprintTemplateRelations {
   blueprintTemplatesByForkedFromId?: ConnectionResult<BlueprintTemplate>;
   blueprintsByTemplateId?: ConnectionResult<Blueprint>;
 }
+export interface CatalogModuleRelations {}
 export interface ComputeLogModuleRelations {}
 export interface ConfigSecretsUserModuleRelations {}
 export interface ConnectedAccountsModuleRelations {}
 export interface CryptoAddressesModuleRelations {}
 export interface CryptoAuthModuleRelations {}
 export interface DatabaseProvisionModuleRelations {}
+export interface DatabaseSettingsModuleRelations {}
 export interface DbPoolConfigRelations {}
 export interface DbPoolRelations {}
 export interface DbPresetModuleRelations {
@@ -2077,6 +2267,9 @@ export interface DbUsageModuleRelations {}
 export interface DefaultIdsModuleRelations {}
 export interface DenormalizedTableFieldRelations {}
 export interface DevicesModuleRelations {}
+export interface DomainModuleRelations {
+  catalogModule?: CatalogModule | null;
+}
 export interface EmailsModuleRelations {}
 export interface EntityTypeProvisionRelations {}
 export interface EventsModuleRelations {}
@@ -2129,9 +2322,16 @@ export interface ResourceModuleRelations {
   namespaceModule?: NamespaceModule | null;
 }
 export interface RlsModuleRelations {}
+export interface RouteModuleRelations {
+  catalogModule?: CatalogModule | null;
+  domainModule?: DomainModule | null;
+}
 export interface SecureTableProvisionRelations {}
 export interface SessionSecretsModuleRelations {}
 export interface SessionsModuleRelations {}
+export interface SiteSurfaceModuleRelations {
+  catalogModule?: CatalogModule | null;
+}
 export interface StorageLogModuleRelations {}
 export interface StorageModuleRelations {}
 export interface TransferLogModuleRelations {}
@@ -2150,58 +2350,49 @@ export interface WebhookModuleRelations {
 }
 // ============ Entity Types With Relations ============
 export type AgentModuleWithRelations = AgentModule & AgentModuleRelations;
+export type ApiSurfaceModuleWithRelations = ApiSurfaceModule & ApiSurfaceModuleRelations;
+export type AppModuleWithRelations = AppModule & AppModuleRelations;
 export type BillingModuleWithRelations = BillingModule & BillingModuleRelations;
-export type BillingProviderModuleWithRelations = BillingProviderModule &
-  BillingProviderModuleRelations;
+export type BillingProviderModuleWithRelations = BillingProviderModule & BillingProviderModuleRelations;
 export type BlueprintWithRelations = Blueprint & BlueprintRelations;
-export type BlueprintConstructionWithRelations = BlueprintConstruction &
-  BlueprintConstructionRelations;
+export type BlueprintConstructionWithRelations = BlueprintConstruction & BlueprintConstructionRelations;
 export type BlueprintTemplateWithRelations = BlueprintTemplate & BlueprintTemplateRelations;
+export type CatalogModuleWithRelations = CatalogModule & CatalogModuleRelations;
 export type ComputeLogModuleWithRelations = ComputeLogModule & ComputeLogModuleRelations;
-export type ConfigSecretsUserModuleWithRelations = ConfigSecretsUserModule &
-  ConfigSecretsUserModuleRelations;
-export type ConnectedAccountsModuleWithRelations = ConnectedAccountsModule &
-  ConnectedAccountsModuleRelations;
-export type CryptoAddressesModuleWithRelations = CryptoAddressesModule &
-  CryptoAddressesModuleRelations;
+export type ConfigSecretsUserModuleWithRelations = ConfigSecretsUserModule & ConfigSecretsUserModuleRelations;
+export type ConnectedAccountsModuleWithRelations = ConnectedAccountsModule & ConnectedAccountsModuleRelations;
+export type CryptoAddressesModuleWithRelations = CryptoAddressesModule & CryptoAddressesModuleRelations;
 export type CryptoAuthModuleWithRelations = CryptoAuthModule & CryptoAuthModuleRelations;
-export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule &
-  DatabaseProvisionModuleRelations;
+export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule & DatabaseProvisionModuleRelations;
+export type DatabaseSettingsModuleWithRelations = DatabaseSettingsModule & DatabaseSettingsModuleRelations;
 export type DbPoolConfigWithRelations = DbPoolConfig & DbPoolConfigRelations;
 export type DbPoolWithRelations = DbPool & DbPoolRelations;
 export type DbPresetModuleWithRelations = DbPresetModule & DbPresetModuleRelations;
 export type DbUsageModuleWithRelations = DbUsageModule & DbUsageModuleRelations;
 export type DefaultIdsModuleWithRelations = DefaultIdsModule & DefaultIdsModuleRelations;
-export type DenormalizedTableFieldWithRelations = DenormalizedTableField &
-  DenormalizedTableFieldRelations;
+export type DenormalizedTableFieldWithRelations = DenormalizedTableField & DenormalizedTableFieldRelations;
 export type DevicesModuleWithRelations = DevicesModule & DevicesModuleRelations;
+export type DomainModuleWithRelations = DomainModule & DomainModuleRelations;
 export type EmailsModuleWithRelations = EmailsModule & EmailsModuleRelations;
 export type EntityTypeProvisionWithRelations = EntityTypeProvision & EntityTypeProvisionRelations;
 export type EventsModuleWithRelations = EventsModule & EventsModuleRelations;
-export type FunctionDeploymentModuleWithRelations = FunctionDeploymentModule &
-  FunctionDeploymentModuleRelations;
-export type FunctionInvocationModuleWithRelations = FunctionInvocationModule &
-  FunctionInvocationModuleRelations;
+export type FunctionDeploymentModuleWithRelations = FunctionDeploymentModule & FunctionDeploymentModuleRelations;
+export type FunctionInvocationModuleWithRelations = FunctionInvocationModule & FunctionInvocationModuleRelations;
 export type FunctionModuleWithRelations = FunctionModule & FunctionModuleRelations;
-export type GraphExecutionModuleWithRelations = GraphExecutionModule &
-  GraphExecutionModuleRelations;
+export type GraphExecutionModuleWithRelations = GraphExecutionModule & GraphExecutionModuleRelations;
 export type GraphModuleWithRelations = GraphModule & GraphModuleRelations;
 export type HierarchyModuleWithRelations = HierarchyModule & HierarchyModuleRelations;
 export type HttpRouteModuleWithRelations = HttpRouteModule & HttpRouteModuleRelations;
 export type I18NModuleWithRelations = I18NModule & I18NModuleRelations;
-export type IdentityProvidersModuleWithRelations = IdentityProvidersModule &
-  IdentityProvidersModuleRelations;
+export type IdentityProvidersModuleWithRelations = IdentityProvidersModule & IdentityProvidersModuleRelations;
 export type InferenceLogModuleWithRelations = InferenceLogModule & InferenceLogModuleRelations;
 export type InfraConfigModuleWithRelations = InfraConfigModule & InfraConfigModuleRelations;
 export type InfraSecretsModuleWithRelations = InfraSecretsModule & InfraSecretsModuleRelations;
-export type IntegrationProvidersModuleWithRelations = IntegrationProvidersModule &
-  IntegrationProvidersModuleRelations;
-export type InternalSecretsModuleWithRelations = InternalSecretsModule &
-  InternalSecretsModuleRelations;
+export type IntegrationProvidersModuleWithRelations = IntegrationProvidersModule & IntegrationProvidersModuleRelations;
+export type InternalSecretsModuleWithRelations = InternalSecretsModule & InternalSecretsModuleRelations;
 export type InvitesModuleWithRelations = InvitesModule & InvitesModuleRelations;
 export type LimitsModuleWithRelations = LimitsModule & LimitsModuleRelations;
-export type MembershipTypesModuleWithRelations = MembershipTypesModule &
-  MembershipTypesModuleRelations;
+export type MembershipTypesModuleWithRelations = MembershipTypesModule & MembershipTypesModuleRelations;
 export type MembershipsModuleWithRelations = MembershipsModule & MembershipsModuleRelations;
 export type MerkleStoreModuleWithRelations = MerkleStoreModule & MerkleStoreModuleRelations;
 export type NamespaceModuleWithRelations = NamespaceModule & NamespaceModuleRelations;
@@ -2211,30 +2402,27 @@ export type PhoneNumbersModuleWithRelations = PhoneNumbersModule & PhoneNumbersM
 export type PlansModuleWithRelations = PlansModule & PlansModuleRelations;
 export type PrincipalAuthModuleWithRelations = PrincipalAuthModule & PrincipalAuthModuleRelations;
 export type ProfilesModuleWithRelations = ProfilesModule & ProfilesModuleRelations;
-export type RateLimitMetersModuleWithRelations = RateLimitMetersModule &
-  RateLimitMetersModuleRelations;
+export type RateLimitMetersModuleWithRelations = RateLimitMetersModule & RateLimitMetersModuleRelations;
 export type RateLimitsModuleWithRelations = RateLimitsModule & RateLimitsModuleRelations;
 export type RealtimeModuleWithRelations = RealtimeModule & RealtimeModuleRelations;
 export type RelationProvisionWithRelations = RelationProvision & RelationProvisionRelations;
 export type ResourceModuleWithRelations = ResourceModule & ResourceModuleRelations;
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
-export type SecureTableProvisionWithRelations = SecureTableProvision &
-  SecureTableProvisionRelations;
-export type SessionSecretsModuleWithRelations = SessionSecretsModule &
-  SessionSecretsModuleRelations;
+export type RouteModuleWithRelations = RouteModule & RouteModuleRelations;
+export type SecureTableProvisionWithRelations = SecureTableProvision & SecureTableProvisionRelations;
+export type SessionSecretsModuleWithRelations = SessionSecretsModule & SessionSecretsModuleRelations;
 export type SessionsModuleWithRelations = SessionsModule & SessionsModuleRelations;
+export type SiteSurfaceModuleWithRelations = SiteSurfaceModule & SiteSurfaceModuleRelations;
 export type StorageLogModuleWithRelations = StorageLogModule & StorageLogModuleRelations;
 export type StorageModuleWithRelations = StorageModule & StorageModuleRelations;
 export type TransferLogModuleWithRelations = TransferLogModule & TransferLogModuleRelations;
 export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelations;
-export type UserCredentialsModuleWithRelations = UserCredentialsModule &
-  UserCredentialsModuleRelations;
+export type UserCredentialsModuleWithRelations = UserCredentialsModule & UserCredentialsModuleRelations;
 export type UserSettingsModuleWithRelations = UserSettingsModule & UserSettingsModuleRelations;
 export type UserStateModuleWithRelations = UserStateModule & UserStateModuleRelations;
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
 export type WebauthnAuthModuleWithRelations = WebauthnAuthModule & WebauthnAuthModuleRelations;
-export type WebauthnCredentialsModuleWithRelations = WebauthnCredentialsModule &
-  WebauthnCredentialsModuleRelations;
+export type WebauthnCredentialsModuleWithRelations = WebauthnCredentialsModule & WebauthnCredentialsModuleRelations;
 export type WebhookModuleWithRelations = WebhookModule & WebhookModuleRelations;
 // ============ Entity Select Types ============
 export type AgentModuleSelect = {
@@ -2274,6 +2462,60 @@ export type AgentModuleSelect = {
   taskTableName?: boolean;
   threadTableId?: boolean;
   threadTableName?: boolean;
+};
+export type ApiSurfaceModuleSelect = {
+  apiModulesTableId?: boolean;
+  apiModulesTableName?: boolean;
+  apiName?: boolean;
+  apiSchemasTableId?: boolean;
+  apiSchemasTableName?: boolean;
+  apiSettingsTableId?: boolean;
+  apiSettingsTableName?: boolean;
+  apisTableId?: boolean;
+  apisTableName?: boolean;
+  catalogModuleId?: boolean;
+  corsSettingsTableId?: boolean;
+  corsSettingsTableName?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
+};
+export type AppModuleSelect = {
+  apiName?: boolean;
+  appComponentsTableId?: boolean;
+  appComponentsTableName?: boolean;
+  appsTableId?: boolean;
+  appsTableName?: boolean;
+  catalogModuleId?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
 };
 export type BillingModuleSelect = {
   apiName?: boolean;
@@ -2404,6 +2646,37 @@ export type BlueprintTemplateSelect = {
     orderBy?: BlueprintOrderBy[];
   };
 };
+export type CatalogModuleSelect = {
+  apiName?: boolean;
+  apisTableId?: boolean;
+  apisTableName?: boolean;
+  appsTableId?: boolean;
+  appsTableName?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  domainsTableId?: boolean;
+  domainsTableName?: boolean;
+  entityTableId?: boolean;
+  functionsTableId?: boolean;
+  functionsTableName?: boolean;
+  id?: boolean;
+  namespacesTableId?: boolean;
+  namespacesTableName?: boolean;
+  policies?: boolean;
+  privateApiName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  resourceDefinitionsTableId?: boolean;
+  resourceDefinitionsTableName?: boolean;
+  resourceInstallationsTableId?: boolean;
+  resourceInstallationsTableName?: boolean;
+  resourcesTableId?: boolean;
+  resourcesTableName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  sitesTableId?: boolean;
+  sitesTableName?: boolean;
+};
 export type ComputeLogModuleSelect = {
   actorFkTableId?: boolean;
   apiName?: boolean;
@@ -2476,6 +2749,7 @@ export type CryptoAuthModuleSelect = {
   usersTableId?: boolean;
 };
 export type DatabaseProvisionModuleSelect = {
+  async?: boolean;
   bootstrapError?: boolean;
   bootstrapStatus?: boolean;
   bootstrapUser?: boolean;
@@ -2494,6 +2768,29 @@ export type DatabaseProvisionModuleSelect = {
   status?: boolean;
   subdomain?: boolean;
   updatedAt?: boolean;
+};
+export type DatabaseSettingsModuleSelect = {
+  apiName?: boolean;
+  databaseId?: boolean;
+  databaseSettingsTableId?: boolean;
+  databaseSettingsTableName?: boolean;
+  defaultPermissions?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  provisions?: boolean;
+  pubkeySettingsTableId?: boolean;
+  pubkeySettingsTableName?: boolean;
+  publicSchemaName?: boolean;
+  rlsSettingsTableId?: boolean;
+  rlsSettingsTableName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  webauthnSettingsTableId?: boolean;
+  webauthnSettingsTableName?: boolean;
 };
 export type DbPoolConfigSelect = {
   createdAt?: boolean;
@@ -2599,6 +2896,35 @@ export type DevicesModuleSelect = {
   schemaId?: boolean;
   userDevicesTableId?: boolean;
   userDevicesTableName?: boolean;
+};
+export type DomainModuleSelect = {
+  apiName?: boolean;
+  catalogModuleId?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  domainEventsTableId?: boolean;
+  domainEventsTableName?: boolean;
+  domainVerificationsTableId?: boolean;
+  domainVerificationsTableName?: boolean;
+  domainsTableId?: boolean;
+  domainsTableName?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  managedDomainsTableId?: boolean;
+  managedDomainsTableName?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
 };
 export type EmailsModuleSelect = {
   apiName?: boolean;
@@ -2729,6 +3055,8 @@ export type FunctionDeploymentModuleSelect = {
 };
 export type FunctionInvocationModuleSelect = {
   apiName?: boolean;
+  attemptsTableId?: boolean;
+  attemptsTableName?: boolean;
   databaseId?: boolean;
   defaultPermissions?: boolean;
   entityField?: boolean;
@@ -3422,6 +3750,38 @@ export type RlsModuleSelect = {
   sessionsTableId?: boolean;
   usersTableId?: boolean;
 };
+export type RouteModuleSelect = {
+  apiName?: boolean;
+  catalogModuleId?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  domainModuleId?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  hostnameBindingsTableId?: boolean;
+  hostnameBindingsTableName?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  resolverFunctionName?: boolean;
+  routeBindingsTableId?: boolean;
+  routeBindingsTableName?: boolean;
+  routesTableId?: boolean;
+  routesTableName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
+  domainModule?: {
+    select: DomainModuleSelect;
+  };
+};
 export type SecureTableProvisionSelect = {
   databaseId?: boolean;
   fields?: boolean;
@@ -3455,6 +3815,33 @@ export type SessionsModuleSelect = {
   sessionsTableId?: boolean;
   sessionsTableName?: boolean;
   usersTableId?: boolean;
+};
+export type SiteSurfaceModuleSelect = {
+  apiName?: boolean;
+  catalogModuleId?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  siteMetadataTableId?: boolean;
+  siteMetadataTableName?: boolean;
+  siteModulesTableId?: boolean;
+  siteModulesTableName?: boolean;
+  siteThemesTableId?: boolean;
+  siteThemesTableName?: boolean;
+  sitesTableId?: boolean;
+  sitesTableName?: boolean;
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
 };
 export type StorageLogModuleSelect = {
   actorFkTableId?: boolean;
@@ -3756,6 +4143,118 @@ export interface AgentModuleFilter {
   /** Filter by the object’s `threadTableName` field. */
   threadTableName?: StringFilter;
 }
+export interface ApiSurfaceModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: ApiSurfaceModuleFilter[];
+  /** Filter by the object’s `apiModulesTableId` field. */
+  apiModulesTableId?: UUIDFilter;
+  /** Filter by the object’s `apiModulesTableName` field. */
+  apiModulesTableName?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `apiSchemasTableId` field. */
+  apiSchemasTableId?: UUIDFilter;
+  /** Filter by the object’s `apiSchemasTableName` field. */
+  apiSchemasTableName?: StringFilter;
+  /** Filter by the object’s `apiSettingsTableId` field. */
+  apiSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `apiSettingsTableName` field. */
+  apiSettingsTableName?: StringFilter;
+  /** Filter by the object’s `apisTableId` field. */
+  apisTableId?: UUIDFilter;
+  /** Filter by the object’s `apisTableName` field. */
+  apisTableName?: StringFilter;
+  /** Filter by the object’s `catalogModule` relation. */
+  catalogModule?: CatalogModuleFilter;
+  /** A related `catalogModule` exists. */
+  catalogModuleExists?: boolean;
+  /** Filter by the object’s `catalogModuleId` field. */
+  catalogModuleId?: UUIDFilter;
+  /** Filter by the object’s `corsSettingsTableId` field. */
+  corsSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `corsSettingsTableName` field. */
+  corsSettingsTableName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ApiSurfaceModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: ApiSurfaceModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+}
+export interface AppModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: AppModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `appComponentsTableId` field. */
+  appComponentsTableId?: UUIDFilter;
+  /** Filter by the object’s `appComponentsTableName` field. */
+  appComponentsTableName?: StringFilter;
+  /** Filter by the object’s `appsTableId` field. */
+  appsTableId?: UUIDFilter;
+  /** Filter by the object’s `appsTableName` field. */
+  appsTableName?: StringFilter;
+  /** Filter by the object’s `catalogModule` relation. */
+  catalogModule?: CatalogModuleFilter;
+  /** A related `catalogModule` exists. */
+  catalogModuleExists?: boolean;
+  /** Filter by the object’s `catalogModuleId` field. */
+  catalogModuleId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AppModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+}
 export interface BillingModuleFilter {
   /** Checks for all expressions in this list. */
   and?: BillingModuleFilter[];
@@ -4002,6 +4501,72 @@ export interface BlueprintTemplateFilter {
   /** Filter by the object’s `visibility` field. */
   visibility?: StringFilter;
 }
+export interface CatalogModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: CatalogModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `apisTableId` field. */
+  apisTableId?: UUIDFilter;
+  /** Filter by the object’s `apisTableName` field. */
+  apisTableName?: StringFilter;
+  /** Filter by the object’s `appsTableId` field. */
+  appsTableId?: UUIDFilter;
+  /** Filter by the object’s `appsTableName` field. */
+  appsTableName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `domainsTableId` field. */
+  domainsTableId?: UUIDFilter;
+  /** Filter by the object’s `domainsTableName` field. */
+  domainsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionsTableId` field. */
+  functionsTableId?: UUIDFilter;
+  /** Filter by the object’s `functionsTableName` field. */
+  functionsTableName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `namespacesTableId` field. */
+  namespacesTableId?: UUIDFilter;
+  /** Filter by the object’s `namespacesTableName` field. */
+  namespacesTableName?: StringFilter;
+  /** Negates the expression. */
+  not?: CatalogModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: CatalogModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `resourceDefinitionsTableId` field. */
+  resourceDefinitionsTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceDefinitionsTableName` field. */
+  resourceDefinitionsTableName?: StringFilter;
+  /** Filter by the object’s `resourceInstallationsTableId` field. */
+  resourceInstallationsTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceInstallationsTableName` field. */
+  resourceInstallationsTableName?: StringFilter;
+  /** Filter by the object’s `resourcesTableId` field. */
+  resourcesTableId?: UUIDFilter;
+  /** Filter by the object’s `resourcesTableName` field. */
+  resourcesTableName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `sitesTableId` field. */
+  sitesTableId?: UUIDFilter;
+  /** Filter by the object’s `sitesTableName` field. */
+  sitesTableName?: StringFilter;
+}
 export interface ComputeLogModuleFilter {
   /** Filter by the object’s `actorFkTableId` field. */
   actorFkTableId?: UUIDFilter;
@@ -4167,6 +4732,8 @@ export interface CryptoAuthModuleFilter {
 export interface DatabaseProvisionModuleFilter {
   /** Checks for all expressions in this list. */
   and?: DatabaseProvisionModuleFilter[];
+  /** Filter by the object’s `async` field. */
+  async?: BooleanFilter;
   /** Filter by the object’s `bootstrapError` field. */
   bootstrapError?: StringFilter;
   /** Filter by the object’s `bootstrapStatus` field. */
@@ -4207,6 +4774,56 @@ export interface DatabaseProvisionModuleFilter {
   subdomain?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+}
+export interface DatabaseSettingsModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: DatabaseSettingsModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `databaseSettingsTableId` field. */
+  databaseSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `databaseSettingsTableName` field. */
+  databaseSettingsTableName?: StringFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: DatabaseSettingsModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: DatabaseSettingsModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `pubkeySettingsTableId` field. */
+  pubkeySettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `pubkeySettingsTableName` field. */
+  pubkeySettingsTableName?: StringFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `rlsSettingsTableId` field. */
+  rlsSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `rlsSettingsTableName` field. */
+  rlsSettingsTableName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `webauthnSettingsTableId` field. */
+  webauthnSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `webauthnSettingsTableName` field. */
+  webauthnSettingsTableName?: StringFilter;
 }
 export interface DbPoolConfigFilter {
   /** Checks for all expressions in this list. */
@@ -4441,6 +5058,66 @@ export interface DevicesModuleFilter {
   userDevicesTableId?: UUIDFilter;
   /** Filter by the object’s `userDevicesTableName` field. */
   userDevicesTableName?: StringFilter;
+}
+export interface DomainModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `catalogModule` relation. */
+  catalogModule?: CatalogModuleFilter;
+  /** A related `catalogModule` exists. */
+  catalogModuleExists?: boolean;
+  /** Filter by the object’s `catalogModuleId` field. */
+  catalogModuleId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `domainEventsTableId` field. */
+  domainEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `domainEventsTableName` field. */
+  domainEventsTableName?: StringFilter;
+  /** Filter by the object’s `domainVerificationsTableId` field. */
+  domainVerificationsTableId?: UUIDFilter;
+  /** Filter by the object’s `domainVerificationsTableName` field. */
+  domainVerificationsTableName?: StringFilter;
+  /** Filter by the object’s `domainsTableId` field. */
+  domainsTableId?: UUIDFilter;
+  /** Filter by the object’s `domainsTableName` field. */
+  domainsTableName?: StringFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `managedDomainsTableId` field. */
+  managedDomainsTableId?: UUIDFilter;
+  /** Filter by the object’s `managedDomainsTableName` field. */
+  managedDomainsTableName?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
 }
 export interface EmailsModuleFilter {
   /** Checks for all expressions in this list. */
@@ -4713,6 +5390,10 @@ export interface FunctionInvocationModuleFilter {
   and?: FunctionInvocationModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
+  /** Filter by the object’s `attemptsTableId` field. */
+  attemptsTableId?: UUIDFilter;
+  /** Filter by the object’s `attemptsTableName` field. */
+  attemptsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultPermissions` field. */
@@ -6188,6 +6869,70 @@ export interface RlsModuleFilter {
   /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
 }
+export interface RouteModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: RouteModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `catalogModule` relation. */
+  catalogModule?: CatalogModuleFilter;
+  /** A related `catalogModule` exists. */
+  catalogModuleExists?: boolean;
+  /** Filter by the object’s `catalogModuleId` field. */
+  catalogModuleId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `domainModule` relation. */
+  domainModule?: DomainModuleFilter;
+  /** A related `domainModule` exists. */
+  domainModuleExists?: boolean;
+  /** Filter by the object’s `domainModuleId` field. */
+  domainModuleId?: UUIDFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `hostnameBindingsTableId` field. */
+  hostnameBindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `hostnameBindingsTableName` field. */
+  hostnameBindingsTableName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: RouteModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: RouteModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `resolverFunctionName` field. */
+  resolverFunctionName?: StringFilter;
+  /** Filter by the object’s `routeBindingsTableId` field. */
+  routeBindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `routeBindingsTableName` field. */
+  routeBindingsTableName?: StringFilter;
+  /** Filter by the object’s `routesTableId` field. */
+  routesTableId?: UUIDFilter;
+  /** Filter by the object’s `routesTableName` field. */
+  routesTableName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+}
 export interface SecureTableProvisionFilter {
   /** Checks for all expressions in this list. */
   and?: SecureTableProvisionFilter[];
@@ -6267,6 +7012,62 @@ export interface SessionsModuleFilter {
   sessionsTableName?: StringFilter;
   /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+}
+export interface SiteSurfaceModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: SiteSurfaceModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `catalogModule` relation. */
+  catalogModule?: CatalogModuleFilter;
+  /** A related `catalogModule` exists. */
+  catalogModuleExists?: boolean;
+  /** Filter by the object’s `catalogModuleId` field. */
+  catalogModuleId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: SiteSurfaceModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: SiteSurfaceModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `siteMetadataTableId` field. */
+  siteMetadataTableId?: UUIDFilter;
+  /** Filter by the object’s `siteMetadataTableName` field. */
+  siteMetadataTableName?: StringFilter;
+  /** Filter by the object’s `siteModulesTableId` field. */
+  siteModulesTableId?: UUIDFilter;
+  /** Filter by the object’s `siteModulesTableName` field. */
+  siteModulesTableName?: StringFilter;
+  /** Filter by the object’s `siteThemesTableId` field. */
+  siteThemesTableId?: UUIDFilter;
+  /** Filter by the object’s `siteThemesTableName` field. */
+  siteThemesTableName?: StringFilter;
+  /** Filter by the object’s `sitesTableId` field. */
+  sitesTableId?: UUIDFilter;
+  /** Filter by the object’s `sitesTableName` field. */
+  sitesTableName?: StringFilter;
 }
 export interface StorageLogModuleFilter {
   /** Filter by the object’s `actorFkTableId` field. */
@@ -6743,2720 +7544,81 @@ export interface WebhookModuleFilter {
   webhookEventsTableName?: StringFilter;
 }
 // ============ OrderBy Types ============
-export type AgentModuleOrderBy =
-  | 'AGENT_TABLE_ID_ASC'
-  | 'AGENT_TABLE_ID_DESC'
-  | 'AGENT_TABLE_NAME_ASC'
-  | 'AGENT_TABLE_NAME_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'HAS_AGENTS_ASC'
-  | 'HAS_AGENTS_DESC'
-  | 'HAS_PLANS_ASC'
-  | 'HAS_PLANS_DESC'
-  | 'HAS_RESOURCES_ASC'
-  | 'HAS_RESOURCES_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_TABLE_ID_ASC'
-  | 'MESSAGE_TABLE_ID_DESC'
-  | 'MESSAGE_TABLE_NAME_ASC'
-  | 'MESSAGE_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'PERSONA_TABLE_ID_ASC'
-  | 'PERSONA_TABLE_ID_DESC'
-  | 'PERSONA_TABLE_NAME_ASC'
-  | 'PERSONA_TABLE_NAME_DESC'
-  | 'PLAN_TABLE_ID_ASC'
-  | 'PLAN_TABLE_ID_DESC'
-  | 'PLAN_TABLE_NAME_ASC'
-  | 'PLAN_TABLE_NAME_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROMPTS_TABLE_ID_ASC'
-  | 'PROMPTS_TABLE_ID_DESC'
-  | 'PROMPTS_TABLE_NAME_ASC'
-  | 'PROMPTS_TABLE_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RESOURCES_ASC'
-  | 'RESOURCES_DESC'
-  | 'RESOURCE_TABLE_ID_ASC'
-  | 'RESOURCE_TABLE_ID_DESC'
-  | 'RESOURCE_TABLE_NAME_ASC'
-  | 'RESOURCE_TABLE_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'SHARED_ASC'
-  | 'SHARED_DESC'
-  | 'TASK_TABLE_ID_ASC'
-  | 'TASK_TABLE_ID_DESC'
-  | 'TASK_TABLE_NAME_ASC'
-  | 'TASK_TABLE_NAME_DESC'
-  | 'THREAD_TABLE_ID_ASC'
-  | 'THREAD_TABLE_ID_DESC'
-  | 'THREAD_TABLE_NAME_ASC'
-  | 'THREAD_TABLE_NAME_DESC';
-export type BillingModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'BALANCES_TABLE_ID_ASC'
-  | 'BALANCES_TABLE_ID_DESC'
-  | 'BALANCES_TABLE_NAME_ASC'
-  | 'BALANCES_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LEDGER_TABLE_ID_ASC'
-  | 'LEDGER_TABLE_ID_DESC'
-  | 'LEDGER_TABLE_NAME_ASC'
-  | 'LEDGER_TABLE_NAME_DESC'
-  | 'METERS_TABLE_ID_ASC'
-  | 'METERS_TABLE_ID_DESC'
-  | 'METERS_TABLE_NAME_ASC'
-  | 'METERS_TABLE_NAME_DESC'
-  | 'METER_CREDITS_TABLE_ID_ASC'
-  | 'METER_CREDITS_TABLE_ID_DESC'
-  | 'METER_CREDITS_TABLE_NAME_ASC'
-  | 'METER_CREDITS_TABLE_NAME_DESC'
-  | 'METER_DEFAULTS_TABLE_ID_ASC'
-  | 'METER_DEFAULTS_TABLE_ID_DESC'
-  | 'METER_DEFAULTS_TABLE_NAME_ASC'
-  | 'METER_DEFAULTS_TABLE_NAME_DESC'
-  | 'METER_SOURCES_TABLE_ID_ASC'
-  | 'METER_SOURCES_TABLE_ID_DESC'
-  | 'METER_SOURCES_TABLE_NAME_ASC'
-  | 'METER_SOURCES_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'PLAN_SUBSCRIPTIONS_TABLE_ID_ASC'
-  | 'PLAN_SUBSCRIPTIONS_TABLE_ID_DESC'
-  | 'PLAN_SUBSCRIPTIONS_TABLE_NAME_ASC'
-  | 'PLAN_SUBSCRIPTIONS_TABLE_NAME_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RECORD_USAGE_FUNCTION_ASC'
-  | 'RECORD_USAGE_FUNCTION_DESC'
-  | 'ROLLUP_USAGE_SUMMARY_FUNCTION_ASC'
-  | 'ROLLUP_USAGE_SUMMARY_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SWEEP_EXPIRED_SUBSCRIPTIONS_FUNCTION_ASC'
-  | 'SWEEP_EXPIRED_SUBSCRIPTIONS_FUNCTION_DESC';
-export type BillingProviderModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'BILLING_CUSTOMERS_TABLE_ID_ASC'
-  | 'BILLING_CUSTOMERS_TABLE_ID_DESC'
-  | 'BILLING_CUSTOMERS_TABLE_NAME_ASC'
-  | 'BILLING_CUSTOMERS_TABLE_NAME_DESC'
-  | 'BILLING_PRICES_TABLE_ID_ASC'
-  | 'BILLING_PRICES_TABLE_ID_DESC'
-  | 'BILLING_PRICES_TABLE_NAME_ASC'
-  | 'BILLING_PRICES_TABLE_NAME_DESC'
-  | 'BILLING_PRODUCTS_TABLE_ID_ASC'
-  | 'BILLING_PRODUCTS_TABLE_ID_DESC'
-  | 'BILLING_PRODUCTS_TABLE_NAME_ASC'
-  | 'BILLING_PRODUCTS_TABLE_NAME_DESC'
-  | 'BILLING_SUBSCRIPTIONS_TABLE_ID_ASC'
-  | 'BILLING_SUBSCRIPTIONS_TABLE_ID_DESC'
-  | 'BILLING_SUBSCRIPTIONS_TABLE_NAME_ASC'
-  | 'BILLING_SUBSCRIPTIONS_TABLE_NAME_DESC'
-  | 'BILLING_WEBHOOK_EVENTS_TABLE_ID_ASC'
-  | 'BILLING_WEBHOOK_EVENTS_TABLE_ID_DESC'
-  | 'BILLING_WEBHOOK_EVENTS_TABLE_NAME_ASC'
-  | 'BILLING_WEBHOOK_EVENTS_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRICES_TABLE_ID_ASC'
-  | 'PRICES_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PROCESS_BILLING_EVENT_FUNCTION_ASC'
-  | 'PROCESS_BILLING_EVENT_FUNCTION_DESC'
-  | 'PRODUCTS_TABLE_ID_ASC'
-  | 'PRODUCTS_TABLE_ID_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SUBSCRIPTIONS_TABLE_ID_ASC'
-  | 'SUBSCRIPTIONS_TABLE_ID_DESC';
-export type BlueprintOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFINITION_ASC'
-  | 'DEFINITION_DESC'
-  | 'DEFINITION_HASH_ASC'
-  | 'DEFINITION_HASH_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TABLE_HASHES_ASC'
-  | 'TABLE_HASHES_DESC'
-  | 'TEMPLATE_ID_ASC'
-  | 'TEMPLATE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type BlueprintConstructionOrderBy =
-  | 'BLUEPRINT_ID_ASC'
-  | 'BLUEPRINT_ID_DESC'
-  | 'CONSTRUCTED_AT_ASC'
-  | 'CONSTRUCTED_AT_DESC'
-  | 'CONSTRUCTED_DEFINITION_ASC'
-  | 'CONSTRUCTED_DEFINITION_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ERROR_DETAILS_ASC'
-  | 'ERROR_DETAILS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'TABLE_MAP_ASC'
-  | 'TABLE_MAP_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type BlueprintTemplateOrderBy =
-  | 'CATEGORIES_ASC'
-  | 'CATEGORIES_DESC'
-  | 'COMPLEXITY_ASC'
-  | 'COMPLEXITY_DESC'
-  | 'COPY_COUNT_ASC'
-  | 'COPY_COUNT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DEFINITION_ASC'
-  | 'DEFINITION_DESC'
-  | 'DEFINITION_HASH_ASC'
-  | 'DEFINITION_HASH_DESC'
-  | 'DEFINITION_SCHEMA_VERSION_ASC'
-  | 'DEFINITION_SCHEMA_VERSION_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'FORKED_FROM_ID_ASC'
-  | 'FORKED_FROM_ID_DESC'
-  | 'FORK_COUNT_ASC'
-  | 'FORK_COUNT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOURCE_ASC'
-  | 'SOURCE_DESC'
-  | 'TABLE_HASHES_ASC'
-  | 'TABLE_HASHES_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'VERSION_ASC'
-  | 'VERSION_DESC'
-  | 'VISIBILITY_ASC'
-  | 'VISIBILITY_DESC';
-export type ComputeLogModuleOrderBy =
-  | 'ACTOR_FK_TABLE_ID_ASC'
-  | 'ACTOR_FK_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'COMPUTE_LOG_TABLE_ID_ASC'
-  | 'COMPUTE_LOG_TABLE_ID_DESC'
-  | 'COMPUTE_LOG_TABLE_NAME_ASC'
-  | 'COMPUTE_LOG_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_FK_TABLE_ID_ASC'
-  | 'ENTITY_FK_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'USAGE_SUMMARY_TABLE_ID_ASC'
-  | 'USAGE_SUMMARY_TABLE_ID_DESC'
-  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
-  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
-export type ConfigSecretsUserModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type ConnectedAccountsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type CryptoAddressesModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CRYPTO_NETWORK_ASC'
-  | 'CRYPTO_NETWORK_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type CryptoAuthModuleOrderBy =
-  | 'ADDRESSES_TABLE_ID_ASC'
-  | 'ADDRESSES_TABLE_ID_DESC'
-  | 'CRYPTO_NETWORK_ASC'
-  | 'CRYPTO_NETWORK_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SECRETS_TABLE_ID_ASC'
-  | 'SECRETS_TABLE_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'SIGN_IN_RECORD_FAILURE_ASC'
-  | 'SIGN_IN_RECORD_FAILURE_DESC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_ASC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_DESC'
-  | 'SIGN_IN_WITH_CHALLENGE_ASC'
-  | 'SIGN_IN_WITH_CHALLENGE_DESC'
-  | 'SIGN_UP_WITH_KEY_ASC'
-  | 'SIGN_UP_WITH_KEY_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'USER_FIELD_ASC'
-  | 'USER_FIELD_DESC';
-export type DatabaseProvisionModuleOrderBy =
-  | 'BOOTSTRAP_ERROR_ASC'
-  | 'BOOTSTRAP_ERROR_DESC'
-  | 'BOOTSTRAP_STATUS_ASC'
-  | 'BOOTSTRAP_STATUS_DESC'
-  | 'BOOTSTRAP_USER_ASC'
-  | 'BOOTSTRAP_USER_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATABASE_NAME_ASC'
-  | 'DATABASE_NAME_DESC'
-  | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC'
-  | 'FULFILLED_AT_ASC'
-  | 'FULFILLED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MODULES_ASC'
-  | 'MODULES_DESC'
-  | 'NATURAL'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOURCE_DATABASE_ID_ASC'
-  | 'SOURCE_DATABASE_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'SUBDOMAIN_ASC'
-  | 'SUBDOMAIN_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type DbPoolConfigOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC'
-  | 'ENABLED_ASC'
-  | 'ENABLED_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'MIN_ASC'
-  | 'MIN_DESC'
-  | 'NATURAL'
-  | 'POOL_OWNER_ID_ASC'
-  | 'POOL_OWNER_ID_DESC'
-  | 'PRESET_SLUG_ASC'
-  | 'PRESET_SLUG_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'WARM_TTL_ASC'
-  | 'WARM_TTL_DESC';
-export type DbPoolOrderBy =
-  | 'BOOTSTRAP_ERROR_ASC'
-  | 'BOOTSTRAP_ERROR_DESC'
-  | 'BOOTSTRAP_STATUS_ASC'
-  | 'BOOTSTRAP_STATUS_DESC'
-  | 'CLAIMED_AT_ASC'
-  | 'CLAIMED_AT_DESC'
-  | 'CLAIMED_BY_ASC'
-  | 'CLAIMED_BY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRESET_COMMIT_ID_ASC'
-  | 'PRESET_COMMIT_ID_DESC'
-  | 'PRESET_SLUG_ASC'
-  | 'PRESET_SLUG_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type DbPresetModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DB_PRESETS_TABLE_ID_ASC'
-  | 'DB_PRESETS_TABLE_ID_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MERKLE_STORE_MODULE_ID_ASC'
-  | 'MERKLE_STORE_MODULE_ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_ID_ASC'
-  | 'PUBLIC_SCHEMA_ID_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'STORE_NAME_ASC'
-  | 'STORE_NAME_DESC';
-export type DbUsageModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'COLLECT_DB_QUERY_STATS_FUNCTION_ASC'
-  | 'COLLECT_DB_QUERY_STATS_FUNCTION_DESC'
-  | 'COLLECT_DB_TABLE_STATS_FUNCTION_ASC'
-  | 'COLLECT_DB_TABLE_STATS_FUNCTION_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'QUERY_STATS_LOG_TABLE_ID_ASC'
-  | 'QUERY_STATS_LOG_TABLE_ID_DESC'
-  | 'QUERY_STATS_LOG_TABLE_NAME_ASC'
-  | 'QUERY_STATS_LOG_TABLE_NAME_DESC'
-  | 'QUERY_STATS_SUMMARY_TABLE_ID_ASC'
-  | 'QUERY_STATS_SUMMARY_TABLE_ID_DESC'
-  | 'QUERY_STATS_SUMMARY_TABLE_NAME_ASC'
-  | 'QUERY_STATS_SUMMARY_TABLE_NAME_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_ASC'
-  | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_DESC'
-  | 'ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_ASC'
-  | 'ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_STATS_LOG_TABLE_ID_ASC'
-  | 'TABLE_STATS_LOG_TABLE_ID_DESC'
-  | 'TABLE_STATS_LOG_TABLE_NAME_ASC'
-  | 'TABLE_STATS_LOG_TABLE_NAME_DESC'
-  | 'TABLE_STATS_SUMMARY_TABLE_ID_ASC'
-  | 'TABLE_STATS_SUMMARY_TABLE_ID_DESC'
-  | 'TABLE_STATS_SUMMARY_TABLE_NAME_ASC'
-  | 'TABLE_STATS_SUMMARY_TABLE_NAME_DESC';
-export type DefaultIdsModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
-export type DenormalizedTableFieldOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELD_ID_ASC'
-  | 'FIELD_ID_DESC'
-  | 'FUNC_NAME_ASC'
-  | 'FUNC_NAME_DESC'
-  | 'FUNC_ORDER_ASC'
-  | 'FUNC_ORDER_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REF_FIELD_ID_ASC'
-  | 'REF_FIELD_ID_DESC'
-  | 'REF_IDS_ASC'
-  | 'REF_IDS_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'SET_IDS_ASC'
-  | 'SET_IDS_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'UPDATE_DEFAULTS_ASC'
-  | 'UPDATE_DEFAULTS_DESC'
-  | 'USE_UPDATES_ASC'
-  | 'USE_UPDATES_DESC';
-export type DevicesModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEVICE_SETTINGS_TABLE_ID_ASC'
-  | 'DEVICE_SETTINGS_TABLE_ID_DESC'
-  | 'DEVICE_SETTINGS_TABLE_NAME_ASC'
-  | 'DEVICE_SETTINGS_TABLE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'USER_DEVICES_TABLE_ID_ASC'
-  | 'USER_DEVICES_TABLE_ID_DESC'
-  | 'USER_DEVICES_TABLE_NAME_ASC'
-  | 'USER_DEVICES_TABLE_NAME_DESC';
-export type EmailsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type EntityTypeProvisionOrderBy =
-  | 'AGENTS_ASC'
-  | 'AGENTS_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'FUNCTIONS_ASC'
-  | 'FUNCTIONS_DESC'
-  | 'GRAPHS_ASC'
-  | 'GRAPHS_DESC'
-  | 'HAS_INVITES_ASC'
-  | 'HAS_INVITES_DESC'
-  | 'HAS_INVITE_ACHIEVEMENTS_ASC'
-  | 'HAS_INVITE_ACHIEVEMENTS_DESC'
-  | 'HAS_LEVELS_ASC'
-  | 'HAS_LEVELS_DESC'
-  | 'HAS_LIMITS_ASC'
-  | 'HAS_LIMITS_DESC'
-  | 'HAS_PROFILES_ASC'
-  | 'HAS_PROFILES_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_VISIBLE_ASC'
-  | 'IS_VISIBLE_DESC'
-  | 'NAMESPACES_ASC'
-  | 'NAMESPACES_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'OUT_AGENT_MODULE_ID_ASC'
-  | 'OUT_AGENT_MODULE_ID_DESC'
-  | 'OUT_BUCKETS_TABLE_ID_ASC'
-  | 'OUT_BUCKETS_TABLE_ID_DESC'
-  | 'OUT_DEFINITIONS_TABLE_ID_ASC'
-  | 'OUT_DEFINITIONS_TABLE_ID_DESC'
-  | 'OUT_ENTITY_TABLE_ID_ASC'
-  | 'OUT_ENTITY_TABLE_ID_DESC'
-  | 'OUT_ENTITY_TABLE_NAME_ASC'
-  | 'OUT_ENTITY_TABLE_NAME_DESC'
-  | 'OUT_EXECUTION_LOGS_TABLE_ID_ASC'
-  | 'OUT_EXECUTION_LOGS_TABLE_ID_DESC'
-  | 'OUT_FILES_TABLE_ID_ASC'
-  | 'OUT_FILES_TABLE_ID_DESC'
-  | 'OUT_FUNCTION_MODULE_ID_ASC'
-  | 'OUT_FUNCTION_MODULE_ID_DESC'
-  | 'OUT_GRAPHS_TABLE_ID_ASC'
-  | 'OUT_GRAPHS_TABLE_ID_DESC'
-  | 'OUT_GRAPH_MODULE_ID_ASC'
-  | 'OUT_GRAPH_MODULE_ID_DESC'
-  | 'OUT_INSTALLED_MODULES_ASC'
-  | 'OUT_INSTALLED_MODULES_DESC'
-  | 'OUT_INVITES_MODULE_ID_ASC'
-  | 'OUT_INVITES_MODULE_ID_DESC'
-  | 'OUT_INVOCATIONS_TABLE_ID_ASC'
-  | 'OUT_INVOCATIONS_TABLE_ID_DESC'
-  | 'OUT_MEMBERSHIP_TYPE_ASC'
-  | 'OUT_MEMBERSHIP_TYPE_DESC'
-  | 'OUT_NAMESPACES_TABLE_ID_ASC'
-  | 'OUT_NAMESPACES_TABLE_ID_DESC'
-  | 'OUT_NAMESPACE_EVENTS_TABLE_ID_ASC'
-  | 'OUT_NAMESPACE_EVENTS_TABLE_ID_DESC'
-  | 'OUT_NAMESPACE_MODULE_ID_ASC'
-  | 'OUT_NAMESPACE_MODULE_ID_DESC'
-  | 'OUT_PATH_SHARES_TABLE_ID_ASC'
-  | 'OUT_PATH_SHARES_TABLE_ID_DESC'
-  | 'OUT_STORAGE_MODULE_ID_ASC'
-  | 'OUT_STORAGE_MODULE_ID_DESC'
-  | 'PARENT_ENTITY_ASC'
-  | 'PARENT_ENTITY_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SKIP_ENTITY_POLICIES_ASC'
-  | 'SKIP_ENTITY_POLICIES_DESC'
-  | 'STORAGE_ASC'
-  | 'STORAGE_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_PROVISION_ASC'
-  | 'TABLE_PROVISION_DESC';
-export type EventsModuleOrderBy =
-  | 'ACHIEVEMENT_REWARDS_TABLE_ID_ASC'
-  | 'ACHIEVEMENT_REWARDS_TABLE_ID_DESC'
-  | 'ACHIEVEMENT_REWARDS_TABLE_NAME_ASC'
-  | 'ACHIEVEMENT_REWARDS_TABLE_NAME_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'EVENTS_TABLE_ID_ASC'
-  | 'EVENTS_TABLE_ID_DESC'
-  | 'EVENTS_TABLE_NAME_ASC'
-  | 'EVENTS_TABLE_NAME_DESC'
-  | 'EVENT_AGGREGATES_TABLE_ID_ASC'
-  | 'EVENT_AGGREGATES_TABLE_ID_DESC'
-  | 'EVENT_AGGREGATES_TABLE_NAME_ASC'
-  | 'EVENT_AGGREGATES_TABLE_NAME_DESC'
-  | 'EVENT_TYPES_TABLE_ID_ASC'
-  | 'EVENT_TYPES_TABLE_ID_DESC'
-  | 'EVENT_TYPES_TABLE_NAME_ASC'
-  | 'EVENT_TYPES_TABLE_NAME_DESC'
-  | 'GRANT_ACHIEVEMENT_ASC'
-  | 'GRANT_ACHIEVEMENT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'LEVELS_TABLE_ID_ASC'
-  | 'LEVELS_TABLE_ID_DESC'
-  | 'LEVELS_TABLE_NAME_ASC'
-  | 'LEVELS_TABLE_NAME_DESC'
-  | 'LEVEL_ACHIEVED_ASC'
-  | 'LEVEL_ACHIEVED_DESC'
-  | 'LEVEL_GRANTS_TABLE_ID_ASC'
-  | 'LEVEL_GRANTS_TABLE_ID_DESC'
-  | 'LEVEL_GRANTS_TABLE_NAME_ASC'
-  | 'LEVEL_GRANTS_TABLE_NAME_DESC'
-  | 'LEVEL_REQUIREMENTS_TABLE_ID_ASC'
-  | 'LEVEL_REQUIREMENTS_TABLE_ID_DESC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_ASC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RECORD_EVENT_ASC'
-  | 'RECORD_EVENT_DESC'
-  | 'REMOVE_EVENT_ASC'
-  | 'REMOVE_EVENT_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'STEPS_REQUIRED_ASC'
-  | 'STEPS_REQUIRED_DESC'
-  | 'TG_ACHIEVEMENT_REWARD_ASC'
-  | 'TG_ACHIEVEMENT_REWARD_DESC'
-  | 'TG_CHECK_ACHIEVEMENTS_ASC'
-  | 'TG_CHECK_ACHIEVEMENTS_DESC'
-  | 'TG_EVENT_ASC'
-  | 'TG_EVENT_BOOL_ASC'
-  | 'TG_EVENT_BOOL_DESC'
-  | 'TG_EVENT_DESC'
-  | 'TG_EVENT_TOGGLE_ASC'
-  | 'TG_EVENT_TOGGLE_BOOL_ASC'
-  | 'TG_EVENT_TOGGLE_BOOL_DESC'
-  | 'TG_EVENT_TOGGLE_DESC'
-  | 'TG_UPDATE_AGGREGATES_ASC'
-  | 'TG_UPDATE_AGGREGATES_DESC'
-  | 'UPSERT_AGGREGATE_ASC'
-  | 'UPSERT_AGGREGATE_DESC';
-export type FunctionDeploymentModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'DEPLOYMENTS_TABLE_ID_ASC'
-  | 'DEPLOYMENTS_TABLE_ID_DESC'
-  | 'DEPLOYMENTS_TABLE_NAME_ASC'
-  | 'DEPLOYMENTS_TABLE_NAME_DESC'
-  | 'DEPLOYMENT_EVENTS_TABLE_ID_ASC'
-  | 'DEPLOYMENT_EVENTS_TABLE_ID_DESC'
-  | 'DEPLOYMENT_EVENTS_TABLE_NAME_ASC'
-  | 'DEPLOYMENT_EVENTS_TABLE_NAME_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'FUNCTION_MODULE_ID_ASC'
-  | 'FUNCTION_MODULE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAMESPACE_MODULE_ID_ASC'
-  | 'NAMESPACE_MODULE_ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type FunctionInvocationModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'EXECUTION_LOGS_TABLE_ID_ASC'
-  | 'EXECUTION_LOGS_TABLE_ID_DESC'
-  | 'EXECUTION_LOGS_TABLE_NAME_ASC'
-  | 'EXECUTION_LOGS_TABLE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVOCATIONS_TABLE_ID_ASC'
-  | 'INVOCATIONS_TABLE_ID_DESC'
-  | 'INVOCATIONS_TABLE_NAME_ASC'
-  | 'INVOCATIONS_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type FunctionModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'BINDINGS_TABLE_ID_ASC'
-  | 'BINDINGS_TABLE_ID_DESC'
-  | 'BINDINGS_TABLE_NAME_ASC'
-  | 'BINDINGS_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'DEFINITIONS_TABLE_ID_ASC'
-  | 'DEFINITIONS_TABLE_ID_DESC'
-  | 'DEFINITIONS_TABLE_NAME_ASC'
-  | 'DEFINITIONS_TABLE_NAME_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'HAS_CRON_ASC'
-  | 'HAS_CRON_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEDULES_TABLE_ID_ASC'
-  | 'SCHEDULES_TABLE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type GraphExecutionModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'EXECUTIONS_TABLE_ID_ASC'
-  | 'EXECUTIONS_TABLE_ID_DESC'
-  | 'EXECUTIONS_TABLE_NAME_ASC'
-  | 'EXECUTIONS_TABLE_NAME_DESC'
-  | 'GRAPH_MODULE_ID_ASC'
-  | 'GRAPH_MODULE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'NODE_STATES_TABLE_ID_ASC'
-  | 'NODE_STATES_TABLE_ID_DESC'
-  | 'NODE_STATES_TABLE_NAME_ASC'
-  | 'NODE_STATES_TABLE_NAME_DESC'
-  | 'OUTPUTS_TABLE_ID_ASC'
-  | 'OUTPUTS_TABLE_ID_DESC'
-  | 'OUTPUTS_TABLE_NAME_ASC'
-  | 'OUTPUTS_TABLE_NAME_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type GraphModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'GRAPHS_TABLE_ID_ASC'
-  | 'GRAPHS_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MERKLE_STORE_MODULE_ID_ASC'
-  | 'MERKLE_STORE_MODULE_ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_ID_ASC'
-  | 'PUBLIC_SCHEMA_ID_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type HierarchyModuleOrderBy =
-  | 'CHART_EDGES_TABLE_ID_ASC'
-  | 'CHART_EDGES_TABLE_ID_DESC'
-  | 'CHART_EDGES_TABLE_NAME_ASC'
-  | 'CHART_EDGES_TABLE_NAME_DESC'
-  | 'CHART_EDGE_GRANTS_TABLE_ID_ASC'
-  | 'CHART_EDGE_GRANTS_TABLE_ID_DESC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_ASC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'GET_MANAGERS_FUNCTION_ASC'
-  | 'GET_MANAGERS_FUNCTION_DESC'
-  | 'GET_SUBORDINATES_FUNCTION_ASC'
-  | 'GET_SUBORDINATES_FUNCTION_DESC'
-  | 'HIERARCHY_SPRT_TABLE_ID_ASC'
-  | 'HIERARCHY_SPRT_TABLE_ID_DESC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_ASC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_MANAGER_OF_FUNCTION_ASC'
-  | 'IS_MANAGER_OF_FUNCTION_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'REBUILD_HIERARCHY_FUNCTION_ASC'
-  | 'REBUILD_HIERARCHY_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'SPRT_TABLE_NAME_ASC'
-  | 'SPRT_TABLE_NAME_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC';
-export type HttpRouteModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'FUNCTION_MODULE_ID_ASC'
-  | 'FUNCTION_MODULE_ID_DESC'
-  | 'HTTP_ROUTES_TABLE_ID_ASC'
-  | 'HTTP_ROUTES_TABLE_ID_DESC'
-  | 'HTTP_ROUTES_TABLE_NAME_ASC'
-  | 'HTTP_ROUTES_TABLE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RESOLVER_FUNCTION_NAME_ASC'
-  | 'RESOLVER_FUNCTION_NAME_DESC'
-  | 'RESOURCE_MODULE_ID_ASC'
-  | 'RESOURCE_MODULE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'STORAGE_MODULE_ID_ASC'
-  | 'STORAGE_MODULE_ID_DESC';
-export type I18NModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SETTINGS_TABLE_ID_ASC'
-  | 'SETTINGS_TABLE_ID_DESC';
-export type IdentityProvidersModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type InferenceLogModuleOrderBy =
-  | 'ACTOR_FK_TABLE_ID_ASC'
-  | 'ACTOR_FK_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_FK_TABLE_ID_ASC'
-  | 'ENTITY_FK_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INFERENCE_LOG_TABLE_ID_ASC'
-  | 'INFERENCE_LOG_TABLE_ID_DESC'
-  | 'INFERENCE_LOG_TABLE_NAME_ASC'
-  | 'INFERENCE_LOG_TABLE_NAME_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'USAGE_SUMMARY_TABLE_ID_ASC'
-  | 'USAGE_SUMMARY_TABLE_ID_DESC'
-  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
-  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
-export type InfraConfigModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CONFIG_TABLE_ID_ASC'
-  | 'CONFIG_TABLE_ID_DESC'
-  | 'CONFIG_TABLE_NAME_ASC'
-  | 'CONFIG_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type InfraSecretsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'SECRETS_TABLE_ID_ASC'
-  | 'SECRETS_TABLE_ID_DESC'
-  | 'SECRETS_TABLE_NAME_ASC'
-  | 'SECRETS_TABLE_NAME_DESC';
-export type IntegrationProvidersModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type InternalSecretsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERNAL_SECRETS_TABLE_ID_ASC'
-  | 'INTERNAL_SECRETS_TABLE_ID_DESC'
-  | 'INTERNAL_SECRETS_TABLE_NAME_ASC'
-  | 'INTERNAL_SECRETS_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type InvitesModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CLAIMED_INVITES_TABLE_ID_ASC'
-  | 'CLAIMED_INVITES_TABLE_ID_DESC'
-  | 'CLAIMED_INVITES_TABLE_NAME_ASC'
-  | 'CLAIMED_INVITES_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'EMAILS_TABLE_ID_ASC'
-  | 'EMAILS_TABLE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INVITES_TABLE_ID_ASC'
-  | 'INVITES_TABLE_ID_DESC'
-  | 'INVITES_TABLE_NAME_ASC'
-  | 'INVITES_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_ASC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC';
-export type LimitsModuleOrderBy =
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'AGGREGATE_TABLE_ID_ASC'
-  | 'AGGREGATE_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CAP_CHECK_TRIGGER_ASC'
-  | 'CAP_CHECK_TRIGGER_DESC'
-  | 'CREDIT_CODES_TABLE_ID_ASC'
-  | 'CREDIT_CODES_TABLE_ID_DESC'
-  | 'CREDIT_CODE_ITEMS_TABLE_ID_ASC'
-  | 'CREDIT_CODE_ITEMS_TABLE_ID_DESC'
-  | 'CREDIT_REDEMPTIONS_TABLE_ID_ASC'
-  | 'CREDIT_REDEMPTIONS_TABLE_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_TABLE_ID_ASC'
-  | 'DEFAULT_TABLE_ID_DESC'
-  | 'DEFAULT_TABLE_NAME_ASC'
-  | 'DEFAULT_TABLE_NAME_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'EVENTS_TABLE_ID_ASC'
-  | 'EVENTS_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_ASC'
-  | 'LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_DESC'
-  | 'LIMIT_CAPS_DEFAULTS_TABLE_ID_ASC'
-  | 'LIMIT_CAPS_DEFAULTS_TABLE_ID_DESC'
-  | 'LIMIT_CAPS_TABLE_ID_ASC'
-  | 'LIMIT_CAPS_TABLE_ID_DESC'
-  | 'LIMIT_CHECK_FUNCTION_ASC'
-  | 'LIMIT_CHECK_FUNCTION_DESC'
-  | 'LIMIT_CHECK_SOFT_FUNCTION_ASC'
-  | 'LIMIT_CHECK_SOFT_FUNCTION_DESC'
-  | 'LIMIT_CREDITS_TABLE_ID_ASC'
-  | 'LIMIT_CREDITS_TABLE_ID_DESC'
-  | 'LIMIT_DECREMENT_FUNCTION_ASC'
-  | 'LIMIT_DECREMENT_FUNCTION_DESC'
-  | 'LIMIT_DECREMENT_TRIGGER_ASC'
-  | 'LIMIT_DECREMENT_TRIGGER_DESC'
-  | 'LIMIT_INCREMENT_FUNCTION_ASC'
-  | 'LIMIT_INCREMENT_FUNCTION_DESC'
-  | 'LIMIT_INCREMENT_TRIGGER_ASC'
-  | 'LIMIT_INCREMENT_TRIGGER_DESC'
-  | 'LIMIT_UPDATE_TRIGGER_ASC'
-  | 'LIMIT_UPDATE_TRIGGER_DESC'
-  | 'LIMIT_WARNINGS_TABLE_ID_ASC'
-  | 'LIMIT_WARNINGS_TABLE_ID_DESC'
-  | 'LIMIT_WARNING_STATE_TABLE_ID_ASC'
-  | 'LIMIT_WARNING_STATE_TABLE_ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RESOLVE_CAP_FUNCTION_ASC'
-  | 'RESOLVE_CAP_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type MembershipTypesModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type MembershipsModuleOrderBy =
-  | 'ACTOR_MASK_CHECK_ASC'
-  | 'ACTOR_MASK_CHECK_DESC'
-  | 'ACTOR_PERM_CHECK_ASC'
-  | 'ACTOR_PERM_CHECK_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'ADMIN_GRANTS_TABLE_ID_ASC'
-  | 'ADMIN_GRANTS_TABLE_ID_DESC'
-  | 'ADMIN_GRANTS_TABLE_NAME_ASC'
-  | 'ADMIN_GRANTS_TABLE_NAME_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_LIMITS_TABLE_ID_ASC'
-  | 'DEFAULT_LIMITS_TABLE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_TABLE_ID_ASC'
-  | 'DEFAULT_PERMISSIONS_TABLE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_IDS_BY_MASK_ASC'
-  | 'ENTITY_IDS_BY_MASK_DESC'
-  | 'ENTITY_IDS_BY_PERM_ASC'
-  | 'ENTITY_IDS_BY_PERM_DESC'
-  | 'ENTITY_IDS_FUNCTION_ASC'
-  | 'ENTITY_IDS_FUNCTION_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ENTITY_TABLE_OWNER_ID_ASC'
-  | 'ENTITY_TABLE_OWNER_ID_DESC'
-  | 'GET_ORG_FN_ASC'
-  | 'GET_ORG_FN_DESC'
-  | 'GRANTS_TABLE_ID_ASC'
-  | 'GRANTS_TABLE_ID_DESC'
-  | 'GRANTS_TABLE_NAME_ASC'
-  | 'GRANTS_TABLE_NAME_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'LIMITS_TABLE_ID_ASC'
-  | 'LIMITS_TABLE_ID_DESC'
-  | 'MEMBERSHIPS_TABLE_ID_ASC'
-  | 'MEMBERSHIPS_TABLE_ID_DESC'
-  | 'MEMBERSHIPS_TABLE_NAME_ASC'
-  | 'MEMBERSHIPS_TABLE_NAME_DESC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_ID_ASC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_ID_DESC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_ASC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_DESC'
-  | 'MEMBERSHIP_SETTINGS_TABLE_ID_ASC'
-  | 'MEMBERSHIP_SETTINGS_TABLE_ID_DESC'
-  | 'MEMBERSHIP_SETTINGS_TABLE_NAME_ASC'
-  | 'MEMBERSHIP_SETTINGS_TABLE_NAME_DESC'
-  | 'MEMBERS_TABLE_ID_ASC'
-  | 'MEMBERS_TABLE_ID_DESC'
-  | 'MEMBERS_TABLE_NAME_ASC'
-  | 'MEMBERS_TABLE_NAME_DESC'
-  | 'MEMBER_PROFILES_TABLE_ID_ASC'
-  | 'MEMBER_PROFILES_TABLE_ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_GRANTS_TABLE_ID_ASC'
-  | 'OWNER_GRANTS_TABLE_ID_DESC'
-  | 'OWNER_GRANTS_TABLE_NAME_ASC'
-  | 'OWNER_GRANTS_TABLE_NAME_DESC'
-  | 'PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSIONS_TABLE_ID_DESC'
-  | 'PERMISSION_DEFAULT_GRANTS_TABLE_ID_ASC'
-  | 'PERMISSION_DEFAULT_GRANTS_TABLE_ID_DESC'
-  | 'PERMISSION_DEFAULT_PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSION_DEFAULT_PERMISSIONS_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'SPRT_TABLE_ID_ASC'
-  | 'SPRT_TABLE_ID_DESC';
-export type MerkleStoreModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'COMMIT_TABLE_ID_ASC'
-  | 'COMMIT_TABLE_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'FUNCTION_PREFIX_ASC'
-  | 'FUNCTION_PREFIX_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OBJECT_TABLE_ID_ASC'
-  | 'OBJECT_TABLE_ID_DESC'
-  | 'PERMISSION_KEY_ASC'
-  | 'PERMISSION_KEY_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'STORE_TABLE_ID_ASC'
-  | 'STORE_TABLE_ID_DESC';
-export type NamespaceModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAMESPACES_TABLE_ID_ASC'
-  | 'NAMESPACES_TABLE_ID_DESC'
-  | 'NAMESPACES_TABLE_NAME_ASC'
-  | 'NAMESPACES_TABLE_NAME_DESC'
-  | 'NAMESPACE_EVENTS_TABLE_ID_ASC'
-  | 'NAMESPACE_EVENTS_TABLE_ID_DESC'
-  | 'NAMESPACE_EVENTS_TABLE_NAME_ASC'
-  | 'NAMESPACE_EVENTS_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type NotificationsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CHANNELS_TABLE_ID_ASC'
-  | 'CHANNELS_TABLE_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'DELIVERY_LOG_TABLE_ID_ASC'
-  | 'DELIVERY_LOG_TABLE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'HAS_CHANNELS_ASC'
-  | 'HAS_CHANNELS_DESC'
-  | 'HAS_DIGEST_METADATA_ASC'
-  | 'HAS_DIGEST_METADATA_DESC'
-  | 'HAS_PREFERENCES_ASC'
-  | 'HAS_PREFERENCES_DESC'
-  | 'HAS_SETTINGS_EXTENSION_ASC'
-  | 'HAS_SETTINGS_EXTENSION_DESC'
-  | 'HAS_SUBSCRIPTIONS_ASC'
-  | 'HAS_SUBSCRIPTIONS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'NOTIFICATIONS_TABLE_ID_ASC'
-  | 'NOTIFICATIONS_TABLE_ID_DESC'
-  | 'ORGANIZATION_SETTINGS_TABLE_ID_ASC'
-  | 'ORGANIZATION_SETTINGS_TABLE_ID_DESC'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PREFERENCES_TABLE_ID_ASC'
-  | 'PREFERENCES_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'READ_STATE_TABLE_ID_ASC'
-  | 'READ_STATE_TABLE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SUPPRESSIONS_TABLE_ID_ASC'
-  | 'SUPPRESSIONS_TABLE_ID_DESC'
-  | 'USER_SETTINGS_TABLE_ID_ASC'
-  | 'USER_SETTINGS_TABLE_ID_DESC';
-export type PermissionsModuleOrderBy =
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'BITLEN_ASC'
-  | 'BITLEN_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_TABLE_ID_ASC'
-  | 'DEFAULT_TABLE_ID_DESC'
-  | 'DEFAULT_TABLE_NAME_ASC'
-  | 'DEFAULT_TABLE_NAME_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'GET_BY_MASK_ASC'
-  | 'GET_BY_MASK_DESC'
-  | 'GET_MASK_ASC'
-  | 'GET_MASK_BY_NAME_ASC'
-  | 'GET_MASK_BY_NAME_DESC'
-  | 'GET_MASK_DESC'
-  | 'GET_PADDED_MASK_ASC'
-  | 'GET_PADDED_MASK_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type PhoneNumbersModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type PlansModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'APPLY_BILLING_PLAN_FUNCTION_ASC'
-  | 'APPLY_BILLING_PLAN_FUNCTION_DESC'
-  | 'APPLY_PLAN_AGGREGATE_FUNCTION_ASC'
-  | 'APPLY_PLAN_AGGREGATE_FUNCTION_DESC'
-  | 'APPLY_PLAN_CAPS_FUNCTION_ASC'
-  | 'APPLY_PLAN_CAPS_FUNCTION_DESC'
-  | 'APPLY_PLAN_FUNCTION_ASC'
-  | 'APPLY_PLAN_FUNCTION_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PLANS_TABLE_ID_ASC'
-  | 'PLANS_TABLE_ID_DESC'
-  | 'PLANS_TABLE_NAME_ASC'
-  | 'PLANS_TABLE_NAME_DESC'
-  | 'PLAN_CAPS_TABLE_ID_ASC'
-  | 'PLAN_CAPS_TABLE_ID_DESC'
-  | 'PLAN_LIMITS_TABLE_ID_ASC'
-  | 'PLAN_LIMITS_TABLE_ID_DESC'
-  | 'PLAN_LIMITS_TABLE_NAME_ASC'
-  | 'PLAN_LIMITS_TABLE_NAME_DESC'
-  | 'PLAN_METER_LIMITS_TABLE_ID_ASC'
-  | 'PLAN_METER_LIMITS_TABLE_ID_DESC'
-  | 'PLAN_OVERRIDES_TABLE_ID_ASC'
-  | 'PLAN_OVERRIDES_TABLE_ID_DESC'
-  | 'PLAN_PRICING_TABLE_ID_ASC'
-  | 'PLAN_PRICING_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC';
-export type PrincipalAuthModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'AUDITS_TABLE_ID_ASC'
-  | 'AUDITS_TABLE_ID_DESC'
-  | 'CREATE_ORG_API_KEY_FUNCTION_ASC'
-  | 'CREATE_ORG_API_KEY_FUNCTION_DESC'
-  | 'CREATE_ORG_PRINCIPAL_FUNCTION_ASC'
-  | 'CREATE_ORG_PRINCIPAL_FUNCTION_DESC'
-  | 'CREATE_PRINCIPAL_FUNCTION_ASC'
-  | 'CREATE_PRINCIPAL_FUNCTION_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DELETE_ORG_PRINCIPAL_FUNCTION_ASC'
-  | 'DELETE_ORG_PRINCIPAL_FUNCTION_DESC'
-  | 'DELETE_PRINCIPAL_FUNCTION_ASC'
-  | 'DELETE_PRINCIPAL_FUNCTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRINCIPALS_TABLE_ID_ASC'
-  | 'PRINCIPALS_TABLE_ID_DESC'
-  | 'PRINCIPALS_TABLE_NAME_ASC'
-  | 'PRINCIPALS_TABLE_NAME_DESC'
-  | 'PRINCIPAL_ENTITIES_TABLE_ID_ASC'
-  | 'PRINCIPAL_ENTITIES_TABLE_ID_DESC'
-  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_ASC'
-  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_DESC'
-  | 'REVOKE_ORG_API_KEY_FUNCTION_ASC'
-  | 'REVOKE_ORG_API_KEY_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC';
-export type ProfilesModuleOrderBy =
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MEMBERSHIPS_TABLE_ID_ASC'
-  | 'MEMBERSHIPS_TABLE_ID_DESC'
-  | 'NATURAL'
-  | 'PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSIONS_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_ID_ASC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_ID_DESC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_ASC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_DESC'
-  | 'PROFILE_GRANTS_TABLE_ID_ASC'
-  | 'PROFILE_GRANTS_TABLE_ID_DESC'
-  | 'PROFILE_GRANTS_TABLE_NAME_ASC'
-  | 'PROFILE_GRANTS_TABLE_NAME_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_ID_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_ID_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_DESC'
-  | 'PROFILE_TEMPLATES_TABLE_ID_ASC'
-  | 'PROFILE_TEMPLATES_TABLE_ID_DESC'
-  | 'PROFILE_TEMPLATES_TABLE_NAME_ASC'
-  | 'PROFILE_TEMPLATES_TABLE_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type RateLimitMetersModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CHECK_RATE_LIMIT_FUNCTION_ASC'
-  | 'CHECK_RATE_LIMIT_FUNCTION_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RATE_LIMIT_OVERRIDES_TABLE_ID_ASC'
-  | 'RATE_LIMIT_OVERRIDES_TABLE_ID_DESC'
-  | 'RATE_LIMIT_OVERRIDES_TABLE_NAME_ASC'
-  | 'RATE_LIMIT_OVERRIDES_TABLE_NAME_DESC'
-  | 'RATE_LIMIT_STATE_TABLE_ID_ASC'
-  | 'RATE_LIMIT_STATE_TABLE_ID_DESC'
-  | 'RATE_LIMIT_STATE_TABLE_NAME_ASC'
-  | 'RATE_LIMIT_STATE_TABLE_NAME_DESC'
-  | 'RATE_WINDOW_LIMITS_TABLE_ID_ASC'
-  | 'RATE_WINDOW_LIMITS_TABLE_ID_DESC'
-  | 'RATE_WINDOW_LIMITS_TABLE_NAME_ASC'
-  | 'RATE_WINDOW_LIMITS_TABLE_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC';
-export type RateLimitsModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IP_RATE_LIMITS_TABLE_ID_ASC'
-  | 'IP_RATE_LIMITS_TABLE_ID_DESC'
-  | 'IP_RATE_LIMITS_TABLE_NAME_ASC'
-  | 'IP_RATE_LIMITS_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RATE_LIMITS_TABLE_ID_ASC'
-  | 'RATE_LIMITS_TABLE_ID_DESC'
-  | 'RATE_LIMITS_TABLE_NAME_ASC'
-  | 'RATE_LIMITS_TABLE_NAME_DESC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_ID_ASC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_ID_DESC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_NAME_ASC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC';
-export type RealtimeModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'CHANGE_LOG_TABLE_ID_ASC'
-  | 'CHANGE_LOG_TABLE_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'LISTENER_NODE_TABLE_ID_ASC'
-  | 'LISTENER_NODE_TABLE_ID_DESC'
-  | 'NATURAL'
-  | 'NOTIFY_CHANNEL_ASC'
-  | 'NOTIFY_CHANNEL_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'RETENTION_HOURS_ASC'
-  | 'RETENTION_HOURS_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SOURCE_REGISTRY_TABLE_ID_ASC'
-  | 'SOURCE_REGISTRY_TABLE_ID_DESC'
-  | 'SUBSCRIPTIONS_SCHEMA_ID_ASC'
-  | 'SUBSCRIPTIONS_SCHEMA_ID_DESC';
-export type RelationProvisionOrderBy =
-  | 'API_REQUIRED_ASC'
-  | 'API_REQUIRED_DESC'
-  | 'CREATE_INDEX_ASC'
-  | 'CREATE_INDEX_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DELETE_ACTION_ASC'
-  | 'DELETE_ACTION_DESC'
-  | 'EXPOSE_IN_API_ASC'
-  | 'EXPOSE_IN_API_DESC'
-  | 'FIELD_NAME_ASC'
-  | 'FIELD_NAME_DESC'
-  | 'GRANTS_ASC'
-  | 'GRANTS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'IS_REQUIRED_ASC'
-  | 'IS_REQUIRED_DESC'
-  | 'JUNCTION_SCHEMA_ID_ASC'
-  | 'JUNCTION_SCHEMA_ID_DESC'
-  | 'JUNCTION_TABLE_ID_ASC'
-  | 'JUNCTION_TABLE_ID_DESC'
-  | 'JUNCTION_TABLE_NAME_ASC'
-  | 'JUNCTION_TABLE_NAME_DESC'
-  | 'NATURAL'
-  | 'NODES_ASC'
-  | 'NODES_DESC'
-  | 'OUT_FIELD_ID_ASC'
-  | 'OUT_FIELD_ID_DESC'
-  | 'OUT_JUNCTION_TABLE_ID_ASC'
-  | 'OUT_JUNCTION_TABLE_ID_DESC'
-  | 'OUT_SOURCE_FIELD_ID_ASC'
-  | 'OUT_SOURCE_FIELD_ID_DESC'
-  | 'OUT_TARGET_FIELD_ID_ASC'
-  | 'OUT_TARGET_FIELD_ID_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'RELATION_TYPE_ASC'
-  | 'RELATION_TYPE_DESC'
-  | 'SOURCE_FIELD_NAME_ASC'
-  | 'SOURCE_FIELD_NAME_DESC'
-  | 'SOURCE_TABLE_ID_ASC'
-  | 'SOURCE_TABLE_ID_DESC'
-  | 'TARGET_FIELD_NAME_ASC'
-  | 'TARGET_FIELD_NAME_DESC'
-  | 'TARGET_TABLE_ID_ASC'
-  | 'TARGET_TABLE_ID_DESC'
-  | 'USE_COMPOSITE_KEY_ASC'
-  | 'USE_COMPOSITE_KEY_DESC';
-export type ResourceModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_STORE_NAME_ASC'
-  | 'INSTALLATION_STORE_NAME_DESC'
-  | 'MERKLE_STORE_MODULE_ID_ASC'
-  | 'MERKLE_STORE_MODULE_ID_DESC'
-  | 'NAMESPACE_MODULE_ID_ASC'
-  | 'NAMESPACE_MODULE_ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'REQUIREMENTS_STATE_VIEW_NAME_ASC'
-  | 'REQUIREMENTS_STATE_VIEW_NAME_DESC'
-  | 'RESOLVED_REQUIREMENTS_VIEW_NAME_ASC'
-  | 'RESOLVED_REQUIREMENTS_VIEW_NAME_DESC'
-  | 'RESOURCES_TABLE_ID_ASC'
-  | 'RESOURCES_TABLE_ID_DESC'
-  | 'RESOURCES_TABLE_NAME_ASC'
-  | 'RESOURCES_TABLE_NAME_DESC'
-  | 'RESOURCE_BILLING_ROLLUP_FUNCTION_ASC'
-  | 'RESOURCE_BILLING_ROLLUP_FUNCTION_DESC'
-  | 'RESOURCE_DEFINITIONS_TABLE_ID_ASC'
-  | 'RESOURCE_DEFINITIONS_TABLE_ID_DESC'
-  | 'RESOURCE_DEFINITIONS_TABLE_NAME_ASC'
-  | 'RESOURCE_DEFINITIONS_TABLE_NAME_DESC'
-  | 'RESOURCE_EVENTS_TABLE_ID_ASC'
-  | 'RESOURCE_EVENTS_TABLE_ID_DESC'
-  | 'RESOURCE_EVENTS_TABLE_NAME_ASC'
-  | 'RESOURCE_EVENTS_TABLE_NAME_DESC'
-  | 'RESOURCE_INSTALLATIONS_TABLE_ID_ASC'
-  | 'RESOURCE_INSTALLATIONS_TABLE_ID_DESC'
-  | 'RESOURCE_INSTALLATIONS_TABLE_NAME_ASC'
-  | 'RESOURCE_INSTALLATIONS_TABLE_NAME_DESC'
-  | 'RESOURCE_STATUS_CHECKS_TABLE_ID_ASC'
-  | 'RESOURCE_STATUS_CHECKS_TABLE_ID_DESC'
-  | 'RESOURCE_STATUS_CHECKS_TABLE_NAME_ASC'
-  | 'RESOURCE_STATUS_CHECKS_TABLE_NAME_DESC'
-  | 'RESOURCE_USAGE_LOG_TABLE_ID_ASC'
-  | 'RESOURCE_USAGE_LOG_TABLE_ID_DESC'
-  | 'RESOURCE_USAGE_LOG_TABLE_NAME_ASC'
-  | 'RESOURCE_USAGE_LOG_TABLE_NAME_DESC'
-  | 'RESOURCE_USAGE_SUMMARY_TABLE_ID_ASC'
-  | 'RESOURCE_USAGE_SUMMARY_TABLE_ID_DESC'
-  | 'RESOURCE_USAGE_SUMMARY_TABLE_NAME_ASC'
-  | 'RESOURCE_USAGE_SUMMARY_TABLE_NAME_DESC'
-  | 'ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_ASC'
-  | 'ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
-export type RlsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'AUTHENTICATE_ASC'
-  | 'AUTHENTICATE_DESC'
-  | 'AUTHENTICATE_STRICT_ASC'
-  | 'AUTHENTICATE_STRICT_DESC'
-  | 'CURRENT_ROLE_ASC'
-  | 'CURRENT_ROLE_DESC'
-  | 'CURRENT_ROLE_ID_ASC'
-  | 'CURRENT_ROLE_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC';
-export type SecureTableProvisionOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FIELDS_ASC'
-  | 'FIELDS_DESC'
-  | 'GRANTS_ASC'
-  | 'GRANTS_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'NODES_ASC'
-  | 'NODES_DESC'
-  | 'OUT_FIELDS_ASC'
-  | 'OUT_FIELDS_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'USE_RLS_ASC'
-  | 'USE_RLS_DESC';
-export type SessionSecretsModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type SessionsModuleOrderBy =
-  | 'AUTH_SETTINGS_TABLE_ID_ASC'
-  | 'AUTH_SETTINGS_TABLE_ID_DESC'
-  | 'AUTH_SETTINGS_TABLE_NAME_ASC'
-  | 'AUTH_SETTINGS_TABLE_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_DEFAULT_EXPIRATION_ASC'
-  | 'SESSIONS_DEFAULT_EXPIRATION_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSIONS_TABLE_NAME_ASC'
-  | 'SESSIONS_TABLE_NAME_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_NAME_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_NAME_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC';
-export type StorageLogModuleOrderBy =
-  | 'ACTOR_FK_TABLE_ID_ASC'
-  | 'ACTOR_FK_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_FK_TABLE_ID_ASC'
-  | 'ENTITY_FK_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'STORAGE_LOG_TABLE_ID_ASC'
-  | 'STORAGE_LOG_TABLE_ID_DESC'
-  | 'STORAGE_LOG_TABLE_NAME_ASC'
-  | 'STORAGE_LOG_TABLE_NAME_DESC'
-  | 'USAGE_SUMMARY_TABLE_ID_ASC'
-  | 'USAGE_SUMMARY_TABLE_ID_DESC'
-  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
-  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
-export type StorageModuleOrderBy =
-  | 'ALLOWED_ORIGINS_ASC'
-  | 'ALLOWED_ORIGINS_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'BUCKETS_TABLE_ID_ASC'
-  | 'BUCKETS_TABLE_ID_DESC'
-  | 'BUCKETS_TABLE_NAME_ASC'
-  | 'BUCKETS_TABLE_NAME_DESC'
-  | 'CACHE_TTL_SECONDS_ASC'
-  | 'CACHE_TTL_SECONDS_DESC'
-  | 'CONFIRM_UPLOAD_DELAY_ASC'
-  | 'CONFIRM_UPLOAD_DELAY_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_MAX_FILE_SIZE_ASC'
-  | 'DEFAULT_MAX_FILE_SIZE_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'DOWNLOAD_URL_EXPIRY_SECONDS_ASC'
-  | 'DOWNLOAD_URL_EXPIRY_SECONDS_DESC'
-  | 'ENDPOINT_ASC'
-  | 'ENDPOINT_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'FILES_TABLE_ID_ASC'
-  | 'FILES_TABLE_ID_DESC'
-  | 'FILES_TABLE_NAME_ASC'
-  | 'FILES_TABLE_NAME_DESC'
-  | 'FILE_EVENTS_TABLE_ID_ASC'
-  | 'FILE_EVENTS_TABLE_ID_DESC'
-  | 'HAS_AUDIT_LOG_ASC'
-  | 'HAS_AUDIT_LOG_DESC'
-  | 'HAS_CONFIRM_UPLOAD_ASC'
-  | 'HAS_CONFIRM_UPLOAD_DESC'
-  | 'HAS_CONTENT_HASH_ASC'
-  | 'HAS_CONTENT_HASH_DESC'
-  | 'HAS_CUSTOM_KEYS_ASC'
-  | 'HAS_CUSTOM_KEYS_DESC'
-  | 'HAS_PATH_SHARES_ASC'
-  | 'HAS_PATH_SHARES_DESC'
-  | 'HAS_VERSIONING_ASC'
-  | 'HAS_VERSIONING_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_BULK_FILES_ASC'
-  | 'MAX_BULK_FILES_DESC'
-  | 'MAX_BULK_TOTAL_SIZE_ASC'
-  | 'MAX_BULK_TOTAL_SIZE_DESC'
-  | 'MAX_FILENAME_LENGTH_ASC'
-  | 'MAX_FILENAME_LENGTH_DESC'
-  | 'NATURAL'
-  | 'PATH_SHARES_TABLE_ID_ASC'
-  | 'PATH_SHARES_TABLE_ID_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVIDER_ASC'
-  | 'PROVIDER_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'PUBLIC_URL_PREFIX_ASC'
-  | 'PUBLIC_URL_PREFIX_DESC'
-  | 'RESTRICT_READS_ASC'
-  | 'RESTRICT_READS_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'UPLOAD_URL_EXPIRY_SECONDS_ASC'
-  | 'UPLOAD_URL_EXPIRY_SECONDS_DESC';
-export type TransferLogModuleOrderBy =
-  | 'ACTOR_FK_TABLE_ID_ASC'
-  | 'ACTOR_FK_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_FK_TABLE_ID_ASC'
-  | 'ENTITY_FK_TABLE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INTERVAL_ASC'
-  | 'INTERVAL_DESC'
-  | 'NATURAL'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PREMAKE_ASC'
-  | 'PREMAKE_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'RETENTION_ASC'
-  | 'RETENTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TRANSFER_LOG_TABLE_ID_ASC'
-  | 'TRANSFER_LOG_TABLE_ID_DESC'
-  | 'TRANSFER_LOG_TABLE_NAME_ASC'
-  | 'TRANSFER_LOG_TABLE_NAME_DESC'
-  | 'USAGE_SUMMARY_TABLE_ID_ASC'
-  | 'USAGE_SUMMARY_TABLE_ID_DESC'
-  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
-  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
-export type UserAuthModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'AUDITS_TABLE_ID_ASC'
-  | 'AUDITS_TABLE_ID_DESC'
-  | 'AUDITS_TABLE_NAME_ASC'
-  | 'AUDITS_TABLE_NAME_DESC'
-  | 'CHECK_PASSWORD_FUNCTION_ASC'
-  | 'CHECK_PASSWORD_FUNCTION_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DELETE_ACCOUNT_FUNCTION_ASC'
-  | 'DELETE_ACCOUNT_FUNCTION_DESC'
-  | 'EMAILS_TABLE_ID_ASC'
-  | 'EMAILS_TABLE_ID_DESC'
-  | 'ENCRYPTED_TABLE_ID_ASC'
-  | 'ENCRYPTED_TABLE_ID_DESC'
-  | 'EXTEND_TOKEN_EXPIRES_ASC'
-  | 'EXTEND_TOKEN_EXPIRES_DESC'
-  | 'FORGOT_PASSWORD_FUNCTION_ASC'
-  | 'FORGOT_PASSWORD_FUNCTION_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'REQUEST_CROSS_ORIGIN_TOKEN_FUNCTION_ASC'
-  | 'REQUEST_CROSS_ORIGIN_TOKEN_FUNCTION_DESC'
-  | 'RESET_PASSWORD_FUNCTION_ASC'
-  | 'RESET_PASSWORD_FUNCTION_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SECRETS_TABLE_ID_ASC'
-  | 'SECRETS_TABLE_ID_DESC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_ASC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_DESC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_ASC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'SET_PASSWORD_FUNCTION_ASC'
-  | 'SET_PASSWORD_FUNCTION_DESC'
-  | 'SIGN_IN_CROSS_ORIGIN_FUNCTION_ASC'
-  | 'SIGN_IN_CROSS_ORIGIN_FUNCTION_DESC'
-  | 'SIGN_IN_FUNCTION_ASC'
-  | 'SIGN_IN_FUNCTION_DESC'
-  | 'SIGN_OUT_FUNCTION_ASC'
-  | 'SIGN_OUT_FUNCTION_DESC'
-  | 'SIGN_UP_FUNCTION_ASC'
-  | 'SIGN_UP_FUNCTION_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'VERIFY_EMAIL_FUNCTION_ASC'
-  | 'VERIFY_EMAIL_FUNCTION_DESC'
-  | 'VERIFY_PASSWORD_FUNCTION_ASC'
-  | 'VERIFY_PASSWORD_FUNCTION_DESC';
-export type UserCredentialsModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type UserSettingsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type UserStateModuleOrderBy =
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type UsersModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TYPE_TABLE_ID_ASC'
-  | 'TYPE_TABLE_ID_DESC'
-  | 'TYPE_TABLE_NAME_ASC'
-  | 'TYPE_TABLE_NAME_DESC';
-export type WebauthnAuthModuleOrderBy =
-  | 'ATTESTATION_TYPE_ASC'
-  | 'ATTESTATION_TYPE_DESC'
-  | 'AUTH_SETTINGS_TABLE_ID_ASC'
-  | 'AUTH_SETTINGS_TABLE_ID_DESC'
-  | 'CHALLENGE_EXPIRY_ASC'
-  | 'CHALLENGE_EXPIRY_DESC'
-  | 'CREDENTIALS_TABLE_ID_ASC'
-  | 'CREDENTIALS_TABLE_ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORIGIN_ALLOWLIST_ASC'
-  | 'ORIGIN_ALLOWLIST_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REQUIRE_USER_VERIFICATION_ASC'
-  | 'REQUIRE_USER_VERIFICATION_DESC'
-  | 'RESIDENT_KEY_ASC'
-  | 'RESIDENT_KEY_DESC'
-  | 'RP_ID_ASC'
-  | 'RP_ID_DESC'
-  | 'RP_NAME_ASC'
-  | 'RP_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'SESSION_SECRETS_TABLE_ID_ASC'
-  | 'SESSION_SECRETS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC';
-export type WebauthnCredentialsModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC';
-export type WebhookModuleOrderBy =
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'ENTITY_FIELD_ASC'
-  | 'ENTITY_FIELD_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'FUNCTION_INVOCATION_MODULE_ID_ASC'
-  | 'FUNCTION_INVOCATION_MODULE_ID_DESC'
-  | 'FUNCTION_MODULE_ID_ASC'
-  | 'FUNCTION_MODULE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INFRA_SECRETS_MODULE_ID_ASC'
-  | 'INFRA_SECRETS_MODULE_ID_DESC'
-  | 'NAMESPACE_MODULE_ID_ASC'
-  | 'NAMESPACE_MODULE_ID_DESC'
-  | 'NATURAL'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'WEBHOOK_ENDPOINTS_TABLE_ID_ASC'
-  | 'WEBHOOK_ENDPOINTS_TABLE_ID_DESC'
-  | 'WEBHOOK_ENDPOINTS_TABLE_NAME_ASC'
-  | 'WEBHOOK_ENDPOINTS_TABLE_NAME_DESC'
-  | 'WEBHOOK_EVENTS_TABLE_ID_ASC'
-  | 'WEBHOOK_EVENTS_TABLE_ID_DESC'
-  | 'WEBHOOK_EVENTS_TABLE_NAME_ASC'
-  | 'WEBHOOK_EVENTS_TABLE_NAME_DESC';
+export type AgentModuleOrderBy = "AGENT_TABLE_ID_ASC" | "AGENT_TABLE_ID_DESC" | "AGENT_TABLE_NAME_ASC" | "AGENT_TABLE_NAME_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "HAS_AGENTS_ASC" | "HAS_AGENTS_DESC" | "HAS_PLANS_ASC" | "HAS_PLANS_DESC" | "HAS_RESOURCES_ASC" | "HAS_RESOURCES_DESC" | "ID_ASC" | "ID_DESC" | "MESSAGE_TABLE_ID_ASC" | "MESSAGE_TABLE_ID_DESC" | "MESSAGE_TABLE_NAME_ASC" | "MESSAGE_TABLE_NAME_DESC" | "NATURAL" | "PERSONA_TABLE_ID_ASC" | "PERSONA_TABLE_ID_DESC" | "PERSONA_TABLE_NAME_ASC" | "PERSONA_TABLE_NAME_DESC" | "PLAN_TABLE_ID_ASC" | "PLAN_TABLE_ID_DESC" | "PLAN_TABLE_NAME_ASC" | "PLAN_TABLE_NAME_DESC" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROMPTS_TABLE_ID_ASC" | "PROMPTS_TABLE_ID_DESC" | "PROMPTS_TABLE_NAME_ASC" | "PROMPTS_TABLE_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RESOURCES_ASC" | "RESOURCES_DESC" | "RESOURCE_TABLE_ID_ASC" | "RESOURCE_TABLE_ID_DESC" | "RESOURCE_TABLE_NAME_ASC" | "RESOURCE_TABLE_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SHARED_ASC" | "SHARED_DESC" | "TASK_TABLE_ID_ASC" | "TASK_TABLE_ID_DESC" | "TASK_TABLE_NAME_ASC" | "TASK_TABLE_NAME_DESC" | "THREAD_TABLE_ID_ASC" | "THREAD_TABLE_ID_DESC" | "THREAD_TABLE_NAME_ASC" | "THREAD_TABLE_NAME_DESC";
+export type ApiSurfaceModuleOrderBy = "APIS_TABLE_ID_ASC" | "APIS_TABLE_ID_DESC" | "APIS_TABLE_NAME_ASC" | "APIS_TABLE_NAME_DESC" | "API_MODULES_TABLE_ID_ASC" | "API_MODULES_TABLE_ID_DESC" | "API_MODULES_TABLE_NAME_ASC" | "API_MODULES_TABLE_NAME_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "API_SCHEMAS_TABLE_ID_ASC" | "API_SCHEMAS_TABLE_ID_DESC" | "API_SCHEMAS_TABLE_NAME_ASC" | "API_SCHEMAS_TABLE_NAME_DESC" | "API_SETTINGS_TABLE_ID_ASC" | "API_SETTINGS_TABLE_ID_DESC" | "API_SETTINGS_TABLE_NAME_ASC" | "API_SETTINGS_TABLE_NAME_DESC" | "CATALOG_MODULE_ID_ASC" | "CATALOG_MODULE_ID_DESC" | "CORS_SETTINGS_TABLE_ID_ASC" | "CORS_SETTINGS_TABLE_ID_DESC" | "CORS_SETTINGS_TABLE_NAME_ASC" | "CORS_SETTINGS_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type AppModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "APPS_TABLE_ID_ASC" | "APPS_TABLE_ID_DESC" | "APPS_TABLE_NAME_ASC" | "APPS_TABLE_NAME_DESC" | "APP_COMPONENTS_TABLE_ID_ASC" | "APP_COMPONENTS_TABLE_ID_DESC" | "APP_COMPONENTS_TABLE_NAME_ASC" | "APP_COMPONENTS_TABLE_NAME_DESC" | "CATALOG_MODULE_ID_ASC" | "CATALOG_MODULE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type BillingModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "BALANCES_TABLE_ID_ASC" | "BALANCES_TABLE_ID_DESC" | "BALANCES_TABLE_NAME_ASC" | "BALANCES_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ID_ASC" | "ID_DESC" | "LEDGER_TABLE_ID_ASC" | "LEDGER_TABLE_ID_DESC" | "LEDGER_TABLE_NAME_ASC" | "LEDGER_TABLE_NAME_DESC" | "METERS_TABLE_ID_ASC" | "METERS_TABLE_ID_DESC" | "METERS_TABLE_NAME_ASC" | "METERS_TABLE_NAME_DESC" | "METER_CREDITS_TABLE_ID_ASC" | "METER_CREDITS_TABLE_ID_DESC" | "METER_CREDITS_TABLE_NAME_ASC" | "METER_CREDITS_TABLE_NAME_DESC" | "METER_DEFAULTS_TABLE_ID_ASC" | "METER_DEFAULTS_TABLE_ID_DESC" | "METER_DEFAULTS_TABLE_NAME_ASC" | "METER_DEFAULTS_TABLE_NAME_DESC" | "METER_SOURCES_TABLE_ID_ASC" | "METER_SOURCES_TABLE_ID_DESC" | "METER_SOURCES_TABLE_NAME_ASC" | "METER_SOURCES_TABLE_NAME_DESC" | "NATURAL" | "PLAN_SUBSCRIPTIONS_TABLE_ID_ASC" | "PLAN_SUBSCRIPTIONS_TABLE_ID_DESC" | "PLAN_SUBSCRIPTIONS_TABLE_NAME_ASC" | "PLAN_SUBSCRIPTIONS_TABLE_NAME_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RECORD_USAGE_FUNCTION_ASC" | "RECORD_USAGE_FUNCTION_DESC" | "ROLLUP_USAGE_SUMMARY_FUNCTION_ASC" | "ROLLUP_USAGE_SUMMARY_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SWEEP_EXPIRED_SUBSCRIPTIONS_FUNCTION_ASC" | "SWEEP_EXPIRED_SUBSCRIPTIONS_FUNCTION_DESC";
+export type BillingProviderModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "BILLING_CUSTOMERS_TABLE_ID_ASC" | "BILLING_CUSTOMERS_TABLE_ID_DESC" | "BILLING_CUSTOMERS_TABLE_NAME_ASC" | "BILLING_CUSTOMERS_TABLE_NAME_DESC" | "BILLING_PRICES_TABLE_ID_ASC" | "BILLING_PRICES_TABLE_ID_DESC" | "BILLING_PRICES_TABLE_NAME_ASC" | "BILLING_PRICES_TABLE_NAME_DESC" | "BILLING_PRODUCTS_TABLE_ID_ASC" | "BILLING_PRODUCTS_TABLE_ID_DESC" | "BILLING_PRODUCTS_TABLE_NAME_ASC" | "BILLING_PRODUCTS_TABLE_NAME_DESC" | "BILLING_SUBSCRIPTIONS_TABLE_ID_ASC" | "BILLING_SUBSCRIPTIONS_TABLE_ID_DESC" | "BILLING_SUBSCRIPTIONS_TABLE_NAME_ASC" | "BILLING_SUBSCRIPTIONS_TABLE_NAME_DESC" | "BILLING_WEBHOOK_EVENTS_TABLE_ID_ASC" | "BILLING_WEBHOOK_EVENTS_TABLE_ID_DESC" | "BILLING_WEBHOOK_EVENTS_TABLE_NAME_ASC" | "BILLING_WEBHOOK_EVENTS_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRICES_TABLE_ID_ASC" | "PRICES_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PROCESS_BILLING_EVENT_FUNCTION_ASC" | "PROCESS_BILLING_EVENT_FUNCTION_DESC" | "PRODUCTS_TABLE_ID_ASC" | "PRODUCTS_TABLE_ID_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SUBSCRIPTIONS_TABLE_ID_ASC" | "SUBSCRIPTIONS_TABLE_ID_DESC";
+export type BlueprintOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFINITION_ASC" | "DEFINITION_DESC" | "DEFINITION_HASH_ASC" | "DEFINITION_HASH_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TABLE_HASHES_ASC" | "TABLE_HASHES_DESC" | "TEMPLATE_ID_ASC" | "TEMPLATE_ID_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type BlueprintConstructionOrderBy = "BLUEPRINT_ID_ASC" | "BLUEPRINT_ID_DESC" | "CONSTRUCTED_AT_ASC" | "CONSTRUCTED_AT_DESC" | "CONSTRUCTED_DEFINITION_ASC" | "CONSTRUCTED_DEFINITION_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_DETAILS_ASC" | "ERROR_DETAILS_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "STATUS_ASC" | "STATUS_DESC" | "TABLE_MAP_ASC" | "TABLE_MAP_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type BlueprintTemplateOrderBy = "CATEGORIES_ASC" | "CATEGORIES_DESC" | "COMPLEXITY_ASC" | "COMPLEXITY_DESC" | "COPY_COUNT_ASC" | "COPY_COUNT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DEFINITION_ASC" | "DEFINITION_DESC" | "DEFINITION_HASH_ASC" | "DEFINITION_HASH_DESC" | "DEFINITION_SCHEMA_VERSION_ASC" | "DEFINITION_SCHEMA_VERSION_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "DISPLAY_NAME_ASC" | "DISPLAY_NAME_DESC" | "FORKED_FROM_ID_ASC" | "FORKED_FROM_ID_DESC" | "FORK_COUNT_ASC" | "FORK_COUNT_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOURCE_ASC" | "SOURCE_DESC" | "TABLE_HASHES_ASC" | "TABLE_HASHES_DESC" | "TAGS_ASC" | "TAGS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "VERSION_ASC" | "VERSION_DESC" | "VISIBILITY_ASC" | "VISIBILITY_DESC";
+export type CatalogModuleOrderBy = "APIS_TABLE_ID_ASC" | "APIS_TABLE_ID_DESC" | "APIS_TABLE_NAME_ASC" | "APIS_TABLE_NAME_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "APPS_TABLE_ID_ASC" | "APPS_TABLE_ID_DESC" | "APPS_TABLE_NAME_ASC" | "APPS_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DOMAINS_TABLE_ID_ASC" | "DOMAINS_TABLE_ID_DESC" | "DOMAINS_TABLE_NAME_ASC" | "DOMAINS_TABLE_NAME_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "FUNCTIONS_TABLE_ID_ASC" | "FUNCTIONS_TABLE_ID_DESC" | "FUNCTIONS_TABLE_NAME_ASC" | "FUNCTIONS_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACES_TABLE_ID_ASC" | "NAMESPACES_TABLE_ID_DESC" | "NAMESPACES_TABLE_NAME_ASC" | "NAMESPACES_TABLE_NAME_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RESOURCES_TABLE_ID_ASC" | "RESOURCES_TABLE_ID_DESC" | "RESOURCES_TABLE_NAME_ASC" | "RESOURCES_TABLE_NAME_DESC" | "RESOURCE_DEFINITIONS_TABLE_ID_ASC" | "RESOURCE_DEFINITIONS_TABLE_ID_DESC" | "RESOURCE_DEFINITIONS_TABLE_NAME_ASC" | "RESOURCE_DEFINITIONS_TABLE_NAME_DESC" | "RESOURCE_INSTALLATIONS_TABLE_ID_ASC" | "RESOURCE_INSTALLATIONS_TABLE_ID_DESC" | "RESOURCE_INSTALLATIONS_TABLE_NAME_ASC" | "RESOURCE_INSTALLATIONS_TABLE_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SITES_TABLE_ID_ASC" | "SITES_TABLE_ID_DESC" | "SITES_TABLE_NAME_ASC" | "SITES_TABLE_NAME_DESC";
+export type ComputeLogModuleOrderBy = "ACTOR_FK_TABLE_ID_ASC" | "ACTOR_FK_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "COMPUTE_LOG_TABLE_ID_ASC" | "COMPUTE_LOG_TABLE_ID_DESC" | "COMPUTE_LOG_TABLE_NAME_ASC" | "COMPUTE_LOG_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_FK_TABLE_ID_ASC" | "ENTITY_FK_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "USAGE_SUMMARY_TABLE_ID_ASC" | "USAGE_SUMMARY_TABLE_ID_DESC" | "USAGE_SUMMARY_TABLE_NAME_ASC" | "USAGE_SUMMARY_TABLE_NAME_DESC";
+export type ConfigSecretsUserModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type ConnectedAccountsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type CryptoAddressesModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CRYPTO_NETWORK_ASC" | "CRYPTO_NETWORK_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type CryptoAuthModuleOrderBy = "ADDRESSES_TABLE_ID_ASC" | "ADDRESSES_TABLE_ID_DESC" | "CRYPTO_NETWORK_ASC" | "CRYPTO_NETWORK_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SECRETS_TABLE_ID_ASC" | "SECRETS_TABLE_ID_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "SIGN_IN_RECORD_FAILURE_ASC" | "SIGN_IN_RECORD_FAILURE_DESC" | "SIGN_IN_REQUEST_CHALLENGE_ASC" | "SIGN_IN_REQUEST_CHALLENGE_DESC" | "SIGN_IN_WITH_CHALLENGE_ASC" | "SIGN_IN_WITH_CHALLENGE_DESC" | "SIGN_UP_WITH_KEY_ASC" | "SIGN_UP_WITH_KEY_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC" | "USER_FIELD_ASC" | "USER_FIELD_DESC";
+export type DatabaseProvisionModuleOrderBy = "ASYNC_ASC" | "ASYNC_DESC" | "BOOTSTRAP_ERROR_ASC" | "BOOTSTRAP_ERROR_DESC" | "BOOTSTRAP_STATUS_ASC" | "BOOTSTRAP_STATUS_DESC" | "BOOTSTRAP_USER_ASC" | "BOOTSTRAP_USER_DESC" | "COMPLETED_AT_ASC" | "COMPLETED_AT_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATABASE_NAME_ASC" | "DATABASE_NAME_DESC" | "DOMAIN_ASC" | "DOMAIN_DESC" | "ERROR_MESSAGE_ASC" | "ERROR_MESSAGE_DESC" | "FULFILLED_AT_ASC" | "FULFILLED_AT_DESC" | "ID_ASC" | "ID_DESC" | "MODULES_ASC" | "MODULES_DESC" | "NATURAL" | "OPTIONS_ASC" | "OPTIONS_DESC" | "OWNER_ID_ASC" | "OWNER_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOURCE_DATABASE_ID_ASC" | "SOURCE_DATABASE_ID_DESC" | "STATUS_ASC" | "STATUS_DESC" | "SUBDOMAIN_ASC" | "SUBDOMAIN_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DatabaseSettingsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DATABASE_SETTINGS_TABLE_ID_ASC" | "DATABASE_SETTINGS_TABLE_ID_DESC" | "DATABASE_SETTINGS_TABLE_NAME_ASC" | "DATABASE_SETTINGS_TABLE_NAME_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBKEY_SETTINGS_TABLE_ID_ASC" | "PUBKEY_SETTINGS_TABLE_ID_DESC" | "PUBKEY_SETTINGS_TABLE_NAME_ASC" | "PUBKEY_SETTINGS_TABLE_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RLS_SETTINGS_TABLE_ID_ASC" | "RLS_SETTINGS_TABLE_ID_DESC" | "RLS_SETTINGS_TABLE_NAME_ASC" | "RLS_SETTINGS_TABLE_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "WEBAUTHN_SETTINGS_TABLE_ID_ASC" | "WEBAUTHN_SETTINGS_TABLE_ID_DESC" | "WEBAUTHN_SETTINGS_TABLE_NAME_ASC" | "WEBAUTHN_SETTINGS_TABLE_NAME_DESC";
+export type DbPoolConfigOrderBy = "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DOMAIN_ASC" | "DOMAIN_DESC" | "ENABLED_ASC" | "ENABLED_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "MIN_ASC" | "MIN_DESC" | "NATURAL" | "POOL_OWNER_ID_ASC" | "POOL_OWNER_ID_DESC" | "PRESET_SLUG_ASC" | "PRESET_SLUG_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC" | "WARM_TTL_ASC" | "WARM_TTL_DESC";
+export type DbPoolOrderBy = "BOOTSTRAP_ERROR_ASC" | "BOOTSTRAP_ERROR_DESC" | "BOOTSTRAP_STATUS_ASC" | "BOOTSTRAP_STATUS_DESC" | "CLAIMED_AT_ASC" | "CLAIMED_AT_DESC" | "CLAIMED_BY_ASC" | "CLAIMED_BY_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ERROR_MESSAGE_ASC" | "ERROR_MESSAGE_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRESET_COMMIT_ID_ASC" | "PRESET_COMMIT_ID_DESC" | "PRESET_SLUG_ASC" | "PRESET_SLUG_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "STATUS_ASC" | "STATUS_DESC" | "UPDATED_AT_ASC" | "UPDATED_AT_DESC";
+export type DbPresetModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DB_PRESETS_TABLE_ID_ASC" | "DB_PRESETS_TABLE_ID_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "MERKLE_STORE_MODULE_ID_ASC" | "MERKLE_STORE_MODULE_ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_ID_ASC" | "PUBLIC_SCHEMA_ID_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "STORE_NAME_ASC" | "STORE_NAME_DESC";
+export type DbUsageModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "COLLECT_DB_QUERY_STATS_FUNCTION_ASC" | "COLLECT_DB_QUERY_STATS_FUNCTION_DESC" | "COLLECT_DB_TABLE_STATS_FUNCTION_ASC" | "COLLECT_DB_TABLE_STATS_FUNCTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "QUERY_STATS_LOG_TABLE_ID_ASC" | "QUERY_STATS_LOG_TABLE_ID_DESC" | "QUERY_STATS_LOG_TABLE_NAME_ASC" | "QUERY_STATS_LOG_TABLE_NAME_DESC" | "QUERY_STATS_SUMMARY_TABLE_ID_ASC" | "QUERY_STATS_SUMMARY_TABLE_ID_DESC" | "QUERY_STATS_SUMMARY_TABLE_NAME_ASC" | "QUERY_STATS_SUMMARY_TABLE_NAME_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_ASC" | "ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_DESC" | "ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_ASC" | "ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TABLE_STATS_LOG_TABLE_ID_ASC" | "TABLE_STATS_LOG_TABLE_ID_DESC" | "TABLE_STATS_LOG_TABLE_NAME_ASC" | "TABLE_STATS_LOG_TABLE_NAME_DESC" | "TABLE_STATS_SUMMARY_TABLE_ID_ASC" | "TABLE_STATS_SUMMARY_TABLE_ID_DESC" | "TABLE_STATS_SUMMARY_TABLE_NAME_ASC" | "TABLE_STATS_SUMMARY_TABLE_NAME_DESC";
+export type DefaultIdsModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
+export type DenormalizedTableFieldOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELD_ID_ASC" | "FIELD_ID_DESC" | "FUNC_NAME_ASC" | "FUNC_NAME_DESC" | "FUNC_ORDER_ASC" | "FUNC_ORDER_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REF_FIELD_ID_ASC" | "REF_FIELD_ID_DESC" | "REF_IDS_ASC" | "REF_IDS_DESC" | "REF_TABLE_ID_ASC" | "REF_TABLE_ID_DESC" | "SET_IDS_ASC" | "SET_IDS_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "UPDATE_DEFAULTS_ASC" | "UPDATE_DEFAULTS_DESC" | "USE_UPDATES_ASC" | "USE_UPDATES_DESC";
+export type DevicesModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEVICE_SETTINGS_TABLE_ID_ASC" | "DEVICE_SETTINGS_TABLE_ID_DESC" | "DEVICE_SETTINGS_TABLE_NAME_ASC" | "DEVICE_SETTINGS_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "USER_DEVICES_TABLE_ID_ASC" | "USER_DEVICES_TABLE_ID_DESC" | "USER_DEVICES_TABLE_NAME_ASC" | "USER_DEVICES_TABLE_NAME_DESC";
+export type DomainModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CATALOG_MODULE_ID_ASC" | "CATALOG_MODULE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DOMAINS_TABLE_ID_ASC" | "DOMAINS_TABLE_ID_DESC" | "DOMAINS_TABLE_NAME_ASC" | "DOMAINS_TABLE_NAME_DESC" | "DOMAIN_EVENTS_TABLE_ID_ASC" | "DOMAIN_EVENTS_TABLE_ID_DESC" | "DOMAIN_EVENTS_TABLE_NAME_ASC" | "DOMAIN_EVENTS_TABLE_NAME_DESC" | "DOMAIN_VERIFICATIONS_TABLE_ID_ASC" | "DOMAIN_VERIFICATIONS_TABLE_ID_DESC" | "DOMAIN_VERIFICATIONS_TABLE_NAME_ASC" | "DOMAIN_VERIFICATIONS_TABLE_NAME_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "MANAGED_DOMAINS_TABLE_ID_ASC" | "MANAGED_DOMAINS_TABLE_ID_DESC" | "MANAGED_DOMAINS_TABLE_NAME_ASC" | "MANAGED_DOMAINS_TABLE_NAME_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type EmailsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type EntityTypeProvisionOrderBy = "AGENTS_ASC" | "AGENTS_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DESCRIPTION_ASC" | "DESCRIPTION_DESC" | "FUNCTIONS_ASC" | "FUNCTIONS_DESC" | "GRAPHS_ASC" | "GRAPHS_DESC" | "HAS_INVITES_ASC" | "HAS_INVITES_DESC" | "HAS_INVITE_ACHIEVEMENTS_ASC" | "HAS_INVITE_ACHIEVEMENTS_DESC" | "HAS_LEVELS_ASC" | "HAS_LEVELS_DESC" | "HAS_LIMITS_ASC" | "HAS_LIMITS_DESC" | "HAS_PROFILES_ASC" | "HAS_PROFILES_DESC" | "ID_ASC" | "ID_DESC" | "IS_VISIBLE_ASC" | "IS_VISIBLE_DESC" | "NAMESPACES_ASC" | "NAMESPACES_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "OUT_AGENT_MODULE_ID_ASC" | "OUT_AGENT_MODULE_ID_DESC" | "OUT_BUCKETS_TABLE_ID_ASC" | "OUT_BUCKETS_TABLE_ID_DESC" | "OUT_DEFINITIONS_TABLE_ID_ASC" | "OUT_DEFINITIONS_TABLE_ID_DESC" | "OUT_ENTITY_TABLE_ID_ASC" | "OUT_ENTITY_TABLE_ID_DESC" | "OUT_ENTITY_TABLE_NAME_ASC" | "OUT_ENTITY_TABLE_NAME_DESC" | "OUT_EXECUTION_LOGS_TABLE_ID_ASC" | "OUT_EXECUTION_LOGS_TABLE_ID_DESC" | "OUT_FILES_TABLE_ID_ASC" | "OUT_FILES_TABLE_ID_DESC" | "OUT_FUNCTION_MODULE_ID_ASC" | "OUT_FUNCTION_MODULE_ID_DESC" | "OUT_GRAPHS_TABLE_ID_ASC" | "OUT_GRAPHS_TABLE_ID_DESC" | "OUT_GRAPH_MODULE_ID_ASC" | "OUT_GRAPH_MODULE_ID_DESC" | "OUT_INSTALLED_MODULES_ASC" | "OUT_INSTALLED_MODULES_DESC" | "OUT_INVITES_MODULE_ID_ASC" | "OUT_INVITES_MODULE_ID_DESC" | "OUT_INVOCATIONS_TABLE_ID_ASC" | "OUT_INVOCATIONS_TABLE_ID_DESC" | "OUT_MEMBERSHIP_TYPE_ASC" | "OUT_MEMBERSHIP_TYPE_DESC" | "OUT_NAMESPACES_TABLE_ID_ASC" | "OUT_NAMESPACES_TABLE_ID_DESC" | "OUT_NAMESPACE_EVENTS_TABLE_ID_ASC" | "OUT_NAMESPACE_EVENTS_TABLE_ID_DESC" | "OUT_NAMESPACE_MODULE_ID_ASC" | "OUT_NAMESPACE_MODULE_ID_DESC" | "OUT_PATH_SHARES_TABLE_ID_ASC" | "OUT_PATH_SHARES_TABLE_ID_DESC" | "OUT_STORAGE_MODULE_ID_ASC" | "OUT_STORAGE_MODULE_ID_DESC" | "PARENT_ENTITY_ASC" | "PARENT_ENTITY_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SKIP_ENTITY_POLICIES_ASC" | "SKIP_ENTITY_POLICIES_DESC" | "STORAGE_ASC" | "STORAGE_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC" | "TABLE_PROVISION_ASC" | "TABLE_PROVISION_DESC";
+export type EventsModuleOrderBy = "ACHIEVEMENT_REWARDS_TABLE_ID_ASC" | "ACHIEVEMENT_REWARDS_TABLE_ID_DESC" | "ACHIEVEMENT_REWARDS_TABLE_NAME_ASC" | "ACHIEVEMENT_REWARDS_TABLE_NAME_DESC" | "ACTOR_TABLE_ID_ASC" | "ACTOR_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "EVENTS_TABLE_ID_ASC" | "EVENTS_TABLE_ID_DESC" | "EVENTS_TABLE_NAME_ASC" | "EVENTS_TABLE_NAME_DESC" | "EVENT_AGGREGATES_TABLE_ID_ASC" | "EVENT_AGGREGATES_TABLE_ID_DESC" | "EVENT_AGGREGATES_TABLE_NAME_ASC" | "EVENT_AGGREGATES_TABLE_NAME_DESC" | "EVENT_TYPES_TABLE_ID_ASC" | "EVENT_TYPES_TABLE_ID_DESC" | "EVENT_TYPES_TABLE_NAME_ASC" | "EVENT_TYPES_TABLE_NAME_DESC" | "GRANT_ACHIEVEMENT_ASC" | "GRANT_ACHIEVEMENT_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "LEVELS_TABLE_ID_ASC" | "LEVELS_TABLE_ID_DESC" | "LEVELS_TABLE_NAME_ASC" | "LEVELS_TABLE_NAME_DESC" | "LEVEL_ACHIEVED_ASC" | "LEVEL_ACHIEVED_DESC" | "LEVEL_GRANTS_TABLE_ID_ASC" | "LEVEL_GRANTS_TABLE_ID_DESC" | "LEVEL_GRANTS_TABLE_NAME_ASC" | "LEVEL_GRANTS_TABLE_NAME_DESC" | "LEVEL_REQUIREMENTS_TABLE_ID_ASC" | "LEVEL_REQUIREMENTS_TABLE_ID_DESC" | "LEVEL_REQUIREMENTS_TABLE_NAME_ASC" | "LEVEL_REQUIREMENTS_TABLE_NAME_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RECORD_EVENT_ASC" | "RECORD_EVENT_DESC" | "REMOVE_EVENT_ASC" | "REMOVE_EVENT_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "STEPS_REQUIRED_ASC" | "STEPS_REQUIRED_DESC" | "TG_ACHIEVEMENT_REWARD_ASC" | "TG_ACHIEVEMENT_REWARD_DESC" | "TG_CHECK_ACHIEVEMENTS_ASC" | "TG_CHECK_ACHIEVEMENTS_DESC" | "TG_EVENT_ASC" | "TG_EVENT_BOOL_ASC" | "TG_EVENT_BOOL_DESC" | "TG_EVENT_DESC" | "TG_EVENT_TOGGLE_ASC" | "TG_EVENT_TOGGLE_BOOL_ASC" | "TG_EVENT_TOGGLE_BOOL_DESC" | "TG_EVENT_TOGGLE_DESC" | "TG_UPDATE_AGGREGATES_ASC" | "TG_UPDATE_AGGREGATES_DESC" | "UPSERT_AGGREGATE_ASC" | "UPSERT_AGGREGATE_DESC";
+export type FunctionDeploymentModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DEPLOYMENTS_TABLE_ID_ASC" | "DEPLOYMENTS_TABLE_ID_DESC" | "DEPLOYMENTS_TABLE_NAME_ASC" | "DEPLOYMENTS_TABLE_NAME_DESC" | "DEPLOYMENT_EVENTS_TABLE_ID_ASC" | "DEPLOYMENT_EVENTS_TABLE_ID_DESC" | "DEPLOYMENT_EVENTS_TABLE_NAME_ASC" | "DEPLOYMENT_EVENTS_TABLE_NAME_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "FUNCTION_MODULE_ID_ASC" | "FUNCTION_MODULE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACE_MODULE_ID_ASC" | "NAMESPACE_MODULE_ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type FunctionInvocationModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "ATTEMPTS_TABLE_ID_ASC" | "ATTEMPTS_TABLE_ID_DESC" | "ATTEMPTS_TABLE_NAME_ASC" | "ATTEMPTS_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "EXECUTION_LOGS_TABLE_ID_ASC" | "EXECUTION_LOGS_TABLE_ID_DESC" | "EXECUTION_LOGS_TABLE_NAME_ASC" | "EXECUTION_LOGS_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "INVOCATIONS_TABLE_ID_ASC" | "INVOCATIONS_TABLE_ID_DESC" | "INVOCATIONS_TABLE_NAME_ASC" | "INVOCATIONS_TABLE_NAME_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type FunctionModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "BINDINGS_TABLE_ID_ASC" | "BINDINGS_TABLE_ID_DESC" | "BINDINGS_TABLE_NAME_ASC" | "BINDINGS_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DEFINITIONS_TABLE_ID_ASC" | "DEFINITIONS_TABLE_ID_DESC" | "DEFINITIONS_TABLE_NAME_ASC" | "DEFINITIONS_TABLE_NAME_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "HAS_CRON_ASC" | "HAS_CRON_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEDULES_TABLE_ID_ASC" | "SCHEDULES_TABLE_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type GraphExecutionModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "EXECUTIONS_TABLE_ID_ASC" | "EXECUTIONS_TABLE_ID_DESC" | "EXECUTIONS_TABLE_NAME_ASC" | "EXECUTIONS_TABLE_NAME_DESC" | "GRAPH_MODULE_ID_ASC" | "GRAPH_MODULE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "NODE_STATES_TABLE_ID_ASC" | "NODE_STATES_TABLE_ID_DESC" | "NODE_STATES_TABLE_NAME_ASC" | "NODE_STATES_TABLE_NAME_DESC" | "OUTPUTS_TABLE_ID_ASC" | "OUTPUTS_TABLE_ID_DESC" | "OUTPUTS_TABLE_NAME_ASC" | "OUTPUTS_TABLE_NAME_DESC" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type GraphModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "GRAPHS_TABLE_ID_ASC" | "GRAPHS_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "MERKLE_STORE_MODULE_ID_ASC" | "MERKLE_STORE_MODULE_ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_ID_ASC" | "PUBLIC_SCHEMA_ID_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type HierarchyModuleOrderBy = "CHART_EDGES_TABLE_ID_ASC" | "CHART_EDGES_TABLE_ID_DESC" | "CHART_EDGES_TABLE_NAME_ASC" | "CHART_EDGES_TABLE_NAME_DESC" | "CHART_EDGE_GRANTS_TABLE_ID_ASC" | "CHART_EDGE_GRANTS_TABLE_ID_DESC" | "CHART_EDGE_GRANTS_TABLE_NAME_ASC" | "CHART_EDGE_GRANTS_TABLE_NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "GET_MANAGERS_FUNCTION_ASC" | "GET_MANAGERS_FUNCTION_DESC" | "GET_SUBORDINATES_FUNCTION_ASC" | "GET_SUBORDINATES_FUNCTION_DESC" | "HIERARCHY_SPRT_TABLE_ID_ASC" | "HIERARCHY_SPRT_TABLE_ID_DESC" | "HIERARCHY_SPRT_TABLE_NAME_ASC" | "HIERARCHY_SPRT_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "IS_MANAGER_OF_FUNCTION_ASC" | "IS_MANAGER_OF_FUNCTION_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "REBUILD_HIERARCHY_FUNCTION_ASC" | "REBUILD_HIERARCHY_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SPRT_TABLE_NAME_ASC" | "SPRT_TABLE_NAME_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC";
+export type HttpRouteModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "FUNCTION_MODULE_ID_ASC" | "FUNCTION_MODULE_ID_DESC" | "HTTP_ROUTES_TABLE_ID_ASC" | "HTTP_ROUTES_TABLE_ID_DESC" | "HTTP_ROUTES_TABLE_NAME_ASC" | "HTTP_ROUTES_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RESOLVER_FUNCTION_NAME_ASC" | "RESOLVER_FUNCTION_NAME_DESC" | "RESOURCE_MODULE_ID_ASC" | "RESOURCE_MODULE_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "STORAGE_MODULE_ID_ASC" | "STORAGE_MODULE_ID_DESC";
+export type I18NModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SETTINGS_TABLE_ID_ASC" | "SETTINGS_TABLE_ID_DESC";
+export type IdentityProvidersModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type InferenceLogModuleOrderBy = "ACTOR_FK_TABLE_ID_ASC" | "ACTOR_FK_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_FK_TABLE_ID_ASC" | "ENTITY_FK_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INFERENCE_LOG_TABLE_ID_ASC" | "INFERENCE_LOG_TABLE_ID_DESC" | "INFERENCE_LOG_TABLE_NAME_ASC" | "INFERENCE_LOG_TABLE_NAME_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "USAGE_SUMMARY_TABLE_ID_ASC" | "USAGE_SUMMARY_TABLE_ID_DESC" | "USAGE_SUMMARY_TABLE_NAME_ASC" | "USAGE_SUMMARY_TABLE_NAME_DESC";
+export type InfraConfigModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CONFIG_TABLE_ID_ASC" | "CONFIG_TABLE_ID_DESC" | "CONFIG_TABLE_NAME_ASC" | "CONFIG_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type InfraSecretsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SECRETS_TABLE_ID_ASC" | "SECRETS_TABLE_ID_DESC" | "SECRETS_TABLE_NAME_ASC" | "SECRETS_TABLE_NAME_DESC";
+export type IntegrationProvidersModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type InternalSecretsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERNAL_SECRETS_TABLE_ID_ASC" | "INTERNAL_SECRETS_TABLE_ID_DESC" | "INTERNAL_SECRETS_TABLE_NAME_ASC" | "INTERNAL_SECRETS_TABLE_NAME_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type InvitesModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CLAIMED_INVITES_TABLE_ID_ASC" | "CLAIMED_INVITES_TABLE_ID_DESC" | "CLAIMED_INVITES_TABLE_NAME_ASC" | "CLAIMED_INVITES_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "EMAILS_TABLE_ID_ASC" | "EMAILS_TABLE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INVITES_TABLE_ID_ASC" | "INVITES_TABLE_ID_DESC" | "INVITES_TABLE_NAME_ASC" | "INVITES_TABLE_NAME_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SUBMIT_INVITE_CODE_FUNCTION_ASC" | "SUBMIT_INVITE_CODE_FUNCTION_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC";
+export type LimitsModuleOrderBy = "ACTOR_TABLE_ID_ASC" | "ACTOR_TABLE_ID_DESC" | "AGGREGATE_TABLE_ID_ASC" | "AGGREGATE_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "CAP_CHECK_TRIGGER_ASC" | "CAP_CHECK_TRIGGER_DESC" | "CREDIT_CODES_TABLE_ID_ASC" | "CREDIT_CODES_TABLE_ID_DESC" | "CREDIT_CODE_ITEMS_TABLE_ID_ASC" | "CREDIT_CODE_ITEMS_TABLE_ID_DESC" | "CREDIT_REDEMPTIONS_TABLE_ID_ASC" | "CREDIT_REDEMPTIONS_TABLE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_TABLE_ID_ASC" | "DEFAULT_TABLE_ID_DESC" | "DEFAULT_TABLE_NAME_ASC" | "DEFAULT_TABLE_NAME_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "EVENTS_TABLE_ID_ASC" | "EVENTS_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_ASC" | "LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_DESC" | "LIMIT_CAPS_DEFAULTS_TABLE_ID_ASC" | "LIMIT_CAPS_DEFAULTS_TABLE_ID_DESC" | "LIMIT_CAPS_TABLE_ID_ASC" | "LIMIT_CAPS_TABLE_ID_DESC" | "LIMIT_CHECK_FUNCTION_ASC" | "LIMIT_CHECK_FUNCTION_DESC" | "LIMIT_CHECK_SOFT_FUNCTION_ASC" | "LIMIT_CHECK_SOFT_FUNCTION_DESC" | "LIMIT_CREDITS_TABLE_ID_ASC" | "LIMIT_CREDITS_TABLE_ID_DESC" | "LIMIT_DECREMENT_FUNCTION_ASC" | "LIMIT_DECREMENT_FUNCTION_DESC" | "LIMIT_DECREMENT_TRIGGER_ASC" | "LIMIT_DECREMENT_TRIGGER_DESC" | "LIMIT_INCREMENT_FUNCTION_ASC" | "LIMIT_INCREMENT_FUNCTION_DESC" | "LIMIT_INCREMENT_TRIGGER_ASC" | "LIMIT_INCREMENT_TRIGGER_DESC" | "LIMIT_UPDATE_TRIGGER_ASC" | "LIMIT_UPDATE_TRIGGER_DESC" | "LIMIT_WARNINGS_TABLE_ID_ASC" | "LIMIT_WARNINGS_TABLE_ID_DESC" | "LIMIT_WARNING_STATE_TABLE_ID_ASC" | "LIMIT_WARNING_STATE_TABLE_ID_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RESOLVE_CAP_FUNCTION_ASC" | "RESOLVE_CAP_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type MembershipTypesModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type MembershipsModuleOrderBy = "ACTOR_MASK_CHECK_ASC" | "ACTOR_MASK_CHECK_DESC" | "ACTOR_PERM_CHECK_ASC" | "ACTOR_PERM_CHECK_DESC" | "ACTOR_TABLE_ID_ASC" | "ACTOR_TABLE_ID_DESC" | "ADMIN_GRANTS_TABLE_ID_ASC" | "ADMIN_GRANTS_TABLE_ID_DESC" | "ADMIN_GRANTS_TABLE_NAME_ASC" | "ADMIN_GRANTS_TABLE_NAME_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_LIMITS_TABLE_ID_ASC" | "DEFAULT_LIMITS_TABLE_ID_DESC" | "DEFAULT_PERMISSIONS_TABLE_ID_ASC" | "DEFAULT_PERMISSIONS_TABLE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_IDS_BY_MASK_ASC" | "ENTITY_IDS_BY_MASK_DESC" | "ENTITY_IDS_BY_PERM_ASC" | "ENTITY_IDS_BY_PERM_DESC" | "ENTITY_IDS_FUNCTION_ASC" | "ENTITY_IDS_FUNCTION_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ENTITY_TABLE_OWNER_ID_ASC" | "ENTITY_TABLE_OWNER_ID_DESC" | "GET_ORG_FN_ASC" | "GET_ORG_FN_DESC" | "GRANTS_TABLE_ID_ASC" | "GRANTS_TABLE_ID_DESC" | "GRANTS_TABLE_NAME_ASC" | "GRANTS_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "LIMITS_TABLE_ID_ASC" | "LIMITS_TABLE_ID_DESC" | "MEMBERSHIPS_TABLE_ID_ASC" | "MEMBERSHIPS_TABLE_ID_DESC" | "MEMBERSHIPS_TABLE_NAME_ASC" | "MEMBERSHIPS_TABLE_NAME_DESC" | "MEMBERSHIP_DEFAULTS_TABLE_ID_ASC" | "MEMBERSHIP_DEFAULTS_TABLE_ID_DESC" | "MEMBERSHIP_DEFAULTS_TABLE_NAME_ASC" | "MEMBERSHIP_DEFAULTS_TABLE_NAME_DESC" | "MEMBERSHIP_SETTINGS_TABLE_ID_ASC" | "MEMBERSHIP_SETTINGS_TABLE_ID_DESC" | "MEMBERSHIP_SETTINGS_TABLE_NAME_ASC" | "MEMBERSHIP_SETTINGS_TABLE_NAME_DESC" | "MEMBERS_TABLE_ID_ASC" | "MEMBERS_TABLE_ID_DESC" | "MEMBERS_TABLE_NAME_ASC" | "MEMBERS_TABLE_NAME_DESC" | "MEMBER_PROFILES_TABLE_ID_ASC" | "MEMBER_PROFILES_TABLE_ID_DESC" | "NATURAL" | "OWNER_GRANTS_TABLE_ID_ASC" | "OWNER_GRANTS_TABLE_ID_DESC" | "OWNER_GRANTS_TABLE_NAME_ASC" | "OWNER_GRANTS_TABLE_NAME_DESC" | "PERMISSIONS_TABLE_ID_ASC" | "PERMISSIONS_TABLE_ID_DESC" | "PERMISSION_DEFAULT_GRANTS_TABLE_ID_ASC" | "PERMISSION_DEFAULT_GRANTS_TABLE_ID_DESC" | "PERMISSION_DEFAULT_PERMISSIONS_TABLE_ID_ASC" | "PERMISSION_DEFAULT_PERMISSIONS_TABLE_ID_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SPRT_TABLE_ID_ASC" | "SPRT_TABLE_ID_DESC";
+export type MerkleStoreModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "COMMIT_TABLE_ID_ASC" | "COMMIT_TABLE_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "FUNCTION_PREFIX_ASC" | "FUNCTION_PREFIX_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OBJECT_TABLE_ID_ASC" | "OBJECT_TABLE_ID_DESC" | "PERMISSION_KEY_ASC" | "PERMISSION_KEY_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "REF_TABLE_ID_ASC" | "REF_TABLE_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "STORE_TABLE_ID_ASC" | "STORE_TABLE_ID_DESC";
+export type NamespaceModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAMESPACES_TABLE_ID_ASC" | "NAMESPACES_TABLE_ID_DESC" | "NAMESPACES_TABLE_NAME_ASC" | "NAMESPACES_TABLE_NAME_DESC" | "NAMESPACE_EVENTS_TABLE_ID_ASC" | "NAMESPACE_EVENTS_TABLE_ID_DESC" | "NAMESPACE_EVENTS_TABLE_NAME_ASC" | "NAMESPACE_EVENTS_TABLE_NAME_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type NotificationsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CHANNELS_TABLE_ID_ASC" | "CHANNELS_TABLE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DELIVERY_LOG_TABLE_ID_ASC" | "DELIVERY_LOG_TABLE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "HAS_CHANNELS_ASC" | "HAS_CHANNELS_DESC" | "HAS_DIGEST_METADATA_ASC" | "HAS_DIGEST_METADATA_DESC" | "HAS_PREFERENCES_ASC" | "HAS_PREFERENCES_DESC" | "HAS_SETTINGS_EXTENSION_ASC" | "HAS_SETTINGS_EXTENSION_DESC" | "HAS_SUBSCRIPTIONS_ASC" | "HAS_SUBSCRIPTIONS_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "NOTIFICATIONS_TABLE_ID_ASC" | "NOTIFICATIONS_TABLE_ID_DESC" | "ORGANIZATION_SETTINGS_TABLE_ID_ASC" | "ORGANIZATION_SETTINGS_TABLE_ID_DESC" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PREFERENCES_TABLE_ID_ASC" | "PREFERENCES_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "READ_STATE_TABLE_ID_ASC" | "READ_STATE_TABLE_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SUPPRESSIONS_TABLE_ID_ASC" | "SUPPRESSIONS_TABLE_ID_DESC" | "USER_SETTINGS_TABLE_ID_ASC" | "USER_SETTINGS_TABLE_ID_DESC";
+export type PermissionsModuleOrderBy = "ACTOR_TABLE_ID_ASC" | "ACTOR_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "BITLEN_ASC" | "BITLEN_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_TABLE_ID_ASC" | "DEFAULT_TABLE_ID_DESC" | "DEFAULT_TABLE_NAME_ASC" | "DEFAULT_TABLE_NAME_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "GET_BY_MASK_ASC" | "GET_BY_MASK_DESC" | "GET_MASK_ASC" | "GET_MASK_BY_NAME_ASC" | "GET_MASK_BY_NAME_DESC" | "GET_MASK_DESC" | "GET_PADDED_MASK_ASC" | "GET_PADDED_MASK_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type PhoneNumbersModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type PlansModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "APPLY_BILLING_PLAN_FUNCTION_ASC" | "APPLY_BILLING_PLAN_FUNCTION_DESC" | "APPLY_PLAN_AGGREGATE_FUNCTION_ASC" | "APPLY_PLAN_AGGREGATE_FUNCTION_DESC" | "APPLY_PLAN_CAPS_FUNCTION_ASC" | "APPLY_PLAN_CAPS_FUNCTION_DESC" | "APPLY_PLAN_FUNCTION_ASC" | "APPLY_PLAN_FUNCTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PLANS_TABLE_ID_ASC" | "PLANS_TABLE_ID_DESC" | "PLANS_TABLE_NAME_ASC" | "PLANS_TABLE_NAME_DESC" | "PLAN_CAPS_TABLE_ID_ASC" | "PLAN_CAPS_TABLE_ID_DESC" | "PLAN_LIMITS_TABLE_ID_ASC" | "PLAN_LIMITS_TABLE_ID_DESC" | "PLAN_LIMITS_TABLE_NAME_ASC" | "PLAN_LIMITS_TABLE_NAME_DESC" | "PLAN_METER_LIMITS_TABLE_ID_ASC" | "PLAN_METER_LIMITS_TABLE_ID_DESC" | "PLAN_OVERRIDES_TABLE_ID_ASC" | "PLAN_OVERRIDES_TABLE_ID_DESC" | "PLAN_PRICING_TABLE_ID_ASC" | "PLAN_PRICING_TABLE_ID_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC";
+export type PrincipalAuthModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "AUDITS_TABLE_ID_ASC" | "AUDITS_TABLE_ID_DESC" | "CREATE_ORG_API_KEY_FUNCTION_ASC" | "CREATE_ORG_API_KEY_FUNCTION_DESC" | "CREATE_ORG_PRINCIPAL_FUNCTION_ASC" | "CREATE_ORG_PRINCIPAL_FUNCTION_DESC" | "CREATE_PRINCIPAL_FUNCTION_ASC" | "CREATE_PRINCIPAL_FUNCTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DELETE_ORG_PRINCIPAL_FUNCTION_ASC" | "DELETE_ORG_PRINCIPAL_FUNCTION_DESC" | "DELETE_PRINCIPAL_FUNCTION_ASC" | "DELETE_PRINCIPAL_FUNCTION_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRINCIPALS_TABLE_ID_ASC" | "PRINCIPALS_TABLE_ID_DESC" | "PRINCIPALS_TABLE_NAME_ASC" | "PRINCIPALS_TABLE_NAME_DESC" | "PRINCIPAL_ENTITIES_TABLE_ID_ASC" | "PRINCIPAL_ENTITIES_TABLE_ID_DESC" | "PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_ASC" | "PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_DESC" | "REVOKE_ORG_API_KEY_FUNCTION_ASC" | "REVOKE_ORG_API_KEY_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC";
+export type ProfilesModuleOrderBy = "ACTOR_TABLE_ID_ASC" | "ACTOR_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "MEMBERSHIPS_TABLE_ID_ASC" | "MEMBERSHIPS_TABLE_ID_DESC" | "NATURAL" | "PERMISSIONS_TABLE_ID_ASC" | "PERMISSIONS_TABLE_ID_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROFILE_DEFINITION_GRANTS_TABLE_ID_ASC" | "PROFILE_DEFINITION_GRANTS_TABLE_ID_DESC" | "PROFILE_DEFINITION_GRANTS_TABLE_NAME_ASC" | "PROFILE_DEFINITION_GRANTS_TABLE_NAME_DESC" | "PROFILE_GRANTS_TABLE_ID_ASC" | "PROFILE_GRANTS_TABLE_ID_DESC" | "PROFILE_GRANTS_TABLE_NAME_ASC" | "PROFILE_GRANTS_TABLE_NAME_DESC" | "PROFILE_PERMISSIONS_TABLE_ID_ASC" | "PROFILE_PERMISSIONS_TABLE_ID_DESC" | "PROFILE_PERMISSIONS_TABLE_NAME_ASC" | "PROFILE_PERMISSIONS_TABLE_NAME_DESC" | "PROFILE_TEMPLATES_TABLE_ID_ASC" | "PROFILE_TEMPLATES_TABLE_ID_DESC" | "PROFILE_TEMPLATES_TABLE_NAME_ASC" | "PROFILE_TEMPLATES_TABLE_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type RateLimitMetersModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CHECK_RATE_LIMIT_FUNCTION_ASC" | "CHECK_RATE_LIMIT_FUNCTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RATE_LIMIT_OVERRIDES_TABLE_ID_ASC" | "RATE_LIMIT_OVERRIDES_TABLE_ID_DESC" | "RATE_LIMIT_OVERRIDES_TABLE_NAME_ASC" | "RATE_LIMIT_OVERRIDES_TABLE_NAME_DESC" | "RATE_LIMIT_STATE_TABLE_ID_ASC" | "RATE_LIMIT_STATE_TABLE_ID_DESC" | "RATE_LIMIT_STATE_TABLE_NAME_ASC" | "RATE_LIMIT_STATE_TABLE_NAME_DESC" | "RATE_WINDOW_LIMITS_TABLE_ID_ASC" | "RATE_WINDOW_LIMITS_TABLE_ID_DESC" | "RATE_WINDOW_LIMITS_TABLE_NAME_ASC" | "RATE_WINDOW_LIMITS_TABLE_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC";
+export type RateLimitsModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "IP_RATE_LIMITS_TABLE_ID_ASC" | "IP_RATE_LIMITS_TABLE_ID_DESC" | "IP_RATE_LIMITS_TABLE_NAME_ASC" | "IP_RATE_LIMITS_TABLE_NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RATE_LIMITS_TABLE_ID_ASC" | "RATE_LIMITS_TABLE_ID_DESC" | "RATE_LIMITS_TABLE_NAME_ASC" | "RATE_LIMITS_TABLE_NAME_DESC" | "RATE_LIMIT_SETTINGS_TABLE_ID_ASC" | "RATE_LIMIT_SETTINGS_TABLE_ID_DESC" | "RATE_LIMIT_SETTINGS_TABLE_NAME_ASC" | "RATE_LIMIT_SETTINGS_TABLE_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC";
+export type RealtimeModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CHANGE_LOG_TABLE_ID_ASC" | "CHANGE_LOG_TABLE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "LISTENER_NODE_TABLE_ID_ASC" | "LISTENER_NODE_TABLE_ID_DESC" | "NATURAL" | "NOTIFY_CHANNEL_ASC" | "NOTIFY_CHANNEL_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "RETENTION_HOURS_ASC" | "RETENTION_HOURS_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SOURCE_REGISTRY_TABLE_ID_ASC" | "SOURCE_REGISTRY_TABLE_ID_DESC" | "SUBSCRIPTIONS_SCHEMA_ID_ASC" | "SUBSCRIPTIONS_SCHEMA_ID_DESC";
+export type RelationProvisionOrderBy = "API_REQUIRED_ASC" | "API_REQUIRED_DESC" | "CREATE_INDEX_ASC" | "CREATE_INDEX_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DELETE_ACTION_ASC" | "DELETE_ACTION_DESC" | "EXPOSE_IN_API_ASC" | "EXPOSE_IN_API_DESC" | "FIELD_NAME_ASC" | "FIELD_NAME_DESC" | "GRANTS_ASC" | "GRANTS_DESC" | "ID_ASC" | "ID_DESC" | "IS_REQUIRED_ASC" | "IS_REQUIRED_DESC" | "JUNCTION_SCHEMA_ID_ASC" | "JUNCTION_SCHEMA_ID_DESC" | "JUNCTION_TABLE_ID_ASC" | "JUNCTION_TABLE_ID_DESC" | "JUNCTION_TABLE_NAME_ASC" | "JUNCTION_TABLE_NAME_DESC" | "NATURAL" | "NODES_ASC" | "NODES_DESC" | "OUT_FIELD_ID_ASC" | "OUT_FIELD_ID_DESC" | "OUT_JUNCTION_TABLE_ID_ASC" | "OUT_JUNCTION_TABLE_ID_DESC" | "OUT_SOURCE_FIELD_ID_ASC" | "OUT_SOURCE_FIELD_ID_DESC" | "OUT_TARGET_FIELD_ID_ASC" | "OUT_TARGET_FIELD_ID_DESC" | "POLICIES_ASC" | "POLICIES_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "RELATION_TYPE_ASC" | "RELATION_TYPE_DESC" | "SOURCE_FIELD_NAME_ASC" | "SOURCE_FIELD_NAME_DESC" | "SOURCE_TABLE_ID_ASC" | "SOURCE_TABLE_ID_DESC" | "TARGET_FIELD_NAME_ASC" | "TARGET_FIELD_NAME_DESC" | "TARGET_TABLE_ID_ASC" | "TARGET_TABLE_ID_DESC" | "USE_COMPOSITE_KEY_ASC" | "USE_COMPOSITE_KEY_DESC";
+export type ResourceModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INSTALLATION_STORE_NAME_ASC" | "INSTALLATION_STORE_NAME_DESC" | "MERKLE_STORE_MODULE_ID_ASC" | "MERKLE_STORE_MODULE_ID_DESC" | "NAMESPACE_MODULE_ID_ASC" | "NAMESPACE_MODULE_ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "REQUIREMENTS_STATE_VIEW_NAME_ASC" | "REQUIREMENTS_STATE_VIEW_NAME_DESC" | "RESOLVED_REQUIREMENTS_VIEW_NAME_ASC" | "RESOLVED_REQUIREMENTS_VIEW_NAME_DESC" | "RESOURCES_TABLE_ID_ASC" | "RESOURCES_TABLE_ID_DESC" | "RESOURCES_TABLE_NAME_ASC" | "RESOURCES_TABLE_NAME_DESC" | "RESOURCE_BILLING_ROLLUP_FUNCTION_ASC" | "RESOURCE_BILLING_ROLLUP_FUNCTION_DESC" | "RESOURCE_DEFINITIONS_TABLE_ID_ASC" | "RESOURCE_DEFINITIONS_TABLE_ID_DESC" | "RESOURCE_DEFINITIONS_TABLE_NAME_ASC" | "RESOURCE_DEFINITIONS_TABLE_NAME_DESC" | "RESOURCE_EVENTS_TABLE_ID_ASC" | "RESOURCE_EVENTS_TABLE_ID_DESC" | "RESOURCE_EVENTS_TABLE_NAME_ASC" | "RESOURCE_EVENTS_TABLE_NAME_DESC" | "RESOURCE_INSTALLATIONS_TABLE_ID_ASC" | "RESOURCE_INSTALLATIONS_TABLE_ID_DESC" | "RESOURCE_INSTALLATIONS_TABLE_NAME_ASC" | "RESOURCE_INSTALLATIONS_TABLE_NAME_DESC" | "RESOURCE_STATUS_CHECKS_TABLE_ID_ASC" | "RESOURCE_STATUS_CHECKS_TABLE_ID_DESC" | "RESOURCE_STATUS_CHECKS_TABLE_NAME_ASC" | "RESOURCE_STATUS_CHECKS_TABLE_NAME_DESC" | "RESOURCE_USAGE_LOG_TABLE_ID_ASC" | "RESOURCE_USAGE_LOG_TABLE_ID_DESC" | "RESOURCE_USAGE_LOG_TABLE_NAME_ASC" | "RESOURCE_USAGE_LOG_TABLE_NAME_DESC" | "RESOURCE_USAGE_SUMMARY_TABLE_ID_ASC" | "RESOURCE_USAGE_SUMMARY_TABLE_ID_DESC" | "RESOURCE_USAGE_SUMMARY_TABLE_NAME_ASC" | "RESOURCE_USAGE_SUMMARY_TABLE_NAME_DESC" | "ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_ASC" | "ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type RlsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "AUTHENTICATE_ASC" | "AUTHENTICATE_DESC" | "AUTHENTICATE_STRICT_ASC" | "AUTHENTICATE_STRICT_DESC" | "CURRENT_ROLE_ASC" | "CURRENT_ROLE_DESC" | "CURRENT_ROLE_ID_ASC" | "CURRENT_ROLE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC";
+export type RouteModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CATALOG_MODULE_ID_ASC" | "CATALOG_MODULE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DOMAIN_MODULE_ID_ASC" | "DOMAIN_MODULE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "HOSTNAME_BINDINGS_TABLE_ID_ASC" | "HOSTNAME_BINDINGS_TABLE_ID_DESC" | "HOSTNAME_BINDINGS_TABLE_NAME_ASC" | "HOSTNAME_BINDINGS_TABLE_NAME_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RESOLVER_FUNCTION_NAME_ASC" | "RESOLVER_FUNCTION_NAME_DESC" | "ROUTES_TABLE_ID_ASC" | "ROUTES_TABLE_ID_DESC" | "ROUTES_TABLE_NAME_ASC" | "ROUTES_TABLE_NAME_DESC" | "ROUTE_BINDINGS_TABLE_ID_ASC" | "ROUTE_BINDINGS_TABLE_ID_DESC" | "ROUTE_BINDINGS_TABLE_NAME_ASC" | "ROUTE_BINDINGS_TABLE_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC";
+export type SecureTableProvisionOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "FIELDS_ASC" | "FIELDS_DESC" | "GRANTS_ASC" | "GRANTS_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "NODES_ASC" | "NODES_DESC" | "OUT_FIELDS_ASC" | "OUT_FIELDS_DESC" | "POLICIES_ASC" | "POLICIES_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC" | "USE_RLS_ASC" | "USE_RLS_DESC";
+export type SessionSecretsModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type SessionsModuleOrderBy = "AUTH_SETTINGS_TABLE_ID_ASC" | "AUTH_SETTINGS_TABLE_ID_DESC" | "AUTH_SETTINGS_TABLE_NAME_ASC" | "AUTH_SETTINGS_TABLE_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SESSIONS_DEFAULT_EXPIRATION_ASC" | "SESSIONS_DEFAULT_EXPIRATION_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSIONS_TABLE_NAME_ASC" | "SESSIONS_TABLE_NAME_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_NAME_ASC" | "SESSION_CREDENTIALS_TABLE_NAME_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC";
+export type SiteSurfaceModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "CATALOG_MODULE_ID_ASC" | "CATALOG_MODULE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "SITES_TABLE_ID_ASC" | "SITES_TABLE_ID_DESC" | "SITES_TABLE_NAME_ASC" | "SITES_TABLE_NAME_DESC" | "SITE_METADATA_TABLE_ID_ASC" | "SITE_METADATA_TABLE_ID_DESC" | "SITE_METADATA_TABLE_NAME_ASC" | "SITE_METADATA_TABLE_NAME_DESC" | "SITE_MODULES_TABLE_ID_ASC" | "SITE_MODULES_TABLE_ID_DESC" | "SITE_MODULES_TABLE_NAME_ASC" | "SITE_MODULES_TABLE_NAME_DESC" | "SITE_THEMES_TABLE_ID_ASC" | "SITE_THEMES_TABLE_ID_DESC" | "SITE_THEMES_TABLE_NAME_ASC" | "SITE_THEMES_TABLE_NAME_DESC";
+export type StorageLogModuleOrderBy = "ACTOR_FK_TABLE_ID_ASC" | "ACTOR_FK_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_FK_TABLE_ID_ASC" | "ENTITY_FK_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "STORAGE_LOG_TABLE_ID_ASC" | "STORAGE_LOG_TABLE_ID_DESC" | "STORAGE_LOG_TABLE_NAME_ASC" | "STORAGE_LOG_TABLE_NAME_DESC" | "USAGE_SUMMARY_TABLE_ID_ASC" | "USAGE_SUMMARY_TABLE_ID_DESC" | "USAGE_SUMMARY_TABLE_NAME_ASC" | "USAGE_SUMMARY_TABLE_NAME_DESC";
+export type StorageModuleOrderBy = "ALLOWED_ORIGINS_ASC" | "ALLOWED_ORIGINS_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "BUCKETS_TABLE_ID_ASC" | "BUCKETS_TABLE_ID_DESC" | "BUCKETS_TABLE_NAME_ASC" | "BUCKETS_TABLE_NAME_DESC" | "CACHE_TTL_SECONDS_ASC" | "CACHE_TTL_SECONDS_DESC" | "CONFIRM_UPLOAD_DELAY_ASC" | "CONFIRM_UPLOAD_DELAY_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_MAX_FILE_SIZE_ASC" | "DEFAULT_MAX_FILE_SIZE_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "DOWNLOAD_URL_EXPIRY_SECONDS_ASC" | "DOWNLOAD_URL_EXPIRY_SECONDS_DESC" | "ENDPOINT_ASC" | "ENDPOINT_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "FILES_TABLE_ID_ASC" | "FILES_TABLE_ID_DESC" | "FILES_TABLE_NAME_ASC" | "FILES_TABLE_NAME_DESC" | "FILE_EVENTS_TABLE_ID_ASC" | "FILE_EVENTS_TABLE_ID_DESC" | "HAS_AUDIT_LOG_ASC" | "HAS_AUDIT_LOG_DESC" | "HAS_CONFIRM_UPLOAD_ASC" | "HAS_CONFIRM_UPLOAD_DESC" | "HAS_CONTENT_HASH_ASC" | "HAS_CONTENT_HASH_DESC" | "HAS_CUSTOM_KEYS_ASC" | "HAS_CUSTOM_KEYS_DESC" | "HAS_PATH_SHARES_ASC" | "HAS_PATH_SHARES_DESC" | "HAS_VERSIONING_ASC" | "HAS_VERSIONING_DESC" | "ID_ASC" | "ID_DESC" | "MAX_BULK_FILES_ASC" | "MAX_BULK_FILES_DESC" | "MAX_BULK_TOTAL_SIZE_ASC" | "MAX_BULK_TOTAL_SIZE_DESC" | "MAX_FILENAME_LENGTH_ASC" | "MAX_FILENAME_LENGTH_DESC" | "NATURAL" | "PATH_SHARES_TABLE_ID_ASC" | "PATH_SHARES_TABLE_ID_DESC" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVIDER_ASC" | "PROVIDER_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "PUBLIC_URL_PREFIX_ASC" | "PUBLIC_URL_PREFIX_DESC" | "RESTRICT_READS_ASC" | "RESTRICT_READS_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "UPLOAD_URL_EXPIRY_SECONDS_ASC" | "UPLOAD_URL_EXPIRY_SECONDS_DESC";
+export type TransferLogModuleOrderBy = "ACTOR_FK_TABLE_ID_ASC" | "ACTOR_FK_TABLE_ID_DESC" | "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_FK_TABLE_ID_ASC" | "ENTITY_FK_TABLE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INTERVAL_ASC" | "INTERVAL_DESC" | "NATURAL" | "PREFIX_ASC" | "PREFIX_DESC" | "PREMAKE_ASC" | "PREMAKE_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "RETENTION_ASC" | "RETENTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "TRANSFER_LOG_TABLE_ID_ASC" | "TRANSFER_LOG_TABLE_ID_DESC" | "TRANSFER_LOG_TABLE_NAME_ASC" | "TRANSFER_LOG_TABLE_NAME_DESC" | "USAGE_SUMMARY_TABLE_ID_ASC" | "USAGE_SUMMARY_TABLE_ID_DESC" | "USAGE_SUMMARY_TABLE_NAME_ASC" | "USAGE_SUMMARY_TABLE_NAME_DESC";
+export type UserAuthModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "AUDITS_TABLE_ID_ASC" | "AUDITS_TABLE_ID_DESC" | "AUDITS_TABLE_NAME_ASC" | "AUDITS_TABLE_NAME_DESC" | "CHECK_PASSWORD_FUNCTION_ASC" | "CHECK_PASSWORD_FUNCTION_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DELETE_ACCOUNT_FUNCTION_ASC" | "DELETE_ACCOUNT_FUNCTION_DESC" | "EMAILS_TABLE_ID_ASC" | "EMAILS_TABLE_ID_DESC" | "ENCRYPTED_TABLE_ID_ASC" | "ENCRYPTED_TABLE_ID_DESC" | "EXTEND_TOKEN_EXPIRES_ASC" | "EXTEND_TOKEN_EXPIRES_DESC" | "FORGOT_PASSWORD_FUNCTION_ASC" | "FORGOT_PASSWORD_FUNCTION_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "REQUEST_CROSS_ORIGIN_TOKEN_FUNCTION_ASC" | "REQUEST_CROSS_ORIGIN_TOKEN_FUNCTION_DESC" | "RESET_PASSWORD_FUNCTION_ASC" | "RESET_PASSWORD_FUNCTION_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SECRETS_TABLE_ID_ASC" | "SECRETS_TABLE_ID_DESC" | "SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_ASC" | "SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_DESC" | "SEND_VERIFICATION_EMAIL_FUNCTION_ASC" | "SEND_VERIFICATION_EMAIL_FUNCTION_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "SET_PASSWORD_FUNCTION_ASC" | "SET_PASSWORD_FUNCTION_DESC" | "SIGN_IN_CROSS_ORIGIN_FUNCTION_ASC" | "SIGN_IN_CROSS_ORIGIN_FUNCTION_DESC" | "SIGN_IN_FUNCTION_ASC" | "SIGN_IN_FUNCTION_DESC" | "SIGN_OUT_FUNCTION_ASC" | "SIGN_OUT_FUNCTION_DESC" | "SIGN_UP_FUNCTION_ASC" | "SIGN_UP_FUNCTION_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC" | "VERIFY_EMAIL_FUNCTION_ASC" | "VERIFY_EMAIL_FUNCTION_DESC" | "VERIFY_PASSWORD_FUNCTION_ASC" | "VERIFY_PASSWORD_FUNCTION_DESC";
+export type UserCredentialsModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type UserSettingsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type UserStateModuleOrderBy = "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type UsersModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC" | "TYPE_TABLE_ID_ASC" | "TYPE_TABLE_ID_DESC" | "TYPE_TABLE_NAME_ASC" | "TYPE_TABLE_NAME_DESC";
+export type WebauthnAuthModuleOrderBy = "ATTESTATION_TYPE_ASC" | "ATTESTATION_TYPE_DESC" | "AUTH_SETTINGS_TABLE_ID_ASC" | "AUTH_SETTINGS_TABLE_ID_DESC" | "CHALLENGE_EXPIRY_ASC" | "CHALLENGE_EXPIRY_DESC" | "CREDENTIALS_TABLE_ID_ASC" | "CREDENTIALS_TABLE_ID_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORIGIN_ALLOWLIST_ASC" | "ORIGIN_ALLOWLIST_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REQUIRE_USER_VERIFICATION_ASC" | "REQUIRE_USER_VERIFICATION_DESC" | "RESIDENT_KEY_ASC" | "RESIDENT_KEY_DESC" | "RP_ID_ASC" | "RP_ID_DESC" | "RP_NAME_ASC" | "RP_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SESSIONS_TABLE_ID_ASC" | "SESSIONS_TABLE_ID_DESC" | "SESSION_CREDENTIALS_TABLE_ID_ASC" | "SESSION_CREDENTIALS_TABLE_ID_DESC" | "SESSION_SECRETS_TABLE_ID_ASC" | "SESSION_SECRETS_TABLE_ID_DESC" | "USERS_TABLE_ID_ASC" | "USERS_TABLE_ID_DESC";
+export type WebauthnCredentialsModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "OWNER_TABLE_ID_ASC" | "OWNER_TABLE_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "TABLE_ID_ASC" | "TABLE_ID_DESC" | "TABLE_NAME_ASC" | "TABLE_NAME_DESC";
+export type WebhookModuleOrderBy = "API_NAME_ASC" | "API_NAME_DESC" | "DATABASE_ID_ASC" | "DATABASE_ID_DESC" | "DEFAULT_PERMISSIONS_ASC" | "DEFAULT_PERMISSIONS_DESC" | "ENTITY_FIELD_ASC" | "ENTITY_FIELD_DESC" | "ENTITY_TABLE_ID_ASC" | "ENTITY_TABLE_ID_DESC" | "FUNCTION_INVOCATION_MODULE_ID_ASC" | "FUNCTION_INVOCATION_MODULE_ID_DESC" | "FUNCTION_MODULE_ID_ASC" | "FUNCTION_MODULE_ID_DESC" | "ID_ASC" | "ID_DESC" | "INFRA_SECRETS_MODULE_ID_ASC" | "INFRA_SECRETS_MODULE_ID_DESC" | "NAMESPACE_MODULE_ID_ASC" | "NAMESPACE_MODULE_ID_DESC" | "NATURAL" | "POLICIES_ASC" | "POLICIES_DESC" | "PREFIX_ASC" | "PREFIX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PRIVATE_API_NAME_ASC" | "PRIVATE_API_NAME_DESC" | "PRIVATE_SCHEMA_ID_ASC" | "PRIVATE_SCHEMA_ID_DESC" | "PRIVATE_SCHEMA_NAME_ASC" | "PRIVATE_SCHEMA_NAME_DESC" | "PROVISIONS_ASC" | "PROVISIONS_DESC" | "PUBLIC_SCHEMA_NAME_ASC" | "PUBLIC_SCHEMA_NAME_DESC" | "SCHEMA_ID_ASC" | "SCHEMA_ID_DESC" | "SCOPE_ASC" | "SCOPE_DESC" | "WEBHOOK_ENDPOINTS_TABLE_ID_ASC" | "WEBHOOK_ENDPOINTS_TABLE_ID_DESC" | "WEBHOOK_ENDPOINTS_TABLE_NAME_ASC" | "WEBHOOK_ENDPOINTS_TABLE_NAME_DESC" | "WEBHOOK_EVENTS_TABLE_ID_ASC" | "WEBHOOK_EVENTS_TABLE_ID_DESC" | "WEBHOOK_EVENTS_TABLE_NAME_ASC" | "WEBHOOK_EVENTS_TABLE_NAME_DESC";
 // ============ CRUD Input Types ============
 export interface CreateAgentModuleInput {
   clientMutationId?: string;
@@ -9490,7 +7652,7 @@ export interface CreateAgentModuleInput {
     resourceTableName?: string;
     resources?: Record<string, unknown>;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     shared?: boolean;
     taskTableId?: string;
     taskTableName?: string;
@@ -9541,6 +7703,122 @@ export interface UpdateAgentModuleInput {
   agentModulePatch: AgentModulePatch;
 }
 export interface DeleteAgentModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateApiSurfaceModuleInput {
+  clientMutationId?: string;
+  apiSurfaceModule: {
+    apiModulesTableId?: string;
+    apiModulesTableName?: string;
+    apiName?: string;
+    apiSchemasTableId?: string;
+    apiSchemasTableName?: string;
+    apiSettingsTableId?: string;
+    apiSettingsTableName?: string;
+    apisTableId?: string;
+    apisTableName?: string;
+    catalogModuleId?: string;
+    corsSettingsTableId?: string;
+    corsSettingsTableName?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    entityField?: string;
+    entityTableId?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope: string;
+  };
+}
+export interface ApiSurfaceModulePatch {
+  apiModulesTableId?: string | null;
+  apiModulesTableName?: string | null;
+  apiName?: string | null;
+  apiSchemasTableId?: string | null;
+  apiSchemasTableName?: string | null;
+  apiSettingsTableId?: string | null;
+  apiSettingsTableName?: string | null;
+  apisTableId?: string | null;
+  apisTableName?: string | null;
+  catalogModuleId?: string | null;
+  corsSettingsTableId?: string | null;
+  corsSettingsTableName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
+export interface UpdateApiSurfaceModuleInput {
+  clientMutationId?: string;
+  id: string;
+  apiSurfaceModulePatch: ApiSurfaceModulePatch;
+}
+export interface DeleteApiSurfaceModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAppModuleInput {
+  clientMutationId?: string;
+  appModule: {
+    apiName?: string;
+    appComponentsTableId?: string;
+    appComponentsTableName?: string;
+    appsTableId?: string;
+    appsTableName?: string;
+    catalogModuleId?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    entityField?: string;
+    entityTableId?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope: string;
+  };
+}
+export interface AppModulePatch {
+  apiName?: string | null;
+  appComponentsTableId?: string | null;
+  appComponentsTableName?: string | null;
+  appsTableId?: string | null;
+  appsTableName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
+export interface UpdateAppModuleInput {
+  clientMutationId?: string;
+  id: string;
+  appModulePatch: AppModulePatch;
+}
+export interface DeleteAppModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -9786,6 +8064,78 @@ export interface DeleteBlueprintTemplateInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateCatalogModuleInput {
+  clientMutationId?: string;
+  catalogModule: {
+    apiName?: string;
+    apisTableId?: string;
+    apisTableName?: string;
+    appsTableId?: string;
+    appsTableName?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    domainsTableId?: string;
+    domainsTableName?: string;
+    entityTableId?: string;
+    functionsTableId?: string;
+    functionsTableName?: string;
+    namespacesTableId?: string;
+    namespacesTableName?: string;
+    policies?: Record<string, unknown>;
+    privateApiName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    resourceDefinitionsTableId?: string;
+    resourceDefinitionsTableName?: string;
+    resourceInstallationsTableId?: string;
+    resourceInstallationsTableName?: string;
+    resourcesTableId?: string;
+    resourcesTableName?: string;
+    schemaId?: string;
+    scope: string;
+    sitesTableId?: string;
+    sitesTableName?: string;
+  };
+}
+export interface CatalogModulePatch {
+  apiName?: string | null;
+  apisTableId?: string | null;
+  apisTableName?: string | null;
+  appsTableId?: string | null;
+  appsTableName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  domainsTableId?: string | null;
+  domainsTableName?: string | null;
+  entityTableId?: string | null;
+  functionsTableId?: string | null;
+  functionsTableName?: string | null;
+  namespacesTableId?: string | null;
+  namespacesTableName?: string | null;
+  policies?: Record<string, unknown> | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  resourceDefinitionsTableId?: string | null;
+  resourceDefinitionsTableName?: string | null;
+  resourceInstallationsTableId?: string | null;
+  resourceInstallationsTableName?: string | null;
+  resourcesTableId?: string | null;
+  resourcesTableName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  sitesTableId?: string | null;
+  sitesTableName?: string | null;
+}
+export interface UpdateCatalogModuleInput {
+  clientMutationId?: string;
+  id: string;
+  catalogModulePatch: CatalogModulePatch;
+}
+export interface DeleteCatalogModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateComputeLogModuleInput {
   clientMutationId?: string;
   computeLogModule: {
@@ -9805,7 +8155,7 @@ export interface CreateComputeLogModuleInput {
     publicSchemaName?: string;
     retention?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     usageSummaryTableId?: string;
     usageSummaryTableName?: string;
   };
@@ -9981,6 +8331,7 @@ export interface DeleteCryptoAuthModuleInput {
 export interface CreateDatabaseProvisionModuleInput {
   clientMutationId?: string;
   databaseProvisionModule: {
+    async?: boolean;
     bootstrapError?: string;
     bootstrapStatus?: string;
     bootstrapUser?: boolean;
@@ -9999,6 +8350,7 @@ export interface CreateDatabaseProvisionModuleInput {
   };
 }
 export interface DatabaseProvisionModulePatch {
+  async?: boolean | null;
   bootstrapError?: string | null;
   bootstrapStatus?: string | null;
   bootstrapUser?: boolean | null;
@@ -10021,6 +8373,62 @@ export interface UpdateDatabaseProvisionModuleInput {
   databaseProvisionModulePatch: DatabaseProvisionModulePatch;
 }
 export interface DeleteDatabaseProvisionModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDatabaseSettingsModuleInput {
+  clientMutationId?: string;
+  databaseSettingsModule: {
+    apiName?: string;
+    databaseId: string;
+    databaseSettingsTableId?: string;
+    databaseSettingsTableName?: string;
+    defaultPermissions?: string[];
+    entityField?: string;
+    entityTableId?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    provisions?: Record<string, unknown>;
+    pubkeySettingsTableId?: string;
+    pubkeySettingsTableName?: string;
+    publicSchemaName?: string;
+    rlsSettingsTableId?: string;
+    rlsSettingsTableName?: string;
+    schemaId?: string;
+    scope: string;
+    webauthnSettingsTableId?: string;
+    webauthnSettingsTableName?: string;
+  };
+}
+export interface DatabaseSettingsModulePatch {
+  apiName?: string | null;
+  databaseId?: string | null;
+  databaseSettingsTableId?: string | null;
+  databaseSettingsTableName?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  pubkeySettingsTableId?: string | null;
+  pubkeySettingsTableName?: string | null;
+  publicSchemaName?: string | null;
+  rlsSettingsTableId?: string | null;
+  rlsSettingsTableName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  webauthnSettingsTableId?: string | null;
+  webauthnSettingsTableName?: string | null;
+}
+export interface UpdateDatabaseSettingsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  databaseSettingsModulePatch: DatabaseSettingsModulePatch;
+}
+export interface DeleteDatabaseSettingsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -10160,7 +8568,7 @@ export interface CreateDbUsageModuleInput {
     rollupDbQueryStatsUsageSummaryFunction?: string;
     rollupDbTableStatsUsageSummaryFunction?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     tableStatsLogTableId?: string;
     tableStatsLogTableName?: string;
     tableStatsSummaryTableId?: string;
@@ -10285,6 +8693,68 @@ export interface UpdateDevicesModuleInput {
   devicesModulePatch: DevicesModulePatch;
 }
 export interface DeleteDevicesModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDomainModuleInput {
+  clientMutationId?: string;
+  domainModule: {
+    apiName?: string;
+    catalogModuleId?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    domainEventsTableId?: string;
+    domainEventsTableName?: string;
+    domainVerificationsTableId?: string;
+    domainVerificationsTableName?: string;
+    domainsTableId?: string;
+    domainsTableName?: string;
+    entityField?: string;
+    entityTableId?: string;
+    managedDomainsTableId?: string;
+    managedDomainsTableName?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope: string;
+  };
+}
+export interface DomainModulePatch {
+  apiName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  domainEventsTableId?: string | null;
+  domainEventsTableName?: string | null;
+  domainVerificationsTableId?: string | null;
+  domainVerificationsTableName?: string | null;
+  domainsTableId?: string | null;
+  domainsTableName?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  managedDomainsTableId?: string | null;
+  managedDomainsTableName?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
+export interface UpdateDomainModuleInput {
+  clientMutationId?: string;
+  id: string;
+  domainModulePatch: DomainModulePatch;
+}
+export interface DeleteDomainModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -10448,7 +8918,7 @@ export interface CreateEventsModuleInput {
     removeEvent?: string;
     retention?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     stepsRequired?: string;
     tgAchievementReward?: string;
     tgCheckAchievements?: string;
@@ -10536,7 +9006,7 @@ export interface CreateFunctionDeploymentModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface FunctionDeploymentModulePatch {
@@ -10574,6 +9044,8 @@ export interface CreateFunctionInvocationModuleInput {
   clientMutationId?: string;
   functionInvocationModule: {
     apiName?: string;
+    attemptsTableId?: string;
+    attemptsTableName?: string;
     databaseId: string;
     defaultPermissions?: string[];
     entityField?: string;
@@ -10590,11 +9062,13 @@ export interface CreateFunctionInvocationModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface FunctionInvocationModulePatch {
   apiName?: string | null;
+  attemptsTableId?: string | null;
+  attemptsTableName?: string | null;
   databaseId?: string | null;
   defaultPermissions?: string[] | null;
   entityField?: string | null;
@@ -10644,7 +9118,7 @@ export interface CreateFunctionModuleInput {
     publicSchemaName?: string;
     schedulesTableId?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface FunctionModulePatch {
@@ -10701,7 +9175,7 @@ export interface CreateGraphExecutionModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface GraphExecutionModulePatch {
@@ -10754,7 +9228,7 @@ export interface CreateGraphModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaId?: string;
     publicSchemaName?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface GraphModulePatch {
@@ -10805,7 +9279,7 @@ export interface CreateHierarchyModuleInput {
     privateSchemaName?: string;
     rebuildHierarchyFunction?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     sprtTableName?: string;
     usersTableId: string;
   };
@@ -10863,7 +9337,7 @@ export interface CreateHttpRouteModuleInput {
     resolverFunctionName?: string;
     resourceModuleId?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     storageModuleId?: string;
   };
 }
@@ -10939,7 +9413,7 @@ export interface CreateIdentityProvidersModuleInput {
     privateSchemaName?: string;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     tableId?: string;
     tableName?: string;
   };
@@ -10987,7 +9461,7 @@ export interface CreateInferenceLogModuleInput {
     publicSchemaName?: string;
     retention?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     usageSummaryTableId?: string;
     usageSummaryTableName?: string;
   };
@@ -11039,7 +9513,7 @@ export interface CreateInfraConfigModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface InfraConfigModulePatch {
@@ -11083,7 +9557,7 @@ export interface CreateInfraSecretsModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     secretsTableId?: string;
     secretsTableName?: string;
   };
@@ -11127,7 +9601,7 @@ export interface CreateIntegrationProvidersModuleInput {
     privateSchemaName?: string;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     tableId?: string;
     tableName?: string;
   };
@@ -11173,7 +9647,7 @@ export interface CreateInternalSecretsModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface InternalSecretsModulePatch {
@@ -11220,7 +9694,7 @@ export interface CreateInvitesModuleInput {
     privateSchemaName?: string;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     submitInviteCodeFunction?: string;
     usersTableId?: string;
   };
@@ -11290,7 +9764,7 @@ export interface CreateLimitsModuleInput {
     publicSchemaName?: string;
     resolveCapFunction?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     tableId?: string;
     tableName?: string;
   };
@@ -11408,7 +9882,7 @@ export interface CreateMembershipsModuleInput {
     privateSchemaName?: string;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     sprtTableId?: string;
   };
 }
@@ -11481,7 +9955,7 @@ export interface CreateMerkleStoreModuleInput {
     publicSchemaName?: string;
     refTableId?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     storeTableId?: string;
   };
 }
@@ -11532,7 +10006,7 @@ export interface CreateNamespaceModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface NamespaceModulePatch {
@@ -11647,7 +10121,7 @@ export interface CreatePermissionsModuleInput {
     privateSchemaName?: string;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     tableId?: string;
     tableName?: string;
   };
@@ -11846,7 +10320,7 @@ export interface CreateProfilesModuleInput {
     profileTemplatesTableName?: string;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     tableId?: string;
     tableName?: string;
   };
@@ -12107,7 +10581,7 @@ export interface CreateResourceModuleInput {
     resourcesTableName?: string;
     rollupResourceUsageSummaryFunction?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
   };
 }
 export interface ResourceModulePatch {
@@ -12193,6 +10667,68 @@ export interface UpdateRlsModuleInput {
   rlsModulePatch: RlsModulePatch;
 }
 export interface DeleteRlsModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateRouteModuleInput {
+  clientMutationId?: string;
+  routeModule: {
+    apiName?: string;
+    catalogModuleId?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    domainModuleId?: string;
+    entityField?: string;
+    entityTableId?: string;
+    hostnameBindingsTableId?: string;
+    hostnameBindingsTableName?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    resolverFunctionName?: string;
+    routeBindingsTableId?: string;
+    routeBindingsTableName?: string;
+    routesTableId?: string;
+    routesTableName?: string;
+    schemaId?: string;
+    scope: string;
+  };
+}
+export interface RouteModulePatch {
+  apiName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  domainModuleId?: string | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  hostnameBindingsTableId?: string | null;
+  hostnameBindingsTableName?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  resolverFunctionName?: string | null;
+  routeBindingsTableId?: string | null;
+  routeBindingsTableName?: string | null;
+  routesTableId?: string | null;
+  routesTableName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+}
+export interface UpdateRouteModuleInput {
+  clientMutationId?: string;
+  id: string;
+  routeModulePatch: RouteModulePatch;
+}
+export interface DeleteRouteModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12294,6 +10830,64 @@ export interface DeleteSessionsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateSiteSurfaceModuleInput {
+  clientMutationId?: string;
+  siteSurfaceModule: {
+    apiName?: string;
+    catalogModuleId?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    entityField?: string;
+    entityTableId?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope: string;
+    siteMetadataTableId?: string;
+    siteMetadataTableName?: string;
+    siteModulesTableId?: string;
+    siteModulesTableName?: string;
+    siteThemesTableId?: string;
+    siteThemesTableName?: string;
+    sitesTableId?: string;
+    sitesTableName?: string;
+  };
+}
+export interface SiteSurfaceModulePatch {
+  apiName?: string | null;
+  catalogModuleId?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  siteMetadataTableId?: string | null;
+  siteMetadataTableName?: string | null;
+  siteModulesTableId?: string | null;
+  siteModulesTableName?: string | null;
+  siteThemesTableId?: string | null;
+  siteThemesTableName?: string | null;
+  sitesTableId?: string | null;
+  sitesTableName?: string | null;
+}
+export interface UpdateSiteSurfaceModuleInput {
+  clientMutationId?: string;
+  id: string;
+  siteSurfaceModulePatch: SiteSurfaceModulePatch;
+}
+export interface DeleteSiteSurfaceModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateStorageLogModuleInput {
   clientMutationId?: string;
   storageLogModule: {
@@ -12311,7 +10905,7 @@ export interface CreateStorageLogModuleInput {
     publicSchemaName?: string;
     retention?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     storageLogTableId?: string;
     storageLogTableName?: string;
     usageSummaryTableId?: string;
@@ -12388,7 +10982,7 @@ export interface CreateStorageModuleInput {
     publicUrlPrefix?: string;
     restrictReads?: boolean;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     uploadUrlExpirySeconds?: number;
   };
 }
@@ -12459,7 +11053,7 @@ export interface CreateTransferLogModuleInput {
     publicSchemaName?: string;
     retention?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     transferLogTableId?: string;
     transferLogTableName?: string;
     usageSummaryTableId?: string;
@@ -12778,7 +11372,7 @@ export interface CreateWebhookModuleInput {
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
     schemaId?: string;
-    scope?: string;
+    scope: string;
     webhookEndpointsTableId?: string;
     webhookEndpointsTableName?: string;
     webhookEventsTableId?: string;
@@ -12820,17 +11414,17 @@ export interface DeleteWebhookModuleInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
-  Blueprint: {
-    blueprintConstructions: 'BlueprintConstruction',
+  "Blueprint": {
+    "blueprintConstructions": "BlueprintConstruction"
   },
-  BlueprintTemplate: {
-    blueprintTemplatesByForkedFromId: 'BlueprintTemplate',
-    blueprintsByTemplateId: 'Blueprint',
+  "BlueprintTemplate": {
+    "blueprintTemplatesByForkedFromId": "BlueprintTemplate",
+    "blueprintsByTemplateId": "Blueprint"
   },
-  MerkleStoreModule: {
-    dbPresetModules: 'DbPresetModule',
-    graphModules: 'GraphModule',
-  },
+  "MerkleStoreModule": {
+    "dbPresetModules": "DbPresetModule",
+    "graphModules": "GraphModule"
+  }
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface ConstructBlueprintInput {
@@ -12897,14 +11491,14 @@ export interface ProvisionRelationInput {
 }
 export interface ProvisionSpatialRelationInput {
   clientMutationId?: string;
-  pDatabaseId?: string;
-  pName?: string;
-  pOperator?: string;
-  pParamName?: string;
-  pSourceFieldId?: string;
-  pSourceTableId?: string;
-  pTargetFieldId?: string;
-  pTargetTableId?: string;
+  databaseId?: string;
+  name?: string;
+  operator?: string;
+  paramName?: string;
+  sourceFieldId?: string;
+  sourceTableId?: string;
+  targetFieldId?: string;
+  targetTableId?: string;
 }
 export interface ProvisionTableInput {
   clientMutationId?: string;
@@ -13069,12 +11663,62 @@ export interface AgentModuleInput {
   resourceTableName?: string;
   resources?: Record<string, unknown>;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   shared?: boolean;
   taskTableId?: string;
   taskTableName?: string;
   threadTableId?: string;
   threadTableName?: string;
+}
+/** An input for mutations affecting `ApiSurfaceModule` */
+export interface ApiSurfaceModuleInput {
+  apiModulesTableId?: string;
+  apiModulesTableName?: string;
+  apiName?: string;
+  apiSchemasTableId?: string;
+  apiSchemasTableName?: string;
+  apiSettingsTableId?: string;
+  apiSettingsTableName?: string;
+  apisTableId?: string;
+  apisTableName?: string;
+  catalogModuleId?: string;
+  corsSettingsTableId?: string;
+  corsSettingsTableName?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope: string;
+}
+/** An input for mutations affecting `AppModule` */
+export interface AppModuleInput {
+  apiName?: string;
+  appComponentsTableId?: string;
+  appComponentsTableName?: string;
+  appsTableId?: string;
+  appsTableName?: string;
+  catalogModuleId?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope: string;
 }
 /** An input for mutations affecting `BillingModule` */
 export interface BillingModuleInput {
@@ -13226,6 +11870,38 @@ export interface BlueprintTemplateInput {
   /** Access control for the template. private: only the owner can see and copy. public: anyone can browse and copy from the marketplace. Defaults to private. */
   visibility?: string;
 }
+/** An input for mutations affecting `CatalogModule` */
+export interface CatalogModuleInput {
+  apiName?: string;
+  apisTableId?: string;
+  apisTableName?: string;
+  appsTableId?: string;
+  appsTableName?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  domainsTableId?: string;
+  domainsTableName?: string;
+  entityTableId?: string;
+  functionsTableId?: string;
+  functionsTableName?: string;
+  id?: string;
+  namespacesTableId?: string;
+  namespacesTableName?: string;
+  policies?: Record<string, unknown>;
+  privateApiName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  resourceDefinitionsTableId?: string;
+  resourceDefinitionsTableName?: string;
+  resourceInstallationsTableId?: string;
+  resourceInstallationsTableName?: string;
+  resourcesTableId?: string;
+  resourcesTableName?: string;
+  schemaId?: string;
+  scope: string;
+  sitesTableId?: string;
+  sitesTableName?: string;
+}
 /** An input for mutations affecting `ComputeLogModule` */
 export interface ComputeLogModuleInput {
   actorFkTableId?: string;
@@ -13245,7 +11921,7 @@ export interface ComputeLogModuleInput {
   publicSchemaName?: string;
   retention?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   usageSummaryTableId?: string;
   usageSummaryTableName?: string;
 }
@@ -13304,6 +11980,8 @@ export interface CryptoAuthModuleInput {
 }
 /** An input for mutations affecting `DatabaseProvisionModule` */
 export interface DatabaseProvisionModuleInput {
+  /** When true, cold provisioning runs in the database:provision background job and the insert returns a pending ticket; when false, provisioning runs inline in the insert trigger */
+  async?: boolean;
   /** Error message from the most recent failed bootstrap attempt */
   bootstrapError?: string;
   /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
@@ -13335,6 +12013,30 @@ export interface DatabaseProvisionModuleInput {
   /** Subdomain prefix for the database. If null, auto-generated using unique_names + random chars */
   subdomain?: string;
   updatedAt?: string;
+}
+/** An input for mutations affecting `DatabaseSettingsModule` */
+export interface DatabaseSettingsModuleInput {
+  apiName?: string;
+  databaseId: string;
+  databaseSettingsTableId?: string;
+  databaseSettingsTableName?: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  provisions?: Record<string, unknown>;
+  pubkeySettingsTableId?: string;
+  pubkeySettingsTableName?: string;
+  publicSchemaName?: string;
+  rlsSettingsTableId?: string;
+  rlsSettingsTableName?: string;
+  schemaId?: string;
+  scope: string;
+  webauthnSettingsTableId?: string;
+  webauthnSettingsTableName?: string;
 }
 /** An input for mutations affecting `DbPoolConfig` */
 export interface DbPoolConfigInput {
@@ -13441,7 +12143,7 @@ export interface DbUsageModuleInput {
   rollupDbQueryStatsUsageSummaryFunction?: string;
   rollupDbTableStatsUsageSummaryFunction?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   tableStatsLogTableId?: string;
   tableStatsLogTableName?: string;
   tableStatsSummaryTableId?: string;
@@ -13476,6 +12178,33 @@ export interface DevicesModuleInput {
   schemaId?: string;
   userDevicesTableId?: string;
   userDevicesTableName?: string;
+}
+/** An input for mutations affecting `DomainModule` */
+export interface DomainModuleInput {
+  apiName?: string;
+  catalogModuleId?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  domainEventsTableId?: string;
+  domainEventsTableName?: string;
+  domainVerificationsTableId?: string;
+  domainVerificationsTableName?: string;
+  domainsTableId?: string;
+  domainsTableName?: string;
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  managedDomainsTableId?: string;
+  managedDomainsTableName?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope: string;
 }
 /** An input for mutations affecting `EmailsModule` */
 export interface EmailsModuleInput {
@@ -13777,7 +12506,7 @@ export interface EventsModuleInput {
   removeEvent?: string;
   retention?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   stepsRequired?: string;
   tgAchievementReward?: string;
   tgCheckAchievements?: string;
@@ -13810,11 +12539,13 @@ export interface FunctionDeploymentModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `FunctionInvocationModule` */
 export interface FunctionInvocationModuleInput {
   apiName?: string;
+  attemptsTableId?: string;
+  attemptsTableName?: string;
   databaseId: string;
   defaultPermissions?: string[];
   entityField?: string;
@@ -13832,7 +12563,7 @@ export interface FunctionInvocationModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `FunctionModule` */
 export interface FunctionModuleInput {
@@ -13856,7 +12587,7 @@ export interface FunctionModuleInput {
   publicSchemaName?: string;
   schedulesTableId?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `GraphExecutionModule` */
 export interface GraphExecutionModuleInput {
@@ -13882,7 +12613,7 @@ export interface GraphExecutionModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `GraphModule` */
 export interface GraphModuleInput {
@@ -13903,7 +12634,7 @@ export interface GraphModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaId?: string;
   publicSchemaName?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `HierarchyModule` */
 export interface HierarchyModuleInput {
@@ -13927,7 +12658,7 @@ export interface HierarchyModuleInput {
   privateSchemaName?: string;
   rebuildHierarchyFunction?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   sprtTableName?: string;
   usersTableId: string;
 }
@@ -13952,7 +12683,7 @@ export interface HttpRouteModuleInput {
   resolverFunctionName?: string;
   resourceModuleId?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   storageModuleId?: string;
 }
 /** An input for mutations affecting `I18NModule` */
@@ -13979,7 +12710,7 @@ export interface IdentityProvidersModuleInput {
   privateSchemaName?: string;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   tableId?: string;
   tableName?: string;
 }
@@ -14002,7 +12733,7 @@ export interface InferenceLogModuleInput {
   publicSchemaName?: string;
   retention?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   usageSummaryTableId?: string;
   usageSummaryTableName?: string;
 }
@@ -14023,7 +12754,7 @@ export interface InfraConfigModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `InfraSecretsModule` */
 export interface InfraSecretsModuleInput {
@@ -14040,7 +12771,7 @@ export interface InfraSecretsModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   secretsTableId?: string;
   secretsTableName?: string;
 }
@@ -14057,7 +12788,7 @@ export interface IntegrationProvidersModuleInput {
   privateSchemaName?: string;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   tableId?: string;
   tableName?: string;
 }
@@ -14078,7 +12809,7 @@ export interface InternalSecretsModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `InvitesModule` */
 export interface InvitesModuleInput {
@@ -14098,7 +12829,7 @@ export interface InvitesModuleInput {
   privateSchemaName?: string;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   submitInviteCodeFunction?: string;
   usersTableId?: string;
 }
@@ -14138,7 +12869,7 @@ export interface LimitsModuleInput {
   publicSchemaName?: string;
   resolveCapFunction?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   tableId?: string;
   tableName?: string;
 }
@@ -14192,7 +12923,7 @@ export interface MembershipsModuleInput {
   privateSchemaName?: string;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   sprtTableId?: string;
 }
 /** An input for mutations affecting `MerkleStoreModule` */
@@ -14213,7 +12944,7 @@ export interface MerkleStoreModuleInput {
   publicSchemaName?: string;
   refTableId?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   storeTableId?: string;
 }
 /** An input for mutations affecting `NamespaceModule` */
@@ -14236,7 +12967,7 @@ export interface NamespaceModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `NotificationsModule` */
 export interface NotificationsModuleInput {
@@ -14286,7 +13017,7 @@ export interface PermissionsModuleInput {
   privateSchemaName?: string;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   tableId?: string;
   tableName?: string;
 }
@@ -14371,7 +13102,7 @@ export interface ProfilesModuleInput {
   profileTemplatesTableName?: string;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   tableId?: string;
   tableName?: string;
 }
@@ -14585,7 +13316,7 @@ export interface ResourceModuleInput {
   resourcesTableName?: string;
   rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
 }
 /** An input for mutations affecting `RlsModule` */
 export interface RlsModuleInput {
@@ -14602,6 +13333,33 @@ export interface RlsModuleInput {
   sessionCredentialsTableId?: string;
   sessionsTableId?: string;
   usersTableId?: string;
+}
+/** An input for mutations affecting `RouteModule` */
+export interface RouteModuleInput {
+  apiName?: string;
+  catalogModuleId?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  domainModuleId?: string;
+  entityField?: string;
+  entityTableId?: string;
+  hostnameBindingsTableId?: string;
+  hostnameBindingsTableName?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  resolverFunctionName?: string;
+  routeBindingsTableId?: string;
+  routeBindingsTableName?: string;
+  routesTableId?: string;
+  routesTableName?: string;
+  schemaId?: string;
+  scope: string;
 }
 /** An input for mutations affecting `SecureTableProvision` */
 export interface SecureTableProvisionInput {
@@ -14652,6 +13410,31 @@ export interface SessionsModuleInput {
   sessionsTableName?: string;
   usersTableId?: string;
 }
+/** An input for mutations affecting `SiteSurfaceModule` */
+export interface SiteSurfaceModuleInput {
+  apiName?: string;
+  catalogModuleId?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope: string;
+  siteMetadataTableId?: string;
+  siteMetadataTableName?: string;
+  siteModulesTableId?: string;
+  siteModulesTableName?: string;
+  siteThemesTableId?: string;
+  siteThemesTableName?: string;
+  sitesTableId?: string;
+  sitesTableName?: string;
+}
 /** An input for mutations affecting `StorageLogModule` */
 export interface StorageLogModuleInput {
   actorFkTableId?: string;
@@ -14669,7 +13452,7 @@ export interface StorageLogModuleInput {
   publicSchemaName?: string;
   retention?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   storageLogTableId?: string;
   storageLogTableName?: string;
   usageSummaryTableId?: string;
@@ -14715,7 +13498,7 @@ export interface StorageModuleInput {
   publicUrlPrefix?: string;
   restrictReads?: boolean;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   uploadUrlExpirySeconds?: number;
 }
 /** An input for mutations affecting `TransferLogModule` */
@@ -14735,7 +13518,7 @@ export interface TransferLogModuleInput {
   publicSchemaName?: string;
   retention?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   transferLogTableId?: string;
   transferLogTableName?: string;
   usageSummaryTableId?: string;
@@ -14865,7 +13648,7 @@ export interface WebhookModuleInput {
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
   schemaId?: string;
-  scope?: string;
+  scope: string;
   webhookEndpointsTableId?: string;
   webhookEndpointsTableName?: string;
   webhookEventsTableId?: string;
@@ -15517,6 +14300,96 @@ export type DeleteAgentModulePayloadSelect = {
   };
   clientMutationId?: boolean;
 };
+export interface CreateApiSurfaceModulePayload {
+  /** The `ApiSurfaceModule` that was created by this mutation. */
+  apiSurfaceModule?: ApiSurfaceModule | null;
+  apiSurfaceModuleEdge?: ApiSurfaceModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateApiSurfaceModulePayloadSelect = {
+  apiSurfaceModule?: {
+    select: ApiSurfaceModuleSelect;
+  };
+  apiSurfaceModuleEdge?: {
+    select: ApiSurfaceModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateApiSurfaceModulePayload {
+  /** The `ApiSurfaceModule` that was updated by this mutation. */
+  apiSurfaceModule?: ApiSurfaceModule | null;
+  apiSurfaceModuleEdge?: ApiSurfaceModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateApiSurfaceModulePayloadSelect = {
+  apiSurfaceModule?: {
+    select: ApiSurfaceModuleSelect;
+  };
+  apiSurfaceModuleEdge?: {
+    select: ApiSurfaceModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteApiSurfaceModulePayload {
+  /** The `ApiSurfaceModule` that was deleted by this mutation. */
+  apiSurfaceModule?: ApiSurfaceModule | null;
+  apiSurfaceModuleEdge?: ApiSurfaceModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteApiSurfaceModulePayloadSelect = {
+  apiSurfaceModule?: {
+    select: ApiSurfaceModuleSelect;
+  };
+  apiSurfaceModuleEdge?: {
+    select: ApiSurfaceModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface CreateAppModulePayload {
+  /** The `AppModule` that was created by this mutation. */
+  appModule?: AppModule | null;
+  appModuleEdge?: AppModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateAppModulePayloadSelect = {
+  appModule?: {
+    select: AppModuleSelect;
+  };
+  appModuleEdge?: {
+    select: AppModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateAppModulePayload {
+  /** The `AppModule` that was updated by this mutation. */
+  appModule?: AppModule | null;
+  appModuleEdge?: AppModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateAppModulePayloadSelect = {
+  appModule?: {
+    select: AppModuleSelect;
+  };
+  appModuleEdge?: {
+    select: AppModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteAppModulePayload {
+  /** The `AppModule` that was deleted by this mutation. */
+  appModule?: AppModule | null;
+  appModuleEdge?: AppModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteAppModulePayloadSelect = {
+  appModule?: {
+    select: AppModuleSelect;
+  };
+  appModuleEdge?: {
+    select: AppModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
 export interface CreateBillingModulePayload {
   /** The `BillingModule` that was created by this mutation. */
   billingModule?: BillingModule | null;
@@ -15739,6 +14612,51 @@ export type DeleteBlueprintTemplatePayloadSelect = {
   };
   blueprintTemplateEdge?: {
     select: BlueprintTemplateEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface CreateCatalogModulePayload {
+  /** The `CatalogModule` that was created by this mutation. */
+  catalogModule?: CatalogModule | null;
+  catalogModuleEdge?: CatalogModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type CreateCatalogModulePayloadSelect = {
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
+  catalogModuleEdge?: {
+    select: CatalogModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface UpdateCatalogModulePayload {
+  /** The `CatalogModule` that was updated by this mutation. */
+  catalogModule?: CatalogModule | null;
+  catalogModuleEdge?: CatalogModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type UpdateCatalogModulePayloadSelect = {
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
+  catalogModuleEdge?: {
+    select: CatalogModuleEdgeSelect;
+  };
+  clientMutationId?: boolean;
+};
+export interface DeleteCatalogModulePayload {
+  /** The `CatalogModule` that was deleted by this mutation. */
+  catalogModule?: CatalogModule | null;
+  catalogModuleEdge?: CatalogModuleEdge | null;
+  clientMutationId?: string | null;
+}
+export type DeleteCatalogModulePayloadSelect = {
+  catalogModule?: {
+    select: CatalogModuleSelect;
+  };
+  catalogModuleEdge?: {
+    select: CatalogModuleEdgeSelect;
   };
   clientMutationId?: boolean;
 };
@@ -16010,6 +14928,51 @@ export type DeleteDatabaseProvisionModulePayloadSelect = {
   };
   databaseProvisionModuleEdge?: {
     select: DatabaseProvisionModuleEdgeSelect;
+  };
+};
+export interface CreateDatabaseSettingsModulePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSettingsModule` that was created by this mutation. */
+  databaseSettingsModule?: DatabaseSettingsModule | null;
+  databaseSettingsModuleEdge?: DatabaseSettingsModuleEdge | null;
+}
+export type CreateDatabaseSettingsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  databaseSettingsModule?: {
+    select: DatabaseSettingsModuleSelect;
+  };
+  databaseSettingsModuleEdge?: {
+    select: DatabaseSettingsModuleEdgeSelect;
+  };
+};
+export interface UpdateDatabaseSettingsModulePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSettingsModule` that was updated by this mutation. */
+  databaseSettingsModule?: DatabaseSettingsModule | null;
+  databaseSettingsModuleEdge?: DatabaseSettingsModuleEdge | null;
+}
+export type UpdateDatabaseSettingsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  databaseSettingsModule?: {
+    select: DatabaseSettingsModuleSelect;
+  };
+  databaseSettingsModuleEdge?: {
+    select: DatabaseSettingsModuleEdgeSelect;
+  };
+};
+export interface DeleteDatabaseSettingsModulePayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSettingsModule` that was deleted by this mutation. */
+  databaseSettingsModule?: DatabaseSettingsModule | null;
+  databaseSettingsModuleEdge?: DatabaseSettingsModuleEdge | null;
+}
+export type DeleteDatabaseSettingsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  databaseSettingsModule?: {
+    select: DatabaseSettingsModuleSelect;
+  };
+  databaseSettingsModuleEdge?: {
+    select: DatabaseSettingsModuleEdgeSelect;
   };
 };
 export interface CreateDbPoolConfigPayload {
@@ -16325,6 +15288,51 @@ export type DeleteDevicesModulePayloadSelect = {
   };
   devicesModuleEdge?: {
     select: DevicesModuleEdgeSelect;
+  };
+};
+export interface CreateDomainModulePayload {
+  clientMutationId?: string | null;
+  /** The `DomainModule` that was created by this mutation. */
+  domainModule?: DomainModule | null;
+  domainModuleEdge?: DomainModuleEdge | null;
+}
+export type CreateDomainModulePayloadSelect = {
+  clientMutationId?: boolean;
+  domainModule?: {
+    select: DomainModuleSelect;
+  };
+  domainModuleEdge?: {
+    select: DomainModuleEdgeSelect;
+  };
+};
+export interface UpdateDomainModulePayload {
+  clientMutationId?: string | null;
+  /** The `DomainModule` that was updated by this mutation. */
+  domainModule?: DomainModule | null;
+  domainModuleEdge?: DomainModuleEdge | null;
+}
+export type UpdateDomainModulePayloadSelect = {
+  clientMutationId?: boolean;
+  domainModule?: {
+    select: DomainModuleSelect;
+  };
+  domainModuleEdge?: {
+    select: DomainModuleEdgeSelect;
+  };
+};
+export interface DeleteDomainModulePayload {
+  clientMutationId?: string | null;
+  /** The `DomainModule` that was deleted by this mutation. */
+  domainModule?: DomainModule | null;
+  domainModuleEdge?: DomainModuleEdge | null;
+}
+export type DeleteDomainModulePayloadSelect = {
+  clientMutationId?: boolean;
+  domainModule?: {
+    select: DomainModuleSelect;
+  };
+  domainModuleEdge?: {
+    select: DomainModuleEdgeSelect;
   };
 };
 export interface CreateEmailsModulePayload {
@@ -17902,6 +16910,51 @@ export type DeleteRlsModulePayloadSelect = {
     select: RlsModuleEdgeSelect;
   };
 };
+export interface CreateRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `RouteModule` that was created by this mutation. */
+  routeModule?: RouteModule | null;
+  routeModuleEdge?: RouteModuleEdge | null;
+}
+export type CreateRouteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  routeModule?: {
+    select: RouteModuleSelect;
+  };
+  routeModuleEdge?: {
+    select: RouteModuleEdgeSelect;
+  };
+};
+export interface UpdateRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `RouteModule` that was updated by this mutation. */
+  routeModule?: RouteModule | null;
+  routeModuleEdge?: RouteModuleEdge | null;
+}
+export type UpdateRouteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  routeModule?: {
+    select: RouteModuleSelect;
+  };
+  routeModuleEdge?: {
+    select: RouteModuleEdgeSelect;
+  };
+};
+export interface DeleteRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `RouteModule` that was deleted by this mutation. */
+  routeModule?: RouteModule | null;
+  routeModuleEdge?: RouteModuleEdge | null;
+}
+export type DeleteRouteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  routeModule?: {
+    select: RouteModuleSelect;
+  };
+  routeModuleEdge?: {
+    select: RouteModuleEdgeSelect;
+  };
+};
 export interface CreateSecureTableProvisionPayload {
   clientMutationId?: string | null;
   /** The `SecureTableProvision` that was created by this mutation. */
@@ -18035,6 +17088,51 @@ export type DeleteSessionsModulePayloadSelect = {
   };
   sessionsModuleEdge?: {
     select: SessionsModuleEdgeSelect;
+  };
+};
+export interface CreateSiteSurfaceModulePayload {
+  clientMutationId?: string | null;
+  /** The `SiteSurfaceModule` that was created by this mutation. */
+  siteSurfaceModule?: SiteSurfaceModule | null;
+  siteSurfaceModuleEdge?: SiteSurfaceModuleEdge | null;
+}
+export type CreateSiteSurfaceModulePayloadSelect = {
+  clientMutationId?: boolean;
+  siteSurfaceModule?: {
+    select: SiteSurfaceModuleSelect;
+  };
+  siteSurfaceModuleEdge?: {
+    select: SiteSurfaceModuleEdgeSelect;
+  };
+};
+export interface UpdateSiteSurfaceModulePayload {
+  clientMutationId?: string | null;
+  /** The `SiteSurfaceModule` that was updated by this mutation. */
+  siteSurfaceModule?: SiteSurfaceModule | null;
+  siteSurfaceModuleEdge?: SiteSurfaceModuleEdge | null;
+}
+export type UpdateSiteSurfaceModulePayloadSelect = {
+  clientMutationId?: boolean;
+  siteSurfaceModule?: {
+    select: SiteSurfaceModuleSelect;
+  };
+  siteSurfaceModuleEdge?: {
+    select: SiteSurfaceModuleEdgeSelect;
+  };
+};
+export interface DeleteSiteSurfaceModulePayload {
+  clientMutationId?: string | null;
+  /** The `SiteSurfaceModule` that was deleted by this mutation. */
+  siteSurfaceModule?: SiteSurfaceModule | null;
+  siteSurfaceModuleEdge?: SiteSurfaceModuleEdge | null;
+}
+export type DeleteSiteSurfaceModulePayloadSelect = {
+  clientMutationId?: boolean;
+  siteSurfaceModule?: {
+    select: SiteSurfaceModuleSelect;
+  };
+  siteSurfaceModuleEdge?: {
+    select: SiteSurfaceModuleEdgeSelect;
   };
 };
 export interface CreateStorageLogModulePayload {
@@ -18564,6 +17662,30 @@ export type AgentModuleEdgeSelect = {
     select: AgentModuleSelect;
   };
 };
+/** A `ApiSurfaceModule` edge in the connection. */
+export interface ApiSurfaceModuleEdge {
+  cursor?: string | null;
+  /** The `ApiSurfaceModule` at the end of the edge. */
+  node?: ApiSurfaceModule | null;
+}
+export type ApiSurfaceModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ApiSurfaceModuleSelect;
+  };
+};
+/** A `AppModule` edge in the connection. */
+export interface AppModuleEdge {
+  cursor?: string | null;
+  /** The `AppModule` at the end of the edge. */
+  node?: AppModule | null;
+}
+export type AppModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AppModuleSelect;
+  };
+};
 /** A `BillingModule` edge in the connection. */
 export interface BillingModuleEdge {
   cursor?: string | null;
@@ -18622,6 +17744,18 @@ export type BlueprintTemplateEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: BlueprintTemplateSelect;
+  };
+};
+/** A `CatalogModule` edge in the connection. */
+export interface CatalogModuleEdge {
+  cursor?: string | null;
+  /** The `CatalogModule` at the end of the edge. */
+  node?: CatalogModule | null;
+}
+export type CatalogModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: CatalogModuleSelect;
   };
 };
 /** A `ComputeLogModule` edge in the connection. */
@@ -18694,6 +17828,18 @@ export type DatabaseProvisionModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DatabaseProvisionModuleSelect;
+  };
+};
+/** A `DatabaseSettingsModule` edge in the connection. */
+export interface DatabaseSettingsModuleEdge {
+  cursor?: string | null;
+  /** The `DatabaseSettingsModule` at the end of the edge. */
+  node?: DatabaseSettingsModule | null;
+}
+export type DatabaseSettingsModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DatabaseSettingsModuleSelect;
   };
 };
 /** A `DbPoolConfig` edge in the connection. */
@@ -18778,6 +17924,18 @@ export type DevicesModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DevicesModuleSelect;
+  };
+};
+/** A `DomainModule` edge in the connection. */
+export interface DomainModuleEdge {
+  cursor?: string | null;
+  /** The `DomainModule` at the end of the edge. */
+  node?: DomainModule | null;
+}
+export type DomainModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainModuleSelect;
   };
 };
 /** A `EmailsModule` edge in the connection. */
@@ -19200,6 +18358,18 @@ export type RlsModuleEdgeSelect = {
     select: RlsModuleSelect;
   };
 };
+/** A `RouteModule` edge in the connection. */
+export interface RouteModuleEdge {
+  cursor?: string | null;
+  /** The `RouteModule` at the end of the edge. */
+  node?: RouteModule | null;
+}
+export type RouteModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RouteModuleSelect;
+  };
+};
 /** A `SecureTableProvision` edge in the connection. */
 export interface SecureTableProvisionEdge {
   cursor?: string | null;
@@ -19234,6 +18404,18 @@ export type SessionsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: SessionsModuleSelect;
+  };
+};
+/** A `SiteSurfaceModule` edge in the connection. */
+export interface SiteSurfaceModuleEdge {
+  cursor?: string | null;
+  /** The `SiteSurfaceModule` at the end of the edge. */
+  node?: SiteSurfaceModule | null;
+}
+export type SiteSurfaceModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: SiteSurfaceModuleSelect;
   };
 };
 /** A `StorageLogModule` edge in the connection. */

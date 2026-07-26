@@ -4,35 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildListSelectionArgs } from '../selection';
-import type { ListSelectionConfig } from '../selection';
-import { principalAuthModuleKeys } from '../query-keys';
-import type {
-  PrincipalAuthModuleSelect,
-  PrincipalAuthModuleWithRelations,
-  PrincipalAuthModuleFilter,
-  PrincipalAuthModuleOrderBy,
-} from '../../orm/input-types';
-import type {
-  FindManyArgs,
-  InferSelectResult,
-  ConnectionResult,
-  HookStrictSelect,
-} from '../../orm/select-types';
-export type {
-  PrincipalAuthModuleSelect,
-  PrincipalAuthModuleWithRelations,
-  PrincipalAuthModuleFilter,
-  PrincipalAuthModuleOrderBy,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import { principalAuthModuleKeys } from "../query-keys";
+import type { PrincipalAuthModuleSelect, PrincipalAuthModuleWithRelations, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PrincipalAuthModuleSelect, PrincipalAuthModuleWithRelations, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const principalAuthModulesQueryKey = principalAuthModuleKeys.list;
 /**
  * Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database.
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePrincipalAuthModulesQuery({
@@ -45,58 +30,33 @@ export const principalAuthModulesQueryKey = principalAuthModuleKeys.list;
  * });
  * ```
  */
-export function usePrincipalAuthModulesQuery<
-  S extends PrincipalAuthModuleSelect,
-  TData = {
-    principalAuthModules: ConnectionResult<InferSelectResult<PrincipalAuthModuleWithRelations, S>>;
-  },
->(
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PrincipalAuthModuleSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        principalAuthModules: ConnectionResult<
-          InferSelectResult<PrincipalAuthModuleWithRelations, S>
-        >;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePrincipalAuthModulesQuery(
-  params: {
-    selection: ListSelectionConfig<
-      PrincipalAuthModuleSelect,
-      PrincipalAuthModuleFilter,
-      PrincipalAuthModuleOrderBy
-    >;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
-  const args = buildListSelectionArgs<
-    PrincipalAuthModuleSelect,
-    PrincipalAuthModuleFilter,
-    PrincipalAuthModuleOrderBy
-  >(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+export function usePrincipalAuthModulesQuery<S extends PrincipalAuthModuleSelect, TData = {
+  principalAuthModules: ConnectionResult<InferSelectResult<PrincipalAuthModuleWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalAuthModuleSelect>;
+} & Omit<UseQueryOptions<{
+  principalAuthModules: ConnectionResult<InferSelectResult<PrincipalAuthModuleWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePrincipalAuthModulesQuery(params: {
+  selection: ListSelectionConfig<PrincipalAuthModuleSelect, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<PrincipalAuthModuleSelect, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: principalAuthModuleKeys.list(args),
     queryFn: () => getClient().principalAuthModule.findMany(args).unwrap(),
-    ...queryOptions,
+    ...queryOptions
   });
 }
 /**
  * Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database.
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPrincipalAuthModulesQuery({
@@ -110,65 +70,35 @@ export function usePrincipalAuthModulesQuery(
 export async function fetchPrincipalAuthModulesQuery<S extends PrincipalAuthModuleSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<
-    ListSelectionConfig<S, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>,
-    'fields'
-  > &
-    HookStrictSelect<NoInfer<S>, PrincipalAuthModuleSelect>;
+  } & Omit<ListSelectionConfig<S, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalAuthModuleSelect>;
 }): Promise<{
   principalAuthModules: ConnectionResult<InferSelectResult<PrincipalAuthModuleWithRelations, S>>;
 }>;
 export async function fetchPrincipalAuthModulesQuery(params: {
-  selection: ListSelectionConfig<
-    PrincipalAuthModuleSelect,
-    PrincipalAuthModuleFilter,
-    PrincipalAuthModuleOrderBy
-  >;
+  selection: ListSelectionConfig<PrincipalAuthModuleSelect, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>;
 }) {
-  const args = buildListSelectionArgs<
-    PrincipalAuthModuleSelect,
-    PrincipalAuthModuleFilter,
-    PrincipalAuthModuleOrderBy
-  >(params.selection);
+  const args = buildListSelectionArgs<PrincipalAuthModuleSelect, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>(params.selection);
   return getClient().principalAuthModule.findMany(args).unwrap();
 }
 /**
  * Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database.
- *
+ * 
  * @example
  * ```ts
  * await prefetchPrincipalAuthModulesQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * ```
  */
-export async function prefetchPrincipalAuthModulesQuery<S extends PrincipalAuthModuleSelect>(
-  queryClient: QueryClient,
-  params: {
-    selection: {
-      fields: S;
-    } & Omit<
-      ListSelectionConfig<S, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>,
-      'fields'
-    > &
-      HookStrictSelect<NoInfer<S>, PrincipalAuthModuleSelect>;
-  }
-): Promise<void>;
-export async function prefetchPrincipalAuthModulesQuery(
-  queryClient: QueryClient,
-  params: {
-    selection: ListSelectionConfig<
-      PrincipalAuthModuleSelect,
-      PrincipalAuthModuleFilter,
-      PrincipalAuthModuleOrderBy
-    >;
-  }
-): Promise<void> {
-  const args = buildListSelectionArgs<
-    PrincipalAuthModuleSelect,
-    PrincipalAuthModuleFilter,
-    PrincipalAuthModuleOrderBy
-  >(params.selection);
+export async function prefetchPrincipalAuthModulesQuery<S extends PrincipalAuthModuleSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PrincipalAuthModuleSelect>;
+}): Promise<void>;
+export async function prefetchPrincipalAuthModulesQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PrincipalAuthModuleSelect, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PrincipalAuthModuleSelect, PrincipalAuthModuleFilter, PrincipalAuthModuleOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: principalAuthModuleKeys.list(args),
-    queryFn: () => getClient().principalAuthModule.findMany(args).unwrap(),
+    queryFn: () => getClient().principalAuthModule.findMany(args).unwrap()
   });
 }

@@ -4,101 +4,77 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { webauthnAuthModuleKeys } from '../query-keys';
-import { webauthnAuthModuleMutationKeys } from '../mutation-keys';
-import type {
-  WebauthnAuthModuleSelect,
-  WebauthnAuthModuleWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  WebauthnAuthModuleSelect,
-  WebauthnAuthModuleWithRelations,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { webauthnAuthModuleKeys } from "../query-keys";
+import { webauthnAuthModuleMutationKeys } from "../mutation-keys";
+import type { WebauthnAuthModuleSelect, WebauthnAuthModuleWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { WebauthnAuthModuleSelect, WebauthnAuthModuleWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a WebauthnAuthModule with typed selection
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteWebauthnAuthModuleMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteWebauthnAuthModuleMutation<S extends WebauthnAuthModuleSelect>(
-  params: {
-    selection: {
-      fields: S & WebauthnAuthModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, WebauthnAuthModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteWebauthnAuthModule: {
-          webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteWebauthnAuthModule: {
-      webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-  }
->;
-export function useDeleteWebauthnAuthModuleMutation(
-  params: {
-    selection: SelectionConfig<WebauthnAuthModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteWebauthnAuthModuleMutation<S extends WebauthnAuthModuleSelect>(params: {
+  selection: ({
+    fields: S & WebauthnAuthModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, WebauthnAuthModuleSelect>);
+} & Omit<UseMutationOptions<{
+  deleteWebauthnAuthModule: {
+    webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteWebauthnAuthModule: {
+    webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteWebauthnAuthModuleMutation(params: {
+  selection: SelectionConfig<WebauthnAuthModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<WebauthnAuthModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: webauthnAuthModuleMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
-      getClient()
-        .webauthnAuthModule.delete({
-          where: {
-            id,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().webauthnAuthModule.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: webauthnAuthModuleKeys.detail(variables.id),
+        queryKey: webauthnAuthModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: webauthnAuthModuleKeys.lists(),
+        queryKey: webauthnAuthModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

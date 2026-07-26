@@ -12,8 +12,8 @@ csdk field list --where.<field>.<op> <value> --orderBy <values>
 csdk field list --limit 10 --after <cursor>
 csdk field find-first --where.<field>.<op> <value>
 csdk field get --id <UUID>
-csdk field create --name <String> --tableId <UUID> --type <JSON> [--apiRequired <Boolean>] [--category <ObjectCategory>] [--chk <JSON>] [--chkExpr <JSON>] [--databaseId <UUID>] [--defaultValue <JSON>] [--description <String>] [--fieldOrder <Int>] [--generationExpression <JSON>] [--generationType <String>] [--isRequired <Boolean>] [--label <String>] [--max <Float>] [--min <Float>] [--regexp <String>] [--smartTags <JSON>] [--tags <String>]
-csdk field update --id <UUID> [--apiRequired <Boolean>] [--category <ObjectCategory>] [--chk <JSON>] [--chkExpr <JSON>] [--databaseId <UUID>] [--defaultValue <JSON>] [--description <String>] [--fieldOrder <Int>] [--generationExpression <JSON>] [--generationType <String>] [--isRequired <Boolean>] [--label <String>] [--max <Float>] [--min <Float>] [--name <String>] [--regexp <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <JSON>]
+csdk field create --name <String> --tableId <UUID> --type <JSON> [--apiRequired <Boolean>] [--category <ObjectCategory>] [--chk <JSON>] [--chkExpr <JSON>] [--databaseId <UUID>] [--defaultValue <JSON>] [--description <String>] [--fieldOrder <Int>] [--generationExpression <JSON>] [--generationType <String>] [--identityGeneration <String>] [--identityOptions <JSON>] [--isRequired <Boolean>] [--label <String>] [--max <Float>] [--min <Float>] [--regexp <String>] [--smartTags <JSON>] [--tags <String>]
+csdk field update --id <UUID> [--apiRequired <Boolean>] [--category <ObjectCategory>] [--chk <JSON>] [--chkExpr <JSON>] [--databaseId <UUID>] [--defaultValue <JSON>] [--description <String>] [--fieldOrder <Int>] [--generationExpression <JSON>] [--generationType <String>] [--identityGeneration <String>] [--identityOptions <JSON>] [--isRequired <Boolean>] [--label <String>] [--max <Float>] [--min <Float>] [--name <String>] [--regexp <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--type <JSON>]
 csdk field delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk field list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a field
 
 ```bash
-csdk field create --name <String> --tableId <UUID> --type <JSON> [--apiRequired <Boolean>] [--category <ObjectCategory>] [--chk <JSON>] [--chkExpr <JSON>] [--databaseId <UUID>] [--defaultValue <JSON>] [--description <String>] [--fieldOrder <Int>] [--generationExpression <JSON>] [--generationType <String>] [--isRequired <Boolean>] [--label <String>] [--max <Float>] [--min <Float>] [--regexp <String>] [--smartTags <JSON>] [--tags <String>]
+csdk field create --name <String> --tableId <UUID> --type <JSON> [--apiRequired <Boolean>] [--category <ObjectCategory>] [--chk <JSON>] [--chkExpr <JSON>] [--databaseId <UUID>] [--defaultValue <JSON>] [--description <String>] [--fieldOrder <Int>] [--generationExpression <JSON>] [--generationType <String>] [--identityGeneration <String>] [--identityOptions <JSON>] [--isRequired <Boolean>] [--label <String>] [--max <Float>] [--min <Float>] [--regexp <String>] [--smartTags <JSON>] [--tags <String>]
 ```
 
 ### Get a field by id

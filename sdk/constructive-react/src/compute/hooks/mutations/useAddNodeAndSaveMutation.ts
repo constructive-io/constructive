@@ -4,52 +4,39 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { customMutationKeys } from '../mutation-keys';
-import type { AddNodeAndSaveVariables } from '../../orm/mutation';
-import type { AddNodeAndSavePayloadSelect, AddNodeAndSavePayload } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect, StrictSelect } from '../../orm/select-types';
-export type { AddNodeAndSaveVariables } from '../../orm/mutation';
-export type { AddNodeAndSavePayloadSelect } from '../../orm/input-types';
-export function useAddNodeAndSaveMutation<S extends AddNodeAndSavePayloadSelect>(
-  params: {
-    selection: {
-      fields: S & AddNodeAndSavePayloadSelect;
-    } & HookStrictSelect<NoInfer<S>, AddNodeAndSavePayloadSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        addNodeAndSave: InferSelectResult<AddNodeAndSavePayload, S> | null;
-      },
-      Error,
-      AddNodeAndSaveVariables
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    addNodeAndSave: InferSelectResult<AddNodeAndSavePayload, S> | null;
-  },
-  Error,
-  AddNodeAndSaveVariables
-> {
+import { useMutation } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { customMutationKeys } from "../mutation-keys";
+import type { AddNodeAndSaveVariables } from "../../orm/mutation";
+import type { AddNodeAndSavePayloadSelect, AddNodeAndSavePayload } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
+export type { AddNodeAndSaveVariables } from "../../orm/mutation";
+export type { AddNodeAndSavePayloadSelect } from "../../orm/input-types";
+export function useAddNodeAndSaveMutation<S extends AddNodeAndSavePayloadSelect>(params: {
+  selection: ({
+    fields: S & AddNodeAndSavePayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, AddNodeAndSavePayloadSelect>);
+} & Omit<UseMutationOptions<{
+  addNodeAndSave: InferSelectResult<AddNodeAndSavePayload, S> | null;
+}, Error, AddNodeAndSaveVariables>, "mutationFn">): UseMutationResult<{
+  addNodeAndSave: InferSelectResult<AddNodeAndSavePayload, S> | null;
+}, Error, AddNodeAndSaveVariables> {
   const args = buildSelectionArgs<S>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   return useMutation({
     mutationKey: customMutationKeys.addNodeAndSave(),
-    mutationFn: (variables: AddNodeAndSaveVariables) =>
-      getClient()
-        .mutation.addNodeAndSave(variables, {
-          select: args.select,
-        } as {
-          select: S;
-        } & StrictSelect<S, AddNodeAndSavePayloadSelect>)
-        .unwrap(),
-    ...mutationOptions,
+    mutationFn: (variables: AddNodeAndSaveVariables) => getClient().mutation.addNodeAndSave(variables, {
+      select: args.select
+    } as {
+      select: S;
+    } & StrictSelect<S, AddNodeAndSavePayloadSelect>).unwrap(),
+    ...mutationOptions
   });
 }

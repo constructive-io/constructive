@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site
+Frontend module configuration for a site surface; stores module name and JSON settings
 
 ## Usage
 
 ```typescript
-useSiteModulesQuery({ selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } } })
-useSiteModuleQuery({ id: '<UUID>', selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } } })
+useSiteModulesQuery({ selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } } })
+useSiteModuleQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } } })
 useCreateSiteModuleMutation({ selection: { fields: { id: true } } })
 useUpdateSiteModuleMutation({ selection: { fields: { id: true } } })
 useDeleteSiteModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteModulesQuery({
-  selection: { fields: { data: true, databaseId: true, id: true, name: true, siteId: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, name: true, siteId: true, updatedAt: true } },
 });
 ```
 

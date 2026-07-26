@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { platformResourceKeys } from '../query-keys';
-import type { PlatformResourceSelect, PlatformResourceWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { PlatformResourceSelect, PlatformResourceWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { platformResourceKeys } from "../query-keys";
+import type { PlatformResourceSelect, PlatformResourceWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PlatformResourceSelect, PlatformResourceWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const platformResourceQueryKey = platformResourceKeys.detail;
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = usePlatformResourceQuery({
@@ -26,52 +26,38 @@ export const platformResourceQueryKey = platformResourceKeys.detail;
  * });
  * ```
  */
-export function usePlatformResourceQuery<
-  S extends PlatformResourceSelect,
-  TData = {
-    platformResource: InferSelectResult<PlatformResourceWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        platformResource: InferSelectResult<PlatformResourceWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function usePlatformResourceQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformResourceSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function usePlatformResourceQuery<S extends PlatformResourceSelect, TData = {
+  platformResource: InferSelectResult<PlatformResourceWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
+} & Omit<UseQueryOptions<{
+  platformResource: InferSelectResult<PlatformResourceWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function usePlatformResourceQuery(params: {
+  id: string;
+  selection: SelectionConfig<PlatformResourceSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<PlatformResourceSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: platformResourceKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformResource.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().platformResource.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchPlatformResourceQuery({
@@ -93,46 +79,35 @@ export async function fetchPlatformResourceQuery(params: {
   selection: SelectionConfig<PlatformResourceSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<PlatformResourceSelect>(params.selection);
-  return getClient()
-    .platformResource.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().platformResource.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
- *
+ * 
  * @example
  * ```ts
  * await prefetchPlatformResourceQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchPlatformResourceQuery<S extends PlatformResourceSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
-  }
-): Promise<void>;
-export async function prefetchPlatformResourceQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<PlatformResourceSelect>;
-  }
-): Promise<void> {
+export async function prefetchPlatformResourceQuery<S extends PlatformResourceSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PlatformResourceSelect>;
+}): Promise<void>;
+export async function prefetchPlatformResourceQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<PlatformResourceSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<PlatformResourceSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: platformResourceKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .platformResource.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().platformResource.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

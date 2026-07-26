@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-API feature flag overrides; NULL columns inherit from database_settings, explicit true/false overrides the database default
+Per-API feature flag overrides; NULL columns inherit from database_settings
 
 ## Usage
 

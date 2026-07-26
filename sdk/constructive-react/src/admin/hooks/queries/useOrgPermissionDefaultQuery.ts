@@ -4,26 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { orgPermissionDefaultKeys } from '../query-keys';
-import type {
-  OrgPermissionDefaultSelect,
-  OrgPermissionDefaultWithRelations,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  OrgPermissionDefaultSelect,
-  OrgPermissionDefaultWithRelations,
-} from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { orgPermissionDefaultKeys } from "../query-keys";
+import type { OrgPermissionDefaultSelect, OrgPermissionDefaultWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { OrgPermissionDefaultSelect, OrgPermissionDefaultWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const orgPermissionDefaultQueryKey = orgPermissionDefaultKeys.detail;
 /**
  * Stores the default permission bitmask assigned to new members upon joining
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useOrgPermissionDefaultQuery({
@@ -32,52 +26,38 @@ export const orgPermissionDefaultQueryKey = orgPermissionDefaultKeys.detail;
  * });
  * ```
  */
-export function useOrgPermissionDefaultQuery<
-  S extends OrgPermissionDefaultSelect,
-  TData = {
-    orgPermissionDefault: InferSelectResult<OrgPermissionDefaultWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        orgPermissionDefault: InferSelectResult<OrgPermissionDefaultWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useOrgPermissionDefaultQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<OrgPermissionDefaultSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useOrgPermissionDefaultQuery<S extends OrgPermissionDefaultSelect, TData = {
+  orgPermissionDefault: InferSelectResult<OrgPermissionDefaultWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
+} & Omit<UseQueryOptions<{
+  orgPermissionDefault: InferSelectResult<OrgPermissionDefaultWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useOrgPermissionDefaultQuery(params: {
+  id: string;
+  selection: SelectionConfig<OrgPermissionDefaultSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<OrgPermissionDefaultSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: orgPermissionDefaultKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .orgPermissionDefault.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().orgPermissionDefault.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Stores the default permission bitmask assigned to new members upon joining
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchOrgPermissionDefaultQuery({
@@ -99,46 +79,35 @@ export async function fetchOrgPermissionDefaultQuery(params: {
   selection: SelectionConfig<OrgPermissionDefaultSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<OrgPermissionDefaultSelect>(params.selection);
-  return getClient()
-    .orgPermissionDefault.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().orgPermissionDefault.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Stores the default permission bitmask assigned to new members upon joining
- *
+ * 
  * @example
  * ```ts
  * await prefetchOrgPermissionDefaultQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchOrgPermissionDefaultQuery<S extends OrgPermissionDefaultSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
-  }
-): Promise<void>;
-export async function prefetchOrgPermissionDefaultQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<OrgPermissionDefaultSelect>;
-  }
-): Promise<void> {
+export async function prefetchOrgPermissionDefaultQuery<S extends OrgPermissionDefaultSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, OrgPermissionDefaultSelect>;
+}): Promise<void>;
+export async function prefetchOrgPermissionDefaultQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<OrgPermissionDefaultSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<OrgPermissionDefaultSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: orgPermissionDefaultKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .orgPermissionDefault.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().orgPermissionDefault.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

@@ -8,24 +8,16 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { integrationProvidersModuleKeys } from '../query-keys';
-import { integrationProvidersModuleMutationKeys } from '../mutation-keys';
-import type {
-  IntegrationProvidersModuleSelect,
-  IntegrationProvidersModuleWithRelations,
-  IntegrationProvidersModulePatch,
-} from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type {
-  IntegrationProvidersModuleSelect,
-  IntegrationProvidersModuleWithRelations,
-  IntegrationProvidersModulePatch,
-} from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { integrationProvidersModuleKeys } from "../query-keys";
+import { integrationProvidersModuleMutationKeys } from "../mutation-keys";
+import type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations, IntegrationProvidersModulePatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { IntegrationProvidersModuleSelect, IntegrationProvidersModuleWithRelations, IntegrationProvidersModulePatch } from "../../orm/input-types";
 /**
  * Config row for the integration_providers_module, which provisions a per-database
      integration_providers table holding branded, reusable service definitions.
@@ -42,85 +34,61 @@ export type {
  * mutate({ id: 'value-here', integrationProvidersModulePatch: { name: 'Updated' } });
  * ```
  */
-export function useUpdateIntegrationProvidersModuleMutation<
-  S extends IntegrationProvidersModuleSelect,
->(
-  params: {
-    selection: {
-      fields: S & IntegrationProvidersModuleSelect;
-    } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        updateIntegrationProvidersModule: {
-          integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        integrationProvidersModulePatch: IntegrationProvidersModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    updateIntegrationProvidersModule: {
-      integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    integrationProvidersModulePatch: IntegrationProvidersModulePatch;
-  }
->;
-export function useUpdateIntegrationProvidersModuleMutation(
-  params: {
-    selection: SelectionConfig<IntegrationProvidersModuleSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        integrationProvidersModulePatch: IntegrationProvidersModulePatch;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useUpdateIntegrationProvidersModuleMutation<S extends IntegrationProvidersModuleSelect>(params: {
+  selection: ({
+    fields: S & IntegrationProvidersModuleSelect;
+  } & HookStrictSelect<NoInfer<S>, IntegrationProvidersModuleSelect>);
+} & Omit<UseMutationOptions<{
+  updateIntegrationProvidersModule: {
+    integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  integrationProvidersModulePatch: IntegrationProvidersModulePatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateIntegrationProvidersModule: {
+    integrationProvidersModule: InferSelectResult<IntegrationProvidersModuleWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  integrationProvidersModulePatch: IntegrationProvidersModulePatch;
+}>;
+export function useUpdateIntegrationProvidersModuleMutation(params: {
+  selection: SelectionConfig<IntegrationProvidersModuleSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  integrationProvidersModulePatch: IntegrationProvidersModulePatch;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<IntegrationProvidersModuleSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: integrationProvidersModuleMutationKeys.all,
     mutationFn: ({
       id,
-      integrationProvidersModulePatch,
+      integrationProvidersModulePatch
     }: {
       id: string;
       integrationProvidersModulePatch: IntegrationProvidersModulePatch;
-    }) =>
-      getClient()
-        .integrationProvidersModule.update({
-          where: {
-            id,
-          },
-          data: integrationProvidersModulePatch,
-          select: args.select,
-        })
-        .unwrap(),
+    }) => getClient().integrationProvidersModule.update({
+      where: {
+        id
+      },
+      data: integrationProvidersModulePatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: integrationProvidersModuleKeys.detail(variables.id),
+        queryKey: integrationProvidersModuleKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: integrationProvidersModuleKeys.lists(),
+        queryKey: integrationProvidersModuleKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Theme configuration for a site; stores design tokens, colors, and typography as JSONB
+Theme (colors, fonts, design tokens) for a site surface
 
 ## Usage
 
 ```typescript
-useSiteThemesQuery({ selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } } })
-useSiteThemeQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } } })
+useSiteThemesQuery({ selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } } })
+useSiteThemeQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } } })
 useCreateSiteThemeMutation({ selection: { fields: { id: true } } })
 useUpdateSiteThemeMutation({ selection: { fields: { id: true } } })
 useDeleteSiteThemeMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteThemeMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteThemesQuery({
-  selection: { fields: { databaseId: true, id: true, siteId: true, theme: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, siteId: true, theme: true, updatedAt: true } },
 });
 ```
 

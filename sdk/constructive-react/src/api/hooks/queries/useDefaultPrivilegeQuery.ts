@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { defaultPrivilegeKeys } from '../query-keys';
-import type { DefaultPrivilegeSelect, DefaultPrivilegeWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { DefaultPrivilegeSelect, DefaultPrivilegeWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { defaultPrivilegeKeys } from "../query-keys";
+import type { DefaultPrivilegeSelect, DefaultPrivilegeWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { DefaultPrivilegeSelect, DefaultPrivilegeWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const defaultPrivilegeQueryKey = defaultPrivilegeKeys.detail;
 /**
  * Query hook for fetching a single DefaultPrivilege
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useDefaultPrivilegeQuery({
@@ -26,52 +26,38 @@ export const defaultPrivilegeQueryKey = defaultPrivilegeKeys.detail;
  * });
  * ```
  */
-export function useDefaultPrivilegeQuery<
-  S extends DefaultPrivilegeSelect,
-  TData = {
-    defaultPrivilege: InferSelectResult<DefaultPrivilegeWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        defaultPrivilege: InferSelectResult<DefaultPrivilegeWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useDefaultPrivilegeQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<DefaultPrivilegeSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useDefaultPrivilegeQuery<S extends DefaultPrivilegeSelect, TData = {
+  defaultPrivilege: InferSelectResult<DefaultPrivilegeWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
+} & Omit<UseQueryOptions<{
+  defaultPrivilege: InferSelectResult<DefaultPrivilegeWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useDefaultPrivilegeQuery(params: {
+  id: string;
+  selection: SelectionConfig<DefaultPrivilegeSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<DefaultPrivilegeSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: defaultPrivilegeKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .defaultPrivilege.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().defaultPrivilege.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Fetch a single DefaultPrivilege without React hooks
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchDefaultPrivilegeQuery({
@@ -93,46 +79,35 @@ export async function fetchDefaultPrivilegeQuery(params: {
   selection: SelectionConfig<DefaultPrivilegeSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<DefaultPrivilegeSelect>(params.selection);
-  return getClient()
-    .defaultPrivilege.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().defaultPrivilege.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single DefaultPrivilege for SSR or cache warming
- *
+ * 
  * @example
  * ```ts
  * await prefetchDefaultPrivilegeQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchDefaultPrivilegeQuery<S extends DefaultPrivilegeSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
-  }
-): Promise<void>;
-export async function prefetchDefaultPrivilegeQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<DefaultPrivilegeSelect>;
-  }
-): Promise<void> {
+export async function prefetchDefaultPrivilegeQuery<S extends DefaultPrivilegeSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, DefaultPrivilegeSelect>;
+}): Promise<void>;
+export async function prefetchDefaultPrivilegeQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<DefaultPrivilegeSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<DefaultPrivilegeSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: defaultPrivilegeKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .defaultPrivilege.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().defaultPrivilege.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }

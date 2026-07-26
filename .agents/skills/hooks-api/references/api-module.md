@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server
+Server-side module configuration for an API surface; stores module name and JSON settings
 
 ## Usage
 
 ```typescript
-useApiModulesQuery({ selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } } })
-useApiModuleQuery({ id: '<UUID>', selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } } })
+useApiModulesQuery({ selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } } })
+useApiModuleQuery({ id: '<UUID>', selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } } })
 useCreateApiModuleMutation({ selection: { fields: { id: true } } })
 useUpdateApiModuleMutation({ selection: { fields: { id: true } } })
 useDeleteApiModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteApiModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useApiModulesQuery({
-  selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } },
+  selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } },
 });
 ```
 

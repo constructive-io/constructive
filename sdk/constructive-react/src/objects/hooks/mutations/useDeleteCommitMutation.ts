@@ -4,99 +4,83 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { commitKeys } from '../query-keys';
-import { commitMutationKeys } from '../mutation-keys';
-import type { CommitSelect, CommitWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { CommitSelect, CommitWithRelations } from '../../orm/input-types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { commitKeys } from "../query-keys";
+import { commitMutationKeys } from "../mutation-keys";
+import type { CommitSelect, CommitWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { CommitSelect, CommitWithRelations } from "../../orm/input-types";
 /**
  * Commit history — each commit snapshots a tree root for a store
- *
+ * 
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteCommitMutation({
  *   selection: { fields: { id: true } },
  * });
- *
+ * 
  * mutate({ id: 'value-to-delete' });
  * ```
  */
-export function useDeleteCommitMutation<S extends CommitSelect>(
-  params: {
-    selection: {
-      fields: S & CommitSelect;
-    } & HookStrictSelect<NoInfer<S>, CommitSelect>;
-  } & Omit<
-    UseMutationOptions<
-      {
-        deleteCommit: {
-          commit: InferSelectResult<CommitWithRelations, S>;
-        };
-      },
-      Error,
-      {
-        id: string;
-        databaseId: string;
-      }
-    >,
-    'mutationFn'
-  >
-): UseMutationResult<
-  {
-    deleteCommit: {
-      commit: InferSelectResult<CommitWithRelations, S>;
-    };
-  },
-  Error,
-  {
-    id: string;
-    databaseId: string;
-  }
->;
-export function useDeleteCommitMutation(
-  params: {
-    selection: SelectionConfig<CommitSelect>;
-  } & Omit<
-    UseMutationOptions<
-      any,
-      Error,
-      {
-        id: string;
-        databaseId: string;
-      }
-    >,
-    'mutationFn'
-  >
-) {
+export function useDeleteCommitMutation<S extends CommitSelect>(params: {
+  selection: ({
+    fields: S & CommitSelect;
+  } & HookStrictSelect<NoInfer<S>, CommitSelect>);
+} & Omit<UseMutationOptions<{
+  deleteCommit: {
+    commit: InferSelectResult<CommitWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteCommit: {
+    commit: InferSelectResult<CommitWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  databaseId: string;
+}>;
+export function useDeleteCommitMutation(params: {
+  selection: SelectionConfig<CommitSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  databaseId: string;
+}>, "mutationFn">) {
   const args = buildSelectionArgs<CommitSelect>(params.selection);
-  const { selection: _selection, ...mutationOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
   void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: commitMutationKeys.all,
-    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
-      getClient()
-        .commit.delete({
-          where: {
-            id,
-            databaseId,
-          },
-          select: args.select,
-        })
-        .unwrap(),
+    mutationFn: ({
+      id,
+      databaseId
+    }: {
+      id: string;
+      databaseId: string;
+    }) => getClient().commit.delete({
+      where: {
+        id,
+        databaseId
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: commitKeys.detail(variables.id),
+        queryKey: commitKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
-        queryKey: commitKeys.lists(),
+        queryKey: commitKeys.lists()
       });
     },
-    ...mutationOptions,
+    ...mutationOptions
   });
 }

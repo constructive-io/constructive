@@ -4,393 +4,43 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type {
-  AppLimit,
-  AppLimitCap,
-  AppLimitCapsDefault,
-  AppLimitCredit,
-  AppLimitCreditCode,
-  AppLimitCreditCodeItem,
-  AppLimitCreditRedemption,
-  AppLimitDefault,
-  AppLimitEvent,
-  AppLimitWarning,
-  OrgLimit,
-  OrgLimitAggregate,
-  OrgLimitCap,
-  OrgLimitCapsDefault,
-  OrgLimitCredit,
-  OrgLimitDefault,
-  OrgLimitEvent,
-  OrgLimitWarning,
-  BigFloatFilter,
-  BigIntFilter,
-  BitStringFilter,
-  BooleanFilter,
-  DateFilter,
-  DatetimeFilter,
-  FloatFilter,
-  FullTextFilter,
-  IntFilter,
-  IntListFilter,
-  InternetAddressFilter,
-  JSONFilter,
-  StringFilter,
-  StringListFilter,
-  UUIDFilter,
-  UUIDListFilter,
-  VectorFilter,
-} from './types';
+import type { AppLimit, AppLimitCap, AppLimitCapsDefault, AppLimitCredit, AppLimitCreditCode, AppLimitCreditCodeItem, AppLimitCreditRedemption, AppLimitDefault, AppLimitEvent, AppLimitWarning, OrgLimit, OrgLimitAggregate, OrgLimitCap, OrgLimitCapsDefault, OrgLimitCredit, OrgLimitDefault, OrgLimitEvent, OrgLimitWarning, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 /** Methods to use when ordering `AppLimitCap`. */
-export type AppLimitCapOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppLimitCapOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `AppLimitCapsDefault`. */
-export type AppLimitCapsDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppLimitCapsDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `AppLimitCreditCodeItem`. */
-export type AppLimitCreditCodeItemOrderBy =
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_CODE_ID_ASC'
-  | 'CREDIT_CODE_ID_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppLimitCreditCodeItemOrderBy = "AMOUNT_ASC" | "AMOUNT_DESC" | "CREDIT_CODE_ID_ASC" | "CREDIT_CODE_ID_DESC" | "CREDIT_TYPE_ASC" | "CREDIT_TYPE_DESC" | "DEFAULT_LIMIT_ID_ASC" | "DEFAULT_LIMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `AppLimitCreditCode`. */
-export type AppLimitCreditCodeOrderBy =
-  | 'CODE_ASC'
-  | 'CODE_DESC'
-  | 'CURRENT_REDEMPTIONS_ASC'
-  | 'CURRENT_REDEMPTIONS_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_REDEMPTIONS_ASC'
-  | 'MAX_REDEMPTIONS_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppLimitCreditCodeOrderBy = "CODE_ASC" | "CODE_DESC" | "CURRENT_REDEMPTIONS_ASC" | "CURRENT_REDEMPTIONS_DESC" | "EXPIRES_AT_ASC" | "EXPIRES_AT_DESC" | "ID_ASC" | "ID_DESC" | "MAX_REDEMPTIONS_ASC" | "MAX_REDEMPTIONS_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `AppLimitCredit`. */
-export type AppLimitCreditOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
+export type AppLimitCreditOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "AMOUNT_ASC" | "AMOUNT_DESC" | "CREDIT_TYPE_ASC" | "CREDIT_TYPE_DESC" | "DEFAULT_LIMIT_ID_ASC" | "DEFAULT_LIMIT_ID_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
 /** Methods to use when ordering `AppLimitCreditRedemption`. */
-export type AppLimitCreditRedemptionOrderBy =
-  | 'CREDIT_CODE_ID_ASC'
-  | 'CREDIT_CODE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type AppLimitCreditRedemptionOrderBy = "CREDIT_CODE_ID_ASC" | "CREDIT_CODE_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `AppLimitDefault`. */
-export type AppLimitDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC';
+export type AppLimitDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC";
 /** Methods to use when ordering `AppLimitEvent`. */
-export type AppLimitEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DELTA_ASC'
-  | 'DELTA_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_AT_EVENT_ASC'
-  | 'MAX_AT_EVENT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_AFTER_ASC'
-  | 'NUM_AFTER_DESC'
-  | 'NUM_BEFORE_ASC'
-  | 'NUM_BEFORE_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
+export type AppLimitEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DELTA_ASC" | "DELTA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_AT_EVENT_ASC" | "MAX_AT_EVENT_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_AFTER_ASC" | "NUM_AFTER_DESC" | "NUM_BEFORE_ASC" | "NUM_BEFORE_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
 /** Methods to use when ordering `AppLimit`. */
-export type AppLimitOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC';
+export type AppLimitOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_ASC" | "NUM_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PERIOD_CREDITS_ASC" | "PERIOD_CREDITS_DESC" | "PLAN_MAX_ASC" | "PLAN_MAX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PURCHASED_CREDITS_ASC" | "PURCHASED_CREDITS_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC" | "WINDOW_DURATION_ASC" | "WINDOW_DURATION_DESC" | "WINDOW_START_ASC" | "WINDOW_START_DESC";
 /** Methods to use when ordering `AppLimitWarning`. */
-export type AppLimitWarningOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'THRESHOLD_VALUE_ASC'
-  | 'THRESHOLD_VALUE_DESC'
-  | 'WARNING_TYPE_ASC'
-  | 'WARNING_TYPE_DESC';
+export type AppLimitWarningOrderBy = "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "THRESHOLD_VALUE_ASC" | "THRESHOLD_VALUE_DESC" | "WARNING_TYPE_ASC" | "WARNING_TYPE_DESC";
 /** Methods to use when ordering `OrgLimitAggregate`. */
-export type OrgLimitAggregateOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'RESERVED_ASC'
-  | 'RESERVED_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC';
+export type OrgLimitAggregateOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_ASC" | "NUM_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PERIOD_CREDITS_ASC" | "PERIOD_CREDITS_DESC" | "PLAN_MAX_ASC" | "PLAN_MAX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PURCHASED_CREDITS_ASC" | "PURCHASED_CREDITS_DESC" | "RESERVED_ASC" | "RESERVED_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC" | "WINDOW_DURATION_ASC" | "WINDOW_DURATION_DESC" | "WINDOW_START_ASC" | "WINDOW_START_DESC";
 /** Methods to use when ordering `OrgLimitCap`. */
-export type OrgLimitCapOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type OrgLimitCapOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `OrgLimitCapsDefault`. */
-export type OrgLimitCapsDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+export type OrgLimitCapsDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 /** Methods to use when ordering `OrgLimitCredit`. */
-export type OrgLimitCreditOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NATURAL'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
+export type OrgLimitCreditOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "AMOUNT_ASC" | "AMOUNT_DESC" | "CREDIT_TYPE_ASC" | "CREDIT_TYPE_DESC" | "DEFAULT_LIMIT_ID_ASC" | "DEFAULT_LIMIT_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "NATURAL" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
 /** Methods to use when ordering `OrgLimitDefault`. */
-export type OrgLimitDefaultOrderBy =
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC';
+export type OrgLimitDefaultOrderBy = "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC";
 /** Methods to use when ordering `OrgLimitEvent`. */
-export type OrgLimitEventOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DELTA_ASC'
-  | 'DELTA_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_AT_EVENT_ASC'
-  | 'MAX_AT_EVENT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_AFTER_ASC'
-  | 'NUM_AFTER_DESC'
-  | 'NUM_BEFORE_ASC'
-  | 'NUM_BEFORE_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
+export type OrgLimitEventOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "DELTA_ASC" | "DELTA_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "EVENT_TYPE_ASC" | "EVENT_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_AT_EVENT_ASC" | "MAX_AT_EVENT_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_AFTER_ASC" | "NUM_AFTER_DESC" | "NUM_BEFORE_ASC" | "NUM_BEFORE_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "REASON_ASC" | "REASON_DESC";
 /** Methods to use when ordering `OrgLimit`. */
-export type OrgLimitOrderBy =
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC';
+export type OrgLimitOrderBy = "ACTOR_ID_ASC" | "ACTOR_ID_DESC" | "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ENTITY_TYPE_ASC" | "ENTITY_TYPE_DESC" | "ID_ASC" | "ID_DESC" | "MAX_ASC" | "MAX_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "NUM_ASC" | "NUM_DESC" | "ORGANIZATION_ID_ASC" | "ORGANIZATION_ID_DESC" | "PERIOD_CREDITS_ASC" | "PERIOD_CREDITS_DESC" | "PLAN_MAX_ASC" | "PLAN_MAX_DESC" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "PURCHASED_CREDITS_ASC" | "PURCHASED_CREDITS_DESC" | "SOFT_MAX_ASC" | "SOFT_MAX_DESC" | "WINDOW_DURATION_ASC" | "WINDOW_DURATION_DESC" | "WINDOW_START_ASC" | "WINDOW_START_DESC";
 /** Methods to use when ordering `OrgLimitWarning`. */
-export type OrgLimitWarningOrderBy =
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'THRESHOLD_VALUE_ASC'
-  | 'THRESHOLD_VALUE_DESC'
-  | 'WARNING_TYPE_ASC'
-  | 'WARNING_TYPE_DESC';
+export type OrgLimitWarningOrderBy = "ENTITY_ID_ASC" | "ENTITY_ID_DESC" | "ID_ASC" | "ID_DESC" | "NAME_ASC" | "NAME_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "TASK_IDENTIFIER_ASC" | "TASK_IDENTIFIER_DESC" | "THRESHOLD_VALUE_ASC" | "THRESHOLD_VALUE_DESC" | "WARNING_TYPE_ASC" | "WARNING_TYPE_DESC";
 /** A filter to be used against `AppLimitCap` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCapFilter {
   /** Checks for all expressions in this list. */
@@ -2325,6 +1975,8 @@ export interface MetaTable {
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
+  /** Provisioning scope metadata (null if no @scope tag) */
+  scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
   /** Storage metadata (null if not a storage table) */
@@ -2533,6 +2185,19 @@ export interface MetaRelations {
   hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
 }
+/** Provisioning scope metadata for a table */
+export interface MetaScope {
+  /** SQL name of the entity table for entity scopes, else null */
+  entityTable?: string | null;
+  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  keyColumn?: string | null;
+  /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
+  scope: string;
+  /** Provenance of the scope metadata (always 'smartTag') */
+  source: string;
+  /** Coarse bucket: 'global', 'database', or 'entity' */
+  tier: string;
+}
 /** Search metadata for a table */
 export interface MetaSearch {
   /** Active search algorithms on this table */
@@ -2565,6 +2230,8 @@ export interface MetaEnum {
 }
 /** Information about a PostgreSQL type */
 export interface MetaType {
+  /** Scalar serialization contract (null for plain scalars) */
+  encoding?: MetaScalarEncoding | null;
   gqlType: string;
   hasDefault?: boolean | null;
   isArray: boolean;
@@ -2629,4 +2296,19 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+export interface MetaScalarEncoding {
+  /** For 'vector': declared length, else null. */
+  dimensions?: number | null;
+  /** For 'ltree': values are dot-separated path strings. */
+  dotPath?: boolean | null;
+  /** For 'vector': element scalar (e.g. 'float'). */
+  elementType?: string | null;
+  /** For 'geojson': Point/LineString/Polygon/…, else null. */
+  geometrySubtype?: string | null;
+  /** Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite. */
+  kind: string;
+  /** For 'geojson': spatial reference id, else null. */
+  srid?: number | null;
 }

@@ -4,20 +4,20 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
-import { getClient } from '../client';
-import { buildSelectionArgs } from '../selection';
-import type { SelectionConfig } from '../selection';
-import { agentResourceKeys } from '../query-keys';
-import type { AgentResourceSelect, AgentResourceWithRelations } from '../../orm/input-types';
-import type { InferSelectResult, HookStrictSelect } from '../../orm/select-types';
-export type { AgentResourceSelect, AgentResourceWithRelations } from '../../orm/input-types';
+import { useQuery } from "@tanstack/react-query";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import { agentResourceKeys } from "../query-keys";
+import type { AgentResourceSelect, AgentResourceWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { AgentResourceSelect, AgentResourceWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const agentResourceQueryKey = agentResourceKeys.detail;
 /**
  * Unified skills and knowledge resources for agent retrieval
- *
+ * 
  * @example
  * ```tsx
  * const { data, isLoading } = useAgentResourceQuery({
@@ -26,52 +26,38 @@ export const agentResourceQueryKey = agentResourceKeys.detail;
  * });
  * ```
  */
-export function useAgentResourceQuery<
-  S extends AgentResourceSelect,
-  TData = {
-    agentResource: InferSelectResult<AgentResourceWithRelations, S> | null;
-  },
->(
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
-  } & Omit<
-    UseQueryOptions<
-      {
-        agentResource: InferSelectResult<AgentResourceWithRelations, S> | null;
-      },
-      Error,
-      TData
-    >,
-    'queryKey' | 'queryFn'
-  >
-): UseQueryResult<TData>;
-export function useAgentResourceQuery(
-  params: {
-    id: string;
-    selection: SelectionConfig<AgentResourceSelect>;
-  } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
-) {
+export function useAgentResourceQuery<S extends AgentResourceSelect, TData = {
+  agentResource: InferSelectResult<AgentResourceWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
+} & Omit<UseQueryOptions<{
+  agentResource: InferSelectResult<AgentResourceWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useAgentResourceQuery(params: {
+  id: string;
+  selection: SelectionConfig<AgentResourceSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
   const args = buildSelectionArgs<AgentResourceSelect>(params.selection);
-  const { selection: _selection, ...queryOptions } = params ?? {};
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
   void _selection;
   return useQuery({
     queryKey: agentResourceKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .agentResource.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
-    ...queryOptions,
+    queryFn: () => getClient().agentResource.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
  * Unified skills and knowledge resources for agent retrieval
- *
+ * 
  * @example
  * ```ts
  * const data = await fetchAgentResourceQuery({
@@ -93,46 +79,35 @@ export async function fetchAgentResourceQuery(params: {
   selection: SelectionConfig<AgentResourceSelect>;
 }): Promise<any> {
   const args = buildSelectionArgs<AgentResourceSelect>(params.selection);
-  return getClient()
-    .agentResource.findOne({
-      id: params.id,
-      select: args.select,
-    })
-    .unwrap();
+  return getClient().agentResource.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Unified skills and knowledge resources for agent retrieval
- *
+ * 
  * @example
  * ```ts
  * await prefetchAgentResourceQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * ```
  */
-export async function prefetchAgentResourceQuery<S extends AgentResourceSelect>(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: {
-      fields: S;
-    } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
-  }
-): Promise<void>;
-export async function prefetchAgentResourceQuery(
-  queryClient: QueryClient,
-  params: {
-    id: string;
-    selection: SelectionConfig<AgentResourceSelect>;
-  }
-): Promise<void> {
+export async function prefetchAgentResourceQuery<S extends AgentResourceSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, AgentResourceSelect>;
+}): Promise<void>;
+export async function prefetchAgentResourceQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<AgentResourceSelect>;
+}): Promise<void> {
   const args = buildSelectionArgs<AgentResourceSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: agentResourceKeys.detail(params.id),
-    queryFn: () =>
-      getClient()
-        .agentResource.findOne({
-          id: params.id,
-          select: args.select,
-        })
-        .unwrap(),
+    queryFn: () => getClient().agentResource.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
 }
