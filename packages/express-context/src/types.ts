@@ -13,23 +13,6 @@ import type { BillingClient } from './billing-client';
 
 // ─── API Structure ──────────────────────────────────────────────────────────
 
-export interface CorsModuleData {
-  urls: string[];
-}
-
-export interface PublicKeyChallengeData {
-  schema: string;
-  crypto_network: string;
-  sign_up_with_key: string;
-  sign_in_request_challenge: string;
-  sign_in_record_failure: string;
-  sign_in_with_challenge: string;
-}
-
-export interface GenericModuleData {
-  [key: string]: unknown;
-}
-
 export interface DatabaseSettings {
   enableAggregates: boolean;
   enablePostgis: boolean;
@@ -68,11 +51,6 @@ export interface WebauthnSettings {
   challengeExpirySeconds: number;
 }
 
-export type ApiModule =
-  | { name: 'cors'; data: CorsModuleData }
-  | { name: 'pubkey_challenge'; data: PublicKeyChallengeData }
-  | { name: string; data?: GenericModuleData };
-
 export interface RlsModule {
   authenticate: string;
   authenticateStrict: string;
@@ -106,7 +84,6 @@ export interface ApiStructure {
   anonRole: string;
   roleName: string;
   schema: string[];
-  apiModules: ApiModule[];
   rlsModule?: RlsModule;
   domains?: string[];
   databaseId?: string;

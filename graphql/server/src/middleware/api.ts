@@ -231,7 +231,6 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleS
   anonRole: row.anon_role || 'anon',
   roleName: row.role_name || 'authenticated',
   schema: row.schemas || [],
-  apiModules: [],
   rlsModule: settings.rlsModule,
   domains: [],
   databaseId: row.database_id,
@@ -252,7 +251,6 @@ const createAdminStructure = (
   anonRole: 'administrator',
   roleName: 'administrator',
   schema: schemas,
-  apiModules: [],
   domains: [],
   databaseId,
   isPublic: false

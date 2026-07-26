@@ -100,9 +100,9 @@ export function buildEmbedder(config: EmbedderConfig): EmbedderFunction | null {
 // ─── Resolution from LLM Module ─────────────────────────────────────────────
 
 /**
- * Build an embedder from an `llm_module` api_modules row.
+ * Build an embedder from an `llm_module` row.
  *
- * @param data - The llm_module data from constructive_routing_public.api_modules
+ * @param data - The llm_module data from metaschema_modules_public.llm_module
  * @returns An EmbedderFunction, or null if the provider is not supported
  */
 export function buildEmbedderFromModule(data: LlmModuleData): EmbedderFunction | null {

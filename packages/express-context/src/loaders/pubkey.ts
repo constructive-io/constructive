@@ -2,8 +2,8 @@
  * Pubkey Challenge Settings Loader
  *
  * Resolves public-key challenge auth config (crypto network, sign-in/sign-up
- * function names) from the scoped routing plane. Tries the pubkey_settings
- * table first, falls back to the api_modules approach.
+ * function names) from the scoped routing plane via the typed pubkey_settings
+ * table.
  */
 
 import type { PubkeyChallengeSettings } from '../types';
@@ -30,13 +30,6 @@ const PUBKEY_SETTINGS_SQL = `
   LIMIT 1
 `;
 
-const PUBKEY_MODULE_SQL = `
-  SELECT data
-  FROM constructive_routing_public.api_modules
-  WHERE api_id = $1 AND name = 'pubkey_challenge'
-  LIMIT 1
-`;
-
 // ─── Row Types ──────────────────────────────────────────────────────────────
 
 interface PubkeySettingsRow {
@@ -46,10 +39,6 @@ interface PubkeySettingsRow {
   sign_in_request_challenge: string;
   sign_in_record_failure: string;
   sign_in_with_challenge: string;
-}
-
-interface PubkeyModuleRow {
-  data: PubkeySettingsRow | null;
 }
 
 // ─── Transforms ─────────────────────────────────────────────────────────────
@@ -72,23 +61,8 @@ export const pubkeyLoader: ModuleLoader<PubkeyChallengeSettings> = createModuleL
   name: 'pubkeyChallengeSettings',
   ttlMs: 5 * 60_000,
   async resolve(ctx: LoaderContext) {
-    const { routingPool, databaseId, apiId } = ctx;
-
-    // Try new pubkey_settings table first
-    try {
-      const result = await routingPool.query<PubkeySettingsRow>(PUBKEY_SETTINGS_SQL, [databaseId]);
-      const resolved = fromRow(result.rows[0] ?? null);
-      if (resolved) return resolved;
-    } catch {
-      // Table may not exist yet
-    }
-
-    // Fall back to api_modules
-    if (apiId) {
-      const result = await routingPool.query<PubkeyModuleRow>(PUBKEY_MODULE_SQL, [apiId]);
-      return fromRow(result.rows[0]?.data ?? null);
-    }
-
-    return undefined;
+    const { routingPool, databaseId } = ctx;
+    const result = await routingPool.query<PubkeySettingsRow>(PUBKEY_SETTINGS_SQL, [databaseId]);
+    return fromRow(result.rows[0] ?? null);
   }
 });
