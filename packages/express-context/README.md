@@ -63,11 +63,11 @@ Each loader encapsulates a SQL query + type transform + per-databaseId LRU cache
 
 | Loader | Source | Description |
 |--------|--------|-------------|
-| `rlsLoader` | `constructive_routing_public.rls_settings` | RLS module (authenticate functions, schema refs) |
-| `corsLoader` | `constructive_routing_public.cors_settings` | CORS allowed origins |
-| `databaseSettingsLoader` | `constructive_routing_public.database_settings` | Feature flags (aggregates, search, uploads, etc.) |
-| `pubkeyLoader` | `constructive_routing_public.pubkey_settings` | Public key challenge auth settings |
-| `webauthnLoader` | `constructive_routing_public.webauthn_settings` | WebAuthn/passkey configuration |
+| `rlsLoader` | `routing_public.rls_settings` | RLS module (authenticate functions, schema refs) |
+| `corsLoader` | `routing_public.cors_settings` | CORS allowed origins |
+| `databaseSettingsLoader` | `routing_public.database_settings` | Feature flags (aggregates, search, uploads, etc.) |
+| `pubkeyLoader` | `routing_public.pubkey_settings` | Public key challenge auth settings |
+| `webauthnLoader` | `routing_public.webauthn_settings` | WebAuthn/passkey configuration |
 | `authSettingsLoader` | `metaschema_modules_public.sessions_module` | Cookie/captcha settings (two-step tenant DB discovery) |
 
 ### Custom loaders

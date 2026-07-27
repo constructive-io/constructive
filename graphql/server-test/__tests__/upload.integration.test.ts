@@ -318,7 +318,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
           scopedRouting: true,
           api: {
             isPublic: false,
-            metaSchemas
+            metaSchemas,
+            scopedRoutingSchema: 'constructive_routing_public'
           }
         }
       },

@@ -62,7 +62,8 @@ beforeAll(async () => {
         scopedRouting: true,
         api: {
           isPublic: true,
-          metaSchemas
+          metaSchemas,
+          scopedRoutingSchema: 'constructive_routing_public'
         }
       }
     },

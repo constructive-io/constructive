@@ -73,9 +73,9 @@ export const apiDefaults: ApiOptions = {
   roleName: 'administrator',
   isPublic: true,
   metaSchemas: [
-    'constructive_routing_public',
+    'routing_public',
     'metaschema_public',
     'metaschema_modules_public'
   ],
-  scopedRoutingSchema: 'constructive_routing_public'
+  scopedRoutingSchema: 'routing_public'
 };

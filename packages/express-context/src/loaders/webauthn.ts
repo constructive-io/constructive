@@ -8,10 +8,11 @@
 import type { WebauthnSettings } from '../types';
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
+import { routingSchemaOf } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
-const WEBAUTHN_SETTINGS_SQL = `
+const webauthnSettingsSql = (schema: string): string => `
   SELECT
     s.schema_name AS schema,
     cred_s.schema_name AS credentials_schema,
@@ -24,7 +25,7 @@ const WEBAUTHN_SETTINGS_SQL = `
     ws.require_user_verification,
     ws.resident_key,
     ws.challenge_expiry_seconds
-  FROM constructive_routing_public.webauthn_settings ws
+  FROM "${schema}".webauthn_settings ws
   LEFT JOIN metaschema_public.schema s ON ws.schema_id = s.id
   LEFT JOIN metaschema_public.schema cred_s ON ws.credentials_schema_id = cred_s.id
   LEFT JOIN metaschema_public.schema sess_s ON ws.sessions_schema_id = sess_s.id
@@ -57,7 +58,7 @@ export const webauthnLoader: ModuleLoader<WebauthnSettings> = createModuleLoader
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId } = ctx;
 
-    const result = await routingPool.query<WebauthnSettingsRow>(WEBAUTHN_SETTINGS_SQL, [databaseId]);
+    const result = await routingPool.query<WebauthnSettingsRow>(webauthnSettingsSql(routingSchemaOf(ctx)), [databaseId]);
     const row = result.rows[0];
     if (!row?.schema) return undefined;
 

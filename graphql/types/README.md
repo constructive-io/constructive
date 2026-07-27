@@ -40,7 +40,7 @@ const config: ConstructiveOptions = {
     appendPlugins: [],
   },
   api: {
-    scopedRoutingSchema: 'constructive_routing_public',
+    scopedRoutingSchema: 'routing_public',
     exposedSchemas: ['public'],
   },
   features: {

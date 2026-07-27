@@ -6,11 +6,11 @@
  * a LoaderRegistry and pass it to createContextMiddleware().
  *
  * Built-in loaders cover the standard Constructive modules:
- *   - rlsModule       (constructive_routing_public.rls_settings)
- *   - corsOrigins     (constructive_routing_public.cors_settings)
- *   - databaseSettings(constructive_routing_public.database_settings)
- *   - pubkeyChallengeSettings (constructive_routing_public.pubkey_settings)
- *   - webauthnSettings(constructive_routing_public.webauthn_settings)
+ *   - rlsModule       (routing-plane rls_settings)
+ *   - corsOrigins     (routing-plane cors_settings)
+ *   - databaseSettings(routing-plane database_settings)
+ *   - pubkeyChallengeSettings (routing-plane pubkey_settings)
+ *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:

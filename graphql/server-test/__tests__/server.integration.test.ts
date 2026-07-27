@@ -50,6 +50,7 @@ type Scenario = {
   api: {
     isPublic: boolean;
     metaSchemas?: string[];
+    scopedRoutingSchema?: string;
   };
   headers?: Record<string, string>;
 };
@@ -65,7 +66,7 @@ const scenarios: Scenario[] = [
     name: 'scoped public via domain',
     seedDir: 'simple-seed-scoped',
     scopedRouting: true,
-    api: { isPublic: true, metaSchemas: scopedMetaSchemas },
+    api: { isPublic: true, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
     headers: {
       Host: 'app.test.constructive.io'
     }
@@ -74,7 +75,7 @@ const scenarios: Scenario[] = [
     name: 'scoped private via domain',
     seedDir: 'simple-seed-scoped',
     scopedRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
     headers: {
       Host: 'private.test.constructive.io'
     }
@@ -83,7 +84,7 @@ const scenarios: Scenario[] = [
     name: 'scoped private via X-Api-Name',
     seedDir: 'simple-seed-scoped',
     scopedRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Api-Name': 'private'
@@ -93,7 +94,7 @@ const scenarios: Scenario[] = [
     name: 'scoped private via X-Schemata',
     seedDir: 'simple-seed-scoped',
     scopedRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Schemata': schemas.join(',')
@@ -283,7 +284,8 @@ describe('scoped private via X-Meta-Schema', () => {
           scopedRouting: true,
           api: {
             isPublic: false,
-            metaSchemas: metaApiSchemas
+            metaSchemas: metaApiSchemas,
+            scopedRoutingSchema: 'constructive_routing_public'
           }
         }
       },
@@ -358,7 +360,8 @@ describe('Error paths', () => {
           scopedRouting: true,
           api: {
             isPublic: false,
-            metaSchemas: scopedMetaSchemas
+            metaSchemas: scopedMetaSchemas,
+            scopedRoutingSchema: 'constructive_routing_public'
           }
         }
       },
@@ -407,7 +410,8 @@ describe('Error paths', () => {
             scopedRouting: true,
             api: {
               isPublic: false,
-              metaSchemas: scopedMetaSchemas
+              metaSchemas: scopedMetaSchemas,
+              scopedRoutingSchema: 'constructive_routing_public'
             }
           }
         },
@@ -441,7 +445,8 @@ describe('Error paths', () => {
             scopedRouting: true,
             api: {
               isPublic: true,
-              metaSchemas: scopedMetaSchemas
+              metaSchemas: scopedMetaSchemas,
+              scopedRoutingSchema: 'constructive_routing_public'
             }
           }
         },

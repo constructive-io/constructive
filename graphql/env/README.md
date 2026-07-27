@@ -74,8 +74,8 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     anonRole: 'administrator',
     roleName: 'administrator',
     isPublic: true,
-    metaSchemas: ['constructive_routing_public', 'metaschema_public', 'metaschema_modules_public'],
-    scopedRoutingSchema: 'constructive_routing_public'
+    metaSchemas: ['routing_public', 'metaschema_public', 'metaschema_modules_public'],
+    scopedRoutingSchema: 'routing_public'
   }
 }
 ```

@@ -181,7 +181,7 @@ The `server.api` option provides full control over the GraphQL server configurat
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `scopedRoutingSchema` | `string` | `constructive_routing_public` | Schema that owns `resolve_route()` and the routing tables |
+| `scopedRoutingSchema` | `string` | `routing_public` | Schema that owns `resolve_route()` and the routing tables |
 | `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
 | `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
 | `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
