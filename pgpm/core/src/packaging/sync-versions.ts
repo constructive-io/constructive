@@ -2,7 +2,7 @@ import { Logger } from '@pgpmjs/logger';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-import { getExtensionName, parseControlContent } from '@pgpmjs/ast/files';
+import { getExtensionInfo, parseControlContent } from '@pgpmjs/ast/files';
 import { writePackage } from './package';
 
 const log = new Logger('sync-versions');
@@ -40,20 +40,17 @@ export interface SyncVersionsResult {
  * (.control default_version + sql bundle) matches the package.json version.
  */
 export const getModuleVersionStatus = (packageDir: string): ModuleVersionStatus => {
-  const name = getExtensionName(packageDir);
-  const pkg = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf-8'));
-  const control = readFileSync(join(packageDir, `${name}.control`), 'utf-8');
-  const { version: controlVersion } = parseControlContent(control);
-  const packageVersion = pkg.version;
-  const sqlFileExists = existsSync(join(packageDir, 'sql', `${name}--${packageVersion}.sql`));
+  const { extname, version, controlFile, sqlFile } = getExtensionInfo(packageDir);
+  const { version: controlVersion } = parseControlContent(readFileSync(controlFile, 'utf-8'));
+  const sqlFileExists = existsSync(join(packageDir, sqlFile));
 
   return {
-    name,
+    name: extname,
     packageDir,
-    packageVersion,
+    packageVersion: version,
     controlVersion,
     sqlFileExists,
-    inSync: packageVersion === controlVersion && sqlFileExists
+    inSync: version === controlVersion && sqlFileExists
   };
 };
 
