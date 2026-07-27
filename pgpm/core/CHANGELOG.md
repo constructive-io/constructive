@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.5.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.5.0...@pgpmjs/core@7.5.1) (2026-07-27)
+
+### Bug Fixes
+
+- **core:** record the requested package's own version during install ([9c23659](https://github.com/constructive-io/constructive/commit/9c23659a79c102a8f2c0f314b7eb92c04ec4a832))
+
 # [7.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.4.2...@pgpmjs/core@7.5.0) (2026-07-27)
 
 ### Features
