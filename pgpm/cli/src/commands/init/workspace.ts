@@ -4,6 +4,8 @@ import path from 'path';
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
 import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
 
+import { isNoTtyRequested } from '../../utils';
+
 const DEFAULT_MOTD = `
                  |              _   _
      ===         |.===.        '\\-//\`
@@ -53,7 +55,7 @@ export default async function runWorkspaceSetup(
       workspaceName: answers.name
     },
     toolName: DEFAULT_TEMPLATE_TOOL_NAME,
-    noTty: Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true'),
+    noTty: isNoTtyRequested(argv),
     cwd,
     prompter
   });
