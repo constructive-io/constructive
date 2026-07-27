@@ -1066,5 +1066,88 @@ relocatable = false
       );
       expect(planContent).toContain('schemas/pets_full_public/tables/pets/policies/pets_policy');
     }, 180000);
+
+    it('hoists meta_registration registry fixtures into the service package', async () => {
+      const PART_EXTENSION_NAME = 'pets-part';
+      const PART_META_EXTENSION_NAME = 'pets-part-svc';
+      const PARTMAN_DEPLOY = 'schemas/pets_public/tables/pets/table/partman';
+
+      await pg.query(
+        `INSERT INTO db_migrate.sql_actions (name, database_id, deploy, deps, content, revert, verify, category)
+         VALUES (
+           'register_partman_parent',
+           $1,
+           $2,
+           ARRAY['schemas/pets_public/tables/pets/table']::text[],
+           'INSERT INTO metaschema_public.partition (id, database_id, table_id) VALUES (''00000000-0000-0000-0000-000000000001'', ''${DATABASE_ID}'', ''00000000-0000-0000-0000-000000000002'') ON CONFLICT (table_id) DO NOTHING;',
+           'DELETE FROM metaschema_public.partition WHERE table_id = ''00000000-0000-0000-0000-000000000002'';',
+           'SELECT 1;',
+           'meta_registration'
+         )
+         ON CONFLICT (database_id, deploy) DO NOTHING`,
+        [DATABASE_ID, PARTMAN_DEPLOY]
+      );
+
+      const schemaResult = await pg.query(
+        'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
+        [DATABASE_ID]
+      );
+      const schemaNames = schemaResult.rows.map((r: any) => r.schema_name);
+
+      scaffoldModule(PART_EXTENSION_NAME, 'Exported pets database schema (partman)');
+      scaffoldModule(PART_META_EXTENSION_NAME, 'Exported pets service metadata (partman)');
+
+      const project = new PgpmPackage(exportWorkspaceDir);
+
+      await exportMigrations({
+        project,
+        options: {
+          pg: dbConfig
+        },
+        dbInfo: {
+          dbname: dbConfig.database,
+          databaseName: 'pets',
+          database_ids: [DATABASE_ID]
+        },
+        author: 'test <test@test.local>',
+        outdir: join(exportWorkspaceDir, 'packages'),
+        schema_names: schemaNames,
+        extensionName: PART_EXTENSION_NAME,
+        extensionDesc: 'Exported pets database schema (partman)',
+        metaExtensionName: PART_META_EXTENSION_NAME,
+        metaExtensionDesc: 'Exported pets service metadata (partman)'
+      });
+
+      // The app package must NOT carry the registry fixture — it FK-references
+      // metaschema identity rows that only exist in the service package.
+      const appPlan = readFileSync(
+        join(exportWorkspaceDir, 'packages', PART_EXTENSION_NAME, 'pgpm.plan'),
+        'utf-8'
+      );
+      expect(appPlan).not.toContain('/table/partman');
+
+      // The service package carries it, ordered after the metaschema fixtures,
+      // with its DDL prerequisite expressed as a cross-package require.
+      const svcPlan = readFileSync(
+        join(exportWorkspaceDir, 'packages', PART_META_EXTENSION_NAME, 'pgpm.plan'),
+        'utf-8'
+      );
+      expect(svcPlan).toContain('tables/pets/table/partman');
+      expect(svcPlan).toContain(`${PART_EXTENSION_NAME}:schemas/pets_part_public/tables/pets/table`);
+
+      const svcDeploy = readFileSync(
+        join(exportWorkspaceDir, 'packages', PART_META_EXTENSION_NAME, 'deploy',
+          'schemas/pets_part_public/tables/pets/table/partman.sql'),
+        'utf-8'
+      );
+      expect(svcDeploy).toContain('INSERT INTO metaschema_public.partition');
+
+      // The service control declares the app package as a required extension.
+      const svcControl = readFileSync(
+        join(exportWorkspaceDir, 'packages', PART_META_EXTENSION_NAME, `${PART_META_EXTENSION_NAME}.control`),
+        'utf-8'
+      );
+      expect(svcControl).toContain(PART_EXTENSION_NAME);
+    }, 180000);
   });
 });
