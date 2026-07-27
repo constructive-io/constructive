@@ -272,6 +272,29 @@ describe('exportTableData', () => {
     expect(none.insert).toBeNull();
   });
 
+  it('reads from the physical schema but emits statements targeting targetSchema', async () => {
+    const result = await exportTableData(
+      pg,
+      {
+        schema: 'app_routing_public',
+        table: 'apis',
+        targetSchema: 'routing_public'
+      },
+      { excludeColumns: ['dbname'] }
+    );
+
+    expect(result.rowCount).toBe(2);
+    expect(result.schema).toBe('routing_public');
+    const insert = result.insert as string;
+    expect(insert).toContain('INSERT INTO routing_public.apis');
+    expect(insert).not.toContain('app_routing_public');
+
+    const revert = buildDataRevertScript([result]);
+    expect(revert).toContain('FROM routing_public.apis');
+    const verify = buildDataVerifyScript([result]);
+    expect(verify).toContain('FROM routing_public.apis');
+  });
+
   it('exports tables without an id column (no ids, ordered by all columns)', async () => {
     const result = await exportTableData(pg, {
       schema: 'app_routing_public',

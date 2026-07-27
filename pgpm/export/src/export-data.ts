@@ -186,10 +186,18 @@ export const getMetadataExportColumns = async (
 };
 
 export interface DataExportTableSpec {
+  /** Physical schema the rows are read from. */
   schema: string;
   table: string;
   /** Optional equality filter, e.g. { column: 'database_id', value: id }. */
   filter?: { column: string; value: string };
+  /**
+   * Schema the emitted INSERT/DELETE/verify statements target when it
+   * differs from the physical source schema (e.g. rows read from a
+   * prefixed staging schema but replayed into its published logical name).
+   * Defaults to `schema`.
+   */
+  targetSchema?: string;
 }
 
 export interface ExportTableDataOptions {
@@ -204,6 +212,7 @@ export interface ExportTableDataOptions {
 }
 
 export interface TableDataExport {
+  /** Schema the emitted statements target (targetSchema when supplied). */
   schema: string;
   table: string;
   /** Columns included in the INSERT, in table order. */
@@ -234,8 +243,9 @@ export const exportTableData = async (
     c => !excluded.has(c.name) && !isVolatileTimestampColumn(c)
   );
 
+  const targetSchema = spec.targetSchema ?? spec.schema;
   const base: TableDataExport = {
-    schema: spec.schema,
+    schema: targetSchema,
     table: spec.table,
     columns,
     rowCount: 0,
@@ -270,7 +280,7 @@ export const exportTableData = async (
   if (rowsRes.rows.length === 0) return base;
 
   const insertQb = new QueryBuilder()
-    .schema(spec.schema)
+    .schema(targetSchema)
     .table(spec.table)
     .insert(
       rowsRes.rows.map((row: Record<string, string | null>) =>
