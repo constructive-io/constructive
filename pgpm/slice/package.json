@@ -1,0 +1,50 @@
+{
+  "name": "@pgpmjs/slice",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PGPM plan slicing — split a monolithic pgpm plan into packages with pattern strategies and opt-in AST-based dependency closure",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "sql",
+    "postgres",
+    "postgresql",
+    "pgpm",
+    "pgpmjs",
+    "slice",
+    "migration",
+    "plan"
+  ],
+  "devDependencies": {
+    "makage": "^0.3.0"
+  },
+  "dependencies": {
+    "@pgpmjs/ast": "workspace:^",
+    "@pgpmjs/transform": "workspace:^",
+    "minimatch": "^10.2.5",
+    "plpgsql-parser": "^18.2.1"
+  }
+}

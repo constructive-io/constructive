@@ -1,5 +1,5 @@
 import { Change } from '@pgpmjs/ast/files/types';
-import { SliceWarning } from '../slice/types';
+import { SliceWarning } from '@pgpmjs/slice';
 
 /**
  * Strategy for rebundling a module's changes into fewer, larger chunks.

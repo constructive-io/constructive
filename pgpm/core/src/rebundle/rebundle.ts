@@ -3,15 +3,16 @@ import { join } from 'path';
 
 import { getChanges } from '@pgpmjs/ast/files/plan/parser';
 import { resolveWithPlan } from '../resolution/resolve';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import {
   buildDependencyGraph,
   buildPackageDependencies,
   computeDeployOrder,
+  DependencyGraph,
   detectPackageCycle,
   extractPackageFromPath,
-} from '../slice/slice';
-import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
-import { DependencyGraph, SliceWarning } from '../slice/types';
+  SliceWarning,
+} from '@pgpmjs/slice';
 import { Chunk, RebundleResult, RebundleStrategy } from './types';
 
 /**

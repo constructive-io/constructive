@@ -1,7 +1,9 @@
 import { Change, Tag, ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { generateChangeLineContent, generateTagLineContent } from '@pgpmjs/ast/files/plan/writer';
+import { buildAstEdges, expandClosures } from './closure';
 import {
+  ClosureReport,
   SliceConfig,
   SliceResult,
   DependencyGraph,
@@ -221,7 +223,8 @@ export function mergeSmallPackages(
  */
 export function buildPackageDependencies(
   graph: DependencyGraph,
-  assignments: Map<string, Set<string>>
+  assignments: Map<string, Set<string>>,
+  extraEdges?: Map<string, Map<string, string>>
 ): Map<string, Set<string>> {
   const packageDeps = new Map<string, Set<string>>();
 
@@ -239,7 +242,12 @@ export function buildPackageDependencies(
     const myPackage = changeToPackage.get(changeName);
     if (!myPackage) continue;
 
-    for (const dep of deps) {
+    const allDeps = new Set(deps);
+    for (const dep of extraEdges?.get(changeName)?.keys() ?? []) {
+      allDeps.add(dep);
+    }
+
+    for (const dep of allDeps) {
       const depPackage = changeToPackage.get(dep);
 
       if (depPackage && depPackage !== myPackage) {
@@ -528,6 +536,22 @@ export function slicePlan(config: SliceConfig): SliceResult {
     config.defaultPackage || 'core'
   );
 
+  // Expand closure-enabled pattern slices to cover their dependency closure
+  let closureReport: ClosureReport | undefined;
+  let astDepEdges: Map<string, Map<string, string>> | undefined;
+  if (config.closure && config.strategy.type === 'pattern' &&
+      config.strategy.slices.some(s => s.closure)) {
+    const astEdges = buildAstEdges(graph, config.closure.moduleDir);
+    closureReport = expandClosures(
+      assignments,
+      graph,
+      astEdges,
+      config.strategy,
+      config.defaultPackage || 'core'
+    );
+    astDepEdges = astEdges.edges;
+  }
+
   // Merge small packages if configured
   if (config.minChangesPerPackage && config.minChangesPerPackage > 1) {
     assignments = mergeSmallPackages(
@@ -537,8 +561,10 @@ export function slicePlan(config: SliceConfig): SliceResult {
     );
   }
 
-  // Build package dependencies
-  const packageDeps = buildPackageDependencies(graph, assignments);
+  // Build package dependencies (AST-discovered edges only affect package-level
+  // requires/deploy order, never plan lines — PL/pgSQL body references are
+  // late-binding and may legitimately form cycles between functions)
+  const packageDeps = buildPackageDependencies(graph, assignments, astDepEdges);
 
   // Check for package cycles
   const cycle = detectPackageCycle(packageDeps);
@@ -639,6 +665,7 @@ export function slicePlan(config: SliceConfig): SliceResult {
       internalEdges,
       crossPackageEdges,
       crossPackageRatio: totalEdges > 0 ? crossPackageEdges / totalEdges : 0
-    }
+    },
+    ...(closureReport ? { closureReport } : {})
   };
 }

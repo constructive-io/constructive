@@ -47,6 +47,7 @@
   "dependencies": {
     "@inquirerer/utils": "^3.3.9",
     "@pgpmjs/core": "workspace:^",
+    "@pgpmjs/slice": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/export": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
