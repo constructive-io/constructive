@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "7.4.2",
+  "version": "7.5.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",
@@ -53,8 +53,8 @@
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
-    "@pgpmjs/types": "workspace:^",
     "@pgpmjs/slice": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
     "genomic": "^5.6.2",
     "glob": "^13.0.6",

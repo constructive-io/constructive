@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/constructive-io/constructive/compare/pgpm@5.3.0...pgpm@5.4.0) (2026-07-27)
+
+### Features
+
+- add @pgpmjs/slice — plan slicing moved out of core, with opt-in AST dependency closure ([b58b745](https://github.com/constructive-io/constructive/commit/b58b745b2fdc265de674a96f902f467d73a9987d))
+
 # [5.3.0](https://github.com/constructive-io/constructive/compare/pgpm@5.2.3...pgpm@5.3.0) (2026-07-27)
 
 ### Features

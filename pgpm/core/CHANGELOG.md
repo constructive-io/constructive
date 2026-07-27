@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.4.2...@pgpmjs/core@7.5.0) (2026-07-27)
+
+### Features
+
+- add @pgpmjs/slice — plan slicing moved out of core, with opt-in AST dependency closure ([b58b745](https://github.com/constructive-io/constructive/commit/b58b745b2fdc265de674a96f902f467d73a9987d))
+- **slice:** opt-in AST-based dependency closure for pattern slices ([c295e48](https://github.com/constructive-io/constructive/commit/c295e48647937e74fd8269f6ae0cb7def89bffac))
+
 ## [7.4.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.4.1...@pgpmjs/core@7.4.2) (2026-07-26)
 
 **Note:** Version bump only for package @pgpmjs/core
