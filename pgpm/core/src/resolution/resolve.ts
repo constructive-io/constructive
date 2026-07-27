@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
-import { getChanges, getExtensionName } from '../files';
-import { parsePlanFile } from '../files/plan/parser';
+import { getChanges, getExtensionName } from '@pgpmjs/ast/files';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { resolveDependencies } from './deps';
 import { errors } from '@pgpmjs/types';
 

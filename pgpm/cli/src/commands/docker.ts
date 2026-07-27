@@ -1,5 +1,7 @@
 import { spawn } from 'child_process';
-import { CLIOptions, Inquirerer, cliExitWithError, extractFirst } from 'inquirerer';
+import { cliExitWithError, CLIOptions, extractFirst,Inquirerer } from 'inquirerer';
+
+import { detectPlatform, dockerDaemonGuidance, dockerInstallGuidance, getDockerStatus } from '../utils/doctor';
 
 const dockerUsageText = `
 Docker Command:
@@ -82,25 +84,25 @@ const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
     image: 'minio/minio',
     ports: [
       { host: 9000, container: 9000 },
-      { host: 9001, container: 9001 },
+      { host: 9001, container: 9001 }
     ],
     env: {
       MINIO_ROOT_USER: 'minioadmin',
-      MINIO_ROOT_PASSWORD: 'minioadmin',
+      MINIO_ROOT_PASSWORD: 'minioadmin'
     },
     command: ['server', '/data', '--console-address', ':9001'],
-    volumes: [{ name: 'minio-data', containerPath: '/data' }],
+    volumes: [{ name: 'minio-data', containerPath: '/data' }]
   },
   ollama: {
     name: 'ollama',
     image: 'ollama/ollama',
     ports: [
-      { host: 11434, container: 11434 },
+      { host: 11434, container: 11434 }
     ],
     env: {},
     volumes: [{ name: 'ollama-data', containerPath: '/root/.ollama' }],
-    gpuCapable: true,
-  },
+    gpuCapable: true
+  }
 };
 
 interface SpawnResult {
@@ -141,13 +143,18 @@ function run(command: string, args: string[], options: { stdio?: 'inherit' | 'pi
   });
 }
 
-async function checkDockerAvailable(): Promise<boolean> {
-  try {
-    const result = await run('docker', ['--version']);
-    return result.code === 0;
-  } catch (error) {
-    return false;
+async function ensureDockerReady(): Promise<boolean> {
+  const status = await getDockerStatus();
+  if (status.binary && status.daemon) {
+    return true;
   }
+  const platformInfo = detectPlatform();
+  if (!status.binary) {
+    await cliExitWithError(`Docker is not installed or not available in PATH.\n${dockerInstallGuidance(platformInfo)}`);
+  } else {
+    await cliExitWithError(dockerDaemonGuidance(platformInfo));
+  }
+  return false;
 }
 
 async function isContainerRunning(name: string): Promise<boolean | null> {
@@ -174,9 +181,7 @@ async function containerExists(name: string): Promise<boolean> {
 async function startContainer(options: DockerRunOptions): Promise<void> {
   const { name, image, port, user, password, shmSize, recreate } = options;
 
-  const dockerAvailable = await checkDockerAvailable();
-  if (!dockerAvailable) {
-    await cliExitWithError('Docker is not installed or not available in PATH. Please install Docker first.');
+  if (!(await ensureDockerReady())) {
     return;
   }
 
@@ -232,9 +237,7 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
 }
 
 async function stopContainer(name: string): Promise<void> {
-  const dockerAvailable = await checkDockerAvailable();
-  if (!dockerAvailable) {
-    await cliExitWithError('Docker is not installed or not available in PATH. Please install Docker first.');
+  if (!(await ensureDockerReady())) {
     return;
   }
 
@@ -294,7 +297,7 @@ async function startService(service: ServiceDefinition, recreate: boolean, gpu: 
   const runArgs = [
     'run',
     '-d',
-    '--name', name,
+    '--name', name
   ];
 
   for (const [key, value] of Object.entries(serviceEnv)) {
@@ -347,7 +350,8 @@ function resolveServiceFlags(args: Partial<Record<string, any>>): ServiceDefinit
 }
 
 async function listServices(): Promise<void> {
-  const dockerAvailable = await checkDockerAvailable();
+  const dockerStatus = await getDockerStatus();
+  const dockerAvailable = dockerStatus.binary && dockerStatus.daemon;
 
   console.log('\nAvailable services:\n');
   console.log('  Primary:');

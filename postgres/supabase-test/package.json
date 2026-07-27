@@ -1,6 +1,6 @@
 {
   "name": "supabase-test",
-  "version": "3.0.0",
+  "version": "3.1.2",
   "author": "Interweb <developers@interweb.io>",
   "description": "supabase-test offers isolated, role-aware, and rollback-friendly PostgreSQL environments for integration tests with Supabase defaults baked in",
   "main": "index.js",
@@ -45,8 +45,8 @@
     "clean": "makage clean",
     "copy": "makage assets",
     "prepack": "npm run build",
-    "build": "npm run clean; tsc; tsc -p tsconfig.esm.json; npm run copy",
-    "build:dev": "npm run clean; tsc --declarationMap; tsc -p tsconfig.esm.json; npm run copy",
+    "build": "npm run clean && tsc && tsc -p tsconfig.esm.json && npm run copy",
+    "build:dev": "npm run clean && tsc --declarationMap && tsc -p tsconfig.esm.json && npm run copy",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"

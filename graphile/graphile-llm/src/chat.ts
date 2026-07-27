@@ -7,7 +7,7 @@
  * Used by the RAG plugin to generate answers from retrieved context.
  *
  * Resolution order mirrors the embedder:
- *   1. The `llm_module` api_modules configuration (per-database)
+ *   1. The `llm_module` configuration (per-database)
  *   2. The preset's `defaultChatCompleter` option (fallback for dev/testing)
  *   3. Environment variables (CHAT_PROVIDER, CHAT_MODEL, CHAT_BASE_URL)
  */
@@ -94,9 +94,9 @@ export function buildChatCompleter(config: ChatConfig): ChatFunction | null {
 // ─── Resolution from LLM Module ─────────────────────────────────────────────
 
 /**
- * Build a chat completer from an `llm_module` api_modules row.
+ * Build a chat completer from an `llm_module` row.
  *
- * @param data - The llm_module data from services_public.api_modules
+ * @param data - The llm_module data from metaschema_modules_public.llm_module
  * @returns A ChatFunction, or null if the chat provider is not configured
  */
 export function buildChatCompleterFromModule(data: LlmModuleData): ChatFunction | null {

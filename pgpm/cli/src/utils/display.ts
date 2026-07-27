@@ -41,6 +41,7 @@ export const usageText = `
   
   Development Tools:
     docker             Manage Docker containers (start/stop/ls, --minio)
+    doctor             Check local dependencies (node, docker, psql) with install guidance
     env                Manage environment variables (--supabase, --minio)
     test-packages      Run integration tests on workspace packages
   

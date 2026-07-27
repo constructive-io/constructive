@@ -5,14 +5,10 @@ import type { ApiOptions as ApiConfig } from '@constructive-io/graphql-types';
 export type {
   ApiConfigResult,
   ApiError,
-  ApiModule,
   ApiStructure,
   AuthSettings,
-  CorsModuleData,
   DatabaseSettings,
-  GenericModuleData,
   PubkeyChallengeSettings,
-  PublicKeyChallengeData,
   RlsModule,
   WebauthnSettings,
 } from '@constructive-io/express-context';

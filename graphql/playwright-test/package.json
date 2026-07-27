@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/playwright-test",
-  "version": "3.0.0",
+  "version": "3.3.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive Playwright Testing with HTTP server support",
   "main": "index.js",
@@ -35,6 +35,7 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "@constructive-io/graphql-dev-server": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-test": "workspace:^",

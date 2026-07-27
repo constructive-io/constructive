@@ -139,6 +139,82 @@ jobs:
           done
 
   # =========================================================================
+  # TIER 1b – Windows compatibility (native runner, no Linux containers)
+  #
+  # Windows runners cannot use service containers, so this job uses the
+  # PostgreSQL install that ships with the runner image. It covers the
+  # platform-specific failure modes: path separators in glob patterns,
+  # spaces in paths, and the PG client binaries on PATH.
+  # =========================================================================
+  windows-tests:
+    if: github.event.pull_request.draft != true
+    runs-on: windows-latest
+    timeout-minutes: 25
+
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: root
+      NODE_OPTIONS: '--max-old-space-size=4096'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Configure Git (for tests)
+        run: |
+          git config --global user.name "CI Test User"
+          git config --global user.email "ci@example.com"
+
+      - name: Start PostgreSQL
+        shell: pwsh
+        run: |
+          $service = Get-Service -Name 'postgresql*' | Select-Object -First 1
+          if (-not $service) { throw 'No PostgreSQL service found on the runner image' }
+          Set-Service -Name $service.Name -StartupType Manual
+          Start-Service -Name $service.Name
+          $bin = (Get-ChildItem 'C:\Program Files\PostgreSQL\*\bin' | Select-Object -First 1).FullName
+          if (-not $bin) { throw 'No PostgreSQL bin directory found on the runner image' }
+          Add-Content -Path $env:GITHUB_PATH -Value $bin
+
+      - name: Wait for PostgreSQL
+        shell: pwsh
+        run: |
+          for ($i = 0; $i -lt 30; $i++) {
+            pg_isready -h localhost -p 5432
+            if ($LASTEXITCODE -eq 0) { exit 0 }
+            Start-Sleep -Seconds 2
+          }
+          throw 'PostgreSQL did not become ready'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build pgpm
+        run: pnpm --filter pgpm... build
+
+      # Database-free suites: workspace/module discovery, dependency
+      # resolution, plan parsing. These are the codepaths that regress when
+      # native path separators leak into glob patterns.
+      - name: Test @pgpmjs/core (no database)
+        run: pnpm --filter @pgpmjs/core exec jest __tests__/workspace __tests__/resolution __tests__/core __tests__/files __tests__/roles __tests__/modules
+
+      - name: pgpm end-to-end smoke (deploy → verify → revert)
+        run: node scripts/pgpm-smoke.mjs
+
+  # =========================================================================
   # TIER 2 – PostgreSQL-only tests
   # =========================================================================
   pg-tests:
@@ -154,7 +230,7 @@ jobs:
       matrix:
         include:
           - batch: pg-core
-            packages: 'pgpm/core pgpm/cli jobs/knative-job-service packages/client packages/safegres postgres/pg-codegen'
+            packages: 'pgpm/ast pgpm/traverse pgpm/bundle pgpm/core pgpm/cli packages/client packages/safegres postgres/pg-codegen'
           - batch: pg-postgres
             packages: 'postgres/pgsql-test postgres/drizzle-orm-test postgres/introspectron graphile/graphile-test graphile/graphile-connection-filter graphile/graphile-postgis'
           - batch: pg-graphql

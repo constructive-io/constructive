@@ -22,7 +22,7 @@ export const resolveHttpRouteQueryKey = customQueryKeys.resolveHttpRoute;
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useResolveHttpRouteQuery({ variables: { pHost, pMethod, pPath }, selection: { fields: { id: true } } });
+ * const { data, isLoading } = useResolveHttpRouteQuery({ variables: { requestHost, requestMethod, requestPath }, selection: { fields: { id: true } } });
  *
  * if (data?.resolveHttpRoute) {
  *   console.log(data.resolveHttpRoute);
@@ -78,7 +78,7 @@ export function useResolveHttpRouteQuery(
  *
  * @example
  * ```ts
- * const data = await fetchResolveHttpRouteQuery({ variables: { pHost, pMethod, pPath }, selection: { fields: { id: true } } });
+ * const data = await fetchResolveHttpRouteQuery({ variables: { requestHost, requestMethod, requestPath }, selection: { fields: { id: true } } });
  * ```
  */
 export async function fetchResolveHttpRouteQuery<S extends ResolveHttpRouteRecordSelect>(params: {
@@ -106,7 +106,7 @@ export async function fetchResolveHttpRouteQuery(params: {
  *
  * @example
  * ```ts
- * await prefetchResolveHttpRouteQuery(queryClient, { variables: { pHost, pMethod, pPath }, selection: { fields: { id: true } } });
+ * await prefetchResolveHttpRouteQuery(queryClient, { variables: { requestHost, requestMethod, requestPath }, selection: { fields: { id: true } } });
  * ```
  */
 export async function prefetchResolveHttpRouteQuery<S extends ResolveHttpRouteRecordSelect>(

@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Top-level site configuration: branding assets, title, and description for a deployed application
+Site surfaces exposed by this scope; publication makes a surface bindable from other scopes
 
 ## Usage
 
 ```typescript
-useSitesQuery({ selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } } })
-useSiteQuery({ id: '<UUID>', selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } } })
+useSitesQuery({ selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } } })
+useSiteQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } } })
 useCreateSiteMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMutation({})
 
 ```typescript
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, title: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSitesQuery({
 const { mutate } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', appleTouchIcon: '<Image>', databaseId: '<UUID>', dbname: '<String>', description: '<String>', favicon: '<Attachment>', labels: '<JSON>', logo: '<Image>', ogImage: '<Image>', title: '<String>' });
+mutate({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', title: '<String>' });
 ```

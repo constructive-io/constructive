@@ -21,12 +21,15 @@ const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
   fieldIds: 'uuid',
   id: 'uuid',
+  initiallyDeferred: 'boolean',
+  isDeferrable: 'boolean',
   name: 'string',
   smartTags: 'json',
   tableId: 'uuid',
   tags: 'string',
   type: 'string',
   updatedAt: 'string',
+  withoutOverlaps: 'boolean',
 };
 const usage =
   '\nprimary-key-constraint <command>\n\nCommands:\n  list                  List primaryKeyConstraint records\n  find-first            Find first matching primaryKeyConstraint record\n  get                   Get a primaryKeyConstraint by ID\n  create                Create a new primaryKeyConstraint\n  update                Update an existing primaryKeyConstraint\n  delete                Delete a primaryKeyConstraint\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -84,12 +87,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       databaseId: true,
       fieldIds: true,
       id: true,
+      initiallyDeferred: true,
+      isDeferrable: true,
       name: true,
       smartTags: true,
       tableId: true,
       tags: true,
       type: true,
       updatedAt: true,
+      withoutOverlaps: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -119,12 +125,15 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       databaseId: true,
       fieldIds: true,
       id: true,
+      initiallyDeferred: true,
+      isDeferrable: true,
       name: true,
       smartTags: true,
       tableId: true,
       tags: true,
       type: true,
       updatedAt: true,
+      withoutOverlaps: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -166,12 +175,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           databaseId: true,
           fieldIds: true,
           id: true,
+          initiallyDeferred: true,
+          isDeferrable: true,
           name: true,
           smartTags: true,
           tableId: true,
           tags: true,
           type: true,
           updatedAt: true,
+          withoutOverlaps: true,
         },
       })
       .execute();
@@ -208,6 +220,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'boolean',
+        name: 'initiallyDeferred',
+        message: 'initiallyDeferred',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isDeferrable',
+        message: 'isDeferrable',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'name',
         message: 'name',
@@ -241,6 +267,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'withoutOverlaps',
+        message: 'withoutOverlaps',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -254,11 +287,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           category: cleanedData.category,
           databaseId: cleanedData.databaseId,
           fieldIds: cleanedData.fieldIds,
+          initiallyDeferred: cleanedData.initiallyDeferred,
+          isDeferrable: cleanedData.isDeferrable,
           name: cleanedData.name,
           smartTags: cleanedData.smartTags,
           tableId: cleanedData.tableId,
           tags: cleanedData.tags,
           type: cleanedData.type,
+          withoutOverlaps: cleanedData.withoutOverlaps,
         },
         select: {
           category: true,
@@ -266,12 +302,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: true,
           fieldIds: true,
           id: true,
+          initiallyDeferred: true,
+          isDeferrable: true,
           name: true,
           smartTags: true,
           tableId: true,
           tags: true,
           type: true,
           updatedAt: true,
+          withoutOverlaps: true,
         },
       })
       .execute();
@@ -314,6 +353,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
+        type: 'boolean',
+        name: 'initiallyDeferred',
+        message: 'initiallyDeferred',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isDeferrable',
+        message: 'isDeferrable',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'name',
         message: 'name',
@@ -347,6 +400,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'withoutOverlaps',
+        message: 'withoutOverlaps',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PrimaryKeyConstraintPatch;
@@ -360,11 +420,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           category: cleanedData.category,
           databaseId: cleanedData.databaseId,
           fieldIds: cleanedData.fieldIds,
+          initiallyDeferred: cleanedData.initiallyDeferred,
+          isDeferrable: cleanedData.isDeferrable,
           name: cleanedData.name,
           smartTags: cleanedData.smartTags,
           tableId: cleanedData.tableId,
           tags: cleanedData.tags,
           type: cleanedData.type,
+          withoutOverlaps: cleanedData.withoutOverlaps,
         },
         select: {
           category: true,
@@ -372,12 +435,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: true,
           fieldIds: true,
           id: true,
+          initiallyDeferred: true,
+          isDeferrable: true,
           name: true,
           smartTags: true,
           tableId: true,
           tags: true,
           type: true,
           updatedAt: true,
+          withoutOverlaps: true,
         },
       })
       .execute();

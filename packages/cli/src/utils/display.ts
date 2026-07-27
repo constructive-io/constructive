@@ -11,9 +11,6 @@ export const usageText = `
   Code Generation:
     codegen            Generate TypeScript types and SDK from GraphQL schema
 
-  Jobs:
-    jobs up            Start combined server (jobs runtime)
-
   Execution Engine:
     context            Manage contexts (create, list, use, current, delete)
     auth               Manage authentication (set-token, status, logout)
@@ -34,7 +31,6 @@ export const usageText = `
     cnc explorer                      Launch GraphiQL explorer
     cnc codegen --schema schema.graphql  Generate types from schema
     cnc codegen --schema-enabled --output ./schemas  Export schema SDL
-    cnc jobs up                       Start combined server (jobs runtime)
 
     # Execution Engine
     cnc context create my-api --endpoint https://api.example.com/graphql

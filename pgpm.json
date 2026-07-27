@@ -3,12 +3,15 @@
     "testing/*"
   ],
   "dependencies": {
-    "@pgpm/database-jobs": "0.33.0",
-    "@pgpm/function-resolution": "0.33.0",
+    "@constructive-db/apps": "1.0.1",
+    "@constructive-db/catalog": "1.0.1",
+    "@constructive-db/routing": "1.0.1",
+    "@constructive-db/routing-functions": "1.1.0",
+    "@pgpm/database-jobs": "0.33.1",
+    "@pgpm/function-resolution": "0.33.1",
     "@pgpm/jwt-claims": "0.33.0",
-    "@pgpm/metaschema-modules": "0.33.0",
-    "@pgpm/metaschema-schema": "0.33.0",
-    "@pgpm/services": "0.33.0",
+    "@pgpm/metaschema-modules": "0.33.1",
+    "@pgpm/metaschema-schema": "0.33.1",
     "@pgpm/stamps": "0.33.0",
     "@pgpm/uuid": "0.33.0"
   }

@@ -19,6 +19,7 @@ const fieldSchema: FieldSchema = {
   authenticateFunctionId: 'uuid',
   authenticateSchemaId: 'uuid',
   authenticateStrictFunctionId: 'uuid',
+  createdAt: 'string',
   currentIpAddressFunctionId: 'uuid',
   currentRoleFunctionId: 'uuid',
   currentRoleIdFunctionId: 'uuid',
@@ -26,6 +27,7 @@ const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
   id: 'uuid',
   roleSchemaId: 'uuid',
+  updatedAt: 'string',
 };
 const usage =
   '\nrls-setting <command>\n\nCommands:\n  list                  List rlsSetting records\n  find-first            Find first matching rlsSetting record\n  get                   Get a rlsSetting by ID\n  create                Create a new rlsSetting\n  update                Update an existing rlsSetting\n  delete                Delete a rlsSetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -81,6 +83,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       authenticateFunctionId: true,
       authenticateSchemaId: true,
       authenticateStrictFunctionId: true,
+      createdAt: true,
       currentIpAddressFunctionId: true,
       currentRoleFunctionId: true,
       currentRoleIdFunctionId: true,
@@ -88,6 +91,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       databaseId: true,
       id: true,
       roleSchemaId: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy> & {
@@ -111,6 +115,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       authenticateFunctionId: true,
       authenticateSchemaId: true,
       authenticateStrictFunctionId: true,
+      createdAt: true,
       currentIpAddressFunctionId: true,
       currentRoleFunctionId: true,
       currentRoleIdFunctionId: true,
@@ -118,6 +123,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       databaseId: true,
       id: true,
       roleSchemaId: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<RlsSettingSelect, RlsSettingFilter, RlsSettingOrderBy> & {
@@ -153,6 +159,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           authenticateFunctionId: true,
           authenticateSchemaId: true,
           authenticateStrictFunctionId: true,
+          createdAt: true,
           currentIpAddressFunctionId: true,
           currentRoleFunctionId: true,
           currentRoleIdFunctionId: true,
@@ -160,6 +167,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           databaseId: true,
           id: true,
           roleSchemaId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -258,6 +266,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           authenticateFunctionId: true,
           authenticateSchemaId: true,
           authenticateStrictFunctionId: true,
+          createdAt: true,
           currentIpAddressFunctionId: true,
           currentRoleFunctionId: true,
           currentRoleIdFunctionId: true,
@@ -265,6 +274,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: true,
           id: true,
           roleSchemaId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -372,6 +382,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           authenticateFunctionId: true,
           authenticateSchemaId: true,
           authenticateStrictFunctionId: true,
+          createdAt: true,
           currentIpAddressFunctionId: true,
           currentRoleFunctionId: true,
           currentRoleIdFunctionId: true,
@@ -379,6 +390,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: true,
           id: true,
           roleSchemaId: true,
+          updatedAt: true,
         },
       })
       .execute();

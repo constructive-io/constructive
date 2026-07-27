@@ -1,6 +1,7 @@
 export {
   add,
   and,
+  cast,
   col,
   div,
   eq,

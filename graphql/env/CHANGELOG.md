@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.19.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.19.1...@constructive-io/graphql-env@3.19.2) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [3.19.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.19.0...@constructive-io/graphql-env@3.19.1) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+# [3.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.18.0...@constructive-io/graphql-env@3.19.0) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+# [3.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.17.1...@constructive-io/graphql-env@3.18.0) (2026-07-26)
+
+### Features
+
+- remove default database; require an explicit database id ([31390df](https://github.com/constructive-io/constructive/commit/31390df350a6e5b816f402d19b29e9420bf2def9))
+- split single-tenant dev server out of production graphql-server ([0709556](https://github.com/constructive-io/constructive/commit/070955672decec77d8de1919b9b0adb4ec615e5d))
+
+## [3.17.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.17.0...@constructive-io/graphql-env@3.17.1) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+# [3.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.16.3...@constructive-io/graphql-env@3.17.0) (2026-07-25)
+
+### Features
+
+- add typed SMS configuration flow ([da90111](https://github.com/constructive-io/constructive/commit/da9011125cac9df348db4990518d66efad8684c1))
+- **server:** hard-break GraphQL runtime off services_public onto scoped routing plane ([d3059ef](https://github.com/constructive-io/constructive/commit/d3059efecb32fc128da04059688bd48ad24b74a5))
+
 ## [3.16.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.16.2...@constructive-io/graphql-env@3.16.3) (2026-07-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-env

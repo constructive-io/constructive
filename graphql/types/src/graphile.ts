@@ -28,27 +28,21 @@ export interface GraphileFeatureOptions {
  * Configuration options for the Constructive API
  */
 export interface ApiOptions {
-  /** Whether to enable the services API (domain/subdomain routing via services_public) */
-  enableServicesApi?: boolean;
   /** Database schemas to expose through the API */
   exposedSchemas?: string[];
   /** Anonymous role name for unauthenticated requests */
   anonRole?: string;
   /** Default role name for authenticated requests */
   roleName?: string;
-  /** Default database identifier to use */
-  defaultDatabaseId?: string;
   /** Whether the API is publicly accessible */
   isPublic?: boolean;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
   /**
-   * Enable scoped-routing resolution via <schema>.resolve_route() before the
-   * legacy services_public domain lookup. Additive: when the resolver returns
-   * no match (or is not installed), resolution falls back to the legacy path.
+   * Schema containing the compiled resolve_route() resolver. Requests are
+   * always resolved through the scoped-routing plane via
+   * <schema>.resolve_route() (host → tenant/api/db/role).
    */
-  enableScopedRouting?: boolean;
-  /** Schema containing the compiled resolve_route() resolver */
   scopedRoutingSchema?: string;
 }
 
@@ -58,7 +52,7 @@ export interface ApiOptions {
 export const graphileDefaults: GraphileOptions = {
   schema: [],
   extends: [],
-  preset: {},
+  preset: {}
 };
 
 /**
@@ -67,24 +61,21 @@ export const graphileDefaults: GraphileOptions = {
 export const graphileFeatureDefaults: GraphileFeatureOptions = {
   simpleInflection: true,
   oppositeBaseNames: true,
-  postgis: true,
+  postgis: true
 };
 
 /**
  * Default API configuration values
  */
 export const apiDefaults: ApiOptions = {
-  enableServicesApi: true,
   exposedSchemas: [],
   anonRole: 'administrator',
   roleName: 'administrator',
-  defaultDatabaseId: 'hard-coded',
   isPublic: true,
   metaSchemas: [
-    'services_public',
+    'constructive_routing_public',
     'metaschema_public',
-    'metaschema_modules_public',
+    'metaschema_modules_public'
   ],
-  enableScopedRouting: false,
-  scopedRoutingSchema: 'constructive_routing_public',
+  scopedRoutingSchema: 'constructive_routing_public'
 };

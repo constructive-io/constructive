@@ -40,7 +40,7 @@ interface ExportMigrationsToDiskOptions {
   serviceOutdir?: string;
   /**
    * Skip schema name replacement for infrastructure schemas.
-   * When true, schema names like metaschema_public, services_public will not be renamed.
+   * When true, schema names like metaschema_public, constructive_routing_public will not be renamed.
    * Useful for self-referential introspection where you want to apply policies to real schemas.
    */
   skipSchemaRenaming?: boolean;
@@ -77,7 +77,7 @@ interface ExportOptions {
   serviceOutdir?: string;
   /**
    * Skip schema name replacement for infrastructure schemas.
-   * When true, schema names like metaschema_public, services_public will not be renamed.
+   * When true, schema names like metaschema_public, constructive_routing_public will not be renamed.
    * Useful for self-referential introspection where you want to apply policies to real schemas.
    */
   skipSchemaRenaming?: boolean;
@@ -143,7 +143,7 @@ const exportMigrationsToDisk = async ({
 
   // When skipSchemaRenaming is true, pass empty schemas array to avoid renaming
   // This is useful for self-referential introspection where you want to apply
-  // policies to real infrastructure schemas (metaschema_public, services_public, etc.)
+  // policies to real infrastructure schemas (metaschema_public, constructive_routing_public, etc.)
   const schemasForReplacement = skipSchemaRenaming
     ? []
     : schemas.rows.filter((schema: any) => schema_names.includes(schema.schema_name));

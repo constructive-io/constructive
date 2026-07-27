@@ -12,8 +12,8 @@ csdk view list --where.<field>.<op> <value> --orderBy <values>
 csdk view list --limit 10 --after <cursor>
 csdk view find-first --where.<field>.<op> <value>
 csdk view get --id <UUID>
-csdk view create --name <String> --schemaId <UUID> --viewType <String> [--category <ObjectCategory>] [--data <JSON>] [--databaseId <UUID>] [--filterData <JSON>] [--filterType <String>] [--isReadOnly <Boolean>] [--securityInvoker <Boolean>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>]
-csdk view update --id <UUID> [--category <ObjectCategory>] [--data <JSON>] [--databaseId <UUID>] [--filterData <JSON>] [--filterType <String>] [--isReadOnly <Boolean>] [--name <String>] [--schemaId <UUID>] [--securityInvoker <Boolean>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--viewType <String>]
+csdk view create --name <String> --schemaId <UUID> --viewType <String> [--category <ObjectCategory>] [--checkOption <String>] [--data <JSON>] [--databaseId <UUID>] [--filterData <JSON>] [--filterType <String>] [--isReadOnly <Boolean>] [--securityBarrier <Boolean>] [--securityInvoker <Boolean>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>]
+csdk view update --id <UUID> [--category <ObjectCategory>] [--checkOption <String>] [--data <JSON>] [--databaseId <UUID>] [--filterData <JSON>] [--filterType <String>] [--isReadOnly <Boolean>] [--name <String>] [--schemaId <UUID>] [--securityBarrier <Boolean>] [--securityInvoker <Boolean>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>] [--viewType <String>]
 csdk view delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk view list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a view
 
 ```bash
-csdk view create --name <String> --schemaId <UUID> --viewType <String> [--category <ObjectCategory>] [--data <JSON>] [--databaseId <UUID>] [--filterData <JSON>] [--filterType <String>] [--isReadOnly <Boolean>] [--securityInvoker <Boolean>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>]
+csdk view create --name <String> --schemaId <UUID> --viewType <String> [--category <ObjectCategory>] [--checkOption <String>] [--data <JSON>] [--databaseId <UUID>] [--filterData <JSON>] [--filterType <String>] [--isReadOnly <Boolean>] [--securityBarrier <Boolean>] [--securityInvoker <Boolean>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>]
 ```
 
 ### Get a view by id

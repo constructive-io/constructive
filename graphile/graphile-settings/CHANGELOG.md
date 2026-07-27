@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.1.2...graphile-settings@6.1.3) (2026-07-26)
+
+### Bug Fixes
+
+- fail fast on Node < 22 (grafast requires Promise.withResolvers) ([172683e](https://github.com/constructive-io/constructive/commit/172683e95c5ab987458abbf8615182203d488c42))
+
+## [6.1.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.1.1...graphile-settings@6.1.2) (2026-07-26)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.1.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.1.0...graphile-settings@6.1.1) (2026-07-26)
+
+**Note:** Version bump only for package graphile-settings
+
+# [6.1.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.7...graphile-settings@6.1.0) (2026-07-26)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.7](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.6...graphile-settings@6.0.7) (2026-07-26)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.6](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.5...graphile-settings@6.0.6) (2026-07-26)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.5](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.4...graphile-settings@6.0.5) (2026-07-25)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.3...graphile-settings@6.0.4) (2026-07-23)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.2...graphile-settings@6.0.3) (2026-07-23)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.1...graphile-settings@6.0.2) (2026-07-23)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.0.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.0.0...graphile-settings@6.0.1) (2026-07-22)
+
+**Note:** Version bump only for package graphile-settings
+
 # [6.0.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.17.3...graphile-settings@6.0.0) (2026-07-21)
 
 ### Features

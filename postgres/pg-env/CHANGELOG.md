@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.2](https://github.com/constructive-io/constructive/compare/pg-env@1.19.1...pg-env@1.19.2) (2026-07-26)
+
+**Note:** Version bump only for package pg-env
+
+## [1.19.1](https://github.com/constructive-io/constructive/compare/pg-env@1.19.0...pg-env@1.19.1) (2026-07-26)
+
+**Note:** Version bump only for package pg-env
+
+# [1.19.0](https://github.com/constructive-io/constructive/compare/pg-env@1.18.1...pg-env@1.19.0) (2026-07-26)
+
+**Note:** Version bump only for package pg-env
+
 ## [1.18.1](https://github.com/constructive-io/constructive/compare/pg-env@1.18.0...pg-env@1.18.1) (2026-07-18)
 
 **Note:** Version bump only for package pg-env

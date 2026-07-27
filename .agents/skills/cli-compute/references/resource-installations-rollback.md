@@ -7,7 +7,7 @@ Execute the resourceInstallationsRollback mutation
 ## Usage
 
 ```bash
-csdk resource-installations-rollback --input.clientMutationId <String> --input.pCommitId <UUID> --input.pInstallationId <UUID>
+csdk resource-installations-rollback --input.clientMutationId <String> --input.commitId <UUID> --input.targetInstallationId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resource-installations-rollback --input.clientMutationId <String> --input.p
 ### Run resourceInstallationsRollback
 
 ```bash
-csdk resource-installations-rollback --input.clientMutationId <String> --input.pCommitId <UUID> --input.pInstallationId <UUID>
+csdk resource-installations-rollback --input.clientMutationId <String> --input.commitId <UUID> --input.targetInstallationId <UUID>
 ```

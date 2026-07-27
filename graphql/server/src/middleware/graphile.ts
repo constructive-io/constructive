@@ -1,23 +1,25 @@
+import './types'; // for Request type
+
 import crypto from 'node:crypto';
 import { classify, type ErrorContext, parse } from '@constructive-io/errors';
-import { getNodeEnv } from '@pgpmjs/env';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
+import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
-import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
+import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
-import './types'; // for Request type
+
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
-import { observeGraphileBuild } from './observability/graphile-build-stats';
-import type { DatabaseSettings } from '../types';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import type { DatabaseSettings } from '../types';
+import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -132,7 +134,7 @@ const SAFE_ERROR_CODES = new Set([
   '23503', // foreign_key_violation
   '23502', // not_null_violation
   '23514', // check_violation
-  '23P01', // exclusion_violation
+  '23P01' // exclusion_violation
 ]);
 
 /** A code is safe to surface when the registry classifies it public, or it is
@@ -203,8 +205,8 @@ const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError =>
     message: `An unexpected error occurred. Reference: ${errorId}`,
     extensions: {
       code: 'INTERNAL_SERVER_ERROR',
-      errorId,
-    },
+      errorId
+    }
   } as GraphQLFormattedError;
 };
 
@@ -260,126 +262,127 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
-  compute?: ComputeConfig,
+  compute?: ComputeConfig
 ): GraphileConfig.Preset => {
   return {
-  extends: [createConstructivePreset(databaseSettings)],
-  plugins: [
-    AuthCookiePlugin,
-    // Only registered when the compute module is provisioned for this
-    // database — all schema/table names come from the constructive
-    // metaschema (express-context compute module loader); the plugin has
-    // no fallbacks or discovery of its own.
-    ...(apiId && compute?.modules.length
-      ? [
-        createFunctionBindingsPlugin({
-          apiId,
-          modules: compute.modules.map((m) => ({
-            computeSchema: m.schemaName,
-            bindingsTable: m.bindingsTableName,
-            definitionsTable: m.definitionsTableName,
-            invocationsSchema: m.invocationsSchemaName,
-            invocationsTable: m.invocationsTableName,
-            invocationsEntityField: m.invocationsEntityField,
-          })),
-        }),
-      ]
-      : []),
-  ],
-  pgServices: [
-    makePgService({
-      pool,
-      schemas,
-    }),
-  ],
-  grafserv: {
-    graphqlPath: '/graphql',
-    graphiqlPath: '/graphiql',
-    graphiql: true,
-    graphiqlOnGraphQLGET: false,
-    maskError,
-  },
-  grafast: {
-    explain: process.env.NODE_ENV === 'development',
-    context: (requestContext: Partial<Grafast.RequestContext>) => {
-      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-      const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
-      const context: Record<string, string> = {};
-
-      if (req) {
-        if (req.databaseId) {
-          context['jwt.claims.database_id'] = req.databaseId;
-        }
-        // API provenance — which API surface this request arrived through.
-        // Derived server-side from hostname -> services_public.domains -> api_id;
-        // never taken from client-supplied headers, body, or token payload.
-        if (req.api?.apiId) {
-          context['jwt.claims.api_id'] = req.api.apiId;
-        }
-        if (req.clientIp) {
-          context['jwt.claims.ip_address'] = req.clientIp;
-        }
-        if (req.get('origin')) {
-          context['jwt.claims.origin'] = req.get('origin') as string;
-        }
-        if (req.get('User-Agent')) {
-          context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
-        }
-        if (req.deviceToken) {
-          context['jwt.claims.device_token'] = req.deviceToken;
-        }
-
-        if (req.token?.user_id) {
-          const pgSettings: Record<string, string> = {
-            role: roleName,
-            'jwt.claims.token_id': req.token.id,
-            'jwt.claims.user_id': req.token.user_id,
-            ...context,
-          };
-
-          if (req.token.session_id) {
-            pgSettings['jwt.claims.session_id'] = req.token.session_id;
-          }
-
-          // Propagate credential metadata as JWT claims so PG functions
-          // can read them via current_setting('jwt.claims.access_level') etc.
-          if (req.token.access_level) {
-            pgSettings['jwt.claims.access_level'] = req.token.access_level;
-          }
-          if (req.token.kind) {
-            pgSettings['jwt.claims.kind'] = req.token.kind;
-          }
-
-          // Principal identity — always set; equals user_id for human sessions
-          pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
-
-          // Enforce read-only transactions for read_only credentials
-          if (req.token.access_level === 'read_only') {
-            pgSettings['default_transaction_read_only'] = 'on';
-          }
-
-          if (req.requestId) {
-            pgSettings['request.id'] = req.requestId;
-          }
-
-          return { pgSettings };
-        }
-      }
-
-      const anonSettings: Record<string, string> = {
-        role: anonRole,
-        ...context,
-      };
-      if (req?.requestId) {
-        anonSettings['request.id'] = req.requestId;
-      }
-
-      return {
-        pgSettings: anonSettings,
-      };
+    extends: [createConstructivePreset(databaseSettings)],
+    plugins: [
+      AuthCookiePlugin,
+      // Only registered when the compute module is provisioned for this
+      // database — all schema/table names come from the constructive
+      // metaschema (express-context compute module loader); the plugin has
+      // no fallbacks or discovery of its own.
+      ...(apiId && compute?.modules.length
+        ? [
+          createFunctionBindingsPlugin({
+            apiId,
+            modules: compute.modules.map((m) => ({
+              computeSchema: m.schemaName,
+              bindingsTable: m.bindingsTableName,
+              definitionsTable: m.definitionsTableName,
+              invocationsSchema: m.invocationsSchemaName,
+              invocationsTable: m.invocationsTableName,
+              invocationsEntityField: m.invocationsEntityField
+            }))
+          })
+        ]
+        : [])
+    ],
+    pgServices: [
+      makePgService({
+        pool,
+        schemas
+      })
+    ],
+    grafserv: {
+      graphqlPath: '/graphql',
+      graphiqlPath: '/graphiql',
+      graphiql: true,
+      graphiqlOnGraphQLGET: false,
+      maskError
     },
-  },
-};
+    grafast: {
+      explain: process.env.NODE_ENV === 'development',
+      context: (requestContext: Partial<Grafast.RequestContext>) => {
+      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        const context: Record<string, string> = {};
+
+        if (req) {
+          if (req.databaseId) {
+            context['jwt.claims.database_id'] = req.databaseId;
+          }
+          // API provenance — which API surface this request arrived through.
+          // Derived server-side by resolving the hostname through the scoped
+          // routing plane (resolve_route -> api_id); never taken from
+          // client-supplied headers, body, or token payload.
+          if (req.api?.apiId) {
+            context['jwt.claims.api_id'] = req.api.apiId;
+          }
+          if (req.clientIp) {
+            context['jwt.claims.ip_address'] = req.clientIp;
+          }
+          if (req.get('origin')) {
+            context['jwt.claims.origin'] = req.get('origin') as string;
+          }
+          if (req.get('User-Agent')) {
+            context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
+          }
+          if (req.deviceToken) {
+            context['jwt.claims.device_token'] = req.deviceToken;
+          }
+
+          if (req.token?.user_id) {
+            const pgSettings: Record<string, string> = {
+              role: roleName,
+              'jwt.claims.token_id': req.token.id,
+              'jwt.claims.user_id': req.token.user_id,
+              ...context
+            };
+
+            if (req.token.session_id) {
+              pgSettings['jwt.claims.session_id'] = req.token.session_id;
+            }
+
+            // Propagate credential metadata as JWT claims so PG functions
+            // can read them via current_setting('jwt.claims.access_level') etc.
+            if (req.token.access_level) {
+              pgSettings['jwt.claims.access_level'] = req.token.access_level;
+            }
+            if (req.token.kind) {
+              pgSettings['jwt.claims.kind'] = req.token.kind;
+            }
+
+            // Principal identity — always set; equals user_id for human sessions
+            pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
+
+            // Enforce read-only transactions for read_only credentials
+            if (req.token.access_level === 'read_only') {
+              pgSettings['default_transaction_read_only'] = 'on';
+            }
+
+            if (req.requestId) {
+              pgSettings['request.id'] = req.requestId;
+            }
+
+            return { pgSettings };
+          }
+        }
+
+        const anonSettings: Record<string, string> = {
+          role: anonRole,
+          ...context
+        };
+        if (req?.requestId) {
+          anonSettings['request.id'] = req.requestId;
+        }
+
+        return {
+          pgSettings: anonSettings
+        };
+      }
+    }
+  };
 };
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
@@ -447,12 +450,12 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       }
 
       log.info(
-        `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`,
+        `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
       const pgConfig = getPgEnvOptions({
         ...opts.pg,
-        database: dbname,
+        database: dbname
       });
 
       // Route through pg-cache so the pool is tracked and can be cleaned up
@@ -466,14 +469,14 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         {
           cacheKey: key,
           serviceKey: key,
-          databaseId: api.databaseId ?? null,
+          databaseId: api.databaseId ?? null
         },
         () => createGraphileInstance({
           preset,
           cacheKey: key,
-          enableRealtime: api.databaseSettings?.enableRealtime,
+          enableRealtime: api.databaseSettings?.enableRealtime
         }),
-        { enabled: observabilityEnabled },
+        { enabled: observabilityEnabled }
       );
       creating.set(key, creationPromise);
 
@@ -488,8 +491,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,
           {
             cacheKey: key,
-            cause: error instanceof Error ? error.message : String(error),
-          },
+            cause: error instanceof Error ? error.message : String(error)
+          }
         );
       } finally {
         // Always clean up in-flight tracker

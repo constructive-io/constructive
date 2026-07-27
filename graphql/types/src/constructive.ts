@@ -7,8 +7,7 @@ import {
   DeploymentOptions,
   ServerOptions,
   CDNOptions,
-  MigrationOptions,
-  JobsConfig
+  MigrationOptions
 } from '@pgpmjs/types';
 import {
   GraphileOptions,
@@ -19,6 +18,7 @@ import {
   apiDefaults
 } from './graphile';
 import { LlmOptions } from './llm';
+import { SmsOptions } from './sms';
 
 /**
  * GraphQL-specific options for Constructive
@@ -55,10 +55,10 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   deployment?: DeploymentOptions;
   /** Migration and code generation options */
   migrations?: MigrationOptions;
-  /** Job system configuration */
-  jobs?: JobsConfig;
   /** LLM provider configuration (embeddings, chat, RAG) */
   llm?: LlmOptions;
+  /** SMS provider configuration */
+  sms?: SmsOptions;
 }
 
 /**

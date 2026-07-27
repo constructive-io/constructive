@@ -16,6 +16,7 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  async: 'boolean',
   bootstrapError: 'string',
   bootstrapStatus: 'string',
   bootstrapUser: 'boolean',
@@ -86,6 +87,7 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      async: true,
       bootstrapError: true,
       bootstrapStatus: true,
       bootstrapUser: true,
@@ -128,6 +130,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      async: true,
       bootstrapError: true,
       bootstrapStatus: true,
       bootstrapUser: true,
@@ -182,6 +185,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          async: true,
           bootstrapError: true,
           bootstrapStatus: true,
           bootstrapUser: true,
@@ -215,6 +219,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'boolean',
+        name: 'async',
+        message: 'async',
+        required: false,
+        skipPrompt: true,
+      },
       {
         type: 'text',
         name: 'bootstrapError',
@@ -327,6 +338,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.databaseProvisionModule
       .create({
         data: {
+          async: cleanedData.async,
           bootstrapError: cleanedData.bootstrapError,
           bootstrapStatus: cleanedData.bootstrapStatus,
           bootstrapUser: cleanedData.bootstrapUser,
@@ -344,6 +356,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           subdomain: cleanedData.subdomain,
         },
         select: {
+          async: true,
           bootstrapError: true,
           bootstrapStatus: true,
           bootstrapUser: true,
@@ -382,6 +395,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'async',
+        message: 'async',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -495,6 +515,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          async: cleanedData.async,
           bootstrapError: cleanedData.bootstrapError,
           bootstrapStatus: cleanedData.bootstrapStatus,
           bootstrapUser: cleanedData.bootstrapUser,
@@ -512,6 +533,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           subdomain: cleanedData.subdomain,
         },
         select: {
+          async: true,
           bootstrapError: true,
           bootstrapStatus: true,
           bootstrapUser: true,

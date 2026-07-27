@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.3.2...graphql-server-test@3.3.3) (2026-07-26)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.3.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.3.1...graphql-server-test@3.3.2) (2026-07-26)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.3.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.3.0...graphql-server-test@3.3.1) (2026-07-26)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.3.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.2.0...graphql-server-test@3.3.0) (2026-07-26)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.2.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.1.1...graphql-server-test@3.2.0) (2026-07-26)
+
+### Features
+
+- install @constructive-db/routing-functions and drop the copied resolver fixture ([5221149](https://github.com/constructive-io/constructive/commit/522114904ad70014bf01b0793003c6d2ce9acb5c))
+- remove default database; require an explicit database id ([31390df](https://github.com/constructive-io/constructive/commit/31390df350a6e5b816f402d19b29e9420bf2def9))
+- split single-tenant dev server out of production graphql-server ([0709556](https://github.com/constructive-io/constructive/commit/070955672decec77d8de1919b9b0adb4ec615e5d))
+
+## [3.1.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.1.0...graphql-server-test@3.1.1) (2026-07-26)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.1.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.0.4...graphql-server-test@3.1.0) (2026-07-25)
+
+### Features
+
+- **server:** hard-break GraphQL runtime off services_public onto scoped routing plane ([d3059ef](https://github.com/constructive-io/constructive/commit/d3059efecb32fc128da04059688bd48ad24b74a5))
+
+## [3.0.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.0.3...graphql-server-test@3.0.4) (2026-07-23)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.0.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.0.2...graphql-server-test@3.0.3) (2026-07-23)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.0.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.0.1...graphql-server-test@3.0.2) (2026-07-23)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.0.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.0.0...graphql-server-test@3.0.1) (2026-07-22)
+
+**Note:** Version bump only for package graphql-server-test
+
 # [3.0.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.36.3...graphql-server-test@3.0.0) (2026-07-21)
 
 **Note:** Version bump only for package graphql-server-test

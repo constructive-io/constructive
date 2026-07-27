@@ -16,17 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  annotations: 'json',
-  appleTouchIcon: 'string',
+  config: 'json',
+  createdAt: 'string',
   databaseId: 'uuid',
-  dbname: 'string',
   description: 'string',
-  favicon: 'string',
   id: 'uuid',
-  labels: 'json',
-  logo: 'string',
-  ogImage: 'string',
+  isPublished: 'boolean',
+  name: 'string',
   title: 'string',
+  updatedAt: 'string',
 };
 const usage =
   '\nsite <command>\n\nCommands:\n  list                  List site records\n  find-first            Find first matching site record\n  get                   Get a site by ID\n  create                Create a new site\n  update                Update an existing site\n  delete                Delete a site\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -79,17 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      annotations: true,
-      appleTouchIcon: true,
+      config: true,
+      createdAt: true,
       databaseId: true,
-      dbname: true,
       description: true,
-      favicon: true,
       id: true,
-      labels: true,
-      logo: true,
-      ogImage: true,
+      isPublished: true,
+      name: true,
       title: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<SiteSelect, SiteFilter, SiteOrderBy> & {
@@ -110,17 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      annotations: true,
-      appleTouchIcon: true,
+      config: true,
+      createdAt: true,
       databaseId: true,
-      dbname: true,
       description: true,
-      favicon: true,
       id: true,
-      labels: true,
-      logo: true,
-      ogImage: true,
+      isPublished: true,
+      name: true,
       title: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<SiteSelect, SiteFilter, SiteOrderBy> & {
@@ -153,17 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          annotations: true,
-          appleTouchIcon: true,
+          config: true,
+          createdAt: true,
           databaseId: true,
-          dbname: true,
           description: true,
-          favicon: true,
           id: true,
-          labels: true,
-          logo: true,
-          ogImage: true,
+          isPublished: true,
+          name: true,
           title: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -181,15 +173,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'json',
-        name: 'annotations',
-        message: 'annotations',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'appleTouchIcon',
-        message: 'appleTouchIcon',
+        name: 'config',
+        message: 'config',
         required: false,
         skipPrompt: true,
       },
@@ -201,45 +186,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'dbname',
-        message: 'dbname',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'description',
         message: 'description',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
-        name: 'favicon',
-        message: 'favicon',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'json',
-        name: 'labels',
-        message: 'labels',
+        type: 'boolean',
+        name: 'isPublished',
+        message: 'isPublished',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'logo',
-        message: 'logo',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'ogImage',
-        message: 'ogImage',
-        required: false,
-        skipPrompt: true,
+        name: 'name',
+        message: 'name',
+        required: true,
       },
       {
         type: 'text',
@@ -255,29 +218,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.site
       .create({
         data: {
-          annotations: cleanedData.annotations,
-          appleTouchIcon: cleanedData.appleTouchIcon,
+          config: cleanedData.config,
           databaseId: cleanedData.databaseId,
-          dbname: cleanedData.dbname,
           description: cleanedData.description,
-          favicon: cleanedData.favicon,
-          labels: cleanedData.labels,
-          logo: cleanedData.logo,
-          ogImage: cleanedData.ogImage,
+          isPublished: cleanedData.isPublished,
+          name: cleanedData.name,
           title: cleanedData.title,
         },
         select: {
-          annotations: true,
-          appleTouchIcon: true,
+          config: true,
+          createdAt: true,
           databaseId: true,
-          dbname: true,
           description: true,
-          favicon: true,
           id: true,
-          labels: true,
-          logo: true,
-          ogImage: true,
+          isPublished: true,
+          name: true,
           title: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -301,15 +258,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'json',
-        name: 'annotations',
-        message: 'annotations',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'appleTouchIcon',
-        message: 'appleTouchIcon',
+        name: 'config',
+        message: 'config',
         required: false,
         skipPrompt: true,
       },
@@ -321,45 +271,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'dbname',
-        message: 'dbname',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'description',
         message: 'description',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
-        name: 'favicon',
-        message: 'favicon',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'json',
-        name: 'labels',
-        message: 'labels',
+        type: 'boolean',
+        name: 'isPublished',
+        message: 'isPublished',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'logo',
-        message: 'logo',
+        name: 'name',
+        message: 'name',
         required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'ogImage',
-        message: 'ogImage',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -378,29 +306,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          annotations: cleanedData.annotations,
-          appleTouchIcon: cleanedData.appleTouchIcon,
+          config: cleanedData.config,
           databaseId: cleanedData.databaseId,
-          dbname: cleanedData.dbname,
           description: cleanedData.description,
-          favicon: cleanedData.favicon,
-          labels: cleanedData.labels,
-          logo: cleanedData.logo,
-          ogImage: cleanedData.ogImage,
+          isPublished: cleanedData.isPublished,
+          name: cleanedData.name,
           title: cleanedData.title,
         },
         select: {
-          annotations: true,
-          appleTouchIcon: true,
+          config: true,
+          createdAt: true,
           databaseId: true,
-          dbname: true,
           description: true,
-          favicon: true,
           id: true,
-          labels: true,
-          logo: true,
-          ogImage: true,
+          isPublished: true,
+          name: true,
           title: true,
+          updatedAt: true,
         },
       })
       .execute();

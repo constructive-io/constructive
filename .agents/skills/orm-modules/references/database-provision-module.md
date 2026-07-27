@@ -9,8 +9,8 @@ Tracks database provisioning requests and their status. The BEFORE INSERT trigge
 ```typescript
 db.databaseProvisionModule.findMany({ select: { id: true } }).execute()
 db.databaseProvisionModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.databaseProvisionModule.create({ data: { bootstrapError: '<String>', bootstrapStatus: '<String>', bootstrapUser: '<Boolean>', completedAt: '<Datetime>', databaseId: '<UUID>', databaseName: '<String>', domain: '<String>', errorMessage: '<String>', fulfilledAt: '<Datetime>', modules: '<JSON>', options: '<JSON>', ownerId: '<UUID>', sourceDatabaseId: '<UUID>', status: '<String>', subdomain: '<String>' }, select: { id: true } }).execute()
-db.databaseProvisionModule.update({ where: { id: '<UUID>' }, data: { bootstrapError: '<String>' }, select: { id: true } }).execute()
+db.databaseProvisionModule.create({ data: { async: '<Boolean>', bootstrapError: '<String>', bootstrapStatus: '<String>', bootstrapUser: '<Boolean>', completedAt: '<Datetime>', databaseId: '<UUID>', databaseName: '<String>', domain: '<String>', errorMessage: '<String>', fulfilledAt: '<Datetime>', modules: '<JSON>', options: '<JSON>', ownerId: '<UUID>', sourceDatabaseId: '<UUID>', status: '<String>', subdomain: '<String>' }, select: { id: true } }).execute()
+db.databaseProvisionModule.update({ where: { id: '<UUID>' }, data: { async: '<Boolean>' }, select: { id: true } }).execute()
 db.databaseProvisionModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.databaseProvisionModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.databaseProvisionModule.findMany({
-  select: { id: true, bootstrapError: true }
+  select: { id: true, async: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.databaseProvisionModule.findMany({
 
 ```typescript
 const item = await db.databaseProvisionModule.create({
-  data: { bootstrapError: '<String>', bootstrapStatus: '<String>', bootstrapUser: '<Boolean>', completedAt: '<Datetime>', databaseId: '<UUID>', databaseName: '<String>', domain: '<String>', errorMessage: '<String>', fulfilledAt: '<Datetime>', modules: '<JSON>', options: '<JSON>', ownerId: '<UUID>', sourceDatabaseId: '<UUID>', status: '<String>', subdomain: '<String>' },
+  data: { async: '<Boolean>', bootstrapError: '<String>', bootstrapStatus: '<String>', bootstrapUser: '<Boolean>', completedAt: '<Datetime>', databaseId: '<UUID>', databaseName: '<String>', domain: '<String>', errorMessage: '<String>', fulfilledAt: '<Datetime>', modules: '<JSON>', options: '<JSON>', ownerId: '<UUID>', sourceDatabaseId: '<UUID>', status: '<String>', subdomain: '<String>' },
   select: { id: true }
 }).execute();
 ```

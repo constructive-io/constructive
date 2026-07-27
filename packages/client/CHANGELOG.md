@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.22.2](https://github.com/constructive-io/constructive/compare/@constructive-io/client@2.22.1...@constructive-io/client@2.22.2) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/client
+
+## [2.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/client@2.22.0...@constructive-io/client@2.22.1) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/client
+
+# [2.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/client@2.21.0...@constructive-io/client@2.22.0) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/client
+
 # [2.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/client@2.20.1...@constructive-io/client@2.21.0) (2026-07-12)
 
 **Note:** Version bump only for package @constructive-io/client

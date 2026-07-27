@@ -2,7 +2,6 @@ import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
 
 import { PgpmDriverConfig } from './driver';
-import { JobsConfig, jobsDefaults } from './jobs';
 
 /**
  * Authentication options for test client sessions
@@ -217,6 +216,12 @@ export interface PgpmWorkspaceConfig {
    */
   dependencies?: Record<string, string>;
   /**
+   * Directory (relative to the workspace root) where pgpm modules are installed.
+   * Defaults to `extensions`. Useful for keeping ephemeral test/fixture installs
+   * out of a committed `extensions/` directory.
+   */
+  extensionsDir?: string;
+  /**
    * Template source recorded at scaffold time when the workspace is created
    * from a non-default boilerplate repo (e.g. via `pgpm init workspace --pglite`
    * or `--repo`). `pgpm init` reads this so modules created inside the workspace
@@ -273,12 +278,15 @@ export interface PgpmOptions {
     deployment?: DeploymentOptions;
     /** Migration and code generation options */
     migrations?: MigrationOptions;
-    /** Job system configuration */
-    jobs?: JobsConfig;
     /** Error output formatting options */
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
+    /**
+     * Directory (relative to the workspace root) where pgpm modules are installed
+     * by `pgpm install`. Defaults to `extensions`.
+     */
+    extensionsDir?: string;
     /**
      * Pluggable migration backend. Undefined = built-in `pg` (server) path.
      * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved
@@ -286,6 +294,11 @@ export interface PgpmOptions {
      */
     driver?: PgpmDriverConfig;
 }
+
+/**
+ * Default directory (relative to the workspace root) where pgpm modules are installed.
+ */
+export const DEFAULT_EXTENSIONS_DIR = 'extensions';
 
 /**
  * Default configuration values for PGPM framework
@@ -349,12 +362,12 @@ export const pgpmDefaults: PgpmOptions = {
       useTx: false
     }
   },
-  jobs: jobsDefaults,
   errorOutput: {
     queryHistoryLimit: 30,
     maxLength: 10000,
     verbose: false
   },
+  extensionsDir: DEFAULT_EXTENSIONS_DIR,
   smtp: {
     port: 587,
     secure: false,

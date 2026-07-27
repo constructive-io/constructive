@@ -14,7 +14,12 @@
 
 Constructive Playwright Testing with HTTP server support for end-to-end testing.
 
-This package extends `@constructive-io/graphql-test` to provide an actual HTTP server for Playwright and other E2E testing frameworks. It creates isolated test databases and starts a GraphQL server that bypasses domain routing, making it perfect for integration testing.
+This package extends `@constructive-io/graphql-test` to provide an actual HTTP server for Playwright and other E2E testing frameworks. It creates isolated test databases and starts a GraphQL server for your suite to hit over HTTP.
+
+It can run either server, selected per-suite with `server.scopedRouting`:
+
+- `server.scopedRouting: false` (default) — the single-tenant `@constructive-io/graphql-dev-server` (pure PostGraphile). No host route resolution and no database id; the configured schemas are exposed directly. Best for UI/local suites.
+- `server.scopedRouting: true` — the production `@constructive-io/graphql-server`. Every request is resolved through the scoped-routing plane (`constructive_routing_public.resolve_route()`), so the suite must seed real routing/database records and reach the api surface via its seeded host (`Host` header).
 
 ## Installation
 
@@ -54,6 +59,43 @@ describe('E2E Tests', () => {
 });
 ```
 
+### Against the real (scoped-routing) server
+
+Set `server.scopedRouting: true` to run the production `@constructive-io/graphql-server`. Seed real routing/database records and address the api surface by its seeded host:
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { getConnectionsWithServer, seed } from '@constructive-io/playwright-test';
+
+test('resolves through the scoped routing plane', async ({ request }) => {
+  const { server, teardown } = await getConnectionsWithServer(
+    {
+      schemas: ['simple-pets-public'],
+      authRole: 'anonymous',
+      server: {
+        scopedRouting: true,
+        api: {
+          scopedRoutingSchema: 'constructive_routing_public',
+          isPublic: true,
+          metaSchemas: ['constructive_routing_public', 'metaschema_public']
+        }
+      }
+    },
+    [seed.pgpm(pgpmWorkspace), seed.sqlfile([/* app schema + routing records */])]
+  );
+
+  try {
+    const res = await request.post(server.graphqlUrl, {
+      headers: { 'Content-Type': 'application/json', Host: 'app.test.constructive.io' },
+      data: { query: '{ animals { nodes { name } } }' }
+    });
+    expect(res.ok()).toBeTruthy();
+  } finally {
+    await teardown();
+  }
+});
+```
+
 ### With Playwright
 
 ```typescript
@@ -64,7 +106,7 @@ let connections: Awaited<ReturnType<typeof getConnectionsWithServer>>;
 
 test.beforeAll(async () => {
   connections = await getConnectionsWithServer({
-    schemas: ['services_public', 'app_public'],
+    schemas: ['app_public'],
     authRole: 'anonymous',
     server: {
       port: 5555,
@@ -124,6 +166,8 @@ Creates database connections and starts an HTTP server for testing.
 - `input.authRole` - Default authentication role (e.g., 'anonymous', 'authenticated')
 - `input.server.port` - Port to run the server on (defaults to random available port)
 - `input.server.host` - Host to bind to (defaults to 'localhost')
+- `input.server.scopedRouting` - `false` (default) runs the dev server; `true` runs the production scoped-routing server
+- `input.server.api` - API options forwarded to the production scoped server (e.g. `metaSchemas`, `isPublic`); only used when `scopedRouting` is `true`
 - `input.graphile` - Optional Graphile configuration overrides
 - `seedAdapters` - Optional array of seed adapters for database setup
 
@@ -144,20 +188,27 @@ Same as `getConnectionsWithServer` but throws on GraphQL errors instead of retur
 
 ### createTestServer(opts, serverOpts?)
 
-Low-level function to create just the HTTP server without database setup.
+Low-level function to create just the single-tenant dev HTTP server without database setup.
+
+### createScopedTestServer(opts, serverOpts?)
+
+Low-level function to create just the production `@constructive-io/graphql-server` (scoped routing) HTTP server without database setup.
 
 ## How It Works
 
 1. Creates an isolated test database using `pgsql-test`
-2. Starts an Express server with Constructive GraphQL middleware
-3. Configures `enableServicesApi: false` to bypass domain/subdomain routing
-4. Exposes the specified schemas directly via the GraphQL endpoint
-5. Returns the server URL for Playwright to connect to
-6. Provides a teardown function that stops the server and cleans up the database
+2. Starts either the dev server or the production scoped-routing server (see `server.scopedRouting`)
+3. Exposes the GraphQL endpoint for your suite to hit over HTTP
+4. Returns the server URL for Playwright to connect to
+5. Provides a teardown function that stops the server and cleans up the database
 
 ## Configuration
 
-The server is configured with `enableServicesApi: false`, which means:
-- No domain/subdomain routing is required
+By default (`scopedRouting: false`) the server runs `@constructive-io/graphql-dev-server`, which means:
+- No host route resolution (`resolve_route()`) is required and no database id is needed
 - Schemas are exposed directly based on the `schemas` parameter
 - Perfect for isolated testing without complex domain setup
+
+With `scopedRouting: true` the server runs the production `@constructive-io/graphql-server`:
+- Every request is resolved through `constructive_routing_public.resolve_route()`
+- The suite must seed real routing/database records and address the api surface by its seeded host

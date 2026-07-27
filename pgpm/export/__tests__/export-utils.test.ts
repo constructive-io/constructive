@@ -11,16 +11,15 @@ import { join } from 'path';
 import path from 'path';
 
 import {
+  DB_REQUIRED_EXTENSIONS,
+  makeReplacer,
+  META_COMMON_FOOTER,
+  META_COMMON_HEADER,
   META_TABLE_CONFIG,
   META_TABLE_ORDER,
   META_TABLE_OVERRIDES,
-  DB_REQUIRED_EXTENSIONS,
-  SERVICE_REQUIRED_EXTENSIONS,
-  META_COMMON_HEADER,
-  META_COMMON_FOOTER,
-  makeReplacer,
-  normalizeOutdir
-} from '../src/export-utils';
+  normalizeOutdir,
+  SERVICE_REQUIRED_EXTENSIONS} from '../src/export-utils';
 
 // =============================================================================
 // Config / Order consistency
@@ -69,7 +68,13 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
   });
 
   it('every config entry should have a valid schema', () => {
-    const validSchemas = ['metaschema_public', 'services_public', 'metaschema_modules_public'];
+    const validSchemas = [
+      'metaschema_public',
+      'metaschema_modules_public',
+      'constructive_catalog_public',
+      'constructive_routing_public',
+      'constructive_apps_public'
+    ];
 
     for (const [key, config] of Object.entries(META_TABLE_CONFIG)) {
       expect(validSchemas).toContain(config.schema);
@@ -141,7 +146,8 @@ describe('Shared constants', () => {
   it('SERVICE_REQUIRED_EXTENSIONS should include metaschema dependencies', () => {
     expect(SERVICE_REQUIRED_EXTENSIONS).toContain('plpgsql');
     expect(SERVICE_REQUIRED_EXTENSIONS).toContain('metaschema-schema');
-    expect(SERVICE_REQUIRED_EXTENSIONS).toContain('services');
+    expect(SERVICE_REQUIRED_EXTENSIONS).toContain('metaschema-modules');
+    expect(SERVICE_REQUIRED_EXTENSIONS).not.toContain('services');
   });
 
   it('META_COMMON_HEADER should set session_replication_role', () => {

@@ -7,7 +7,6 @@ const api: ApiStructure = {
   anonRole: 'anonymous',
   roleName: 'authenticated',
   schema: ['public'],
-  apiModules: [],
   domains: [],
   databaseId: '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
   isPublic: true

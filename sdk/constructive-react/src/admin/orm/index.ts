@@ -18,11 +18,7 @@ import { AppPermissionDefaultGrantModel } from './models/appPermissionDefaultGra
 import { AppPermissionDefaultPermissionModel } from './models/appPermissionDefaultPermission';
 import { MembershipTypeModel } from './models/membershipType';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
-import { OrgChartEdgeModel } from './models/orgChartEdge';
-import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
-import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
-import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgInviteModel } from './models/orgInvite';
 import { OrgMemberModel } from './models/orgMember';
@@ -83,11 +79,7 @@ export function createClient(config: OrmClientConfig) {
     appPermissionDefaultPermission: new AppPermissionDefaultPermissionModel(client),
     membershipType: new MembershipTypeModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
-    orgChartEdge: new OrgChartEdgeModel(client),
-    orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
-    orgGetManagersRecord: new OrgGetManagersRecordModel(client),
-    orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
     orgGrant: new OrgGrantModel(client),
     orgInvite: new OrgInviteModel(client),
     orgMember: new OrgMemberModel(client),

@@ -20,6 +20,13 @@ Export tools for extracting database migrations from existing PostgreSQL databas
 - **GraphQL Export** — Extract migrations via a PostGraphile GraphQL endpoint
 - **Cross-flow parity** — Both flows produce identical output for the same source data
 - **Metadata export** — Export metaschema, services, and module metadata tables
+- **Table-data export** — Generic deterministic row-data dumps (`exportTablesData`,
+  `buildDataDeployScript` / `buildDataRevertScript` / `buildDataVerifyScript`): one
+  INSERT per table in stable order, volatile-default columns excluded via pg_catalog
+  volatility (no regex on default text), replayed under
+  `session_replication_role = replica`, with ID-precise reverts and divide-by-zero
+  verify checks. These scripts are the data/fixtures parts a `@pgpmjs/bundle`
+  envelope ships. All SQL is emitted through `@constructive-io/query-builder`.
 
 ## Usage
 

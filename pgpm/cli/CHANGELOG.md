@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.3](https://github.com/constructive-io/constructive/compare/pgpm@5.2.2...pgpm@5.2.3) (2026-07-26)
+
+**Note:** Version bump only for package pgpm
+
+## [5.2.2](https://github.com/constructive-io/constructive/compare/pgpm@5.2.1...pgpm@5.2.2) (2026-07-26)
+
+**Note:** Version bump only for package pgpm
+
+## [5.2.1](https://github.com/constructive-io/constructive/compare/pgpm@5.2.0...pgpm@5.2.1) (2026-07-26)
+
+**Note:** Version bump only for package pgpm
+
+# [5.2.0](https://github.com/constructive-io/constructive/compare/pgpm@5.1.2...pgpm@5.2.0) (2026-07-26)
+
+**Note:** Version bump only for package pgpm
+
+## [5.1.2](https://github.com/constructive-io/constructive/compare/pgpm@5.1.1...pgpm@5.1.2) (2026-07-26)
+
+**Note:** Version bump only for package pgpm
+
+## [5.1.1](https://github.com/constructive-io/constructive/compare/pgpm@5.1.0...pgpm@5.1.1) (2026-07-26)
+
+**Note:** Version bump only for package pgpm
+
+# [5.1.0](https://github.com/constructive-io/constructive/compare/pgpm@5.0.4...pgpm@5.1.0) (2026-07-25)
+
+### Features
+
+- **pgpm:** configurable extensions install directory ([67bb658](https://github.com/constructive-io/constructive/commit/67bb6584e07afdfe0aeca5f35bf6a7586bae1172))
+
+## [5.0.4](https://github.com/constructive-io/constructive/compare/pgpm@5.0.3...pgpm@5.0.4) (2026-07-23)
+
+**Note:** Version bump only for package pgpm
+
+## [5.0.3](https://github.com/constructive-io/constructive/compare/pgpm@5.0.2...pgpm@5.0.3) (2026-07-23)
+
+**Note:** Version bump only for package pgpm
+
+## [5.0.2](https://github.com/constructive-io/constructive/compare/pgpm@5.0.1...pgpm@5.0.2) (2026-07-23)
+
+**Note:** Version bump only for package pgpm
+
+## [5.0.1](https://github.com/constructive-io/constructive/compare/pgpm@5.0.0...pgpm@5.0.1) (2026-07-22)
+
+**Note:** Version bump only for package pgpm
+
 # [5.0.0](https://github.com/constructive-io/constructive/compare/pgpm@4.41.0...pgpm@5.0.0) (2026-07-21)
 
 ### Features

@@ -32,7 +32,7 @@ export const verifyProject = async (
   }
 
   const modulePath = path.resolve(pkg.workspacePath!, modules[name].path);
-  const moduleProject = new PgpmPackage(modulePath);
+  const moduleProject = new PgpmPackage(modulePath, { extensionsDir: pkg.extensionsDir });
 
   log.info(`📦 Resolving dependencies for ${name}...`);
   const extensions: Extensions = moduleProject.getModuleExtensions();

@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.1.1...graphile-llm@1.1.2) (2026-07-26)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.1.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.1.0...graphile-llm@1.1.1) (2026-07-26)
+
+**Note:** Version bump only for package graphile-llm
+
+# [1.1.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.7...graphile-llm@1.1.0) (2026-07-26)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.6...graphile-llm@1.0.7) (2026-07-26)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.5...graphile-llm@1.0.6) (2026-07-26)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.5](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.4...graphile-llm@1.0.5) (2026-07-25)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.3...graphile-llm@1.0.4) (2026-07-23)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.2...graphile-llm@1.0.3) (2026-07-23)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.1...graphile-llm@1.0.2) (2026-07-23)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.0.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.0.0...graphile-llm@1.0.1) (2026-07-22)
+
+**Note:** Version bump only for package graphile-llm
+
 # [1.0.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.19.6...graphile-llm@1.0.0) (2026-07-21)
 
 **Note:** Version bump only for package graphile-llm

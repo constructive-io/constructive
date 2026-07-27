@@ -20,9 +20,12 @@ const fieldSchema: FieldSchema = {
   createdAt: 'string',
   databaseId: 'uuid',
   deleteAction: 'string',
+  deleteSetFieldIds: 'uuid',
   description: 'string',
   fieldIds: 'uuid',
   id: 'uuid',
+  initiallyDeferred: 'boolean',
+  isDeferrable: 'boolean',
   name: 'string',
   refFieldIds: 'uuid',
   refTableId: 'uuid',
@@ -32,6 +35,7 @@ const fieldSchema: FieldSchema = {
   type: 'string',
   updateAction: 'string',
   updatedAt: 'string',
+  withPeriod: 'boolean',
 };
 const usage =
   '\nforeign-key-constraint <command>\n\nCommands:\n  list                  List foreignKeyConstraint records\n  find-first            Find first matching foreignKeyConstraint record\n  get                   Get a foreignKeyConstraint by ID\n  create                Create a new foreignKeyConstraint\n  update                Update an existing foreignKeyConstraint\n  delete                Delete a foreignKeyConstraint\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -88,9 +92,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       databaseId: true,
       deleteAction: true,
+      deleteSetFieldIds: true,
       description: true,
       fieldIds: true,
       id: true,
+      initiallyDeferred: true,
+      isDeferrable: true,
       name: true,
       refFieldIds: true,
       refTableId: true,
@@ -100,6 +107,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       type: true,
       updateAction: true,
       updatedAt: true,
+      withPeriod: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -128,9 +136,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       databaseId: true,
       deleteAction: true,
+      deleteSetFieldIds: true,
       description: true,
       fieldIds: true,
       id: true,
+      initiallyDeferred: true,
+      isDeferrable: true,
       name: true,
       refFieldIds: true,
       refTableId: true,
@@ -140,6 +151,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       type: true,
       updateAction: true,
       updatedAt: true,
+      withPeriod: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -180,9 +192,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           createdAt: true,
           databaseId: true,
           deleteAction: true,
+          deleteSetFieldIds: true,
           description: true,
           fieldIds: true,
           id: true,
+          initiallyDeferred: true,
+          isDeferrable: true,
           name: true,
           refFieldIds: true,
           refTableId: true,
@@ -192,6 +207,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           type: true,
           updateAction: true,
           updatedAt: true,
+          withPeriod: true,
         },
       })
       .execute();
@@ -230,6 +246,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'deleteSetFieldIds',
+        message: 'deleteSetFieldIds',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'description',
         message: 'description',
         required: false,
@@ -240,6 +263,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'fieldIds',
         message: 'fieldIds',
         required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'initiallyDeferred',
+        message: 'initiallyDeferred',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isDeferrable',
+        message: 'isDeferrable',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -294,6 +331,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'withPeriod',
+        message: 'withPeriod',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -307,8 +351,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           category: cleanedData.category,
           databaseId: cleanedData.databaseId,
           deleteAction: cleanedData.deleteAction,
+          deleteSetFieldIds: cleanedData.deleteSetFieldIds,
           description: cleanedData.description,
           fieldIds: cleanedData.fieldIds,
+          initiallyDeferred: cleanedData.initiallyDeferred,
+          isDeferrable: cleanedData.isDeferrable,
           name: cleanedData.name,
           refFieldIds: cleanedData.refFieldIds,
           refTableId: cleanedData.refTableId,
@@ -317,15 +364,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tags: cleanedData.tags,
           type: cleanedData.type,
           updateAction: cleanedData.updateAction,
+          withPeriod: cleanedData.withPeriod,
         },
         select: {
           category: true,
           createdAt: true,
           databaseId: true,
           deleteAction: true,
+          deleteSetFieldIds: true,
           description: true,
           fieldIds: true,
           id: true,
+          initiallyDeferred: true,
+          isDeferrable: true,
           name: true,
           refFieldIds: true,
           refTableId: true,
@@ -335,6 +386,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           type: true,
           updateAction: true,
           updatedAt: true,
+          withPeriod: true,
         },
       })
       .execute();
@@ -379,6 +431,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'deleteSetFieldIds',
+        message: 'deleteSetFieldIds',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'description',
         message: 'description',
         required: false,
@@ -389,6 +448,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'fieldIds',
         message: 'fieldIds',
         required: false,
+      },
+      {
+        type: 'boolean',
+        name: 'initiallyDeferred',
+        message: 'initiallyDeferred',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isDeferrable',
+        message: 'isDeferrable',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -443,6 +516,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'withPeriod',
+        message: 'withPeriod',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ForeignKeyConstraintPatch;
@@ -456,8 +536,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           category: cleanedData.category,
           databaseId: cleanedData.databaseId,
           deleteAction: cleanedData.deleteAction,
+          deleteSetFieldIds: cleanedData.deleteSetFieldIds,
           description: cleanedData.description,
           fieldIds: cleanedData.fieldIds,
+          initiallyDeferred: cleanedData.initiallyDeferred,
+          isDeferrable: cleanedData.isDeferrable,
           name: cleanedData.name,
           refFieldIds: cleanedData.refFieldIds,
           refTableId: cleanedData.refTableId,
@@ -466,15 +549,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tags: cleanedData.tags,
           type: cleanedData.type,
           updateAction: cleanedData.updateAction,
+          withPeriod: cleanedData.withPeriod,
         },
         select: {
           category: true,
           createdAt: true,
           databaseId: true,
           deleteAction: true,
+          deleteSetFieldIds: true,
           description: true,
           fieldIds: true,
           id: true,
+          initiallyDeferred: true,
+          isDeferrable: true,
           name: true,
           refFieldIds: true,
           refTableId: true,
@@ -484,6 +571,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           type: true,
           updateAction: true,
           updatedAt: true,
+          withPeriod: true,
         },
       })
       .execute();

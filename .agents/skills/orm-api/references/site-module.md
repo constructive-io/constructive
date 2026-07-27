@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site
+Frontend module configuration for a site surface; stores module name and JSON settings
 
 ## Usage
 

@@ -3,7 +3,8 @@
  * 
  * These tests validate that META_TABLE_CONFIG uses correct table names,
  * schema groupings, and field definitions for exporting metaschema_public,
- * services_public, and metaschema_modules_public data.
+ * constructive_routing_public, constructive_apps_public, and
+ * metaschema_modules_public data.
  * 
  * Uses actual imports instead of string-matching source files.
  */
@@ -28,18 +29,25 @@ describe('Export Meta Config Validation', () => {
     });
   });
 
-  describe('services_public tables', () => {
+  describe('constructive_routing_public tables', () => {
     const required = [
-      'domains', 'sites', 'apis', 'apps',
+      'domains', 'sites', 'apis',
       'site_modules', 'site_themes', 'site_metadata',
       'api_modules', 'api_schemas'
     ];
 
-    it('should include all required services_public tables in config', () => {
+    it('should include all required constructive_routing_public tables in config', () => {
       for (const table of required) {
         expect(META_TABLE_CONFIG).toHaveProperty(table);
-        expect(META_TABLE_CONFIG[table].schema).toBe('services_public');
+        expect(META_TABLE_CONFIG[table].schema).toBe('constructive_routing_public');
       }
+    });
+  });
+
+  describe('constructive_apps_public tables', () => {
+    it('should include apps in config', () => {
+      expect(META_TABLE_CONFIG).toHaveProperty('apps');
+      expect(META_TABLE_CONFIG.apps.schema).toBe('constructive_apps_public');
     });
   });
 
@@ -70,7 +78,10 @@ describe('Export Meta Config Validation', () => {
       'compute_log_module', 'db_usage_module',
       'storage_log_module', 'transfer_log_module',
       'webauthn_auth_module', 'webauthn_credentials_module',
-      'inference_log_module', 'rate_limit_meters_module'
+      'inference_log_module', 'rate_limit_meters_module',
+      'catalog_module', 'domain_module', 'api_surface_module',
+      'site_surface_module', 'route_module', 'app_module',
+      'database_settings_module'
     ];
 
     it('should include all required metaschema_modules_public tables in config', () => {
@@ -78,6 +89,24 @@ describe('Export Meta Config Validation', () => {
         expect(META_TABLE_CONFIG).toHaveProperty(table);
         expect(META_TABLE_CONFIG[table].schema).toBe('metaschema_modules_public');
       }
+    });
+  });
+
+  describe('surface module dependency order', () => {
+    it('catalog_module should come before the modules that reference it', () => {
+      const order = META_TABLE_ORDER as unknown as string[];
+      const catalogIdx = order.indexOf('catalog_module');
+
+      expect(catalogIdx).toBeGreaterThanOrEqual(0);
+      for (const table of ['domain_module', 'api_surface_module', 'site_surface_module', 'app_module', 'route_module']) {
+        expect(catalogIdx).toBeLessThan(order.indexOf(table));
+      }
+    });
+
+    it('domain_module should come before route_module', () => {
+      const order = META_TABLE_ORDER as unknown as string[];
+
+      expect(order.indexOf('domain_module')).toBeLessThan(order.indexOf('route_module'));
     });
   });
 
@@ -95,7 +124,7 @@ describe('Export Meta Config Validation', () => {
       expect(tableIdx).toBeLessThan(fieldIdx);
     });
 
-    it('metaschema_public tables should come before services_public tables', () => {
+    it('metaschema_public tables should come before scoped plane tables', () => {
       const order = META_TABLE_ORDER as unknown as string[];
       const lastMetaschema = order.indexOf('default_privilege');
       const firstService = order.indexOf('domains');
@@ -103,12 +132,12 @@ describe('Export Meta Config Validation', () => {
       expect(lastMetaschema).toBeLessThan(firstService);
     });
 
-    it('services_public tables should come before metaschema_modules_public tables', () => {
+    it('metaschema_modules_public tables should come before scoped plane tables', () => {
       const order = META_TABLE_ORDER as unknown as string[];
-      const lastService = order.indexOf('api_schemas');
-      const firstModule = order.indexOf('rls_module');
+      const lastModule = order.indexOf('rls_module');
+      const firstScoped = order.indexOf('apis');
 
-      expect(lastService).toBeLessThan(firstModule);
+      expect(lastModule).toBeLessThan(firstScoped);
     });
   });
 });

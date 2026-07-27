@@ -3,6 +3,71 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.4.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.4.1...@pgpmjs/core@7.4.2) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.4.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.4.0...@pgpmjs/core@7.4.1) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [7.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.3.1...@pgpmjs/core@7.4.0) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.3.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.3.0...@pgpmjs/core@7.3.1) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [7.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.2.2...@pgpmjs/core@7.3.0) (2026-07-25)
+
+### Bug Fixes
+
+- **pgpm/core:** build glob patterns with posix separators ([658b763](https://github.com/constructive-io/constructive/commit/658b763c9e4e03f18b33a30ba693a2f2eaa19836))
+- **pgpm:** windows-safe module install, posix module paths, LF checkout ([81f3a7c](https://github.com/constructive-io/constructive/commit/81f3a7c59da6364a31d046d53d4e706616ef2ead))
+
+### Features
+
+- **pgpm-core:** applyEnvelope — apply a bundle envelope (schema + data/fixtures replay) into a target DB ([4d05f93](https://github.com/constructive-io/constructive/commit/4d05f9340770836611f5e04886734af2dde1a505))
+- **pgpm:** configurable extensions install directory ([67bb658](https://github.com/constructive-io/constructive/commit/67bb6584e07afdfe0aeca5f35bf6a7586bae1172))
+
+## [7.2.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.2.1...@pgpmjs/core@7.2.2) (2026-07-23)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.2.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.2.0...@pgpmjs/core@7.2.1) (2026-07-23)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [7.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.1.0...@pgpmjs/core@7.2.0) (2026-07-23)
+
+### Features
+
+- **pgpm-ast:** extract @pgpmjs/ast leaf package (files/\* + module AST) from core ([f324d40](https://github.com/constructive-io/constructive/commit/f324d401c88ddef800f41a76a44ac3e5d0cb107e))
+- **pgpm-bundle:** extract @pgpmjs/bundle package; applyBundle stays in core ([c05f62f](https://github.com/constructive-io/constructive/commit/c05f62f81cf4e28bc824e49e165a18e9f994d1c2))
+- **pgpm-core:** applyBundle — safety wrapper (dry-run, integrity/namespace gate, atomic, timeout) over PgpmMigrate ([1a3747e](https://github.com/constructive-io/constructive/commit/1a3747ebb64406139ed5b0d7e85920ef0c4e1523))
+- **pgpm-core:** diffBundles — digest-based structural diff of two migration bundles ([50ad4a4](https://github.com/constructive-io/constructive/commit/50ad4a48c078ee0bc19b2e11d1d939825bac25cb))
+- **pgpm-core:** migration bundle artifact — content-addressed, verifiable, provenance manifest ([6627bb2](https://github.com/constructive-io/constructive/commit/6627bb27c3a8da55d64570425ff8a790fa9819be))
+- **pgpm-core:** parseModule/deparseModule — parse()/deparse() aliases for the module AST ([b2e4c28](https://github.com/constructive-io/constructive/commit/b2e4c28857d476cd226aed5579bb93da319d3476))
+- **pgpm-core:** pgpm-ast — unified PgpmModule/Change/Script AST with lossless read/write ([bf54445](https://github.com/constructive-io/constructive/commit/bf54445fef2b701e5ad8c3fae8287916efc4fb8e))
+- **pgpm-core:** reconcilePlan — ordered revert/deploy plan between two bundle revisions ([149b596](https://github.com/constructive-io/constructive/commit/149b5964679b89cf1ebe9ddc2ae5b8448ad8e959))
+- **pgpm-core:** transpileBundle — namespace transpiler over the migration bundle ([6a024c9](https://github.com/constructive-io/constructive/commit/6a024c9da626665324ad60204db1c385d6b5a38d))
+
+# [7.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.0.0...@pgpmjs/core@7.1.0) (2026-07-22)
+
+### Bug Fixes
+
+- **pgpm-core:** default emitted workspace license to CONSTRUCTIVE (not MIT), add license opt ([0889444](https://github.com/constructive-io/constructive/commit/0889444d682c7995138b256ce028d3e476d0be0e))
+
+### Features
+
+- **pgpm-core:** emit real deployable workspace via writeMinimalWorkspace/writeMinimalModule ([7d758a4](https://github.com/constructive-io/constructive/commit/7d758a459672fbc800b56b4a522c25b9d20770ef))
+- **pgpm-core:** rebundle category boundary — classifier-driven chunk seams ([af600fa](https://github.com/constructive-io/constructive/commit/af600fae84a6d946e34cdf6e30ec6e853e5d5b45))
+- **pgpm-core:** rebundleModule — per-chunk packageModule merge with byte-identical gate ([a1e18b5](https://github.com/constructive-io/constructive/commit/a1e18b50f00fce946c7b0f67fe47e66d8caaf374))
+- **pgpm-core:** rebundlePlan — dependency-aware chunk/merge primitive with byte-identical gate ([f747dea](https://github.com/constructive-io/constructive/commit/f747dea9f05f9acb41c6e650a1c12848b55303c8))
+- **pgpm-core:** rebundleWorkspace — emit chunks as separate modules with control-only cross-chunk deps ([30ffa94](https://github.com/constructive-io/constructive/commit/30ffa94191caa495e4049fd46c5b433ec46dd5c5))
+- **pgpm-core:** rebundleWorkspace initScaffold option (pgpm init boilerplate) ([d439121](https://github.com/constructive-io/constructive/commit/d4391215b22b4b025d94dff24099e55129920f22))
+
 # [7.0.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.34.0...@pgpmjs/core@7.0.0) (2026-07-21)
 
 ### Features

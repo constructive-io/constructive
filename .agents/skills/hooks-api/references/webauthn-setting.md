@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries
+WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage
 
 ## Usage
 
 ```typescript
-useWebauthnSettingsQuery({ selection: { fields: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } } })
-useWebauthnSettingQuery({ id: '<UUID>', selection: { fields: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } } })
+useWebauthnSettingsQuery({ selection: { fields: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } } })
+useWebauthnSettingQuery({ id: '<UUID>', selection: { fields: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } } })
 useCreateWebauthnSettingMutation({ selection: { fields: { id: true } } })
 useUpdateWebauthnSettingMutation({ selection: { fields: { id: true } } })
 useDeleteWebauthnSettingMutation({})
@@ -20,7 +20,7 @@ useDeleteWebauthnSettingMutation({})
 
 ```typescript
 const { data, isLoading } = useWebauthnSettingsQuery({
-  selection: { fields: { attestationType: true, challengeExpirySeconds: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, userFieldId: true } },
+  selection: { fields: { attestationType: true, challengeExpirySeconds: true, createdAt: true, credentialsSchemaId: true, credentialsTableId: true, databaseId: true, id: true, originAllowlist: true, requireUserVerification: true, residentKey: true, rpId: true, rpName: true, schemaId: true, sessionCredentialsTableId: true, sessionSecretsSchemaId: true, sessionSecretsTableId: true, sessionsSchemaId: true, sessionsTableId: true, updatedAt: true, userFieldId: true } },
 });
 ```
 

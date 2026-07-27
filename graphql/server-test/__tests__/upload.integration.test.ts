@@ -30,8 +30,9 @@
 
 import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
-import { getConnections, seed } from '../src';
 import type supertest from 'supertest';
+
+import { getConnections, seed } from '../src';
 
 jest.setTimeout(120000);
 
@@ -39,8 +40,6 @@ const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
 const sql = (seedDir: string, file: string) =>
   path.join(localSeedRoot, seedDir, file);
-const shared = (...segments: string[]) =>
-  path.join(sharedSeedRoot, ...segments);
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 
 // =========================================================================
@@ -65,17 +64,19 @@ const malloryPublicFileId = 'fa99fa99-0000-0000-0000-000000000001';
 const malloryPublicBucketId = 'fa77fa77-0000-0000-0000-000000000001';
 
 const metaSchemas = [
-  'services_public',
+  'constructive_catalog_public',
+  'constructive_routing_public',
+  'constructive_apps_public',
   'metaschema_public',
-  'metaschema_modules_public',
+  'metaschema_modules_public'
 ];
 
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
     sql('simple-seed-storage', 'schema.sql'),
-    sql('simple-seed-storage', 'test-data.sql'),
-  ]),
+    sql('simple-seed-storage', 'test-data.sql')
+  ])
 ];
 
 // =========================================================================
@@ -221,7 +222,7 @@ const DELETE_APP_BUCKET = `
  */
 function expectRlsDenied(
   res: supertest.Response,
-  mutationName: string,
+  mutationName: string
 ): void {
   if (res.body.errors?.length) {
     const err = res.body.errors[0];
@@ -234,7 +235,7 @@ function expectRlsDenied(
         msg.includes('new row violates row-level security') ||
         msg.includes('insufficient_privilege') ||
         msg.includes('No values were') ||
-        code === 'INTERNAL_SERVER_ERROR',
+        code === 'INTERNAL_SERVER_ERROR'
     ).toBe(true);
     return;
   }
@@ -243,11 +244,11 @@ function expectRlsDenied(
     if (result === null) return;
     if (typeof result === 'object' && Object.values(result).every((v) => v === null)) return;
     throw new Error(
-      `Expected RLS denial but mutation returned data: ${JSON.stringify(result)}`,
+      `Expected RLS denial but mutation returned data: ${JSON.stringify(result)}`
     );
   }
   throw new Error(
-    `Expected RLS denial but got status=${res.status}, body=${JSON.stringify(res.body)}`,
+    `Expected RLS denial but got status=${res.status}, body=${JSON.stringify(res.body)}`
   );
 }
 
@@ -283,7 +284,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     payload: {
       query: string;
       variables?: Record<string, unknown>;
-    },
+    }
   ) => {
     return request
       .post('/graphql')
@@ -298,7 +299,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     payload: {
       query: string;
       variables?: Record<string, unknown>;
-    },
+    }
   ) => {
     return request
       .post('/graphql')
@@ -314,14 +315,14 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         schemas: [...aliceSchemas, ...bobSchemas, ...mallorySchemas],
         authRole: 'anonymous',
         server: {
+          scopedRouting: true,
           api: {
-            enableServicesApi: true,
             isPublic: false,
-            metaSchemas,
-          },
-        },
+            metaSchemas
+          }
+        }
       },
-      seedAdapters,
+      seedAdapters
     ));
   });
 
@@ -353,9 +354,9 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
               contentHash,
               contentType,
               size: Buffer.byteLength(fileContent),
-              filename: 'hello-public.txt',
-            },
-          },
+              filename: 'hello-public.txt'
+            }
+          }
         });
 
         const data = expectSuccess(res);
@@ -395,9 +396,9 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
               contentHash,
               contentType,
               size: Buffer.byteLength(fileContent),
-              filename: 'hello-private.txt',
-            },
-          },
+              filename: 'hello-private.txt'
+            }
+          }
         });
 
         const data = expectSuccess(res);
@@ -431,9 +432,9 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
               contentHash,
               contentType: 'text/plain',
               size: Buffer.byteLength(fileContent),
-              filename: 'hello-public-copy.txt',
-            },
-          },
+              filename: 'hello-public-copy.txt'
+            }
+          }
         });
 
         const data = expectSuccess(res);
@@ -454,44 +455,44 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   describe('Feature flag gating via database_settings / api_settings', () => {
     it('Alice: uploadAppFile exposed (presigned uploads enabled)', async () => {
       const res = await postGraphQLViaApi(aliceDatabaseId, 'app', {
-        query: INTROSPECT_UPLOAD_MUTATION,
+        query: INTROSPECT_UPLOAD_MUTATION
       });
       const data = expectSuccess(res);
       const names = (data.__type?.fields ?? []).map(
-        (f: { name: string }) => f.name,
+        (f: { name: string }) => f.name
       );
       expect(names).toContain('uploadAppFile');
     });
 
     it('Bob primary API: uploadAppFile exposed (enabled by default)', async () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
-        query: INTROSPECT_UPLOAD_MUTATION,
+        query: INTROSPECT_UPLOAD_MUTATION
       });
       const data = expectSuccess(res);
       const names = (data.__type?.fields ?? []).map(
-        (f: { name: string }) => f.name,
+        (f: { name: string }) => f.name
       );
       expect(names).toContain('uploadAppFile');
     });
 
     it('Bob restricted API: uploadAppFile NOT exposed (api_settings override)', async () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-restricted', {
-        query: INTROSPECT_UPLOAD_MUTATION,
+        query: INTROSPECT_UPLOAD_MUTATION
       });
       const data = expectSuccess(res);
       const names = (data.__type?.fields ?? []).map(
-        (f: { name: string }) => f.name,
+        (f: { name: string }) => f.name
       );
       expect(names).not.toContain('uploadAppFile');
     });
 
     it('Mallory: uploadAppFile exposed (enabled by default)', async () => {
       const res = await postGraphQLViaApi(malloryDatabaseId, 'mallory-app', {
-        query: INTROSPECT_UPLOAD_MUTATION,
+        query: INTROSPECT_UPLOAD_MUTATION
       });
       const data = expectSuccess(res);
       const names = (data.__type?.fields ?? []).map(
-        (f: { name: string }) => f.name,
+        (f: { name: string }) => f.name
       );
       expect(names).toContain('uploadAppFile');
     });
@@ -514,9 +515,9 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
             contentHash,
             contentType: 'text/plain',
             size: Buffer.byteLength(fileContent),
-            filename: 'bob-file.txt',
-          },
-        },
+            filename: 'bob-file.txt'
+          }
+        }
       });
 
       const data = expectSuccess(res);
@@ -613,8 +614,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: UPDATE_APP_FILE,
         variables: {
-          input: { id: bobSeededPublicFileId, appFilePatch: { bucketId: bobPrivateBucketId } },
-        },
+          input: { id: bobSeededPublicFileId, appFilePatch: { bucketId: bobPrivateBucketId } }
+        }
       });
       expectRlsDenied(res, 'updateAppFile');
     });
@@ -623,8 +624,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: UPDATE_APP_FILE,
         variables: {
-          input: { id: bobSeededPublicFileId, appFilePatch: { isPublic: false } },
-        },
+          input: { id: bobSeededPublicFileId, appFilePatch: { isPublic: false } }
+        }
       });
       expectRlsDenied(res, 'updateAppFile');
     });
@@ -632,7 +633,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     it('Bob: anonymous cannot delete a file', async () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: DELETE_APP_FILE,
-        variables: { input: { id: bobSeededPublicFileId } },
+        variables: { input: { id: bobSeededPublicFileId } }
       });
       expectRlsDenied(res, 'deleteAppFile');
     });
@@ -648,10 +649,10 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
               contentHash: 'injected-hash',
               mimeType: 'text/plain',
               size: 100,
-              filename: 'injected-file.txt',
-            },
-          },
-        },
+              filename: 'injected-file.txt'
+            }
+          }
+        }
       });
       expectRlsDenied(res, 'createAppFile');
     });
@@ -660,8 +661,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(malloryDatabaseId, 'mallory-app', {
         query: UPDATE_APP_FILE,
         variables: {
-          input: { id: malloryPublicFileId, appFilePatch: { filename: 'hacked.txt' } },
-        },
+          input: { id: malloryPublicFileId, appFilePatch: { filename: 'hacked.txt' } }
+        }
       });
       expectRlsDenied(res, 'updateAppFile');
     });
@@ -669,7 +670,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     it('Mallory: anonymous cannot delete a file', async () => {
       const res = await postGraphQLViaApi(malloryDatabaseId, 'mallory-app', {
         query: DELETE_APP_FILE,
-        variables: { input: { id: malloryPublicFileId } },
+        variables: { input: { id: malloryPublicFileId } }
       });
       expectRlsDenied(res, 'deleteAppFile');
     });
@@ -691,8 +692,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: CREATE_APP_BUCKET,
         variables: {
-          input: { appBucket: { key: 'evil-bucket', type: 'public', isPublic: true } },
-        },
+          input: { appBucket: { key: 'evil-bucket', type: 'public', isPublic: true } }
+        }
       });
       expectRlsDenied(res, 'createAppBucket');
     });
@@ -701,8 +702,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: UPDATE_APP_BUCKET,
         variables: {
-          input: { id: bobPublicBucketId, appBucketPatch: { isPublic: false } },
-        },
+          input: { id: bobPublicBucketId, appBucketPatch: { isPublic: false } }
+        }
       });
       expectRlsDenied(res, 'updateAppBucket');
     });
@@ -710,7 +711,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     it('Bob: anonymous cannot delete a bucket', async () => {
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: DELETE_APP_BUCKET,
-        variables: { input: { id: bobPublicBucketId } },
+        variables: { input: { id: bobPublicBucketId } }
       });
       expectRlsDenied(res, 'deleteAppBucket');
     });
@@ -719,8 +720,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(malloryDatabaseId, 'mallory-app', {
         query: CREATE_APP_BUCKET,
         variables: {
-          input: { appBucket: { key: 'evil-bucket', type: 'public', isPublic: true } },
-        },
+          input: { appBucket: { key: 'evil-bucket', type: 'public', isPublic: true } }
+        }
       });
       expectRlsDenied(res, 'createAppBucket');
     });
@@ -755,7 +756,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaApi(
         'deadbeef-dead-4ead-beef-deadbeefbeef',
         'app',
-        { query: APP_FILES },
+        { query: APP_FILES }
       );
       expect(res.status).toBe(404);
     });
@@ -764,7 +765,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaSchemata(aliceDatabaseId, bobSchemas, { query: APP_FILES });
       if (res.status === 200 && res.body.data) {
         const names = (res.body.data.appFiles?.nodes ?? []).map(
-          (f: { filename: string }) => f.filename,
+          (f: { filename: string }) => f.filename
         );
         expect(names).not.toContain('hello-public.txt');
         expect(names).not.toContain('hello-private.txt');
@@ -775,7 +776,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const res = await postGraphQLViaSchemata(bobDatabaseId, mallorySchemas, { query: APP_FILES });
       if (res.status === 200 && res.body.data) {
         const names = (res.body.data.appFiles?.nodes ?? []).map(
-          (f: { filename: string }) => f.filename,
+          (f: { filename: string }) => f.filename
         );
         expect(names).not.toContain('bob-file.txt');
         expect(names).not.toContain('bob-seeded-public.txt');

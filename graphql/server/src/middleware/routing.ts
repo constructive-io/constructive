@@ -48,8 +48,8 @@ const isValidSchemaName = (name: string): boolean =>
  * Resolve a hostname through the compiled scoped-routing plane (host-only:
  * path/method routing belongs to Traefik/Ingress, not the server).
  * Returns null when there is no match (route_binding_id IS NULL) or when the
- * resolver is not installed in the target database — callers fall back to the
- * legacy services_public lookup in both cases.
+ * resolver is not installed in the target database — in both cases the caller
+ * treats it as a hard no-match (→ 404); there is no legacy fallback.
  */
 export const resolveRoute = async (
   pool: Pool,
@@ -75,9 +75,9 @@ export const resolveRoute = async (
   } catch (error: unknown) {
     const err = error as { code?: string; message?: string };
     // 42883 undefined_function / 3F000 invalid_schema_name: resolver not
-    // installed in this database — treat as no-match so the caller falls back.
+    // installed in this database — treat as a hard no-match.
     if (err.code === '42883' || err.code === '3F000') {
-      log.debug(`[resolve-route] resolver not installed (${err.code}); falling back`);
+      log.debug(`[resolve-route] resolver not installed (${err.code}); no match`);
       return null;
     }
     throw error;
@@ -99,10 +99,9 @@ interface ApiSurfaceConfig {
 }
 
 /**
- * Map a resolved api-target route onto the legacy ApiStructure shape consumed
- * by the rest of the middleware chain. Returns null when the route target is
- * not an api surface or its resolved_config lacks the api essentials — the
- * caller falls back to the legacy lookup.
+ * Map a resolved api-target route onto the ApiStructure shape consumed by the
+ * rest of the middleware chain. Returns null when the route target is not an
+ * api surface or its resolved_config lacks the api essentials (→ 404).
  */
 export const routeToApiStructure = (
   route: ResolvedRoute,
@@ -114,7 +113,7 @@ export const routeToApiStructure = (
 
   const config = (route.resolved_config ?? {}) as ApiSurfaceConfig;
   if (!config.dbname || !config.schemas?.length) {
-    log.debug('[resolve-route] api target missing dbname/schemas in resolved_config; falling back');
+    log.debug('[resolve-route] api target missing dbname/schemas in resolved_config; no match');
     return null;
   }
 
@@ -124,9 +123,8 @@ export const routeToApiStructure = (
     anonRole: config.anon_role || 'anon',
     roleName: config.role_name || 'authenticated',
     schema: config.schemas,
-    apiModules: [],
     domains: [],
     databaseId: config.database_id,
-    isPublic: config.is_public ?? (opts.api?.isPublic ?? false),
+    isPublic: config.is_public ?? (opts.api?.isPublic ?? false)
   };
 };

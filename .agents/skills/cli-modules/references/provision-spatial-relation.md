@@ -7,7 +7,7 @@ Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row dec
 ## Usage
 
 ```bash
-csdk provision-spatial-relation --input.clientMutationId <String> --input.pDatabaseId <UUID> --input.pName <String> --input.pOperator <String> --input.pParamName <String> --input.pSourceFieldId <UUID> --input.pSourceTableId <UUID> --input.pTargetFieldId <UUID> --input.pTargetTableId <UUID>
+csdk provision-spatial-relation --input.clientMutationId <String> --input.databaseId <UUID> --input.name <String> --input.operator <String> --input.paramName <String> --input.sourceFieldId <UUID> --input.sourceTableId <UUID> --input.targetFieldId <UUID> --input.targetTableId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-spatial-relation --input.clientMutationId <String> --input.pDatab
 ### Run provisionSpatialRelation
 
 ```bash
-csdk provision-spatial-relation --input.clientMutationId <String> --input.pDatabaseId <UUID> --input.pName <String> --input.pOperator <String> --input.pParamName <String> --input.pSourceFieldId <UUID> --input.pSourceTableId <UUID> --input.pTargetFieldId <UUID> --input.pTargetTableId <UUID>
+csdk provision-spatial-relation --input.clientMutationId <String> --input.databaseId <UUID> --input.name <String> --input.operator <String> --input.paramName <String> --input.sourceFieldId <UUID> --input.sourceTableId <UUID> --input.targetFieldId <UUID> --input.targetTableId <UUID>
 ```

@@ -1,8 +1,12 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from 'fs';
 import { dirname, join, relative, sep } from 'path';
 
-import { parsePlanFileSimple } from '../files/plan/parser';
-import { parsePgpmHeader, renameInHeader, writePgpmScript } from '../files/sql/header';
+import { parsePlanFileSimple } from '@pgpmjs/ast/files/plan/parser';
+import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
+import { renameInPlanContent } from '@pgpmjs/ast/plan-rename';
+
+// Re-exported from @pgpmjs/ast so existing `@pgpmjs/core` consumers keep importing it here.
+export { renameInPlanContent };
 
 const SCRIPT_DIRS = ['deploy', 'revert', 'verify'] as const;
 
@@ -84,33 +88,6 @@ export function validateRenames(moduleDir: string, renames: Map<string, string>)
     }
     targets.add(to);
   }
-}
-
-/**
- * Rewrite change names in a pgpm.plan's content according to a rename map.
- * Textual and format-preserving: only the change-name token at the start of a
- * change line, plain (same-package) dependency refs inside `[...]`, and tag
- * lines' change field are rewritten; timestamps, planners, comments,
- * cross-package refs, and tag refs are untouched.
- */
-export function renameInPlanContent(content: string, renames: Map<string, string>): string {
-  const froms = Array.from(renames.keys()).sort((a, b) => b.length - a.length);
-
-  return content
-    .split('\n')
-    .map(line => {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('%')) return line;
-
-      let result = line;
-      for (const from of froms) {
-        const to = renames.get(from)!;
-        const re = new RegExp(`(^|[\\s\\[])${escapeRe(from)}(?=$|[\\s\\]@])`, 'g');
-        result = result.replace(re, `$1${to}`);
-      }
-      return result;
-    })
-    .join('\n');
 }
 
 /**

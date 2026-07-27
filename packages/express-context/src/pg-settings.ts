@@ -57,8 +57,9 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
   }
 
   // API provenance — which API surface this request arrived through.
-  // Derived server-side from hostname -> services_public.domains -> api_id;
-  // never taken from client-supplied headers, body, or token payload.
+  // Derived server-side by resolving the hostname through the scoped routing
+  // plane (resolve_route -> api_id); never taken from client-supplied headers,
+  // body, or token payload.
   if (api.apiId) {
     settings['jwt.claims.api_id'] = api.apiId;
   }

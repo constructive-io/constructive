@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   attestationType: 'string',
   challengeExpirySeconds: 'int',
+  createdAt: 'string',
   credentialsSchemaId: 'uuid',
   credentialsTableId: 'uuid',
   databaseId: 'uuid',
@@ -33,6 +34,7 @@ const fieldSchema: FieldSchema = {
   sessionSecretsTableId: 'uuid',
   sessionsSchemaId: 'uuid',
   sessionsTableId: 'uuid',
+  updatedAt: 'string',
   userFieldId: 'uuid',
 };
 const usage =
@@ -88,6 +90,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       attestationType: true,
       challengeExpirySeconds: true,
+      createdAt: true,
       credentialsSchemaId: true,
       credentialsTableId: true,
       databaseId: true,
@@ -103,6 +106,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       sessionSecretsTableId: true,
       sessionsSchemaId: true,
       sessionsTableId: true,
+      updatedAt: true,
       userFieldId: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -126,6 +130,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       attestationType: true,
       challengeExpirySeconds: true,
+      createdAt: true,
       credentialsSchemaId: true,
       credentialsTableId: true,
       databaseId: true,
@@ -141,6 +146,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       sessionSecretsTableId: true,
       sessionsSchemaId: true,
       sessionsTableId: true,
+      updatedAt: true,
       userFieldId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -176,6 +182,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           attestationType: true,
           challengeExpirySeconds: true,
+          createdAt: true,
           credentialsSchemaId: true,
           credentialsTableId: true,
           databaseId: true,
@@ -191,6 +198,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           sessionSecretsTableId: true,
           sessionsSchemaId: true,
           sessionsTableId: true,
+          updatedAt: true,
           userFieldId: true,
         },
       })
@@ -356,6 +364,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           attestationType: true,
           challengeExpirySeconds: true,
+          createdAt: true,
           credentialsSchemaId: true,
           credentialsTableId: true,
           databaseId: true,
@@ -371,6 +380,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           sessionSecretsTableId: true,
           sessionsSchemaId: true,
           sessionsTableId: true,
+          updatedAt: true,
           userFieldId: true,
         },
       })
@@ -542,6 +552,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           attestationType: true,
           challengeExpirySeconds: true,
+          createdAt: true,
           credentialsSchemaId: true,
           credentialsTableId: true,
           databaseId: true,
@@ -557,6 +568,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           sessionSecretsTableId: true,
           sessionsSchemaId: true,
           sessionsTableId: true,
+          updatedAt: true,
           userFieldId: true,
         },
       })

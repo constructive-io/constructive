@@ -6,8 +6,8 @@
  */
 
 import type { WebauthnSettings } from '../types';
-import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
+import type { LoaderContext, ModuleLoader } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ const WEBAUTHN_SETTINGS_SQL = `
     ws.require_user_verification,
     ws.resident_key,
     ws.challenge_expiry_seconds
-  FROM services_public.webauthn_settings ws
+  FROM constructive_routing_public.webauthn_settings ws
   LEFT JOIN metaschema_public.schema s ON ws.schema_id = s.id
   LEFT JOIN metaschema_public.schema cred_s ON ws.credentials_schema_id = cred_s.id
   LEFT JOIN metaschema_public.schema sess_s ON ws.sessions_schema_id = sess_s.id
@@ -55,9 +55,9 @@ export const webauthnLoader: ModuleLoader<WebauthnSettings> = createModuleLoader
   name: 'webauthnSettings',
   ttlMs: 5 * 60_000,
   async resolve(ctx: LoaderContext) {
-    const { servicesPool, databaseId } = ctx;
+    const { routingPool, databaseId } = ctx;
 
-    const result = await servicesPool.query<WebauthnSettingsRow>(WEBAUTHN_SETTINGS_SQL, [databaseId]);
+    const result = await routingPool.query<WebauthnSettingsRow>(WEBAUTHN_SETTINGS_SQL, [databaseId]);
     const row = result.rows[0];
     if (!row?.schema) return undefined;
 
@@ -72,7 +72,7 @@ export const webauthnLoader: ModuleLoader<WebauthnSettings> = createModuleLoader
       attestationType: row.attestation_type,
       requireUserVerification: row.require_user_verification,
       residentKey: row.resident_key,
-      challengeExpirySeconds: row.challenge_expiry_seconds,
+      challengeExpirySeconds: row.challenge_expiry_seconds
     };
-  },
+  }
 });

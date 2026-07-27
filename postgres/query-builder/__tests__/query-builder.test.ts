@@ -1,6 +1,7 @@
 import {
   add,
   and,
+  cast,
   col,
   eq,
   fn,
@@ -914,6 +915,27 @@ describe('QueryBuilder', () => {
       expect(text).toMatch(/secret_name\s*=>\s*s\.name/);
       expect(text).toMatch(/namespace_id\s*=>\s*s\.namespace_id/);
       // Column refs are not parameterized.
+      expect(values).toEqual([]);
+    });
+
+    it('should emit type casts via cast()', () => {
+      const { text, values } = new QueryBuilder()
+        .table('t')
+        .select([])
+        .selectExpr('a', cast(lit('a8f0'), 'uuid'))
+        .selectExpr('b', cast(col('id'), 'text'))
+        .selectExpr('c', cast(lit('x'), 'timestamp with time zone'))
+        .selectExpr('d', cast(lit('{}'), 'text[]'))
+        .selectExpr('e', cast(lit('9.99'), 'numeric(10,2)'))
+        .selectExpr('f', cast(lit('v'), 'character varying(255)'))
+        .build();
+
+      expect(text).toMatch(/'a8f0'::uuid/);
+      expect(text).toMatch(/id::text/);
+      expect(text).toMatch(/AS timestamp with time zone\)|'x'::timestamptz/);
+      expect(text).toMatch(/text\[\]/);
+      expect(text).toMatch(/numeric\(10,\s*2\)/i);
+      expect(text).toMatch(/varchar\(255\)/i);
       expect(values).toEqual([]);
     });
 

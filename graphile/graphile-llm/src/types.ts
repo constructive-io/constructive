@@ -103,7 +103,7 @@ export interface ChatConfig {
 // ─── LLM Module Types ───────────────────────────────────────────────────────
 
 /**
- * The shape of the `llm_module` data stored in `services_public.api_modules`.
+ * The shape of the `llm_module` configuration stored in `metaschema_modules_public.llm_module`.
  *
  * This is the per-database configuration that controls which LLM provider
  * and models are available for that API.
@@ -235,7 +235,7 @@ export interface MeteringConfig {
 export interface GraphileLlmOptions {
   /**
    * Default embedding provider when no llm_module is configured.
-   * Useful for development/testing without requiring api_modules setup.
+   * Useful for development/testing without requiring llm_module setup.
    * @default undefined (requires llm_module to be configured)
    */
   defaultEmbedder?: EmbedderConfig;

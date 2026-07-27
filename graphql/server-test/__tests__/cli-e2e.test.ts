@@ -22,17 +22,17 @@
  *          search+pagination, pgvector error handling, schema introspection
  */
 
-import path from 'path';
+import type { Table } from '@constructive-io/graphql-codegen';
+import { generateCli } from '@constructive-io/graphql-codegen/core/codegen/cli';
+import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
+import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
-import { spawn } from 'child_process';
+import path from 'path';
 import * as ts from 'typescript';
 
 import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
-import type { Table } from '@constructive-io/graphql-codegen';
-import { generateCli } from '@constructive-io/graphql-codegen/core/codegen/cli';
-import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
 
 jest.setTimeout(120000);
 
@@ -54,7 +54,7 @@ function resolveNodePaths(): string[] {
     'graphql',
     '@constructive-io/graphql-types',
     '@constructive-io/graphql-query',
-    '@agentic-kit/ollama',
+    '@agentic-kit/ollama'
   ];
   const dirs = new Set<string>();
 
@@ -92,7 +92,7 @@ const TS_COMPILE_OPTIONS: ts.CompilerOptions = {
   module: ts.ModuleKind.CommonJS,
   target: ts.ScriptTarget.ES2020,
   esModuleInterop: true,
-  strict: false,
+  strict: false
 };
 
 /**
@@ -107,52 +107,52 @@ function buildAnimalsTable(): Table {
         name: 'id',
         type: { gqlType: 'UUID', isArray: false, pgType: 'uuid' },
         isNotNull: true,
-        hasDefault: true,
+        hasDefault: true
       },
       {
         name: 'name',
         type: { gqlType: 'String', isArray: false, pgType: 'text' },
         isNotNull: true,
-        hasDefault: false,
+        hasDefault: false
       },
       {
         name: 'species',
         type: { gqlType: 'String', isArray: false, pgType: 'text' },
         isNotNull: true,
-        hasDefault: false,
+        hasDefault: false
       },
       {
         name: 'ownerId',
         type: { gqlType: 'UUID', isArray: false, pgType: 'uuid' },
         isNotNull: false,
-        hasDefault: false,
+        hasDefault: false
       },
       {
         name: 'createdAt',
         type: {
           gqlType: 'Datetime',
           isArray: false,
-          pgType: 'timestamptz',
+          pgType: 'timestamptz'
         },
         isNotNull: false,
-        hasDefault: true,
+        hasDefault: true
       },
       {
         name: 'updatedAt',
         type: {
           gqlType: 'Datetime',
           isArray: false,
-          pgType: 'timestamptz',
+          pgType: 'timestamptz'
         },
         isNotNull: false,
-        hasDefault: true,
-      },
+        hasDefault: true
+      }
     ],
     relations: {
       belongsTo: [] as never[],
       hasOne: [] as never[],
       hasMany: [] as never[],
-      manyToMany: [] as never[],
+      manyToMany: [] as never[]
     },
     inflection: {
       allRows: 'animals',
@@ -176,7 +176,7 @@ function buildAnimalsTable(): Table {
       tableType: 'Animal',
       typeName: 'Animal',
       updateByPrimaryKey: 'updateAnimalById',
-      updatePayloadType: 'UpdateAnimalPayload',
+      updatePayloadType: 'UpdateAnimalPayload'
     },
     query: {
       all: 'animals',
@@ -184,7 +184,7 @@ function buildAnimalsTable(): Table {
       create: 'createAnimal',
       update: 'updateAnimalById',
       delete: 'deleteAnimalById',
-      patchFieldName: 'animalPatch',
+      patchFieldName: 'animalPatch'
     },
     constraints: {
       primaryKey: [
@@ -195,14 +195,14 @@ function buildAnimalsTable(): Table {
               name: 'id',
               type: { gqlType: 'UUID', isArray: false, pgType: 'uuid' },
               isNotNull: true,
-              hasDefault: true,
-            },
-          ],
-        },
+              hasDefault: true
+            }
+          ]
+        }
       ],
       foreignKey: [] as never[],
-      unique: [] as never[],
-    },
+      unique: [] as never[]
+    }
   };
 }
 
@@ -212,7 +212,7 @@ function buildAnimalsTable(): Table {
  */
 function transpileFile(content: string): string {
   return ts.transpileModule(content, {
-    compilerOptions: TS_COMPILE_OPTIONS,
+    compilerOptions: TS_COMPILE_OPTIONS
   }).outputText;
 }
 
@@ -223,7 +223,7 @@ function writeAndTranspile(
   srcDir: string,
   distDir: string,
   subdir: string,
-  files: Array<{ fileName?: string; path?: string; content: string }>,
+  files: Array<{ fileName?: string; path?: string; content: string }>
 ) {
   for (const file of files) {
     const relPath = file.fileName ?? file.path ?? '';
@@ -250,7 +250,7 @@ function writeAndTranspile(
 function setupAppstashContext(
   tmpHome: string,
   graphqlUrl: string,
-  token?: string,
+  token?: string
 ) {
   const configDir = path.join(tmpHome, `.${TOOL_NAME}`, 'config');
   const contextsDir = path.join(configDir, 'contexts');
@@ -260,7 +260,7 @@ function setupAppstashContext(
   fs.writeFileSync(
     path.join(configDir, 'settings.json'),
     JSON.stringify({ currentContext: 'default' }),
-    'utf-8',
+    'utf-8'
   );
 
   // Context file: endpoint pointing at the test GraphQL server
@@ -271,9 +271,9 @@ function setupAppstashContext(
       name: 'default',
       endpoint: graphqlUrl,
       createdAt: now,
-      updatedAt: now,
+      updatedAt: now
     }),
-    'utf-8',
+    'utf-8'
   );
 
   // Credentials file: optional bearer token for auth testing
@@ -281,7 +281,7 @@ function setupAppstashContext(
     fs.writeFileSync(
       path.join(configDir, 'credentials.json'),
       JSON.stringify({ tokens: { default: token } }),
-      'utf-8',
+      'utf-8'
     );
   }
 }
@@ -329,7 +329,7 @@ function runCliWithEnv(
   distDir: string,
   tmpHome: string,
   args: string[],
-  extraEnv?: Record<string, string>,
+  extraEnv?: Record<string, string>
 ): Promise<string> {
   const runnerPath = path.join(distDir, '_runner.js');
   if (!fs.existsSync(runnerPath)) {
@@ -346,12 +346,12 @@ function runCliWithEnv(
           APPSTASH_BASE_DIR: tmpHome,
           NODE_PATH: [
             distDir,
-            ...resolveNodePaths(),
+            ...resolveNodePaths()
           ].join(path.delimiter),
-          ...extraEnv,
+          ...extraEnv
         },
-        stdio: ['pipe', 'pipe', 'pipe'],
-      },
+        stdio: ['pipe', 'pipe', 'pipe']
+      }
     );
 
     let stdout = '';
@@ -394,15 +394,15 @@ describe('CLI E2E — generated CLI against real DB', () => {
       {
         schemas: ['simple-pets-pets-public'],
         authRole: 'anonymous',
-        server: { api: { enableServicesApi: false, isPublic: false } },
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       [
         seed.sqlfile([
           shared('base', 'setup.sql'),
           shared('app-schemas', 'simple-pets', 'schema.sql'),
-          shared('app-schemas', 'simple-pets', 'test-data.sql'),
-        ]),
-      ],
+          shared('app-schemas', 'simple-pets', 'test-data.sql')
+        ])
+      ]
     );
     server = conn.server;
     teardown = conn.teardown;
@@ -417,7 +417,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
     const animalsTable = buildAnimalsTable();
     const ormResult = generateOrm({
       tables: [animalsTable],
-      config: { codegen: { comments: false, condition: true } },
+      config: { codegen: { comments: false, condition: true } }
     });
     writeAndTranspile(srcDir, distDir, 'orm', ormResult.files);
 
@@ -426,8 +426,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
       tables: [animalsTable],
       config: {
         cli: { toolName: TOOL_NAME, entryPoint: true },
-        codegen: { comments: false, condition: true },
-      },
+        codegen: { comments: false, condition: true }
+      }
     });
     writeAndTranspile(srcDir, distDir, 'cli', cliResult.files);
 
@@ -457,7 +457,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '--where.species.equalTo',
       'Cat',
       '--select',
-      'id,name,species',
+      'id,name,species'
     );
 
     // ORM execute() returns { ok, data } where data holds the query result
@@ -491,7 +491,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '--limit',
       '2',
       '--select',
-      'id,name',
+      'id,name'
     );
     const page1Raw = JSON.parse(page1Output);
     const page1 = page1Raw.data?.animals ?? page1Raw;
@@ -513,7 +513,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '--after',
       page1.pageInfo.endCursor,
       '--select',
-      'id,name',
+      'id,name'
     );
     const page2Raw = JSON.parse(page2Output);
     const page2 = page2Raw.data?.animals ?? page2Raw;
@@ -541,7 +541,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '--where.name.equalTo',
       'Buddy',
       '--select',
-      'id,name,species',
+      'id,name,species'
     );
 
     const raw = JSON.parse(output);
@@ -568,7 +568,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '--orderBy',
       'ID_ASC',
       '--select',
-      'id,name,species',
+      'id,name,species'
     );
 
     const raw = JSON.parse(output);
@@ -597,7 +597,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '--where.species.equalTo',
       'Fish',
       '--select',
-      'id,name',
+      'id,name'
     );
 
     const raw = JSON.parse(output);
@@ -629,64 +629,64 @@ function buildArticlesTable(hasVector: boolean): Table {
       name: 'id',
       type: { gqlType: 'UUID', isArray: false, pgType: 'uuid' },
       isNotNull: true,
-      hasDefault: true,
+      hasDefault: true
     },
     {
       name: 'title',
       type: { gqlType: 'String', isArray: false, pgType: 'text' },
       isNotNull: true,
-      hasDefault: false,
+      hasDefault: false
     },
     {
       name: 'body',
       type: { gqlType: 'String', isArray: false, pgType: 'text' },
       isNotNull: false,
-      hasDefault: false,
+      hasDefault: false
     },
     // tsvector column — PostGraphile maps to FullText GQL scalar
     {
       name: 'tsv',
       type: { gqlType: 'FullText', isArray: false, pgType: 'tsvector' },
       isNotNull: false,
-      hasDefault: false,
+      hasDefault: false
     },
     {
       name: 'createdAt',
       type: { gqlType: 'Datetime', isArray: false, pgType: 'timestamptz' },
       isNotNull: false,
-      hasDefault: true,
+      hasDefault: true
     },
     {
       name: 'updatedAt',
       type: { gqlType: 'Datetime', isArray: false, pgType: 'timestamptz' },
       isNotNull: false,
-      hasDefault: true,
+      hasDefault: true
     },
     // Computed search fields (read-only, generated by graphile-search plugin)
     {
       name: 'tsvRank',
       type: { gqlType: 'Float', isArray: false, pgType: 'float8' },
       isNotNull: false,
-      hasDefault: false,
+      hasDefault: false
     },
     {
       name: 'titleTrgmSimilarity',
       type: { gqlType: 'Float', isArray: false, pgType: 'float8' },
       isNotNull: false,
-      hasDefault: false,
+      hasDefault: false
     },
     {
       name: 'bodyTrgmSimilarity',
       type: { gqlType: 'Float', isArray: false, pgType: 'float8' },
       isNotNull: false,
-      hasDefault: false,
+      hasDefault: false
     },
     {
       name: 'searchScore',
       type: { gqlType: 'Float', isArray: false, pgType: 'float8' },
       isNotNull: false,
-      hasDefault: false,
-    },
+      hasDefault: false
+    }
   ];
 
   if (hasVector) {
@@ -695,14 +695,14 @@ function buildArticlesTable(hasVector: boolean): Table {
         name: 'embedding',
         type: { gqlType: 'Vector', isArray: false, pgType: 'vector' },
         isNotNull: false,
-        hasDefault: false,
+        hasDefault: false
       },
       {
         name: 'embeddingVectorDistance',
         type: { gqlType: 'Float', isArray: false, pgType: 'float8' },
         isNotNull: false,
-        hasDefault: false,
-      },
+        hasDefault: false
+      }
     );
   }
 
@@ -713,7 +713,7 @@ function buildArticlesTable(hasVector: boolean): Table {
       belongsTo: [] as never[],
       hasOne: [] as never[],
       hasMany: [] as never[],
-      manyToMany: [] as never[],
+      manyToMany: [] as never[]
     },
     inflection: {
       allRows: 'articles',
@@ -737,7 +737,7 @@ function buildArticlesTable(hasVector: boolean): Table {
       tableType: 'Article',
       typeName: 'Article',
       updateByPrimaryKey: 'updateArticleById',
-      updatePayloadType: 'UpdateArticlePayload',
+      updatePayloadType: 'UpdateArticlePayload'
     },
     query: {
       all: 'articles',
@@ -745,7 +745,7 @@ function buildArticlesTable(hasVector: boolean): Table {
       create: 'createArticle',
       update: 'updateArticleById',
       delete: 'deleteArticleById',
-      patchFieldName: 'articlePatch',
+      patchFieldName: 'articlePatch'
     },
     constraints: {
       primaryKey: [
@@ -756,14 +756,14 @@ function buildArticlesTable(hasVector: boolean): Table {
               name: 'id',
               type: { gqlType: 'UUID', isArray: false, pgType: 'uuid' },
               isNotNull: true,
-              hasDefault: true,
-            },
-          ],
-        },
+              hasDefault: true
+            }
+          ]
+        }
       ],
       foreignKey: [] as never[],
-      unique: [] as never[],
-    },
+      unique: [] as never[]
+    }
   };
 }
 
@@ -782,16 +782,16 @@ describe('CLI E2E — search commands against real DB', () => {
       {
         schemas: ['search_public'],
         authRole: 'anonymous',
-        server: { api: { enableServicesApi: false, isPublic: false } },
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       [
         seed.sqlfile([
           shared('base', 'setup.sql'),
           sql('search-seed', 'extensions.sql'),
           sql('search-seed', 'schema.sql'),
-          sql('search-seed', 'test-data.sql'),
-        ]),
-      ],
+          sql('search-seed', 'test-data.sql')
+        ])
+      ]
     );
     server = conn.server;
     request = conn.request;
@@ -803,11 +803,11 @@ describe('CLI E2E — search commands against real DB', () => {
         __type(name: "Article") {
           fields { name }
         }
-      }`,
+      }`
     });
     const fieldNames =
       introspection.body.data?.__type?.fields?.map(
-        (f: { name: string }) => f.name,
+        (f: { name: string }) => f.name
       ) ?? [];
     hasVector = fieldNames.includes('embeddingVectorDistance');
 
@@ -823,7 +823,7 @@ describe('CLI E2E — search commands against real DB', () => {
     // 5. Generate + transpile ORM files
     const ormResult = generateOrm({
       tables: [articlesTable],
-      config: { codegen: { comments: false, condition: true } },
+      config: { codegen: { comments: false, condition: true } }
     });
     writeAndTranspile(srcDir, distDir, 'orm', ormResult.files);
 
@@ -832,8 +832,8 @@ describe('CLI E2E — search commands against real DB', () => {
       tables: [articlesTable],
       config: {
         cli: { toolName: TOOL_NAME, entryPoint: true },
-        codegen: { comments: false, condition: true },
-      },
+        codegen: { comments: false, condition: true }
+      }
     });
     writeAndTranspile(srcDir, distDir, 'cli', cliResult.files);
 
@@ -862,7 +862,7 @@ describe('CLI E2E — search commands against real DB', () => {
       '--where.tsvTsv',
       'machine learning',
       '--select',
-      'title,tsvRank',
+      'title,tsvRank'
     );
 
     const raw = JSON.parse(output);
@@ -896,7 +896,7 @@ describe('CLI E2E — search commands against real DB', () => {
       '--where.trgmTitle.threshold',
       '0.1',
       '--select',
-      'title,titleTrgmSimilarity',
+      'title,titleTrgmSimilarity'
     );
 
     const raw = JSON.parse(output);
@@ -912,20 +912,20 @@ describe('CLI E2E — search commands against real DB', () => {
   });
 
   // =========================================================================
-    // Test 3: composite unifiedSearch via list --where
-    // The unifiedSearch filter dispatches to all text-capable adapters.
+  // Test 3: composite unifiedSearch via list --where
+  // The unifiedSearch filter dispatches to all text-capable adapters.
   // =========================================================================
 
-    it('should filter via unifiedSearch composite filter', async () => {
-      const output = await runCli(
-        distDir,
-        tmpHome,
-        'article',
-        'list',
-        '--where.unifiedSearch',
+  it('should filter via unifiedSearch composite filter', async () => {
+    const output = await runCli(
+      distDir,
+      tmpHome,
+      'article',
+      'list',
+      '--where.unifiedSearch',
       'vector databases',
       '--select',
-      'title,searchScore',
+      'title,searchScore'
     );
 
     const raw = JSON.parse(output);
@@ -960,7 +960,7 @@ describe('CLI E2E — search commands against real DB', () => {
       '--limit',
       '2',
       '--select',
-      'title,tsvRank',
+      'title,tsvRank'
     );
 
     const raw = JSON.parse(output);
@@ -998,7 +998,7 @@ describe('CLI E2E — search commands against real DB', () => {
       '--where.vectorEmbedding.distance',
       '1.0',
       '--select',
-      'title,embeddingVectorDistance',
+      'title,embeddingVectorDistance'
     );
 
     const raw = JSON.parse(output);
@@ -1026,7 +1026,7 @@ describe('CLI E2E — search commands against real DB', () => {
             }
           }
         }
-      }`,
+      }`
     });
 
     expect(introspectRes.status).toBe(200);
@@ -1088,7 +1088,7 @@ async function ensureNomicModel(): Promise<boolean> {
     const data = await res.json() as { models?: Array<{ name: string }> };
     const models = data.models ?? [];
     const hasModel = models.some(
-      (m: { name: string }) => m.name.includes('nomic-embed-text'),
+      (m: { name: string }) => m.name.includes('nomic-embed-text')
     );
     if (hasModel) return true;
 
@@ -1097,7 +1097,7 @@ async function ensureNomicModel(): Promise<boolean> {
     const pullRes = await fetch('http://localhost:11434/api/pull', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'nomic-embed-text' }),
+      body: JSON.stringify({ name: 'nomic-embed-text' })
     });
     return pullRes.ok;
   } catch {
@@ -1126,16 +1126,16 @@ describe('CLI E2E — embedder / --auto-embed', () => {
       {
         schemas: ['search_public'],
         authRole: 'anonymous',
-        server: { api: { enableServicesApi: false, isPublic: false } },
+        server: { scopedRouting: false, api: { isPublic: false } }
       },
       [
         seed.sqlfile([
           shared('base', 'setup.sql'),
           sql('search-seed', 'extensions.sql'),
           sql('search-seed', 'schema.sql'),
-          sql('search-seed', 'test-data.sql'),
-        ]),
-      ],
+          sql('search-seed', 'test-data.sql')
+        ])
+      ]
     );
     server = conn.server;
     teardown = conn.teardown;
@@ -1146,11 +1146,11 @@ describe('CLI E2E — embedder / --auto-embed', () => {
         __type(name: "Article") {
           fields { name }
         }
-      }`,
+      }`
     });
     const fieldNames =
       introspection.body.data?.__type?.fields?.map(
-        (f: { name: string }) => f.name,
+        (f: { name: string }) => f.name
       ) ?? [];
     hasVector = fieldNames.includes('embeddingVectorDistance');
 
@@ -1166,7 +1166,7 @@ describe('CLI E2E — embedder / --auto-embed', () => {
     // 6. Generate + transpile ORM files
     const ormResult = generateOrm({
       tables: [articlesTable],
-      config: { codegen: { comments: false, condition: true } },
+      config: { codegen: { comments: false, condition: true } }
     });
     writeAndTranspile(srcDir, distDir, 'orm', ormResult.files);
 
@@ -1175,8 +1175,8 @@ describe('CLI E2E — embedder / --auto-embed', () => {
       tables: [articlesTable],
       config: {
         cli: { toolName: TOOL_NAME, entryPoint: true },
-        codegen: { comments: false, condition: true },
-      },
+        codegen: { comments: false, condition: true }
+      }
     });
     writeAndTranspile(srcDir, distDir, 'cli', cliResult.files);
 
@@ -1211,11 +1211,11 @@ describe('CLI E2E — embedder / --auto-embed', () => {
           'machine learning',
           '--auto-embed',
           '--select',
-          'title',
+          'title'
         ],
         // Explicitly unset EMBEDDER_PROVIDER
-        { EMBEDDER_PROVIDER: '' },
-      ),
+        { EMBEDDER_PROVIDER: '' }
+      )
     ).rejects.toThrow(/exited with code 1/);
   });
 
@@ -1250,13 +1250,13 @@ describe('CLI E2E — embedder / --auto-embed', () => {
         'machine learning AI',
         '--auto-embed',
         '--select',
-        'title,embeddingVectorDistance',
+        'title,embeddingVectorDistance'
       ],
       {
         EMBEDDER_PROVIDER: 'ollama',
         EMBEDDER_MODEL: 'nomic-embed-text',
-        EMBEDDER_BASE_URL: 'http://localhost:11434',
-      },
+        EMBEDDER_BASE_URL: 'http://localhost:11434'
+      }
     );
 
     // The CLI exits 0 but returns { ok: false } because the server rejects
@@ -1300,13 +1300,13 @@ describe('CLI E2E — embedder / --auto-embed', () => {
         'vector databases',
         '--auto-embed',
         '--select',
-        'title',
+        'title'
       ],
       {
         EMBEDDER_PROVIDER: 'ollama',
         EMBEDDER_MODEL: 'nomic-embed-text',
-        EMBEDDER_BASE_URL: 'http://localhost:11434',
-      },
+        EMBEDDER_BASE_URL: 'http://localhost:11434'
+      }
     );
 
     // The output should be valid JSON (CLI exits 0 with GraphQL response)

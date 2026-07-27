@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.30.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.30.1...@pgpmjs/env@2.30.2) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.30.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.30.0...@pgpmjs/env@2.30.1) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+# [2.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.29.0...@pgpmjs/env@2.30.0) (2026-07-26)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+# [2.29.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.28.2...@pgpmjs/env@2.29.0) (2026-07-25)
+
+### Features
+
+- **pgpm:** configurable extensions install directory ([67bb658](https://github.com/constructive-io/constructive/commit/67bb6584e07afdfe0aeca5f35bf6a7586bae1172))
+
 ## [2.28.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.28.1...@pgpmjs/env@2.28.2) (2026-07-18)
 
 **Note:** Version bump only for package @pgpmjs/env

@@ -6,19 +6,61 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type { ResolveHttpRouteRecord, ResolveHttpRouteRecordSelect } from '../input-types';
+import type {
+  ResolveHttpRouteRecord,
+  ResolveRouteRecord,
+  ResolveHttpRouteRecordSelect,
+  ResolveRouteRecordSelect,
+} from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface ApiSchemaNamesVariables {
+  targetApiId?: string;
+}
 export interface ApplyRegistryDefaultsVariables {
   data?: unknown;
   nodeType?: string;
 }
 export interface ResolveHttpRouteVariables {
-  pHost?: string;
-  pMethod?: string;
-  pPath?: string;
+  requestHost?: string;
+  requestMethod?: string;
+  requestPath?: string;
+}
+export interface ResolveRouteVariables {
+  requestHost?: string;
+  requestMethod?: string;
+  requestPath?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
+    apiSchemaNames: (
+      args: ApiSchemaNamesVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        apiSchemaNames: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ApiSchemaNames',
+        fieldName: 'apiSchemaNames',
+        ...buildCustomDocument(
+          'query',
+          'ApiSchemaNames',
+          'apiSchemaNames',
+          options?.select,
+          args,
+          [
+            {
+              name: 'targetApiId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
     applyRegistryDefaults: (
       args: ApplyRegistryDefaultsVariables,
       options?: {
@@ -73,20 +115,57 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'pHost',
+              name: 'requestHost',
               type: 'String',
             },
             {
-              name: 'pMethod',
+              name: 'requestMethod',
               type: 'String',
             },
             {
-              name: 'pPath',
+              name: 'requestPath',
               type: 'String',
             },
           ],
           connectionFieldsMap,
           'ResolveHttpRouteRecord'
+        ),
+      }),
+    resolveRoute: <S extends ResolveRouteRecordSelect>(
+      args: ResolveRouteVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResolveRouteRecordSelect>
+    ) =>
+      new QueryBuilder<{
+        resolveRoute: InferSelectResult<ResolveRouteRecord, S> | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveRoute',
+        fieldName: 'resolveRoute',
+        ...buildCustomDocument(
+          'query',
+          'ResolveRoute',
+          'resolveRoute',
+          options.select,
+          args,
+          [
+            {
+              name: 'requestHost',
+              type: 'String',
+            },
+            {
+              name: 'requestMethod',
+              type: 'String',
+            },
+            {
+              name: 'requestPath',
+              type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          'ResolveRouteRecord'
         ),
       }),
   };

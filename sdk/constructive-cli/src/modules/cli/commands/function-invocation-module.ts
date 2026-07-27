@@ -17,6 +17,8 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   apiName: 'string',
+  attemptsTableId: 'uuid',
+  attemptsTableName: 'string',
   databaseId: 'uuid',
   defaultPermissions: 'string',
   entityField: 'string',
@@ -88,6 +90,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       apiName: true,
+      attemptsTableId: true,
+      attemptsTableName: true,
       databaseId: true,
       defaultPermissions: true,
       entityField: true,
@@ -131,6 +135,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       apiName: true,
+      attemptsTableId: true,
+      attemptsTableName: true,
       databaseId: true,
       defaultPermissions: true,
       entityField: true,
@@ -186,6 +192,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           apiName: true,
+          attemptsTableId: true,
+          attemptsTableName: true,
           databaseId: true,
           defaultPermissions: true,
           entityField: true,
@@ -223,6 +231,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'apiName',
         message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'attemptsTableId',
+        message: 'attemptsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'attemptsTableName',
+        message: 'attemptsTableName',
         required: false,
         skipPrompt: true,
       },
@@ -341,8 +363,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'scope',
         message: 'scope',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -355,6 +376,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           apiName: cleanedData.apiName,
+          attemptsTableId: cleanedData.attemptsTableId,
+          attemptsTableName: cleanedData.attemptsTableName,
           databaseId: cleanedData.databaseId,
           defaultPermissions: cleanedData.defaultPermissions,
           entityField: cleanedData.entityField,
@@ -375,6 +398,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           apiName: true,
+          attemptsTableId: true,
+          attemptsTableName: true,
           databaseId: true,
           defaultPermissions: true,
           entityField: true,
@@ -423,6 +448,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'attemptsTableId',
+        message: 'attemptsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'attemptsTableName',
+        message: 'attemptsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -537,7 +576,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'scope',
         message: 'scope',
         required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -550,6 +588,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           apiName: cleanedData.apiName,
+          attemptsTableId: cleanedData.attemptsTableId,
+          attemptsTableName: cleanedData.attemptsTableName,
           databaseId: cleanedData.databaseId,
           defaultPermissions: cleanedData.defaultPermissions,
           entityField: cleanedData.entityField,
@@ -570,6 +610,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           apiName: true,
+          attemptsTableId: true,
+          attemptsTableName: true,
           databaseId: true,
           defaultPermissions: true,
           entityField: true,

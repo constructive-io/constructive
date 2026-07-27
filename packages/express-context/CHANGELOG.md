@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.14.1...@constructive-io/express-context@0.14.2) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.14.0...@constructive-io/express-context@0.14.1) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+# [0.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.13.1...@constructive-io/express-context@0.14.0) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.13.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.13.0...@constructive-io/express-context@0.13.1) (2026-07-26)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+# [0.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.12.2...@constructive-io/express-context@0.13.0) (2026-07-25)
+
+### Features
+
+- **server:** hard-break GraphQL runtime off services_public onto scoped routing plane ([d3059ef](https://github.com/constructive-io/constructive/commit/d3059efecb32fc128da04059688bd48ad24b74a5))
+
 ## [0.12.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.12.1...@constructive-io/express-context@0.12.2) (2026-07-18)
 
 **Note:** Version bump only for package @constructive-io/express-context

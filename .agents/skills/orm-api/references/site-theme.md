@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Theme configuration for a site; stores design tokens, colors, and typography as JSONB
+Theme (colors, fonts, design tokens) for a site surface
 
 ## Usage
 

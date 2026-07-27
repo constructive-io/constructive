@@ -1191,9 +1191,56 @@ type MetaRelations {
   manyToMany: [MetaManyToManyRelation!]!
 }
 
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
 """Root meta schema type"""
 type MetaSchema {
   tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
 }
 
 """Search metadata for a table"""
@@ -1263,6 +1310,9 @@ type MetaTable {
   relations: MetaRelations!
   schemaName: String!
 
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
   """Search metadata (null if no search configured)"""
   search: MetaSearch
 
@@ -1273,6 +1323,8 @@ type MetaTable {
 
 """Information about a PostgreSQL type"""
 type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
   gqlType: String!
   hasDefault: Boolean
   isArray: Boolean!

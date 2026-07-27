@@ -1,5 +1,5 @@
 -- Test data for simple-seed-storage scenario
--- Seeds metaschema, services, storage_module, and bucket data
+-- Seeds metaschema, scoped routing plane, storage_module, and bucket data
 
 SET session_replication_role TO replica;
 
@@ -44,15 +44,15 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- SERVICES DATA
+-- ROUTING DATA (constructive_routing_public)
 -- =====================================================
 
-INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role)
+INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
 VALUES
   ('6c9997a4-591b-4cb3-9313-4ef45d6f134e', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'app', current_database(), false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
+INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id)
 VALUES
   ('71181146-890e-4991-9da7-3dddf87d9e01', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dbae92a-5450-401b-1ed5-d69e7754940d', '6c9997a4-591b-4cb3-9313-4ef45d6f134e')
 ON CONFLICT (id) DO NOTHING;
@@ -70,7 +70,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   endpoint,
   public_url_prefix,
   provider,
-  allowed_origins
+  allowed_origins,
+  scope
 )
 VALUES (
   'c0000001-0000-0000-0000-000000000001',
@@ -81,7 +82,8 @@ VALUES (
   NULL,  -- use global CDN_ENDPOINT
   NULL,  -- use global CDN_PUBLIC_URL_PREFIX
   'minio',
-  ARRAY['*']
+  ARRAY['*'],
+  'app'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -98,7 +100,7 @@ ON CONFLICT (id) DO NOTHING;
 -- ALICE DATABASE SETTINGS (all defaults — presigned uploads enabled)
 -- =====================================================
 
-INSERT INTO services_public.database_settings (id, database_id)
+INSERT INTO constructive_routing_public.database_settings (id, database_id)
 VALUES (
   'e0000001-0000-0000-0000-000000000001',
   '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9'
@@ -128,22 +130,22 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- BOB SERVICES DATA
+-- BOB ROUTING DATA (constructive_routing_public)
 -- =====================================================
 
 -- Bob's primary API (presigned uploads enabled via database_settings defaults)
-INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role)
+INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
 VALUES
   ('a3a3a3a3-b4b4-4c5c-d6d6-e7e7e7e7e7e7', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'bob-app', current_database(), false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
 -- Bob's restricted API (api_settings will disable presigned uploads)
-INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role)
+INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
 VALUES
   ('a4a4a4a4-b5b5-4c6c-d7d7-e8e8e8e8e8e8', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'bob-restricted', current_database(), false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
+INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id)
 VALUES
   ('a5a5a5a5-0000-0000-0000-000000000001', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'a2a2a2a2-b3b3-4c4c-d5d5-e6e6e6e6e6e6', 'a3a3a3a3-b4b4-4c5c-d6d6-e7e7e7e7e7e7'),
   ('a5a5a5a5-0000-0000-0000-000000000002', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'a2a2a2a2-b3b3-4c4c-d5d5-e6e6e6e6e6e6', 'a4a4a4a4-b5b5-4c6c-d7d7-e8e8e8e8e8e8')
@@ -162,7 +164,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   endpoint,
   public_url_prefix,
   provider,
-  allowed_origins
+  allowed_origins,
+  scope
 )
 VALUES (
   'c1c1c1c1-0000-0000-0000-000000000001',
@@ -173,7 +176,8 @@ VALUES (
   NULL,
   NULL,
   'minio',
-  ARRAY['*']
+  ARRAY['*'],
+  'app'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -216,7 +220,7 @@ VALUES (
 -- BOB DATABASE SETTINGS (all defaults — presigned uploads enabled)
 -- =====================================================
 
-INSERT INTO services_public.database_settings (id, database_id)
+INSERT INTO constructive_routing_public.database_settings (id, database_id)
 VALUES (
   'e0000001-0000-0000-0000-000000000002',
   'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5'
@@ -226,7 +230,7 @@ VALUES (
 -- BOB API SETTINGS (restricted API disables presigned uploads)
 -- =====================================================
 
-INSERT INTO services_public.api_settings (id, database_id, api_id, enable_presigned_uploads)
+INSERT INTO constructive_routing_public.api_settings (id, database_id, api_id, enable_presigned_uploads)
 VALUES (
   'f0000001-0000-0000-0000-000000000001',
   'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5',
@@ -258,15 +262,15 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
--- MALLORY SERVICES DATA
+-- MALLORY ROUTING DATA (constructive_routing_public)
 -- =====================================================
 
-INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role)
+INSERT INTO constructive_routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
 VALUES
   ('fa44fa44-a5a5-4b6b-c7c7-d8d8d8d8d8d8', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'mallory-app', current_database(), false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
+INSERT INTO constructive_routing_public.api_schemas (id, database_id, schema_id, api_id)
 VALUES
   ('fa55fa55-0000-0000-0000-000000000001', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'fa22fa22-a3a3-4b4b-c5c5-d6d6d6d6d6d6', 'fa44fa44-a5a5-4b6b-c7c7-d8d8d8d8d8d8')
 ON CONFLICT (id) DO NOTHING;
@@ -284,7 +288,8 @@ INSERT INTO metaschema_modules_public.storage_module (
   endpoint,
   public_url_prefix,
   provider,
-  allowed_origins
+  allowed_origins,
+  scope
 )
 VALUES (
   'fa66fa66-0000-0000-0000-000000000001',
@@ -295,7 +300,8 @@ VALUES (
   NULL,
   NULL,
   'minio',
-  ARRAY['*']
+  ARRAY['*'],
+  'app'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
@@ -337,7 +343,7 @@ VALUES (
 -- MALLORY DATABASE SETTINGS (all defaults — presigned uploads enabled)
 -- =====================================================
 
-INSERT INTO services_public.database_settings (id, database_id)
+INSERT INTO constructive_routing_public.database_settings (id, database_id)
 VALUES (
   'fa88fa88-0000-0000-0000-000000000001',
   'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5'

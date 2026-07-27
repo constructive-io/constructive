@@ -17,26 +17,6 @@
       "table": "trigger_function"
     },
     {
-      "key": "apis",
-      "schema": "services_public",
-      "table": "apis"
-    },
-    {
-      "key": "database_settings",
-      "schema": "services_public",
-      "table": "database_settings"
-    },
-    {
-      "key": "managed_domains",
-      "schema": "services_public",
-      "table": "managed_domains"
-    },
-    {
-      "key": "sites",
-      "schema": "services_public",
-      "table": "sites"
-    },
-    {
       "key": "default_ids_module",
       "schema": "metaschema_modules_public",
       "table": "default_ids_module"
@@ -77,54 +57,14 @@
       "table": "table"
     },
     {
-      "key": "api_modules",
-      "schema": "services_public",
-      "table": "api_modules"
-    },
-    {
-      "key": "api_schemas",
-      "schema": "services_public",
-      "table": "api_schemas"
-    },
-    {
-      "key": "api_settings",
-      "schema": "services_public",
-      "table": "api_settings"
-    },
-    {
-      "key": "apps",
-      "schema": "services_public",
-      "table": "apps"
-    },
-    {
-      "key": "cors_settings",
-      "schema": "services_public",
-      "table": "cors_settings"
-    },
-    {
-      "key": "domains",
-      "schema": "services_public",
-      "table": "domains"
-    },
-    {
-      "key": "site_metadata",
-      "schema": "services_public",
-      "table": "site_metadata"
-    },
-    {
-      "key": "site_modules",
-      "schema": "services_public",
-      "table": "site_modules"
-    },
-    {
-      "key": "site_themes",
-      "schema": "services_public",
-      "table": "site_themes"
-    },
-    {
       "key": "check_constraint",
       "schema": "metaschema_public",
       "table": "check_constraint"
+    },
+    {
+      "key": "exclusion_constraint",
+      "schema": "metaschema_public",
+      "table": "exclusion_constraint"
     },
     {
       "key": "field",
@@ -177,21 +117,6 @@
       "table": "view"
     },
     {
-      "key": "http_routes",
-      "schema": "services_public",
-      "table": "http_routes"
-    },
-    {
-      "key": "pubkey_settings",
-      "schema": "services_public",
-      "table": "pubkey_settings"
-    },
-    {
-      "key": "rls_settings",
-      "schema": "services_public",
-      "table": "rls_settings"
-    },
-    {
       "key": "agent_module",
       "schema": "metaschema_modules_public",
       "table": "agent_module"
@@ -205,6 +130,11 @@
       "key": "billing_provider_module",
       "schema": "metaschema_modules_public",
       "table": "billing_provider_module"
+    },
+    {
+      "key": "catalog_module",
+      "schema": "metaschema_modules_public",
+      "table": "catalog_module"
     },
     {
       "key": "compute_log_module",
@@ -230,6 +160,11 @@
       "key": "crypto_auth_module",
       "schema": "metaschema_modules_public",
       "table": "crypto_auth_module"
+    },
+    {
+      "key": "database_settings_module",
+      "schema": "metaschema_modules_public",
+      "table": "database_settings_module"
     },
     {
       "key": "db_usage_module",
@@ -472,9 +407,14 @@
       "table": "view_table"
     },
     {
-      "key": "webauthn_settings",
-      "schema": "services_public",
-      "table": "webauthn_settings"
+      "key": "api_surface_module",
+      "schema": "metaschema_modules_public",
+      "table": "api_surface_module"
+    },
+    {
+      "key": "app_module",
+      "schema": "metaschema_modules_public",
+      "table": "app_module"
     },
     {
       "key": "db_preset_module",
@@ -485,6 +425,11 @@
       "key": "denormalized_table_field",
       "schema": "metaschema_modules_public",
       "table": "denormalized_table_field"
+    },
+    {
+      "key": "domain_module",
+      "schema": "metaschema_modules_public",
+      "table": "domain_module"
     },
     {
       "key": "function_deployment_module",
@@ -507,6 +452,11 @@
       "table": "resource_module"
     },
     {
+      "key": "site_surface_module",
+      "schema": "metaschema_modules_public",
+      "table": "site_surface_module"
+    },
+    {
       "key": "webhook_module",
       "schema": "metaschema_modules_public",
       "table": "webhook_module"
@@ -520,9 +470,284 @@
       "key": "http_route_module",
       "schema": "metaschema_modules_public",
       "table": "http_route_module"
+    },
+    {
+      "key": "route_module",
+      "schema": "metaschema_modules_public",
+      "table": "route_module"
+    },
+    {
+      "key": "api_modules",
+      "schema": "constructive_routing_public",
+      "table": "api_modules"
+    },
+    {
+      "key": "api_schemas",
+      "schema": "constructive_routing_public",
+      "table": "api_schemas"
+    },
+    {
+      "key": "api_settings",
+      "schema": "constructive_routing_public",
+      "table": "api_settings"
+    },
+    {
+      "key": "apis",
+      "schema": "constructive_routing_public",
+      "table": "apis"
+    },
+    {
+      "key": "cors_settings",
+      "schema": "constructive_routing_public",
+      "table": "cors_settings"
+    },
+    {
+      "key": "database_settings",
+      "schema": "constructive_routing_public",
+      "table": "database_settings"
+    },
+    {
+      "key": "domain_events",
+      "schema": "constructive_routing_public",
+      "table": "domain_events"
+    },
+    {
+      "key": "domain_verifications",
+      "schema": "constructive_routing_public",
+      "table": "domain_verifications"
+    },
+    {
+      "key": "domains",
+      "schema": "constructive_routing_public",
+      "table": "domains"
+    },
+    {
+      "key": "http_routes",
+      "schema": "constructive_routing_public",
+      "table": "http_routes"
+    },
+    {
+      "key": "managed_domains",
+      "schema": "constructive_routing_public",
+      "table": "managed_domains"
+    },
+    {
+      "key": "pubkey_settings",
+      "schema": "constructive_routing_public",
+      "table": "pubkey_settings"
+    },
+    {
+      "key": "rls_settings",
+      "schema": "constructive_routing_public",
+      "table": "rls_settings"
+    },
+    {
+      "key": "routes",
+      "schema": "constructive_routing_public",
+      "table": "routes"
+    },
+    {
+      "key": "site_metadata",
+      "schema": "constructive_routing_public",
+      "table": "site_metadata"
+    },
+    {
+      "key": "site_modules",
+      "schema": "constructive_routing_public",
+      "table": "site_modules"
+    },
+    {
+      "key": "site_themes",
+      "schema": "constructive_routing_public",
+      "table": "site_themes"
+    },
+    {
+      "key": "sites",
+      "schema": "constructive_routing_public",
+      "table": "sites"
+    },
+    {
+      "key": "webauthn_settings",
+      "schema": "constructive_routing_public",
+      "table": "webauthn_settings"
+    },
+    {
+      "key": "app_components",
+      "schema": "constructive_apps_public",
+      "table": "app_components"
+    },
+    {
+      "key": "apps",
+      "schema": "constructive_apps_public",
+      "table": "apps"
+    },
+    {
+      "key": "constructive_catalog_public.apis",
+      "schema": "constructive_catalog_public",
+      "table": "apis"
+    },
+    {
+      "key": "constructive_catalog_public.apps",
+      "schema": "constructive_catalog_public",
+      "table": "apps"
+    },
+    {
+      "key": "constructive_catalog_public.domains",
+      "schema": "constructive_catalog_public",
+      "table": "domains"
+    },
+    {
+      "key": "functions",
+      "schema": "constructive_catalog_public",
+      "table": "functions"
+    },
+    {
+      "key": "namespaces",
+      "schema": "constructive_catalog_public",
+      "table": "namespaces"
+    },
+    {
+      "key": "resource_definitions",
+      "schema": "constructive_catalog_public",
+      "table": "resource_definitions"
+    },
+    {
+      "key": "resource_installations",
+      "schema": "constructive_catalog_public",
+      "table": "resource_installations"
+    },
+    {
+      "key": "resources",
+      "schema": "constructive_catalog_public",
+      "table": "resources"
+    },
+    {
+      "key": "constructive_catalog_public.sites",
+      "schema": "constructive_catalog_public",
+      "table": "sites"
     }
   ],
   "timestampDefaultColumns": {
+    "constructive_apps_public.app_components": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_apps_public.apps": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.apis": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.apps": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.domains": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.functions": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.namespaces": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.resource_definitions": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.resource_installations": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.resources": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_catalog_public.sites": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.api_modules": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.api_schemas": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.api_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.apis": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.cors_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.database_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.domain_events": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.domain_verifications": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.domains": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.http_routes": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.managed_domains": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.pubkey_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.rls_settings": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.routes": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.site_metadata": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.site_modules": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.site_themes": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.sites": [
+      "created_at",
+      "updated_at"
+    ],
+    "constructive_routing_public.webauthn_settings": [
+      "created_at",
+      "updated_at"
+    ],
     "metaschema_modules_public.db_preset_module": [
       "created_at"
     ],
@@ -547,6 +772,10 @@
       "updated_at"
     ],
     "metaschema_public.embedding_chunks": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.exclusion_constraint": [
       "created_at",
       "updated_at"
     ],
@@ -603,10 +832,6 @@
       "updated_at"
     ],
     "metaschema_public.unique_constraint": [
-      "created_at",
-      "updated_at"
-    ],
-    "services_public.http_routes": [
       "created_at",
       "updated_at"
     ]

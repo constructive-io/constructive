@@ -9,16 +9,18 @@
  *
  * The seeded function_invocations INSERT policy only passes when
  * `jwt.claims.api_id` (set transaction-locally by the server from the
- * hostname → services_public.domains → api_id resolution) matches the
- * binding's api_id — so the happy path also proves the claim is injected.
+ * hostname → constructive_routing_public.resolve_route → api_id resolution)
+ * matches the binding's api_id — so the happy path also proves the claim is
+ * injected.
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=fn-routes.integration
  */
 
 import path from 'path';
-import { getConnections, seed } from '../src';
 import type supertest from 'supertest';
+
+import { getConnections, seed } from '../src';
 
 jest.setTimeout(30000);
 
@@ -28,9 +30,11 @@ const shared = (...segments: string[]) =>
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
-  'services_public',
+  'constructive_catalog_public',
+  'constructive_routing_public',
+  'constructive_apps_public',
   'metaschema_public',
-  'metaschema_modules_public',
+  'metaschema_modules_public'
 ];
 
 const seedAdapters = [
@@ -38,10 +42,10 @@ const seedAdapters = [
   seed.sqlfile([
     shared('compute', 'setup.sql'),
     shared('app-schemas', 'simple-pets', 'schema.sql'),
-    shared('services', 'test-data.sql'),
+    shared('scoped', 'test-data.sql'),
     shared('compute', 'test-data.sql'),
-    shared('app-schemas', 'simple-pets', 'test-data.sql'),
-  ]),
+    shared('app-schemas', 'simple-pets', 'test-data.sql')
+  ])
 ];
 
 const API_HOST = 'app.test.constructive.io';
@@ -55,12 +59,12 @@ beforeAll(async () => {
       schemas,
       authRole: 'anonymous',
       server: {
+        scopedRouting: true,
         api: {
-          enableServicesApi: true,
           isPublic: true,
-          metaSchemas,
-        },
-      },
+          metaSchemas
+        }
+      }
     },
     seedAdapters
   ));

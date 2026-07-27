@@ -22,8 +22,9 @@
  *   pnpm test -- --testPathPattern=schema-snapshot
  */
 
-import path from 'path';
 import { buildSchemaSDL } from 'graphile-schema';
+import path from 'path';
+
 import { getConnections, seed } from '../src';
 
 jest.setTimeout(60000);
@@ -47,22 +48,23 @@ describe('Schema Snapshot', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          api: { enableServicesApi: false, isPublic: false },
-        },
+          scopedRouting: false,
+          api: { isPublic: false }
+        }
       },
       [
         seed.sqlfile([
           shared('base', 'setup.sql'),
           sql('schema-snapshot', 'schema.sql'),
-          sql('schema-snapshot', 'test-data.sql'),
-        ]),
+          sql('schema-snapshot', 'test-data.sql')
+        ])
       ]
     );
     teardown = connections.teardown;
     
     sdl = await buildSchemaSDL({
       database: connections.pg.config.database,
-      schemas,
+      schemas
     });
   });
 

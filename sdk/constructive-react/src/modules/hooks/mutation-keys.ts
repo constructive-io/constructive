@@ -27,6 +27,23 @@ export const agentModuleMutationKeys = {
   /** Delete agentModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'agentmodule', 'delete', id] as const,
 } as const;
+export const apiSurfaceModuleMutationKeys = {
+  /** All apiSurfaceModule mutation keys */ all: ['mutation', 'apisurfacemodule'] as const,
+  /** Create apiSurfaceModule mutation key */ create: () =>
+    ['mutation', 'apisurfacemodule', 'create'] as const,
+  /** Update apiSurfaceModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'apisurfacemodule', 'update', id] as const,
+  /** Delete apiSurfaceModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'apisurfacemodule', 'delete', id] as const,
+} as const;
+export const appModuleMutationKeys = {
+  /** All appModule mutation keys */ all: ['mutation', 'appmodule'] as const,
+  /** Create appModule mutation key */ create: () => ['mutation', 'appmodule', 'create'] as const,
+  /** Update appModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'appmodule', 'update', id] as const,
+  /** Delete appModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'appmodule', 'delete', id] as const,
+} as const;
 export const billingModuleMutationKeys = {
   /** All billingModule mutation keys */ all: ['mutation', 'billingmodule'] as const,
   /** Create billingModule mutation key */ create: () =>
@@ -76,6 +93,15 @@ export const blueprintTemplateMutationKeys = {
     ['mutation', 'blueprinttemplate', 'update', id] as const,
   /** Delete blueprintTemplate mutation key */ delete: (id: string | number) =>
     ['mutation', 'blueprinttemplate', 'delete', id] as const,
+} as const;
+export const catalogModuleMutationKeys = {
+  /** All catalogModule mutation keys */ all: ['mutation', 'catalogmodule'] as const,
+  /** Create catalogModule mutation key */ create: () =>
+    ['mutation', 'catalogmodule', 'create'] as const,
+  /** Update catalogModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'catalogmodule', 'update', id] as const,
+  /** Delete catalogModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'catalogmodule', 'delete', id] as const,
 } as const;
 export const computeLogModuleMutationKeys = {
   /** All computeLogModule mutation keys */ all: ['mutation', 'computelogmodule'] as const,
@@ -143,6 +169,18 @@ export const databaseProvisionModuleMutationKeys = {
   /** Delete databaseProvisionModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'databaseprovisionmodule', 'delete', id] as const,
 } as const;
+export const databaseSettingsModuleMutationKeys = {
+  /** All databaseSettingsModule mutation keys */ all: [
+    'mutation',
+    'databasesettingsmodule',
+  ] as const,
+  /** Create databaseSettingsModule mutation key */ create: () =>
+    ['mutation', 'databasesettingsmodule', 'create'] as const,
+  /** Update databaseSettingsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'databasesettingsmodule', 'update', id] as const,
+  /** Delete databaseSettingsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'databasesettingsmodule', 'delete', id] as const,
+} as const;
 export const dbPoolConfigMutationKeys = {
   /** All dbPoolConfig mutation keys */ all: ['mutation', 'dbpoolconfig'] as const,
   /** Create dbPoolConfig mutation key */ create: () =>
@@ -207,6 +245,15 @@ export const devicesModuleMutationKeys = {
     ['mutation', 'devicesmodule', 'update', id] as const,
   /** Delete devicesModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'devicesmodule', 'delete', id] as const,
+} as const;
+export const domainModuleMutationKeys = {
+  /** All domainModule mutation keys */ all: ['mutation', 'domainmodule'] as const,
+  /** Create domainModule mutation key */ create: () =>
+    ['mutation', 'domainmodule', 'create'] as const,
+  /** Update domainModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'domainmodule', 'update', id] as const,
+  /** Delete domainModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'domainmodule', 'delete', id] as const,
 } as const;
 export const emailsModuleMutationKeys = {
   /** All emailsModule mutation keys */ all: ['mutation', 'emailsmodule'] as const,
@@ -542,6 +589,15 @@ export const rlsModuleMutationKeys = {
   /** Delete rlsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'rlsmodule', 'delete', id] as const,
 } as const;
+export const routeModuleMutationKeys = {
+  /** All routeModule mutation keys */ all: ['mutation', 'routemodule'] as const,
+  /** Create routeModule mutation key */ create: () =>
+    ['mutation', 'routemodule', 'create'] as const,
+  /** Update routeModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'routemodule', 'update', id] as const,
+  /** Delete routeModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'routemodule', 'delete', id] as const,
+} as const;
 export const secureTableProvisionMutationKeys = {
   /** All secureTableProvision mutation keys */ all: ['mutation', 'securetableprovision'] as const,
   /** Create secureTableProvision mutation key */ create: () =>
@@ -568,6 +624,15 @@ export const sessionsModuleMutationKeys = {
     ['mutation', 'sessionsmodule', 'update', id] as const,
   /** Delete sessionsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'sessionsmodule', 'delete', id] as const,
+} as const;
+export const siteSurfaceModuleMutationKeys = {
+  /** All siteSurfaceModule mutation keys */ all: ['mutation', 'sitesurfacemodule'] as const,
+  /** Create siteSurfaceModule mutation key */ create: () =>
+    ['mutation', 'sitesurfacemodule', 'create'] as const,
+  /** Update siteSurfaceModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'sitesurfacemodule', 'update', id] as const,
+  /** Delete siteSurfaceModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'sitesurfacemodule', 'delete', id] as const,
 } as const;
 export const storageLogModuleMutationKeys = {
   /** All storageLogModule mutation keys */ all: ['mutation', 'storagelogmodule'] as const,
@@ -751,17 +816,21 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   agentModule: agentModuleMutationKeys,
+  apiSurfaceModule: apiSurfaceModuleMutationKeys,
+  appModule: appModuleMutationKeys,
   billingModule: billingModuleMutationKeys,
   billingProviderModule: billingProviderModuleMutationKeys,
   blueprint: blueprintMutationKeys,
   blueprintConstruction: blueprintConstructionMutationKeys,
   blueprintTemplate: blueprintTemplateMutationKeys,
+  catalogModule: catalogModuleMutationKeys,
   computeLogModule: computeLogModuleMutationKeys,
   configSecretsUserModule: configSecretsUserModuleMutationKeys,
   connectedAccountsModule: connectedAccountsModuleMutationKeys,
   cryptoAddressesModule: cryptoAddressesModuleMutationKeys,
   cryptoAuthModule: cryptoAuthModuleMutationKeys,
   databaseProvisionModule: databaseProvisionModuleMutationKeys,
+  databaseSettingsModule: databaseSettingsModuleMutationKeys,
   dbPoolConfig: dbPoolConfigMutationKeys,
   dbPool: dbPoolMutationKeys,
   dbPresetModule: dbPresetModuleMutationKeys,
@@ -769,6 +838,7 @@ export const mutationKeys = {
   defaultIdsModule: defaultIdsModuleMutationKeys,
   denormalizedTableField: denormalizedTableFieldMutationKeys,
   devicesModule: devicesModuleMutationKeys,
+  domainModule: domainModuleMutationKeys,
   emailsModule: emailsModuleMutationKeys,
   entityTypeProvision: entityTypeProvisionMutationKeys,
   eventsModule: eventsModuleMutationKeys,
@@ -804,9 +874,11 @@ export const mutationKeys = {
   relationProvision: relationProvisionMutationKeys,
   resourceModule: resourceModuleMutationKeys,
   rlsModule: rlsModuleMutationKeys,
+  routeModule: routeModuleMutationKeys,
   secureTableProvision: secureTableProvisionMutationKeys,
   sessionSecretsModule: sessionSecretsModuleMutationKeys,
   sessionsModule: sessionsModuleMutationKeys,
+  siteSurfaceModule: siteSurfaceModuleMutationKeys,
   storageLogModule: storageLogModuleMutationKeys,
   storageModule: storageModuleMutationKeys,
   transferLogModule: transferLogModuleMutationKeys,

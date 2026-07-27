@@ -86,9 +86,9 @@ export function buildContext(
   // Build loader context (if registry provided and databaseId known)
   let loaderCtx: LoaderContext | null = null;
   if (opts.loaders && api.databaseId) {
-    const servicesPool: Pool = getPgPool(opts.pg);
+    const routingPool: Pool = getPgPool(opts.pg);
     loaderCtx = {
-      servicesPool,
+      routingPool,
       tenantPool,
       databaseId: api.databaseId,
       apiId: api.apiId,

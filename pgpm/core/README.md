@@ -22,6 +22,28 @@ pgpm Core is the main package for pgpm, providing tools for database migrations,
 - Reading and writing SQL scripts
 - Resolving dependencies between migrations
 
+## Migration bundles and envelopes
+
+`@pgpmjs/core` is the deployment half of the portable artifact layer defined in
+`@pgpmjs/bundle` (the pure layer: `MigrationBundle` — a content-addressed snapshot of a
+pgpm module — and `BundleEnvelope` — the versioned shipping container wrapping a schema
+bundle plus data/fixtures SQL parts):
+
+- `applyBundle(bundle, { config, dryRun?, verify?, timeoutMs?, validateReferences? })` —
+  safety-first apply of a `MigrationBundle` via `PgpmMigrate`: artifact-integrity and
+  optional namespace gating, dry-run preview, atomic single-transaction deploy,
+  timeout, and an explicit result including the rollback plan.
+- `applyEnvelope(envelope, { config, dryRun?, verifyParts?, transformPartSql?, ... })` —
+  the generic `applyMigrationBundle` primitive: digest-gates the whole envelope
+  (`verifyEnvelope`), applies the schema via `applyBundle`, then replays each data and
+  fixtures part's deploy SQL in manifest order inside one transaction (a failing part
+  rolls back all part data; the schema stays applied). `previewEnvelopeApply` gives the
+  pure pre-flight: envelope issues, part replay order, and a layered rollback plan.
+  `transformPartSql` is the seam for pre-apply rewriting of part SQL (e.g.
+  deterministic ID remap).
+
+See `pgpm/bundle/README.md` and the `pgpm-migration-bundle` skill for the artifact model.
+
 ## Configuration
 
 ### Error Output Configuration

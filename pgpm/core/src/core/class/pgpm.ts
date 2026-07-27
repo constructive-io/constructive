@@ -1,6 +1,6 @@
-import { loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
+import { getExtensionsDir, loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
+import { DEFAULT_EXTENSIONS_DIR,errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
@@ -12,7 +12,7 @@ import { PgConfig } from 'pg-env';
 import yanse from 'yanse';
 
 import { getAvailableExtensions } from '../../extensions/extensions';
-import { generatePlan, writePlan, writePlanFile } from '../../files';
+import { generatePlan, writePlan, writePlanFile } from '@pgpmjs/ast/files';
 import {
   ExtensionInfo,
   getExtensionInfo,
@@ -20,13 +20,13 @@ import {
   getInstalledExtensions,
   parseControlFile,
   writeExtensions
-} from '../../files';
-import { generateControlFileContent, writeExtensionMakefile } from '../../files/extension/writer';
-import { getNow as getPlanTimestamp } from '../../files/plan/generator';
-import { parsePlanFile } from '../../files/plan/parser';
-import { isValidChangeName, isValidTagName, parseReference } from '../../files/plan/validators';
-import { Change, Tag } from '../../files/types';
-import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
+} from '@pgpmjs/ast/files';
+import { generateControlFileContent, writeExtensionMakefile } from '@pgpmjs/ast/files/extension/writer';
+import { getNow as getPlanTimestamp } from '@pgpmjs/ast/files/plan/generator';
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { isValidChangeName, isValidTagName, parseReference } from '@pgpmjs/ast/files/plan/validators';
+import { Change, Tag } from '@pgpmjs/ast/files/types';
+import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '@pgpmjs/ast/files/types';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,
@@ -37,6 +37,8 @@ import {
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
+import { movePath } from '../../utils/fs';
+import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
 import { parseTarget } from '../../utils/target-utils';
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
@@ -44,10 +46,16 @@ import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL
 const logger = new Logger('pgpm');
 
 /**
- * Directory name for workspace extensions.
- * Extensions are installed globally in the workspace's extensions/ directory.
+ * Options accepted by the {@link PgpmPackage} constructor.
  */
-const EXTENSIONS_DIR = 'extensions';
+export interface PgpmPackageOptions {
+  /**
+   * Directory (relative to the workspace root) where pgpm modules are installed.
+   * Takes precedence over `PGPM_EXTENSIONS_DIR` and the `extensionsDir` config
+   * field. Defaults to `extensions`.
+   */
+  extensionsDir?: string;
+}
 
 function sortObjectByKey<T extends Record<string, any>>(obj: T): T {
   return Object.fromEntries(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))) as T;
@@ -126,11 +134,19 @@ export class PgpmPackage {
   public config?: PgpmWorkspaceConfig;
   public allowedDirs: string[] = [];
   public allowedParentDirs: string[] = [];
+  /**
+   * Directory name (relative to the workspace root) where pgpm modules are installed.
+   * Resolved from the constructor option, `PGPM_EXTENSIONS_DIR`, the `extensionsDir`
+   * config field, then the `extensions` default.
+   */
+  public extensionsDir: string = DEFAULT_EXTENSIONS_DIR;
 
+  private readonly options: PgpmPackageOptions;
   private _moduleMap?: ModuleMap;
   private _moduleInfo?: ExtensionInfo;
 
-  constructor(cwd: string = process.cwd()) {
+  constructor(cwd: string = process.cwd(), options: PgpmPackageOptions = {}) {
+    this.options = options;
     this.resetCwd(cwd);
   }
 
@@ -138,12 +154,24 @@ export class PgpmPackage {
     this.cwd = cwd;
     this.workspacePath = resolvePgpmPath(this.cwd);
     this.modulePath = this.resolveSqitchPath();
+    this.extensionsDir = getExtensionsDir(
+      this.options.extensionsDir,
+      this.workspacePath ?? this.cwd
+    );
 
     if (this.workspacePath) {
       this.config = this.loadConfigSync();
       this.allowedDirs = this.loadAllowedDirs();
       this.allowedParentDirs = this.loadAllowedParentDirs();
     }
+  }
+
+  /**
+   * Absolute path of the workspace directory where pgpm modules are installed.
+   */
+  getExtensionsPath(): string {
+    this.ensureWorkspace();
+    return path.join(this.workspacePath!, this.extensionsDir);
   }
 
   private resolveSqitchPath(): string | undefined {
@@ -161,7 +189,7 @@ export class PgpmPackage {
   private loadAllowedDirs(): string[] {
     const globs: string[] = this.config?.packages ?? [];
     const dirs = globs.flatMap(pattern =>
-      glob.sync(path.join(this.workspacePath!, pattern))
+      globPaths(this.workspacePath!, pattern)
     );
     const resolvedDirs = dirs.map(dir => path.resolve(dir));
     // Remove duplicates by converting to Set and back to array
@@ -268,7 +296,7 @@ export class PgpmPackage {
     const results: PgpmPackage[] = [];
 
     for (const dir of dirs) {
-      const proj = new PgpmPackage(dir);
+      const proj = new PgpmPackage(dir, this.options);
       if (proj.isInModule()) {
         results.push(proj);
       }
@@ -290,11 +318,11 @@ export class PgpmPackage {
     // nested workspaces (e.g. test fixtures) out of the module map.
     const packageDirs = [
       ...this.allowedDirs,
-      ...glob.sync(path.join(this.workspacePath, EXTENSIONS_DIR, '{*,@*/*}'))
+      ...globPaths(this.workspacePath, this.extensionsDir, '{*,@*/*}')
     ];
 
     const moduleFiles = [...new Set(
-      packageDirs.flatMap(dir => glob.sync(`${dir}/**/*.control`))
+      packageDirs.flatMap(dir => glob.sync(globPattern(dir, '**/*.control')))
     )].filter(
       (file: string) => !/node_modules/.test(file)
     ).sort((a, b) => a.localeCompare(b));
@@ -358,7 +386,7 @@ export class PgpmPackage {
     }
     
     const modulePath = path.resolve(this.workspacePath!, modules[name].path);
-    return new PgpmPackage(modulePath);
+    return new PgpmPackage(modulePath, this.options);
   }
 
   // ──────────────── Module-scoped ────────────────
@@ -992,7 +1020,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const inModule = this.isInModule();
     const originalDir = process.cwd();
-    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    const skitchExtDir = this.getExtensionsPath();
 
     let pkgJsonPath: string | undefined;
     let pkgData: Record<string, any> | undefined;
@@ -1017,15 +1045,15 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   
       try {
         process.chdir(tempDir);
-        execSync(`npm install ${pkgstr} --production --prefix ./extensions`, {
+        execSync(`npm install ${pkgstr} --production --prefix ./${this.extensionsDir}`, {
           stdio: 'inherit'
         });
   
-        const matches = glob.sync('./extensions/**/pgpm.plan');
+        const matches = glob.sync(globPattern('.', this.extensionsDir, '**/pgpm.plan'));
         const installs = matches.map((conf) => {
           const fullConf = resolve(conf);
           const extDir = dirname(fullConf);
-          const parts = extDir.split('node_modules/');
+          const parts = toPosixPath(extDir).split('node_modules/');
           const relativeDir = parts[parts.length - 1];
           const dstDir = path.join(skitchExtDir, relativeDir);
           return { src: extDir, dst: dstDir, pkg: relativeDir };
@@ -1033,7 +1061,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
         // Sort deepest paths first so nested node_modules deps are
         // extracted before their parent directories are moved.
-        installs.sort((a, b) => b.src.split('/').length - a.src.split('/').length);
+        installs.sort((a, b) => toPosixPath(b.src).split('/').length - toPosixPath(a.src).split('/').length);
 
         for (const { src, dst, pkg } of installs) {
           if (fs.existsSync(dst)) {
@@ -1041,7 +1069,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           }
   
           fs.mkdirSync(path.dirname(dst), { recursive: true });
-          execSync(`mv "${src}" "${dst}"`);
+          movePath(src, dst);
           logger.success(`✔ installed ${pkg}`);
   
           const pkgJsonFile = path.join(dst, 'package.json');
@@ -1060,8 +1088,9 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         }
   
       } finally {
-        fs.rmSync(tempDir, { recursive: true, force: true });
+        // chdir out first: Windows locks the process working directory
         process.chdir(originalDir);
+        fs.rmSync(tempDir, { recursive: true, force: true });
       }
     }
   
@@ -1213,7 +1242,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
     const dependencies = pkgData.dependencies || {};
-    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    const skitchExtDir = this.getExtensionsPath();
 
     const installed: string[] = [];
     const installedVersions: Record<string, string> = {};
@@ -1241,7 +1270,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   getWorkspaceInstalledModules(): string[] {
     this.ensureWorkspace();
 
-    const extensionsDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    const extensionsDir = this.getExtensionsPath();
     
     if (!fs.existsSync(extensionsDir)) {
       return [];
@@ -1996,7 +2025,8 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       const expected = `${info.extname}.control`;
       if (base !== expected) issues.push({ code: 'control_filename_mismatch', message: `Control filename ${base} != ${expected}`, file: controlPath });
     }
-    return { ok: issues.length === 0, name: info.extname, path: modPath, issues };
+    const reported = issues.map(issue => ({ ...issue, file: toPosixPath(issue.file) }));
+    return { ok: reported.length === 0, name: info.extname, path: toPosixPath(modPath), issues: reported };
   }
 
   renameModule(newName: string, opts?: RenameOptions): { changed: string[]; warnings: string[] } {

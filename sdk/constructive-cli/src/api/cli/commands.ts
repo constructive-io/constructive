@@ -10,7 +10,6 @@ import apiCmd from './commands/api';
 import apiModuleCmd from './commands/api-module';
 import apiSchemaCmd from './commands/api-schema';
 import apiSettingCmd from './commands/api-setting';
-import appCmd from './commands/app';
 import astMigrationCmd from './commands/ast-migration';
 import checkConstraintCmd from './commands/check-constraint';
 import compositeTypeCmd from './commands/composite-type';
@@ -20,21 +19,40 @@ import databaseSettingCmd from './commands/database-setting';
 import databaseTransferCmd from './commands/database-transfer';
 import defaultPrivilegeCmd from './commands/default-privilege';
 import domainCmd from './commands/domain';
+import domainEventCmd from './commands/domain-event';
+import domainVerificationCmd from './commands/domain-verification';
 import embeddingChunkCmd from './commands/embedding-chunk';
 import enumCmd from './commands/enum';
+import exclusionConstraintCmd from './commands/exclusion-constraint';
 import fieldCmd from './commands/field';
 import foreignKeyConstraintCmd from './commands/foreign-key-constraint';
 import fullTextSearchCmd from './commands/full-text-search';
 import functionCmd from './commands/function';
+import hostnameBindingCmd from './commands/hostname-binding';
 import httpRouteCmd from './commands/http-route';
 import indexCmd from './commands/index';
 import managedDomainCmd from './commands/managed-domain';
 import nodeTypeRegistryCmd from './commands/node-type-registry';
 import partitionCmd from './commands/partition';
+import platformApiCmd from './commands/platform-api';
+import platformApiModuleCmd from './commands/platform-api-module';
+import platformApiSchemaCmd from './commands/platform-api-schema';
+import platformApiSettingCmd from './commands/platform-api-setting';
+import platformCorsSettingCmd from './commands/platform-cors-setting';
+import platformDomainCmd from './commands/platform-domain';
+import platformDomainEventCmd from './commands/platform-domain-event';
+import platformDomainVerificationCmd from './commands/platform-domain-verification';
+import platformManagedDomainCmd from './commands/platform-managed-domain';
+import platformSiteCmd from './commands/platform-site';
+import platformSiteMetadatumCmd from './commands/platform-site-metadatum';
+import platformSiteModuleCmd from './commands/platform-site-module';
+import platformSiteThemeCmd from './commands/platform-site-theme';
 import policyCmd from './commands/policy';
 import primaryKeyConstraintCmd from './commands/primary-key-constraint';
 import pubkeySettingCmd from './commands/pubkey-setting';
 import rlsSettingCmd from './commands/rls-setting';
+import routeBindingCmd from './commands/route-binding';
+import routeCmd from './commands/route';
 import schemaCmd from './commands/schema';
 import schemaGrantCmd from './commands/schema-grant';
 import siteCmd from './commands/site';
@@ -53,8 +71,10 @@ import viewGrantCmd from './commands/view-grant';
 import viewRuleCmd from './commands/view-rule';
 import viewTableCmd from './commands/view-table';
 import webauthnSettingCmd from './commands/webauthn-setting';
+import apiSchemaNamesCmd from './commands/api-schema-names';
 import applyRegistryDefaultsCmd from './commands/apply-registry-defaults';
 import resolveHttpRouteCmd from './commands/resolve-http-route';
+import resolveRouteCmd from './commands/resolve-route';
 import acceptDatabaseTransferCmd from './commands/accept-database-transfer';
 import applyRlsCmd from './commands/apply-rls';
 import cancelDatabaseTransferCmd from './commands/cancel-database-transfer';
@@ -76,7 +96,6 @@ const createCommandMap: () => Record<
   'api-module': apiModuleCmd,
   'api-schema': apiSchemaCmd,
   'api-setting': apiSettingCmd,
-  app: appCmd,
   'ast-migration': astMigrationCmd,
   'check-constraint': checkConstraintCmd,
   'composite-type': compositeTypeCmd,
@@ -86,21 +105,40 @@ const createCommandMap: () => Record<
   'database-transfer': databaseTransferCmd,
   'default-privilege': defaultPrivilegeCmd,
   domain: domainCmd,
+  'domain-event': domainEventCmd,
+  'domain-verification': domainVerificationCmd,
   'embedding-chunk': embeddingChunkCmd,
   enum: enumCmd,
+  'exclusion-constraint': exclusionConstraintCmd,
   field: fieldCmd,
   'foreign-key-constraint': foreignKeyConstraintCmd,
   'full-text-search': fullTextSearchCmd,
   function: functionCmd,
+  'hostname-binding': hostnameBindingCmd,
   'http-route': httpRouteCmd,
   index: indexCmd,
   'managed-domain': managedDomainCmd,
   'node-type-registry': nodeTypeRegistryCmd,
   partition: partitionCmd,
+  'platform-api': platformApiCmd,
+  'platform-api-module': platformApiModuleCmd,
+  'platform-api-schema': platformApiSchemaCmd,
+  'platform-api-setting': platformApiSettingCmd,
+  'platform-cors-setting': platformCorsSettingCmd,
+  'platform-domain': platformDomainCmd,
+  'platform-domain-event': platformDomainEventCmd,
+  'platform-domain-verification': platformDomainVerificationCmd,
+  'platform-managed-domain': platformManagedDomainCmd,
+  'platform-site': platformSiteCmd,
+  'platform-site-metadatum': platformSiteMetadatumCmd,
+  'platform-site-module': platformSiteModuleCmd,
+  'platform-site-theme': platformSiteThemeCmd,
   policy: policyCmd,
   'primary-key-constraint': primaryKeyConstraintCmd,
   'pubkey-setting': pubkeySettingCmd,
   'rls-setting': rlsSettingCmd,
+  'route-binding': routeBindingCmd,
+  route: routeCmd,
   schema: schemaCmd,
   'schema-grant': schemaGrantCmd,
   site: siteCmd,
@@ -119,8 +157,10 @@ const createCommandMap: () => Record<
   'view-rule': viewRuleCmd,
   'view-table': viewTableCmd,
   'webauthn-setting': webauthnSettingCmd,
+  'api-schema-names': apiSchemaNamesCmd,
   'apply-registry-defaults': applyRegistryDefaultsCmd,
   'resolve-http-route': resolveHttpRouteCmd,
+  'resolve-route': resolveRouteCmd,
   'accept-database-transfer': acceptDatabaseTransferCmd,
   'apply-rls': applyRlsCmd,
   'cancel-database-transfer': cancelDatabaseTransferCmd,
@@ -130,7 +170,7 @@ const createCommandMap: () => Record<
   'set-field-order': setFieldOrderCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  api                  api CRUD operations\n  api-module           apiModule CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-setting          apiSetting CRUD operations\n  app                  app CRUD operations\n  ast-migration        astMigration CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  composite-type       compositeType CRUD operations\n  cors-setting         corsSetting CRUD operations\n  database             database CRUD operations\n  database-setting     databaseSetting CRUD operations\n  database-transfer    databaseTransfer CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  domain               domain CRUD operations\n  embedding-chunk      embeddingChunk CRUD operations\n  enum                 enum CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  function             function CRUD operations\n  http-route           httpRoute CRUD operations\n  index                index CRUD operations\n  managed-domain       managedDomain CRUD operations\n  node-type-registry   nodeTypeRegistry CRUD operations\n  partition            partition CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  pubkey-setting       pubkeySetting CRUD operations\n  rls-setting          rlsSetting CRUD operations\n  schema               schema CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  site                 site CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  spatial-relation     spatialRelation CRUD operations\n  sql-action           sqlAction CRUD operations\n  table                table CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view                 view CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  view-table           viewTable CRUD operations\n  webauthn-setting     webauthnSetting CRUD operations\n  apply-registry-defaults applyRegistryDefaults\n  resolve-http-route   resolveHttpRoute\n  accept-database-transfer acceptDatabaseTransfer\n  apply-rls            applyRls\n  cancel-database-transfer cancelDatabaseTransfer\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  reject-database-transfer rejectDatabaseTransfer\n  request-database     Requests a database and returns a ticket (database_provision_module row) to poll.\n\nPass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.\n\nExample usage:\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '[\"users_module\", \"emails_module\"]'::jsonb);\n  set-field-order      setFieldOrder\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  api                  api CRUD operations\n  api-module           apiModule CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-setting          apiSetting CRUD operations\n  ast-migration        astMigration CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  composite-type       compositeType CRUD operations\n  cors-setting         corsSetting CRUD operations\n  database             database CRUD operations\n  database-setting     databaseSetting CRUD operations\n  database-transfer    databaseTransfer CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  domain               domain CRUD operations\n  domain-event         domainEvent CRUD operations\n  domain-verification  domainVerification CRUD operations\n  embedding-chunk      embeddingChunk CRUD operations\n  enum                 enum CRUD operations\n  exclusion-constraint exclusionConstraint CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  function             function CRUD operations\n  hostname-binding     hostnameBinding CRUD operations\n  http-route           httpRoute CRUD operations\n  index                index CRUD operations\n  managed-domain       managedDomain CRUD operations\n  node-type-registry   nodeTypeRegistry CRUD operations\n  partition            partition CRUD operations\n  platform-api         platformApi CRUD operations\n  platform-api-module  platformApiModule CRUD operations\n  platform-api-schema  platformApiSchema CRUD operations\n  platform-api-setting platformApiSetting CRUD operations\n  platform-cors-setting platformCorsSetting CRUD operations\n  platform-domain      platformDomain CRUD operations\n  platform-domain-event platformDomainEvent CRUD operations\n  platform-domain-verification platformDomainVerification CRUD operations\n  platform-managed-domain platformManagedDomain CRUD operations\n  platform-site        platformSite CRUD operations\n  platform-site-metadatum platformSiteMetadatum CRUD operations\n  platform-site-module platformSiteModule CRUD operations\n  platform-site-theme  platformSiteTheme CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  pubkey-setting       pubkeySetting CRUD operations\n  rls-setting          rlsSetting CRUD operations\n  route-binding        routeBinding CRUD operations\n  route                route CRUD operations\n  schema               schema CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  site                 site CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  spatial-relation     spatialRelation CRUD operations\n  sql-action           sqlAction CRUD operations\n  table                table CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view                 view CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  view-table           viewTable CRUD operations\n  webauthn-setting     webauthnSetting CRUD operations\n  api-schema-names     apiSchemaNames\n  apply-registry-defaults applyRegistryDefaults\n  resolve-http-route   resolveHttpRoute\n  resolve-route        resolveRoute\n  accept-database-transfer acceptDatabaseTransfer\n  apply-rls            applyRls\n  cancel-database-transfer cancelDatabaseTransfer\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  reject-database-transfer rejectDatabaseTransfer\n  request-database     Requests a database and returns a ticket (database_provision_module row) to poll.\n\nPass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.\n\nExample usage:\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');\n  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '[\"users_module\", \"emails_module\"]'::jsonb);\n  set-field-order      setFieldOrder\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

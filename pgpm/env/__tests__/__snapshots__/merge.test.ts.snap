@@ -47,38 +47,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "queryHistoryLimit": 30,
     "verbose": false,
   },
-  "jobs": {
-    "gateway": {
-      "callbackPort": 12345,
-      "callbackUrl": "http://callback:12345",
-      "gatewayUrl": "http://gateway:8080",
-    },
-    "scheduler": {
-      "gracefulShutdown": true,
-      "hostname": "scheduler-0",
-      "pollInterval": 1000,
-      "schema": "app_jobs",
-      "supportAny": false,
-      "supported": [
-        "alpha",
-        "beta",
-      ],
-    },
-    "schema": {
-      "schema": "app_jobs",
-    },
-    "worker": {
-      "gracefulShutdown": true,
-      "hostname": "worker-0",
-      "pollInterval": 1000,
-      "schema": "app_jobs",
-      "supportAny": false,
-      "supported": [
-        "alpha",
-        "beta",
-      ],
-    },
-  },
+  "extensionsDir": "extensions",
   "migrations": {
     "codegen": {
       "useTx": false,

@@ -1,81 +1,73 @@
-import {
-  createApiMiddleware,
-  createAuthenticateMiddleware,
-  cors,
-  graphile
-} from '@constructive-io/graphql-server';
+import { createDevServer } from '@constructive-io/graphql-dev-server';
+import { Server } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import express from 'express';
-import { Server as HttpServer, createServer } from 'http';
+import { Server as HttpServer } from 'http';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
-import type { ServerInfo, PlaywrightServerOptions } from './types';
+import type { PlaywrightServerOptions, ServerInfo } from './types';
 
 /**
- * Find an available port starting from the given port
- */
-const findAvailablePort = async (startPort: number): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.listen(startPort, () => {
-      const address = server.address();
-      const port = typeof address === 'object' && address ? address.port : startPort;
-      server.close(() => resolve(port));
-    });
-    server.on('error', (err: NodeJS.ErrnoException) => {
-      if (err.code === 'EADDRINUSE') {
-        resolve(findAvailablePort(startPort + 1));
-      } else {
-        reject(err);
-      }
-    });
-  });
-};
-
-/**
- * Create a test server for Playwright testing
- * 
- * This creates an Express server with the Constructive GraphQL middleware
- * configured with enableServicesApi: false to bypass domain routing.
+ * Create a single-tenant dev test server for Playwright testing.
+ *
+ * Delegates to `@constructive-io/graphql-dev-server`, a pure-PostGraphile
+ * single-tenant server (no scoped routing, no database id) that exposes the
+ * configured schemas directly.
  */
 export const createTestServer = async (
   opts: ConstructiveOptions,
   serverOpts: PlaywrightServerOptions = {}
 ): Promise<ServerInfo> => {
+  const { httpServer, url, graphqlUrl, port, host, stop } = await createDevServer(
+    opts,
+    {
+      host: serverOpts.host ?? 'localhost',
+      port: serverOpts.port ?? 0
+    }
+  );
+
+  return { httpServer, url, graphqlUrl, port, host, stop };
+};
+
+/**
+ * Create a production scoped test server for Playwright testing.
+ *
+ * Uses the `Server` class from `@constructive-io/graphql-server` directly, so
+ * every request is resolved through the scoped-routing plane
+ * (`constructive_routing_public.resolve_route()`). Suites using this must seed
+ * real routing/database records so a real database id is resolved.
+ */
+export const createScopedTestServer = async (
+  opts: ConstructiveOptions,
+  serverOpts: PlaywrightServerOptions = {}
+): Promise<ServerInfo> => {
   const host = serverOpts.host ?? 'localhost';
-  const requestedPort = serverOpts.port ?? 0;
-  const port = requestedPort === 0 ? await findAvailablePort(5555) : requestedPort;
+  const port = serverOpts.port ?? 0;
 
-  const app = express();
+  const serverConfig: ConstructiveOptions = {
+    ...opts,
+    server: {
+      ...opts.server,
+      host,
+      port
+    }
+  };
 
-  // Create middleware with enableServicesApi: false to bypass domain routing
-  const api = createApiMiddleware(opts);
-  const authenticate = createAuthenticateMiddleware(opts);
+  const server = new Server(serverConfig);
+  const httpServer: HttpServer = server.listen();
 
-  // Basic middleware setup
-  app.use(cors('*'));
-  app.use(api);
-  app.use(authenticate);
-  app.use(graphile(opts));
-
-  // Create HTTP server
-  const httpServer: HttpServer = await new Promise((resolve, reject) => {
-    const server = app.listen(port, host, () => {
-      resolve(server);
-    });
-    server.on('error', reject);
+  await new Promise<void>((resolve) => {
+    if (httpServer.listening) {
+      resolve();
+    } else {
+      httpServer.once('listening', () => resolve());
+    }
   });
 
   const actualPort = (httpServer.address() as { port: number }).port;
 
   const stop = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      httpServer.close((err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    await server.close({ closeCaches: true });
   };
 
   return {

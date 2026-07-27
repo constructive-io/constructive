@@ -1,6 +1,6 @@
 {
   "name": "constructive-test",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "constructive-test extends pgsql-test with Constructive platform defaults: auto-derived principal_id, role mappings, and platform-specific test helpers",
   "main": "index.js",
@@ -39,8 +39,8 @@
     "clean": "makage clean",
     "copy": "makage assets",
     "prepack": "npm run build",
-    "build": "npm run clean; tsc; tsc -p tsconfig.esm.json; npm run copy",
-    "build:dev": "npm run clean; tsc --declarationMap; tsc -p tsconfig.esm.json; npm run copy",
+    "build": "npm run clean && tsc && tsc -p tsconfig.esm.json && npm run copy",
+    "build:dev": "npm run clean && tsc --declarationMap && tsc -p tsconfig.esm.json && npm run copy",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
