@@ -121,13 +121,15 @@ export const routeToApiStructure = (
   }
 
   const config = (route.resolved_config ?? {}) as ApiSurfaceConfig;
-  if (!config.dbname || !config.schemas?.length) {
-    log.debug('[resolve-route] api target missing dbname/schemas in resolved_config; no match');
+  if (!config.schemas?.length) {
+    log.debug('[resolve-route] api target missing schemas in resolved_config; no match');
     return null;
   }
 
   return {
     apiId: config.api_id ?? route.target_source_id ?? undefined,
+    // Scoped APIs leave dbname NULL when their schemas live in the serving
+    // database; fall back to the server's own database in that case.
     dbname: config.dbname || opts.pg?.database || '',
     anonRole: config.anon_role || 'anon',
     roleName: config.role_name || 'authenticated',
