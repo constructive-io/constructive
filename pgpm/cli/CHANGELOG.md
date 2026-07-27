@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/constructive-io/constructive/compare/pgpm@5.2.3...pgpm@5.3.0) (2026-07-27)
+
+### Features
+
+- **pgpm:** add doctor command with OS-aware dependency checks; robust docker daemon detection ([be7744d](https://github.com/constructive-io/constructive/commit/be7744d424d3eaa9d44d5aaee4d0cc7b576dc4a1))
+
 ## [5.2.3](https://github.com/constructive-io/constructive/compare/pgpm@5.2.2...pgpm@5.2.3) (2026-07-26)
 
 **Note:** Version bump only for package pgpm

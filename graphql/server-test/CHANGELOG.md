@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.3.3...graphql-server-test@3.4.0) (2026-07-27)
+
+### Features
+
+- **server:** default the scoped routing plane to logical routing_public ([08ef699](https://github.com/constructive-io/constructive/commit/08ef699a1155788e58a840e9a624329ab095fca7))
+
 ## [3.3.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.3.2...graphql-server-test@3.3.3) (2026-07-26)
 
 **Note:** Version bump only for package graphql-server-test

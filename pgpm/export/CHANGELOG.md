@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.4.0...@pgpmjs/export@1.5.0) (2026-07-27)
+
+### Features
+
+- **export:** add targetSchema to DataExportTableSpec ([e85788c](https://github.com/constructive-io/constructive/commit/e85788cb7b629c4f77e18ec7e5d2d4d7e54d7ae5))
+
 # [1.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.3.2...@pgpmjs/export@1.4.0) (2026-07-26)
 
 ### Features

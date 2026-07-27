@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.3.3...@constructive-io/graphql-server@5.4.0) (2026-07-27)
+
+### Features
+
+- remove untyped api_modules fallback readers and dead CORS branch ([1d14751](https://github.com/constructive-io/constructive/commit/1d1475144716c4769d5677216788c574c33fe0ad))
+- **server:** default the scoped routing plane to logical routing_public ([08ef699](https://github.com/constructive-io/constructive/commit/08ef699a1155788e58a840e9a624329ab095fca7))
+
 ## [5.3.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.3.2...@constructive-io/graphql-server@5.3.3) (2026-07-26)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
