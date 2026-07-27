@@ -54,7 +54,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@pgsql/traverse": "^18.3.0",
+    "@pgsql/transform": "^18.3.0",
     "csv-to-pg": "workspace:^",
     "genomic": "^5.6.2",
     "glob": "^13.0.6",

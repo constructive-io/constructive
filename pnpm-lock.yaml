@@ -2738,7 +2738,7 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
-      '@pgsql/traverse':
+      '@pgsql/transform':
         specifier: ^18.3.0
         version: 18.3.0
       csv-to-pg:
@@ -5069,6 +5069,9 @@ packages:
 
   '@pgsql/quotes@18.1.0':
     resolution: {integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==}
+
+  '@pgsql/transform@18.3.0':
+    resolution: {integrity: sha512-aCxWTqfHzIh8RL2zU4rC+O0o1rx2zZDYDka8o+Gdap6FN1bmhoOI/5Xgw+aXR1mDXLwY8JkH9GpIbma58PKrpA==}
 
   '@pgsql/traverse@18.1.0':
     resolution: {integrity: sha512-B+jIX6BvWrHO6DKlJ7p6Wvhbu1s7IhksLwwC3tvV+epKiuU4v8gJLd/OVQ5xeRSwhhLWmrctRfuAKHecbCaNjw==}
@@ -12322,6 +12325,14 @@ snapshots:
       '@noble/hashes': 1.8.0
 
   '@pgsql/quotes@18.1.0': {}
+
+  '@pgsql/transform@18.3.0':
+    dependencies:
+      '@pgsql/quotes': 18.1.0
+      '@pgsql/traverse': 18.3.0
+      plpgsql-parser: 18.2.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@pgsql/traverse@18.1.0':
     dependencies:
