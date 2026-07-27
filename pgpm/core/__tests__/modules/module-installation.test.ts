@@ -92,6 +92,17 @@ describe('workspace-level install', () => {
     expect(workspace.getWorkspaceDependencies()['@pgpm-testing/base32']).toBe('1.2.0');
   });
 
+  it('records the requested package version, not a dependency version', async () => {
+    // routing@5.0.0 depends on catalog@4.0.0 and routing-platform@4.0.0;
+    // the recorded pin must be the requested package's own version.
+    await workspace.installModules('@constructive-db/routing@5.0.0');
+
+    const config = JSON.parse(
+      fs.readFileSync(path.join(workspace.getWorkspacePath()!, 'pgpm.json'), 'utf-8')
+    );
+    expect(config.dependencies['@constructive-db/routing']).toBe('5.0.0');
+  });
+
   it('installWorkspaceDependencies installs pinned deps and skips installed ones', async () => {
     const configPath = path.join(workspace.getWorkspacePath()!, 'pgpm.json');
     const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));

@@ -1077,10 +1077,12 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
             throw new Error(`Missing package.json in installed extension: ${dst}`);
           }
   
-          const { version } = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8'));
-          installedVersions[name] = `${version}`;
-          if (pkgData) {
-            pkgData.dependencies[name] = `${version}`;
+          const { name: installedName, version } = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8'));
+          if (installedName === name) {
+            installedVersions[name] = `${version}`;
+            if (pkgData) {
+              pkgData.dependencies[name] = `${version}`;
+            }
           }
   
           const extensionName = getExtensionName(dst);
