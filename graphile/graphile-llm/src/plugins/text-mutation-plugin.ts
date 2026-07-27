@@ -60,6 +60,13 @@ function getTextToVectorMapping(
   const mapping: Record<string, string> = {};
   if (!pgCodec?.attributes) return mapping;
 
+  const attributeFieldNames = new Set<string>(
+    Object.keys(pgCodec.attributes as Record<string, any>).map(
+      (attributeName) =>
+        build.inflection.attribute({ codec: pgCodec, attributeName })
+    )
+  );
+
   for (const [attributeName, attribute] of Object.entries(
     pgCodec.attributes as Record<string, any>
   )) {
@@ -68,7 +75,11 @@ function getTextToVectorMapping(
         codec: pgCodec,
         attributeName
       });
-      mapping[`${fieldName}Text`] = fieldName;
+      const textFieldName = `${fieldName}Text`;
+      // Skip when a physical column already inflects to the companion name
+      // (e.g. `embedding_text` next to `embedding`) — the physical field owns it.
+      if (attributeFieldNames.has(textFieldName)) continue;
+      mapping[textFieldName] = fieldName;
     }
   }
   return mapping;
@@ -161,6 +172,13 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
               attributeName: columnName
             });
             const textFieldName = `${fieldName}Text`;
+
+            // Skip when the input type already has a field with the companion
+            // name (e.g. a physical `embedding_text` column inflected to
+            // `embeddingText`) — extending would be a naming conflict.
+            if (textFieldName in newFields) {
+              continue;
+            }
 
             newFields = build.extend(
               newFields,

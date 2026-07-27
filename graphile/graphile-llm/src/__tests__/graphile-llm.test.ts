@@ -314,6 +314,57 @@ describe('graphile-llm schema enrichment', () => {
       expect(textField).toBeDefined();
       expect(textField!.type.name).toBe('String');
     });
+
+    it('does not conflict with a physical embedding_text column (NoteInput)', async () => {
+      const result = await query<{
+        __type: { inputFields: Array<{ name: string; type: { name: string } }> };
+      }>(`
+        query {
+          __type(name: "NoteInput") {
+            inputFields {
+              name
+              type { name }
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const inputType = result.data?.__type;
+      expect(inputType).toBeDefined();
+
+      // Exactly one embeddingText field — the physical column, not a
+      // plugin-synthesized companion.
+      const textFields = inputType!.inputFields.filter(
+        (f) => f.name === 'embeddingText'
+      );
+      expect(textFields).toHaveLength(1);
+      expect(textFields[0].type.name).toBe('String');
+    });
+
+    it('stores raw text in the physical embedding_text column (not consumed as companion)', async () => {
+      const result = await query<{
+        createNote: { note: { id: number; title: string; embeddingText: string; embedding: number[] | null } };
+      }>(`
+        mutation {
+          createNote(input: { note: { title: "Physical column", embeddingText: "keep me as text" } }) {
+            note {
+              id
+              title
+              embeddingText
+              embedding
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const note = result.data?.createNote?.note;
+      expect(note).toBeDefined();
+      expect(note!.embeddingText).toBe('keep me as text');
+      // The vector column must NOT have been populated by the plugin.
+      expect(note!.embedding).toBeNull();
+    });
   });
 });
 
