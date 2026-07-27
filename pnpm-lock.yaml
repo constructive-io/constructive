@@ -2738,6 +2738,9 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
+      '@pgsql/transform':
+        specifier: ^18.3.0
+        version: 18.3.0
       csv-to-pg:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
@@ -2768,6 +2771,9 @@ importers:
       pgsql-parser:
         specifier: ^18.1.1
         version: 18.1.1
+      plpgsql-parser:
+        specifier: ^18.2.1
+        version: 18.2.1
       yanse:
         specifier: ^0.2.1
         version: 0.2.1
