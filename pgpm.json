@@ -5,7 +5,7 @@
   "dependencies": {
     "@constructive-db/apps": "4.0.0",
     "@constructive-db/catalog": "4.0.0",
-    "@constructive-db/routing": "4.0.0",
+    "@constructive-db/routing": "5.0.0",
     "@constructive-db/routing-platform": "4.0.0",
     "@pgpm/database-jobs": "0.33.1",
     "@pgpm/function-resolution": "0.33.1",
