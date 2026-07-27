@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.24.0](https://github.com/constructive-io/constructive/compare/mime-bytes@0.23.0...mime-bytes@0.24.0) (2026-07-27)
+
+**Note:** Version bump only for package mime-bytes
+
 # [0.23.0](https://github.com/constructive-io/constructive/compare/mime-bytes@0.22.0...mime-bytes@0.23.0) (2026-07-27)
 
 **Note:** Version bump only for package mime-bytes

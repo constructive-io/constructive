@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.33.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.32.0...@constructive-io/s3-streamer@2.33.0) (2026-07-27)
+
+**Note:** Version bump only for package @constructive-io/s3-streamer
+
 # [2.32.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.31.0...@constructive-io/s3-streamer@2.32.0) (2026-07-27)
 
 **Note:** Version bump only for package @constructive-io/s3-streamer

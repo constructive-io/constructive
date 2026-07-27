@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/url-domains@2.22.0...@constructive-io/url-domains@2.23.0) (2026-07-27)
+
+**Note:** Version bump only for package @constructive-io/url-domains
+
 # [2.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/url-domains@2.21.0...@constructive-io/url-domains@2.22.0) (2026-07-27)
 
 **Note:** Version bump only for package @constructive-io/url-domains
