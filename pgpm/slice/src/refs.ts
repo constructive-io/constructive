@@ -1,4 +1,4 @@
-import { classifyStatements } from '@pgsql/transform';
+import { classifyStatements } from '@pgpmjs/transform';
 
 /**
  * The parser runs on a WASM build of the real PostgreSQL parser; callers must

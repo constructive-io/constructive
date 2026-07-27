@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 
 import { PgpmMigrate } from '../../src/migrate/client';
-import { slicePlan, writeSliceResult } from '../../src/slice';
+import { slicePlan, writeSliceResult } from '@pgpmjs/slice';
 import { MigrateTestFixture, teardownAllPools, TestDatabase } from '../../test-utils';
 
 describe('Slice Deploy Integration', () => {

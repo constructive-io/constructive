@@ -2,7 +2,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { extractSqlFacts, loadModule, slicePlan } from '../../src/slice';
+import { extractSqlFacts, loadModule, slicePlan } from '../src';
 
 beforeAll(async () => {
   await loadModule();

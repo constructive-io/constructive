@@ -13,7 +13,7 @@ import {
   topologicalSortWithinPackage,
   slicePlan,
   PatternStrategy
-} from '../../src/slice';
+} from '../src';
 import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 
 describe('Slice Module', () => {

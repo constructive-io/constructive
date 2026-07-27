@@ -1,4 +1,5 @@
-import { PgpmPackage, slicePlan, writeSliceResult, generateDryRunReport, SliceConfig, PatternSlice } from '@pgpmjs/core';
+import { PgpmPackage } from '@pgpmjs/core';
+import { generateDryRunReport, PatternSlice, SliceConfig, slicePlan, writeSliceResult } from '@pgpmjs/slice';
 import { getGitConfigInfo } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { resolve } from 'path';

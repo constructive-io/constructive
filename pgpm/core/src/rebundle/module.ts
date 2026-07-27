@@ -4,7 +4,7 @@ import { join } from 'path';
 import { Change, Tag } from '@pgpmjs/ast/files/types';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { mergeSqlStatements, packageModule } from '../packaging/package';
-import { generatePlanContent } from '../slice/slice';
+import { generatePlanContent } from '@pgpmjs/slice';
 import { assembleChunkSql, rebundlePlan } from './rebundle';
 import { Chunk, RebundleModuleOptions, RebundleModuleResult } from './types';
 

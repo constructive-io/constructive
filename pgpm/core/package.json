@@ -54,18 +54,16 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@pgsql/transform": "^18.3.0",
+    "@pgpmjs/slice": "workspace:^",
     "csv-to-pg": "workspace:^",
     "genomic": "^5.6.2",
     "glob": "^13.0.6",
-    "minimatch": "^10.2.5",
     "parse-package-name": "^1.0.0",
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-deparser": "^18.1.1",
     "pgsql-parser": "^18.1.1",
-    "plpgsql-parser": "^18.2.1",
     "yanse": "^0.2.1"
   }
 }

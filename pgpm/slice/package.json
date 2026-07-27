@@ -1,8 +1,8 @@
 {
-  "name": "@pgpmjs/transform",
+  "name": "@pgpmjs/slice",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Change-aware SQL transformation for PGPM — superset of @pgsql/transform plus change categorization, fixture closure, and bundle transpile/apply drivers",
+  "description": "PGPM plan slicing — split a monolithic pgpm plan into packages with pattern strategies and opt-in AST-based dependency closure",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -34,16 +34,17 @@
     "postgresql",
     "pgpm",
     "pgpmjs",
-    "transform",
-    "classify",
-    "plpgsql"
+    "slice",
+    "migration",
+    "plan"
   ],
   "devDependencies": {
-    "@pgpmjs/bundle": "workspace:^",
     "makage": "^0.3.0"
   },
   "dependencies": {
-    "@pgsql/transform": "^18.3.1",
+    "@pgpmjs/ast": "workspace:^",
+    "@pgpmjs/transform": "workspace:^",
+    "minimatch": "^10.2.5",
     "plpgsql-parser": "^18.2.1"
   }
 }

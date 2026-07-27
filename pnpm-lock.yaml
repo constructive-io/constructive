@@ -2646,6 +2646,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
+      '@pgpmjs/slice':
+        specifier: workspace:^
+        version: link:../slice/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
@@ -2735,12 +2738,12 @@ importers:
       '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../../packages/server-utils/dist
+      '@pgpmjs/slice':
+        specifier: workspace:^
+        version: link:../slice/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
-      '@pgsql/transform':
-        specifier: ^18.3.0
-        version: 18.3.0
       csv-to-pg:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
@@ -2750,9 +2753,6 @@ importers:
       glob:
         specifier: ^13.0.6
         version: 13.0.6
-      minimatch:
-        specifier: ^10.2.5
-        version: 10.2.5
       parse-package-name:
         specifier: ^1.0.0
         version: 1.0.0
@@ -2771,9 +2771,6 @@ importers:
       pgsql-parser:
         specifier: ^18.1.1
         version: 18.1.1
-      plpgsql-parser:
-        specifier: ^18.2.1
-        version: 18.2.1
       yanse:
         specifier: ^0.2.1
         version: 0.2.1
@@ -2873,11 +2870,31 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  pgpm/slice:
+    dependencies:
+      '@pgpmjs/ast':
+        specifier: workspace:^
+        version: link:../ast/dist
+      '@pgpmjs/transform':
+        specifier: workspace:^
+        version: link:../transform/dist
+      minimatch:
+        specifier: ^10.2.5
+        version: 10.2.5
+      plpgsql-parser:
+        specifier: ^18.2.1
+        version: 18.2.1
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   pgpm/transform:
     dependencies:
       '@pgsql/transform':
-        specifier: ^18.3.0
-        version: 18.3.0
+        specifier: ^18.3.1
+        version: 18.3.1
       plpgsql-parser:
         specifier: ^18.2.1
         version: 18.2.1
@@ -5087,8 +5104,8 @@ packages:
   '@pgsql/quotes@18.1.0':
     resolution: {integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==}
 
-  '@pgsql/transform@18.3.0':
-    resolution: {integrity: sha512-aCxWTqfHzIh8RL2zU4rC+O0o1rx2zZDYDka8o+Gdap6FN1bmhoOI/5Xgw+aXR1mDXLwY8JkH9GpIbma58PKrpA==}
+  '@pgsql/transform@18.3.1':
+    resolution: {integrity: sha512-eWYZ4OQucZo4ZGtf6KYw/uE8hrAwn4PH4Gp+cUfVzsx3CKBChJ/dYbTAsFjMFfG+5IbAQQNGvkLbWFJ0a1gTWQ==}
 
   '@pgsql/traverse@18.1.0':
     resolution: {integrity: sha512-B+jIX6BvWrHO6DKlJ7p6Wvhbu1s7IhksLwwC3tvV+epKiuU4v8gJLd/OVQ5xeRSwhhLWmrctRfuAKHecbCaNjw==}
@@ -6438,15 +6455,8 @@ packages:
   brace-expansion@1.1.12:
     resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
 
-  brace-expansion@2.0.2:
-    resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
-
   brace-expansion@2.1.0:
     resolution: {integrity: sha512-TN1kCZAgdgweJhWWpgKYrQaMNHcDULHkWwQIspdtjV4Y5aurRdZpjAqn6yX3FPqTA9ngHCc4hJxMAMgGfve85w==}
-
-  brace-expansion@5.0.4:
-    resolution: {integrity: sha512-h+DEnpVvxmfVefa4jFbCf5HdH5YMDXRsmKflpf1pILZWRFlTbJpxeU55nJl4Smt5HQaGzg1o6RHFPJaOqnmBDg==}
-    engines: {node: 18 || 20 || >=22}
 
   brace-expansion@5.0.6:
     resolution: {integrity: sha512-kLpxurY4Z4r9sgMsyG0Z9uzsBlgiU/EFKhj/h91/8yHu0edo7XuixOIH3VcJ8kkxs6/jPzoI6U9Vj3WqbMQ94g==}
@@ -11245,7 +11255,7 @@ snapshots:
     dependencies:
       '@eslint/object-schema': 2.1.7
       debug: 4.4.3(supports-color@5.5.0)
-      minimatch: 3.1.2
+      minimatch: 3.1.5
     transitivePeerDependencies:
       - supports-color
 
@@ -11266,7 +11276,7 @@ snapshots:
       ignore: 5.3.2
       import-fresh: 3.3.1
       js-yaml: 4.1.1
-      minimatch: 3.1.2
+      minimatch: 3.1.5
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
@@ -12343,7 +12353,7 @@ snapshots:
 
   '@pgsql/quotes@18.1.0': {}
 
-  '@pgsql/transform@18.3.0':
+  '@pgsql/transform@18.3.1':
     dependencies:
       '@pgsql/quotes': 18.1.0
       '@pgsql/traverse': 18.3.0
@@ -13713,17 +13723,9 @@ snapshots:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
-  brace-expansion@2.0.2:
-    dependencies:
-      balanced-match: 1.0.2
-
   brace-expansion@2.1.0:
     dependencies:
       balanced-match: 1.0.2
-
-  brace-expansion@5.0.4:
-    dependencies:
-      balanced-match: 4.0.4
 
   brace-expansion@5.0.6:
     dependencies:
@@ -16309,7 +16311,7 @@ snapshots:
 
   minimatch@10.2.4:
     dependencies:
-      brace-expansion: 5.0.4
+      brace-expansion: 5.0.6
 
   minimatch@10.2.5:
     dependencies:
@@ -16337,11 +16339,11 @@ snapshots:
 
   minimatch@9.0.3:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimatch@9.0.9:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimist-options@4.1.0:
     dependencies:
@@ -16422,7 +16424,7 @@ snapshots:
       array-differ: 3.0.0
       array-union: 2.1.0
       arrify: 2.0.1
-      minimatch: 3.0.5
+      minimatch: 3.1.5
 
   mute-stream@0.0.8: {}
 
