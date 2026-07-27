@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 65 tables and 11 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 63 tables and 11 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 65 tables and 11 custom operations
+ORM client for the api API — provides typed CRUD operations for 63 tables and 11 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the api API — provides typed CRUD operations for 65 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: api, apiModule, apiSchema, apiSetting, astMigration, checkConstraint, compositeType, corsSetting, ...
+// Available models: api, apiSchema, apiSetting, astMigration, checkConstraint, compositeType, corsSetting, database, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -38,7 +38,6 @@ const items = await db.api.findMany({
 See the `references/` directory for detailed per-entity API documentation:
 
 - [api](references/api.md)
-- [api-module](references/api-module.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
 - [ast-migration](references/ast-migration.md)
@@ -66,7 +65,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [partition](references/partition.md)
 - [platform-api](references/platform-api.md)
-- [platform-api-module](references/platform-api-module.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
 - [platform-cors-setting](references/platform-cors-setting.md)

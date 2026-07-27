@@ -181,10 +181,6 @@ export type ApiSurfaceModuleOrderBy =
   | 'APIS_TABLE_ID_DESC'
   | 'APIS_TABLE_NAME_ASC'
   | 'APIS_TABLE_NAME_DESC'
-  | 'API_MODULES_TABLE_ID_ASC'
-  | 'API_MODULES_TABLE_ID_DESC'
-  | 'API_MODULES_TABLE_NAME_ASC'
-  | 'API_MODULES_TABLE_NAME_DESC'
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
   | 'API_SCHEMAS_TABLE_ID_ASC'
@@ -3412,10 +3408,6 @@ export interface AgentModulePatch {
 export interface ApiSurfaceModuleFilter {
   /** Checks for all expressions in this list. */
   and?: ApiSurfaceModuleFilter[];
-  /** Filter by the object’s `apiModulesTableId` field. */
-  apiModulesTableId?: UUIDFilter;
-  /** Filter by the object’s `apiModulesTableName` field. */
-  apiModulesTableName?: StringFilter;
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
   /** Filter by the object’s `apiSchemasTableId` field. */
@@ -3471,8 +3463,6 @@ export interface ApiSurfaceModuleFilter {
 }
 /** An input for mutations affecting `ApiSurfaceModule` */
 export interface ApiSurfaceModuleInput {
-  apiModulesTableId?: string;
-  apiModulesTableName?: string;
   apiName?: string;
   apiSchemasTableId?: string;
   apiSchemasTableName?: string;
@@ -3498,8 +3488,6 @@ export interface ApiSurfaceModuleInput {
 }
 /** Represents an update to a `ApiSurfaceModule`. Fields that are set will be updated. */
 export interface ApiSurfaceModulePatch {
-  apiModulesTableId?: string;
-  apiModulesTableName?: string;
   apiName?: string;
   apiSchemasTableId?: string;
   apiSchemasTableName?: string;

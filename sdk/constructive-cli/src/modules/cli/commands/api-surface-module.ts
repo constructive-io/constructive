@@ -16,8 +16,6 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  apiModulesTableId: 'uuid',
-  apiModulesTableName: 'string',
   apiName: 'string',
   apiSchemasTableId: 'uuid',
   apiSchemasTableName: 'string',
@@ -92,8 +90,6 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      apiModulesTableId: true,
-      apiModulesTableName: true,
       apiName: true,
       apiSchemasTableId: true,
       apiSchemasTableName: true,
@@ -136,8 +132,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      apiModulesTableId: true,
-      apiModulesTableName: true,
       apiName: true,
       apiSchemasTableId: true,
       apiSchemasTableName: true,
@@ -192,8 +186,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          apiModulesTableId: true,
-          apiModulesTableName: true,
           apiName: true,
           apiSchemasTableId: true,
           apiSchemasTableName: true,
@@ -231,20 +223,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'apiModulesTableId',
-        message: 'apiModulesTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'apiModulesTableName',
-        message: 'apiModulesTableName',
-        required: false,
-        skipPrompt: true,
-      },
       {
         type: 'text',
         name: 'apiName',
@@ -400,8 +378,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.apiSurfaceModule
       .create({
         data: {
-          apiModulesTableId: cleanedData.apiModulesTableId,
-          apiModulesTableName: cleanedData.apiModulesTableName,
           apiName: cleanedData.apiName,
           apiSchemasTableId: cleanedData.apiSchemasTableId,
           apiSchemasTableName: cleanedData.apiSchemasTableName,
@@ -425,8 +401,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: cleanedData.scope,
         },
         select: {
-          apiModulesTableId: true,
-          apiModulesTableName: true,
           apiName: true,
           apiSchemasTableId: true,
           apiSchemasTableName: true,
@@ -469,20 +443,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'apiModulesTableId',
-        message: 'apiModulesTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'apiModulesTableName',
-        message: 'apiModulesTableName',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -639,8 +599,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          apiModulesTableId: cleanedData.apiModulesTableId,
-          apiModulesTableName: cleanedData.apiModulesTableName,
           apiName: cleanedData.apiName,
           apiSchemasTableId: cleanedData.apiSchemasTableId,
           apiSchemasTableName: cleanedData.apiSchemasTableName,
@@ -664,8 +622,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: cleanedData.scope,
         },
         select: {
-          apiModulesTableId: true,
-          apiModulesTableName: true,
           apiName: true,
           apiSchemasTableId: true,
           apiSchemasTableName: true,

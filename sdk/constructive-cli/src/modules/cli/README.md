@@ -232,8 +232,6 @@ CRUD operations for ApiSurfaceModule records.
 
 | Field | Type |
 |-------|------|
-| `apiModulesTableId` | UUID |
-| `apiModulesTableName` | String |
 | `apiName` | String |
 | `apiSchemasTableId` | UUID |
 | `apiSchemasTableName` | String |
@@ -258,7 +256,7 @@ CRUD operations for ApiSurfaceModule records.
 | `scope` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiModulesTableId`, `apiModulesTableName`, `apiName`, `apiSchemasTableId`, `apiSchemasTableName`, `apiSettingsTableId`, `apiSettingsTableName`, `apisTableId`, `apisTableName`, `catalogModuleId`, `corsSettingsTableId`, `corsSettingsTableName`, `defaultPermissions`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `provisions`, `publicSchemaName`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `apiSchemasTableId`, `apiSchemasTableName`, `apiSettingsTableId`, `apiSettingsTableName`, `apisTableId`, `apisTableName`, `catalogModuleId`, `corsSettingsTableId`, `corsSettingsTableName`, `defaultPermissions`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `provisions`, `publicSchemaName`, `schemaId`
 
 ### `app-module`
 

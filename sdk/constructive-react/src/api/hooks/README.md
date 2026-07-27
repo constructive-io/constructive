@@ -37,11 +37,6 @@ function App() {
 | `useCreateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useUpdateApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useDeleteApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `useApiModulesQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useApiModuleQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useCreateApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useUpdateApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useDeleteApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
 | `useApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreateApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -177,11 +172,6 @@ function App() {
 | `useCreatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useUpdatePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
 | `useDeletePlatformApiMutation` | Mutation | API surfaces exposed by this scope; publication makes a surface bindable from other scopes |
-| `usePlatformApiModulesQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `usePlatformApiModuleQuery` | Query | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useCreatePlatformApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useUpdatePlatformApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
-| `useDeletePlatformApiModuleMutation` | Mutation | Server-side module configuration for an API surface; stores module name and JSON settings |
 | `usePlatformApiSchemasQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `usePlatformApiSchemaQuery` | Query | Join table linking API surfaces to the metaschema schemas they expose |
 | `useCreatePlatformApiSchemaMutation` | Mutation | Join table linking API surfaces to the metaschema schemas they expose |
@@ -399,27 +389,6 @@ const { mutate: create } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
 create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
-```
-
-### ApiModule
-
-```typescript
-// List all apiModules
-const { data, isLoading } = useApiModulesQuery({
-  selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } },
-});
-
-// Get one apiModule
-const { data: item } = useApiModuleQuery({
-  id: '<UUID>',
-  selection: { fields: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } },
-});
-
-// Create a apiModule
-const { mutate: create } = useCreateApiModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' });
 ```
 
 ### ApiSchema
@@ -987,27 +956,6 @@ const { mutate: create } = useCreatePlatformApiMutation({
   selection: { fields: { id: true } },
 });
 create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
-```
-
-### PlatformApiModule
-
-```typescript
-// List all platformApiModules
-const { data, isLoading } = usePlatformApiModulesQuery({
-  selection: { fields: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } },
-});
-
-// Get one platformApiModule
-const { data: item } = usePlatformApiModuleQuery({
-  id: '<UUID>',
-  selection: { fields: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } },
-});
-
-// Create a platformApiModule
-const { mutate: create } = useCreatePlatformApiModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ apiId: '<UUID>', data: '<JSON>', name: '<String>' });
 ```
 
 ### PlatformApiSchema

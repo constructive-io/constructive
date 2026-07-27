@@ -6,7 +6,6 @@
 
 import type {
   Api,
-  ApiModule,
   ApiSchema,
   ApiSetting,
   AstMigration,
@@ -34,7 +33,6 @@ import type {
   NodeTypeRegistry,
   Partition,
   PlatformApi,
-  PlatformApiModule,
   PlatformApiSchema,
   PlatformApiSetting,
   PlatformCorsSetting,
@@ -90,25 +88,6 @@ import type {
 } from './types';
 export type ConstructiveInternalTypeImage = unknown;
 export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
-/** Methods to use when ordering `ApiModule`. */
-export type ApiModuleOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `Api`. */
 export type ApiOrderBy =
   | 'ANON_ROLE_ASC'
@@ -933,23 +912,6 @@ export type PartitionOrderBy =
   | 'STRATEGY_DESC'
   | 'TABLE_ID_ASC'
   | 'TABLE_ID_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `PlatformApiModule`. */
-export type PlatformApiModuleOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformApi`. */
@@ -1927,10 +1889,6 @@ export interface ApiFilter {
   and?: ApiFilter[];
   /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
-  /** Filter by the object’s `apiModules` relation. */
-  apiModules?: ApiToManyApiModuleFilter;
-  /** `apiModules` exist. */
-  apiModulesExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: ApiToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -1984,57 +1942,6 @@ export interface ApiInput {
   name: string;
   /** Authenticated role the API executes as */
   roleName?: string;
-  updatedAt?: string;
-}
-/** A filter to be used against `ApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApiModuleFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: ApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: ApiModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApiModuleFilter[];
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `ApiModule` */
-export interface ApiModuleInput {
-  /** API surface this module configuration belongs to */
-  apiId: string;
-  createdAt?: string;
-  /** JSON configuration data for this module */
-  data: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  id?: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `ApiModule`. Fields that are set will be updated. */
-export interface ApiModulePatch {
-  /** API surface this module configuration belongs to */
-  apiId?: string;
-  createdAt?: string;
-  /** JSON configuration data for this module */
-  data?: unknown;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string;
-  id?: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name?: string;
   updatedAt?: string;
 }
 /** Represents an update to a `Api`. Fields that are set will be updated. */
@@ -2224,15 +2131,6 @@ export interface ApiSettingPatch {
   /** Extensible JSON for additional per-API settings that do not have dedicated columns */
   options?: unknown;
   updatedAt?: string;
-}
-/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiToManyApiModuleFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ApiModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ApiModuleFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ApiModuleFilter;
 }
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiToManyApiSchemaFilter {
@@ -2524,11 +2422,6 @@ export interface CreateApiInput {
   api: ApiInput;
   clientMutationId?: string;
 }
-export interface CreateApiModuleInput {
-  /** The `ApiModule` to be created by this mutation. */
-  apiModule: ApiModuleInput;
-  clientMutationId?: string;
-}
 export interface CreateApiSchemaInput {
   /** The `ApiSchema` to be created by this mutation. */
   apiSchema: ApiSchemaInput;
@@ -2658,11 +2551,6 @@ export interface CreatePlatformApiInput {
   clientMutationId?: string;
   /** The `PlatformApi` to be created by this mutation. */
   platformApi: PlatformApiInput;
-}
-export interface CreatePlatformApiModuleInput {
-  clientMutationId?: string;
-  /** The `PlatformApiModule` to be created by this mutation. */
-  platformApiModule: PlatformApiModuleInput;
 }
 export interface CreatePlatformApiSchemaInput {
   clientMutationId?: string;
@@ -3483,10 +3371,6 @@ export interface DeleteApiInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteApiModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteApiSchemaInput {
   clientMutationId?: string;
   id: string;
@@ -3588,10 +3472,6 @@ export interface DeletePartitionInput {
   id: string;
 }
 export interface DeletePlatformApiInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeletePlatformApiModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -5187,10 +5067,6 @@ export interface PlatformApiFilter {
   not?: PlatformApiFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformApiFilter[];
-  /** Filter by the object’s `platformApiModulesByApiId` relation. */
-  platformApiModulesByApiId?: PlatformApiToManyPlatformApiModuleFilter;
-  /** `platformApiModulesByApiId` exist. */
-  platformApiModulesByApiIdExist?: boolean;
   /** Filter by the object’s `platformApiSchemasByApiId` relation. */
   platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
   /** `platformApiSchemasByApiId` exist. */
@@ -5224,51 +5100,6 @@ export interface PlatformApiInput {
   name: string;
   /** Authenticated role the API executes as */
   roleName?: string;
-  updatedAt?: string;
-}
-/** A filter to be used against `PlatformApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApiModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformApiModuleFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: PlatformApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: PlatformApiModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformApiModuleFilter[];
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `PlatformApiModule` */
-export interface PlatformApiModuleInput {
-  /** API surface this module configuration belongs to */
-  apiId: string;
-  createdAt?: string;
-  /** JSON configuration data for this module */
-  data: unknown;
-  id?: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name: string;
-  updatedAt?: string;
-}
-/** Represents an update to a `PlatformApiModule`. Fields that are set will be updated. */
-export interface PlatformApiModulePatch {
-  /** API surface this module configuration belongs to */
-  apiId?: string;
-  createdAt?: string;
-  /** JSON configuration data for this module */
-  data?: unknown;
-  id?: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name?: string;
   updatedAt?: string;
 }
 /** Represents an update to a `PlatformApi`. Fields that are set will be updated. */
@@ -5444,15 +5275,6 @@ export interface PlatformApiSettingPatch {
   /** Extensible JSON for additional per-API settings that do not have dedicated columns */
   options?: unknown;
   updatedAt?: string;
-}
-/** A filter to be used against many `PlatformApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApiToManyPlatformApiModuleFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: PlatformApiModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: PlatformApiModuleFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: PlatformApiModuleFilter;
 }
 /** A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiToManyPlatformApiSchemaFilter {
@@ -7877,12 +7699,6 @@ export interface UpdateApiInput {
   clientMutationId?: string;
   id: string;
 }
-export interface UpdateApiModuleInput {
-  /** An object where the defined keys will be set on the `ApiModule` being updated. */
-  apiModulePatch: ApiModulePatch;
-  clientMutationId?: string;
-  id: string;
-}
 export interface UpdateApiSchemaInput {
   /** An object where the defined keys will be set on the `ApiSchema` being updated. */
   apiSchemaPatch: ApiSchemaPatch;
@@ -8038,12 +7854,6 @@ export interface UpdatePlatformApiInput {
   id: string;
   /** An object where the defined keys will be set on the `PlatformApi` being updated. */
   platformApiPatch: PlatformApiPatch;
-}
-export interface UpdatePlatformApiModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `PlatformApiModule` being updated. */
-  platformApiModulePatch: PlatformApiModulePatch;
 }
 export interface UpdatePlatformApiSchemaInput {
   clientMutationId?: string;
@@ -8679,13 +8489,6 @@ export interface WebauthnSettingPatch {
 export interface MetaSchema {
   tables: MetaTable[];
 }
-/** A connection to a list of `ApiModule` values. */
-export interface ApiModuleConnection {
-  edges: ApiModuleEdge[];
-  nodes: ApiModule[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `ApiSchema` values. */
 export interface ApiSchemaConnection {
   edges: ApiSchemaEdge[];
@@ -8872,13 +8675,6 @@ export interface NodeTypeRegistryConnection {
 export interface PartitionConnection {
   edges: PartitionEdge[];
   nodes: Partition[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `PlatformApiModule` values. */
-export interface PlatformApiModuleConnection {
-  edges: PlatformApiModuleEdge[];
-  nodes: PlatformApiModule[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9178,12 +8974,6 @@ export interface CreateApiPayload {
   apiEdge?: ApiEdge | null;
   clientMutationId?: string | null;
 }
-export interface CreateApiModulePayload {
-  /** The `ApiModule` that was created by this mutation. */
-  apiModule?: ApiModule | null;
-  apiModuleEdge?: ApiModuleEdge | null;
-  clientMutationId?: string | null;
-}
 export interface CreateApiSchemaPayload {
   /** The `ApiSchema` that was created by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -9339,12 +9129,6 @@ export interface CreatePlatformApiPayload {
   /** The `PlatformApi` that was created by this mutation. */
   platformApi?: PlatformApi | null;
   platformApiEdge?: PlatformApiEdge | null;
-}
-export interface CreatePlatformApiModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApiModule` that was created by this mutation. */
-  platformApiModule?: PlatformApiModule | null;
-  platformApiModuleEdge?: PlatformApiModuleEdge | null;
 }
 export interface CreatePlatformApiSchemaPayload {
   clientMutationId?: string | null;
@@ -9556,12 +9340,6 @@ export interface DeleteApiPayload {
   apiEdge?: ApiEdge | null;
   clientMutationId?: string | null;
 }
-export interface DeleteApiModulePayload {
-  /** The `ApiModule` that was deleted by this mutation. */
-  apiModule?: ApiModule | null;
-  apiModuleEdge?: ApiModuleEdge | null;
-  clientMutationId?: string | null;
-}
 export interface DeleteApiSchemaPayload {
   /** The `ApiSchema` that was deleted by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -9717,12 +9495,6 @@ export interface DeletePlatformApiPayload {
   /** The `PlatformApi` that was deleted by this mutation. */
   platformApi?: PlatformApi | null;
   platformApiEdge?: PlatformApiEdge | null;
-}
-export interface DeletePlatformApiModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApiModule` that was deleted by this mutation. */
-  platformApiModule?: PlatformApiModule | null;
-  platformApiModuleEdge?: PlatformApiModuleEdge | null;
 }
 export interface DeletePlatformApiSchemaPayload {
   clientMutationId?: string | null;
@@ -9959,12 +9731,6 @@ export interface UpdateApiPayload {
   apiEdge?: ApiEdge | null;
   clientMutationId?: string | null;
 }
-export interface UpdateApiModulePayload {
-  /** The `ApiModule` that was updated by this mutation. */
-  apiModule?: ApiModule | null;
-  apiModuleEdge?: ApiModuleEdge | null;
-  clientMutationId?: string | null;
-}
 export interface UpdateApiSchemaPayload {
   /** The `ApiSchema` that was updated by this mutation. */
   apiSchema?: ApiSchema | null;
@@ -10120,12 +9886,6 @@ export interface UpdatePlatformApiPayload {
   /** The `PlatformApi` that was updated by this mutation. */
   platformApi?: PlatformApi | null;
   platformApiEdge?: PlatformApiEdge | null;
-}
-export interface UpdatePlatformApiModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApiModule` that was updated by this mutation. */
-  platformApiModule?: PlatformApiModule | null;
-  platformApiModuleEdge?: PlatformApiModuleEdge | null;
 }
 export interface UpdatePlatformApiSchemaPayload {
   clientMutationId?: string | null;
@@ -10355,11 +10115,11 @@ export interface MetaTable {
   storage?: MetaStorage | null;
   uniqueConstraints: MetaUniqueConstraint[];
 }
-/** A `ApiModule` edge in the connection. */
-export interface ApiModuleEdge {
+/** A `ApiSchema` edge in the connection. */
+export interface ApiSchemaEdge {
   cursor?: string | null;
-  /** The `ApiModule` at the end of the edge. */
-  node?: ApiModule | null;
+  /** The `ApiSchema` at the end of the edge. */
+  node?: ApiSchema | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -10371,12 +10131,6 @@ export interface PageInfo {
   hasPreviousPage: boolean;
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
-}
-/** A `ApiSchema` edge in the connection. */
-export interface ApiSchemaEdge {
-  cursor?: string | null;
-  /** The `ApiSchema` at the end of the edge. */
-  node?: ApiSchema | null;
 }
 /** A `ApiSetting` edge in the connection. */
 export interface ApiSettingEdge {
@@ -10533,12 +10287,6 @@ export interface PartitionEdge {
   cursor?: string | null;
   /** The `Partition` at the end of the edge. */
   node?: Partition | null;
-}
-/** A `PlatformApiModule` edge in the connection. */
-export interface PlatformApiModuleEdge {
-  cursor?: string | null;
-  /** The `PlatformApiModule` at the end of the edge. */
-  node?: PlatformApiModule | null;
 }
 /** A `PlatformApiSchema` edge in the connection. */
 export interface PlatformApiSchemaEdge {
