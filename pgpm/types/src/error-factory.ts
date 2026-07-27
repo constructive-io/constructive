@@ -145,6 +145,13 @@ export const errors = {
       `${type ? `${type} file` : 'File'} not found: ${filePath}`,
     404
   ),
+
+  DUPLICATE_MODULE: makeError(
+    'DUPLICATE_MODULE',
+    ({ name, paths }: { name: string, paths: string }) =>
+      `Multiple modules share the name "${name}". Each module in a workspace must have a unique name.\n  Found in:\n${paths}`,
+    400
+  ),
 };
 
 // throw errors.MODULE_NOT_FOUND({ name: 'auth' });
