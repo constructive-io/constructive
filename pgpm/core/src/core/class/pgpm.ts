@@ -36,6 +36,7 @@ import {
   ModuleMap
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
+import { syncModuleVersions, SyncVersionsOptions, SyncVersionsResult } from '../../packaging/sync-versions';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { movePath } from '../../utils/fs';
 import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
@@ -1466,6 +1467,25 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   }
 
   // ──────────────── Package Operations ────────────────
+
+  /**
+   * Sync extension metadata (.control default_version, Makefile sql filename,
+   * and the sql/<name>--<version>.sql bundle) to the package.json version.
+   * Inside a module, syncs just that module; at a workspace root, syncs every
+   * workspace module. With `check: true`, reports skew without writing.
+   */
+  async syncVersions(options: SyncVersionsOptions = {}): Promise<SyncVersionsResult> {
+    if (this.isInModule()) {
+      return syncModuleVersions([this.modulePath!], options);
+    }
+
+    this.ensureWorkspace();
+    const moduleMap = this.getModuleMap();
+    const packageDirs = Object.values(moduleMap).map(mod =>
+      path.resolve(this.workspacePath!, mod.path)
+    );
+    return syncModuleVersions(packageDirs, options);
+  }
 
   /**
    * Get the set of modules that have been deployed to the database
