@@ -5,8 +5,6 @@
  */
 export * from './useApisQuery';
 export * from './useApiQuery';
-export * from './useApiModulesQuery';
-export * from './useApiModuleQuery';
 export * from './useApiSchemasQuery';
 export * from './useApiSchemaQuery';
 export * from './useApiSettingsQuery';
@@ -61,8 +59,6 @@ export * from './usePartitionsQuery';
 export * from './usePartitionQuery';
 export * from './usePlatformApisQuery';
 export * from './usePlatformApiQuery';
-export * from './usePlatformApiModulesQuery';
-export * from './usePlatformApiModuleQuery';
 export * from './usePlatformApiSchemasQuery';
 export * from './usePlatformApiSchemaQuery';
 export * from './usePlatformApiSettingsQuery';

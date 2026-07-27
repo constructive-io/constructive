@@ -17,15 +17,6 @@ export interface Api {
   roleName: string | null;
   updatedAt: string | null;
 }
-export interface ApiModule {
-  apiId: string | null;
-  createdAt: string | null;
-  data: unknown | null;
-  databaseId: string | null;
-  id: string | null;
-  name: string | null;
-  updatedAt: string | null;
-}
 export interface ApiSchema {
   apiId: string | null;
   createdAt: string | null;
@@ -423,14 +414,6 @@ export interface PlatformApi {
   isPublished: boolean | null;
   name: string | null;
   roleName: string | null;
-  updatedAt: string | null;
-}
-export interface PlatformApiModule {
-  apiId: string | null;
-  createdAt: string | null;
-  data: unknown | null;
-  id: string | null;
-  name: string | null;
   updatedAt: string | null;
 }
 export interface PlatformApiSchema {

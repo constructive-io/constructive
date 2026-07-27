@@ -27,7 +27,6 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `api` | api CRUD operations |
-| `api-module` | apiModule CRUD operations |
 | `api-schema` | apiSchema CRUD operations |
 | `api-setting` | apiSetting CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
@@ -55,7 +54,6 @@ csdk auth set-token <your-token>
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `partition` | partition CRUD operations |
 | `platform-api` | platformApi CRUD operations |
-| `platform-api-module` | platformApiModule CRUD operations |
 | `platform-api-schema` | platformApiSchema CRUD operations |
 | `platform-api-setting` | platformApiSetting CRUD operations |
 | `platform-cors-setting` | platformCorsSetting CRUD operations |
@@ -183,33 +181,6 @@ CRUD operations for Api records.
 
 **Required create fields:** `databaseId`, `name`
 **Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
-
-### `api-module`
-
-CRUD operations for ApiModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all apiModule records |
-| `find-first` | Find first matching apiModule record |
-| `get` | Get a apiModule by id |
-| `create` | Create a new apiModule |
-| `update` | Update an existing apiModule |
-| `delete` | Delete a apiModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `apiId` | UUID |
-| `createdAt` | Datetime |
-| `data` | JSON |
-| `databaseId` | UUID |
-| `id` | UUID |
-| `name` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `apiId`, `data`, `databaseId`, `name`
 
 ### `api-schema`
 
@@ -1118,32 +1089,6 @@ CRUD operations for PlatformApi records.
 
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
-
-### `platform-api-module`
-
-CRUD operations for PlatformApiModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformApiModule records |
-| `find-first` | Find first matching platformApiModule record |
-| `get` | Get a platformApiModule by id |
-| `create` | Create a new platformApiModule |
-| `update` | Update an existing platformApiModule |
-| `delete` | Delete a platformApiModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `apiId` | UUID |
-| `createdAt` | Datetime |
-| `data` | JSON |
-| `id` | UUID |
-| `name` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `apiId`, `data`, `name`
 
 ### `platform-api-schema`
 

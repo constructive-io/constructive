@@ -42,8 +42,6 @@ export interface AgentModule {
   threadTableName: string | null;
 }
 export interface ApiSurfaceModule {
-  apiModulesTableId: string | null;
-  apiModulesTableName: string | null;
   apiName: string | null;
   apiSchemasTableId: string | null;
   apiSchemasTableName: string | null;

@@ -16,7 +16,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   apiKeys,
-  apiModuleKeys,
   apiSchemaKeys,
   apiSettingKeys,
   astMigrationKeys,
@@ -44,7 +43,6 @@ import {
   nodeTypeRegistryKeys,
   partitionKeys,
   platformApiKeys,
-  platformApiModuleKeys,
   platformApiSchemaKeys,
   platformApiSettingKeys,
   platformCorsSettingKeys,
@@ -113,23 +111,6 @@ export const invalidate = {
     /** Invalidate a specific api */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: apiKeys.detail(id),
-      }),
-  },
-  /** Invalidate apiModule queries */ apiModule: {
-    /** Invalidate all apiModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiModuleKeys.all,
-      }),
-    /** Invalidate apiModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: apiModuleKeys.lists(),
-      }),
-    /** Invalidate a specific apiModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: apiModuleKeys.detail(id),
       }),
   },
   /** Invalidate apiSchema queries */ apiSchema: {
@@ -571,23 +552,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformApiKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformApiModule queries */ platformApiModule: {
-    /** Invalidate all platformApiModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformApiModuleKeys.all,
-      }),
-    /** Invalidate platformApiModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformApiModuleKeys.lists(),
-      }),
-    /** Invalidate a specific platformApiModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformApiModuleKeys.detail(id),
       }),
   },
   /** Invalidate platformApiSchema queries */ platformApiSchema: {
@@ -1179,11 +1143,6 @@ export const remove = {
       queryKey: apiKeys.detail(id),
     });
   },
-  /** Remove apiModule from cache */ apiModule: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: apiModuleKeys.detail(id),
-    });
-  },
   /** Remove apiSchema from cache */ apiSchema: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: apiSchemaKeys.detail(id),
@@ -1371,14 +1330,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformApiKeys.detail(id),
-    });
-  },
-  /** Remove platformApiModule from cache */ platformApiModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformApiModuleKeys.detail(id),
     });
   },
   /** Remove platformApiSchema from cache */ platformApiSchema: (

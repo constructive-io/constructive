@@ -28,15 +28,6 @@ export const apiKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...apiKeys.details(), id] as const,
 } as const;
-export const apiModuleKeys = {
-  /** All apiModule queries */ all: ['apimodule'] as const,
-  /** List query keys */ lists: () => [...apiModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apiModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apiModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apiModuleKeys.details(), id] as const,
-} as const;
 export const apiSchemaKeys = {
   /** All apiSchema queries */ all: ['apischema'] as const,
   /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
@@ -279,15 +270,6 @@ export const platformApiKeys = {
   /** Detail query keys */ details: () => [...platformApiKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformApiKeys.details(), id] as const,
-} as const;
-export const platformApiModuleKeys = {
-  /** All platformApiModule queries */ all: ['platformapimodule'] as const,
-  /** List query keys */ lists: () => [...platformApiModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformApiModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformApiModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformApiModuleKeys.details(), id] as const,
 } as const;
 export const platformApiSchemaKeys = {
   /** All platformApiSchema queries */ all: ['platformapischema'] as const,
@@ -644,7 +626,6 @@ export const customQueryKeys = {
  */
 export const queryKeys = {
   api: apiKeys,
-  apiModule: apiModuleKeys,
   apiSchema: apiSchemaKeys,
   apiSetting: apiSettingKeys,
   astMigration: astMigrationKeys,
@@ -672,7 +653,6 @@ export const queryKeys = {
   nodeTypeRegistry: nodeTypeRegistryKeys,
   partition: partitionKeys,
   platformApi: platformApiKeys,
-  platformApiModule: platformApiModuleKeys,
   platformApiSchema: platformApiSchemaKeys,
   platformApiSetting: platformApiSettingKeys,
   platformCorsSetting: platformCorsSettingKeys,

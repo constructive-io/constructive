@@ -22,7 +22,6 @@ const db = createClient({
 | Model | Operations |
 |-------|------------|
 | `api` | findMany, findOne, create, update, delete |
-| `apiModule` | findMany, findOne, create, update, delete |
 | `apiSchema` | findMany, findOne, create, update, delete |
 | `apiSetting` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
@@ -50,7 +49,6 @@ const db = createClient({
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `partition` | findMany, findOne, create, update, delete |
 | `platformApi` | findMany, findOne, create, update, delete |
-| `platformApiModule` | findMany, findOne, create, update, delete |
 | `platformApiSchema` | findMany, findOne, create, update, delete |
 | `platformApiSetting` | findMany, findOne, create, update, delete |
 | `platformCorsSetting` | findMany, findOne, create, update, delete |
@@ -125,41 +123,6 @@ const updated = await db.api.update({ where: { id: '<UUID>' }, data: { anonRole:
 
 // Delete
 const deleted = await db.api.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.apiModule`
-
-CRUD operations for ApiModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `apiId` | UUID | Yes |
-| `createdAt` | Datetime | No |
-| `data` | JSON | Yes |
-| `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all apiModule records
-const items = await db.apiModule.findMany({ select: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.apiModule.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.apiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.apiModule.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.apiModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.apiSchema`
@@ -1261,40 +1224,6 @@ const updated = await db.platformApi.update({ where: { id: '<UUID>' }, data: { a
 
 // Delete
 const deleted = await db.platformApi.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.platformApiModule`
-
-CRUD operations for PlatformApiModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `apiId` | UUID | Yes |
-| `createdAt` | Datetime | No |
-| `data` | JSON | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all platformApiModule records
-const items = await db.platformApiModule.findMany({ select: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.platformApiModule.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.platformApiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', name: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformApiModule.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformApiModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformApiSchema`

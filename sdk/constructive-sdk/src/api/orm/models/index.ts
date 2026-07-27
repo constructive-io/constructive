@@ -4,7 +4,6 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { ApiModel } from './api';
-export { ApiModuleModel } from './apiModule';
 export { ApiSchemaModel } from './apiSchema';
 export { ApiSettingModel } from './apiSetting';
 export { AstMigrationModel } from './astMigration';
@@ -32,7 +31,6 @@ export { ManagedDomainModel } from './managedDomain';
 export { NodeTypeRegistryModel } from './nodeTypeRegistry';
 export { PartitionModel } from './partition';
 export { PlatformApiModel } from './platformApi';
-export { PlatformApiModuleModel } from './platformApiModule';
 export { PlatformApiSchemaModel } from './platformApiSchema';
 export { PlatformApiSettingModel } from './platformApiSetting';
 export { PlatformCorsSettingModel } from './platformCorsSetting';

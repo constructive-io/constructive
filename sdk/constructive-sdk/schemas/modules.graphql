@@ -347,8 +347,6 @@ input AgentModulePatch {
 }
 
 type ApiSurfaceModule {
-  apiModulesTableId: UUID!
-  apiModulesTableName: String!
   apiName: String
   apiSchemasTableId: UUID!
   apiSchemasTableName: String!
@@ -412,12 +410,6 @@ A filter to be used against `ApiSurfaceModule` object types. All fields are comb
 input ApiSurfaceModuleFilter {
   """Checks for all expressions in this list."""
   and: [ApiSurfaceModuleFilter!]
-
-  """Filter by the object’s `apiModulesTableId` field."""
-  apiModulesTableId: UUIDFilter
-
-  """Filter by the object’s `apiModulesTableName` field."""
-  apiModulesTableName: StringFilter
 
   """Filter by the object’s `apiName` field."""
   apiName: StringFilter
@@ -500,8 +492,6 @@ input ApiSurfaceModuleFilter {
 
 """An input for mutations affecting `ApiSurfaceModule`"""
 input ApiSurfaceModuleInput {
-  apiModulesTableId: UUID
-  apiModulesTableName: String
   apiName: String
   apiSchemasTableId: UUID
   apiSchemasTableName: String
@@ -532,10 +522,6 @@ enum ApiSurfaceModuleOrderBy {
   APIS_TABLE_ID_DESC
   APIS_TABLE_NAME_ASC
   APIS_TABLE_NAME_DESC
-  API_MODULES_TABLE_ID_ASC
-  API_MODULES_TABLE_ID_DESC
-  API_MODULES_TABLE_NAME_ASC
-  API_MODULES_TABLE_NAME_DESC
   API_NAME_ASC
   API_NAME_DESC
   API_SCHEMAS_TABLE_ID_ASC
@@ -585,8 +571,6 @@ enum ApiSurfaceModuleOrderBy {
 Represents an update to a `ApiSurfaceModule`. Fields that are set will be updated.
 """
 input ApiSurfaceModulePatch {
-  apiModulesTableId: UUID
-  apiModulesTableName: String
   apiName: String
   apiSchemasTableId: UUID
   apiSchemasTableName: String
