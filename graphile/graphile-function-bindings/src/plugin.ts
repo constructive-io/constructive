@@ -37,6 +37,7 @@ import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { isValidNameError } from 'graphql';
 import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
+import { escapeIdentifier } from 'pg';
 
 import type { DerivedField, DerivedInput } from './derive';
 import { buildInvocationPayload, deriveInputFields, isGraphqlEnabled } from './derive';
@@ -65,6 +66,34 @@ interface FunctionBindingsBuildInput {
   bindings: LoadedBinding[];
 }
 
+export function buildBindingsQuery(module: ComputeModuleNames, apiId: string): { text: string; values: SqlValue[] } {
+  const definitionsTable = `${escapeIdentifier(module.computeSchema)}.${escapeIdentifier(module.definitionsTable)}`;
+  const bindingsTable = `${escapeIdentifier(module.computeSchema)}.${escapeIdentifier(module.bindingsTable)}`;
+
+  return {
+    text: `
+      SELECT
+        b.id,
+        b.alias,
+        b.config,
+        b.function_definition_id,
+        d.task_identifier,
+        d.description,
+        COALESCE(
+          to_jsonb(d) -> 'payload_args',
+          to_jsonb(d) -> 'inputs',
+          '[]'::jsonb
+        ) AS payload_args
+      FROM ${bindingsTable} b
+      JOIN ${definitionsTable} d
+        ON d.id = b.function_definition_id
+      WHERE b.api_id = $1
+      ORDER BY b.alias ASC
+    `,
+    values: [apiId]
+  };
+}
+
 async function loadBindings(
   pgService: GraphileConfig.PgServiceConfiguration,
   options: FunctionBindingsPluginOptions
@@ -72,26 +101,7 @@ async function loadBindings(
   return withPgClientFromPgService(pgService, null, async (client) => {
     const bindings: LoadedBinding[] = [];
     for (const module of options.modules) {
-      const { computeSchema, bindingsTable, definitionsTable } = module;
-      const { text, values } = new QueryBuilder()
-        .schema(computeSchema)
-        .table(bindingsTable, 'b')
-        .select([
-          'b.id',
-          'b.alias',
-          'b.config',
-          'b.function_definition_id',
-          'd.task_identifier',
-          'd.description',
-          'd.payload_args'
-        ])
-        .innerJoin(definitionsTable, 'b.function_definition_id', '=', 'd.id', {
-          schema: computeSchema,
-          alias: 'd'
-        })
-        .where({ 'b.api_id': { equalTo: options.apiId } })
-        .orderBy('b.alias', 'ASC')
-        .build();
+      const { text, values } = buildBindingsQuery(module, options.apiId);
       const { rows } = await client.query<{
         id: string;
         alias: string;
