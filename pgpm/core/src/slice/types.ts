@@ -36,6 +36,24 @@ export interface SliceConfig {
 
   /** Author for generated plan files */
   author?: string;
+
+  /**
+   * Opt-in dependency-closure expansion for pattern slices marked
+   * `closure: true`. Requires access to the module's deploy scripts to parse
+   * SQL and discover references that are not declared in `requires` headers.
+   */
+  closure?: ClosureOptions;
+}
+
+/**
+ * Options for AST-based dependency-closure expansion
+ */
+export interface ClosureOptions {
+  /**
+   * Module root directory containing `deploy/<change>.sql` scripts, used to
+   * parse each change's SQL and extract referenced objects.
+   */
+  moduleDir: string;
 }
 
 /**
@@ -78,6 +96,15 @@ export interface PatternSlice {
   packageName: string;
   /** Glob patterns to match change paths (e.g., "schemas/auth/**") */
   patterns: string[];
+  /**
+   * When true (and `SliceConfig.closure` is set), the package is expanded to
+   * cover the transitive dependency closure of the changes its patterns
+   * matched: declared plan `requires` plus AST-discovered references
+   * (function calls including PL/pgSQL bodies, table/view references, types,
+   * FK targets), intersected with plan-known changes. Auto-included changes
+   * are reported in `SliceResult.closureReport`.
+   */
+  closure?: boolean;
 }
 
 export interface ExplicitStrategy {
@@ -117,6 +144,37 @@ export interface SliceResult {
 
   /** Statistics */
   stats: SliceStats;
+
+  /** Report of dependency-closure expansion (when configured). */
+  closureReport?: ClosureReport;
+}
+
+/**
+ * A change automatically pulled into a package by closure expansion
+ */
+export interface ClosureAutoInclude {
+  /** The auto-included change */
+  change: string;
+  /** Package it was pulled into */
+  package: string;
+  /** The change whose dependency pulled it in */
+  requiredBy: string;
+  /** Edge type: declared plan `requires` or AST-discovered reference */
+  reason: 'requires' | 'ast';
+  /** For AST edges: the referenced object that links the two changes */
+  ref?: string;
+}
+
+/**
+ * Report of dependency-closure expansion
+ */
+export interface ClosureReport {
+  /** Changes pulled into packages beyond their pattern matches, and why */
+  autoIncluded: ClosureAutoInclude[];
+  /** Changes whose PL/pgSQL bodies execute dynamic SQL (edges incomplete) */
+  dynamicSqlChanges: string[];
+  /** Schema-qualified references no change in the plan produces */
+  unresolvedReferences: { change: string; ref: string }[];
 }
 
 /**
