@@ -13,19 +13,18 @@
 import { QuoteUtils } from '@pgsql/quotes';
 import type { Pool } from 'pg';
 
-import type {
-  AuthSettings,
-  AuthSettingsRow,
-} from '../types';
+import type { AuthSettings, AuthSettingsRow } from '../types';
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const AUTH_SETTINGS_DISCOVERY_SQL = `
-  SELECT s.schema_name, sm.auth_settings_table_name AS table_name
+  SELECT resolved.schema_name, resolved.table_name
   FROM metaschema_modules_public.sessions_module sm
-  JOIN metaschema_public.schema s ON s.id = sm.schema_id
+  CROSS JOIN LATERAL metaschema.schema_and_table(
+    sm.auth_settings_table_id
+  ) resolved
   WHERE sm.database_id = $1
   LIMIT 1
 `;
@@ -37,14 +36,14 @@ interface AuthSettingsTableRef {
 
 async function discoverAuthSettingsTable(
   pool: Pool,
-  databaseId: string | null | undefined,
+  databaseId: string | null | undefined
 ): Promise<AuthSettingsTableRef | null> {
   if (!databaseId) return null;
 
-  const discovery = await pool.query<{ schema_name: string; table_name: string }>(
-    AUTH_SETTINGS_DISCOVERY_SQL,
-    [databaseId],
-  );
+  const discovery = await pool.query<{
+    schema_name: string;
+    table_name: string;
+  }>(AUTH_SETTINGS_DISCOVERY_SQL, [databaseId]);
   const resolved = discovery.rows[0];
   if (!resolved) return null;
 
@@ -57,7 +56,7 @@ async function discoverAuthSettingsTable(
 function buildAuthSettingsQuery(schemaName: string, tableName: string): string {
   const authSettingsTable = QuoteUtils.quoteQualifiedIdentifier(
     schemaName,
-    tableName,
+    tableName
   );
 
   return `
@@ -83,36 +82,37 @@ function buildAuthSettingsQuery(schemaName: string, tableName: string): string {
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
-export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader<AuthSettings>({
-  name: 'authSettings',
-  ttlMs: 5 * 60_000,
-  async resolve(ctx: LoaderContext) {
-    const { tenantPool, databaseId } = ctx;
+export const authSettingsLoader: ModuleLoader<AuthSettings> =
+  createModuleLoader<AuthSettings>({
+    name: 'authSettings',
+    ttlMs: 5 * 60_000,
+    async resolve(ctx: LoaderContext) {
+      const { tenantPool, databaseId } = ctx;
 
-    const resolved = await discoverAuthSettingsTable(tenantPool, databaseId);
-    if (!resolved) return undefined;
+      const resolved = await discoverAuthSettingsTable(tenantPool, databaseId);
+      if (!resolved) return undefined;
 
-    const result = await tenantPool.query<AuthSettingsRow>(
-      buildAuthSettingsQuery(resolved.schemaName, resolved.tableName),
-    );
-    const row = result.rows[0];
-    if (!row) return undefined;
+      const result = await tenantPool.query<AuthSettingsRow>(
+        buildAuthSettingsQuery(resolved.schemaName, resolved.tableName)
+      );
+      const row = result.rows[0];
+      if (!row) return undefined;
 
-    return {
-      allowIdentitySignIn: row.allow_identity_sign_in,
-      allowIdentitySignUp: row.allow_identity_sign_up,
-      cookieSecure: row.cookie_secure,
-      cookieSamesite: row.cookie_samesite,
-      cookieDomain: row.cookie_domain,
-      cookieHttponly: row.cookie_httponly,
-      cookieMaxAge: row.cookie_max_age,
-      cookiePath: row.cookie_path,
-      rememberMeDuration: row.remember_me_duration,
-      enableCaptcha: row.enable_captcha,
-      captchaSiteKey: row.captcha_site_key,
-      oauthStateMaxAge: row.oauth_state_max_age,
-      oauthRequireVerifiedEmail: row.oauth_require_verified_email,
-      oauthErrorRedirectPath: row.oauth_error_redirect_path
-    };
-  }
-});
+      return {
+        allowIdentitySignIn: row.allow_identity_sign_in,
+        allowIdentitySignUp: row.allow_identity_sign_up,
+        cookieSecure: row.cookie_secure,
+        cookieSamesite: row.cookie_samesite,
+        cookieDomain: row.cookie_domain,
+        cookieHttponly: row.cookie_httponly,
+        cookieMaxAge: row.cookie_max_age,
+        cookiePath: row.cookie_path,
+        rememberMeDuration: row.remember_me_duration,
+        enableCaptcha: row.enable_captcha,
+        captchaSiteKey: row.captcha_site_key,
+        oauthStateMaxAge: row.oauth_state_max_age,
+        oauthRequireVerifiedEmail: row.oauth_require_verified_email,
+        oauthErrorRedirectPath: row.oauth_error_redirect_path,
+      };
+    },
+  });
