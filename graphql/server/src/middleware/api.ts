@@ -30,7 +30,10 @@ const defaultRegistry: LoaderRegistry = createDefaultRegistry();
 // =============================================================================
 
 // Private-header X-Api-Name lookup against the scoped routing plane.
-// `is_published` is the routing-plane analog of the legacy `is_public` column.
+// X-Api-Name is a trusted internal selector (only honored when the server
+// runs with isPublic=false): it addresses a database's API surface by name.
+// `is_published` governs cross-scope route visibility, not internal
+// addressability, so it does not filter this lookup.
 const scopedApiNameLookupSql = (routingSchema: string): string => `
   SELECT 
     a.id as api_id,
@@ -45,7 +48,6 @@ const scopedApiNameLookupSql = (routingSchema: string): string => `
   LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
   WHERE a.database_id = $1 
     AND a.name = $2
-    AND a.is_published = $3
   GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_published
   LIMIT 1
 `;
@@ -273,15 +275,14 @@ const queryByApiName = async (
   pool: Pool,
   opts: ApiOptions,
   databaseId: string,
-  name: string,
-  isPublic: boolean
+  name: string
 ): Promise<ApiRow | null> => {
   const routingSchema = getRoutingSchema(opts);
   if (!isValidSchemaName(routingSchema)) {
     log.warn(`[api-name-lookup] invalid routing schema name: ${routingSchema}`);
     return null;
   }
-  const result = await pool.query<ApiRow>(scopedApiNameLookupSql(routingSchema), [databaseId, name, isPublic]);
+  const result = await pool.query<ApiRow>(scopedApiNameLookupSql(routingSchema), [databaseId, name]);
   return result.rows[0] ?? null;
 };
 
@@ -318,8 +319,7 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
   const { opts, pool, headers } = ctx;
   if (!headers.databaseId) return null;
 
-  const isPublic = opts.api?.isPublic ?? false;
-  const row = await queryByApiName(pool, opts, headers.databaseId, headers.apiName!, isPublic);
+  const row = await queryByApiName(pool, opts, headers.databaseId, headers.apiName!);
   
   if (!row) {
     log.debug(`[api-name-lookup] No API found for databaseId=${headers.databaseId} name=${headers.apiName}`);

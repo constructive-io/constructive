@@ -40,6 +40,18 @@ CREATE INDEX idx_articles_chunks_embedding ON llm_test.articles_chunks
   USING ivfflat(embedding vector_cosine_ops) WITH (lists = 1);
 
 -- ============================================================================
+-- NOTES table — vector column alongside a physical `embedding_text` column,
+-- which inflects to the same `embeddingText` GraphQL name the mutation plugin
+-- would synthesize. The physical field must win (no naming conflict).
+-- ============================================================================
+CREATE TABLE llm_test.notes (
+  id serial PRIMARY KEY,
+  title text NOT NULL,
+  embedding_text text,
+  embedding vector(3)
+);
+
+-- ============================================================================
 -- SEED DATA — articles
 -- ============================================================================
 INSERT INTO llm_test.articles (id, title, body, embedding) VALUES

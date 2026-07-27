@@ -170,6 +170,16 @@ const exportMigrationsToDisk = async ({
         [databaseId]
       );
 
+  // Registry fixtures — meta_registration actions that insert into
+  // metaschema_public.* (e.g. pg_partman partition registration) — FK-reference
+  // the database/schema/table/field identity rows exported into the
+  // meta/service package. Hoist them into that package, after its metaschema
+  // fixtures, so both packages deploy cleanly in app → service order.
+  const isRegistryFixture = (row: { category?: string; content?: string }): boolean =>
+    row.category === 'meta_registration' && /\bmetaschema_public\./.test(row.content ?? '');
+  const registryRows = results.rows.filter(isRegistryFixture);
+  const appRows = results.rows.filter((row: any) => !isRegistryFixture(row));
+
   const opts: SqlWriteOptions = {
     name,
     replacer,
@@ -180,7 +190,7 @@ const exportMigrationsToDisk = async ({
   // Build description for the database extension package
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
 
-  if (results?.rows?.length > 0) {
+  if (appRows.length > 0) {
     // Detect missing modules at workspace level and prompt user
     const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter, argv);
 
@@ -202,8 +212,8 @@ const exportMigrationsToDisk = async ({
       await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
     }
 
-    writePgpmPlan(results.rows, opts);
-    writePgpmFiles(results.rows, opts);
+    writePgpmPlan(appRows, opts);
+    writePgpmFiles(appRows, opts);
   } else {
     console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');
   }
@@ -224,6 +234,12 @@ const exportMigrationsToDisk = async ({
   // Detect missing modules at workspace level and prompt user
   const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter, argv);
 
+  // Hoisted registry fixtures reference the application package's DDL, so the
+  // service package requires it as an extension when any are present.
+  const svcExtensions = registryRows.length > 0 && appRows.length > 0
+    ? [...SERVICE_REQUIRED_EXTENSIONS, name]
+    : [...SERVICE_REQUIRED_EXTENSIONS];
+
   // Create/prepare the module directory (use serviceOutdir if provided)
   const svcModuleDir = await preparePackage({
     project,
@@ -231,7 +247,7 @@ const exportMigrationsToDisk = async ({
     outdir: svcOutdir,
     name: metaExtensionName,
     description: metaDesc,
-    extensions: [...SERVICE_REQUIRED_EXTENSIONS],
+    extensions: svcExtensions,
     prompter,
     repoName,
     username
@@ -290,6 +306,24 @@ ${META_COMMON_FOOTER}
 
       tablesWithContent.push(tableName);
     }
+  }
+
+  // Append the hoisted registry fixtures after the metaschema identity
+  // fixtures they FK-reference. Their DDL prerequisites live in the
+  // application package, so those deps become cross-package requires.
+  const lastMetaChange = tablesWithContent.length > 0
+    ? `migrate/${tablesWithContent[tablesWithContent.length - 1]}`
+    : null;
+  for (const row of registryRows) {
+    const crossDeps = (row.deps ?? []).map((dep: string) => `${name}:${dep}`);
+    metaPackage.push({
+      name: row.name,
+      deploy: row.deploy,
+      content: row.content,
+      revert: row.revert,
+      verify: row.verify,
+      deps: lastMetaChange ? [...crossDeps, lastMetaChange] : crossDeps
+    });
   }
 
   opts.replacer = metaReplacer.replacer;
