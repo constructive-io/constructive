@@ -27,8 +27,8 @@ export default async function runWorkspaceSetup(
   const answers = await prompter.prompt(argv, workspaceQuestions);
   const { cwd = process.cwd() } = argv;
   const targetPath = path.join(cwd, sluggify(answers.name));
-  // Prevent double-echoed keystrokes by closing our prompter before template prompts.
-  prompter.close();
+  // Note: Don't close prompter here - it's still needed by scaffoldTemplate for template prompts.
+  // The prompter will be closed by the CLI framework after the command completes.
 
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   // Don't set default template - let scaffoldTemplate use metadata-driven resolution
