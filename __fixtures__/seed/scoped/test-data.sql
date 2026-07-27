@@ -177,8 +177,11 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Routing-side domains (source rows for the compiled hostname index).
--- Triggers are re-enabled so the binding-sync triggers from
--- @constructive-db/routing-functions compile hostname_bindings/route_bindings.
+-- Triggers are re-enabled here: the published modules attach only the
+-- catalog-sync propagation triggers, whose upserts into catalog_public are
+-- idempotent with the direct catalog seeds above. Binding-sync triggers are
+-- NOT published, so the compiled hostname_bindings/route_bindings rows are
+-- still seeded directly below.
 SET session_replication_role TO DEFAULT;
 
 INSERT INTO routing_public.domains

@@ -87,12 +87,14 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 
   it('deploys the scoped catalog/routing/apps schemas', async () => {
     const rows = await pg.any<{ nspname: string }>(
-      `SELECT nspname FROM pg_namespace WHERE nspname LIKE 'constructive_%' ORDER BY nspname`
+      `SELECT nspname FROM pg_namespace
+       WHERE nspname IN ('apps_public', 'catalog_public', 'routing_public', 'routing_private')
+       ORDER BY nspname`
     );
     expect(rows.map((r) => r.nspname)).toEqual([
       'apps_public',
       'catalog_public',
-      'constructive_routing_private',
+      'routing_private',
       'routing_public'
     ]);
   });
