@@ -2,7 +2,7 @@
  * Server Integration Tests using graphql-server-test
  *
  * All host routing resolves through the scoped routing plane
- * (constructive_routing_public.resolve_route); there is no legacy fallback.
+ * (routing_public.resolve_route); there is no legacy fallback.
  * The single-tenant scenario runs against the dev server
  * (server.useRouting: false), which exposes the configured schemas
  * directly with no route resolution.
@@ -26,9 +26,9 @@ const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const scopedDatabaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const scopedMetaSchemas = [
-  'constructive_catalog_public',
-  'constructive_routing_public',
-  'constructive_apps_public',
+  'catalog_public',
+  'routing_public',
+  'apps_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
@@ -37,7 +37,7 @@ const scopedMetaSchemas = [
 // cannot be exposed together in one PostGraphile schema. Expose the
 // authoritative routing plane plus the metaschema tables.
 const metaApiSchemas = [
-  'constructive_routing_public',
+  'routing_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
@@ -66,7 +66,7 @@ const scenarios: Scenario[] = [
     name: 'scoped public via domain',
     seedDir: 'simple-seed-scoped',
     useRouting: true,
-    api: { isPublic: true, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
+    api: { isPublic: true, metaSchemas: scopedMetaSchemas },
     headers: {
       Host: 'app.test.constructive.io'
     }
@@ -75,7 +75,7 @@ const scenarios: Scenario[] = [
     name: 'scoped private via domain',
     seedDir: 'simple-seed-scoped',
     useRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       Host: 'private.test.constructive.io'
     }
@@ -84,7 +84,7 @@ const scenarios: Scenario[] = [
     name: 'scoped private via X-Api-Name',
     seedDir: 'simple-seed-scoped',
     useRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Api-Name': 'private'
@@ -94,7 +94,7 @@ const scenarios: Scenario[] = [
     name: 'scoped private via X-Schemata',
     seedDir: 'simple-seed-scoped',
     useRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Schemata': schemas.join(',')
@@ -284,8 +284,7 @@ describe('scoped private via X-Meta-Schema', () => {
           useRouting: true,
           api: {
             isPublic: false,
-            metaSchemas: metaApiSchemas,
-            routingSchema: 'constructive_routing_public'
+            metaSchemas: metaApiSchemas
           }
         }
       },
@@ -360,8 +359,7 @@ describe('Error paths', () => {
           useRouting: true,
           api: {
             isPublic: false,
-            metaSchemas: scopedMetaSchemas,
-            routingSchema: 'constructive_routing_public'
+            metaSchemas: scopedMetaSchemas
           }
         }
       },
@@ -410,8 +408,7 @@ describe('Error paths', () => {
             useRouting: true,
             api: {
               isPublic: false,
-              metaSchemas: scopedMetaSchemas,
-              routingSchema: 'constructive_routing_public'
+              metaSchemas: scopedMetaSchemas
             }
           }
         },
@@ -445,8 +442,7 @@ describe('Error paths', () => {
             useRouting: true,
             api: {
               isPublic: true,
-              metaSchemas: scopedMetaSchemas,
-              routingSchema: 'constructive_routing_public'
+              metaSchemas: scopedMetaSchemas
             }
           }
         },

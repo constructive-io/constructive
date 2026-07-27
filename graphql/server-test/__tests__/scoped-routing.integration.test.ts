@@ -2,9 +2,9 @@
  * Scoped Routing Integration Tests (simple-seed-scoped)
  *
  * Exercises the new schema-only pgpm modules
- *   @constructive-db/catalog → constructive_catalog_public
- *   @constructive-db/routing → constructive_routing_public
- *   @constructive-db/apps    → constructive_apps_public
+ *   @constructive-db/catalog → catalog_public
+ *   @constructive-db/routing → routing_public
+ *   @constructive-db/apps    → apps_public
  * seeded from `__fixtures__/seed/scoped/*` for the same "simple-pets" tenant
  * that the retired legacy fixture used to model.
  *
@@ -29,14 +29,14 @@ const scopedDatabaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const appApiId = '6c9997a4-591b-4cb3-9313-4ef45d6f134e';
 const privateApiId = 'e257c53d-6ba6-40de-b679-61b37188a316';
 const scopedMetaSchemas = [
-  'constructive_catalog_public',
-  'constructive_routing_public',
-  'constructive_apps_public',
+  'catalog_public',
+  'routing_public',
+  'apps_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
 
-/** Row shape returned by constructive_routing_public.resolve_route(). */
+/** Row shape returned by routing_public.resolve_route(). */
 interface ResolvedRouteRow {
   route_binding_id: string | null;
   hostname: string | null;
@@ -66,7 +66,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 
   const resolveRoute = (host: string) =>
     pg.oneOrNone<ResolvedRouteRow>(
-      `SELECT * FROM constructive_routing_public.resolve_route($1, '/', NULL)`,
+      `SELECT * FROM routing_public.resolve_route($1, '/', NULL)`,
       [host]
     );
 
@@ -90,10 +90,10 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
       `SELECT nspname FROM pg_namespace WHERE nspname LIKE 'constructive_%' ORDER BY nspname`
     );
     expect(rows.map((r) => r.nspname)).toEqual([
-      'constructive_apps_public',
-      'constructive_catalog_public',
+      'apps_public',
+      'catalog_public',
       'constructive_routing_private',
-      'constructive_routing_public'
+      'routing_public'
     ]);
   });
 
@@ -155,7 +155,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 
 /**
  * End-to-end scoped plane: the request is resolved solely by
- * constructive_routing_public.resolve_route(). There is
+ * routing_public.resolve_route(). There is
  * no legacy fallback, so a successful request proves the scoped path.
  */
 describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
@@ -176,7 +176,6 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
         server: {
           useRouting: true,
           api: {
-            routingSchema: 'constructive_routing_public',
             isPublic: true,
             metaSchemas: scopedMetaSchemas
           }

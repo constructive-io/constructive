@@ -9,7 +9,7 @@
  *
  * Uses the shared seed fixtures from __fixtures__/seed/ (repo root-level)
  * for the full metaschema + scoped routing plane + app-schemas stack.
- * Host routing resolves through constructive_routing_public.resolve_route.
+ * Host routing resolves through routing_public.resolve_route.
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=express-context.integration
@@ -29,9 +29,9 @@ const shared = (...segments: string[]) =>
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
-  'constructive_catalog_public',
-  'constructive_routing_public',
-  'constructive_apps_public',
+  'catalog_public',
+  'routing_public',
+  'apps_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
@@ -58,8 +58,7 @@ beforeAll(async () => {
         useRouting: true,
         api: {
           isPublic: true,
-          metaSchemas,
-          routingSchema: 'constructive_routing_public'
+          metaSchemas
         }
       }
     },
