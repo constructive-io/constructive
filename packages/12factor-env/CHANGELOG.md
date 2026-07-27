@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.20.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.19.0...12factor-env@1.20.0) (2026-07-27)
+
+**Note:** Version bump only for package 12factor-env
+
 # [1.19.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.18.2...12factor-env@1.19.0) (2026-07-27)
 
 **Note:** Version bump only for package 12factor-env

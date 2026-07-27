@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@3.2.0...graphile-sql-expression-validator@3.3.0) (2026-07-27)
+
+**Note:** Version bump only for package graphile-sql-expression-validator
+
 # [3.2.0](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@3.1.2...graphile-sql-expression-validator@3.2.0) (2026-07-27)
 
 **Note:** Version bump only for package graphile-sql-expression-validator
