@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.3.1...@constructive-io/graphql-codegen@5.4.0) (2026-07-27)
+
+### Features
+
+- **fixtures:** install logical-name plane packages and drop legacy routing schema overrides ([b3a99ee](https://github.com/constructive-io/constructive/commit/b3a99ee95cb501a582b70612dfc29f3c423fe4dd))
+
 ## [5.3.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.3.0...@constructive-io/graphql-codegen@5.3.1) (2026-07-27)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

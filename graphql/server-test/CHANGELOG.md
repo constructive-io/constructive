@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.4.1...graphql-server-test@3.5.0) (2026-07-27)
+
+### Bug Fixes
+
+- **fixtures:** pin schema+grants-only plane packages (routing@4, catalog/apps@3.1, routing-platform@3) ([f2e640c](https://github.com/constructive-io/constructive/commit/f2e640c4bd3d3f0f50f2413e339ee0a975b6dcac))
+
+### Features
+
+- **fixtures:** install logical-name plane packages and drop legacy routing schema overrides ([b3a99ee](https://github.com/constructive-io/constructive/commit/b3a99ee95cb501a582b70612dfc29f3c423fe4dd))
+
 ## [3.4.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.4.0...graphql-server-test@3.4.1) (2026-07-27)
 
 **Note:** Version bump only for package graphql-server-test
