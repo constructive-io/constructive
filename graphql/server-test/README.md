@@ -181,7 +181,7 @@ The `server.api` option provides full control over the GraphQL server configurat
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `scopedRoutingSchema` | `string` | `constructive_routing_public` | Schema that owns `resolve_route()` and the routing tables |
+| `routingSchema` | `string` | `routing_public` | Schema that owns `resolve_route()` and the routing tables |
 | `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
 | `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
 | `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
@@ -190,12 +190,12 @@ The `server.api` option provides full control over the GraphQL server configurat
 
 The convenience properties (`schemas`, `authRole`) take precedence over corresponding values in `server.api`.
 
-### Choosing the server (`server.scopedRouting`)
+### Choosing the server (`server.useRouting`)
 
 The harness runs suites against one of two servers:
 
-- `server.scopedRouting: true` (default) — the production `@constructive-io/graphql-server`. Every request resolves through the scoped-routing plane, so the suite must seed real routing/database records and use a real database id.
-- `server.scopedRouting: false` — the single-tenant `@constructive-io/graphql-dev-server` (pure PostGraphile, no routing, no database id). It exposes the configured schemas directly and is for local/static suites only.
+- `server.useRouting: true` (default) — the production `@constructive-io/graphql-server`. Every request resolves through the scoped-routing plane, so the suite must seed real routing/database records and use a real database id.
+- `server.useRouting: false` — the single-tenant `@constructive-io/graphql-dev-server` (pure PostGraphile, no routing, no database id). It exposes the configured schemas directly and is for local/static suites only.
 
 ```typescript
 // Basic usage with convenience properties
@@ -208,7 +208,7 @@ const { query } = await getConnections({
 const { query } = await getConnections({
   schemas: ['app_public'],
   server: {
-    scopedRouting: false
+    useRouting: false
   }
 });
 
@@ -219,7 +219,7 @@ const { query } = await getConnections({
   server: {
     port: 5555,
     host: 'localhost',
-    scopedRouting: true,
+    useRouting: true,
     api: {
       isPublic: false,
       metaSchemas: ['constructive_routing_public', 'metaschema_public']

@@ -20,10 +20,10 @@ export interface PlaywrightServerOptions {
    *   every request through the scoped-routing plane. Suites must seed real
    *   routing/database records so `resolve_route()` returns a real database id.
    */
-  scopedRouting?: boolean;
+  useRouting?: boolean;
   /**
    * API configuration forwarded to the production scoped server (e.g.
-   * `metaSchemas`, `isPublic`). Only used when `scopedRouting` is `true`.
+   * `metaSchemas`, `isPublic`). Only used when `useRouting` is `true`.
    */
   api?: Partial<ApiOptions>;
 }

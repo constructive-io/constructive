@@ -60,9 +60,9 @@ export const getConnections = async (
 
   // Start the HTTP server. Suites default to the production scoped-routing
   // server; static/single-tenant suites opt into the dev server with
-  // `server.scopedRouting: false`.
-  const scopedRouting = input.server?.scopedRouting ?? true;
-  const server = scopedRouting
+  // `server.useRouting: false`.
+  const useRouting = input.server?.useRouting ?? true;
+  const server = useRouting
     ? await createTestServer(serverOpts, input.server)
     : await createDevTestServer(serverOpts, input.server);
 

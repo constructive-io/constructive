@@ -16,10 +16,10 @@ Constructive Playwright Testing with HTTP server support for end-to-end testing.
 
 This package extends `@constructive-io/graphql-test` to provide an actual HTTP server for Playwright and other E2E testing frameworks. It creates isolated test databases and starts a GraphQL server for your suite to hit over HTTP.
 
-It can run either server, selected per-suite with `server.scopedRouting`:
+It can run either server, selected per-suite with `server.useRouting`:
 
-- `server.scopedRouting: false` (default) — the single-tenant `@constructive-io/graphql-dev-server` (pure PostGraphile). No host route resolution and no database id; the configured schemas are exposed directly. Best for UI/local suites.
-- `server.scopedRouting: true` — the production `@constructive-io/graphql-server`. Every request is resolved through the scoped-routing plane (`constructive_routing_public.resolve_route()`), so the suite must seed real routing/database records and reach the api surface via its seeded host (`Host` header).
+- `server.useRouting: false` (default) — the single-tenant `@constructive-io/graphql-dev-server` (pure PostGraphile). No host route resolution and no database id; the configured schemas are exposed directly. Best for UI/local suites.
+- `server.useRouting: true` — the production `@constructive-io/graphql-server`. Every request is resolved through the scoped-routing plane (`constructive_routing_public.resolve_route()`), so the suite must seed real routing/database records and reach the api surface via its seeded host (`Host` header).
 
 ## Installation
 
@@ -61,7 +61,7 @@ describe('E2E Tests', () => {
 
 ### Against the real (scoped-routing) server
 
-Set `server.scopedRouting: true` to run the production `@constructive-io/graphql-server`. Seed real routing/database records and address the api surface by its seeded host:
+Set `server.useRouting: true` to run the production `@constructive-io/graphql-server`. Seed real routing/database records and address the api surface by its seeded host:
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -73,9 +73,9 @@ test('resolves through the scoped routing plane', async ({ request }) => {
       schemas: ['simple-pets-public'],
       authRole: 'anonymous',
       server: {
-        scopedRouting: true,
+        useRouting: true,
         api: {
-          scopedRoutingSchema: 'constructive_routing_public',
+          routingSchema: 'constructive_routing_public',
           isPublic: true,
           metaSchemas: ['constructive_routing_public', 'metaschema_public']
         }
@@ -166,8 +166,8 @@ Creates database connections and starts an HTTP server for testing.
 - `input.authRole` - Default authentication role (e.g., 'anonymous', 'authenticated')
 - `input.server.port` - Port to run the server on (defaults to random available port)
 - `input.server.host` - Host to bind to (defaults to 'localhost')
-- `input.server.scopedRouting` - `false` (default) runs the dev server; `true` runs the production scoped-routing server
-- `input.server.api` - API options forwarded to the production scoped server (e.g. `metaSchemas`, `isPublic`); only used when `scopedRouting` is `true`
+- `input.server.useRouting` - `false` (default) runs the dev server; `true` runs the production scoped-routing server
+- `input.server.api` - API options forwarded to the production scoped server (e.g. `metaSchemas`, `isPublic`); only used when `useRouting` is `true`
 - `input.graphile` - Optional Graphile configuration overrides
 - `seedAdapters` - Optional array of seed adapters for database setup
 
@@ -197,18 +197,18 @@ Low-level function to create just the production `@constructive-io/graphql-serve
 ## How It Works
 
 1. Creates an isolated test database using `pgsql-test`
-2. Starts either the dev server or the production scoped-routing server (see `server.scopedRouting`)
+2. Starts either the dev server or the production scoped-routing server (see `server.useRouting`)
 3. Exposes the GraphQL endpoint for your suite to hit over HTTP
 4. Returns the server URL for Playwright to connect to
 5. Provides a teardown function that stops the server and cleans up the database
 
 ## Configuration
 
-By default (`scopedRouting: false`) the server runs `@constructive-io/graphql-dev-server`, which means:
+By default (`useRouting: false`) the server runs `@constructive-io/graphql-dev-server`, which means:
 - No host route resolution (`resolve_route()`) is required and no database id is needed
 - Schemas are exposed directly based on the `schemas` parameter
 - Perfect for isolated testing without complex domain setup
 
-With `scopedRouting: true` the server runs the production `@constructive-io/graphql-server`:
+With `useRouting: true` the server runs the production `@constructive-io/graphql-server`:
 - Every request is resolved through `constructive_routing_public.resolve_route()`
 - The suite must seed real routing/database records and address the api surface by its seeded host

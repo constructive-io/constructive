@@ -15,7 +15,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
-import { resolveRoute, routeToApiStructure } from './routing';
+import { getRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
 
 const log = new Logger('api');
 
@@ -31,7 +31,7 @@ const defaultRegistry: LoaderRegistry = createDefaultRegistry();
 
 // Private-header X-Api-Name lookup against the scoped routing plane.
 // `is_published` is the routing-plane analog of the legacy `is_public` column.
-const SCOPED_API_NAME_LOOKUP_SQL = `
+const scopedApiNameLookupSql = (routingSchema: string): string => `
   SELECT 
     a.id as api_id,
     a.database_id,
@@ -40,8 +40,8 @@ const SCOPED_API_NAME_LOOKUP_SQL = `
     a.anon_role,
     a.is_published as is_public,
     COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
-  FROM constructive_routing_public.apis a
-  LEFT JOIN constructive_routing_public.api_schemas aps ON a.id = aps.api_id
+  FROM "${routingSchema}".apis a
+  LEFT JOIN "${routingSchema}".api_schemas aps ON a.id = aps.api_id
   LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
   WHERE a.database_id = $1 
     AND a.name = $2
@@ -112,6 +112,7 @@ const buildLoaderContext = (
   row: ApiRow
 ): LoaderContext => ({
   routingPool,
+  routingSchema: getRoutingSchema(opts),
   tenantPool: getPgPool({ ...opts.pg, database: row.dbname }),
   databaseId: row.database_id,
   apiId: row.api_id,
@@ -270,11 +271,17 @@ const validateSchemata = async (pool: Pool, schemas: string[]): Promise<string[]
 
 const queryByApiName = async (
   pool: Pool,
+  opts: ApiOptions,
   databaseId: string,
   name: string,
   isPublic: boolean
 ): Promise<ApiRow | null> => {
-  const result = await pool.query<ApiRow>(SCOPED_API_NAME_LOOKUP_SQL, [databaseId, name, isPublic]);
+  const routingSchema = getRoutingSchema(opts);
+  if (!isValidSchemaName(routingSchema)) {
+    log.warn(`[api-name-lookup] invalid routing schema name: ${routingSchema}`);
+    return null;
+  }
+  const result = await pool.query<ApiRow>(scopedApiNameLookupSql(routingSchema), [databaseId, name, isPublic]);
   return result.rows[0] ?? null;
 };
 
@@ -312,7 +319,7 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
   if (!headers.databaseId) return null;
 
   const isPublic = opts.api?.isPublic ?? false;
-  const row = await queryByApiName(pool, headers.databaseId, headers.apiName!, isPublic);
+  const row = await queryByApiName(pool, opts, headers.databaseId, headers.apiName!, isPublic);
   
   if (!row) {
     log.debug(`[api-name-lookup] No API found for databaseId=${headers.databaseId} name=${headers.apiName}`);
@@ -343,7 +350,7 @@ const resolveMetaSchemaHeader = (
 const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
   const { opts, pool, host } = ctx;
 
-  const schema = opts.api?.scopedRoutingSchema || 'constructive_routing_public';
+  const schema = getRoutingSchema(opts);
   const route = await resolveRoute(pool, schema, host);
   if (!route) return null;
 

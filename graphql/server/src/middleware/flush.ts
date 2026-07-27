@@ -7,6 +7,8 @@ import { NextFunction, Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 
+import { getRoutingSchema, isValidSchemaName } from './routing';
+
 const log = new Logger('flush');
 
 export const flush = async (
@@ -44,9 +46,14 @@ export const flushService = async (
     });
   }
 
+  const routingSchema = getRoutingSchema(opts);
+  if (!isValidSchemaName(routingSchema)) {
+    log.warn(`[flush] invalid routing schema name: ${routingSchema}`);
+    return;
+  }
   const svc = await pgPool.query(
     `SELECT hostname
-     FROM constructive_routing_public.domains
+     FROM "${routingSchema}".domains
      WHERE database_id = $1`,
     [databaseId]
   );

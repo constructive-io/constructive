@@ -50,7 +50,7 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 - `FEATURES_POSTGIS` - Enable PostGIS support
 
 ### API Configuration
-- `API_SCOPED_ROUTING_SCHEMA` - Schema containing the compiled `resolve_route()` resolver (production routing always resolves through it)
+- `API_ROUTING_SCHEMA` - Schema containing the compiled `resolve_route()` resolver (production routing always resolves through it)
 - `API_IS_PUBLIC` - Whether API is public
 - `API_EXPOSED_SCHEMAS` - Comma-separated list of exposed schemas
 - `API_META_SCHEMAS` - Comma-separated list of meta schemas
@@ -74,8 +74,8 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     anonRole: 'administrator',
     roleName: 'administrator',
     isPublic: true,
-    metaSchemas: ['constructive_routing_public', 'metaschema_public', 'metaschema_modules_public'],
-    scopedRoutingSchema: 'constructive_routing_public'
+    metaSchemas: ['routing_public', 'metaschema_public', 'metaschema_modules_public'],
+    routingSchema: 'routing_public'
   }
 }
 ```

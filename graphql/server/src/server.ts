@@ -41,6 +41,7 @@ import { createDebugDatabaseMiddleware } from './middleware/observability/debug-
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
+import { getRoutingSchema } from './middleware/routing';
 
 const log = new Logger('server');
 
@@ -102,7 +103,7 @@ class Server {
       serverHost: effectiveOpts.server?.host,
       serverPort: effectiveOpts.server?.port,
       apiIsPublic: apiOpts.isPublic,
-      scopedRoutingSchema: apiOpts.scopedRoutingSchema,
+      routingSchema: apiOpts.routingSchema,
       metaSchemas: apiOpts.metaSchemas?.join(',') || 'default',
       observabilityEnabled
     });
@@ -162,7 +163,11 @@ class Server {
     app.use(requestLogger);
     app.use(api);
     app.use(authenticate);
-    app.use(createContextMiddleware({ pg: effectiveOpts.pg, loaders: createDefaultRegistry() }));
+    app.use(createContextMiddleware({
+      pg: effectiveOpts.pg,
+      loaders: createDefaultRegistry(),
+      routingSchema: getRoutingSchema(effectiveOpts)
+    }));
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests

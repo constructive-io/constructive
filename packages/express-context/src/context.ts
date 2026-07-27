@@ -32,6 +32,8 @@ export interface ContextMiddlewareOptions {
   pg?: PgpmOptions['pg'];
   /** Module loader registry for per-database cached lookups */
   loaders?: LoaderRegistry;
+  /** Routing-plane schema loaders query (defaults to routing_public) */
+  routingSchema?: string;
 }
 
 /**
@@ -89,6 +91,7 @@ export function buildContext(
     const routingPool: Pool = getPgPool(opts.pg);
     loaderCtx = {
       routingPool,
+      routingSchema: opts.routingSchema,
       tenantPool,
       databaseId: api.databaseId,
       apiId: api.apiId,

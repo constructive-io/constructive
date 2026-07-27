@@ -9,10 +9,11 @@
 import type { RlsModule } from '../types';
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
+import { routingSchemaOf } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
-const RLS_SETTINGS_SQL = `
+const rlsSettingsSql = (schema: string): string => `
   SELECT
     auth_schema.schema_name AS authenticate_schema,
     role_schema.schema_name AS role_schema,
@@ -22,7 +23,7 @@ const RLS_SETTINGS_SQL = `
     role_id_fn.name AS current_role_id,
     ua_fn.name AS current_user_agent,
     ip_fn.name AS current_ip_address
-  FROM constructive_routing_public.rls_settings rs
+  FROM "${schema}".rls_settings rs
   LEFT JOIN metaschema_public.schema auth_schema ON rs.authenticate_schema_id = auth_schema.id
   LEFT JOIN metaschema_public.schema role_schema ON rs.role_schema_id = role_schema.id
   LEFT JOIN metaschema_public.function auth_fn ON rs.authenticate_function_id = auth_fn.id
@@ -72,7 +73,7 @@ export const rlsLoader: ModuleLoader<RlsModule> = createModuleLoader<RlsModule>(
   ttlMs: 5 * 60_000,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId } = ctx;
-    const result = await routingPool.query<RlsSettingsRow>(RLS_SETTINGS_SQL, [databaseId]);
+    const result = await routingPool.query<RlsSettingsRow>(rlsSettingsSql(routingSchemaOf(ctx)), [databaseId]);
     return fromSettings(result.rows[0] ?? null);
   }
 });

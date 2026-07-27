@@ -8,19 +8,20 @@
 
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
+import { routingSchemaOf } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
-const CORS_SETTINGS_SQL = `
+const corsSettingsSql = (schema: string): string => `
   SELECT allowed_origins
-  FROM constructive_routing_public.cors_settings
+  FROM "${schema}".cors_settings
   WHERE database_id = $1 AND api_id = $2
   LIMIT 1
 `;
 
-const CORS_SETTINGS_DB_DEFAULT_SQL = `
+const corsSettingsDbDefaultSql = (schema: string): string => `
   SELECT allowed_origins
-  FROM constructive_routing_public.cors_settings
+  FROM "${schema}".cors_settings
   WHERE database_id = $1 AND api_id IS NULL
   LIMIT 1
 `;
@@ -38,12 +39,13 @@ export const corsLoader: ModuleLoader<string[]> = createModuleLoader<string[]>({
   ttlMs: 5 * 60_000,
   async resolve(ctx: LoaderContext) {
     const { routingPool, databaseId, apiId } = ctx;
+    const schema = routingSchemaOf(ctx);
 
     if (apiId) {
-      const perApi = await routingPool.query<CorsSettingsRow>(CORS_SETTINGS_SQL, [databaseId, apiId]);
+      const perApi = await routingPool.query<CorsSettingsRow>(corsSettingsSql(schema), [databaseId, apiId]);
       if (perApi.rows[0]) return perApi.rows[0].allowed_origins;
     }
-    const dbDefault = await routingPool.query<CorsSettingsRow>(CORS_SETTINGS_DB_DEFAULT_SQL, [databaseId]);
+    const dbDefault = await routingPool.query<CorsSettingsRow>(corsSettingsDbDefaultSql(schema), [databaseId]);
     if (dbDefault.rows[0]) return dbDefault.rows[0].allowed_origins;
 
     return undefined;

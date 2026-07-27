@@ -103,7 +103,7 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 
 This is a production-only server: every request is resolved through the scoped-routing plane. There is no static single-tenant mode and no flag to disable routing. For single-database local development without route resolution or a database id, use [`@constructive-io/graphql-dev-server`](../dev-server/README.md).
 
-- The server resolves the request host with a single `resolve_route()` call against the compiled route bindings in the scoped routing schema (`API_SCOPED_ROUTING_SCHEMA`, default `constructive_routing_public`), mapping host → tenant/api/database/role.
+- The server resolves the request host with a single `resolve_route()` call against the compiled route bindings in the scoped routing schema (`API_ROUTING_SCHEMA`, default `routing_public`), mapping host → tenant/api/database/role.
 - Only APIs where `api.is_public` matches `API_IS_PUBLIC` are served.
 - In private mode (`API_IS_PUBLIC=false`), you can override with headers:
   - `X-Api-Name` + `X-Database-Id`
@@ -126,10 +126,10 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
-| `API_SCOPED_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `constructive_routing_public`                                 |
+| `API_ROUTING_SCHEMA`    | Schema containing `resolve_route()`   | `routing_public`                                 |
 | `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
 | `API_EXPOSED_SCHEMAS`          | Additional schemas to expose          | empty                                                         |
-| `API_META_SCHEMAS`             | Meta schemas to query                 | `constructive_routing_public,metaschema_public,metaschema_modules_public` |
+| `API_META_SCHEMAS`             | Meta schemas to query                 | `routing_public,metaschema_public,metaschema_modules_public` |
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
 | `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |

@@ -22,7 +22,7 @@ export interface ServerOptions {
    *   (pure PostGraphile, no routing, no database id) exposing the configured
    *   schemas directly. For local/static suites only.
    */
-  scopedRouting?: boolean;
+  useRouting?: boolean;
   /**
    * API configuration options for the GraphQL server.
    * These options control how the server handles requests and which features are enabled.
@@ -33,7 +33,7 @@ export interface ServerOptions {
    *   schemas: ['app_public'],
    *   server: {
    *     port: 5555,
-   *     scopedRouting: false
+   *     useRouting: false
    *   }
    * });
    * ```
