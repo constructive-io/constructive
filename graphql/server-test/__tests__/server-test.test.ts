@@ -22,7 +22,7 @@ describe('graphql-server-test', () => {
           schemas: ['app_public'],
           authRole: 'anonymous',
           server: {
-            scopedRouting: false
+            useRouting: false
           }
         },
         [seed.sqlfile([sql('test.sql')])]
@@ -111,7 +111,7 @@ describe('graphql-server-test', () => {
           schemas: ['app_public'],
           authRole: 'authenticated',
           server: {
-            scopedRouting: false
+            useRouting: false
           }
         },
         [seed.sqlfile([sql('test.sql')])]

@@ -59,11 +59,11 @@ beforeAll(async () => {
       schemas,
       authRole: 'anonymous',
       server: {
-        scopedRouting: true,
+        useRouting: true,
         api: {
           isPublic: true,
           metaSchemas,
-          scopedRoutingSchema: 'constructive_routing_public'
+          routingSchema: 'constructive_routing_public'
         }
       }
     },

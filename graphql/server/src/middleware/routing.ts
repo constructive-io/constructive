@@ -42,13 +42,13 @@ export interface ResolvedRoute {
 const RESOLVER_FUNCTION = 'resolve_route';
 
 /** Published logical name of the database-scope routing plane. */
-export const DEFAULT_SCOPED_ROUTING_SCHEMA = 'routing_public';
+export const DEFAULT_ROUTING_SCHEMA = 'routing_public';
 
 /** The routing-plane schema in effect: configured override or the published default. */
-export const getScopedRoutingSchema = (opts: {
-  api?: { scopedRoutingSchema?: string };
+export const getRoutingSchema = (opts: {
+  api?: { routingSchema?: string };
 }): string =>
-  opts.api?.scopedRoutingSchema || DEFAULT_SCOPED_ROUTING_SCHEMA;
+  opts.api?.routingSchema || DEFAULT_ROUTING_SCHEMA;
 
 export const isValidSchemaName = (name: string): boolean =>
   /^[a-z_][a-z0-9_]*$/.test(name);

@@ -47,7 +47,7 @@ describe('Unified Search — server integration', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          scopedRouting: false,
+          useRouting: false,
           api: { isPublic: false }
         }
       },

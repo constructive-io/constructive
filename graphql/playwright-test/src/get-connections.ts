@@ -55,9 +55,9 @@ const createConnectionsWithServerBase = async (
 
   // Start the HTTP server. Suites default to the single-tenant dev server;
   // suites exercising the real routing plane opt into the production
-  // scoped-routing server with `server.scopedRouting: true`.
-  const scopedRouting = input.server?.scopedRouting ?? false;
-  const server = scopedRouting
+  // scoped-routing server with `server.useRouting: true`.
+  const useRouting = input.server?.useRouting ?? false;
+  const server = useRouting
     ? await createScopedTestServer(serverOpts, input.server)
     : await createTestServer(serverOpts, input.server);
 

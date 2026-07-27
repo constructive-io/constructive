@@ -12,7 +12,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     FEATURES_OPPOSITE_BASE_NAMES,
     FEATURES_POSTGIS,
 
-    API_SCOPED_ROUTING_SCHEMA,
+    API_ROUTING_SCHEMA,
     API_IS_PUBLIC,
     API_EXPOSED_SCHEMAS,
     API_META_SCHEMAS,
@@ -60,7 +60,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(FEATURES_POSTGIS && { postgis: parseEnvBoolean(FEATURES_POSTGIS) })
     },
     api: {
-      ...(API_SCOPED_ROUTING_SCHEMA && { scopedRoutingSchema: API_SCOPED_ROUTING_SCHEMA }),
+      ...(API_ROUTING_SCHEMA && { routingSchema: API_ROUTING_SCHEMA }),
       ...(API_IS_PUBLIC && { isPublic: parseEnvBoolean(API_IS_PUBLIC) }),
       ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),

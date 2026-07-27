@@ -75,7 +75,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
       {
         schemas,
         authRole: 'anonymous',
-        server: { scopedRouting: false, api: { isPublic: false } }
+        server: { useRouting: false, api: { isPublic: false } }
       },
       scopedSeedAdapters()
     ));
@@ -174,9 +174,9 @@ describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          scopedRouting: true,
+          useRouting: true,
           api: {
-            scopedRoutingSchema: 'constructive_routing_public',
+            routingSchema: 'constructive_routing_public',
             isPublic: true,
             metaSchemas: scopedMetaSchemas
           }

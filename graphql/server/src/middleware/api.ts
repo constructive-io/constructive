@@ -15,7 +15,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
-import { getScopedRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
+import { getRoutingSchema, isValidSchemaName, resolveRoute, routeToApiStructure } from './routing';
 
 const log = new Logger('api');
 
@@ -112,7 +112,7 @@ const buildLoaderContext = (
   row: ApiRow
 ): LoaderContext => ({
   routingPool,
-  routingSchema: getScopedRoutingSchema(opts),
+  routingSchema: getRoutingSchema(opts),
   tenantPool: getPgPool({ ...opts.pg, database: row.dbname }),
   databaseId: row.database_id,
   apiId: row.api_id,
@@ -276,7 +276,7 @@ const queryByApiName = async (
   name: string,
   isPublic: boolean
 ): Promise<ApiRow | null> => {
-  const routingSchema = getScopedRoutingSchema(opts);
+  const routingSchema = getRoutingSchema(opts);
   if (!isValidSchemaName(routingSchema)) {
     log.warn(`[api-name-lookup] invalid routing schema name: ${routingSchema}`);
     return null;
@@ -350,7 +350,7 @@ const resolveMetaSchemaHeader = (
 const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
   const { opts, pool, host } = ctx;
 
-  const schema = getScopedRoutingSchema(opts);
+  const schema = getRoutingSchema(opts);
   const route = await resolveRoute(pool, schema, host);
   if (!route) return null;
 

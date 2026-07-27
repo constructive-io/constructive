@@ -315,11 +315,11 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         schemas: [...aliceSchemas, ...bobSchemas, ...mallorySchemas],
         authRole: 'anonymous',
         server: {
-          scopedRouting: true,
+          useRouting: true,
           api: {
             isPublic: false,
             metaSchemas,
-            scopedRoutingSchema: 'constructive_routing_public'
+            routingSchema: 'constructive_routing_public'
           }
         }
       },

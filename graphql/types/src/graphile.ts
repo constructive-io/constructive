@@ -43,7 +43,7 @@ export interface ApiOptions {
    * always resolved through the scoped-routing plane via
    * <schema>.resolve_route() (host → tenant/api/db/role).
    */
-  scopedRoutingSchema?: string;
+  routingSchema?: string;
 }
 
 /**
@@ -77,5 +77,5 @@ export const apiDefaults: ApiOptions = {
     'metaschema_public',
     'metaschema_modules_public'
   ],
-  scopedRoutingSchema: 'routing_public'
+  routingSchema: 'routing_public'
 };

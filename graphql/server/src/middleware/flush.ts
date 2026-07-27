@@ -7,7 +7,7 @@ import { NextFunction, Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 
-import { getScopedRoutingSchema, isValidSchemaName } from './routing';
+import { getRoutingSchema, isValidSchemaName } from './routing';
 
 const log = new Logger('flush');
 
@@ -46,7 +46,7 @@ export const flushService = async (
     });
   }
 
-  const routingSchema = getScopedRoutingSchema(opts);
+  const routingSchema = getRoutingSchema(opts);
   if (!isValidSchemaName(routingSchema)) {
     log.warn(`[flush] invalid routing schema name: ${routingSchema}`);
     return;

@@ -8,7 +8,7 @@
  * routing/database records and reaches the api surface via its seeded host.
  *
  * Contrast with `server.playwright.test.ts`, which uses the single-tenant dev
- * server (`scopedRouting` defaults to `false`).
+ * server (`useRouting` defaults to `false`).
  */
 import { expect, test } from '@playwright/test';
 import path from 'path';
@@ -46,9 +46,9 @@ test.describe('playwright-test scoped server (real graphql-server)', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          scopedRouting: true,
+          useRouting: true,
           api: {
-            scopedRoutingSchema: 'constructive_routing_public',
+            routingSchema: 'constructive_routing_public',
             isPublic: true,
             metaSchemas: scopedMetaSchemas
           }

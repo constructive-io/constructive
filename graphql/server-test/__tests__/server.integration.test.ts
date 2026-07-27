@@ -4,7 +4,7 @@
  * All host routing resolves through the scoped routing plane
  * (constructive_routing_public.resolve_route); there is no legacy fallback.
  * The single-tenant scenario runs against the dev server
- * (server.scopedRouting: false), which exposes the configured schemas
+ * (server.useRouting: false), which exposes the configured schemas
  * directly with no route resolution.
  *
  * Run tests:
@@ -46,11 +46,11 @@ const teardowns: Array<() => Promise<void>> = [];
 type Scenario = {
   name: string;
   seedDir: 'simple-seed' | 'simple-seed-scoped';
-  scopedRouting: boolean;
+  useRouting: boolean;
   api: {
     isPublic: boolean;
     metaSchemas?: string[];
-    scopedRoutingSchema?: string;
+    routingSchema?: string;
   };
   headers?: Record<string, string>;
 };
@@ -59,14 +59,14 @@ const scenarios: Scenario[] = [
   {
     name: 'static single-tenant (dev server)',
     seedDir: 'simple-seed',
-    scopedRouting: false,
+    useRouting: false,
     api: { isPublic: false }
   },
   {
     name: 'scoped public via domain',
     seedDir: 'simple-seed-scoped',
-    scopedRouting: true,
-    api: { isPublic: true, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
+    useRouting: true,
+    api: { isPublic: true, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
     headers: {
       Host: 'app.test.constructive.io'
     }
@@ -74,8 +74,8 @@ const scenarios: Scenario[] = [
   {
     name: 'scoped private via domain',
     seedDir: 'simple-seed-scoped',
-    scopedRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
+    useRouting: true,
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
     headers: {
       Host: 'private.test.constructive.io'
     }
@@ -83,8 +83,8 @@ const scenarios: Scenario[] = [
   {
     name: 'scoped private via X-Api-Name',
     seedDir: 'simple-seed-scoped',
-    scopedRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
+    useRouting: true,
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Api-Name': 'private'
@@ -93,8 +93,8 @@ const scenarios: Scenario[] = [
   {
     name: 'scoped private via X-Schemata',
     seedDir: 'simple-seed-scoped',
-    scopedRouting: true,
-    api: { isPublic: false, metaSchemas: scopedMetaSchemas, scopedRoutingSchema: 'constructive_routing_public' },
+    useRouting: true,
+    api: { isPublic: false, metaSchemas: scopedMetaSchemas, routingSchema: 'constructive_routing_public' },
     headers: {
       'X-Database-Id': scopedDatabaseId,
       'X-Schemata': schemas.join(',')
@@ -149,7 +149,7 @@ describe.each(scenarios)('$name', (scenario) => {
         schemas,
         authRole: 'anonymous',
         server: {
-          scopedRouting: scenario.scopedRouting,
+          useRouting: scenario.useRouting,
           api: scenario.api
         }
       },
@@ -281,11 +281,11 @@ describe('scoped private via X-Meta-Schema', () => {
         schemas: metaApiSchemas,
         authRole: 'anonymous',
         server: {
-          scopedRouting: true,
+          useRouting: true,
           api: {
             isPublic: false,
             metaSchemas: metaApiSchemas,
-            scopedRoutingSchema: 'constructive_routing_public'
+            routingSchema: 'constructive_routing_public'
           }
         }
       },
@@ -357,11 +357,11 @@ describe('Error paths', () => {
         schemas,
         authRole: 'anonymous',
         server: {
-          scopedRouting: true,
+          useRouting: true,
           api: {
             isPublic: false,
             metaSchemas: scopedMetaSchemas,
-            scopedRoutingSchema: 'constructive_routing_public'
+            routingSchema: 'constructive_routing_public'
           }
         }
       },
@@ -407,11 +407,11 @@ describe('Error paths', () => {
           schemas,
           authRole: 'anonymous',
           server: {
-            scopedRouting: true,
+            useRouting: true,
             api: {
               isPublic: false,
               metaSchemas: scopedMetaSchemas,
-              scopedRoutingSchema: 'constructive_routing_public'
+              routingSchema: 'constructive_routing_public'
             }
           }
         },
@@ -442,11 +442,11 @@ describe('Error paths', () => {
           schemas,
           authRole: 'anonymous',
           server: {
-            scopedRouting: true,
+            useRouting: true,
             api: {
               isPublic: true,
               metaSchemas: scopedMetaSchemas,
-              scopedRoutingSchema: 'constructive_routing_public'
+              routingSchema: 'constructive_routing_public'
             }
           }
         },
