@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.5.2...@pgpmjs/export@1.5.3) (2026-07-27)
+
+### Bug Fixes
+
+- **export:** hoist metaschema registry fixtures into the service package ([6ea3de0](https://github.com/constructive-io/constructive/commit/6ea3de05fd232bc7e1fca91f2251b469d0f9b1a2))
+- **export:** sync control requires when re-exporting over an existing package ([5eec54a](https://github.com/constructive-io/constructive/commit/5eec54aeafefd3cd1378df56c6c8ca647fe93a74))
+
 ## [1.5.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.5.1...@pgpmjs/export@1.5.2) (2026-07-27)
 
 **Note:** Version bump only for package @pgpmjs/export

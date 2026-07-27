@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.2.2...graphile-llm@1.2.3) (2026-07-27)
+
+### Bug Fixes
+
+- **graphile-llm:** skip companion field synthesis when a physical column owns the name ([ac6c84f](https://github.com/constructive-io/constructive/commit/ac6c84fc77794acecb6446eb1dc381e5a7420954))
+
 ## [1.2.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.2.1...graphile-llm@1.2.2) (2026-07-27)
 
 **Note:** Version bump only for package graphile-llm

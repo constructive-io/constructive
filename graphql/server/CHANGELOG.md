@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.4.2...@constructive-io/graphql-server@5.4.3) (2026-07-27)
+
+### Bug Fixes
+
+- **routing:** fall back to server database when scoped route config lacks dbname ([47deea5](https://github.com/constructive-io/constructive/commit/47deea5c416952da7fe0b47297d95d661e32719d))
+- **server:** X-Api-Name lookup no longer filters by is_published ([236ecf1](https://github.com/constructive-io/constructive/commit/236ecf1e513061a86c075da68ae5610557f54297))
+
 ## [5.4.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.4.1...@constructive-io/graphql-server@5.4.2) (2026-07-27)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
