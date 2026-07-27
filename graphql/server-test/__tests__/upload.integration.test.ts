@@ -64,9 +64,9 @@ const malloryPublicFileId = 'fa99fa99-0000-0000-0000-000000000001';
 const malloryPublicBucketId = 'fa77fa77-0000-0000-0000-000000000001';
 
 const metaSchemas = [
-  'constructive_catalog_public',
-  'constructive_routing_public',
-  'constructive_apps_public',
+  'catalog_public',
+  'routing_public',
+  'apps_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
@@ -318,8 +318,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
           useRouting: true,
           api: {
             isPublic: false,
-            metaSchemas,
-            routingSchema: 'constructive_routing_public'
+            metaSchemas
           }
         }
       },

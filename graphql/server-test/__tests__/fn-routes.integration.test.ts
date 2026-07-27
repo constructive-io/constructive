@@ -9,7 +9,7 @@
  *
  * The seeded function_invocations INSERT policy only passes when
  * `jwt.claims.api_id` (set transaction-locally by the server from the
- * hostname → constructive_routing_public.resolve_route → api_id resolution)
+ * hostname → routing_public.resolve_route → api_id resolution)
  * matches the binding's api_id — so the happy path also proves the claim is
  * injected.
  *
@@ -30,9 +30,9 @@ const shared = (...segments: string[]) =>
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
-  'constructive_catalog_public',
-  'constructive_routing_public',
-  'constructive_apps_public',
+  'catalog_public',
+  'routing_public',
+  'apps_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
@@ -62,8 +62,7 @@ beforeAll(async () => {
         useRouting: true,
         api: {
           isPublic: true,
-          metaSchemas,
-          routingSchema: 'constructive_routing_public'
+          metaSchemas
         }
       }
     },

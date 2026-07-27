@@ -38,7 +38,7 @@ export interface PgpmModulePathOptions {
 
   /**
    * API names to resolve schemas from
-   * Queries constructive_routing_public.api_schemas to get schema names
+   * Queries routing_public.api_schemas to get schema names
    * Mutually exclusive with schemas
    */
   apiNames?: string[];
@@ -73,7 +73,7 @@ export interface PgpmWorkspaceOptions {
 
   /**
    * API names to resolve schemas from
-   * Queries constructive_routing_public.api_schemas to get schema names
+   * Queries routing_public.api_schemas to get schema names
    * Mutually exclusive with schemas
    */
   apiNames?: string[];

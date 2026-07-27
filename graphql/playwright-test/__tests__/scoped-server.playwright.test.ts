@@ -4,7 +4,7 @@
  * Proves the Playwright harness can drive the *production*
  * `@constructive-io/graphql-server` (not the dev server): every request is
  * resolved through the scoped-routing plane
- * (`constructive_routing_public.resolve_route()`), so this suite seeds real
+ * (`routing_public.resolve_route()`), so this suite seeds real
  * routing/database records and reaches the api surface via its seeded host.
  *
  * Contrast with `server.playwright.test.ts`, which uses the single-tenant dev
@@ -21,9 +21,9 @@ const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const scopedMetaSchemas = [
-  'constructive_catalog_public',
-  'constructive_routing_public',
-  'constructive_apps_public',
+  'catalog_public',
+  'routing_public',
+  'apps_public',
   'metaschema_public',
   'metaschema_modules_public'
 ];
@@ -48,7 +48,6 @@ test.describe('playwright-test scoped server (real graphql-server)', () => {
         server: {
           useRouting: true,
           api: {
-            routingSchema: 'constructive_routing_public',
             isPublic: true,
             metaSchemas: scopedMetaSchemas
           }

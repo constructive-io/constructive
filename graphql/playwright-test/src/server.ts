@@ -34,7 +34,7 @@ export const createTestServer = async (
  *
  * Uses the `Server` class from `@constructive-io/graphql-server` directly, so
  * every request is resolved through the scoped-routing plane
- * (`constructive_routing_public.resolve_route()`). Suites using this must seed
+ * (`routing_public.resolve_route()`). Suites using this must seed
  * real routing/database records so a real database id is resolved.
  */
 export const createScopedTestServer = async (
