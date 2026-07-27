@@ -268,6 +268,15 @@ export interface ConfigSecretsModuleRow {
   table_id: string;
 }
 
+export interface ConfigSecretsModuleRow {
+  table_id: string;
+}
+
+export interface SecretsModuleAvailabilityRow {
+  has_internal_secrets_module: boolean;
+  has_config_secrets_module: boolean;
+}
+
 export interface SchemaAndTableRow {
   schema_name: string;
   table_name: string;
@@ -340,7 +349,7 @@ export interface BuiltinModuleMap {
 export type WithPgClient = <T>(
   fn: (client: PoolClient) => Promise<T>,
   /** Per-call settings merged over the request pgSettings before SET LOCAL. */
-  pgSettingsOverrides?: Record<string, string>,
+  pgSettingsOverrides?: Record<string, string>
 ) => Promise<T>;
 
 /**
@@ -384,7 +393,9 @@ export interface ConstructiveContext {
    *   - The module isn't provisioned for this database
    */
   useModule: {
-    <K extends keyof BuiltinModuleMap>(name: K): Promise<BuiltinModuleMap[K] | undefined>;
+    <K extends keyof BuiltinModuleMap>(
+      name: K
+    ): Promise<BuiltinModuleMap[K] | undefined>;
     (name: string): Promise<unknown>;
   };
 

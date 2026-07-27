@@ -9,12 +9,14 @@ import { QuoteUtils } from '@pgsql/quotes';
 
 import type {
   ConfigSecretsModuleRow,
+  InternalSecretsModuleRow,
   IdentityProviderConfigMap,
   IdentityProvidersConfig,
   IdentityProvidersModuleRow,
   PlatformDatabaseRow,
   ProviderRow,
   SchemaAndTableRow,
+  SecretsModuleAvailabilityRow,
 } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
@@ -44,6 +46,24 @@ const CONFIG_SECRETS_MODULE_SQL = `
   LIMIT 1
 `;
 
+const INTERNAL_SECRETS_MODULE_SQL = `
+  SELECT ism.internal_secrets_table_id
+  FROM metaschema_modules_public.internal_secrets_module ism
+  WHERE ism.database_id = $1
+    AND ism.scope = $2
+  LIMIT 1
+`;
+
+const SECRETS_MODULE_AVAILABILITY_SQL = `
+  SELECT
+    to_regclass(
+      'metaschema_modules_public.internal_secrets_module'
+    ) IS NOT NULL AS has_internal_secrets_module,
+    to_regclass(
+      'metaschema_modules_public.config_secrets_module'
+    ) IS NOT NULL AS has_config_secrets_module
+`;
+
 const SCHEMA_AND_TABLE_SQL = `
   SELECT schema_name, table_name
   FROM metaschema.schema_and_table($1)
@@ -70,12 +90,12 @@ function buildProvidersSql(
   ipSchema: string,
   ipTable: string,
   secretsSchema: string,
-  secretsTable: string,
+  secretsTable: string
 ): string {
   const providersTable = QuoteUtils.quoteQualifiedIdentifier(ipSchema, ipTable);
   const secretsTableName = QuoteUtils.quoteQualifiedIdentifier(
     secretsSchema,
-    secretsTable,
+    secretsTable
   );
 
   return `
@@ -109,7 +129,7 @@ function buildProvidersSql(
 }
 
 function normalizeStringParams(
-  params: Record<string, unknown> | null,
+  params: Record<string, unknown> | null
 ): Record<string, string> {
   if (!params) return {};
   const normalized: Record<string, string> = {};
@@ -126,24 +146,75 @@ function normalizeStringParams(
 async function resolveSecretsTable(
   ctx: LoaderContext,
   databaseId: string,
-  scope: string,
+  scope: string
 ): Promise<SchemaAndTableRow> {
-  const secretsModuleResult =
-    await ctx.servicesPool.query<ConfigSecretsModuleRow>(
-      CONFIG_SECRETS_MODULE_SQL,
-      [databaseId, scope],
+  const availabilityResult =
+    await ctx.servicesPool.query<SecretsModuleAvailabilityRow>(
+      SECRETS_MODULE_AVAILABILITY_SQL
     );
-  const secretsModuleRow = secretsModuleResult.rows[0];
-  if (!secretsModuleRow) {
+  const availability = availabilityResult.rows[0];
+
+  // Some supported DB revisions still expose the pre-split secrets metadata.
+  // Prefer the new contract while retaining support for the legacy module.
+  let selectedModule:
+    | {
+        name: 'internal_secrets_module' | 'config_secrets_module';
+        tableId: string;
+      }
+    | undefined;
+
+  if (availability?.has_internal_secrets_module) {
+    const internalResult =
+      await ctx.servicesPool.query<InternalSecretsModuleRow>(
+        INTERNAL_SECRETS_MODULE_SQL,
+        [databaseId, scope]
+      );
+    const tableId = internalResult.rows[0]?.internal_secrets_table_id;
+    if (tableId) {
+      selectedModule = {
+        name: 'internal_secrets_module',
+        tableId,
+      };
+    }
+  }
+
+  if (!selectedModule && availability?.has_config_secrets_module) {
+    const configResult = await ctx.servicesPool.query<ConfigSecretsModuleRow>(
+      CONFIG_SECRETS_MODULE_SQL,
+      [databaseId, scope]
+    );
+    const tableId = configResult.rows[0]?.table_id;
+    if (tableId) {
+      selectedModule = {
+        name: 'config_secrets_module',
+        tableId,
+      };
+    }
+  }
+
+  if (!selectedModule) {
+    const availableModules = [
+      availability?.has_internal_secrets_module && 'internal_secrets_module',
+      availability?.has_config_secrets_module && 'config_secrets_module',
+    ].filter(Boolean);
+
+    if (availableModules.length === 0) {
+      throw new Error(
+        `secrets module metadata unavailable for database ${databaseId}`
+      );
+    }
+
     throw new Error(
-      `config_secrets_module missing for scope ${scope} on database ${databaseId}`,
+      `${availableModules.join(
+        ' and '
+      )} missing for scope ${scope} on database ${databaseId}`
     );
   }
 
   try {
     const schemaResult = await ctx.servicesPool.query<SchemaAndTableRow>(
       SCHEMA_AND_TABLE_SQL,
-      [secretsModuleRow.table_id],
+      [selectedModule.tableId]
     );
     const schemaRow = schemaResult.rows[0];
     if (schemaRow) return schemaRow;
@@ -152,31 +223,33 @@ async function resolveSecretsTable(
   }
 
   throw new Error(
-    `schema/table resolution missing for config_secrets_module scope ${scope} on database ${databaseId}`,
+    `schema/table resolution missing for ${selectedModule.name} scope ${scope} on database ${databaseId}`
   );
 }
 
 export async function resolveIdentityProvidersConfig(
-  ctx: LoaderContext,
+  ctx: LoaderContext
 ): Promise<IdentityProvidersConfig | undefined> {
   const { servicesPool, tenantPool, databaseId, dbname } = ctx;
 
   const moduleResult = await tenantPool.query<IdentityProvidersModuleRow>(
     IDENTITY_PROVIDERS_MODULE_SQL,
-    [databaseId],
+    [databaseId]
   );
   const moduleRow = moduleResult.rows[0];
   if (!moduleRow) {
-    throw new Error(`identity_providers_module missing for database ${databaseId}`);
+    throw new Error(
+      `identity_providers_module missing for database ${databaseId}`
+    );
   }
   const functionPrefix = moduleRow.prefix || moduleRow.scope || 'platform';
 
   // Provider credentials are platform-managed; auth functions remain scoped
   // to the current request database.
-  const platformDatabaseResult =
-    await servicesPool.query<PlatformDatabaseRow>(PLATFORM_DATABASE_SQL, [
-      dbname,
-    ]);
+  const platformDatabaseResult = await servicesPool.query<PlatformDatabaseRow>(
+    PLATFORM_DATABASE_SQL,
+    [dbname]
+  );
   const platformDatabaseId = platformDatabaseResult.rows[0]?.database_id;
   if (!platformDatabaseId) return undefined;
 
@@ -186,19 +259,19 @@ export async function resolveIdentityProvidersConfig(
       : (
           await servicesPool.query<IdentityProvidersModuleRow>(
             IDENTITY_PROVIDERS_MODULE_SQL,
-            [platformDatabaseId],
+            [platformDatabaseId]
           )
         ).rows[0];
   if (!providerModuleRow) {
     throw new Error(
-      `identity_providers_module missing for database ${platformDatabaseId}`,
+      `identity_providers_module missing for database ${platformDatabaseId}`
     );
   }
 
   const secretsTable = await resolveSecretsTable(
     ctx,
     providerModuleRow.database_id,
-    providerModuleRow.scope,
+    providerModuleRow.scope
   );
 
   const providersResult = await servicesPool.query<ProviderRow>(
@@ -206,8 +279,8 @@ export async function resolveIdentityProvidersConfig(
       providerModuleRow.private_schema_name,
       providerModuleRow.table_name,
       secretsTable.schema_name,
-      secretsTable.table_name,
-    ),
+      secretsTable.table_name
+    )
   );
 
   const providers: IdentityProviderConfigMap = new Map();
@@ -226,7 +299,9 @@ export async function resolveIdentityProvidersConfig(
       tokenUrl: row.token_url,
       userinfoUrl: row.userinfo_url,
       scopes: row.scopes,
-      authorizationParams: normalizeStringParams(row.extra_authorization_params),
+      authorizationParams: normalizeStringParams(
+        row.extra_authorization_params
+      ),
       pkceEnabled: row.pkce_enabled ?? true,
     });
   }
