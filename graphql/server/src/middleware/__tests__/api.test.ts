@@ -111,7 +111,7 @@ describe('api middleware routing priority', () => {
     });
     expect(svcCache.get('api:db-123:customer-api')).toBe(result);
     expect(query.mock.calls).toEqual(expect.arrayContaining([
-      [expect.stringContaining('FROM "routing_public".apis'), ['db-123', 'customer-api', false]]
+      [expect.stringContaining('FROM "routing_public".apis'), ['db-123', 'customer-api']]
     ]));
   });
 });
