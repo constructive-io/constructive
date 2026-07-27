@@ -1,5 +1,5 @@
 import { getMissingInstallableModules, parseAuthor,PgpmPackage } from '@pgpmjs/core';
-import { mkdirSync, rmSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { toSnakeCase } from 'inflekt';
 import { Inquirerer } from 'inquirerer';
@@ -402,6 +402,27 @@ export const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOption
 };
 
 /**
+ * Ensures the module's control file `requires` line contains every requested
+ * extension, preserving any extras already listed.
+ */
+const syncControlRequires = (pgpmDir: string, name: string, extensions: string[]): void => {
+  const controlPath = path.join(pgpmDir, `${name}.control`);
+  if (!existsSync(controlPath)) return;
+
+  const content = readFileSync(controlPath, 'utf-8');
+  const match = content.match(/^requires\s*=\s*'([^']*)'\s*$/m);
+  const existing = match ? match[1].split(',').map((s) => s.trim()).filter(Boolean) : [];
+  const merged = [...existing, ...extensions.filter((ext) => !existing.includes(ext))];
+  if (merged.length === existing.length) return;
+
+  const requiresLine = `requires = '${merged.join(',')}'`;
+  const updated = match
+    ? content.replace(match[0], requiresLine)
+    : `${content.trimEnd()}\n${requiresLine}\n`;
+  writeFileSync(controlPath, updated);
+};
+
+/**
  * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
  * If the module already exists and a prompter is provided, prompts the user for confirmation.
  *
@@ -470,6 +491,10 @@ export const preparePackage = async ({
       rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
       rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
       rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
+
+      // Re-exports over an existing package skip initModule, so sync the
+      // control file's requires with the requested extensions.
+      syncControlRequires(pgpmDir, name, extensions);
     }
   } finally {
     process.chdir(curDir);

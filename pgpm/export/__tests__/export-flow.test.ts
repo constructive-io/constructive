@@ -1147,7 +1147,7 @@ relocatable = false
         join(exportWorkspaceDir, 'packages', PART_META_EXTENSION_NAME, `${PART_META_EXTENSION_NAME}.control`),
         'utf-8'
       );
-      expect(svcControl).toContain(PART_EXTENSION_NAME);
+      expect(svcControl).toMatch(new RegExp(`^requires = '.*\\b${PART_EXTENSION_NAME}'`, 'm'));
     }, 180000);
   });
 });
