@@ -228,6 +228,9 @@ importers:
       '@constructive-io/sdk':
         specifier: workspace:^
         version: link:../../sdk/constructive-sdk/dist
+      node-type-registry:
+        specifier: workspace:^
+        version: link:../../packages/node-type-registry/dist
       zod:
         specifier: ^4.4.3
         version: 4.4.3

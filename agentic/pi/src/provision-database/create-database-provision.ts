@@ -10,7 +10,7 @@
 
 import { api, modules } from '@constructive-io/sdk';
 
-import type { ProvisionModule } from './modules';
+import type { ProvisionModule } from './presets';
 
 type ProvisionInput = Parameters<modules.DatabaseProvisionModuleModel['create']>[0]['data'];
 

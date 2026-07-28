@@ -44,6 +44,17 @@ export type PreviewToken = {
   userId?: string;
 };
 
+/**
+ * Overlay layered over the pinned base preset when provisioning a database.
+ * Structurally the `ProvisionOverlay` from `provision-database/resolve`; typed
+ * loosely here to keep `host.ts` free of provision-internal imports.
+ */
+export interface HostProvisionOverlay {
+  preset?: string;
+  add?: (string | [string, Record<string, unknown>])[];
+  remove?: string[];
+}
+
 export interface PiToolsHost {
   /** Signed-in platform account, or null/undefined when signed out. */
   account(): HostAccount | null | undefined;
@@ -55,6 +66,17 @@ export interface PiToolsHost {
   previewToken?(): Promise<PreviewToken | null>;
   /** Treat tokens expiring within this window as already expired. Default 30s. */
   dataTokenSkewMs?: number;
+  /**
+   * Optional provision overlay: pick a base preset and/or layer module
+   * add/remove on top of it. The base module list always comes from the pinned
+   * `node-type-registry` preset — this only customizes it. Distributed as data
+   * (e.g. materialized from appstash / a pinned git ref), never as code.
+   */
+  provisionOverlay?():
+    | HostProvisionOverlay
+    | null
+    | undefined
+    | Promise<HostProvisionOverlay | null | undefined>;
 }
 
 export const DEFAULT_DATA_TOKEN_SKEW_MS = 30_000;
