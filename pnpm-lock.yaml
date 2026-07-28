@@ -214,6 +214,29 @@ importers:
         version: link:../protocol/dist
     publishDirectory: dist
 
+  agentic/pi:
+    dependencies:
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@constructive-io/graphql-query':
+        specifier: ^4.5.3
+        version: 4.5.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafserv@1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(pg-sql2@5.0.1)(pg@8.21.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tamedevil@0.1.1)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)
+      '@constructive-io/sdk':
+        specifier: ^1.5.3
+        version: 1.5.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafserv@1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(pg-sql2@5.0.1)(pg@8.21.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tamedevil@0.1.1)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@earendil-works/pi-coding-agent':
+        specifier: 0.79.6
+        version: 0.79.6(ws@8.20.1)(zod@4.4.3)
+      typebox:
+        specifier: ^1.0.0
+        version: 1.1.38
+    publishDirectory: dist
+
   agentic/protocol:
     publishDirectory: dist
 
@@ -3712,6 +3735,9 @@ importers:
 
 packages:
 
+  12factor-env@1.21.0:
+    resolution: {integrity: sha512-wWaC+62wfdVW8yqvoVyGkE2s+QztejYvD8IJppVS1yB1ZCOe7H9mJ8U1bJhM0CiHKE02w3tvlFhKKXbFMXmrhw==}
+
   '@0no-co/graphql.web@1.2.0':
     resolution: {integrity: sha512-/1iHy9TTr63gE1YcR5idjx8UREz1s0kFhydf3bBLCXyqjhkIc6igAzTOx3zPifCwFR87tsh/4Pa9cNts6d2otw==}
     peerDependencies:
@@ -3719,6 +3745,12 @@ packages:
     peerDependenciesMeta:
       graphql:
         optional: true
+
+  '@agentic-kit/ollama@2.7.0':
+    resolution: {integrity: sha512-y03wXes0SjZh2KbEyNUJxxAqZrcOz+3suUkRYeJNca1/g6icEhZLnNBdgVRoK8q1tStoCvIfGpLJGr/4eWF5Ag==}
+
+  '@agentic-kit/protocol@1.8.0':
+    resolution: {integrity: sha512-yWRkSeph88nego+lmMbczdGY1y9Tol8zsbzA4cvNHVyhEeNyza79zLh9wBYXXlJcqgTeeihSD7XYUhCQHlANKg==}
 
   '@anthropic-ai/sdk@0.91.1':
     resolution: {integrity: sha512-LAmu761tSN9r66ixvmciswUj/ZC+1Q4iAfpedTfSVLeswRwnY3n2Nb6Tsk+cLPP28aLOPWeMgIuTuCcMC6W/iw==}
@@ -4111,11 +4143,49 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
+  '@constructive-io/bucket-provisioner@0.18.0':
+    resolution: {integrity: sha512-ron3iwQ6Ht130aQx6RgHh7DVY8BnBEUGuqu4p74EacmPUrSn8T9jbzemNZzWJOVUAC09bSrorDvL6uvQePgAZA==}
+
+  '@constructive-io/content-type-stream@2.24.0':
+    resolution: {integrity: sha512-vgY/nFWiq2PUD3Twy85WfwTCCcWBzMeN8BdU+P6244i5s8if6vrtOjIwmQFwDlw5PS/JRvmtw0NjIEqLXgreHg==}
+
+  '@constructive-io/express-context@0.18.0':
+    resolution: {integrity: sha512-apjuKG7031WE4m3WW+6Ap2kDvUtTR0jkBumXrT/1sIoLInYg9sWe17JR7DXse84RAtw5CaWcX/v2vrWYqmqfEg==}
+    peerDependencies:
+      express: ^5.0.0
+
   '@constructive-io/fetch@1.1.1':
     resolution: {integrity: sha512-kpus6sqQwMUTBNpqYvSejG27HJXDucV+BQUNUg3T5U92Qy94Q6of7OhbovICteDMmgcRKCdc5S2e2pXnIY8L5A==}
 
+  '@constructive-io/graphql-env@3.23.0':
+    resolution: {integrity: sha512-jcBZomhnrb+eYA65TlRqzT0sC0ilbCl4z1mwTvkY9XszulvZcjCmSgWMWKxlH6awdgLAE973CrAnGggXVm/how==}
+
+  '@constructive-io/graphql-query@4.5.3':
+    resolution: {integrity: sha512-Ve4l6czmpujUIL3+x6y7uG1TIuuYYBMQspeSx4wwzrFr1r4XeTmXe/38/jtLyKzeMvPMkJ5BbYiIHM1qO3hnWQ==}
+
+  '@constructive-io/graphql-types@3.22.0':
+    resolution: {integrity: sha512-/Ov2D7rQzkzFmKaYzHJrFkPBvs3DszvGISu8Q8kfGC7S/ep0KI2Yw8lYxtLoUzqTkUaotIaJZMcD8bObssmK6A==}
+
+  '@constructive-io/llm-env@0.7.0':
+    resolution: {integrity: sha512-Ef1DNwmWaY/yrI8Du2u9zs5bsg5FZXb00sEoCiyjBptSDvkIrSB88Encq0Derh/yuY+1KGlAhaDSt11ZnacToQ==}
+
   '@constructive-io/noble-hashes@0.2.1':
     resolution: {integrity: sha512-P/C3m4Y9Ywhk7+05aKpg8L7Lkl9Am6AmYMsrMEQ6pRKQA+HIhEutsn9oL99ldsc7gtIt9UEuSHzLRKQvyQCEGQ==}
+
+  '@constructive-io/s3-streamer@2.33.0':
+    resolution: {integrity: sha512-8tj3BOYoBY0h+gHBjdGa8PLdnnZbQUTqK7D2PciaVUseeEe7Okpk95irAoewdGrZko0BL8DZLnefYyHHEf+f3g==}
+
+  '@constructive-io/s3-utils@2.24.0':
+    resolution: {integrity: sha512-qshYjwcUuLEO1DkpYAKOVGEDcQWOBQ9WoPrYXMvxyL344JeYm4UZjHieOLsEWL6IwccnUbXGw8p21d4xCuAgTA==}
+
+  '@constructive-io/sdk@1.5.3':
+    resolution: {integrity: sha512-Lh63Asrjesv77LQ31N8XrXDc6lzdCHDNIBPnRvZkRyS7fiPgiqcX4vT39AoWkshn3vI2gkKlw6uXwxiMEJZCdQ==}
+
+  '@constructive-io/upload-names@2.23.0':
+    resolution: {integrity: sha512-/kh5W//oxeWCJtpUFNIXyUPyKXH6frCwDqU9yflZbySLP7bNtlvPXG6Zs/uEypo1SqE3veco1/+LpIU43+hdtA==}
+
+  '@constructive-io/url-domains@2.23.0':
+    resolution: {integrity: sha512-5yvJWNHB0ztYQXf8lfy6kjGWQUOMaxyNR39xgKWwkLLSVmE/3jLLVymtY1cTLWbQiHa5Ek86B0ArQp48J7P7Ng==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -5335,6 +5405,18 @@ packages:
 
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
+
+  '@pgpmjs/env@2.33.0':
+    resolution: {integrity: sha512-/NlCXAtMd6mbp8lVsiLHo/ErahpF3Pjfz5KvGENHtFnpWIN2Mi9oQhTo8grzH6n47/qyQ36wZ1hYhY8HSigSEA==}
+
+  '@pgpmjs/logger@2.18.0':
+    resolution: {integrity: sha512-2Crr/s299ahmXv0fxasu8GVrV6VovQhGUtFsM4dVUjHx3mXlW8P+nfkHM2BnQxWeqWV3u25z7aXnRiWDCZ0K/Q==}
+
+  '@pgpmjs/server-utils@3.19.0':
+    resolution: {integrity: sha512-36i7q7+bzbklE1Y7+bdQJbMuBhuTRqcznmnDs5HvfM29B9gFK5TXTVO1h3B4FArpmVpYctr303PkqL/a7T+gzg==}
+
+  '@pgpmjs/types@2.40.0':
+    resolution: {integrity: sha512-rI3DLp94jS9PhWzfAyeW0Gn+L8HrwKvjTQHd8X7uQsc9bCCl0TwxKaPiUFJHdgzYSBJltjCWsxWNZ1wp2R0Org==}
 
   '@pgsql/quotes@18.1.0':
     resolution: {integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==}
@@ -7486,6 +7568,9 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
 
+  etag-hash@2.24.0:
+    resolution: {integrity: sha512-3whEZblANp5QeSF3jP/TTz+aalTOoQ+LP6c3TucjwukDvdWG1Hp8lXbn77nldnKWvQNGqaBi/aXTvmik4Hzffg==}
+
   etag@1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
@@ -7845,6 +7930,9 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
+  gql-ast@3.17.0:
+    resolution: {integrity: sha512-HJqf5oeuWmuRTEEwklYIv/9SQvk9e0lehq/fIYcfdUckBwADAQ39zMRlGL5o3CnoYcyeOV7wbt9EN0YFdMC4Fg==}
+
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
@@ -7882,6 +7970,17 @@ packages:
       ws:
         optional: true
 
+  graphile-bucket-provisioner-plugin@1.4.0:
+    resolution: {integrity: sha512-bNgc7a1R0wNiQJQqsNY8Ceapwp4YjU+N5E+RMzDVLnEkap2/suuDysnOQz7GTXFf1WU+iWy0doJyivNbzTADAQ==}
+    peerDependencies:
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-utils: 5.0.0
+      graphql: 16.13.0
+      postgraphile: 5.0.3
+
   graphile-build-pg@5.0.2:
     resolution: {integrity: sha512-8vkg1x5UcooFogPCp+3EUt6qqWX8NG01gANoVFUk9yK2c8DW+aQaF37LAaa96r9JR4FE0yeO2zk6WvOOemk2dg==}
     engines: {node: '>=22'}
@@ -7906,6 +8005,21 @@ packages:
       graphile-config: ^1.0.0-rc.5
       graphql: 16.13.0
 
+  graphile-bulk-mutations@1.5.2:
+    resolution: {integrity: sha512-h6C6gnk2kNG0vNasrEhqaA62A/iW+3+HoJZPmGW4kkxF+OyWGQL/5bNXuZE0zf8pHvJM1yzBhoHf7QB3NWq8ug==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-cache@4.4.0:
+    resolution: {integrity: sha512-1fiiWLpDNBFAEI0OiJtzIhlHeIjCxdQBsP3TT5nI2Ykox98Wnjj/LRVTUMUGKo13+U9wKVbuxRkof+KiA85W3A==}
+
   graphile-config@1.0.1:
     resolution: {integrity: sha512-sVdSWNmetW/WZKVQ0Dii2kCu0Le6X6qwuBRecWg575iOMjbZgxo+b4oVeSOTtR6NTKuLsMYQBkzSaeoAKOPB+A==}
     engines: {node: '>=22'}
@@ -7919,6 +8033,158 @@ packages:
       graphile-config: 1.0.1
       graphql: 16.13.0
       pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-connection-filter@2.5.2:
+    resolution: {integrity: sha512-o4FVxCOSR5KezoIgjtD8ZB42oeh4zK1EOTYcS6nfm3AzkNvzyAIpSLyT+RjyKhT56ORWc6/qhOEvkq/WJGTwNg==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-i18n@2.5.2:
+    resolution: {integrity: sha512-sq0O2pLHix4+kRN7OIdTDl2yTFLEAF7koAMZRvPoLS0/yutLCMFSxkxLL2BaiYQkPoLCAvmMrn5hUPE36uC5bQ==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-llm@1.5.2:
+    resolution: {integrity: sha512-9lzWW72Vmrjv5u24HiQgb4KjlfY1Rz+xxrWFEeEqOmduyMyaHBGNfr9W57TVEmG8mG4e45dK+RFb6vfiuAtsxQ==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-search: ^1.18.0
+      graphile-utils: 5.0.0
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+    peerDependenciesMeta:
+      graphile-search:
+        optional: true
+      graphile-utils:
+        optional: true
+
+  graphile-ltree@2.5.2:
+    resolution: {integrity: sha512-jDbiJP8FdXX3Y3Batr8qhX0e8nlUbi0Lakt3a4LxEyZS/Mky5nVGcuKWaII9ayw4P6i9ooFMTlzavQ6XOxK5fA==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-connection-filter: ^1.13.0
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+    peerDependenciesMeta:
+      graphile-connection-filter:
+        optional: true
+
+  graphile-meta@1.1.1:
+    resolution: {integrity: sha512-2TkIudmP/ut6Hj6EoKSmcyIVfmDkasa4IWiqrTWzX/I/6/6EsNrSkG2IPuCQ/5A2udxHC2BSfTd7FgGBaHjveQ==}
+    peerDependencies:
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      postgraphile: 5.0.3
+
+  graphile-pg-aggregates@2.5.2:
+    resolution: {integrity: sha512-IMql0qpltxR+oqbzU9Luk7LJIi6UnUuk4189UIqbdzjlNwu2KZh2KIxCrs81tYteYQDpEZQCUkwL4VaXe6vdpQ==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-connection-filter: ^1.13.0
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-plugin-utils@1.4.0:
+    resolution: {integrity: sha512-8NEefFFkO7DbriRVptJkUfWPmuIXNG73+H2eKwLDwYuwPzoqJjmiugzo2r7sw14dPVvBXdj/eXlc/PrQRQrsqQ==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-postgis@3.5.2:
+    resolution: {integrity: sha512-XwpWDWG7HoJIWgsqt5YEpRgrzr0nP3SNZkVWVOYtEg4iK03IDtK2Q3eD2z7h9QRMjqrC2bxIH58VocwU3EDWjg==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-connection-filter: ^1.13.0
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+    peerDependenciesMeta:
+      graphile-connection-filter:
+        optional: true
+
+  graphile-presigned-url-plugin@1.4.0:
+    resolution: {integrity: sha512-sNVduSqJSFCHwUu+B+IrI9VlV80LNzxEH2oyX3wIYoF1AJvf00m6l6sH93XpswLXvXLRqeQHVjdsUofx7QYMpQ==}
+    peerDependencies:
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-utils: 5.0.0
+      graphql: 16.13.0
+      postgraphile: 5.0.3
+
+  graphile-realtime-subscriptions@1.4.0:
+    resolution: {integrity: sha512-W8Jzz+2axchlJSGmbtB000MI1bM59VUvY6ovcKat0JalkPlPRm6Z0OeEPEGi4CbWBdoUrKM4In1IJ0RWl2vOpw==}
+    peerDependencies:
+      grafast: 1.0.2
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphile-utils: 5.0.0
+      graphql: 16.13.0
+      postgraphile: 5.0.3
+
+  graphile-search@2.5.2:
+    resolution: {integrity: sha512-ex7EeLKXSVThmEpx6vJ42f6Lw4cTdoE8Y/juqVwObMT1K4qmLbZ+7bgoR+hAFwRc1RN+z4U/AXVzzb+4lo2jJQ==}
+    peerDependencies:
+      '@dataplan/pg': 1.0.3
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3
+
+  graphile-settings@6.5.3:
+    resolution: {integrity: sha512-sccwlpaXs3mAJZSH/5B85uigqKAlBT8HyMv25LEgL6mYDh83v8KbhU863IvV1Pf9qwDVnSGYoynGx484uQba0A==}
+
+  graphile-upload-plugin@2.18.0:
+    resolution: {integrity: sha512-0nh0RrnKg3woKc2Inh1GZP6jo835tTg2Su+qq4y5NYV5V3o+RTcUJqmNOVr6ZYUmfBeI0dz+uXkVhVVVyoVjcw==}
+    peerDependencies:
+      graphile-build: 5.0.2
+      graphile-build-pg: 5.0.2
+      graphile-config: 1.0.1
+      graphql: 16.13.0
       postgraphile: 5.0.3
 
   graphile-utils@5.0.0:
@@ -8819,6 +9085,9 @@ packages:
   microseconds@0.2.0:
     resolution: {integrity: sha512-n7DHHMjR1avBbSpsTBj6fmMGh2AGrifVV4e+WYc3Q9lO+xnSZ3NyhcBND3vzzatt05LFhoKFRxrIyklmLlUtyA==}
 
+  mime-bytes@0.24.0:
+    resolution: {integrity: sha512-G3VvG9nluHSND6IfCQuT9UieXCINL75LQXlh4a4u6igpapa09crROtlC4xmFsTph55TTVc/8e1qY7OEnTT96VA==}
+
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
@@ -9335,6 +9604,9 @@ packages:
     resolution: {integrity: sha512-T2ZUsdZFHgA3u4e5PfPbjd7HDDpxPnQb5jN0SrDsjNSuVXHJqtwTnWqG0B1jZrgmJ/7lj1EmVIByWt1gxGkWvg==}
     engines: {node: '>=4'}
 
+  pg-cache@3.19.0:
+    resolution: {integrity: sha512-dFM0p6iCS2zTJWiiAdcNsJUCU07yJopd1tG0shxUjEG6URJJ0y0NTsgc7f8yfmVP09QJXGLi4dvnP7DRXWWh1Q==}
+
   pg-cloudflare@1.3.0:
     resolution: {integrity: sha512-6lswVVSztmHiRtD6I8hw4qP/nDm1EJbKMRhf3HCYaqud7frGysPv7FYJ5noZQdhQtN2xJnimfMtvQq21pdbzyQ==}
 
@@ -9349,6 +9621,9 @@ packages:
 
   pg-copy-streams@7.0.0:
     resolution: {integrity: sha512-zBvnY6wtaBRE2ae2xXWOOGMaNVPkXh1vhypAkNSKgMdciJeTyIQAHZaEeRAxUjs/p1El5jgzYmwG5u871Zj3dQ==}
+
+  pg-env@1.22.0:
+    resolution: {integrity: sha512-IH4VI5cAs6UGCqkw2sjaBbghoK5L++lPUsVkRxzCh+NJFR947VV8BmkDS5De1QIeX4NFaEadwvo9U+Bouz5hpg==}
 
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
@@ -9379,6 +9654,9 @@ packages:
 
   pg-protocol@1.14.0:
     resolution: {integrity: sha512-n5taZ1kO3s9ngDTVxsEznOqCyToTgz0FLuPq0B33COy5pPpuWJpY3/2oRBVETuOgzdqRXfWpM9HIhp2LBBT1BA==}
+
+  pg-query-context@2.23.0:
+    resolution: {integrity: sha512-ZlGHx1S1BXIqSq+s4vVmMOWoU4YKTlFF/cgcDEhFbUe1udOtB0Q5z55eIifA0FRKyADFttYvHxH/KePLKaCRzQ==}
 
   pg-sql2@5.0.1:
     resolution: {integrity: sha512-DdOZNUBhuBuGcq3UgUNsYE9FPdPzw9YA1K/WQxutNhC17DA/CImapyamv6lliVvdAVNZ+CWB1z+p7SmSJmkezw==}
@@ -10505,6 +10783,9 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuid-hash@2.23.0:
+    resolution: {integrity: sha512-CugWIHeOKrHDMh18vQS1nMh1VGycs99b4ljQFvaQ+w4uVgR4rxnAT3RBlZ1K4SX6m2t5U8pSbHRMScoFqH8GpA==}
+
   uuid@10.0.0:
     resolution: {integrity: sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==}
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
@@ -10767,9 +11048,19 @@ packages:
 
 snapshots:
 
+  12factor-env@1.21.0:
+    dependencies:
+      envalid: 8.1.1
+
   '@0no-co/graphql.web@1.2.0(graphql@16.13.0)':
     optionalDependencies:
       graphql: 16.13.0
+
+  '@agentic-kit/ollama@2.7.0':
+    dependencies:
+      '@agentic-kit/protocol': 1.8.0
+
+  '@agentic-kit/protocol@1.8.0': {}
 
   '@anthropic-ai/sdk@0.91.1(zod@4.4.3)':
     dependencies:
@@ -10836,17 +11127,17 @@ snapshots:
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.13
+      '@aws-sdk/core': 3.977.1
       '@aws-sdk/credential-provider-node': 3.972.44
       '@aws-sdk/eventstream-handler-node': 3.972.30
       '@aws-sdk/middleware-eventstream': 3.972.25
       '@aws-sdk/middleware-websocket': 3.972.44
       '@aws-sdk/token-providers': 3.1048.0
-      '@aws-sdk/types': 3.973.9
-      '@smithy/core': 3.24.4
-      '@smithy/fetch-http-handler': 5.4.4
+      '@aws-sdk/types': 3.974.2
+      '@smithy/core': 3.31.0
+      '@smithy/fetch-http-handler': 5.6.12
       '@smithy/node-http-handler': 4.4.16
-      '@smithy/types': 4.14.2
+      '@smithy/types': 4.16.1
       tslib: 2.8.1
 
   '@aws-sdk/client-s3@3.1052.0':
@@ -11096,11 +11387,11 @@ snapshots:
 
   '@aws-sdk/token-providers@3.1048.0':
     dependencies:
-      '@aws-sdk/core': 3.974.13
+      '@aws-sdk/core': 3.977.1
       '@aws-sdk/nested-clients': 3.997.11
-      '@aws-sdk/types': 3.973.9
-      '@smithy/core': 3.24.4
-      '@smithy/types': 4.14.2
+      '@aws-sdk/types': 3.974.2
+      '@smithy/core': 3.31.0
+      '@smithy/types': 4.16.1
       tslib: 2.8.1
 
   '@aws-sdk/token-providers@3.1052.0':
@@ -11414,9 +11705,155 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
+  '@constructive-io/bucket-provisioner@0.18.0':
+    dependencies:
+      '@aws-sdk/client-s3': 3.1052.0
+      '@constructive-io/s3-utils': 2.24.0
+
+  '@constructive-io/content-type-stream@2.24.0':
+    dependencies:
+      etag-hash: 2.24.0
+      mime-bytes: 0.24.0
+      uuid-hash: 2.23.0
+
+  '@constructive-io/express-context@0.18.0(express@5.2.1)':
+    dependencies:
+      '@constructive-io/url-domains': 2.23.0
+      '@pgpmjs/env': 2.33.0
+      '@pgpmjs/logger': 2.18.0
+      '@pgpmjs/server-utils': 3.19.0
+      '@pgpmjs/types': 2.40.0
+      express: 5.2.1
+      lru-cache: 11.2.7
+      pg: 8.21.0
+      pg-cache: 3.19.0
+      pg-query-context: 2.23.0
+    transitivePeerDependencies:
+      - pg-native
+      - supports-color
+
   '@constructive-io/fetch@1.1.1': {}
 
+  '@constructive-io/graphql-env@3.23.0':
+    dependencies:
+      12factor-env: 1.21.0
+      '@constructive-io/graphql-types': 3.22.0
+      '@pgpmjs/env': 2.33.0
+      deepmerge: 4.3.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@constructive-io/graphql-query@4.5.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafserv@1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(pg-sql2@5.0.1)(pg@8.21.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tamedevil@0.1.1)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)':
+    dependencies:
+      '@0no-co/graphql.web': 1.2.0(graphql@16.13.0)
+      '@constructive-io/fetch': 1.1.1
+      '@constructive-io/graphql-types': 3.22.0
+      ajv: 8.20.0
+      gql-ast: 3.17.0
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-settings: 6.5.3(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)
+      graphql: 16.13.0
+      inflection: 3.0.2
+      inflekt: 0.7.1
+      lru-cache: 11.2.7
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+    transitivePeerDependencies:
+      - '@dataplan/json'
+      - '@dataplan/pg'
+      - '@envelop/core'
+      - '@fastify/websocket'
+      - '@types/node'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@whatwg-node/server'
+      - bufferutil
+      - crossws
+      - grafserv
+      - graphile-build
+      - h3
+      - hono
+      - immer
+      - pg
+      - pg-native
+      - pg-sql2
+      - react
+      - react-dom
+      - supports-color
+      - tamedevil
+      - use-sync-external-store
+      - utf-8-validate
+      - ws
+
+  '@constructive-io/graphql-types@3.22.0':
+    dependencies:
+      '@pgpmjs/types': 2.40.0
+      deepmerge: 4.3.1
+      graphile-config: 1.0.1
+      pg-env: 1.22.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@constructive-io/llm-env@0.7.0': {}
+
   '@constructive-io/noble-hashes@0.2.1': {}
+
+  '@constructive-io/s3-streamer@2.33.0':
+    dependencies:
+      '@aws-sdk/client-s3': 3.1052.0
+      '@aws-sdk/lib-storage': 3.1052.0(@aws-sdk/client-s3@3.1052.0)
+      '@constructive-io/content-type-stream': 2.24.0
+      '@constructive-io/s3-utils': 2.24.0
+      '@pgpmjs/types': 2.40.0
+
+  '@constructive-io/s3-utils@2.24.0':
+    dependencies:
+      '@aws-sdk/client-s3': 3.1052.0
+      '@aws-sdk/lib-storage': 3.1052.0(@aws-sdk/client-s3@3.1052.0)
+      '@aws-sdk/s3-request-presigner': 3.1052.0
+
+  '@constructive-io/sdk@1.5.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafserv@1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(pg-sql2@5.0.1)(pg@8.21.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tamedevil@0.1.1)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)':
+    dependencies:
+      '@0no-co/graphql.web': 1.2.0(graphql@16.13.0)
+      '@constructive-io/graphql-query': 4.5.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafserv@1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(pg-sql2@5.0.1)(pg@8.21.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tamedevil@0.1.1)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)
+      '@constructive-io/graphql-types': 3.22.0
+      gql-ast: 3.17.0
+      graphql: 16.13.0
+    transitivePeerDependencies:
+      - '@dataplan/json'
+      - '@dataplan/pg'
+      - '@envelop/core'
+      - '@fastify/websocket'
+      - '@types/node'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@whatwg-node/server'
+      - bufferutil
+      - crossws
+      - grafserv
+      - graphile-build
+      - h3
+      - hono
+      - immer
+      - pg
+      - pg-native
+      - pg-sql2
+      - react
+      - react-dom
+      - supports-color
+      - tamedevil
+      - use-sync-external-store
+      - utf-8-validate
+      - ws
+
+  '@constructive-io/upload-names@2.23.0': {}
+
+  '@constructive-io/url-domains@2.23.0':
+    dependencies:
+      express: 5.2.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -12976,6 +13413,30 @@ snapshots:
   '@paralleldrive/cuid2@2.3.1':
     dependencies:
       '@noble/hashes': 1.8.0
+
+  '@pgpmjs/env@2.33.0':
+    dependencies:
+      12factor-env: 1.21.0
+      '@pgpmjs/types': 2.40.0
+      deepmerge: 4.3.1
+
+  '@pgpmjs/logger@2.18.0':
+    dependencies:
+      yanse: 0.2.1
+
+  '@pgpmjs/server-utils@3.19.0':
+    dependencies:
+      '@pgpmjs/logger': 2.18.0
+      '@pgpmjs/types': 2.40.0
+      cors: 2.8.6
+      express: 5.2.1
+      lru-cache: 11.2.7
+    transitivePeerDependencies:
+      - supports-color
+
+  '@pgpmjs/types@2.40.0':
+    dependencies:
+      pg-env: 1.22.0
 
   '@pgsql/quotes@18.1.0': {}
 
@@ -15062,6 +15523,8 @@ snapshots:
 
   esutils@2.0.3: {}
 
+  etag-hash@2.24.0: {}
+
   etag@1.8.1: {}
 
   eventemitter3@4.0.7: {}
@@ -15493,6 +15956,10 @@ snapshots:
 
   gopd@1.2.0: {}
 
+  gql-ast@3.17.0:
+    dependencies:
+      graphql: 16.13.0
+
   graceful-fs@4.2.11: {}
 
   grafast@1.0.2(graphql@16.13.0):
@@ -15608,6 +16075,19 @@ snapshots:
       - supports-color
       - use-sync-external-store
 
+  graphile-bucket-provisioner-plugin@1.4.0(c173c9f37f056a802829fa20e1098874):
+    dependencies:
+      '@constructive-io/bucket-provisioner': 0.18.0
+      '@pgpmjs/logger': 2.18.0
+      '@pgsql/quotes': 18.1.0
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-utils: 5.0.1(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
   graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1):
     dependencies:
       '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
@@ -15665,6 +16145,58 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  graphile-bulk-mutations@1.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-cache@4.4.0(2e92867bd5e9d5c071d0c985feeef641):
+    dependencies:
+      12factor-env: 1.21.0
+      '@pgpmjs/logger': 2.18.0
+      express: 5.2.1
+      grafserv: 1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)
+      graphile-realtime-subscriptions: 1.4.0(c173c9f37f056a802829fa20e1098874)
+      lru-cache: 11.2.7
+      pg-cache: 3.19.0
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+    transitivePeerDependencies:
+      - '@dataplan/json'
+      - '@dataplan/pg'
+      - '@envelop/core'
+      - '@fastify/websocket'
+      - '@types/node'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@whatwg-node/server'
+      - bufferutil
+      - crossws
+      - grafast
+      - graphile-build
+      - graphile-build-pg
+      - graphile-config
+      - graphile-utils
+      - graphql
+      - h3
+      - hono
+      - immer
+      - pg
+      - pg-native
+      - pg-sql2
+      - react
+      - react-dom
+      - supports-color
+      - tamedevil
+      - use-sync-external-store
+      - utf-8-validate
+      - ws
+
   graphile-config@1.0.1:
     dependencies:
       chalk: 4.1.2
@@ -15695,6 +16227,238 @@ snapshots:
       graphql: 16.13.0
       pg-sql2: 5.0.1
       postgraphile: 5.0.3(f0ca433f04a3f28b00a29892b7510c70)
+
+  graphile-connection-filter@2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-plugin-utils: 1.4.0(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-i18n@2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      accept-language-parser: 1.5.0
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-llm@1.5.2(e7103b85f4a330e782ad9f626d4b47b1):
+    dependencies:
+      '@agentic-kit/ollama': 2.7.0
+      '@constructive-io/express-context': 0.18.0(express@5.2.1)
+      '@constructive-io/llm-env': 0.7.0
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-cache: 4.4.0(2e92867bd5e9d5c071d0c985feeef641)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+    optionalDependencies:
+      graphile-search: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-utils: 5.0.1(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(tamedevil@0.1.1)
+    transitivePeerDependencies:
+      - '@dataplan/json'
+      - '@envelop/core'
+      - '@fastify/websocket'
+      - '@types/node'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@whatwg-node/server'
+      - bufferutil
+      - crossws
+      - express
+      - h3
+      - hono
+      - immer
+      - pg
+      - pg-native
+      - react
+      - react-dom
+      - supports-color
+      - tamedevil
+      - use-sync-external-store
+      - utf-8-validate
+      - ws
+
+  graphile-ltree@2.5.2(3389f019113bb43c95737d21f1d1a397):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+    optionalDependencies:
+      graphile-connection-filter: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+
+  graphile-meta@1.1.1(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-pg-aggregates@2.5.2(3389f019113bb43c95737d21f1d1a397):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-connection-filter: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-plugin-utils: 1.4.0(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-plugin-utils@1.4.0(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-postgis@3.5.2(3389f019113bb43c95737d21f1d1a397):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+    optionalDependencies:
+      graphile-connection-filter: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+
+  graphile-presigned-url-plugin@1.4.0(c173c9f37f056a802829fa20e1098874):
+    dependencies:
+      '@aws-sdk/client-s3': 3.1052.0
+      '@aws-sdk/s3-request-presigner': 3.1052.0
+      '@pgpmjs/logger': 2.18.0
+      '@pgsql/quotes': 18.1.0
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-utils: 5.0.1(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      lru-cache: 11.2.7
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-realtime-subscriptions@1.4.0(c173c9f37f056a802829fa20e1098874):
+    dependencies:
+      '@pgpmjs/logger': 2.18.0
+      '@pgsql/quotes': 18.1.0
+      grafast: 1.0.2(graphql@16.13.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-utils: 5.0.1(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-search@2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphile-plugin-utils: 1.4.0(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphql: 16.13.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+
+  graphile-settings@6.5.3(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1):
+    dependencies:
+      '@aws-sdk/client-s3': 3.1052.0
+      '@constructive-io/bucket-provisioner': 0.18.0
+      '@constructive-io/graphql-env': 3.23.0
+      '@constructive-io/graphql-types': 3.22.0
+      '@constructive-io/s3-streamer': 2.33.0
+      '@constructive-io/s3-utils': 2.24.0
+      '@constructive-io/upload-names': 2.23.0
+      '@dataplan/json': 1.0.0(grafast@1.0.2(graphql@16.13.0))
+      '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@graphile-contrib/pg-many-to-many': 2.0.0-rc.2
+      '@pgpmjs/logger': 2.18.0
+      '@pgpmjs/types': 2.40.0
+      '@pgsql/quotes': 18.1.0
+      cors: 2.8.6
+      express: 5.2.1
+      grafast: 1.0.2(graphql@16.13.0)
+      grafserv: 1.0.0(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))(ws@8.20.1)
+      graphile-bucket-provisioner-plugin: 1.4.0(c173c9f37f056a802829fa20e1098874)
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-bulk-mutations: 1.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-config: 1.0.1
+      graphile-connection-filter: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-i18n: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-llm: 1.5.2(e7103b85f4a330e782ad9f626d4b47b1)
+      graphile-ltree: 2.5.2(3389f019113bb43c95737d21f1d1a397)
+      graphile-meta: 1.1.1(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-pg-aggregates: 2.5.2(3389f019113bb43c95737d21f1d1a397)
+      graphile-postgis: 3.5.2(3389f019113bb43c95737d21f1d1a397)
+      graphile-presigned-url-plugin: 1.4.0(c173c9f37f056a802829fa20e1098874)
+      graphile-realtime-subscriptions: 1.4.0(c173c9f37f056a802829fa20e1098874)
+      graphile-search: 2.5.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-upload-plugin: 2.18.0(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5))
+      graphile-utils: 5.0.1(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      inflekt: 0.7.1
+      lru-cache: 11.2.7
+      pg: 8.21.0
+      pg-query-context: 2.23.0
+      pg-sql2: 5.0.1
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
+      request-ip: 3.3.0
+      tamedevil: 0.1.1
+    transitivePeerDependencies:
+      - '@envelop/core'
+      - '@fastify/websocket'
+      - '@types/node'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@whatwg-node/server'
+      - bufferutil
+      - crossws
+      - h3
+      - hono
+      - immer
+      - pg-native
+      - react
+      - react-dom
+      - supports-color
+      - use-sync-external-store
+      - utf-8-validate
+      - ws
+
+  graphile-upload-plugin@2.18.0(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(postgraphile@5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)):
+    dependencies:
+      graphile-build: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.0.1
+      graphql: 16.13.0
+      postgraphile: 5.0.3(02c18e7c6179c4ae54031f8cdca16ab5)
 
   graphile-utils@5.0.0(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(tamedevil@0.1.1):
     dependencies:
@@ -17018,6 +17782,8 @@ snapshots:
 
   microseconds@0.2.0: {}
 
+  mime-bytes@0.24.0: {}
+
   mime-db@1.52.0: {}
 
   mime-db@1.54.0: {}
@@ -17342,7 +18108,7 @@ snapshots:
       tmp: 0.2.5
       tsconfig-paths: 4.2.0
       tslib: 2.8.1
-      yaml: 2.8.4
+      yaml: 2.9.0
       yargs: 17.7.2
       yargs-parser: 21.1.1
     optionalDependencies:
@@ -17597,6 +18363,17 @@ snapshots:
     dependencies:
       pify: 3.0.0
 
+  pg-cache@3.19.0:
+    dependencies:
+      12factor-env: 1.21.0
+      '@pgpmjs/logger': 2.18.0
+      '@pgpmjs/types': 2.40.0
+      lru-cache: 11.2.7
+      pg: 8.21.0
+      pg-env: 1.22.0
+    transitivePeerDependencies:
+      - pg-native
+
   pg-cloudflare@1.3.0:
     optional: true
 
@@ -17608,6 +18385,10 @@ snapshots:
   pg-connection-string@2.13.0: {}
 
   pg-copy-streams@7.0.0: {}
+
+  pg-env@1.22.0:
+    dependencies:
+      12factor-env: 1.21.0
 
   pg-int8@1.0.1: {}
 
@@ -17654,6 +18435,12 @@ snapshots:
   pg-protocol@1.13.0: {}
 
   pg-protocol@1.14.0: {}
+
+  pg-query-context@2.23.0:
+    dependencies:
+      pg: 8.21.0
+    transitivePeerDependencies:
+      - pg-native
 
   pg-sql2@5.0.1:
     dependencies:
@@ -19047,6 +19834,8 @@ snapshots:
       react: 19.2.5
 
   util-deprecate@1.0.2: {}
+
+  uuid-hash@2.23.0: {}
 
   uuid@10.0.0: {}
 
