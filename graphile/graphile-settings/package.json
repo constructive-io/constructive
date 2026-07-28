@@ -55,6 +55,7 @@
     "graphile-i18n": "workspace:^",
     "graphile-llm": "workspace:^",
     "graphile-ltree": "workspace:^",
+    "graphile-meta": "workspace:^",
     "graphile-pg-aggregates": "workspace:^",
     "graphile-postgis": "workspace:^",
     "graphile-presigned-url-plugin": "workspace:^",

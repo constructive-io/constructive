@@ -1,4 +1,8 @@
+// Type augmentation: adds the 'schema' property to GraphileConfig.Plugin
+import 'graphile-build';
+
 import type { GraphileConfig } from 'graphile-config';
+
 import { getCachedTablesMeta, setCachedTablesMeta } from './cache';
 import { extendQueryWithMetaField } from './graphql-meta-field';
 import { collectTablesMeta } from './table-meta-builder';

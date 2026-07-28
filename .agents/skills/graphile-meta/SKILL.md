@@ -1,7 +1,7 @@
 ---
 name: graphile-meta
-description: The _meta schema-introspection plugin for PostGraphile v5 (MetaSchemaPlugin / MetaSchemaPreset in graphile-settings). Exposes a single _meta root query describing every table's fields, indexes, constraints, relations, inflection names, root query/mutation names, and smart-tag-derived metadata (storage, search, i18n, realtime). Use when asked to "expose database metadata in GraphQL", "add a field to _meta", "understand the _meta query", "drive codegen from _meta", or when adding a new smart-tag-detected metadata builder to the meta-schema plugin.
-compatibility: PostGraphile v5, graphile-settings, graphile-build-pg
+description: The _meta schema-introspection plugin for PostGraphile v5 (MetaSchemaPlugin / MetaSchemaPreset in graphile-meta, re-exported by graphile-settings). Exposes a single _meta root query describing every table's fields, indexes, constraints, relations, inflection names, root query/mutation names, and smart-tag-derived metadata (storage, search, i18n, realtime). Use when asked to "expose database metadata in GraphQL", "add a field to _meta", "understand the _meta query", "drive codegen from _meta", or when adding a new smart-tag-detected metadata builder to the meta-schema plugin.
+compatibility: PostGraphile v5, graphile-meta, graphile-settings, graphile-build-pg
 metadata:
   author: constructive-io
   version: "1.0.0"
@@ -15,9 +15,10 @@ plus Constructive-specific feature metadata derived from smart tags (storage,
 search, i18n, realtime). Built for code-generation tools that need to understand
 the schema without a live database connection at generation time.
 
-**Package:** `graphile-settings` — plugin lives in
-`graphile/graphile-settings/src/plugins/meta-schema/`
-(exposed as `MetaSchemaPlugin` / `MetaSchemaPreset`).
+**Package:** `graphile-meta` — plugin lives in
+`graphile/graphile-meta/src/`
+(exposed as `MetaSchemaPlugin` / `MetaSchemaPreset`, and re-exported from
+`graphile-settings` for backward compatibility).
 
 > Not to be confused with the **meta API target** in constructive-db
 > (`cli-meta` / `orm-meta` skills) — that is a codegen *target* over ~45
@@ -37,7 +38,8 @@ Use this skill when:
 ## Quick Start
 
 ```typescript
-import { MetaSchemaPreset } from 'graphile-settings';
+import { MetaSchemaPreset } from 'graphile-meta';
+// (also re-exported from 'graphile-settings')
 // (already included in ConstructivePreset)
 
 const preset: GraphileConfig.Preset = {
@@ -146,7 +148,7 @@ Worked pattern (this is exactly how the `scope` block was added — mirror the
    (`__snapshots__/meta-schema.test.ts.snap`). Metadata is tested in-process with
    mocked PostGraphile build resources (no live DB). Add a tagged fixture and an
    untagged fixture (asserting `null`).
-   Run: `pnpm --filter graphile-settings exec jest --runInBand`
+   Run: `pnpm --filter graphile-meta exec jest --runInBand`
 
 ### Builder conventions (follow these)
 

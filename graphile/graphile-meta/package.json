@@ -1,0 +1,55 @@
+{
+  "name": "graphile-meta",
+  "version": "0.0.1",
+  "description": "PostGraphile v5 _meta introspection plugin — exposes a single _meta root query describing tables, fields, indexes, constraints, relations, inflection names, and smart-tag-derived metadata for dynamic query building and code generation",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "makage": "^0.3.0"
+  },
+  "peerDependencies": {
+    "graphile-build": "5.0.2",
+    "graphile-build-pg": "5.0.2",
+    "graphile-config": "1.0.1",
+    "graphql": "16.13.0",
+    "postgraphile": "5.0.3"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "plugin",
+    "postgres",
+    "graphql",
+    "meta",
+    "introspection",
+    "metadata",
+    "codegen",
+    "dynamic-queries"
+  ]
+}
