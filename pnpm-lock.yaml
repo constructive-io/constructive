@@ -1961,6 +1961,9 @@ importers:
       '@constructive-io/llm-env':
         specifier: workspace:^
         version: link:../../packages/llm-env/dist
+      '@constructive-io/oauth':
+        specifier: workspace:^
+        version: link:../../packages/oauth/dist
       '@constructive-io/query-builder':
         specifier: workspace:^
         version: link:../../postgres/query-builder/dist
@@ -6531,6 +6534,12 @@ packages:
         integrity: sha512-vzsuZr7XJogU4YiZUd8gQglS7p1C0dBMTyCLgWhrgc3wTV5qwxelET1uJj7prPE/J/E0ONAbOeJa4e1i66GJig==,
       }
     hasBin: true
+
+  '@pgsql/quotes@17.1.0':
+    resolution:
+      {
+        integrity: sha512-J/H+LcrENBpYgL45WW6aTjb5Yk4tX4+AmB2/k8KZa+Zh3wiCtqmNIag+HZz5HmWaF6EZK9ZGC95NBD1fs+rUvg==,
+      }
 
   '@pgsql/quotes@18.2.0':
     resolution:
@@ -17866,6 +17875,8 @@ snapshots:
       pgsql-parser: 18.2.2
     transitivePeerDependencies:
       - supports-color
+
+  '@pgsql/quotes@17.1.0': {}
 
   '@pgsql/quotes@18.2.0': {}
 

@@ -1,25 +1,22 @@
 /**
  * Identity Providers Module Loader
  *
- * Resolves the identity_providers_module config for the current request and
- * loads enabled provider credentials from the platform database.
+ * Resolves the identity_providers_module config and enabled provider
+ * credentials for the current request database.
  */
 
 import { QuoteUtils } from '@pgsql/quotes';
 
 import type {
-  ConfigSecretsModuleRow,
-  InternalSecretsModuleRow,
   IdentityProviderConfigMap,
   IdentityProvidersConfig,
   IdentityProvidersModuleRow,
-  PlatformDatabaseRow,
+  InternalSecretsModuleRow,
   ProviderRow,
-  SchemaAndTableRow,
-  SecretsModuleAvailabilityRow,
+  SchemaAndTableRow
 } from '../types';
-import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
+import type { LoaderContext, ModuleLoader } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
@@ -35,15 +32,6 @@ const IDENTITY_PROVIDERS_MODULE_SQL = `
   JOIN metaschema_public.schema s ON s.id = ipm.schema_id
   JOIN metaschema_public.schema ps ON ps.id = ipm.private_schema_id
   WHERE ipm.database_id = $1
-  LIMIT 1
-`;
-
-const CONFIG_SECRETS_MODULE_SQL = `
-  SELECT csm.table_id
-  FROM metaschema_modules_public.config_secrets_module csm
-  WHERE csm.database_id = $1
-    AND csm.scope = $2
-  LIMIT 1
 `;
 
 const INTERNAL_SECRETS_MODULE_SQL = `
@@ -54,36 +42,9 @@ const INTERNAL_SECRETS_MODULE_SQL = `
   LIMIT 1
 `;
 
-const SECRETS_MODULE_AVAILABILITY_SQL = `
-  SELECT
-    to_regclass(
-      'metaschema_modules_public.internal_secrets_module'
-    ) IS NOT NULL AS has_internal_secrets_module,
-    to_regclass(
-      'metaschema_modules_public.config_secrets_module'
-    ) IS NOT NULL AS has_config_secrets_module
-`;
-
 const SCHEMA_AND_TABLE_SQL = `
   SELECT schema_name, table_name
   FROM metaschema.schema_and_table($1)
-`;
-
-const PLATFORM_DATABASE_SQL = `
-  SELECT d.id AS database_id
-  FROM metaschema_public.database d
-  WHERE d.name = $1
-     OR EXISTS (
-       SELECT 1
-       FROM services_public.apis a
-       WHERE a.database_id = d.id
-         AND a.dbname = $1
-     )
-  ORDER BY
-    CASE WHEN d.name = $1 THEN 0 ELSE 1 END,
-    CASE WHEN d.owner_id IS NULL THEN 0 ELSE 1 END,
-    d.created_at ASC
-  LIMIT 1
 `;
 
 function buildProvidersSql(
@@ -148,73 +109,22 @@ async function resolveSecretsTable(
   databaseId: string,
   scope: string
 ): Promise<SchemaAndTableRow> {
-  const availabilityResult =
-    await ctx.servicesPool.query<SecretsModuleAvailabilityRow>(
-      SECRETS_MODULE_AVAILABILITY_SQL
-    );
-  const availability = availabilityResult.rows[0];
-
-  // Some supported DB revisions still expose the pre-split secrets metadata.
-  // Prefer the new contract while retaining support for the legacy module.
-  let selectedModule:
-    | {
-        name: 'internal_secrets_module' | 'config_secrets_module';
-        tableId: string;
-      }
-    | undefined;
-
-  if (availability?.has_internal_secrets_module) {
-    const internalResult =
-      await ctx.servicesPool.query<InternalSecretsModuleRow>(
-        INTERNAL_SECRETS_MODULE_SQL,
-        [databaseId, scope]
-      );
-    const tableId = internalResult.rows[0]?.internal_secrets_table_id;
-    if (tableId) {
-      selectedModule = {
-        name: 'internal_secrets_module',
-        tableId,
-      };
-    }
-  }
-
-  if (!selectedModule && availability?.has_config_secrets_module) {
-    const configResult = await ctx.servicesPool.query<ConfigSecretsModuleRow>(
-      CONFIG_SECRETS_MODULE_SQL,
+  const secretsModuleResult =
+    await ctx.tenantPool.query<InternalSecretsModuleRow>(
+      INTERNAL_SECRETS_MODULE_SQL,
       [databaseId, scope]
     );
-    const tableId = configResult.rows[0]?.table_id;
-    if (tableId) {
-      selectedModule = {
-        name: 'config_secrets_module',
-        tableId,
-      };
-    }
-  }
-
-  if (!selectedModule) {
-    const availableModules = [
-      availability?.has_internal_secrets_module && 'internal_secrets_module',
-      availability?.has_config_secrets_module && 'config_secrets_module',
-    ].filter(Boolean);
-
-    if (availableModules.length === 0) {
-      throw new Error(
-        `secrets module metadata unavailable for database ${databaseId}`
-      );
-    }
-
+  const tableId = secretsModuleResult.rows[0]?.internal_secrets_table_id;
+  if (!tableId) {
     throw new Error(
-      `${availableModules.join(
-        ' and '
-      )} missing for scope ${scope} on database ${databaseId}`
+      `internal_secrets_module missing for scope ${scope} on database ${databaseId}`
     );
   }
 
   try {
-    const schemaResult = await ctx.servicesPool.query<SchemaAndTableRow>(
+    const schemaResult = await ctx.tenantPool.query<SchemaAndTableRow>(
       SCHEMA_AND_TABLE_SQL,
-      [selectedModule.tableId]
+      [tableId]
     );
     const schemaRow = schemaResult.rows[0];
     if (schemaRow) return schemaRow;
@@ -223,61 +133,40 @@ async function resolveSecretsTable(
   }
 
   throw new Error(
-    `schema/table resolution missing for ${selectedModule.name} scope ${scope} on database ${databaseId}`
+    `schema/table resolution missing for internal_secrets_module scope ${scope} on database ${databaseId}`
   );
 }
 
 export async function resolveIdentityProvidersConfig(
   ctx: LoaderContext
 ): Promise<IdentityProvidersConfig | undefined> {
-  const { servicesPool, tenantPool, databaseId, dbname } = ctx;
+  const { tenantPool, databaseId } = ctx;
 
   const moduleResult = await tenantPool.query<IdentityProvidersModuleRow>(
     IDENTITY_PROVIDERS_MODULE_SQL,
     [databaseId]
   );
+  if (moduleResult.rows.length > 1) {
+    throw new Error(
+      `multiple identity_providers_module rows found for database ${databaseId}; provider ownership scope must be explicit`
+    );
+  }
   const moduleRow = moduleResult.rows[0];
   if (!moduleRow) {
-    throw new Error(
-      `identity_providers_module missing for database ${databaseId}`
-    );
+    return undefined;
   }
-  const functionPrefix = moduleRow.prefix || moduleRow.scope || 'platform';
-
-  // Provider credentials are platform-managed; auth functions remain scoped
-  // to the current request database.
-  const platformDatabaseResult = await servicesPool.query<PlatformDatabaseRow>(
-    PLATFORM_DATABASE_SQL,
-    [dbname]
-  );
-  const platformDatabaseId = platformDatabaseResult.rows[0]?.database_id;
-  if (!platformDatabaseId) return undefined;
-
-  const providerModuleRow =
-    platformDatabaseId === databaseId
-      ? moduleRow
-      : (
-          await servicesPool.query<IdentityProvidersModuleRow>(
-            IDENTITY_PROVIDERS_MODULE_SQL,
-            [platformDatabaseId]
-          )
-        ).rows[0];
-  if (!providerModuleRow) {
-    throw new Error(
-      `identity_providers_module missing for database ${platformDatabaseId}`
-    );
-  }
+  const functionPrefix = moduleRow.prefix || moduleRow.scope;
 
   const secretsTable = await resolveSecretsTable(
     ctx,
-    providerModuleRow.database_id,
-    providerModuleRow.scope
+    databaseId,
+    moduleRow.scope
   );
 
-  const providersResult = await servicesPool.query<ProviderRow>(
+  const providersResult = await tenantPool.query<ProviderRow>(
     buildProvidersSql(
-      providerModuleRow.private_schema_name,
-      providerModuleRow.table_name,
+      moduleRow.private_schema_name,
+      moduleRow.table_name,
       secretsTable.schema_name,
       secretsTable.table_name
     )
@@ -302,7 +191,7 @@ export async function resolveIdentityProvidersConfig(
       authorizationParams: normalizeStringParams(
         row.extra_authorization_params
       ),
-      pkceEnabled: row.pkce_enabled ?? true,
+      pkceEnabled: row.pkce_enabled ?? true
     });
   }
 
@@ -313,7 +202,7 @@ export async function resolveIdentityProvidersConfig(
     scope: moduleRow.scope,
     prefix: functionPrefix,
     rotateSecretFunction: `rotate_identity_provider_${functionPrefix}_secret`,
-    providers,
+    providers
   };
 }
 
@@ -321,7 +210,7 @@ export const identityProvidersLoader: ModuleLoader<IdentityProvidersConfig> =
   createModuleLoader<IdentityProvidersConfig>({
     name: 'identityProviders',
     ttlMs: 5 * 60_000,
-    resolve: resolveIdentityProvidersConfig,
+    resolve: resolveIdentityProvidersConfig
   });
 
 export { buildProvidersSql };

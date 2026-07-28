@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 
 import type { AuthSettings } from '../types';
+import { pgIntervalToSeconds } from '../utils/pg-interval';
 
 export const SESSION_COOKIE_NAME = 'constructive_session';
 export const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
@@ -24,36 +25,36 @@ export const getSessionCookieConfig = (
   rememberMe = false
 ): CookieConfig => {
   const DEFAULT_MAX_AGE = 86400; // 24 hours
-  let maxAge = DEFAULT_MAX_AGE;
-  if (rememberMe && typeof authSettings?.rememberMeDuration === 'string') {
-    const parsed = parseInt(authSettings.rememberMeDuration, 10);
-    if (!isNaN(parsed)) maxAge = parsed;
-  } else if (typeof authSettings?.cookieMaxAge === 'string') {
-    const parsed = parseInt(authSettings.cookieMaxAge, 10);
-    if (!isNaN(parsed)) maxAge = parsed;
-  }
+  const configuredMaxAge = rememberMe
+    ? (authSettings?.rememberMeDuration ?? authSettings?.cookieMaxAge)
+    : authSettings?.cookieMaxAge;
+  const maxAge = pgIntervalToSeconds(configuredMaxAge) ?? DEFAULT_MAX_AGE;
 
   return {
     secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
-    sameSite: (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
+    sameSite:
+      (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
     httpOnly: authSettings?.cookieHttponly ?? true,
     maxAge,
-    path: authSettings?.cookiePath ?? '/',
+    path: authSettings?.cookiePath ?? '/'
   };
 };
 
 /**
  * Build cookie config for device token (long-lived, 90 days).
  */
-export const getDeviceTokenCookieConfig = (authSettings?: AuthSettings): CookieConfig => {
+export const getDeviceTokenCookieConfig = (
+  authSettings?: AuthSettings
+): CookieConfig => {
   return {
     secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
-    sameSite: (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
+    sameSite:
+      (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
     httpOnly: true,
     maxAge: DEVICE_TOKEN_MAX_AGE,
-    path: authSettings?.cookiePath ?? '/',
+    path: authSettings?.cookiePath ?? '/'
   };
 };
 
@@ -71,20 +72,23 @@ export const setSessionCookie = (
     domain: config.domain,
     httpOnly: config.httpOnly,
     maxAge: config.maxAge * 1000, // Express expects milliseconds
-    path: config.path,
+    path: config.path
   });
 };
 
 /**
  * Clear the session cookie.
  */
-export const clearSessionCookie = (res: Response, config: CookieConfig): void => {
+export const clearSessionCookie = (
+  res: Response,
+  config: CookieConfig
+): void => {
   res.clearCookie(SESSION_COOKIE_NAME, {
     secure: config.secure,
     sameSite: config.sameSite,
     domain: config.domain,
     httpOnly: config.httpOnly,
-    path: config.path,
+    path: config.path
   });
 };
 
@@ -102,20 +106,23 @@ export const setDeviceTokenCookie = (
     domain: config.domain,
     httpOnly: config.httpOnly,
     maxAge: config.maxAge * 1000,
-    path: config.path,
+    path: config.path
   });
 };
 
 /**
  * Clear the device token cookie.
  */
-export const clearDeviceTokenCookie = (res: Response, config: CookieConfig): void => {
+export const clearDeviceTokenCookie = (
+  res: Response,
+  config: CookieConfig
+): void => {
   res.clearCookie(DEVICE_TOKEN_COOKIE_NAME, {
     secure: config.secure,
     sameSite: config.sameSite,
     domain: config.domain,
     httpOnly: config.httpOnly,
-    path: config.path,
+    path: config.path
   });
 };
 
@@ -123,10 +130,15 @@ export const clearDeviceTokenCookie = (res: Response, config: CookieConfig): voi
  * Parse a cookie value from the raw Cookie header.
  * Avoids pulling in cookie-parser as a dependency.
  */
-export const parseCookieValue = (req: Request, cookieName: string): string | undefined => {
+export const parseCookieValue = (
+  req: Request,
+  cookieName: string
+): string | undefined => {
   const header = req.headers.cookie;
   if (!header) return undefined;
-  const match = header.split(';').find((c) => c.trim().startsWith(`${cookieName}=`));
+  const match = header
+    .split(';')
+    .find((c) => c.trim().startsWith(`${cookieName}=`));
   return match ? decodeURIComponent(match.split('=')[1].trim()) : undefined;
 };
 
@@ -140,6 +152,8 @@ export const getDeviceTokenFromRequest = (req: Request): string | undefined => {
 /**
  * Get the session token from the request cookie.
  */
-export const getSessionTokenFromRequest = (req: Request): string | undefined => {
+export const getSessionTokenFromRequest = (
+  req: Request
+): string | undefined => {
   return parseCookieValue(req, SESSION_COOKIE_NAME);
 };

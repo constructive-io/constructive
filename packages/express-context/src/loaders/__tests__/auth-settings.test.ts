@@ -3,14 +3,17 @@ import type { Pool } from 'pg';
 import { authSettingsLoader } from '../auth-settings';
 import type { LoaderContext } from '../types';
 
-function createContext(query: jest.Mock): LoaderContext {
+function createContext(
+  query: jest.Mock,
+  databaseId = 'hub-database-id'
+): LoaderContext {
   const tenantPool = { query } as unknown as Pool;
 
   return {
-    servicesPool: { query: jest.fn() } as unknown as Pool,
+    routingPool: { query: jest.fn() } as unknown as Pool,
     tenantPool,
-    databaseId: 'hub-database-id',
-    dbname: 'constructive',
+    databaseId,
+    dbname: 'constructive'
   };
 }
 
@@ -26,9 +29,9 @@ describe('authSettingsLoader', () => {
         rows: [
           {
             schema_name: 'constructive_auth_private',
-            table_name: 'app_settings_auth',
-          },
-        ],
+            table_name: 'app_settings_auth'
+          }
+        ]
       })
       .mockResolvedValueOnce({
         rows: [
@@ -46,9 +49,9 @@ describe('authSettingsLoader', () => {
             captcha_site_key: null,
             oauth_state_max_age: { minutes: 10 },
             oauth_require_verified_email: true,
-            oauth_error_redirect_path: '/auth/error',
-          },
-        ],
+            oauth_error_redirect_path: '/auth/error'
+          }
+        ]
       });
 
     const config = await authSettingsLoader.resolve(createContext(query));
@@ -70,7 +73,33 @@ describe('authSettingsLoader', () => {
       cookieSecure: false,
       cookieSamesite: 'lax',
       oauthRequireVerifiedEmail: true,
-      oauthErrorRedirectPath: '/auth/error',
+      oauthErrorRedirectPath: '/auth/error'
     });
+  });
+
+  it('returns undefined when the sessions module is not provisioned', async () => {
+    const query = jest.fn().mockResolvedValueOnce({ rows: [] });
+
+    await expect(
+      authSettingsLoader.resolve(createContext(query, 'unprovisioned-db'))
+    ).resolves.toBeUndefined();
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining('sm.database_id = $1'),
+      ['unprovisioned-db']
+    );
+  });
+
+  it('fails clearly when resolved table metadata is incomplete', async () => {
+    const query = jest.fn().mockResolvedValueOnce({
+      rows: [{ schema_name: null, table_name: 'app_settings_auth' }]
+    });
+
+    await expect(
+      authSettingsLoader.resolve(createContext(query, 'invalid-metadata-db'))
+    ).rejects.toThrow(
+      'invalid auth settings table metadata for database invalid-metadata-db'
+    );
+    expect(query).toHaveBeenCalledTimes(1);
   });
 });

@@ -16,46 +16,50 @@
  * the manual `set_config()` calls in the original implementation.
  */
 
-import { Router, Request, Response } from 'express';
-import {
-  OAuthClient,
-  OAuthProfile,
-  createSignedState,
-  verifySignedState,
-} from '@constructive-io/oauth';
-import { Logger } from '@pgpmjs/logger';
-import { getNodeEnv } from '@pgpmjs/env';
-import { QuoteUtils } from '@pgsql/quotes';
-import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
   AuthSettings,
   ConnectedAccountsModuleConfig,
   ConstructiveContext,
-  IdentityProvidersConfig,
   IdentityProviderFullConfig,
-  UserAuthModuleConfig,
+  IdentityProvidersConfig,
+  UserAuthModuleConfig
 } from '@constructive-io/express-context';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
+import {
+  createSignedState,
+  OAuthClient,
+  OAuthProfile,
+  verifySignedState
+} from '@constructive-io/oauth';
+import { getNodeEnv } from '@pgpmjs/env';
+import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
+import { Request, Response,Router } from 'express';
 
+import { pgIntervalToMilliseconds } from '../utils/pg-interval';
 import {
   DEVICE_TOKEN_COOKIE_NAME,
-  getSessionCookieConfig,
   getDeviceTokenCookieConfig,
-  setSessionCookie,
-  setDeviceTokenCookie,
+  getSessionCookieConfig,
   parseCookieValue,
+  setDeviceTokenCookie,
+  setSessionCookie
 } from './cookie';
-import { pgIntervalToMilliseconds } from '../utils/pg-interval';
 
 const log = new Logger('oauth');
 
 const OAUTH_STATE_COOKIE = 'oauth_state';
 const OAUTH_PKCE_COOKIE = 'oauth_pkce';
+const OAUTH_COOKIE_PATH = '/auth';
 const DEFAULT_OAUTH_STATE_MAX_AGE = 10 * 60 * 1000; // 10 minutes
 const DEFAULT_ERROR_REDIRECT_PATH = '/auth/error';
 
 interface OAuthStatePayload {
   redirect_uri: string;
   provider: string;
+  database_id: string;
+  api_id: string | null;
+  origin: string;
 }
 
 interface OAuthPkcePayload {
@@ -88,18 +92,18 @@ interface OAuthModules {
 }
 
 async function resolveOAuthModules(
-  ctx: ConstructiveContext,
+  ctx: ConstructiveContext
 ): Promise<OAuthModules | null> {
   const [
     identityProviders,
     userAuthModule,
     authSettings,
-    connectedAccountsModule,
+    connectedAccountsModule
   ] = await Promise.all([
     ctx.useModule('identityProviders'),
     ctx.useModule('userAuthModule'),
     ctx.useModule('authSettings'),
-    ctx.useModule('connectedAccountsModule'),
+    ctx.useModule('connectedAccountsModule')
   ]);
 
   if (!identityProviders || !userAuthModule) {
@@ -110,7 +114,7 @@ async function resolveOAuthModules(
     identityProviders,
     userAuthModule,
     authSettings,
-    connectedAccountsModule,
+    connectedAccountsModule
   };
 }
 
@@ -120,7 +124,7 @@ async function resolveOAuthModules(
 
 function createOAuthClientForProvider(
   providerConfig: IdentityProviderFullConfig,
-  baseUrl: string,
+  baseUrl: string
 ): OAuthClient {
   return new OAuthClient({
     providers: {
@@ -136,11 +140,11 @@ function createOAuthClientForProvider(
         userinfoUrl: providerConfig.userinfoUrl,
         scopes: providerConfig.scopes,
         authorizationParams: providerConfig.authorizationParams,
-        pkceEnabled: providerConfig.pkceEnabled,
-      },
+        pkceEnabled: providerConfig.pkceEnabled
+      }
     },
     baseUrl,
-    callbackPath: '/auth/{provider}/callback',
+    callbackPath: '/auth/{provider}/callback'
   });
 }
 
@@ -168,7 +172,7 @@ function getBaseUrl(req: Request): string {
 
 function normalizeRedirectUri(
   redirectUri: string | undefined,
-  baseUrl: string,
+  baseUrl: string
 ): string | null {
   const requestedRedirectUri = redirectUri || '/';
 
@@ -194,7 +198,7 @@ function redirectToError(
   errorPath: string,
   error: string,
   provider: string,
-  errorDescription?: string,
+  errorDescription?: string
 ): void {
   const errorUrl = new URL(errorPath, baseUrl);
   errorUrl.searchParams.set('error', error);
@@ -226,7 +230,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       res.json({ providers });
     } catch (error) {
       log.error('[oauth] Failed to fetch providers:', error);
-      res.json({ providers: [] });
+      res.status(500).json({ error: 'OAUTH_CONFIGURATION_ERROR' });
     }
   });
 
@@ -252,7 +256,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
         'API_NOT_CONFIGURED',
-        provider,
+        provider
       );
     }
 
@@ -265,7 +269,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           baseUrl,
           DEFAULT_ERROR_REDIRECT_PATH,
           'MODULES_NOT_CONFIGURED',
-          provider,
+          provider
         );
       }
 
@@ -281,7 +285,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           baseUrl,
           errorRedirectPath,
           'INVALID_REDIRECT_URI',
-          provider,
+          provider
         );
       }
 
@@ -294,39 +298,60 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           baseUrl,
           errorRedirectPath,
           'PROVIDER_NOT_CONFIGURED',
-          provider,
+          provider
         );
       }
 
       const stateMaxAge =
         pgIntervalToMilliseconds(authSettings?.oauthStateMaxAge) ??
         DEFAULT_OAUTH_STATE_MAX_AGE;
+      if (!ctx.databaseId) {
+        log.error(`[oauth] Missing database scope for ${provider}`);
+        return redirectToError(
+          res,
+          baseUrl,
+          errorRedirectPath,
+          'API_NOT_CONFIGURED',
+          provider
+        );
+      }
       const state = createSignedState(
-        { redirect_uri: redirectUri, provider },
+        {
+          redirect_uri: redirectUri,
+          provider,
+          database_id: ctx.databaseId,
+          api_id: ctx.api.apiId ?? null,
+          origin: baseUrl
+        },
         {
           secret: requireStateSecret(opts),
-          maxAgeMs: stateMaxAge,
-        },
+          maxAgeMs: stateMaxAge
+        }
       );
 
       const oauthCookieOptions = {
-        httpOnly: authSettings?.cookieHttponly ?? true,
+        httpOnly: true,
         secure: authSettings?.cookieSecure ?? isProduction,
         maxAge: stateMaxAge,
-        sameSite: (authSettings?.cookieSamesite as 'lax' | 'strict' | 'none') ?? 'lax',
+        sameSite:
+          (authSettings?.cookieSamesite as 'lax' | 'strict' | 'none') ?? 'lax',
+        path: OAUTH_COOKIE_PATH
       };
 
       res.cookie(OAUTH_STATE_COOKIE, state, oauthCookieOptions);
 
       const client = createOAuthClientForProvider(providerConfig, baseUrl);
-      const { url, codeVerifier } = client.getAuthorizationUrl({ provider, state });
+      const { url, codeVerifier } = client.getAuthorizationUrl({
+        provider,
+        state
+      });
       if (codeVerifier) {
         const pkceState = createSignedState<OAuthPkcePayload>(
           { state, provider, code_verifier: codeVerifier },
           {
             secret: requireStateSecret(opts),
-            maxAgeMs: stateMaxAge,
-          },
+            maxAgeMs: stateMaxAge
+          }
         );
         res.cookie(OAUTH_PKCE_COOKIE, pkceState, oauthCookieOptions);
       }
@@ -339,318 +364,315 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         baseUrl,
         DEFAULT_ERROR_REDIRECT_PATH,
         'OAUTH_INIT_FAILED',
-        provider,
+        provider
       );
     }
   });
 
   // GET /auth/:provider/callback - Handle OAuth callback
-  router.get(
-    '/:provider/callback',
-    async (req: Request, res: Response) => {
-      const { provider } = req.params;
-      const {
-        code,
-        state,
-        error: oauthError,
-        error_description: errorDescription,
-      } = req.query;
-      const baseUrl = getBaseUrl(req);
+  router.get('/:provider/callback', async (req: Request, res: Response) => {
+    const { provider } = req.params;
+    const {
+      code,
+      state,
+      error: oauthError,
+      error_description: errorDescription
+    } = req.query;
+    const baseUrl = getBaseUrl(req);
 
-      const storedState = parseCookieValue(req, OAUTH_STATE_COOKIE);
-      const storedPkce = parseCookieValue(req, OAUTH_PKCE_COOKIE);
-      res.clearCookie(OAUTH_STATE_COOKIE);
-      res.clearCookie(OAUTH_PKCE_COOKIE);
+    const storedState = parseCookieValue(req, OAUTH_STATE_COOKIE);
+    const storedPkce = parseCookieValue(req, OAUTH_PKCE_COOKIE);
+    res.clearCookie(OAUTH_STATE_COOKIE, { path: OAUTH_COOKIE_PATH });
+    res.clearCookie(OAUTH_PKCE_COOKIE, { path: OAUTH_COOKIE_PATH });
 
-      // Handle OAuth provider errors
-      if (oauthError) {
-        log.warn(`[oauth] Provider ${provider} returned error: ${oauthError}`);
-        return redirectToError(
-          res,
-          baseUrl,
-          DEFAULT_ERROR_REDIRECT_PATH,
-          oauthError as string,
-          provider,
-          errorDescription as string | undefined,
-        );
-      }
-
-      // Verify state
-      if (state !== storedState) {
-        log.warn(`[oauth] State mismatch for ${provider}`);
-        return redirectToError(
-          res,
-          baseUrl,
-          DEFAULT_ERROR_REDIRECT_PATH,
-          'INVALID_STATE',
-          provider,
-        );
-      }
-
-      const statePayload = verifySignedState<OAuthStatePayload>(
-        storedState as string,
-        { secret: getStateSecret(opts) },
+    // Handle OAuth provider errors
+    if (oauthError) {
+      log.warn(`[oauth] Provider ${provider} returned error: ${oauthError}`);
+      return redirectToError(
+        res,
+        baseUrl,
+        DEFAULT_ERROR_REDIRECT_PATH,
+        oauthError as string,
+        provider,
+        errorDescription as string | undefined
       );
-      if (!statePayload) {
-        log.warn(`[oauth] Invalid or expired state for ${provider}`);
+    }
+
+    // Verify state
+    if (state !== storedState) {
+      log.warn(`[oauth] State mismatch for ${provider}`);
+      return redirectToError(
+        res,
+        baseUrl,
+        DEFAULT_ERROR_REDIRECT_PATH,
+        'INVALID_STATE',
+        provider
+      );
+    }
+
+    const statePayload = verifySignedState<OAuthStatePayload>(
+      storedState as string,
+      { secret: getStateSecret(opts) }
+    );
+    if (!statePayload) {
+      log.warn(`[oauth] Invalid or expired state for ${provider}`);
+      return redirectToError(
+        res,
+        baseUrl,
+        DEFAULT_ERROR_REDIRECT_PATH,
+        'INVALID_STATE',
+        provider
+      );
+    }
+
+    if (statePayload.provider !== provider || statePayload.origin !== baseUrl) {
+      log.warn(`[oauth] State request scope mismatch for ${provider}`);
+      return redirectToError(
+        res,
+        baseUrl,
+        DEFAULT_ERROR_REDIRECT_PATH,
+        'INVALID_STATE',
+        provider
+      );
+    }
+
+    const { redirect_uri: redirectUriFromState } = statePayload;
+    const ctx = req.constructive;
+
+    if (!ctx) {
+      log.error(`[oauth] No constructive context for ${provider} callback`);
+      return redirectToError(
+        res,
+        baseUrl,
+        DEFAULT_ERROR_REDIRECT_PATH,
+        'API_NOT_CONFIGURED',
+        provider
+      );
+    }
+
+    if (
+      statePayload.database_id !== ctx.databaseId ||
+      statePayload.api_id !== (ctx.api.apiId ?? null)
+    ) {
+      log.warn(`[oauth] State database/API scope mismatch for ${provider}`);
+      return redirectToError(
+        res,
+        baseUrl,
+        DEFAULT_ERROR_REDIRECT_PATH,
+        'INVALID_STATE',
+        provider
+      );
+    }
+
+    let modules: OAuthModules | null = null;
+    try {
+      modules = await resolveOAuthModules(ctx);
+      if (!modules) {
+        log.error(`[oauth] Required modules not provisioned for ${provider}`);
         return redirectToError(
           res,
           baseUrl,
           DEFAULT_ERROR_REDIRECT_PATH,
-          'INVALID_STATE',
-          provider,
+          'MODULES_NOT_CONFIGURED',
+          provider
         );
       }
 
-      if (statePayload.provider !== provider) {
-        log.warn(`[oauth] State provider mismatch for ${provider}`);
+      const { authSettings, identityProviders } = modules;
+      const errorRedirectPath =
+        authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
+      const requireVerifiedEmail =
+        authSettings?.oauthRequireVerifiedEmail ?? true;
+
+      const redirectUri = normalizeRedirectUri(redirectUriFromState, baseUrl);
+      if (!redirectUri) {
+        log.warn(`[oauth] Rejected cross-origin redirect_uri for ${provider}`);
         return redirectToError(
           res,
           baseUrl,
-          DEFAULT_ERROR_REDIRECT_PATH,
-          'INVALID_STATE',
-          provider,
+          errorRedirectPath,
+          'INVALID_REDIRECT_URI',
+          provider
         );
       }
 
-      const { redirect_uri: redirectUriFromState } = statePayload;
-      const ctx = req.constructive;
-
-      if (!ctx) {
-        log.error(
-          `[oauth] No constructive context for ${provider} callback`,
-        );
+      // Get provider config from cached map
+      const providerConfig = identityProviders.providers.get(provider);
+      if (!providerConfig) {
+        log.error(`[oauth] Provider ${provider} not found in database`);
         return redirectToError(
           res,
           baseUrl,
-          DEFAULT_ERROR_REDIRECT_PATH,
-          'API_NOT_CONFIGURED',
-          provider,
+          errorRedirectPath,
+          'PROVIDER_NOT_CONFIGURED',
+          provider
         );
       }
 
-      let modules: OAuthModules | null = null;
-      try {
-        modules = await resolveOAuthModules(ctx);
-        if (!modules) {
-          log.error(
-            `[oauth] Required modules not provisioned for ${provider}`,
-          );
-          return redirectToError(
-            res,
-            baseUrl,
-            DEFAULT_ERROR_REDIRECT_PATH,
-            'MODULES_NOT_CONFIGURED',
-            provider,
-          );
-        }
-
-        const { authSettings, identityProviders } = modules;
-        const errorRedirectPath =
-          authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
-        const requireVerifiedEmail =
-          authSettings?.oauthRequireVerifiedEmail ?? true;
-
-        const redirectUri = normalizeRedirectUri(redirectUriFromState, baseUrl);
-        if (!redirectUri) {
-          log.warn(`[oauth] Rejected cross-origin redirect_uri for ${provider}`);
-          return redirectToError(
-            res,
-            baseUrl,
-            errorRedirectPath,
-            'INVALID_REDIRECT_URI',
-            provider,
-          );
-        }
-
-        // Get provider config from cached map
-        const providerConfig = identityProviders.providers.get(provider);
-        if (!providerConfig) {
-          log.error(`[oauth] Provider ${provider} not found in database`);
-          return redirectToError(
-            res,
-            baseUrl,
-            errorRedirectPath,
-            'PROVIDER_NOT_CONFIGURED',
-            provider,
-          );
-        }
-
-        let codeVerifier: string | undefined;
-        if (providerConfig.pkceEnabled) {
-          const pkcePayload = verifySignedState<OAuthPkcePayload>(
-            storedPkce,
-            { secret: getStateSecret(opts) },
-          );
-          if (
-            !pkcePayload ||
-            pkcePayload.state !== storedState ||
-            pkcePayload.provider !== provider ||
-            !pkcePayload.code_verifier
-          ) {
-            log.warn(`[oauth] Invalid PKCE verifier state for ${provider}`);
-            return redirectToError(
-              res,
-              baseUrl,
-              errorRedirectPath,
-              'INVALID_PKCE',
-              provider,
-            );
-          }
-          codeVerifier = pkcePayload.code_verifier;
-        }
-
-        const client = createOAuthClientForProvider(providerConfig, baseUrl);
-        const profile = await client.handleCallback({
-          provider,
-          code: code as string,
-          codeVerifier,
+      let codeVerifier: string | undefined;
+      if (providerConfig.pkceEnabled) {
+        const pkcePayload = verifySignedState<OAuthPkcePayload>(storedPkce, {
+          secret: getStateSecret(opts)
         });
-        log.info(`[oauth] Got profile for ${provider}: ${profile.email}`);
+        if (
+          !pkcePayload ||
+          pkcePayload.state !== storedState ||
+          pkcePayload.provider !== provider ||
+          !pkcePayload.code_verifier
+        ) {
+          log.warn(`[oauth] Invalid PKCE verifier state for ${provider}`);
+          return redirectToError(
+            res,
+            baseUrl,
+            errorRedirectPath,
+            'INVALID_PKCE',
+            provider
+          );
+        }
+        codeVerifier = pkcePayload.code_verifier;
+      }
 
-        const deviceToken =
-          parseCookieValue(req, DEVICE_TOKEN_COOKIE_NAME) ?? null;
+      const client = createOAuthClientForProvider(providerConfig, baseUrl);
+      const profile = await client.handleCallback({
+        provider,
+        code: code as string,
+        codeVerifier
+      });
+      log.info(`[oauth] Got profile for ${provider}: ${profile.email}`);
 
-        const userAgent = req.get('user-agent') || '';
-        const { connectedAccountsModule, userAuthModule } = modules;
-        const authPrivateSchema = userAuthModule.identityFunctionSchemaName;
-        const signInFn = userAuthModule.signInIdentityFunction;
-        const signUpFn = userAuthModule.signUpIdentityFunction;
-        const emailVerified = isEmailVerified(profile);
+      const deviceToken =
+        parseCookieValue(req, DEVICE_TOKEN_COOKIE_NAME) ?? null;
 
-        // Check if identity already exists via connectedAccounts loader
-        // This determines whether to sign_in or sign_up, avoiding SAVEPOINT/rollback
-        let identityExists = false;
-        if (connectedAccountsModule) {
-          const checkSql = `
+      const userAgent = req.get('user-agent') || '';
+      const { connectedAccountsModule, userAuthModule } = modules;
+      const authPrivateSchema = userAuthModule.identityFunctionSchemaName;
+      const signInFn = userAuthModule.signInIdentityFunction;
+      const signUpFn = userAuthModule.signUpIdentityFunction;
+      const emailVerified = isEmailVerified(profile);
+
+      // Check if identity already exists via connectedAccounts loader
+      // This determines whether to sign_in or sign_up, avoiding SAVEPOINT/rollback
+      let identityExists = false;
+      if (connectedAccountsModule) {
+        const checkSql = `
             SELECT 1 FROM ${QuoteUtils.quoteQualifiedIdentifier(connectedAccountsModule.privateSchemaName, connectedAccountsModule.tableName)}
             WHERE service = $1 AND identifier = $2
             LIMIT 1
           `;
-          // Intentional RLS bypass: pre-auth lookup for anonymous user who cannot query
-          // connected_accounts via RLS. Only checks existence by service+identifier.
-          const checkResult = await ctx.pool.query(checkSql, [
-            profile.provider,
-            profile.providerId,
-          ]);
-          identityExists = checkResult.rowCount > 0;
-          log.info(
-            `[oauth] Identity check for ${profile.email}: ${identityExists ? 'exists' : 'new'}`,
-          );
-        }
+        // Intentional RLS bypass: pre-auth lookup for anonymous user who cannot query
+        // connected_accounts via RLS. Only checks existence by service+identifier.
+        const checkResult = await ctx.pool.query(checkSql, [
+          profile.provider,
+          profile.providerId
+        ]);
+        identityExists = checkResult.rowCount > 0;
+        log.info(
+          `[oauth] Identity check for ${profile.email}: ${identityExists ? 'exists' : 'new'}`
+        );
+      }
 
-        // If new identity, check email verification requirement before proceeding
-        if (!identityExists && requireVerifiedEmail && !emailVerified) {
-          throw new Error('EMAIL_NOT_VERIFIED');
-        }
+      // If new identity, check email verification requirement before proceeding
+      if (!identityExists && requireVerifiedEmail && !emailVerified) {
+        throw new Error('EMAIL_NOT_VERIFIED');
+      }
 
-        const result = await ctx.withPgClient<SignInIdentityResult>(
-          async (client) => {
-            const details = {
-              provider: profile.provider,
-              sub: profile.providerId,
-              email: profile.email,
-              email_verified: emailVerified,
-              name: profile.name,
-              picture: profile.picture,
-              raw_userinfo: profile.raw,
-            };
+      const result = await ctx.withPgClient<SignInIdentityResult>(
+        async (client) => {
+          const details = {
+            provider: profile.provider,
+            sub: profile.providerId,
+            email: profile.email,
+            email_verified: emailVerified,
+            name: profile.name,
+            picture: profile.picture,
+            raw_userinfo: profile.raw
+          };
 
-            if (identityExists) {
-              // Sign in existing identity
-              const signInSql = `
+          if (identityExists) {
+            // Sign in existing identity
+            const signInSql = `
                 SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(authPrivateSchema, signInFn)}(
                   $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
                 )
               `;
-              const signInResult = await client.query(signInSql, [
-                profile.provider,
-                profile.providerId,
-                JSON.stringify(details),
-                profile.email,
-                true,
-                deviceToken,
-              ]);
-              return signInResult.rows[0] || {};
-            } else {
-              // Sign up new identity
-              log.info(
-                `[oauth] Creating new account for ${profile.email}`,
-              );
-              const signUpSql = `
+            const signInResult = await client.query(signInSql, [
+              profile.provider,
+              profile.providerId,
+              JSON.stringify(details),
+              profile.email,
+              true,
+              deviceToken
+            ]);
+            return signInResult.rows[0] || {};
+          } else {
+            // Sign up new identity
+            log.info(`[oauth] Creating new account for ${profile.email}`);
+            const signUpSql = `
                 SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(authPrivateSchema, signUpFn)}(
                   $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
                 )
               `;
-              const signUpResult = await client.query(signUpSql, [
-                profile.provider,
-                profile.providerId,
-                profile.email,
-                JSON.stringify(details),
-                true,
-                deviceToken,
-              ]);
-              return signUpResult.rows[0] || {};
-            }
-          },
-          {
-            'jwt.claims.user_agent': userAgent,
-            'jwt.claims.origin': baseUrl,
-          },
-        );
-
-        // Handle MFA required
-        if (result.mfa_required && result.mfa_challenge_token) {
-          log.info(`[oauth] MFA required for ${profile.email}`);
-          const mfaUrl = new URL('/auth/mfa', baseUrl);
-          mfaUrl.searchParams.set('token', result.mfa_challenge_token);
-          mfaUrl.searchParams.set('redirect_uri', redirectUri);
-          return res.redirect(mfaUrl.toString());
+            const signUpResult = await client.query(signUpSql, [
+              profile.provider,
+              profile.providerId,
+              profile.email,
+              JSON.stringify(details),
+              true,
+              deviceToken
+            ]);
+            return signUpResult.rows[0] || {};
+          }
+        },
+        {
+          'jwt.claims.user_agent': userAgent,
+          'jwt.claims.origin': baseUrl
         }
+      );
 
-        if (!result.access_token) {
-          throw new Error('No access token returned from sign_in_identity');
-        }
-
-        const sessionConfig = getSessionCookieConfig(
-          modules.authSettings,
-          true,
-        );
-        setSessionCookie(res, result.access_token, sessionConfig);
-
-        if (result.out_device_token) {
-          const deviceConfig = getDeviceTokenCookieConfig(
-            modules.authSettings,
-          );
-          setDeviceTokenCookie(res, result.out_device_token, deviceConfig);
-        }
-
-        log.info(`[oauth] OAuth success for ${profile.email}`);
-        return res.redirect(redirectUri);
-      } catch (error: any) {
-        const fallbackPath =
-          modules?.authSettings?.oauthErrorRedirectPath ||
-          DEFAULT_ERROR_REDIRECT_PATH;
-
-        // Handle specific error cases
-        if (error.message === 'EMAIL_NOT_VERIFIED') {
-          log.warn(
-            `[oauth] Rejecting unverified email for signup: ${provider}`,
-          );
-          return redirectToError(
-            res,
-            baseUrl,
-            fallbackPath,
-            'EMAIL_NOT_VERIFIED',
-            provider,
-          );
-        }
-
-        log.error(`[oauth] Callback failed for ${provider}:`, error);
-        redirectToError(res, baseUrl, fallbackPath, 'CALLBACK_FAILED', provider);
+      // Handle MFA required
+      if (result.mfa_required && result.mfa_challenge_token) {
+        log.info(`[oauth] MFA required for ${profile.email}`);
+        const mfaUrl = new URL('/auth/mfa', baseUrl);
+        mfaUrl.searchParams.set('token', result.mfa_challenge_token);
+        mfaUrl.searchParams.set('redirect_uri', redirectUri);
+        return res.redirect(mfaUrl.toString());
       }
-    },
-  );
+
+      if (!result.access_token) {
+        throw new Error('No access token returned from sign_in_identity');
+      }
+
+      const sessionConfig = getSessionCookieConfig(modules.authSettings, true);
+      setSessionCookie(res, result.access_token, sessionConfig);
+
+      if (result.out_device_token) {
+        const deviceConfig = getDeviceTokenCookieConfig(modules.authSettings);
+        setDeviceTokenCookie(res, result.out_device_token, deviceConfig);
+      }
+
+      log.info(`[oauth] OAuth success for ${profile.email}`);
+      return res.redirect(redirectUri);
+    } catch (error: any) {
+      const fallbackPath =
+        modules?.authSettings?.oauthErrorRedirectPath ||
+        DEFAULT_ERROR_REDIRECT_PATH;
+
+      // Handle specific error cases
+      if (error.message === 'EMAIL_NOT_VERIFIED') {
+        log.warn(`[oauth] Rejecting unverified email for signup: ${provider}`);
+        return redirectToError(
+          res,
+          baseUrl,
+          fallbackPath,
+          'EMAIL_NOT_VERIFIED',
+          provider
+        );
+      }
+
+      log.error(`[oauth] Callback failed for ${provider}:`, error);
+      redirectToError(res, baseUrl, fallbackPath, 'CALLBACK_FAILED', provider);
+    }
+  });
 
   return router;
 }

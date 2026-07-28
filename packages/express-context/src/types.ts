@@ -264,26 +264,13 @@ export interface IdentityProvidersModuleRow {
   prefix: string | null;
 }
 
-export interface ConfigSecretsModuleRow {
-  table_id: string;
-}
-
-export interface ConfigSecretsModuleRow {
-  table_id: string;
-}
-
-export interface SecretsModuleAvailabilityRow {
-  has_internal_secrets_module: boolean;
-  has_config_secrets_module: boolean;
+export interface InternalSecretsModuleRow {
+  internal_secrets_table_id: string;
 }
 
 export interface SchemaAndTableRow {
   schema_name: string;
   table_name: string;
-}
-
-export interface PlatformDatabaseRow {
-  database_id: string;
 }
 
 export interface ProviderRow {

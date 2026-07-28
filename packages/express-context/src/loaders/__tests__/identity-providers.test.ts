@@ -1,10 +1,11 @@
 import type { Pool } from 'pg';
 
-import type { LoaderContext } from '../types';
 import {
   buildProvidersSql,
-  resolveIdentityProvidersConfig,
+  identityProvidersLoader,
+  resolveIdentityProvidersConfig
 } from '../identity-providers';
+import type { LoaderContext } from '../types';
 import { userAuthModuleLoader } from '../user-auth-module';
 
 type QueryResult = { rows: unknown[] };
@@ -22,21 +23,22 @@ function createMockPool(handlers: QueryHandler[]) {
   });
 
   return {
-    pool: { query },
-    queries,
+    pool: { query } as unknown as Pool,
+    queries
   };
 }
 
 function createContext(
-  servicesPool: ReturnType<typeof createMockPool>['pool'],
-  tenantPool: ReturnType<typeof createMockPool>['pool'],
-  databaseId = 'tenant-db'
+  tenantPool: Pool,
+  databaseId = 'tenant-db',
+  routingPool: Pool = { query: jest.fn() } as unknown as Pool
 ): LoaderContext {
   return {
-    servicesPool: servicesPool as unknown as Pool,
-    tenantPool: tenantPool as unknown as Pool,
+    routingPool,
+    tenantPool,
     databaseId,
-    dbname: 'constructive-test',
+    apiId: 'api-id',
+    dbname: 'constructive-test'
   };
 }
 
@@ -47,34 +49,28 @@ function identityProvidersModuleRow(databaseId: string, scope: string) {
     private_schema_name: 'auth_private',
     table_name: 'identity_providers',
     scope,
-    prefix: scope,
+    prefix: scope
   };
 }
 
 describe('identityProvidersLoader metadata resolution', () => {
-  it('resolves provider secrets table through config_secrets_module schema metadata', async () => {
+  afterEach(() => {
+    identityProvidersLoader.invalidate();
+  });
+
+  it('loads database-owned provider config through internal secrets metadata', async () => {
     const tenant = createMockPool([
       () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
-    ]);
-    const services = createMockPool([
-      () => ({ rows: [{ database_id: 'platform-db' }] }),
-      () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
       () => ({
-        rows: [
-          {
-            has_internal_secrets_module: true,
-            has_config_secrets_module: false,
-          },
-        ],
+        rows: [{ internal_secrets_table_id: 'secrets-table-id' }]
       }),
-      () => ({ rows: [{ internal_secrets_table_id: 'secrets-table-id' }] }),
       () => ({
         rows: [
           {
             schema_name: 'secret_private',
-            table_name: 'resolved_secrets',
-          },
-        ],
+            table_name: 'app_secrets'
+          }
+        ]
       }),
       () => ({
         rows: [
@@ -90,201 +86,115 @@ describe('identityProvidersLoader metadata resolution', () => {
             userinfo_url: 'https://github.example/user',
             scopes: ['read:user'],
             extra_authorization_params: { prompt: 'select_account' },
-            pkce_enabled: true,
-          },
-        ],
-      }),
+            pkce_enabled: true
+          }
+        ]
+      })
     ]);
+    const routing = createMockPool([]);
 
     const config = await resolveIdentityProvidersConfig(
-      createContext(services.pool, tenant.pool)
+      createContext(tenant.pool, 'tenant-db', routing.pool)
     );
 
+    expect(config).toMatchObject({
+      schemaName: 'auth_public',
+      privateSchemaName: 'auth_private',
+      tableName: 'identity_providers',
+      scope: 'app',
+      prefix: 'app',
+      rotateSecretFunction: 'rotate_identity_provider_app_secret'
+    });
     expect(config?.providers.get('github')).toMatchObject({
       clientId: 'dummy-client-id',
       clientSecret: 'dummy-client-secret',
       authorizationUrl: 'https://github.example/authorize',
-      authorizationParams: { prompt: 'select_account' },
+      authorizationParams: { prompt: 'select_account' }
     });
-    expect(services.queries[0].values).toEqual(['constructive-test']);
-    expect(services.queries[2].sql).toContain('to_regclass');
-    expect(services.queries[3].sql).toContain('internal_secrets_module');
-    expect(services.queries[3].values).toEqual(['platform-db', 'platform']);
-    expect(services.queries[5].sql).toContain(
-      'secret_private.resolved_secrets'
+    expect(routing.queries).toHaveLength(0);
+    expect(tenant.queries[0].values).toEqual(['tenant-db']);
+    expect(tenant.queries[1].sql).toContain('internal_secrets_module');
+    expect(tenant.queries[1].values).toEqual(['tenant-db', 'app']);
+    expect(tenant.queries[2].sql).toContain('metaschema.schema_and_table');
+    expect(tenant.queries[3].sql).toContain('secret_private.app_secrets');
+    expect(tenant.queries.map(({ sql }) => sql).join('\n')).not.toContain(
+      'services_public'
     );
-    expect(services.queries[5].sql).not.toContain('constructive_store_private');
-    expect(services.queries[5].sql).not.toContain('platform_secrets');
+    expect(tenant.queries.map(({ sql }) => sql).join('\n')).not.toContain(
+      'config_secrets_module'
+    );
   });
 
-  it('supports the Hub DB config_secrets_module contract', async () => {
+  it('returns undefined when identity providers are not provisioned', async () => {
+    const tenant = createMockPool([() => ({ rows: [] })]);
+
+    await expect(
+      resolveIdentityProvidersConfig(createContext(tenant.pool))
+    ).resolves.toBeUndefined();
+    expect(tenant.queries).toHaveLength(1);
+  });
+
+  it('rejects ambiguous provider ownership within one database', async () => {
     const tenant = createMockPool([
-      () => ({ rows: [identityProvidersModuleRow('tenant-db', 'platform')] }),
-    ]);
-    const services = createMockPool([
-      () => ({ rows: [{ database_id: 'platform-db' }] }),
-      () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
       () => ({
         rows: [
-          {
-            has_internal_secrets_module: false,
-            has_config_secrets_module: true,
-          },
-        ],
-      }),
-      () => ({ rows: [{ table_id: 'platform-secrets-table-id' }] }),
-      () => ({
-        rows: [
-          {
-            schema_name: 'constructive_store_private',
-            table_name: 'platform_secrets',
-          },
-        ],
-      }),
-      () => ({ rows: [] }),
+          identityProvidersModuleRow('tenant-db', 'app'),
+          identityProvidersModuleRow('tenant-db', 'platform')
+        ]
+      })
     ]);
 
-    const config = await resolveIdentityProvidersConfig(
-      createContext(services.pool, tenant.pool)
+    await expect(
+      resolveIdentityProvidersConfig(createContext(tenant.pool))
+    ).rejects.toThrow(
+      'multiple identity_providers_module rows found for database tenant-db'
     );
-
-    expect(config?.rotateSecretFunction).toBe(
-      'rotate_identity_provider_platform_secret'
-    );
-    expect(services.queries[3].sql).toContain('config_secrets_module');
-    expect(services.queries[3].values).toEqual(['platform-db', 'platform']);
-    expect(services.queries[5].sql).toContain(
-      'constructive_store_private.platform_secrets'
-    );
+    expect(tenant.queries).toHaveLength(1);
   });
 
-  it('falls back to config_secrets_module when both relations exist but only the legacy row is provisioned', async () => {
+  it('throws when the matching internal secrets scope is missing', async () => {
     const tenant = createMockPool([
       () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
-    ]);
-    const services = createMockPool([
-      () => ({ rows: [{ database_id: 'platform-db' }] }),
-      () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
-      () => ({
-        rows: [
-          {
-            has_internal_secrets_module: true,
-            has_config_secrets_module: true,
-          },
-        ],
-      }),
-      () => ({ rows: [] }),
-      () => ({ rows: [{ table_id: 'legacy-secrets-table-id' }] }),
-      () => ({
-        rows: [
-          {
-            schema_name: 'legacy_private',
-            table_name: 'legacy_secrets',
-          },
-        ],
-      }),
-      () => ({ rows: [] }),
+      () => ({ rows: [] })
     ]);
 
-    await resolveIdentityProvidersConfig(
-      createContext(services.pool, tenant.pool)
+    await expect(
+      resolveIdentityProvidersConfig(createContext(tenant.pool))
+    ).rejects.toThrow(
+      'internal_secrets_module missing for scope app on database tenant-db'
     );
-
-    expect(services.queries[3].sql).toContain('internal_secrets_module');
-    expect(services.queries[4].sql).toContain('config_secrets_module');
-    expect(services.queries[6].sql).toContain('legacy_private.legacy_secrets');
   });
 
-  it('builds provider SQL without the old platform secrets hardcode', () => {
+  it('throws when the internal secrets table id cannot be resolved', async () => {
+    const tenant = createMockPool([
+      () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
+      () => ({
+        rows: [{ internal_secrets_table_id: 'missing-table-id' }]
+      }),
+      () => {
+        throw new Error('NOT_FOUND');
+      }
+    ]);
+
+    await expect(
+      resolveIdentityProvidersConfig(createContext(tenant.pool))
+    ).rejects.toThrow(
+      'schema/table resolution missing for internal_secrets_module scope app on database tenant-db'
+    );
+  });
+
+  it('builds provider SQL from resolved identifiers', () => {
     const sql = buildProvidersSql(
       'auth_private',
       'identity_providers',
       'secret_private',
-      'resolved_secrets'
+      'app_secrets'
     );
 
     expect(sql).toContain('auth_private.identity_providers');
-    expect(sql).toContain('secret_private.resolved_secrets');
+    expect(sql).toContain('secret_private.app_secrets');
     expect(sql).not.toContain('constructive_store_private');
     expect(sql).not.toContain('platform_secrets');
-  });
-
-  it('throws a clear error when neither secrets metadata relation exists', async () => {
-    const tenant = createMockPool([
-      () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
-    ]);
-    const services = createMockPool([
-      () => ({ rows: [{ database_id: 'platform-db' }] }),
-      () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
-      () => ({
-        rows: [
-          {
-            has_internal_secrets_module: false,
-            has_config_secrets_module: false,
-          },
-        ],
-      }),
-    ]);
-
-    await expect(
-      resolveIdentityProvidersConfig(createContext(services.pool, tenant.pool))
-    ).rejects.toThrow(
-      'secrets module metadata unavailable for database platform-db'
-    );
-  });
-
-  it('throws a clear error when neither available module has the requested scope', async () => {
-    const tenant = createMockPool([
-      () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
-    ]);
-    const services = createMockPool([
-      () => ({ rows: [{ database_id: 'platform-db' }] }),
-      () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
-      () => ({
-        rows: [
-          {
-            has_internal_secrets_module: true,
-            has_config_secrets_module: true,
-          },
-        ],
-      }),
-      () => ({ rows: [] }),
-      () => ({ rows: [] }),
-    ]);
-
-    await expect(
-      resolveIdentityProvidersConfig(createContext(services.pool, tenant.pool))
-    ).rejects.toThrow(
-      'internal_secrets_module and config_secrets_module missing for scope platform on database platform-db'
-    );
-  });
-
-  it('throws a clear error when config_secrets_module table resolution fails', async () => {
-    const tenant = createMockPool([
-      () => ({ rows: [identityProvidersModuleRow('tenant-db', 'app')] }),
-    ]);
-    const services = createMockPool([
-      () => ({ rows: [{ database_id: 'platform-db' }] }),
-      () => ({ rows: [identityProvidersModuleRow('platform-db', 'platform')] }),
-      () => ({
-        rows: [
-          {
-            has_internal_secrets_module: true,
-            has_config_secrets_module: false,
-          },
-        ],
-      }),
-      () => ({ rows: [{ internal_secrets_table_id: 'missing-table-id' }] }),
-      () => {
-        throw new Error('NOT_FOUND');
-      },
-    ]);
-
-    await expect(
-      resolveIdentityProvidersConfig(createContext(services.pool, tenant.pool))
-    ).rejects.toThrow(
-      'schema/table resolution missing for internal_secrets_module scope platform on database platform-db'
-    );
   });
 });
 
@@ -293,7 +203,7 @@ describe('userAuthModuleLoader', () => {
     userAuthModuleLoader.invalidate();
   });
 
-  it('continues resolving identity auth function constants', async () => {
+  it('resolves identity auth function constants', async () => {
     const tenant = createMockPool([
       () => ({
         rows: [
@@ -305,22 +215,15 @@ describe('userAuthModuleLoader', () => {
             sign_out_function: 'sign_out',
             sign_in_cross_origin_function: null,
             request_cross_origin_token_function: null,
-            extend_token_expires: '1 hour',
-          },
-        ],
+            extend_token_expires: '1 hour'
+          }
+        ]
       }),
-      () => ({
-        rows: [
-          {
-            schema_name: 'auth_private',
-          },
-        ],
-      }),
+      () => ({ rows: [{ schema_name: 'auth_private' }] })
     ]);
-    const services = createMockPool([]);
 
     const config = await userAuthModuleLoader.resolve(
-      createContext(services.pool, tenant.pool, 'user-auth-db')
+      createContext(tenant.pool, 'user-auth-db')
     );
 
     expect(config).toMatchObject({
@@ -328,11 +231,11 @@ describe('userAuthModuleLoader', () => {
       identityFunctionSchemaName: 'auth_private',
       sessionCredentialsSchemaName: 'session_private',
       signInIdentityFunction: 'sign_in_identity',
-      signUpIdentityFunction: 'sign_up_identity',
+      signUpIdentityFunction: 'sign_up_identity'
     });
   });
 
-  it('falls back to the public auth schema when identity function schema is not discoverable', async () => {
+  it('falls back to the public auth schema when identity functions are not discoverable', async () => {
     const tenant = createMockPool([
       () => ({
         rows: [
@@ -344,22 +247,21 @@ describe('userAuthModuleLoader', () => {
             sign_out_function: 'sign_out',
             sign_in_cross_origin_function: null,
             request_cross_origin_token_function: null,
-            extend_token_expires: '1 hour',
-          },
-        ],
+            extend_token_expires: '1 hour'
+          }
+        ]
       }),
-      () => ({ rows: [] }),
+      () => ({ rows: [] })
     ]);
-    const services = createMockPool([]);
 
     const config = await userAuthModuleLoader.resolve(
-      createContext(services.pool, tenant.pool, 'fallback-user-auth-db')
+      createContext(tenant.pool, 'fallback-user-auth-db')
     );
 
     expect(config).toMatchObject({
       schemaName: 'auth_public',
       identityFunctionSchemaName: 'auth_public',
-      sessionCredentialsSchemaName: 'auth_public',
+      sessionCredentialsSchemaName: 'auth_public'
     });
   });
 });

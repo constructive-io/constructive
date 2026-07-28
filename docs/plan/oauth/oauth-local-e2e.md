@@ -18,7 +18,7 @@ git status --short --branch
 
 Prepare two groups of environment variables:
 
-- GraphQL server runtime: `OAUTH_STATE_SECRET`. The server reads this at startup to sign and verify `oauth_state` / `oauth_pkce` cookies.
+- GraphQL server runtime: `OAUTH_STATE_SECRET`. The server requires this only when a configured OAuth flow starts, then uses it to sign and verify `oauth_state` / `oauth_pkce` cookies.
 - Provider initialization SQL: `GITHUB_OAUTH_*` and `GOOGLE_OAUTH_*`. These are passed into the provider setup `psql` scripts below, then written or rotated into the database. The GraphQL server does not read these provider credential env vars directly.
 
 ```bash
@@ -61,7 +61,7 @@ pgpm deploy --yes --database constructive --package constructive-local
 
 ## 4. Apply Local OAuth Test Setup
 
-`PGPASSWORD` in the setup commands is only the local PostgreSQL connection password for `psql`.
+`PGPASSWORD` in the setup commands is only the local PostgreSQL connection password for `psql`. The OAuth routes use the same scoped routing plane as every other production route; do not seed `services_public` compatibility tables or rely on a default database.
 
 ```bash
 PGPASSWORD=password psql -h localhost -U postgres -d constructive -v ON_ERROR_STOP=1 <<'SQL'
@@ -71,28 +71,22 @@ SET allow_identity_sign_in = true,
     allow_identity_sign_up = true,
     oauth_require_verified_email = false,
     cookie_secure = false;
-
--- rotate_identity_provider_platform_secret currently expects this namespace.
-INSERT INTO constructive_infra_public.platform_namespaces (database_id, name, status)
-SELECT database_id, 'default', 'ready'
-FROM services_public.apis
-WHERE name = 'auth'
-LIMIT 1
-ON CONFLICT (database_id, name) DO NOTHING;
-
--- Google local callback alias: localhost -> auth API.
-DELETE FROM services_public.domains
-WHERE domain = 'localhost'
-  AND subdomain IS NULL;
-
-INSERT INTO services_public.domains (database_id, api_id, domain, subdomain, annotations)
-SELECT database_id, id, 'localhost', NULL,
-       jsonb_build_object('purpose', 'local-google-oauth-callback')
-FROM services_public.apis
-WHERE name = 'auth'
-LIMIT 1;
 SQL
 ```
+
+Before starting the server, ensure the callback hostname is a real scoped
+routing binding for the intended API/database. Verify it through the current
+routing contract:
+
+```sql
+SELECT *
+FROM routing_public.resolve_route('auth.localhost', '/', NULL);
+```
+
+If Google must use bare `localhost`, create that hostname through the current
+routing/domain provisioning workflow and verify it with
+`routing_public.resolve_route('localhost', '/', NULL)`. Do not insert a legacy
+domain row directly.
 
 ## 5. Build and Start the Server
 
@@ -127,7 +121,7 @@ Keep `NODE_USE_ENV_PROXY=1` when the local network needs `HTTP_PROXY` / `HTTPS_P
 
 ## 6. Configure Providers
 
-These commands use the provider initialization env vars from step 2. `psql` substitutes them into the setup script, and `rotate_identity_provider_platform_secret(...)` stores the provider client secret in the database. The GraphQL server later reads provider credentials through loaders and database metadata, not from `GITHUB_OAUTH_*` or `GOOGLE_OAUTH_*`.
+These commands use the provider initialization env vars from step 2. `psql` substitutes them into the setup script, and `rotate_identity_provider_platform_secret(...)` stores the provider client secret in the current database's `internal_secrets_module` table for the matching scope. The GraphQL server later resolves both provider and secret metadata by the routed `database_id`; it does not infer a platform database from `dbname` or read `GITHUB_OAUTH_*` / `GOOGLE_OAUTH_*`.
 
 GitHub:
 
@@ -203,7 +197,7 @@ curl --noproxy '*' http://localhost:3000/auth/providers
 Expected:
 
 ```json
-{"providers":["github","google"]}
+{ "providers": ["github", "google"] }
 ```
 
 Authorization redirects:

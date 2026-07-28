@@ -25,7 +25,7 @@ describe('cookie utilities', () => {
         domain: undefined,
         httpOnly: true,
         maxAge: 86400,
-        path: '/',
+        path: '/'
       });
     });
 
@@ -36,7 +36,7 @@ describe('cookie utilities', () => {
         cookieDomain: '.example.com',
         cookieHttponly: false,
         cookieMaxAge: '3600',
-        cookiePath: '/api',
+        cookiePath: '/api'
       };
       const config = getSessionCookieConfig(authSettings);
       expect(config).toEqual({
@@ -45,14 +45,14 @@ describe('cookie utilities', () => {
         domain: '.example.com',
         httpOnly: false,
         maxAge: 3600,
-        path: '/api',
+        path: '/api'
       });
     });
 
     it('uses rememberMeDuration when rememberMe is true', () => {
       const authSettings: AuthSettings = {
         cookieMaxAge: '3600',
-        rememberMeDuration: '2592000', // 30 days
+        rememberMeDuration: '2592000' // 30 days
       };
       const config = getSessionCookieConfig(authSettings, true);
       expect(config.maxAge).toBe(2592000);
@@ -61,7 +61,7 @@ describe('cookie utilities', () => {
     it('uses cookieMaxAge when rememberMe is false', () => {
       const authSettings: AuthSettings = {
         cookieMaxAge: '3600',
-        rememberMeDuration: '2592000',
+        rememberMeDuration: '2592000'
       };
       const config = getSessionCookieConfig(authSettings, false);
       expect(config.maxAge).toBe(3600);
@@ -69,10 +69,30 @@ describe('cookie utilities', () => {
 
     it('falls back to cookieMaxAge when rememberMeDuration is not set', () => {
       const authSettings: AuthSettings = {
-        cookieMaxAge: '7200',
+        cookieMaxAge: '7200'
       };
       const config = getSessionCookieConfig(authSettings, true);
       expect(config.maxAge).toBe(7200);
+    });
+
+    it('converts PostgreSQL interval objects to cookie seconds', () => {
+      const authSettings: AuthSettings = {
+        cookieMaxAge: { hours: 2, milliseconds: 500 },
+        rememberMeDuration: { days: 30 }
+      };
+
+      expect(getSessionCookieConfig(authSettings).maxAge).toBe(7200.5);
+      expect(getSessionCookieConfig(authSettings, true).maxAge).toBe(
+        30 * 24 * 60 * 60
+      );
+    });
+
+    it('does not misread textual PostgreSQL intervals as raw seconds', () => {
+      const authSettings: AuthSettings = {
+        cookieMaxAge: '2 hours'
+      };
+
+      expect(getSessionCookieConfig(authSettings).maxAge).toBe(86400);
     });
   });
 
@@ -86,7 +106,7 @@ describe('cookie utilities', () => {
     it('uses authSettings for other cookie options', () => {
       const authSettings: AuthSettings = {
         cookieSecure: true,
-        cookieDomain: '.example.com',
+        cookieDomain: '.example.com'
       };
       const config = getDeviceTokenCookieConfig(authSettings);
       expect(config.secure).toBe(true);
@@ -97,7 +117,7 @@ describe('cookie utilities', () => {
   describe('setSessionCookie', () => {
     it('sets cookie with correct options', () => {
       const mockRes = {
-        cookie: jest.fn(),
+        cookie: jest.fn()
       } as unknown as Response;
 
       const config = {
@@ -106,7 +126,7 @@ describe('cookie utilities', () => {
         domain: '.example.com',
         httpOnly: true,
         maxAge: 3600,
-        path: '/',
+        path: '/'
       };
 
       setSessionCookie(mockRes, 'test-token', config);
@@ -120,7 +140,7 @@ describe('cookie utilities', () => {
           domain: '.example.com',
           httpOnly: true,
           maxAge: 3600000, // converted to milliseconds
-          path: '/',
+          path: '/'
         }
       );
     });
@@ -129,7 +149,7 @@ describe('cookie utilities', () => {
   describe('clearSessionCookie', () => {
     it('clears cookie with correct options', () => {
       const mockRes = {
-        clearCookie: jest.fn(),
+        clearCookie: jest.fn()
       } as unknown as Response;
 
       const config = {
@@ -138,28 +158,25 @@ describe('cookie utilities', () => {
         domain: '.example.com',
         httpOnly: true,
         maxAge: 3600,
-        path: '/',
+        path: '/'
       };
 
       clearSessionCookie(mockRes, config);
 
-      expect(mockRes.clearCookie).toHaveBeenCalledWith(
-        SESSION_COOKIE_NAME,
-        {
-          secure: true,
-          sameSite: 'lax',
-          domain: '.example.com',
-          httpOnly: true,
-          path: '/',
-        }
-      );
+      expect(mockRes.clearCookie).toHaveBeenCalledWith(SESSION_COOKIE_NAME, {
+        secure: true,
+        sameSite: 'lax',
+        domain: '.example.com',
+        httpOnly: true,
+        path: '/'
+      });
     });
   });
 
   describe('setDeviceTokenCookie', () => {
     it('sets device token cookie', () => {
       const mockRes = {
-        cookie: jest.fn(),
+        cookie: jest.fn()
       } as unknown as Response;
 
       const config: Parameters<typeof setDeviceTokenCookie>[2] = {
@@ -167,7 +184,7 @@ describe('cookie utilities', () => {
         sameSite: 'lax',
         httpOnly: true,
         maxAge: 7776000,
-        path: '/',
+        path: '/'
       };
 
       setDeviceTokenCookie(mockRes, 'device-123', config);
@@ -176,7 +193,7 @@ describe('cookie utilities', () => {
         DEVICE_TOKEN_COOKIE_NAME,
         'device-123',
         expect.objectContaining({
-          maxAge: 7776000000,
+          maxAge: 7776000000
         })
       );
     });
@@ -185,7 +202,7 @@ describe('cookie utilities', () => {
   describe('clearDeviceTokenCookie', () => {
     it('clears device token cookie', () => {
       const mockRes = {
-        clearCookie: jest.fn(),
+        clearCookie: jest.fn()
       } as unknown as Response;
 
       const config: Parameters<typeof clearDeviceTokenCookie>[1] = {
@@ -193,7 +210,7 @@ describe('cookie utilities', () => {
         sameSite: 'lax',
         httpOnly: true,
         maxAge: 7776000,
-        path: '/',
+        path: '/'
       };
 
       clearDeviceTokenCookie(mockRes, config);
@@ -202,7 +219,7 @@ describe('cookie utilities', () => {
         DEVICE_TOKEN_COOKIE_NAME,
         expect.objectContaining({
           httpOnly: true,
-          path: '/',
+          path: '/'
         })
       );
     });
@@ -212,8 +229,8 @@ describe('cookie utilities', () => {
     it('parses cookie value from header', () => {
       const mockReq = {
         headers: {
-          cookie: 'foo=bar; constructive_session=test-token; baz=qux',
-        },
+          cookie: 'foo=bar; constructive_session=test-token; baz=qux'
+        }
       } as unknown as Request;
 
       const value = parseCookieValue(mockReq, 'constructive_session');
@@ -223,8 +240,8 @@ describe('cookie utilities', () => {
     it('returns undefined when cookie not found', () => {
       const mockReq = {
         headers: {
-          cookie: 'foo=bar',
-        },
+          cookie: 'foo=bar'
+        }
       } as unknown as Request;
 
       const value = parseCookieValue(mockReq, 'constructive_session');
@@ -233,7 +250,7 @@ describe('cookie utilities', () => {
 
     it('returns undefined when no cookie header', () => {
       const mockReq = {
-        headers: {},
+        headers: {}
       } as unknown as Request;
 
       const value = parseCookieValue(mockReq, 'constructive_session');
@@ -243,8 +260,8 @@ describe('cookie utilities', () => {
     it('decodes URL-encoded cookie values', () => {
       const mockReq = {
         headers: {
-          cookie: 'token=hello%20world',
-        },
+          cookie: 'token=hello%20world'
+        }
       } as unknown as Request;
 
       const value = parseCookieValue(mockReq, 'token');
@@ -256,8 +273,8 @@ describe('cookie utilities', () => {
     it('extracts device token from cookie', () => {
       const mockReq = {
         headers: {
-          cookie: `${DEVICE_TOKEN_COOKIE_NAME}=device-abc123`,
-        },
+          cookie: `${DEVICE_TOKEN_COOKIE_NAME}=device-abc123`
+        }
       } as unknown as Request;
 
       const token = getDeviceTokenFromRequest(mockReq);
@@ -269,8 +286,8 @@ describe('cookie utilities', () => {
     it('extracts session token from cookie', () => {
       const mockReq = {
         headers: {
-          cookie: `${SESSION_COOKIE_NAME}=session-xyz789`,
-        },
+          cookie: `${SESSION_COOKIE_NAME}=session-xyz789`
+        }
       } as unknown as Request;
 
       const token = getSessionTokenFromRequest(mockReq);

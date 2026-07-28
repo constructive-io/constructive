@@ -1,28 +1,30 @@
-import express from 'express';
-import http from 'http';
-import type { AddressInfo } from 'net';
 import {
   createSignedState,
   deriveCodeChallenge,
-  verifySignedState,
+  verifySignedState
 } from '@constructive-io/oauth';
+import express from 'express';
+import http from 'http';
+import type { AddressInfo } from 'net';
 
 import { createOAuthRoutes } from '../oauth';
 
 const OAUTH_STATE_SECRET = 'test-oauth-state-secret';
+const DATABASE_ID = '00000000-0000-4000-8000-000000000001';
+const API_ID = '00000000-0000-4000-8000-000000000002';
 const originalFetch = global.fetch;
 const authQueryMock = jest.fn();
 
 jest.mock('@pgpmjs/env', () => ({
-  getNodeEnv: jest.fn(() => 'test'),
+  getNodeEnv: jest.fn(() => 'test')
 }));
 
 jest.mock('@pgpmjs/logger', () => ({
   Logger: jest.fn(() => ({
     error: jest.fn(),
     info: jest.fn(),
-    warn: jest.fn(),
-  })),
+    warn: jest.fn()
+  }))
 }));
 
 interface TestHttpResponse {
@@ -34,6 +36,9 @@ interface TestHttpResponse {
 interface OAuthStatePayload {
   redirect_uri: string;
   provider: string;
+  database_id: string;
+  api_id: string | null;
+  origin: string;
 }
 
 interface OAuthPkcePayload {
@@ -54,9 +59,9 @@ const providerConfig = {
   userinfoUrl: 'https://github.example.test/api/v3/user',
   scopes: ['read:user', 'user:email'],
   authorizationParams: {
-    prompt: 'select_account',
+    prompt: 'select_account'
   },
-  pkceEnabled: true,
+  pkceEnabled: true
 };
 
 afterEach(() => {
@@ -66,13 +71,19 @@ afterEach(() => {
 
 function createConstructiveContext() {
   return {
-    withPgClient: jest.fn(async (fn: (client: { query: typeof authQueryMock }) => Promise<unknown>) =>
-      fn({ query: authQueryMock }),
+    api: {
+      apiId: API_ID
+    },
+    databaseId: DATABASE_ID,
+    withPgClient: jest.fn(
+      async (
+        fn: (client: { query: typeof authQueryMock }) => Promise<unknown>
+      ) => fn({ query: authQueryMock })
     ),
     useModule: jest.fn(async (name: string) => {
       if (name === 'identityProviders') {
         return {
-          providers: new Map([[providerConfig.slug, providerConfig]]),
+          providers: new Map([[providerConfig.slug, providerConfig]])
         };
       }
       if (name === 'userAuthModule') {
@@ -80,37 +91,44 @@ function createConstructiveContext() {
           schemaName: 'constructive_auth_public',
           identityFunctionSchemaName: 'constructive_auth_private',
           signInIdentityFunction: 'sign_in_identity',
-          signUpIdentityFunction: 'sign_up_identity',
+          signUpIdentityFunction: 'sign_up_identity'
         };
       }
       if (name === 'authSettings') {
         return {
           cookieHttponly: true,
           cookieSecure: false,
-          cookieSamesite: 'lax',
+          cookieSamesite: 'lax'
         };
       }
       if (name === 'connectedAccountsModule') {
         return undefined;
       }
       return undefined;
-    }),
+    })
   };
 }
 
 async function withOAuthServer<T>(
   run: (baseUrl: string) => Promise<T>,
+  stateSecret: string | null = OAUTH_STATE_SECRET,
+  contextFactory: () => ReturnType<
+    typeof createConstructiveContext
+  > = createConstructiveContext
 ): Promise<T> {
   const app = express();
   app.use((req, _res, next) => {
-    (req as any).constructive = createConstructiveContext();
+    (req as any).constructive = contextFactory();
     next();
   });
-  app.use('/auth', createOAuthRoutes({
-    oauth: {
-      stateSecret: OAUTH_STATE_SECRET,
-    },
-  } as any));
+  app.use(
+    '/auth',
+    createOAuthRoutes({
+      oauth: {
+        stateSecret: stateSecret ?? undefined
+      }
+    } as any)
+  );
 
   const server = await new Promise<http.Server>((resolve) => {
     const listening = app.listen(0, '127.0.0.1', () => resolve(listening));
@@ -128,7 +146,7 @@ async function withOAuthServer<T>(
 
 async function request(
   url: string,
-  headers: Record<string, string> = {},
+  headers: Record<string, string> = {}
 ): Promise<TestHttpResponse> {
   return new Promise((resolve, reject) => {
     const req = http.request(url, { method: 'GET', headers }, (res) => {
@@ -138,7 +156,7 @@ async function request(
         resolve({
           statusCode: res.statusCode ?? 0,
           headers: res.headers,
-          body: Buffer.concat(chunks).toString('utf8'),
+          body: Buffer.concat(chunks).toString('utf8')
         });
       });
     });
@@ -162,10 +180,27 @@ function readCookie(setCookies: string[], name: string): string {
   return decodeURIComponent(value);
 }
 
+function createStatePayload(
+  baseUrl: string,
+  provider = 'github',
+  overrides: Partial<OAuthStatePayload> = {}
+): OAuthStatePayload {
+  return {
+    redirect_uri: '/dashboard',
+    provider,
+    database_id: DATABASE_ID,
+    api_id: API_ID,
+    origin: baseUrl,
+    ...overrides
+  };
+}
+
 describe('OAuth routes', () => {
   it('binds PKCE verifier to the signed state cookie without exposing it in the redirect URL', async () => {
     await withOAuthServer(async (baseUrl) => {
-      const response = await request(`${baseUrl}/auth/github?redirect_uri=%2Fdashboard`);
+      const response = await request(
+        `${baseUrl}/auth/github?redirect_uri=%2Fdashboard`
+      );
 
       expect(response.statusCode).toBe(302);
       const location = response.headers.location;
@@ -184,47 +219,59 @@ describe('OAuth routes', () => {
       expect(location).not.toContain('code_verifier');
 
       const statePayload = verifySignedState<OAuthStatePayload>(stateCookie, {
-        secret: OAUTH_STATE_SECRET,
+        secret: OAUTH_STATE_SECRET
       });
       expect(statePayload).toMatchObject({
         redirect_uri: '/dashboard',
         provider: 'github',
+        database_id: DATABASE_ID,
+        api_id: API_ID,
+        origin: baseUrl
       });
 
       const pkcePayload = verifySignedState<OAuthPkcePayload>(pkceCookie, {
-        secret: OAUTH_STATE_SECRET,
+        secret: OAUTH_STATE_SECRET
       });
       expect(pkcePayload).toMatchObject({
         state: stateCookie,
-        provider: 'github',
+        provider: 'github'
       });
       expect(pkcePayload!.code_verifier).toHaveLength(43);
       expect(redirect.searchParams.get('code_challenge')).toBe(
-        deriveCodeChallenge(pkcePayload!.code_verifier),
+        deriveCodeChallenge(pkcePayload!.code_verifier)
       );
 
       expect(
-        setCookies.find((value) => value.startsWith('oauth_state=')),
+        setCookies.find((value) => value.startsWith('oauth_state='))
       ).toContain('HttpOnly');
       expect(
-        setCookies.find((value) => value.startsWith('oauth_pkce=')),
+        setCookies.find((value) => value.startsWith('oauth_state='))
+      ).toContain('Path=/auth');
+      expect(
+        setCookies.find((value) => value.startsWith('oauth_state='))
+      ).not.toContain('Domain=');
+      expect(
+        setCookies.find((value) => value.startsWith('oauth_pkce='))
       ).toContain('HttpOnly');
+      expect(
+        setCookies.find((value) => value.startsWith('oauth_pkce='))
+      ).not.toContain('Domain=');
     });
   });
 
   it('rejects callback requests when the PKCE verifier is not bound to the returned state', async () => {
     await withOAuthServer(async (baseUrl) => {
       const stateCookie = createSignedState<OAuthStatePayload>(
-        { redirect_uri: '/dashboard', provider: 'github' },
-        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 },
+        createStatePayload(baseUrl),
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
       );
       const pkceCookie = createSignedState<OAuthPkcePayload>(
         {
           state: 'different-state',
           provider: 'github',
-          code_verifier: 'test-code-verifier',
+          code_verifier: 'test-code-verifier'
         },
-        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 },
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
       );
       const callbackUrl = new URL('/auth/github/callback', baseUrl);
       callbackUrl.searchParams.set('code', 'callback-code');
@@ -233,8 +280,8 @@ describe('OAuth routes', () => {
       const response = await request(callbackUrl.toString(), {
         Cookie: [
           `oauth_state=${encodeURIComponent(stateCookie)}`,
-          `oauth_pkce=${encodeURIComponent(pkceCookie)}`,
-        ].join('; '),
+          `oauth_pkce=${encodeURIComponent(pkceCookie)}`
+        ].join('; ')
       });
 
       expect(response.statusCode).toBe(302);
@@ -250,15 +297,15 @@ describe('OAuth routes', () => {
       const fetchMock = jest.fn();
       global.fetch = fetchMock as unknown as typeof fetch;
       const stateCookie = createSignedState<OAuthStatePayload>(
-        { redirect_uri: '/dashboard', provider: 'github' },
-        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 },
+        createStatePayload(baseUrl),
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
       );
       const callbackUrl = new URL('/auth/google/callback', baseUrl);
       callbackUrl.searchParams.set('code', 'callback-code');
       callbackUrl.searchParams.set('state', stateCookie);
 
       const response = await request(callbackUrl.toString(), {
-        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`,
+        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`
       });
 
       expect(response.statusCode).toBe(302);
@@ -271,20 +318,139 @@ describe('OAuth routes', () => {
     });
   });
 
+  it('rejects callback state bound to another database', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const fetchMock = jest.fn();
+      global.fetch = fetchMock as unknown as typeof fetch;
+      const stateCookie = createSignedState<OAuthStatePayload>(
+        createStatePayload(baseUrl, 'github', {
+          database_id: '00000000-0000-4000-8000-000000000099'
+        }),
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
+      );
+      const callbackUrl = new URL('/auth/github/callback', baseUrl);
+      callbackUrl.searchParams.set('code', 'callback-code');
+      callbackUrl.searchParams.set('state', stateCookie);
+
+      const response = await request(callbackUrl.toString(), {
+        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`
+      });
+
+      expect(response.statusCode).toBe(302);
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(authQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('rejects callback state bound to another API', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const fetchMock = jest.fn();
+      global.fetch = fetchMock as unknown as typeof fetch;
+      const stateCookie = createSignedState<OAuthStatePayload>(
+        createStatePayload(baseUrl, 'github', {
+          api_id: '00000000-0000-4000-8000-000000000099'
+        }),
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
+      );
+      const callbackUrl = new URL('/auth/github/callback', baseUrl);
+      callbackUrl.searchParams.set('code', 'callback-code');
+      callbackUrl.searchParams.set('state', stateCookie);
+
+      const response = await request(callbackUrl.toString(), {
+        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`
+      });
+
+      expect(response.statusCode).toBe(302);
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(authQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('rejects callback state bound to another origin', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const fetchMock = jest.fn();
+      global.fetch = fetchMock as unknown as typeof fetch;
+      const stateCookie = createSignedState<OAuthStatePayload>(
+        createStatePayload(baseUrl, 'github', {
+          origin: 'https://other.example.test'
+        }),
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
+      );
+      const callbackUrl = new URL('/auth/github/callback', baseUrl);
+      callbackUrl.searchParams.set('code', 'callback-code');
+      callbackUrl.searchParams.set('state', stateCookie);
+
+      const response = await request(callbackUrl.toString(), {
+        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`
+      });
+
+      expect(response.statusCode).toBe(302);
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(authQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('only requires the state secret when an OAuth flow starts', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const providersResponse = await request(`${baseUrl}/auth/providers`);
+      expect(providersResponse.statusCode).toBe(200);
+      expect(JSON.parse(providersResponse.body)).toEqual({
+        providers: ['github']
+      });
+
+      const beginResponse = await request(`${baseUrl}/auth/github`);
+      expect(beginResponse.statusCode).toBe(302);
+      const redirect = new URL(beginResponse.headers.location!);
+      expect(redirect.searchParams.get('error')).toBe('OAUTH_INIT_FAILED');
+      expect(getSetCookieValues(beginResponse.headers)).toHaveLength(0);
+    }, null);
+  });
+
+  it('reports provider metadata failures instead of silently returning no providers', async () => {
+    await withOAuthServer(
+      async (baseUrl) => {
+        const response = await request(`${baseUrl}/auth/providers`);
+
+        expect(response.statusCode).toBe(500);
+        expect(JSON.parse(response.body)).toEqual({
+          error: 'OAUTH_CONFIGURATION_ERROR'
+        });
+      },
+      OAUTH_STATE_SECRET,
+      () => {
+        const context = createConstructiveContext();
+        context.useModule.mockRejectedValue(
+          new Error('internal secrets scope mismatch')
+        );
+        return context;
+      }
+    );
+  });
+
   it('uses the identity function schema for successful sign-up callbacks', async () => {
     await withOAuthServer(async (baseUrl) => {
-      const beginResponse = await request(`${baseUrl}/auth/github?redirect_uri=%2Fdashboard`);
+      const beginResponse = await request(
+        `${baseUrl}/auth/github?redirect_uri=%2Fdashboard`
+      );
       const setCookies = getSetCookieValues(beginResponse.headers);
       const stateCookie = readCookie(setCookies, 'oauth_state');
       const pkceCookie = readCookie(setCookies, 'oauth_pkce');
       const pkcePayload = verifySignedState<OAuthPkcePayload>(pkceCookie, {
-        secret: OAUTH_STATE_SECRET,
+        secret: OAUTH_STATE_SECRET
       });
       expect(pkcePayload).toBeTruthy();
 
       global.fetch = jest.fn(async (url: string | URL, init?: RequestInit) => {
         const urlString = url.toString();
-        if (urlString === 'https://github.example.test/login/oauth/access_token') {
+        if (
+          urlString === 'https://github.example.test/login/oauth/access_token'
+        ) {
           const body = JSON.parse(init?.body as string);
           expect(body.code_verifier).toBe(pkcePayload!.code_verifier);
           return {
@@ -292,9 +458,9 @@ describe('OAuth routes', () => {
             status: 200,
             json: jest.fn().mockResolvedValue({
               access_token: 'provider-access-token',
-              token_type: 'bearer',
+              token_type: 'bearer'
             }),
-            text: jest.fn(),
+            text: jest.fn()
           } as unknown as Response;
         }
         if (urlString === 'https://github.example.test/api/v3/user') {
@@ -305,9 +471,9 @@ describe('OAuth routes', () => {
               id: 12345,
               login: 'octocat',
               email: 'octocat@example.test',
-              name: 'Octo Cat',
+              name: 'Octo Cat'
             }),
-            text: jest.fn(),
+            text: jest.fn()
           } as unknown as Response;
         }
         if (urlString === 'https://github.example.test/api/v3/user/emails') {
@@ -318,10 +484,10 @@ describe('OAuth routes', () => {
               {
                 email: 'octocat@example.test',
                 primary: true,
-                verified: true,
-              },
+                verified: true
+              }
             ]),
-            text: jest.fn(),
+            text: jest.fn()
           } as unknown as Response;
         }
         throw new Error(`Unexpected fetch URL: ${urlString}`);
@@ -329,9 +495,9 @@ describe('OAuth routes', () => {
       authQueryMock.mockResolvedValueOnce({
         rows: [
           {
-            access_token: 'constructive-session-token',
-          },
-        ],
+            access_token: 'constructive-session-token'
+          }
+        ]
       });
 
       const callbackUrl = new URL('/auth/github/callback', baseUrl);
@@ -340,20 +506,20 @@ describe('OAuth routes', () => {
       const callbackResponse = await request(callbackUrl.toString(), {
         Cookie: [
           `oauth_state=${encodeURIComponent(stateCookie)}`,
-          `oauth_pkce=${encodeURIComponent(pkceCookie)}`,
-        ].join('; '),
+          `oauth_pkce=${encodeURIComponent(pkceCookie)}`
+        ].join('; ')
       });
 
       expect(callbackResponse.statusCode).toBe(302);
       expect(callbackResponse.headers.location).toBe('/dashboard');
       expect(authQueryMock).toHaveBeenCalledTimes(1);
       expect(authQueryMock.mock.calls[0][0]).toContain(
-        'constructive_auth_private.sign_up_identity',
+        'constructive_auth_private.sign_up_identity'
       );
       expect(
         getSetCookieValues(callbackResponse.headers).some((cookie) =>
-          cookie.startsWith('constructive_session='),
-        ),
+          cookie.startsWith('constructive_session=')
+        )
       ).toBe(true);
     });
   });

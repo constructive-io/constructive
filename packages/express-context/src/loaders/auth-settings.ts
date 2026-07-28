@@ -46,10 +46,20 @@ async function discoverAuthSettingsTable(
   }>(AUTH_SETTINGS_DISCOVERY_SQL, [databaseId]);
   const resolved = discovery.rows[0];
   if (!resolved) return null;
+  if (
+    typeof resolved.schema_name !== 'string' ||
+    resolved.schema_name.length === 0 ||
+    typeof resolved.table_name !== 'string' ||
+    resolved.table_name.length === 0
+  ) {
+    throw new Error(
+      `invalid auth settings table metadata for database ${databaseId}`
+    );
+  }
 
   return {
     schemaName: resolved.schema_name,
-    tableName: resolved.table_name,
+    tableName: resolved.table_name
   };
 }
 
@@ -112,7 +122,7 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> =
         captchaSiteKey: row.captcha_site_key,
         oauthStateMaxAge: row.oauth_state_max_age,
         oauthRequireVerifiedEmail: row.oauth_require_verified_email,
-        oauthErrorRedirectPath: row.oauth_error_redirect_path,
+        oauthErrorRedirectPath: row.oauth_error_redirect_path
       };
-    },
+    }
   });
