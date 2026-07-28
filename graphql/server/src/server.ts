@@ -37,12 +37,12 @@ import { flush, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
+import { createOAuthRoutes } from './middleware/oauth';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { getRoutingSchema } from './middleware/routing';
-import { createOAuthRoutes } from './middleware/oauth';
 
 const log = new Logger('server');
 

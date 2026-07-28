@@ -103,11 +103,11 @@ export function buildContext(
     fn: (client: any) => Promise<T>,
     pgSettingsOverrides?: Record<string, string>
   ) =>
-    withPgClientFn(
-      tenantPool,
-      pgSettingsOverrides ? { ...pgSettings, ...pgSettingsOverrides } : pgSettings,
-      fn
-    );
+      withPgClientFn(
+        tenantPool,
+        pgSettingsOverrides ? { ...pgSettings, ...pgSettingsOverrides } : pgSettings,
+        fn
+      );
   const useModule = createUseModule(opts.loaders, loaderCtx);
 
   // Lazy-initialized billing client (cached per request)

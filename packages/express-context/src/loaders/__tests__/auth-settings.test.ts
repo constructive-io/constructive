@@ -61,7 +61,14 @@ describe('authSettingsLoader', () => {
       expect.stringContaining('sm.auth_settings_table_id'),
       ['hub-database-id']
     );
-    expect(query.mock.calls[0][0]).toContain('metaschema.schema_and_table');
+    expect(query.mock.calls[0][0]).toContain('metaschema_public.table');
+    expect(query.mock.calls[0][0]).toContain('metaschema_public.schema');
+    expect(query.mock.calls[0][0]).toContain(
+      't.database_id = sm.database_id'
+    );
+    expect(query.mock.calls[0][0]).toContain(
+      's.database_id = sm.database_id'
+    );
     expect(query.mock.calls[0][0]).not.toContain('sm.auth_settings_table_name');
     expect(query.mock.calls[0][0]).not.toContain('sm.auth_settings_table AS');
     expect(query.mock.calls[1][0]).toContain(

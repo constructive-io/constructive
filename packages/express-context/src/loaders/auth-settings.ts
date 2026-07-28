@@ -20,11 +20,14 @@ import type { LoaderContext, ModuleLoader } from './types';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const AUTH_SETTINGS_DISCOVERY_SQL = `
-  SELECT resolved.schema_name, resolved.table_name
+  SELECT s.schema_name, t.name AS table_name
   FROM metaschema_modules_public.sessions_module sm
-  CROSS JOIN LATERAL metaschema.schema_and_table(
-    sm.auth_settings_table_id
-  ) resolved
+  JOIN metaschema_public.table t
+    ON t.id = sm.auth_settings_table_id
+    AND t.database_id = sm.database_id
+  JOIN metaschema_public.schema s
+    ON s.id = t.schema_id
+    AND s.database_id = sm.database_id
   WHERE sm.database_id = $1
   LIMIT 1
 `;

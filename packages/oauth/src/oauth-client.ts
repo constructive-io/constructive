@@ -1,3 +1,4 @@
+import { resolveOAuthProvider } from './provider-resolver';
 import { getProvider, selectGitHubEmail } from './providers';
 import {
   AuthorizationUrlParams,
@@ -9,9 +10,8 @@ import {
   ResolvedOAuthProvider,
   TokenResponse,
 } from './types';
-import { resolveOAuthProvider } from './provider-resolver';
-import { generateState } from './utils/state';
 import { deriveCodeChallenge, generateCodeVerifier } from './utils/pkce';
+import { generateState } from './utils/state';
 
 const AUTHORIZATION_PARAM_RESERVED_KEYS = new Set([
   'client_id',

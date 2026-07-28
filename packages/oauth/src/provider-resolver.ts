@@ -1,10 +1,10 @@
 import { getProvider } from './providers';
 import {
+  createOAuthError,
   OAuthProviderConfig,
   OAuthProviderResolvedConfig,
   OAuthProviderRuntimeConfig,
   ResolvedOAuthProvider,
-  createOAuthError,
 } from './types';
 import { requireProviderConfigString } from './utils/config';
 
@@ -49,10 +49,10 @@ export function resolveOAuthProvider(ctx: {
     tokenEndpointAuthMethod === 'client_secret_post' ||
     tokenEndpointAuthMethod === 'client_secret_basic'
       ? requireProviderConfigString(
-          runtimeConfig.clientSecret,
-          'clientSecret',
-          ctx.providerId
-        )
+        runtimeConfig.clientSecret,
+        'clientSecret',
+        ctx.providerId
+      )
       : runtimeConfig.clientSecret || undefined;
 
   const resolvedConfig: OAuthProviderResolvedConfig = {

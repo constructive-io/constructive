@@ -1,9 +1,9 @@
 import { createOAuthClient } from '../src/oauth-client';
 import { resolveOAuthProvider } from '../src/provider-resolver';
-import { GITHUB_EMAILS_URL, getProvider, getProviderIds } from '../src/providers';
-import { generateState, verifyState } from '../src/utils/state';
-import { createSignedState, verifySignedState } from '../src/utils/signed-state';
+import { getProvider, getProviderIds,GITHUB_EMAILS_URL } from '../src/providers';
 import { deriveCodeChallenge } from '../src/utils/pkce';
+import { createSignedState, verifySignedState } from '../src/utils/signed-state';
+import { generateState, verifyState } from '../src/utils/state';
 
 const originalFetch = global.fetch;
 
