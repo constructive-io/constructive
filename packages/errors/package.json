@@ -1,8 +1,8 @@
 {
-  "name": "@constructive-io/graphql-query",
-  "version": "4.5.5",
-  "description": "Constructive GraphQL Query",
+  "name": "@constructive-io/errors",
+  "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
+  "description": "Canonical Constructive error system: registry, codes, i18n messages, and cross-source (PostgreSQL/GraphQL/client) parsing. Zero runtime dependencies.",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -25,34 +25,20 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
-  "dependencies": {
-    "@0no-co/graphql.web": "^1.1.2",
-    "@constructive-io/errors": "workspace:^",
-    "@constructive-io/fetch": "^1.1.1",
-    "@constructive-io/graphql-types": "workspace:^",
-    "ajv": "^8.20.0",
-    "gql-ast": "workspace:^",
-    "grafast": "1.0.2",
-    "graphile-build-pg": "5.0.2",
-    "graphile-config": "1.0.1",
-    "graphile-settings": "workspace:^",
-    "graphql": "16.13.0",
-    "inflection": "^3.0.0",
-    "inflekt": "^0.7.1",
-    "lru-cache": "^11.2.7",
-    "postgraphile": "5.0.3"
-  },
   "keywords": [
-    "query",
-    "builder",
-    "graphql",
+    "errors",
+    "error-codes",
+    "i18n",
     "constructive",
-    "database"
+    "postgresql",
+    "graphql"
   ],
   "devDependencies": {
-    "makage": "^0.3.0"
+    "@types/node": "^22.19.11",
+    "makage": "^0.3.0",
+    "ts-node": "^10.9.2"
   }
 }

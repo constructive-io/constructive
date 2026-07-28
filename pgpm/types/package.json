@@ -29,6 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@constructive-io/errors": "workspace:^",
     "pg-env": "workspace:^"
   },
   "keywords": [

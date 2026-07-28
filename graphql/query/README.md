@@ -28,7 +28,7 @@ This package is the **canonical source** for PostGraphile query generation logic
 - **Mutation generators** — `buildPostGraphileCreate`, `buildPostGraphileUpdate`, `buildPostGraphileDelete`
 - **Introspection pipeline** — `inferTablesFromIntrospection` to convert a GraphQL schema into `CleanTable` metadata
 - **AST builders** — low-level `getAll`, `getMany`, `getOne`, `createOne`, `patchOne`, `deleteOne`
-- **Client utilities** — `TypedDocumentString`, `execute`, `DataError` for type-safe execution and error handling
+- **Client utilities** — `TypedDocumentString`, `execute`, and `@constructive-io/errors` re-exports (`ConstructiveError`, `parseGraphQLError`) for type-safe execution and error handling
 - **Naming helpers** — server-aware inflection functions that respect PostGraphile's schema naming
 
 All modules are **browser-safe** (no Node.js APIs). `@constructive-io/graphql-codegen` depends on this package for the core logic and adds Node.js-only features (CLI, file output, watch mode).
@@ -329,20 +329,36 @@ const { data, errors } = await client.execute(query, {
 
 ## Error Handling
 
+Error handling is backed by [`@constructive-io/errors`](../../packages/errors), the
+single source of truth for error codes, their public/internal class, message
+copy (i18n), and cross-source parsing. There is no separate client-side error
+catalog or message string-matching — the client re-exports the canonical
+`ConstructiveError`, `parse`, `format`, and helpers.
+
 ```ts
-import { DataError, parseGraphQLError, DataErrorType } from '@constructive-io/graphql-query';
+import {
+  ConstructiveError,
+  parseGraphQLError,
+  format,
+  isRetryable,
+} from '@constructive-io/graphql-query';
 
 try {
   const result = await client.execute(createQuery, { input: { user: { name: 'Alice' } } });
   if (result.errors) {
+    // Normalize any error into a ConstructiveError (machine code + context + class).
     const error = parseGraphQLError(result.errors[0]);
-    if (error.type === DataErrorType.UNIQUE_VIOLATION) {
-      console.log('Duplicate entry:', error.constraintName);
+    if (error.code === 'UNIQUE_VIOLATION') {
+      console.log('Duplicate entry:', error.context.constraint);
     }
   }
 } catch (err) {
-  if (err instanceof DataError) {
-    console.log(err.type, err.message);
+  if (err instanceof ConstructiveError) {
+    // Localized, user-facing copy for public codes; retry hint for transport errors.
+    console.log(err.code, format(err.code, err.context));
+    if (isRetryable(err)) {
+      // network/timeout/rate-limit — safe to retry
+    }
   }
 }
 ```
@@ -441,8 +457,8 @@ GraphQL Schema (introspection or _meta)
 | `TypedDocumentString` | Type-safe GraphQL document wrapper (compatible with codegen client) |
 | `createGraphQLClient(options)` | Create a typed GraphQL client |
 | `execute(url, query, variables, options?)` | Execute a GraphQL query |
-| `DataError` | Structured error class with PG SQLSTATE classification |
-| `parseGraphQLError(error)` | Parse raw GraphQL error into `DataError` |
+| `ConstructiveError` | Canonical error class (`code`, `context`, `class`, `http`) from `@constructive-io/errors` |
+| `parseGraphQLError(error)` | Parse any error (pg / GraphQL / message / SQLSTATE) into a `ConstructiveError` |
 
 ### Naming Helpers
 

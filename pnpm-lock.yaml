@@ -1752,6 +1752,9 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
         version: 1.2.0(graphql@16.13.0)
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       '@constructive-io/fetch':
         specifier: ^1.1.1
         version: 1.1.1
@@ -1893,6 +1896,9 @@ importers:
       '@constructive-io/csrf':
         specifier: workspace:^
         version: link:../../packages/csrf/dist
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       '@constructive-io/express-context':
         specifier: workspace:^
         version: link:../../packages/express-context/dist
@@ -2386,6 +2392,19 @@ importers:
       makage:
         specifier: ^0.3.0
         version: 0.3.0
+    publishDirectory: dist
+
+  packages/errors:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.11
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/csrf:
@@ -3020,6 +3039,9 @@ importers:
 
   pgpm/types:
     dependencies:
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       pg-env:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
