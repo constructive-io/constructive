@@ -1,0 +1,315 @@
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+
+import { api, auth, modules } from '@constructive-io/sdk';
+
+import { probeDatabase } from './db-probe';
+import { DEFAULT_DATA_TOKEN_SKEW_MS, getHost } from './host';
+
+const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
+const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';
+
+export type ApiClient = ReturnType<typeof api.createClient>;
+export type ModulesClient = ReturnType<typeof modules.createClient>;
+
+export type ProjectContext = {
+  api: ApiClient;
+  modules: ModulesClient;
+  databaseId: string;
+  schemaId: string;
+  ownerId: string | undefined;
+  apiEndpoint: string;
+  modulesEndpoint: string;
+  databaseName: string;
+  accessToken: string;
+  // Per-DB data/CRUD endpoint (api-<db>.localhost). Empty when DATABASE_NAME is
+  // absent — record tools need it; schema tools use `api` and ignore it.
+  dataEndpoint: string;
+};
+
+export type ProjectContextFailureCode =
+  | 'no-env'
+  | 'missing-credentials'
+  | 'db-missing'
+  | 'account-mismatch'
+  | 'backend-unreachable'
+  | 'schema-unresolved';
+
+export type ResolveResult = {
+  context: ProjectContext | null;
+  reason: string;
+  code?: ProjectContextFailureCode;
+};
+
+function parseEnv(source: string): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const rawLine of source.split('\n')) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    env[key] = value;
+  }
+  return env;
+}
+
+export type ResolveOptions = {
+  /** Which plane the context is for. Ownership gates the control plane only:
+   *  schema editing and provisioning act under the signed-in account, so a
+   *  foreign-owned binding is blocked ('account-mismatch'). The data plane
+   *  (real rows via app end-user tokens) never checks desktop-account
+   *  ownership — a live foreign-owned database serves data fine, exactly as
+   *  the app itself does in the Preview. */
+  plane?: 'control' | 'data';
+};
+
+export async function resolveProjectContext(
+  cwd: string,
+  options: ResolveOptions = {},
+): Promise<ResolveResult> {
+  let source: string;
+  try {
+    source = await readFile(path.join(cwd, '.env'), 'utf8');
+  } catch {
+    return {
+      context: null,
+      reason:
+        'No .env found in the project. Provision a Constructive database first (scaffold the project), then retry.',
+      code: 'no-env',
+    };
+  }
+
+  const env = parseEnv(source);
+  const accessToken = env.ACCESS_TOKEN;
+  const databaseId = env.DATABASE_ID;
+
+  if (!accessToken || !databaseId) {
+    return {
+      context: null,
+      reason:
+        'Project is not connected to a Constructive database yet (missing ACCESS_TOKEN/DATABASE_ID in .env). Provision the database first, then retry.',
+      code: 'missing-credentials',
+    };
+  }
+
+  // A per-project .env pin wins for the DATA plane (the .env key belongs to
+  // whatever backend wrote it); otherwise fall back to the app's backend-config
+  // store (environment-aware) so app + harness share one endpoint source.
+  const host = getHost();
+  const backend = host.backendConfig();
+  const apiEndpoint = env.API_ENDPOINT || backend?.apiEndpoint || DEFAULT_API_ENDPOINT;
+  const modulesEndpoint = env.MODULES_ENDPOINT || backend?.modulesEndpoint || DEFAULT_MODULES_ENDPOINT;
+
+  // The whole control plane (binding probe, schema resolution, blueprint/schema
+  // tools) authenticates with the ACCOUNT bearer: the platform api rejects
+  // per-database keys, so the project ACCESS_TOKEN can never act on metaschema
+  // surfaces. The .env key stays in the context for the data plane only. The
+  // bearer is only ever sent to the app-configured backend — never a
+  // .env-pinned endpoint, which an untrusted cloned project controls.
+  const controlApiEndpoint = backend?.apiEndpoint || DEFAULT_API_ENDPOINT;
+  const controlModulesEndpoint = backend?.modulesEndpoint || DEFAULT_MODULES_ENDPOINT;
+  const account = host.account();
+  const accountBearer = account?.apiKey ?? account?.accessToken;
+  if (!accountBearer) {
+    return {
+      context: null,
+      reason:
+        'No usable account credential to reach the Constructive control plane. Sign in to the app, then retry.',
+      code: 'missing-credentials',
+    };
+  }
+  const controlHeaders = { Authorization: `Bearer ${accountBearer}` };
+
+  const apiClient = api.createClient({ endpoint: controlApiEndpoint, headers: controlHeaders });
+
+  // Always probe the bound database — the .env stamp proves the project WAS
+  // bound, never that the database still exists (backend refresh, deletion,
+  // revoked key). The probe is the single source of binding health.
+  const probe = await probeDatabase({
+    endpoint: controlApiEndpoint,
+    bearer: accountBearer,
+    databaseId,
+  });
+  if (probe.outcome === 'unreachable') {
+    return {
+      context: null,
+      reason: `Could not reach the Constructive backend at ${controlApiEndpoint} (${probe.detail}). Check it is running, then retry.`,
+      code: 'backend-unreachable',
+    };
+  }
+  if (probe.outcome === 'missing') {
+    return {
+      context: null,
+      reason: `The bound database (DATABASE_ID=${databaseId}) no longer exists on this backend. Re-provision with provision_database (reprovision: true) — the schema is rebuilt from the project; records do not carry over.`,
+      code: 'db-missing',
+    };
+  }
+
+  // Schemas are account-scoped: a live binding under a different account is
+  // never shown in the Schemas tab or written to by the agent. The project's
+  // local blueprint survives account changes, so recovery is a reprovision
+  // under the signed-in account. Owner truth comes from the probe (backend),
+  // not the .env stamp. Data-plane resolution skips this gate — see
+  // ResolveOptions.
+  const sessionUserId = account?.userId;
+  if (
+    options.plane !== 'data' &&
+    probe.ownerId &&
+    sessionUserId &&
+    probe.ownerId !== sessionUserId
+  ) {
+    return {
+      context: null,
+      reason: `The bound database (DATABASE_ID=${databaseId}) was provisioned under a different account than the one signed in. Re-provision with provision_database (reprovision: true) to rebuild it under this account — the schema is rebuilt from the project; records do not carry over.`,
+      code: 'account-mismatch',
+    };
+  }
+
+  const databaseName = env.DATABASE_NAME || probe.name || '';
+  const ownerId = probe.ownerId || env.OWNER_ID || undefined;
+  const dataEndpoint = databaseName
+    ? deriveSubdomainEndpoint(apiEndpoint, `api-${databaseName}`)
+    : '';
+
+  const schemaId = await resolveSchemaId(apiClient, databaseId);
+  if (!schemaId) {
+    return {
+      context: null,
+      reason:
+        'Could not resolve a schema (app_public/public) for this database. The database may not be fully provisioned yet.',
+      code: 'schema-unresolved',
+    };
+  }
+
+  return {
+    context: {
+      api: apiClient,
+      modules: modules.createClient({ endpoint: controlModulesEndpoint, headers: controlHeaders }),
+      databaseId,
+      schemaId,
+      ownerId,
+      apiEndpoint,
+      modulesEndpoint,
+      databaseName,
+      accessToken,
+      dataEndpoint,
+    },
+    reason: '',
+  };
+}
+
+const NEEDS_AUTH_REASON =
+  'Not signed in to the app database yet. Sign in from the Sheets tab, or open the Preview and sign in to your app, then try again.';
+
+export type DataTokenResult = { token?: string; userId?: string; reason?: string };
+
+// Resolve a data-plane token for record operations: serve the broker's active
+// account while valid, otherwise harvest the token the user created by signing
+// into their app in the Preview and adopt it into the broker. Also returns the
+// signed-in user's id (used to scope rows by entityId). Returns a reason (no
+// token) when neither source has a valid token — the caller surfaces a sign-in
+// prompt.
+export async function resolveDataToken(context: ProjectContext): Promise<DataTokenResult> {
+  const host = getHost();
+  const broker = host.dataAuthBroker;
+  const active = broker?.getActiveToken(context.databaseId);
+  if (active) return { token: active.token, userId: active.userId };
+
+  const preview = host.previewToken ? await host.previewToken() : null;
+  if (!preview) return { reason: NEEDS_AUTH_REASON };
+  if (broker?.isInvalidToken(context.databaseId, preview.accessToken)) {
+    return { reason: NEEDS_AUTH_REASON };
+  }
+
+  const parsed = preview.accessTokenExpiresAt ? Date.parse(preview.accessTokenExpiresAt) : NaN;
+  const expiresAt = Number.isNaN(parsed) ? Date.now() + 60 * 60 * 1000 : parsed;
+  const skewMs = host.dataTokenSkewMs ?? DEFAULT_DATA_TOKEN_SKEW_MS;
+  if (expiresAt <= Date.now() + skewMs) return { reason: NEEDS_AUTH_REASON };
+
+  broker?.adoptToken(context.databaseId, {
+    userId: preview.userId,
+    token: preview.accessToken,
+    expiresAt,
+    origin: 'harvest',
+  });
+  return { token: preview.accessToken, userId: preview.userId };
+}
+
+// Per-DB endpoints are deterministic on the provisioning subdomain (= DATABASE_NAME):
+// each plane swaps the first host label of its control-plane endpoint
+// (e.g. api.localhost -> api-myapp.localhost, auth.localhost -> auth-myapp.localhost).
+export function deriveSubdomainEndpoint(baseEndpoint: string, firstLabel: string): string {
+  try {
+    const url = new URL(baseEndpoint);
+    const labels = url.hostname.split('.');
+    labels[0] = firstLabel;
+    url.hostname = labels.join('.');
+    return url.toString();
+  } catch {
+    return '';
+  }
+}
+
+// The backend hierarchy is org -> db -> tables; the owning org is the auth-plane
+// user the database's ownerId points at. Best-effort display lookup only —
+// binding health never depends on it. Authenticates with the account bearer
+// against the app-configured auth endpoint (the platform rejects per-database
+// keys, and the bearer never goes to a .env-pinned endpoint).
+export async function resolveOrgName(ownerId: string): Promise<string | undefined> {
+  try {
+    const host = getHost();
+    const account = host.account();
+    const bearer = account?.apiKey ?? account?.accessToken;
+    if (!bearer) return undefined;
+    const backend = host.backendConfig();
+    const authEndpoint = deriveSubdomainEndpoint(
+      backend?.apiEndpoint || DEFAULT_API_ENDPOINT,
+      'auth',
+    );
+    if (!authEndpoint) return undefined;
+    const client = auth.createClient({
+      endpoint: authEndpoint,
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    const result = await client.user
+      .findMany({
+        select: { displayName: true, username: true },
+        where: { id: { equalTo: ownerId } },
+      })
+      .execute();
+    if (!result.ok) return undefined;
+    const node = (result.data.users?.nodes ?? [])[0];
+    return node?.displayName || node?.username || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function resolveSchemaId(
+  apiClient: ApiClient,
+  databaseId: string,
+): Promise<string | undefined> {
+  const result = await apiClient.schema
+    .findMany({
+      select: { id: true, name: true },
+      where: { databaseId: { equalTo: databaseId } },
+    })
+    .execute();
+
+  if (!result.ok) return undefined;
+
+  const nodes = (result.data.schemas?.nodes ?? []).filter((s) => Boolean(s && s.id));
+  const appPublic = nodes.find((s) => s.name === 'app_public');
+  if (appPublic) return appPublic.id;
+  const pub = nodes.find((s) => s.name === 'public');
+  if (pub) return pub.id;
+  return nodes[0]?.id;
+}

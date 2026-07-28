@@ -1,0 +1,50 @@
+{
+  "name": "@agentic-kit/pi",
+  "version": "0.1.0",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "description": "Pi adapter for agentic-kit — the Constructive typed db tools (provision, blueprint, codegen, records, policies, templates) and confirm gate as a pi coding-agent extension",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@agentic-kit/harness": "workspace:^",
+    "@constructive-io/graphql-query": "^4.5.3",
+    "@constructive-io/sdk": "^1.5.3",
+    "zod": "^4.4.3"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.79.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.79.6",
+    "typebox": "^1.0.0"
+  },
+  "keywords": [
+    "agentic-kit",
+    "pi",
+    "coding-agent",
+    "constructive"
+  ]
+}
