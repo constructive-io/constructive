@@ -18,8 +18,9 @@ import {
   mergeEnv,
   provisionEnvVars,
 } from '../provision-database/env-file';
-import { DEFAULT_PROVISION_MODULES } from '../provision-database/modules';
+import { loadProvisionManifest } from '../provision-database/manifest';
 import { applySqlFixups } from '../provision-database/pg-fixups';
+import { type ProvisionOverlay, resolveProvisionModules } from '../provision-database/resolve';
 
 const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';
@@ -233,6 +234,24 @@ export const provisionDatabaseTool: ToolDefinition<
       }),
     );
 
+    // Resolve the module set: pinned base preset from node-type-registry, then
+    // ordered overlays (host default < project-local provision.json). No list is
+    // hand-copied here; overlays are pure data. A bad preset/manifest fails the
+    // run rather than provisioning a wrong module set.
+    let modules;
+    try {
+      const layers: ProvisionOverlay[] = [];
+      const hostOverlay = await host.provisionOverlay?.();
+      if (hostOverlay) layers.push(hostOverlay);
+      const projectOverlay = await loadProvisionManifest(ctx.cwd);
+      if (projectOverlay) layers.push(projectOverlay);
+      modules = resolveProvisionModules(layers);
+    } catch (err) {
+      return fail(
+        `Cannot resolve provision modules: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
     const physicalDb = process.env.CONSTRUCTIVE_DB || 'constructive';
 
     // Provision on the MODULES endpoint: createDatabaseProvisionModule creates
@@ -249,7 +268,7 @@ export const provisionDatabaseTool: ToolDefinition<
           databaseName,
           domain: provisionDomain(apiEndpoint),
           ownerId,
-          modules: DEFAULT_PROVISION_MODULES,
+          modules,
         }),
       ));
     } catch (err) {

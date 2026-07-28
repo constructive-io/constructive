@@ -67,9 +67,28 @@ export {
   getHost,
   type HostAccount,
   type HostBackendConfig,
+  type HostProvisionOverlay,
   type PiToolsHost,
   type PreviewToken,
 } from './host';
+export {
+  loadProvisionManifest,
+  parseProvisionManifest,
+  PROVISION_MANIFEST_FILE,
+  type ProvisionManifest,
+} from './provision-database/manifest';
+export {
+  allModulePresets,
+  DEFAULT_PROVISION_PRESET,
+  getModulePreset,
+  type ModulePreset,
+  type ProvisionModule,
+} from './provision-database/presets';
+export {
+  moduleKey,
+  type ProvisionOverlay,
+  resolveProvisionModules,
+} from './provision-database/resolve';
 export { toolSchema } from './tool-schema';
 export { createTemplatePreviewTables } from './tools/templates';
 
