@@ -8,12 +8,19 @@ import { materializeSkills } from '../src/skills/materialize';
 import { resolveSkills } from '../src/skills/overlay';
 import { DirectorySkillSource } from '../src/skills/source';
 
-function makeSkillDir(root: string, name: string, body: string, extra?: Record<string, string>) {
+function makeSkillDir(
+  root: string,
+  name: string,
+  body: string,
+  extra?: Record<string, string>,
+  requires?: string[]
+) {
   const dir = path.join(root, name);
   fs.mkdirSync(dir, { recursive: true });
+  const requiresLine = requires ? `requires: [${requires.join(', ')}]\n` : '';
   fs.writeFileSync(
     path.join(dir, 'SKILL.md'),
-    `---\nname: ${name}\ndescription: "${name} description"\n---\n\n${body}\n`
+    `---\nname: ${name}\ndescription: "${name} description"\n${requiresLine}---\n\n${body}\n`
   );
   for (const [rel, contents] of Object.entries(extra ?? {})) {
     const dest = path.join(dir, rel);
@@ -32,6 +39,17 @@ describe('frontmatter', () => {
 
   it('rejects files without frontmatter', () => {
     expect(() => parseFrontmatter('# no frontmatter')).toThrow(/frontmatter/);
+  });
+
+  it('parses requires as inline list, block list, or absent', () => {
+    expect(
+      parseFrontmatter('---\nname: a\ndescription: d\nrequires: [x, "y"]\n---\nbody').requires
+    ).toEqual(['x', 'y']);
+    expect(
+      parseFrontmatter('---\nname: a\ndescription: d\nrequires:\n  - x\n  - y\n---\nbody')
+        .requires
+    ).toEqual(['x', 'y']);
+    expect(parseFrontmatter('---\nname: a\ndescription: d\n---\nbody').requires).toEqual([]);
   });
 });
 
@@ -109,6 +127,38 @@ describe('overlay resolution + materialization', () => {
     fs.mkdirSync(path.join(target, 'stale-skill'), { recursive: true });
     materializeSkills(target, skills, {});
     expect(fs.existsSync(path.join(target, 'stale-skill'))).toBe(false);
+  });
+
+  it('pulls in `requires:` dependencies past include filters, transitively', async () => {
+    const base = path.join(tmp, 'base');
+    makeSkillDir(base, 'workflow', 'workflow body', undefined, ['security']);
+    makeSkillDir(base, 'security', 'security body', undefined, ['access-control']);
+    makeSkillDir(base, 'access-control', 'ac body');
+    makeSkillDir(base, 'unrelated', 'unrelated body');
+
+    const skills = await resolveSkills(
+      { sources: [{ name: 'base', include: ['workflow'] }] },
+      [new DirectorySkillSource('base', base)]
+    );
+    expect(skills.map((s) => s.name).sort()).toEqual(['access-control', 'security', 'workflow']);
+  });
+
+  it('never resurrects excluded skills and reports missing requires', async () => {
+    const base = path.join(tmp, 'base');
+    makeSkillDir(base, 'workflow', 'workflow body', undefined, ['security', 'not-shipped']);
+    makeSkillDir(base, 'security', 'security body');
+
+    const missing: Array<[string, string]> = [];
+    const skills = await resolveSkills(
+      { sources: [{ name: 'base', exclude: ['security'] }] },
+      [new DirectorySkillSource('base', base)],
+      { onMissingRequire: (skill, required) => missing.push([skill, required]) }
+    );
+    expect(skills.map((s) => s.name)).toEqual(['workflow']);
+    expect(missing.sort()).toEqual([
+      ['workflow', 'not-shipped'],
+      ['workflow', 'security'],
+    ]);
   });
 
   it('errors on unknown manifest source and missing directory', async () => {

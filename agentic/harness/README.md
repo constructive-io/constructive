@@ -50,7 +50,12 @@ the core owns everything host-neutral.
   - `DirectorySkillSource` — loads the agentskills.io layout
     (`<skill>/SKILL.md` + references/scripts).
   - `resolveSkills()` — last-write-wins merge across layers (hardened base →
-    team overlays → private known-gaps overlay).
+    team overlays → private known-gaps overlay), then transitive frontmatter
+    `requires:` expansion: a skill can declare skills it depends on
+    (`requires: [constructive-security]` or a YAML list) and they are pulled
+    in even when a layer's `include` filter omits them; explicit `exclude`
+    entries still win, and unresolvable requirements surface through
+    `onMissingRequire` instead of throwing.
   - `materializeSkills()` — writes the merged tree with `{{VAR}}`
     substitution (e.g. `HARNESS_TEMPLATES_DIR`).
 

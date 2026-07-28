@@ -17,6 +17,8 @@ export interface SkillFile {
 export interface HarnessSkill {
   name: string;
   description: string;
+  /** Skill names this skill depends on (frontmatter `requires:`). */
+  requires: string[];
   files: SkillFile[];
   /** Name of the manifest source layer this skill was resolved from. */
   sourceName: string;

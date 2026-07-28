@@ -1,7 +1,28 @@
 export interface ParsedSkillFrontmatter {
   name: string;
   description: string;
+  /** Skill names this skill depends on (frontmatter `requires:`). */
+  requires: string[];
   body: string;
+}
+
+function parseRequires(fm: string): string[] {
+  const inline = fm.match(/(?:^|\n)requires:\s*\[([^\]]*)\]/);
+  if (inline) {
+    return inline[1]
+      .split(',')
+      .map((s) => unquoteScalar(s.trim()) ?? '')
+      .filter(Boolean);
+  }
+  const block = fm.match(/(?:^|\n)requires:\s*\n((?:[ \t]+-[^\n]*\n?)+)/);
+  if (block) {
+    return block[1]
+      .split('\n')
+      .map((line) => line.replace(/^[ \t]+-\s*/, '').trim())
+      .map((s) => unquoteScalar(s) ?? '')
+      .filter(Boolean);
+  }
+  return [];
 }
 
 function unquoteScalar(value: string | undefined): string | undefined {
@@ -15,7 +36,7 @@ function unquoteScalar(value: string | undefined): string | undefined {
   return value;
 }
 
-/** Parse the minimal YAML frontmatter (`name`, `description`) of a SKILL.md. */
+/** Parse the minimal YAML frontmatter (`name`, `description`, optional `requires`) of a SKILL.md. */
 export function parseFrontmatter(raw: string): ParsedSkillFrontmatter {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
@@ -28,5 +49,5 @@ export function parseFrontmatter(raw: string): ParsedSkillFrontmatter {
   const description = unquoteScalar(descMatch?.[1]?.trim());
   if (!name) throw new Error('Skill frontmatter missing `name`');
   if (!description) throw new Error('Skill frontmatter missing `description`');
-  return { name, description, body };
+  return { name, description, requires: parseRequires(fm), body };
 }

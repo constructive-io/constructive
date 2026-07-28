@@ -36,10 +36,10 @@ export class DirectorySkillSource implements SkillSource {
       const skillMd = path.join(skillDir, 'SKILL.md');
       if (!fs.existsSync(skillMd)) continue;
       const raw = fs.readFileSync(skillMd, 'utf8');
-      const { name, description } = parseFrontmatter(raw);
+      const { name, description, requires } = parseFrontmatter(raw);
       const files: SkillFile[] = [{ relPath: 'SKILL.md', contents: raw }];
       collectExtraFiles(skillDir, '', files);
-      skills.push({ name, description, files, sourceName: this.name });
+      skills.push({ name, description, requires, files, sourceName: this.name });
     }
     return skills;
   }
