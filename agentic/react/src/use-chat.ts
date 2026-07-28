@@ -1,7 +1,7 @@
 import type { AgentEvent, AgentToolResult } from '@agentic-kit/agent';
 import { parseSSEStream } from '@agentic-kit/agent';
-import type { AssistantMessage, Message, ToolCallContent, Usage } from 'agentic-kit';
-import { createUserMessage } from 'agentic-kit';
+import type { AssistantMessage, Message, ToolCallContent, Usage } from '@agentic-kit/chat';
+import { createUserMessage } from '@agentic-kit/chat';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type ToolDecisionPendingEvent = Extract<

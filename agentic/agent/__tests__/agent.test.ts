@@ -12,7 +12,7 @@ import {
   type Message,
   type ModelDescriptor,
   type ToolCallContent,
-} from 'agentic-kit';
+} from '@agentic-kit/chat';
 
 import {
   Agent,

@@ -9,7 +9,7 @@ import {
   createAssistantMessageEventStream,
   type ModelDescriptor,
   type StreamOptions,
-} from 'agentic-kit';
+} from '@agentic-kit/chat';
 
 import { Agent, type AgentEvent, type AgentTool, parseSSEStream } from '../src';
 

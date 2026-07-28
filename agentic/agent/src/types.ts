@@ -9,7 +9,7 @@ import type {
   ToolDefinition,
   ToolResultMessage,
   Usage,
-} from 'agentic-kit';
+} from '@agentic-kit/chat';
 
 export interface AgentToolResult<TDetails = unknown> {
   content: ToolResultMessage<TDetails>['content'];

@@ -1,4 +1,4 @@
-import type { JsonSchema } from 'agentic-kit';
+import type { JsonSchema } from '@agentic-kit/chat';
 
 export class DecisionValidationError extends Error {
   readonly toolName: string;
