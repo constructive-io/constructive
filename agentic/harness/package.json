@@ -31,7 +31,8 @@
   "dependencies": {
     "appstash": "^0.7.0",
     "semver": "^7.7.2",
-    "tar": "^7.4.3"
+    "tar": "^7.4.3",
+    "typebox": "~1.1.38"
   },
   "devDependencies": {
     "@types/semver": "^7.7.0"

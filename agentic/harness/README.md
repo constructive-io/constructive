@@ -54,11 +54,25 @@ the core owns everything host-neutral.
   - `materializeSkills()` — writes the merged tree with `{{VAR}}`
     substitution (e.g. `HARNESS_TEMPLATES_DIR`).
 
+- Tool-call gating (`src/gating/`, extracted from `constructive-desktop`):
+  - `createConfirmGate()` — host-neutral confirm gate for the mutating db
+    tools: per-run decline memory (a declined call re-issued with equivalent
+    args is auto-blocked without re-prompting), runnable-project/token
+    short-circuits, and blueprint/records/policy previews. Hosts inject a
+    `GateHost` (confirm UI + skip notification); the pi adapter maps pi's
+    `tool_call` extension event onto `GateToolCallEvent`/`GateResult` 1:1.
+  - `buildConfirmPrompt()` / `MUTATING_DB_TOOLS` / `ConfirmPreview` — the
+    per-tool confirmation copy and structured previews hosts render.
+- Blueprint domain logic (`src/blueprint/`): `expandBlueprintDefaults()`
+  (derive Data* nodes, default grants, policy field defaults),
+  `BlueprintDefinitionSchema` (typebox), field type/default parsing, and the
+  vendored policy-provisioning config tables.
+
 ## Roadmap (per #1273)
 
 - Typed db-tools (`provision_database`, `provision_blueprint`, `run_codegen`,
-  …) and gating extracted from `constructive-desktop` against
-  `HarnessContext`.
+  …) extracted from `constructive-desktop` against `HarnessContext` (needs
+  the generated modules ORM published or generated in-package).
 - pi adapter, terminal CLI, and `.claude`/MCP export surfaces.
 
 ```ts
