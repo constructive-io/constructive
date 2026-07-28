@@ -8,6 +8,7 @@ export * from './skills/materialize';
 export * from './skills/registry';
 export * from './skills/integrity';
 export * from './skills/fetch';
+export * from './skills/git-fetch';
 export * from './skills/update-check';
 export * from './gating/preview';
 export * from './gating/decline-guard';
