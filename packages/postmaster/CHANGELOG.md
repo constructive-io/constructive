@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/postmaster@1.20.1...@constructive-io/postmaster@1.21.0) (2026-07-28)
+
+**Note:** Version bump only for package @constructive-io/postmaster
+
 ## [1.20.1](https://github.com/constructive-io/constructive/compare/@constructive-io/postmaster@1.20.0...@constructive-io/postmaster@1.20.1) (2026-07-28)
 
 **Note:** Version bump only for package @constructive-io/postmaster
