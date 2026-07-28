@@ -10,7 +10,7 @@ import {
   stream,
   type StreamOptions,
   type ToolCallContent,
-} from 'agentic-kit';
+} from '@agentic-kit/chat';
 
 import {
   type AgentRunHandle,

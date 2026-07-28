@@ -4,8 +4,8 @@ import type {
   ModelDescriptor,
   ProviderAdapter,
   Usage,
-} from 'agentic-kit';
-import { createAssistantMessageEventStream } from 'agentic-kit';
+} from '@agentic-kit/chat';
+import { createAssistantMessageEventStream } from '@agentic-kit/chat';
 
 export const ZERO_USAGE: Usage = {
   input: 0,

@@ -1,5 +1,5 @@
 import type { AgentEvent } from '@agentic-kit/agent';
-import type { AssistantMessage, Usage } from 'agentic-kit';
+import type { AssistantMessage, Usage } from '@agentic-kit/chat';
 
 export const ZERO_USAGE: Usage = {
   input: 0,

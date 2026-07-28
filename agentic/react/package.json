@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@agentic-kit/agent": "workspace:*",
-    "agentic-kit": "workspace:*"
+    "@agentic-kit/chat": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18",

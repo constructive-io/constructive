@@ -1,7 +1,7 @@
 import type { AgentEvent } from '@agentic-kit/agent';
 import { createScriptedSSEResponse, makeFakeAssistantMessage, ZERO_USAGE } from './helpers';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import type { AssistantMessage, Message, UserMessage } from 'agentic-kit';
+import type { AssistantMessage, Message, UserMessage } from '@agentic-kit/chat';
 
 import { useChat } from '../src';
 
