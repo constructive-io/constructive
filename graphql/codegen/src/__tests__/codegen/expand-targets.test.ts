@@ -2,7 +2,12 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, removeStaleTargetDirs, TARGETS_MANIFEST } from '../../core/generate';
+import {
+  expandApiNamesToMultiTarget,
+  expandSchemaDirToMultiTarget,
+  removeStaleTargetDirs,
+  TARGETS_MANIFEST,
+} from '../../core/generate';
 
 describe('expandApiNamesToMultiTarget', () => {
   it('returns null for no apiNames', () => {
@@ -15,13 +20,16 @@ describe('expandApiNamesToMultiTarget', () => {
 
   it('returns null for single apiName', () => {
     expect(
-      expandApiNamesToMultiTarget({ db: { apiNames: ['app'] } }),
+      expandApiNamesToMultiTarget({ db: { apiNames: ['app'] } })
     ).toBeNull();
   });
 
   it('expands multiple apiNames into separate targets', () => {
     const result = expandApiNamesToMultiTarget({
-      db: { apiNames: ['app', 'admin'], pgpm: { workspacePath: '/ws', moduleName: 'mod' } },
+      db: {
+        apiNames: ['app', 'admin'],
+        pgpm: { workspacePath: '/ws', moduleName: 'mod' },
+      },
       output: './generated',
       orm: true,
       reactQuery: true,
@@ -34,7 +42,10 @@ describe('expandApiNamesToMultiTarget', () => {
     expect(result!.app.output).toBe('./generated/app');
     expect(result!.app.orm).toBe(true);
     expect(result!.app.reactQuery).toBe(true);
-    expect(result!.app.db?.pgpm).toEqual({ workspacePath: '/ws', moduleName: 'mod' });
+    expect(result!.app.db?.pgpm).toEqual({
+      workspacePath: '/ws',
+      moduleName: 'mod',
+    });
 
     expect(result!.admin.db?.apiNames).toEqual(['admin']);
     expect(result!.admin.output).toBe('./generated/admin');
@@ -80,7 +91,7 @@ describe('expandSchemaDirToMultiTarget', () => {
 
   it('returns null when directory does not exist', () => {
     expect(
-      expandSchemaDirToMultiTarget({ schemaDir: '/nonexistent/path' }),
+      expandSchemaDirToMultiTarget({ schemaDir: '/nonexistent/path' })
     ).toBeNull();
   });
 
@@ -90,8 +101,14 @@ describe('expandSchemaDirToMultiTarget', () => {
   });
 
   it('expands .graphql files into separate targets named by filename', () => {
-    fs.writeFileSync(path.join(tempDir, 'app.graphql'), 'type Query { hello: String }');
-    fs.writeFileSync(path.join(tempDir, 'admin.graphql'), 'type Query { users: [User] }');
+    fs.writeFileSync(
+      path.join(tempDir, 'app.graphql'),
+      'type Query { hello: String }'
+    );
+    fs.writeFileSync(
+      path.join(tempDir, 'admin.graphql'),
+      'type Query { users: [User] }'
+    );
 
     const result = expandSchemaDirToMultiTarget({
       schemaDir: tempDir,
@@ -112,7 +129,10 @@ describe('expandSchemaDirToMultiTarget', () => {
   });
 
   it('uses default output path when output is not specified', () => {
-    fs.writeFileSync(path.join(tempDir, 'api.graphql'), 'type Query { ok: Boolean }');
+    fs.writeFileSync(
+      path.join(tempDir, 'api.graphql'),
+      'type Query { ok: Boolean }'
+    );
 
     const result = expandSchemaDirToMultiTarget({ schemaDir: tempDir });
 
@@ -120,7 +140,10 @@ describe('expandSchemaDirToMultiTarget', () => {
   });
 
   it('ignores non-.graphql files', () => {
-    fs.writeFileSync(path.join(tempDir, 'app.graphql'), 'type Query { a: String }');
+    fs.writeFileSync(
+      path.join(tempDir, 'app.graphql'),
+      'type Query { a: String }'
+    );
     fs.writeFileSync(path.join(tempDir, 'notes.txt'), 'not a schema');
     fs.writeFileSync(path.join(tempDir, 'data.json'), '{}');
 
@@ -130,9 +153,18 @@ describe('expandSchemaDirToMultiTarget', () => {
   });
 
   it('sorts targets alphabetically', () => {
-    fs.writeFileSync(path.join(tempDir, 'zebra.graphql'), 'type Query { z: String }');
-    fs.writeFileSync(path.join(tempDir, 'alpha.graphql'), 'type Query { a: String }');
-    fs.writeFileSync(path.join(tempDir, 'mid.graphql'), 'type Query { m: String }');
+    fs.writeFileSync(
+      path.join(tempDir, 'zebra.graphql'),
+      'type Query { z: String }'
+    );
+    fs.writeFileSync(
+      path.join(tempDir, 'alpha.graphql'),
+      'type Query { a: String }'
+    );
+    fs.writeFileSync(
+      path.join(tempDir, 'mid.graphql'),
+      'type Query { m: String }'
+    );
 
     const result = expandSchemaDirToMultiTarget({ schemaDir: tempDir });
 
@@ -153,7 +185,10 @@ describe('removeStaleTargetDirs', () => {
 
   /** Write a .targets manifest listing the given names. */
   function writeManifest(names: string[]) {
-    fs.writeFileSync(path.join(tempDir, TARGETS_MANIFEST), JSON.stringify(names));
+    fs.writeFileSync(
+      path.join(tempDir, TARGETS_MANIFEST),
+      JSON.stringify(names)
+    );
   }
 
   it('removes previous targets that are no longer current', () => {
@@ -228,5 +263,25 @@ describe('removeStaleTargetDirs', () => {
 
     const removed = removeStaleTargetDirs(tempDir, []);
     expect(removed).toEqual([]);
+  });
+
+  it('refuses target-manifest path traversal', () => {
+    const victim = path.join(
+      path.dirname(tempDir),
+      `${path.basename(tempDir)}-victim`
+    );
+    fs.mkdirSync(victim);
+    fs.writeFileSync(
+      path.join(tempDir, TARGETS_MANIFEST),
+      JSON.stringify([`../${path.basename(victim)}`])
+    );
+
+    try {
+      const removed = removeStaleTargetDirs(tempDir, []);
+      expect(removed).toEqual([]);
+      expect(fs.existsSync(victim)).toBe(true);
+    } finally {
+      fs.rmSync(victim, { recursive: true, force: true });
+    }
   });
 });

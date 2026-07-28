@@ -5,6 +5,7 @@
  * Wraps the existing fetchSchema() function with the SchemaSource interface.
  */
 import { fetchSchema } from '../fetch-schema';
+import { endpointForDisplay } from '../../sensitive-values';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 
@@ -40,25 +41,26 @@ export class EndpointSchemaSource implements SchemaSource {
     this.options = options;
   }
 
-  async fetch(): Promise<SchemaSourceResult> {
+  async fetch(signal?: AbortSignal): Promise<SchemaSourceResult> {
     const result = await fetchSchema({
       endpoint: this.options.endpoint,
       authorization: this.options.authorization,
       headers: this.options.headers,
       timeout: this.options.timeout,
+      signal,
     });
 
     if (!result.success) {
       throw new SchemaSourceError(
         result.error ?? 'Unknown error fetching schema',
-        this.describe(),
+        this.describe()
       );
     }
 
     if (!result.data) {
       throw new SchemaSourceError(
         'No introspection data returned',
-        this.describe(),
+        this.describe()
       );
     }
 
@@ -68,6 +70,6 @@ export class EndpointSchemaSource implements SchemaSource {
   }
 
   describe(): string {
-    return `endpoint: ${this.options.endpoint}`;
+    return `endpoint: ${endpointForDisplay(this.options.endpoint)}`;
   }
 }

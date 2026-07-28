@@ -8,6 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import { buildSchemaSDL } from 'graphile-schema';
+import type { PgConfig } from 'pg-env';
 
 export interface BuildSchemaFromDatabaseOptions {
   /** Database name */
@@ -18,6 +19,10 @@ export interface BuildSchemaFromDatabaseOptions {
   outDir: string;
   /** Optional filename (default: schema.graphql) */
   filename?: string;
+  /** Explicit PostgreSQL values overriding `env`. */
+  pg?: Partial<PgConfig>;
+  /** Explicit environment used for omitted PostgreSQL values. */
+  env?: Readonly<Record<string, string | undefined>>;
 }
 
 export interface BuildSchemaFromDatabaseResult {
@@ -37,9 +42,16 @@ export interface BuildSchemaFromDatabaseResult {
  * @returns The path to the generated schema file and the SDL content
  */
 export async function buildSchemaFromDatabase(
-  options: BuildSchemaFromDatabaseOptions,
+  options: BuildSchemaFromDatabaseOptions
 ): Promise<BuildSchemaFromDatabaseResult> {
-  const { database, schemas, outDir, filename = 'schema.graphql' } = options;
+  const {
+    database,
+    schemas,
+    outDir,
+    filename = 'schema.graphql',
+    pg,
+    env,
+  } = options;
 
   // Ensure output directory exists
   await fs.promises.mkdir(outDir, { recursive: true });
@@ -48,6 +60,8 @@ export async function buildSchemaFromDatabase(
   const sdl = await buildSchemaSDL({
     database,
     schemas,
+    pg,
+    env,
   });
 
   // Write schema to file

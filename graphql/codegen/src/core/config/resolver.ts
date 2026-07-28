@@ -18,6 +18,8 @@ import { findConfigFile, loadConfigFile } from './loader';
 export interface ConfigOverrideOptions extends GraphQLSDKConfigTarget {
   /** Path to config file (CLI-only) */
   config?: string;
+  /** Base directory for config discovery and relative config paths. */
+  cwd?: string;
 }
 
 /**
@@ -38,10 +40,11 @@ export interface LoadConfigResult {
  * 3. Returns fully resolved configuration ready for use
  */
 export async function loadAndResolveConfig(
-  options: ConfigOverrideOptions,
+  options: ConfigOverrideOptions
 ): Promise<LoadConfigResult> {
   // Destructure CLI-only fields, rest is config overrides
-  const { config: configPath, ...overrides } = options;
+  const { config: configPath, cwd: cwdOption, ...overrides } = options;
+  const cwd = cwdOption ?? process.cwd();
 
   // Validate that at most one source is specified
   const sources = [
@@ -60,13 +63,13 @@ export async function loadAndResolveConfig(
   // Find config file
   let resolvedConfigPath = configPath;
   if (!resolvedConfigPath) {
-    resolvedConfigPath = findConfigFile() ?? undefined;
+    resolvedConfigPath = findConfigFile(cwd) ?? undefined;
   }
 
   let baseConfig: GraphQLSDKConfig = {};
 
   if (resolvedConfigPath) {
-    const loadResult = await loadConfigFile(resolvedConfigPath);
+    const loadResult = await loadConfigFile(resolvedConfigPath, cwd);
     if (!loadResult.success) {
       return { success: false, error: loadResult.error };
     }
@@ -100,6 +103,7 @@ export async function loadAndResolveConfig(
  */
 export async function loadWatchConfig(options: {
   config?: string;
+  cwd?: string;
   endpoint?: string;
   output?: string;
   pollInterval?: number;
@@ -107,15 +111,16 @@ export async function loadWatchConfig(options: {
   touch?: string;
   clear?: boolean;
 }): Promise<GraphQLSDKConfigTarget | null> {
+  const cwd = options.cwd ?? process.cwd();
   let configPath = options.config;
   if (!configPath) {
-    configPath = findConfigFile() ?? undefined;
+    configPath = findConfigFile(cwd) ?? undefined;
   }
 
   let baseConfig: GraphQLSDKConfig = {};
 
   if (configPath) {
-    const loadResult = await loadConfigFile(configPath);
+    const loadResult = await loadConfigFile(configPath, cwd);
     if (!loadResult.success) {
       console.error('x', loadResult.error);
       return null;
@@ -145,14 +150,14 @@ export async function loadWatchConfig(options: {
 
   if (!mergedConfig.endpoint) {
     console.error(
-      'x No endpoint specified. Watch mode only supports live endpoints.',
+      'x No endpoint specified. Watch mode only supports live endpoints.'
     );
     return null;
   }
 
   if (mergedConfig.schemaFile) {
     console.error(
-      'x Watch mode is only supported with an endpoint, not schemaFile.',
+      'x Watch mode is only supported with an endpoint, not schemaFile.'
     );
     return null;
   }
