@@ -5,11 +5,11 @@
 </p>
 
 <p align="center" width="100%">
-  <a href="https://github.com/constructive-io/agentic-kit/actions/workflows/run-tests.yaml">
-    <img height="20" src="https://github.com/constructive-io/agentic-kit/actions/workflows/run-tests.yaml/badge.svg" />
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
-   <a href="https://github.com/constructive-io/agentic-kit/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@agentic-kit/ollama"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/agentic-kit?filename=packages%2Follama%2Fpackage.json"/></a>
+   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+   <a href="https://www.npmjs.com/package/@agentic-kit/ollama"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=agentic%2Follama%2Fpackage.json"/></a>
 </p>
 
 A JavaScript/TypeScript client and provider adapter for the Ollama API,
@@ -126,4 +126,4 @@ Either `prompt` (single-turn) or `messages` (multi-turn) must be set.
 
 ## Contributing
 
-Please open issues or pull requests on [GitHub](https://github.com/constructive-io/agentic-kit).
+Please open issues or pull requests on [GitHub](https://github.com/constructive-io/constructive).

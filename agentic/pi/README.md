@@ -4,6 +4,14 @@
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
 </p>
 
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+   <a href="https://www.npmjs.com/package/@agentic-kit/pi"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=agentic%2Fpi%2Fpackage.json"/></a>
+</p>
+
 The [pi coding agent](https://github.com/badlogic/pi-mono) adapter for **agentic-kit**: the Constructive typed database tools and the [`@agentic-kit/harness`](https://www.npmjs.com/package/@agentic-kit/harness) confirm gate, packaged as a pi extension any host can register — Constructive Desktop, the [`agent` CLI](https://www.npmjs.com/package/@agentic-kit/cli), or your own pi-based agent.
 
 ```bash
