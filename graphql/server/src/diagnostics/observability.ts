@@ -1,7 +1,12 @@
+import { getServerEnvironment } from '../runtime-environment';
+
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
 const LOOPBACK_ADDRESSES = new Set(['127.0.0.1', '::1']);
 
-const parseBooleanEnv = (value: string | undefined, fallback: boolean): boolean => {
+const parseBooleanEnv = (
+  value: string | undefined,
+  fallback: boolean
+): boolean => {
   if (value == null) {
     return fallback;
   }
@@ -44,26 +49,45 @@ const normalizeAddress = (value: string | null | undefined): string | null => {
   return normalized.startsWith('::ffff:') ? normalized.slice(7) : normalized;
 };
 
-export const isDevelopmentObservabilityMode = (): boolean => process.env.NODE_ENV === 'development';
+export const isDevelopmentObservabilityMode = (
+  environment: Readonly<
+    Record<string, string | undefined>
+  > = getServerEnvironment()
+): boolean => environment.NODE_ENV === 'development';
 
 export const isLoopbackHost = (value: string | null | undefined): boolean => {
   const normalized = normalizeHost(value);
   return normalized != null && LOOPBACK_HOSTS.has(normalized);
 };
 
-export const isLoopbackAddress = (value: string | null | undefined): boolean => {
+export const isLoopbackAddress = (
+  value: string | null | undefined
+): boolean => {
   const normalized = normalizeAddress(value);
   return normalized != null && LOOPBACK_ADDRESSES.has(normalized);
 };
 
-export const isGraphqlObservabilityRequested = (): boolean =>
-  parseBooleanEnv(process.env.GRAPHQL_OBSERVABILITY_ENABLED, false);
+export const isGraphqlObservabilityRequested = (
+  environment: Readonly<
+    Record<string, string | undefined>
+  > = getServerEnvironment()
+): boolean => parseBooleanEnv(environment.GRAPHQL_OBSERVABILITY_ENABLED, false);
 
-export const isGraphqlObservabilityEnabled = (serverHost?: string | null): boolean =>
-  isDevelopmentObservabilityMode() &&
-  isGraphqlObservabilityRequested() &&
+export const isGraphqlObservabilityEnabled = (
+  serverHost?: string | null,
+  environment: Readonly<
+    Record<string, string | undefined>
+  > = getServerEnvironment()
+): boolean =>
+  isDevelopmentObservabilityMode(environment) &&
+  isGraphqlObservabilityRequested(environment) &&
   isLoopbackHost(serverHost);
 
-export const isGraphqlDebugSamplerEnabled = (serverHost?: string | null): boolean =>
-  isGraphqlObservabilityEnabled(serverHost) &&
-  parseBooleanEnv(process.env.GRAPHQL_DEBUG_SAMPLER_ENABLED, true);
+export const isGraphqlDebugSamplerEnabled = (
+  serverHost?: string | null,
+  environment: Readonly<
+    Record<string, string | undefined>
+  > = getServerEnvironment()
+): boolean =>
+  isGraphqlObservabilityEnabled(serverHost, environment) &&
+  parseBooleanEnv(environment.GRAPHQL_DEBUG_SAMPLER_ENABLED, true);

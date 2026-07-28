@@ -1,7 +1,14 @@
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { Pool, type PoolClient } from 'pg';
-import { buildConnectionString, getPgPool } from 'pg-cache';
+import {
+  buildConnectionString,
+  getPgPool,
+  getPgPoolCacheKey,
+  type PgPoolCacheManager,
+} from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
+import { Pool, type PoolClient } from 'pg';
+
+import { getServerEnvironment } from '../runtime-environment';
 
 const ACTIVE_ACTIVITY_SQL = `
   select
@@ -119,49 +126,77 @@ const NOTIFY_QUEUE_SQL = `
 
 const DIAGNOSTICS_STATEMENT_TIMEOUT_MS = 3_000;
 const DIAGNOSTICS_LOCK_TIMEOUT_MS = 500;
-const diagnosticsPools = new Map<string, Pool>();
+export type DiagnosticsPoolScope = Map<string, Pool>;
 
-const buildDiagnosticsConnectionString = (opts: ConstructiveOptions): string => {
-  const pgConfig = getPgEnvOptions(opts.pg);
+/** Create an owned diagnostics pool scope for one server lifecycle. */
+export const createDebugDatabasePoolScope = (): DiagnosticsPoolScope =>
+  new Map<string, Pool>();
+
+const diagnosticsPools = createDebugDatabasePoolScope();
+
+export interface DebugDatabaseRuntimeOptions {
+  pgCache?: PgPoolCacheManager;
+  environment?: Readonly<Record<string, string | undefined>>;
+  diagnosticsPools?: DiagnosticsPoolScope;
+}
+
+const buildDiagnosticsConnectionString = (
+  opts: ConstructiveOptions,
+  environment: Readonly<Record<string, string | undefined>>
+): string => {
+  const pgConfig = getPgEnvOptions(opts.pg, environment);
   return buildConnectionString(
     pgConfig.user,
     pgConfig.password,
     pgConfig.host,
     pgConfig.port,
-    pgConfig.database,
+    pgConfig.database
   );
 };
 
-const getDiagnosticsPool = (opts: ConstructiveOptions): Pool => {
-  const connectionString = buildDiagnosticsConnectionString(opts);
-  const existing = diagnosticsPools.get(connectionString);
+const getDiagnosticsPool = (
+  opts: ConstructiveOptions,
+  runtime: DebugDatabaseRuntimeOptions
+): Pool => {
+  const environment = runtime.environment ?? getServerEnvironment();
+  const pools = runtime.diagnosticsPools ?? diagnosticsPools;
+  const poolKey = getPgPoolCacheKey(opts.pg ?? {}, {
+    environment,
+    namespace: 'diagnostics',
+  });
+  const existing = pools.get(poolKey);
   if (existing) {
     return existing;
   }
 
   const pool = new Pool({
-    connectionString,
+    connectionString: buildDiagnosticsConnectionString(opts, environment),
     max: 1,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: 1_500,
     allowExitOnIdle: true,
     application_name: 'constructive-debug-snapshot',
   });
-  diagnosticsPools.set(connectionString, pool);
+  pools.set(poolKey, pool);
   return pool;
 };
 
 const withDiagnosticsClient = async <T>(
   opts: ConstructiveOptions,
-  fn: (client: PoolClient) => Promise<T>,
+  runtime: DebugDatabaseRuntimeOptions,
+  fn: (client: PoolClient) => Promise<T>
 ): Promise<T> => {
-  const diagnosticsPool = getDiagnosticsPool(opts);
+  const diagnosticsPool = getDiagnosticsPool(opts, runtime);
   const client = await diagnosticsPool.connect();
 
   try {
     await client.query('BEGIN');
-    await client.query(`SET LOCAL statement_timeout = '${DIAGNOSTICS_STATEMENT_TIMEOUT_MS}ms'`);
-    await client.query(`SET LOCAL lock_timeout = '${DIAGNOSTICS_LOCK_TIMEOUT_MS}ms'`);
+    await client.query(
+      `SET LOCAL statement_timeout = '${DIAGNOSTICS_STATEMENT_TIMEOUT_MS}ms'`
+    );
+    await client.query(
+      `SET LOCAL lock_timeout = '${DIAGNOSTICS_LOCK_TIMEOUT_MS}ms'`
+    );
     const result = await fn(client);
     await client.query('COMMIT');
     return result;
@@ -177,9 +212,11 @@ const withDiagnosticsClient = async <T>(
   }
 };
 
-export const closeDebugDatabasePools = async (): Promise<void> => {
-  const pools = [...diagnosticsPools.values()];
-  diagnosticsPools.clear();
+export const closeDebugDatabasePools = async (
+  poolScope: DiagnosticsPoolScope = diagnosticsPools
+): Promise<void> => {
+  const pools = [...poolScope.values()];
+  poolScope.clear();
   await Promise.allSettled(pools.map((pool) => pool.end()));
 };
 
@@ -202,8 +239,12 @@ export interface DebugDatabaseSnapshot {
 
 export const getDebugDatabaseSnapshot = async (
   opts: ConstructiveOptions,
+  runtime: DebugDatabaseRuntimeOptions = {}
 ): Promise<DebugDatabaseSnapshot> => {
-  const appPool = getPgPool(opts.pg);
+  const appPool = getPgPool(opts.pg, {
+    cache: runtime.pgCache,
+    environment: runtime.environment,
+  });
   const {
     activity,
     blocked,
@@ -211,7 +252,7 @@ export const getDebugDatabaseSnapshot = async (
     databaseStats,
     settings,
     notifyQueue,
-  } = await withDiagnosticsClient(opts, async (client) => ({
+  } = await withDiagnosticsClient(opts, runtime, async (client) => ({
     activity: await client.query(ACTIVE_ACTIVITY_SQL),
     blocked: await client.query(BLOCKED_ACTIVITY_SQL),
     lockSummary: await client.query(LOCK_SUMMARY_SQL),
@@ -233,7 +274,8 @@ export const getDebugDatabaseSnapshot = async (
     lockSummary: lockSummary.rows,
     databaseStats: databaseStats.rows[0] ?? null,
     settings: settings.rows,
-    notificationQueueUsage: (notifyQueue.rows[0]?.queue_usage as number | null | undefined) ?? null,
+    notificationQueueUsage:
+      (notifyQueue.rows[0]?.queue_usage as number | null | undefined) ?? null,
     timestamp: new Date().toISOString(),
   };
 };

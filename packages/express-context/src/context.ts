@@ -17,7 +17,7 @@
 import type { PgpmOptions } from '@pgpmjs/types';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
+import { getPgPool, type PgPoolCacheManager } from 'pg-cache';
 
 import type { BillingClient } from './billing-client';
 import { createBillingClient } from './billing-client';
@@ -34,6 +34,10 @@ export interface ContextMiddlewareOptions {
   loaders?: LoaderRegistry;
   /** Routing-plane schema loaders query (defaults to routing_public) */
   routingSchema?: string;
+  /** Server-owned pool cache. Defaults to the legacy process-wide cache. */
+  pgCache?: PgPoolCacheManager;
+  /** Explicit environment for pool sizing and fallback PG settings. */
+  environment?: Readonly<Record<string, string | undefined>>;
 }
 
 /**
@@ -80,15 +84,21 @@ export function buildContext(
     clientIp: req.clientIp
   });
 
-  const tenantPool: Pool = getPgPool({
-    ...opts.pg,
-    database: api.dbname
-  });
+  const tenantPool: Pool = getPgPool(
+    {
+      ...opts.pg,
+      database: api.dbname
+    },
+    { cache: opts.pgCache, environment: opts.environment }
+  );
 
   // Build loader context (if registry provided and databaseId known)
   let loaderCtx: LoaderContext | null = null;
   if (opts.loaders && api.databaseId) {
-    const routingPool: Pool = getPgPool(opts.pg);
+    const routingPool: Pool = getPgPool(opts.pg, {
+      cache: opts.pgCache,
+      environment: opts.environment,
+    });
     loaderCtx = {
       routingPool,
       routingSchema: opts.routingSchema,

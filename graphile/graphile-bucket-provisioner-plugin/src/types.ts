@@ -27,6 +27,9 @@ export type ConnectionConfigOrGetter =
   | StorageConnectionConfig
   | (() => StorageConnectionConfig);
 
+/** CORS origins or a runtime-scoped getter for them. */
+export type AllowedOriginsOrGetter = string[] | (() => string[]);
+
 /**
  * Function to derive the actual S3 bucket name from a logical bucket key.
  *
@@ -51,7 +54,7 @@ export interface BucketProvisionerPluginOptions {
    * These are the domains where your app runs (e.g., ["https://app.example.com"]).
    * Required for browser-based presigned URL uploads.
    */
-  allowedOrigins: string[];
+  allowedOrigins: AllowedOriginsOrGetter;
 
   /**
    * Optional prefix for S3 bucket names.

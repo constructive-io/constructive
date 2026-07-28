@@ -9,23 +9,38 @@ import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
-import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
+import {
+  createGraphileInstance,
+  graphileCache,
+  type GraphileCacheEntry,
+  type GraphileCacheManager,
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
-import { getPgPool } from 'pg-cache';
+import {
+  getPgPool,
+  getPgPoolCacheKey,
+  type PgPoolCacheManager,
+} from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import { getServerEnvironment } from '../runtime-environment';
 import type { DatabaseSettings } from '../types';
-import { observeGraphileBuild } from './observability/graphile-build-stats';
+import {
+  observeGraphileBuild,
+  type GraphileBuildStatsManager,
+} from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
-const isDev = (): boolean => getNodeEnv() === 'development';
+const isDev = (
+  environment: Readonly<Record<string, string | undefined>> = process.env
+): boolean => getNodeEnv(environment) === 'development';
 
 /**
  * GraphQL framework protocol codes. These originate in the GraphQL/grafast
@@ -91,7 +106,10 @@ const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError =>
   }
 
   const effectiveCode = code ?? (error.extensions?.code as string | undefined);
-  if (isPublicCode(effectiveCode) || getNodeEnv() === 'development') {
+  if (
+    isPublicCode(effectiveCode) ||
+    getNodeEnv(getServerEnvironment()) === 'development'
+  ) {
     // Note: grafserv strips originalError and internal extensions before
     // serializing to the client, so returning the enriched error is safe.
     return {
@@ -130,16 +148,20 @@ const creating = new Map<string, Promise<GraphileCacheEntry>>();
  * Returns the number of currently in-flight handler creation operations.
  * Useful for monitoring and debugging.
  */
-export function getInFlightCount(): number {
-  return creating.size;
+export function getInFlightCount(
+  inFlight: ReadonlyMap<string, unknown> = creating
+): number {
+  return inFlight.size;
 }
 
 /**
  * Returns the cache keys for all currently in-flight handler creation operations.
  * Useful for monitoring and debugging.
  */
-export function getInFlightKeys(): string[] {
-  return [...creating.keys()];
+export function getInFlightKeys(
+  inFlight: ReadonlyMap<string, unknown> = creating
+): string[] {
+  return [...inFlight.keys()];
 }
 
 /**
@@ -319,8 +341,25 @@ const buildPreset = (
   };
 };
 
-export const graphile = (opts: ConstructiveOptions): RequestHandler => {
-  const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+export interface GraphileRuntimeOptions {
+  cache?: GraphileCacheManager;
+  pgCache?: PgPoolCacheManager;
+  inFlight?: Map<string, Promise<GraphileCacheEntry>>;
+  environment?: Readonly<Record<string, string | undefined>>;
+  buildStats?: GraphileBuildStatsManager;
+}
+
+export const graphile = (
+  opts: ConstructiveOptions,
+  runtime: GraphileRuntimeOptions = {}
+): RequestHandler => {
+  const cache = runtime.cache ?? graphileCache;
+  const inFlightCreations = runtime.inFlight ?? creating;
+  const environment = runtime.environment ?? process.env;
+  const observabilityEnabled = isGraphqlObservabilityEnabled(
+    opts.server?.host,
+    environment
+  );
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
@@ -346,7 +385,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       // Phase A: Cache Check (fast path)
       // =========================================================================
-      const cached = graphileCache.get(key);
+      const cached = cache.get(key);
       if (cached) {
         log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
         return cached.handler(req, res, next);
@@ -357,7 +396,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       // Phase B: In-Flight Check (single-flight coalescing)
       // =========================================================================
-      const inFlight = creating.get(key);
+      const inFlight = inFlightCreations.get(key);
       if (inFlight) {
         log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
@@ -374,14 +413,14 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
 
       // Re-check cache after coalesced request failure (another retry may have succeeded)
-      const recheckedCache = graphileCache.get(key);
+      const recheckedCache = cache.get(key);
       if (recheckedCache) {
         log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
         return recheckedCache.handler(req, res, next);
       }
 
       // Re-check in-flight map (another retry may have started creation)
-      const retryInFlight = creating.get(key);
+      const retryInFlight = inFlightCreations.get(key);
       if (retryInFlight) {
         log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
         const retryInstance = await retryInFlight;
@@ -392,14 +431,21 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname
-      });
+      const pgConfig = getPgEnvOptions(
+        {
+          ...opts.pg,
+          database: dbname
+        },
+        environment
+      );
 
       // Route through pg-cache so the pool is tracked and can be cleaned up
       // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
+      const pool = getPgPool(pgConfig, {
+        cache: runtime.pgCache,
+        environment,
+      });
+      const pgPoolKey = getPgPoolCacheKey(pgConfig, { environment });
 
       // Create promise and store in in-flight map BEFORE try block
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
@@ -413,15 +459,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         () => createGraphileInstance({
           preset,
           cacheKey: key,
+          pgPoolKey,
           enableRealtime: api.databaseSettings?.enableRealtime
         }),
-        { enabled: observabilityEnabled }
+        { enabled: observabilityEnabled, stats: runtime.buildStats }
       );
-      creating.set(key, creationPromise);
+      inFlightCreations.set(key, creationPromise);
 
       try {
         const instance = await creationPromise;
-        graphileCache.set(key, instance);
+        cache.set(key, instance);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
         return instance.handler(req, res, next);
       } catch (error) {
@@ -435,7 +482,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         );
       } finally {
         // Always clean up in-flight tracker
-        creating.delete(key);
+        inFlightCreations.delete(key);
       }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
@@ -443,7 +490,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         respondWithGraphQLError(
           res,
           errors.INTERNAL_FAILURE({
-            details: isDev() ? e?.message ?? String(e) : 'An unexpected error occurred'
+            details: isDev(environment)
+              ? e?.message ?? String(e)
+              : 'An unexpected error occurred'
           })
         );
         return;

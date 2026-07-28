@@ -25,7 +25,6 @@
  *   CDN_ENDPOINT     - S3-compatible endpoint (default: 'http://localhost:9000')
  */
 
-import { getEnvOptions } from '@constructive-io/graphql-env';
 import Streamer from '@constructive-io/s3-streamer';
 import { Logger } from '@pgpmjs/logger';
 import { createHash, randomUUID } from 'crypto';
@@ -49,11 +48,17 @@ import {
   createEnsureBucketProvisioned,
   getPresignedUrlS3Config,
 } from './presigned-url-resolver';
+import {
+  getGraphileSettingsRuntime,
+  getGraphileSettingsRuntimeResource,
+} from './runtime-environment';
+import { getGraphileSettingsRuntimeOptions } from './runtime-options';
 
 const log = new Logger('upload-resolver');
 const DEFAULT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
 
-let streamer: Streamer | null = null;
+const UPLOAD_STREAMER = Symbol('constructive.upload-streamer');
+const MANAGED_UPLOAD_OPTIONS = Symbol('constructive.managed-upload-options');
 
 /**
  * The S3 streamer, built from the CDN connection settings.
@@ -63,26 +68,34 @@ let streamer: Streamer | null = null;
  * standing in for a tenant's.
  */
 function getStreamer(): Streamer {
-  if (streamer) return streamer;
+  return getGraphileSettingsRuntimeResource(
+    UPLOAD_STREAMER,
+    () => {
+      const { cdn = {} } = getGraphileSettingsRuntimeOptions();
+      const runtime = getGraphileSettingsRuntime();
 
-  const { cdn = {} } = getEnvOptions();
+      if (
+        runtime.env.NODE_ENV === 'production' &&
+        (!cdn.awsAccessKey || !cdn.awsSecretKey)
+      ) {
+        log.warn(
+          '[upload-resolver] WARNING: Using default credentials in production.'
+        );
+      }
 
-  if (process.env.NODE_ENV === 'production' && (!cdn.awsAccessKey || !cdn.awsSecretKey)) {
-    log.warn('[upload-resolver] WARNING: Using default credentials in production.');
-  }
+      const provider = cdn.provider || 'minio';
+      log.info(`[upload-resolver] Initializing: provider=${provider}`);
 
-  const provider = cdn.provider || 'minio';
-  log.info(`[upload-resolver] Initializing: provider=${provider}`);
-
-  streamer = new Streamer({
-    provider,
-    awsRegion: cdn.awsRegion || 'us-east-1',
-    awsAccessKey: cdn.awsAccessKey || 'minioadmin',
-    awsSecretKey: cdn.awsSecretKey || 'minioadmin',
-    endpoint: cdn.endpoint || 'http://localhost:9000',
-  });
-
-  return streamer;
+      return new Streamer({
+        provider,
+        awsRegion: cdn.awsRegion || 'us-east-1',
+        awsAccessKey: cdn.awsAccessKey || 'minioadmin',
+        awsSecretKey: cdn.awsSecretKey || 'minioadmin',
+        endpoint: cdn.endpoint || 'http://localhost:9000',
+      });
+    },
+    (resource) => resource.destroy()
+  );
 }
 
 /**
@@ -94,17 +107,15 @@ function getStreamer(): Streamer {
  * throws on a missing name prefix, and that must surface as a failed upload, not
  * as a server that will not boot.
  */
-let managedOptions: PresignedUrlPluginOptions | null = null;
-
 function getManagedOptions(): PresignedUrlPluginOptions {
-  if (!managedOptions) {
-    managedOptions = {
+  return getGraphileSettingsRuntimeResource(
+    MANAGED_UPLOAD_OPTIONS,
+    () => ({
       s3: getPresignedUrlS3Config,
       resolveBucketName: createBucketNameResolver(),
       ensureBucketProvisioned: createEnsureBucketProvisioned(),
-    };
-  }
-  return managedOptions;
+    })
+  );
 }
 
 /** A staging key: transient, and never what the object ends up under. */

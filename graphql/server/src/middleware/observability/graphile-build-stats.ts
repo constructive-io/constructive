@@ -8,7 +8,7 @@ export interface GraphileBuildEvent {
   timestamp: string;
 }
 
-interface GraphileBuildAggregate {
+export interface GraphileBuildAggregate {
   count: number;
   totalMs: number;
   maxMs: number;
@@ -25,7 +25,7 @@ interface GraphileBuildContext {
 const MAX_BUILD_EVENTS = 100;
 const MAX_AGGREGATE_KEYS = 100;
 
-const buildStats = {
+const createBuildStatsState = () => ({
   started: 0,
   succeeded: 0,
   failed: 0,
@@ -40,19 +40,34 @@ const buildStats = {
   lastDatabaseId: null as string | null,
   recentEvents: [] as GraphileBuildEvent[],
   byServiceKey: new Map<string, GraphileBuildAggregate>(),
-};
+});
 
-const pushBuildEvent = (event: GraphileBuildEvent): void => {
+export type GraphileBuildStatsState = ReturnType<typeof createBuildStatsState>;
+
+/** Owned build diagnostics for one GraphQL server lifecycle. */
+export class GraphileBuildStatsManager {
+  readonly state: GraphileBuildStatsState = createBuildStatsState();
+}
+
+const graphileBuildStats = new GraphileBuildStatsManager();
+
+const pushBuildEvent = (
+  buildStats: GraphileBuildStatsState,
+  event: GraphileBuildEvent
+): void => {
   buildStats.recentEvents.push(event);
   if (buildStats.recentEvents.length > MAX_BUILD_EVENTS) {
-    buildStats.recentEvents.splice(0, buildStats.recentEvents.length - MAX_BUILD_EVENTS);
+    buildStats.recentEvents.splice(
+      0,
+      buildStats.recentEvents.length - MAX_BUILD_EVENTS
+    );
   }
 };
 
 const updateAggregate = (
   map: Map<string, GraphileBuildAggregate>,
   key: string,
-  durationMs: number,
+  durationMs: number
 ): void => {
   const hasKey = map.has(key);
   if (!hasKey && map.size >= MAX_AGGREGATE_KEYS) {
@@ -83,14 +98,18 @@ const updateAggregate = (
   map.set(key, current);
 };
 
-const recordBuildStart = (context: GraphileBuildContext, startedAt: number): void => {
+const recordBuildStart = (
+  buildStats: GraphileBuildStatsState,
+  context: GraphileBuildContext,
+  startedAt: number
+): void => {
   buildStats.started += 1;
   buildStats.lastKey = context.cacheKey;
   buildStats.lastStartedAt = new Date(startedAt).toISOString();
   buildStats.lastServiceKey = context.serviceKey;
   buildStats.lastDatabaseId = context.databaseId;
 
-  pushBuildEvent({
+  pushBuildEvent(buildStats, {
     type: 'start',
     cacheKey: context.cacheKey,
     serviceKey: context.serviceKey,
@@ -99,7 +118,11 @@ const recordBuildStart = (context: GraphileBuildContext, startedAt: number): voi
   });
 };
 
-const recordBuildSuccess = (context: GraphileBuildContext, startedAt: number): void => {
+const recordBuildSuccess = (
+  buildStats: GraphileBuildStatsState,
+  context: GraphileBuildContext,
+  startedAt: number
+): void => {
   const durationMs = Date.now() - startedAt;
 
   buildStats.succeeded += 1;
@@ -115,7 +138,7 @@ const recordBuildSuccess = (context: GraphileBuildContext, startedAt: number): v
     updateAggregate(buildStats.byServiceKey, context.serviceKey, durationMs);
   }
 
-  pushBuildEvent({
+  pushBuildEvent(buildStats, {
     type: 'success',
     cacheKey: context.cacheKey,
     serviceKey: context.serviceKey,
@@ -126,9 +149,10 @@ const recordBuildSuccess = (context: GraphileBuildContext, startedAt: number): v
 };
 
 const recordBuildFailure = (
+  buildStats: GraphileBuildStatsState,
   context: GraphileBuildContext,
   startedAt: number,
-  error: unknown,
+  error: unknown
 ): void => {
   const durationMs = Date.now() - startedAt;
 
@@ -141,7 +165,7 @@ const recordBuildFailure = (
   buildStats.lastServiceKey = context.serviceKey;
   buildStats.lastDatabaseId = context.databaseId;
 
-  pushBuildEvent({
+  pushBuildEvent(buildStats, {
     type: 'failure',
     cacheKey: context.cacheKey,
     serviceKey: context.serviceKey,
@@ -155,26 +179,30 @@ const recordBuildFailure = (
 export const observeGraphileBuild = async <T>(
   context: GraphileBuildContext,
   fn: () => Promise<T>,
-  opts: { enabled: boolean },
+  opts: { enabled: boolean; stats?: GraphileBuildStatsManager }
 ): Promise<T> => {
   if (!opts.enabled) {
     return fn();
   }
 
+  const buildStats = (opts.stats ?? graphileBuildStats).state;
   const startedAt = Date.now();
-  recordBuildStart(context, startedAt);
+  recordBuildStart(buildStats, context, startedAt);
 
   try {
     const result = await fn();
-    recordBuildSuccess(context, startedAt);
+    recordBuildSuccess(buildStats, context, startedAt);
     return result;
   } catch (error) {
-    recordBuildFailure(context, startedAt, error);
+    recordBuildFailure(buildStats, context, startedAt, error);
     throw error;
   }
 };
 
-export const resetGraphileBuildStats = (): void => {
+export const resetGraphileBuildStats = (
+  manager: GraphileBuildStatsManager = graphileBuildStats
+): void => {
+  const buildStats = manager.state;
   buildStats.started = 0;
   buildStats.succeeded = 0;
   buildStats.failed = 0;
@@ -191,7 +219,9 @@ export const resetGraphileBuildStats = (): void => {
   buildStats.byServiceKey.clear();
 };
 
-export function getGraphileBuildStats(): {
+export function getGraphileBuildStats(
+  manager: GraphileBuildStatsManager = graphileBuildStats
+): {
   started: number;
   succeeded: number;
   failed: number;
@@ -207,7 +237,8 @@ export function getGraphileBuildStats(): {
   lastDatabaseId: string | null;
   recentEvents: GraphileBuildEvent[];
   byServiceKey: Record<string, GraphileBuildAggregate & { averageMs: number }>;
-  } {
+} {
+  const buildStats = manager.state;
   const completed = buildStats.succeeded + buildStats.failed;
   const withAverages = (map: Map<string, GraphileBuildAggregate>) =>
     Object.fromEntries(
@@ -217,7 +248,7 @@ export function getGraphileBuildStats(): {
           ...value,
           averageMs: value.count > 0 ? value.totalMs / value.count : 0,
         },
-      ]),
+      ])
     );
 
   return {

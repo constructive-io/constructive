@@ -1,47 +1,70 @@
 import './types'; // for Request type
 
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import type { LoaderRegistry } from '@constructive-io/express-context';
 import { Logger } from '@pgpmjs/logger';
-import { svcCache } from '@pgpmjs/server-utils';
+import { svcCache, type ServiceCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
-import { getPgPool } from 'pg-cache';
+import { graphileCache, type GraphileCacheManager } from 'graphile-cache';
+import { getPgPool, type PgPoolCacheManager } from 'pg-cache';
 
 import { getRoutingSchema, isValidSchemaName } from './routing';
 
 const log = new Logger('flush');
 
-export const flush = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  if (req.url === '/flush') {
-    // TODO: check bearer for a flush / special key
-    graphileCache.delete((req as any).svc_key);
-    svcCache.delete((req as any).svc_key);
-    res.status(200).send('OK');
-    return;
-  }
-  return next();
+export interface FlushRuntimeOptions {
+  graphileCache?: GraphileCacheManager;
+  serviceCache?: ServiceCache;
+  pgCache?: PgPoolCacheManager;
+  environment?: Readonly<Record<string, string | undefined>>;
+  loaders?: LoaderRegistry;
+}
+
+export const createFlushMiddleware = (runtime: FlushRuntimeOptions = {}) => {
+  const scopedGraphileCache = runtime.graphileCache ?? graphileCache;
+  const scopedServiceCache = runtime.serviceCache ?? svcCache;
+  return async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    if (req.url === '/flush') {
+      // TODO: check bearer for a flush / special key
+      scopedGraphileCache.delete((req as any).svc_key);
+      scopedServiceCache.delete((req as any).svc_key);
+      if (req.databaseId) runtime.loaders?.invalidate(req.databaseId);
+      res.status(200).send('OK');
+      return;
+    }
+    return next();
+  };
 };
+
+export const flush = createFlushMiddleware();
 
 export const flushService = async (
   opts: ConstructiveOptions,
-  databaseId: string
+  databaseId: string,
+  runtime: FlushRuntimeOptions = {}
 ): Promise<void> => {
-  const pgPool = getPgPool(opts.pg);
+  const scopedGraphileCache = runtime.graphileCache ?? graphileCache;
+  const scopedServiceCache = runtime.serviceCache ?? svcCache;
+  const pgPool = getPgPool(opts.pg, {
+    cache: runtime.pgCache,
+    environment: runtime.environment,
+  });
   log.info('flushing db ' + databaseId);
+  runtime.loaders?.invalidate(databaseId);
 
   const api = new RegExp(`^api:${databaseId}:.*`);
   const schemata = new RegExp(`^schemata:${databaseId}:.*`);
   const meta = new RegExp(`^metaschema:api:${databaseId}`);
 
   if (!opts.api.isPublic) {
-    graphileCache.forEach((_, k: string) => {
+    scopedGraphileCache.forEach((_, k: string) => {
       if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
-        svcCache.delete(k);
+        scopedGraphileCache.delete(k);
+        scopedServiceCache.delete(k);
       }
     });
   }
@@ -63,8 +86,8 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      graphileCache.delete(key);
-      svcCache.delete(key);
+      scopedGraphileCache.delete(key);
+      scopedServiceCache.delete(key);
     }
   }
 };
