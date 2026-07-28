@@ -31,6 +31,18 @@ the core owns everything host-neutral.
   (`~/.constructive/{config,cache,data,logs}` with XDG/tmp fallbacks):
   downloaded skill releases under `data/skills/<version>`, the merged tree
   under `cache/skills-materialized`, update-check metadata in `cache/`.
+- Release fetching + freshness:
+  - `fetchSkillsRelease()` — resolves a pin (exact version, semver range, or
+    dist-tag) against the npm registry, downloads the tarball, verifies its
+    SRI integrity, and unpacks it to `data/skills/<version>/`. Already
+    downloaded releases are reused without network (offline fallback;
+    `latestLocalRelease()` picks the newest local one when the registry is
+    unreachable).
+  - `checkForSkillsUpdate()` — registry update check cached in
+    `cache/skills-update-check.json` (TTL, default 24h); only recommends
+    releases inside `compatibleSkillsRange`, and flags
+    `harnessUpgradeRequired` when newer skills need newer tool code. Never
+    throws — falls back to cache or "no update" offline.
 - Ordered-overlay skill resolution:
   - `SkillsManifest` — ordered source layers, each with its own version pin
     and include/exclude filters, plus `compatibleSkillsRange` so updaters
@@ -42,13 +54,25 @@ the core owns everything host-neutral.
   - `materializeSkills()` — writes the merged tree with `{{VAR}}`
     substitution (e.g. `HARNESS_TEMPLATES_DIR`).
 
+- Tool-call gating (`src/gating/`, extracted from `constructive-desktop`):
+  - `createConfirmGate()` — host-neutral confirm gate for the mutating db
+    tools: per-run decline memory (a declined call re-issued with equivalent
+    args is auto-blocked without re-prompting), runnable-project/token
+    short-circuits, and blueprint/records/policy previews. Hosts inject a
+    `GateHost` (confirm UI + skip notification); the pi adapter maps pi's
+    `tool_call` extension event onto `GateToolCallEvent`/`GateResult` 1:1.
+  - `buildConfirmPrompt()` / `MUTATING_DB_TOOLS` / `ConfirmPreview` — the
+    per-tool confirmation copy and structured previews hosts render.
+- Blueprint domain logic (`src/blueprint/`): `expandBlueprintDefaults()`
+  (derive Data* nodes, default grants, policy field defaults),
+  `BlueprintDefinitionSchema` (typebox), field type/default parsing, and the
+  vendored policy-provisioning config tables.
+
 ## Roadmap (per #1273)
 
 - Typed db-tools (`provision_database`, `provision_blueprint`, `run_codegen`,
-  …) and gating extracted from `constructive-desktop` against
-  `HarnessContext`.
-- npm/git release fetchers (download + integrity check into
-  `data/skills/<version>`, offline fallback to the last good release).
+  …) extracted from `constructive-desktop` against `HarnessContext` (needs
+  the generated modules ORM published or generated in-package).
 - pi adapter, terminal CLI, and `.claude`/MCP export surfaces.
 
 ```ts
