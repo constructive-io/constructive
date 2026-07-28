@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/protocol@1.8.0...@agentic-kit/protocol@1.9.0) (2026-07-28)
+
+### Features
+
+- wire @agentic-kit/pi db tools into the agent CLI ([66f6c22](https://github.com/constructive-io/constructive/commit/66f6c2234ab42f9e8b6b0346dd999383d2c118f3))
+
 # [1.8.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/protocol@1.7.0...@agentic-kit/protocol@1.8.0) (2026-07-27)
 
 **Note:** Version bump only for package @agentic-kit/protocol

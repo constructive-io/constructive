@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.2.0...@agentic-kit/harness@0.3.0) (2026-07-28)
+
+### Features
+
+- replace typebox with zod in @agentic-kit/harness blueprint schema ([44d9abb](https://github.com/constructive-io/constructive/commit/44d9abb107f000245e60202992056797a2d05f5d))
+
 # [0.2.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.1.0...@agentic-kit/harness@0.2.0) (2026-07-28)
 
 ### Features
