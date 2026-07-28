@@ -77,9 +77,9 @@ importers:
 
   agentic/agent:
     dependencies:
-      agentic-kit:
+      '@agentic-kit/chat':
         specifier: workspace:*
-        version: link:../agentic-kit/dist
+        version: link:../chat/dist
     devDependencies:
       '@agentic-kit/openai':
         specifier: workspace:*
@@ -88,18 +88,15 @@ importers:
 
   agentic/agentic-kit:
     dependencies:
-      '@agentic-kit/anthropic':
+      '@agentic-kit/agent':
         specifier: workspace:*
-        version: link:../anthropic/dist
-      '@agentic-kit/ollama':
+        version: link:../agent/dist
+      '@agentic-kit/chat':
         specifier: workspace:*
-        version: link:../ollama/dist
-      '@agentic-kit/openai':
+        version: link:../chat/dist
+      '@agentic-kit/harness':
         specifier: workspace:*
-        version: link:../openai/dist
-      '@agentic-kit/protocol':
-        specifier: workspace:*
-        version: link:../protocol/dist
+        version: link:../harness/dist
     publishDirectory: dist
 
   agentic/agentic-server:
@@ -153,6 +150,22 @@ importers:
         version: link:../protocol/dist
     publishDirectory: dist
 
+  agentic/chat:
+    dependencies:
+      '@agentic-kit/anthropic':
+        specifier: workspace:*
+        version: link:../anthropic/dist
+      '@agentic-kit/ollama':
+        specifier: workspace:*
+        version: link:../ollama/dist
+      '@agentic-kit/openai':
+        specifier: workspace:*
+        version: link:../openai/dist
+      '@agentic-kit/protocol':
+        specifier: workspace:*
+        version: link:../protocol/dist
+    publishDirectory: dist
+
   agentic/harness:
     dependencies:
       appstash:
@@ -195,9 +208,9 @@ importers:
       '@agentic-kit/agent':
         specifier: workspace:*
         version: link:../agent/dist
-      agentic-kit:
+      '@agentic-kit/chat':
         specifier: workspace:*
-        version: link:../agentic-kit/dist
+        version: link:../chat/dist
     devDependencies:
       '@testing-library/dom':
         specifier: 10.4.1

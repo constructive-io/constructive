@@ -1,8 +1,8 @@
 {
-  "name": "agentic-kit",
-  "version": "2.0.0",
+  "name": "@agentic-kit/chat",
+  "version": "1.10.0",
   "author": "Dan Lynch <pyramation@gmail.com>",
-  "description": "Umbrella package for the agentic-kit family: chat, agent runtime, and harness",
+  "description": "Provider-agnostic LLM adapter with streaming and multi-turn support",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,9 +29,10 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@agentic-kit/agent": "workspace:*",
-    "@agentic-kit/chat": "workspace:*",
-    "@agentic-kit/harness": "workspace:*"
+    "@agentic-kit/anthropic": "workspace:*",
+    "@agentic-kit/ollama": "workspace:*",
+    "@agentic-kit/openai": "workspace:*",
+    "@agentic-kit/protocol": "workspace:*"
   },
   "keywords": []
 }

@@ -1,5 +1,5 @@
 import { OpenAIAdapter } from '@agentic-kit/openai';
-import { createUserMessage, type AssistantMessage } from 'agentic-kit';
+import { createUserMessage, type AssistantMessage } from '@agentic-kit/chat';
 
 import { Agent } from '../src';
 

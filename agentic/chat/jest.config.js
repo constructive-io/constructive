@@ -10,21 +10,10 @@ module.exports = {
         tsconfig: 'tsconfig.json',
       },
     ],
-    '^.+\\.mjs$': [
-      'ts-jest',
-      {
-        babelConfig: false,
-        tsconfig: {
-          allowJs: true,
-          module: 'commonjs',
-        },
-      },
-    ],
   },
-  // typebox ships ESM-only; transform it so the harness CJS build can load it
-  transformIgnorePatterns: ['/node_modules/(?!.*typebox)'],
+  transformIgnorePatterns: [`/node_modules/*`],
   testRegex: '(/__tests__/.*\\.(test|spec))\\.(jsx?|tsx?)$',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'mjs', 'json', 'node'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   modulePathIgnorePatterns: ['dist/*'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
