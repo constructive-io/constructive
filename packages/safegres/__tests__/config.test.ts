@@ -31,6 +31,7 @@ function finding(partial: Partial<Finding> & { code: string }): Finding {
 describe('rule registry', () => {
   it('expands prefix wildcards', () => {
     expect(expandRuleSelector('P*').sort()).toEqual(['P1', 'P1b', 'P5']);
+    expect(expandRuleSelector('R*').sort()).toEqual(['R1', 'R2', 'R3']);
     expect(expandRuleSelector('*')).toHaveLength(RULES.length);
     expect(expandRuleSelector('A1')).toEqual(['A1']);
     expect(expandRuleSelector('ZZ')).toEqual([]);
@@ -140,16 +141,22 @@ describe('presets', () => {
     expect(rules.get('P1')!.enabled).toBe(false);
   });
 
-  it('multi-tenant escalates leak-prone rules to critical', () => {
+  it('constructive escalates leak-prone rules and watches anonymous', () => {
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'safegres-'));
     fs.writeFileSync(
       path.join(cwd, '.safegresrc.json'),
-      JSON.stringify({ extends: 'safegres:multi-tenant' })
+      JSON.stringify({ extends: 'safegres:constructive' })
     );
     const { config } = loadConfig({ cwd });
     const { rules } = resolveRules(config);
     expect(rules.get('A2')!.severity).toBe('critical');
     expect(rules.get('P5')!.severity).toBe('critical');
+    expect(rules.get('R1')).toEqual({
+      enabled: true,
+      severity: 'critical',
+      options: { roles: ['anonymous'] }
+    });
+    expect(rules.get('R2')!.options).toEqual({ roles: ['anonymous'] });
     expect(config.scoring?.floorOnCritical).toBe('C');
   });
 });

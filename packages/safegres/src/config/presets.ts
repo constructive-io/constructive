@@ -24,16 +24,20 @@ export const strict: SafegresConfig = {
 };
 
 /**
- * Tuned for tenant-isolation apps: anything that can leak rows across
- * tenants is critical.
+ * Tuned for Constructive's role model (RLS-first, anonymous/authenticated/
+ * administrator): untrusted-role rules watch `anonymous`, and anything that
+ * can leak rows across the role boundary is critical.
  */
-export const multiTenant: SafegresConfig = {
+export const constructive: SafegresConfig = {
   extends: 'safegres:recommended',
   rules: {
     A2: 'critical',
     A4: 'critical',
     A7: 'critical',
-    P5: 'critical'
+    P5: 'critical',
+    R1: ['critical', { roles: ['anonymous'] }],
+    R2: ['high', { roles: ['anonymous'] }],
+    R3: 'medium'
   },
   scoring: { floorOnCritical: 'C' }
 };
@@ -51,6 +55,6 @@ export const minimal: SafegresConfig = {
 export const PRESETS: Record<string, SafegresConfig> = {
   'safegres:recommended': recommended,
   'safegres:strict': strict,
-  'safegres:multi-tenant': multiTenant,
+  'safegres:constructive': constructive,
   'safegres:minimal': minimal
 };

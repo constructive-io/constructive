@@ -39,8 +39,13 @@ Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) a
 | A7 | high | anti-pattern | Trivially-permissive policy (`USING (true)` / `WITH CHECK (true)`) |
 | P1 | high | anti-pattern | Policy body calls a **VOLATILE function** (per-row evaluation) |
 | P5 | high | anti-pattern | Policy body references **`session_user`** / `current_user` / `pg_has_role(...)` |
+| R1 | critical | anti-pattern | An **untrusted role** (options: `{ roles: [...] }`) holds a write privilege |
+| R2 | high | anti-pattern | A permissive write policy applies to an untrusted role or PUBLIC |
+| R3 | medium | anti-pattern | An RLS table has grants **TO PUBLIC** (includes all current/future roles) |
 
 Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across every applicable permissive policy (FOR ALL + PUBLIC-role policies considered). Roles with `BYPASSRLS` are suppressed.
+
+R1/R2 are no-ops until a role list is configured — e.g. `"R1": ["critical", { "roles": ["anonymous"] }]` — so they cost nothing on databases without an untrusted-role model. The `safegres:constructive` preset configures them for `anonymous`.
 
 ## Configuration
 
@@ -71,7 +76,7 @@ Or typed:
 import { defineConfig } from 'confstash';
 
 export default defineConfig({
-  extends: 'safegres:multi-tenant',
+  extends: 'safegres:constructive',
   rules: { A6: 'low' }
 });
 ```
@@ -82,7 +87,7 @@ export default defineConfig({
 | --- | --- |
 | `safegres:recommended` | Every rule at its default severity (the no-config behavior) |
 | `safegres:strict` | Coverage gaps escalated (A4 critical, A5 high), `failOn: high` |
-| `safegres:multi-tenant` | Cross-tenant leak surfaces (A2, A4, A7, P5) critical |
+| `safegres:constructive` | Constructive's role model: R1/R2 watch `anonymous`, leak surfaces (A2, A4, A7, P5) critical |
 | `safegres:minimal` | Structural flags only (A1–A3) — fast CI smoke check |
 
 CLI: `--config <path>`, `--preset <name>`, `--rule CODE=off|severity` (repeatable).
