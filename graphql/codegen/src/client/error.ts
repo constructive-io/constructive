@@ -2,12 +2,19 @@
  * Re-export error handling utilities from @constructive-io/graphql-query.
  */
 export {
-  DataError,
-  DataErrorType,
-  PG_ERROR_CODES,
+  ConstructiveError,
+  classify,
   createError,
+  format,
+  isConstructiveError,
+  isPublicCode,
+  isPublicError,
+  isRetryable,
+  parse,
   parseGraphQLError,
-  isDataError,
-  type DataErrorOptions,
+  toError,
+  type ErrorClass,
+  type ErrorContext,
   type GraphQLError,
+  type ParsedError,
 } from '@constructive-io/graphql-query';

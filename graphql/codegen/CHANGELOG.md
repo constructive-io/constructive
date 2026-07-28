@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.8.1...@constructive-io/graphql-codegen@5.9.0) (2026-07-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.8.0...@constructive-io/graphql-codegen@5.8.1) (2026-07-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [5.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.7.5...@constructive-io/graphql-codegen@5.8.0) (2026-07-28)
+
+### Features
+
+- **errors:** client adapter + registry-based server masking ([ab48163](https://github.com/constructive-io/constructive/commit/ab48163f5430c3cc92374a4a9d3e05776b4928d2))
+
 ## [5.7.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.7.4...@constructive-io/graphql-codegen@5.7.5) (2026-07-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

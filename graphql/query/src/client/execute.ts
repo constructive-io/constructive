@@ -5,7 +5,7 @@
 import type { DocumentNode } from 'graphql';
 import { print } from 'graphql';
 
-import { createError, type DataError, parseGraphQLError } from './error';
+import { ConstructiveError, createError, parseGraphQLError } from './error';
 import { TypedDocumentString } from './typed-document';
 
 // ============================================================================
@@ -127,7 +127,7 @@ export async function execute<TDocument extends ExecutableDocument>(
   }
 }
 
-async function handleHttpError(response: Response): Promise<DataError> {
+async function handleHttpError(response: Response): Promise<ConstructiveError> {
   const { status, statusText } = response;
 
   if (status === 401) {

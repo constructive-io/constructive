@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/chat@1.11.2...@agentic-kit/chat@1.12.0) (2026-07-28)
+
+**Note:** Version bump only for package @agentic-kit/chat
+
+## [1.11.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/chat@1.11.1...@agentic-kit/chat@1.11.2) (2026-07-28)
+
+**Note:** Version bump only for package @agentic-kit/chat
+
 ## [1.11.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/chat@1.11.0...@agentic-kit/chat@1.11.1) (2026-07-28)
 
 **Note:** Version bump only for package @agentic-kit/chat

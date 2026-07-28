@@ -3,14 +3,21 @@
  */
 
 export {
+  classify,
+  ConstructiveError,
   createError,
-  DataError,
-  type DataErrorOptions,
-  DataErrorType,
+  type ErrorClass,
+  type ErrorContext,
+  format,
   type GraphQLError,
-  isDataError,
+  isConstructiveError,
+  isPublicCode,
+  isPublicError,
+  isRetryable,
+  parse,
+  type ParsedError,
   parseGraphQLError,
-  PG_ERROR_CODES,
+  toError,
 } from './error';
 export {
   createGraphQLClient,

@@ -1,7 +1,7 @@
+import { boolConst } from '../ast/helpers';
 import type { PgAstNode } from '../ast/parse';
 import { parsePolicyExpression } from '../ast/parse';
 import { columnRefPath, findAll, funcNameParts, funcNameQualified, visitAll } from '../ast/walk';
-import { boolConst } from '../ast/helpers';
 import type { PolicyInfo, TableSnapshot } from '../pg/introspect';
 import type { ProcVolatility } from '../pg/proc';
 import type { Finding } from '../types';
