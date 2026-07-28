@@ -3,10 +3,10 @@ import * as path from 'path';
 
 import * as semver from 'semver';
 
+import { GitFetchOptions, listGitTagVersions } from './git-fetch';
 import { RegistryClient, RegistryOptions } from './registry';
 
-export interface UpdateCheckOptions extends RegistryOptions {
-  pkg: string;
+interface UpdateCheckCommonOptions {
   /** Version currently in use. */
   currentVersion: string;
   /**
@@ -20,6 +20,14 @@ export interface UpdateCheckOptions extends RegistryOptions {
   ttlMs?: number;
   now?: () => number;
 }
+
+export interface UpdateCheckOptions extends RegistryOptions, UpdateCheckCommonOptions {
+  pkg: string;
+}
+
+export interface GitUpdateCheckOptions
+  extends Pick<GitFetchOptions, 'repo' | 'apiUrl' | 'fetchImpl' | 'token'>,
+    UpdateCheckCommonOptions {}
 
 export interface UpdateCheckResult {
   checkedAt: number;
@@ -46,6 +54,26 @@ const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
 export async function checkForSkillsUpdate(
   options: UpdateCheckOptions
 ): Promise<UpdateCheckResult> {
+  return checkWithLister(options, async () => {
+    const packument = await new RegistryClient(options).packument(options.pkg);
+    return Object.keys(packument.versions);
+  });
+}
+
+/**
+ * Same update check against a GitHub repo's semver tags instead of an npm
+ * registry (the skills repo is just a git repository, released by tagging).
+ */
+export async function checkForSkillsUpdateFromGit(
+  options: GitUpdateCheckOptions
+): Promise<UpdateCheckResult> {
+  return checkWithLister(options, () => listGitTagVersions(options));
+}
+
+async function checkWithLister(
+  options: UpdateCheckCommonOptions,
+  listVersions: () => Promise<string[]>
+): Promise<UpdateCheckResult> {
   const now = options.now ?? Date.now;
   const ttl = options.ttlMs ?? DEFAULT_TTL_MS;
 
@@ -56,8 +84,7 @@ export async function checkForSkillsUpdate(
 
   let versions: string[];
   try {
-    const packument = await new RegistryClient(options).packument(options.pkg);
-    versions = Object.keys(packument.versions).filter((v) => semver.valid(v));
+    versions = (await listVersions()).filter((v) => semver.valid(v));
   } catch {
     if (cached) return { ...cached, fromCache: true };
     return noUpdate(options.currentVersion, now());

@@ -43,6 +43,13 @@ the core owns everything host-neutral.
     releases inside `compatibleSkillsRange`, and flags
     `harnessUpgradeRequired` when newer skills need newer tool code. Never
     throws — falls back to cache or "no update" offline.
+  - `fetchSkillsFromGit()` / `checkForSkillsUpdateFromGit()` — the same fetch
+    and update check straight from the GitHub repo (the skills repo is just a
+    git repository, released by tagging): a pin (tag, semver range against
+    tags, full commit SHA, or branch) resolves via the GitHub API, the
+    codeload tarball unpacks into the same `<skillsRoot>/<version>/` layout,
+    so caching, offline fallback (`latestLocalRelease()`), and
+    `DirectorySkillSource` work identically.
 - Ordered-overlay skill resolution:
   - `SkillsManifest` — ordered source layers, each with its own version pin
     and include/exclude filters, plus `compatibleSkillsRange` so updaters
