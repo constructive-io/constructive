@@ -1,115 +1,89 @@
 # @agentic-kit/harness
 
-Host-agnostic core of the **Constructive harness** — the layer that turns a
-generic coding agent into a Constructive app builder. Code only: **no skills
-are bundled in this package**. Skills are pulled at runtime from
-[`constructive-skills`](https://github.com/constructive-io/constructive-skills)
-(plus optional overlays), so guidance stays fresh without a host release.
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
 
-Planning: [constructive-planning#1273](https://github.com/constructive-io/constructive-planning/issues/1273)
-(extraction) and [#1274](https://github.com/constructive-io/constructive-planning/issues/1274)
-(skills consolidation).
+Give your coding agent a backend. `@agentic-kit/harness` is the host-neutral core of the **Constructive harness** — skills releases, confirm gating, and blueprint logic that turn a generic coding agent into a secure, full-stack app builder.
 
-## Layering
-
-```
-@agentic-kit/protocol → agentic-kit → @agentic-kit/agent   (LLM/runtime substrate)
-                                            ↓
-                                  @agentic-kit/harness      (this package)
-                                            ↓
-        pi/Electron desktop adapter | terminal CLI | MCP server | exports
+```bash
+npm install @agentic-kit/harness
 ```
 
-Hosts inject a `HarnessContext` (cwd, endpoints, credentials, confirm gate);
-the core owns everything host-neutral.
+Code only: **no skills are bundled**. Skills are pulled at runtime from [`constructive-skills`](https://github.com/constructive-io/constructive-skills) (plus your overlays), so guidance stays fresh without a host release.
 
-## What's here today
+## Features
 
-- `HarnessContext` / `HarnessCredentials` / `GateRequest` — the injection
-  contracts identified in the desktop extraction research.
-- `harnessDirs()` — on-disk layout via [`appstash`](https://www.npmjs.com/package/appstash)
-  (`~/.constructive/{config,cache,data,logs}` with XDG/tmp fallbacks):
-  downloaded skill releases under `data/skills/<version>`, the merged tree
-  under `cache/skills-materialized`, update-check metadata in `cache/`.
-- Release fetching + freshness:
-  - `fetchSkillsRelease()` — resolves a pin (exact version, semver range, or
-    dist-tag) against the npm registry, downloads the tarball, verifies its
-    SRI integrity, and unpacks it to `data/skills/<version>/`. Already
-    downloaded releases are reused without network (offline fallback;
-    `latestLocalRelease()` picks the newest local one when the registry is
-    unreachable).
-  - `checkForSkillsUpdate()` — registry update check cached in
-    `cache/skills-update-check.json` (TTL, default 24h); only recommends
-    releases inside `compatibleSkillsRange`, and flags
-    `harnessUpgradeRequired` when newer skills need newer tool code. Never
-    throws — falls back to cache or "no update" offline.
-  - `fetchSkillsFromGit()` / `checkForSkillsUpdateFromGit()` — the same fetch
-    and update check straight from the GitHub repo (the skills repo is just a
-    git repository, released by tagging): a pin (tag, semver range against
-    tags, full commit SHA, or branch) resolves via the GitHub API, the
-    codeload tarball unpacks into the same `<skillsRoot>/<version>/` layout,
-    so caching, offline fallback (`latestLocalRelease()`), and
-    `DirectorySkillSource` work identically.
-- Ordered-overlay skill resolution:
-  - `SkillsManifest` — ordered source layers, each with its own version pin
-    and include/exclude filters, plus `compatibleSkillsRange` so updaters
-    never adopt a skills release the installed tool code doesn't support.
-  - `DirectorySkillSource` — loads the agentskills.io layout
-    (`<skill>/SKILL.md` + references/scripts).
-  - `resolveSkills()` — last-write-wins merge across layers (hardened base →
-    team overlays → private known-gaps overlay), then transitive frontmatter
-    `requires:` expansion: a skill can declare skills it depends on
-    (`requires: [constructive-security]` or a YAML list) and they are pulled
-    in even when a layer's `include` filter omits them; explicit `exclude`
-    entries still win, and unresolvable requirements surface through
-    `onMissingRequire` instead of throwing.
-  - `materializeSkills()` — writes the merged tree with `{{VAR}}`
-    substitution (e.g. `HARNESS_TEMPLATES_DIR`).
+- **Skill releases** — fetch a pinned release (npm version/range/dist-tag, or a git tag/semver/SHA/branch straight from GitHub), verified and cached under `~/.constructive/data/skills/<version>/`; offline falls back to the newest local release.
+- **Ordered overlays** — layer skill sources (hardened base → team overlays → private known-gaps), last write wins by skill name, with include/exclude filters and transitive `requires:` expansion.
+- **Confirm gating** — a host-neutral gate for mutating db tools: per-run decline memory (equivalent-args retries are auto-blocked), short-circuits for runnable projects, and structured previews your UI renders.
+- **Blueprint logic** — `expandBlueprintDefaults()`, the zod `BlueprintZod`/JSON-Schema `BlueprintSchema`, field type/default parsing, and policy-provisioning tables.
+- **Appstash state** — everything lives in the [`appstash`](https://www.npmjs.com/package/appstash) `~/.constructive/{config,cache,data,logs}` layout; project directories are untouched.
 
-- Tool-call gating (`src/gating/`, extracted from `constructive-desktop`):
-  - `createConfirmGate()` — host-neutral confirm gate for the mutating db
-    tools: per-run decline memory (a declined call re-issued with equivalent
-    args is auto-blocked without re-prompting), runnable-project/token
-    short-circuits, and blueprint/records/policy previews. Hosts inject a
-    `GateHost` (confirm UI + skip notification); the pi adapter maps pi's
-    `tool_call` extension event onto `GateToolCallEvent`/`GateResult` 1:1.
-  - `buildConfirmPrompt()` / `MUTATING_DB_TOOLS` / `ConfirmPreview` — the
-    per-tool confirmation copy and structured previews hosts render.
-- Blueprint domain logic (`src/blueprint/`): `expandBlueprintDefaults()`
-  (derive Data* nodes, default grants, policy field defaults),
-  `BlueprintDefinitionSchema` (typebox), field type/default parsing, and the
-  vendored policy-provisioning config tables.
-
-## Roadmap (per #1273)
-
-- Typed db-tools (`provision_database`, `provision_blueprint`, `run_codegen`,
-  …) extracted from `constructive-desktop` against `HarnessContext` (needs
-  the generated modules ORM published or generated in-package).
-- pi adapter, terminal CLI, and `.claude`/MCP export surfaces.
+## Quick start
 
 ```ts
 import {
   DirectorySkillSource,
+  fetchSkillsFromGit,
   harnessDirs,
   materializeSkills,
   resolveSkills,
 } from '@agentic-kit/harness';
 
 const dirs = harnessDirs();
+
+const release = await fetchSkillsFromGit({
+  repo: 'constructive-io/constructive-skills',
+  pin: '^1.0.0',
+  skillsRoot: dirs.skillsRoot,
+});
+
 const skills = await resolveSkills(
   {
-    sources: [
-      { name: 'constructive-skills', pin: '1.2.0' },
-      { name: 'known-gaps', pin: 'abc1234' },
-    ],
-    compatibleSkillsRange: '^1.2.0',
+    sources: [{ name: 'constructive-skills' }, { name: 'my-overlay' }],
+    compatibleSkillsRange: '^1.0.0',
   },
   [
-    new DirectorySkillSource('constructive-skills', dirs.skillsVersionDir('1.2.0')),
-    new DirectorySkillSource('known-gaps', '/path/to/private/overlay'),
+    new DirectorySkillSource('constructive-skills', release.skillsDir),
+    new DirectorySkillSource('my-overlay', '/path/to/private/overlay'),
   ]
 );
+
 materializeSkills(dirs.materializedDir, skills, {
   templateVars: { HARNESS_TEMPLATES_DIR: '/path/to/templates' },
 });
 ```
+
+## API surface
+
+- **Contracts** — `HarnessContext` / `HarnessCredentials` / `GateRequest`: hosts inject cwd, endpoints, credentials, and a confirm gate; the core owns everything host-neutral.
+- **Dirs** — `harnessDirs()`: downloaded releases under `data/skills/<version>`, merged tree under `cache/skills-materialized`, update-check metadata in `cache/`.
+- **Fetching** — `fetchSkillsRelease()` (npm), `fetchSkillsFromGit()` (GitHub tags/SHAs/branches via codeload tarballs), `latestLocalRelease()` (offline).
+- **Freshness** — `checkForSkillsUpdate()` / `checkForSkillsUpdateFromGit()`: TTL-cached update checks that never throw, respect `compatibleSkillsRange`, and flag `harnessUpgradeRequired` when newer skills need newer tool code.
+- **Resolution** — `SkillsManifest`, `DirectorySkillSource` (agentskills.io layout: `<skill>/SKILL.md` + references/scripts), `resolveSkills()`, `materializeSkills()` with `{{VAR}}` substitution.
+- **Gating** — `createConfirmGate()`, `buildConfirmPrompt()`, `MUTATING_DB_TOOLS`, `ConfirmPreview`; adapters map host events onto `GateToolCallEvent`/`GateResult` 1:1.
+- **Blueprints** — `expandBlueprintDefaults()`, `BlueprintZod`/`BlueprintSchema`, field types/defaults, policy provisioning.
+
+## Hosts
+
+The same harness powers multiple hosts:
+
+```
+@agentic-kit/protocol → agentic-kit → @agentic-kit/agent   (LLM/runtime substrate)
+                                            ↓
+                                  @agentic-kit/harness      (this package)
+                                            ↓
+     Constructive Desktop (Electron) | @agentic-kit/cli (`agent`) | your host
+```
+
+## Roadmap
+
+- Typed db-tools (`provision_database`, `provision_blueprint`, `run_codegen`, …) extracted from Constructive Desktop against `HarnessContext`.
+- Shared host adapter package and `.claude`/MCP export surfaces.
+
+## Related
+
+- [`@agentic-kit/cli`](https://www.npmjs.com/package/@agentic-kit/cli) — `agent`, a local, secure-by-default coding agent built on this harness.
+- [`agentic-kit`](https://www.npmjs.com/package/agentic-kit) — the umbrella package (chat + agent + harness).
+- Planning: [constructive-planning#1273](https://github.com/constructive-io/constructive-planning/issues/1273), [#1274](https://github.com/constructive-io/constructive-planning/issues/1274), [#1277](https://github.com/constructive-io/constructive-planning/issues/1277).
