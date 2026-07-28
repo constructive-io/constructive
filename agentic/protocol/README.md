@@ -1,5 +1,9 @@
 # @agentic-kit/protocol
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
 The shared protocol kernel for [agentic-kit](https://github.com/constructive-io/agentic-kit).
 
 This package holds the provider-agnostic contracts and helpers that every adapter
