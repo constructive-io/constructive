@@ -109,7 +109,7 @@ jobs:
           - batch: packages-core
             packages: 'packages/url-domains packages/coerce packages/csrf packages/oauth packages/12factor-env packages/orm packages/express-context packages/errors packages/llm-env packages/node-type-registry packages/query-spec packages/server-utils postgres/pg-cache postgres/pg-env'
           - batch: packages-services
-            packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
+            packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli-runtime packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
           - batch: graphile-unit
@@ -149,6 +149,104 @@ jobs:
             (cd ./$pkg && pnpm test)
             echo "::endgroup::"
           done
+
+  # Pack once from the Node 22 build, then exercise the published package
+  # boundary on every supported Node line. This intentionally installs the
+  # tarballs in an empty project so workspace links cannot mask packaging bugs.
+  cli-package-artifacts:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace-build
+
+      - name: Extract workspace
+        run: tar -xzf workspace.tar.gz && rm workspace.tar.gz
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Pack CNC release set
+        run: |
+          mkdir -p /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/cli-runtime pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/graphql-codegen pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/graphql-explorer pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/graphql-query pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/graphql-server pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/express-context pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/job-pg pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/job-scheduler pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/job-utils pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/knative-job-fn pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/knative-job-service pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/knative-job-worker pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/send-email-fn pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/send-verification-link-fn pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @pgpmjs/env pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @pgpmjs/logger pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @pgpmjs/server-utils pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter pg-cache pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter pg-env pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter graphile-cache pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter graphile-bucket-provisioner-plugin pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter graphile-schema pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter graphile-settings pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter graphile-presigned-url-plugin pack --pack-destination /tmp/cnc-package-artifacts
+          npm_config_ignore_scripts=true pnpm --filter @constructive-io/cli pack --pack-destination /tmp/cnc-package-artifacts
+          cp packages/cli/scripts/verify-packed-artifacts.mjs /tmp/cnc-package-artifacts/
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cnc-package-artifacts
+          path: /tmp/cnc-package-artifacts
+          retention-days: 1
+
+  cli-package-matrix:
+    needs: cli-package-artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node-version: '18.17.0'
+            suite: core
+          - node-version: '20'
+            suite: core
+          - node-version: '22'
+            suite: core
+          - node-version: '22.19.0'
+            suite: full
+    steps:
+      - name: Download package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: cnc-package-artifacts
+          path: cnc-package-artifacts
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Verify installed package entrypoints
+        run: node cnc-package-artifacts/verify-packed-artifacts.mjs --artifacts cnc-package-artifacts --suite ${{ matrix.suite }}
 
   # =========================================================================
   # TIER 1b – Windows compatibility (native runner, no Linux containers)
