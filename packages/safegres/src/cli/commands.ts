@@ -2,6 +2,8 @@ import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 
 import audit from './audit';
+import doctor from './doctor';
+import printConfig from './print-config';
 
 const log = new Logger('safegres');
 
@@ -13,6 +15,8 @@ Usage:
 
 Commands:
   audit           Audit grants, RLS flags, policy coverage, and anti-patterns
+  doctor          Diagnose environment, connection, and configuration
+  print-config    Show the resolved effective configuration
   help            Show this help message
 
 Run \`safegres <command> --help\` for command-specific options.
@@ -22,7 +26,9 @@ const commandMap: Record<
   string,
   (argv: ParsedArgs, prompter: Inquirerer, options: CLIOptions) => unknown
 > = {
-  audit
+  audit,
+  doctor,
+  'print-config': printConfig
 };
 
 export const commands = async (

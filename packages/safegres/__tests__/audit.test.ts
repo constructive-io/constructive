@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-
 import { getConnections, PgTestClient } from 'pgsql-test';
 
 import { audit } from '../src/commands/audit';
