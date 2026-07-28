@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/constructive-io/constructive/compare/safegres@1.5.0...safegres@1.6.0) (2026-07-28)
+
+### Features
+
+- **safegres:** configurable rules, presets, scoring, doctor and print-config ([a41688f](https://github.com/constructive-io/constructive/commit/a41688f5b3b626a80eeeef4accd10c060e7feb71))
+- **safegres:** role-trust rules (R1-R3), constructive preset, drop multi-tenant ([c1b251b](https://github.com/constructive-io/constructive/commit/c1b251b68035f73c4b53274e19b2763a0669bc6c))
+
 # [1.5.0](https://github.com/constructive-io/constructive/compare/safegres@1.4.4...safegres@1.5.0) (2026-07-28)
 
 **Note:** Version bump only for package safegres

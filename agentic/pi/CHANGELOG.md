@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.3.0...@agentic-kit/pi@0.4.0) (2026-07-28)
+
+### Features
+
+- **pi:** resolve provision modules from node-type-registry preset + overlay ([b4b9300](https://github.com/constructive-io/constructive/commit/b4b93008ffed10fd0e3fba5c5047518385d6ef3f))
+
 # [0.3.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.2.3...@agentic-kit/pi@0.3.0) (2026-07-28)
 
 **Note:** Version bump only for package @agentic-kit/pi
