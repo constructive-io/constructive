@@ -174,11 +174,15 @@ describe('format / i18n', () => {
     expect(format('MODULE_NOT_FOUND', { name: 'auth' })).toBe('Module "auth" not found in modules list.');
   });
 
-  it('uses a registered locale catalog with fallback to en', () => {
+  it('uses a registered locale overlay, falling back to the registry default', () => {
     registerCatalog('es', { ACCOUNT_EXISTS: 'Ya existe una cuenta con este correo.' });
     expect(format('ACCOUNT_EXISTS', {}, 'es')).toBe('Ya existe una cuenta con este correo.');
-    // falls back to en for codes not in the es catalog
+    // codes without an overlay entry fall back to the untagged registry default
     expect(format('FORBIDDEN', {}, 'es')).toBe('You do not have permission to do that.');
+  });
+
+  it('renders the registry default when no locale is given', () => {
+    expect(format('FORBIDDEN')).toBe('You do not have permission to do that.');
   });
 
   it('humanizes unknown codes as a last resort', () => {
