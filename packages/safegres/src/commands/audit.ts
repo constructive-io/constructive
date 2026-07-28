@@ -5,6 +5,13 @@
  */
 
 import {
+  checkSessionUserGating,
+  checkTriviallyPermissive,
+  checkVolatileFunctions,
+  collectFunctionNames,
+  parseOrNull
+} from '../checks/anti-patterns';
+import {
   checkCoverageGaps,
   checkUpdateWithCheckCoverage
 } from '../checks/coverage';
@@ -13,19 +20,14 @@ import {
   checkRlsEnabledNoPolicies,
   checkRlsNotForced
 } from '../checks/rls-flags';
-import {
-  checkSessionUserGating,
-  checkTriviallyPermissive,
-  checkVolatileFunctions,
-  collectFunctionNames,
-  parseOrNull
-} from '../checks/anti-patterns';
+import { allAstRulesDisabled, applyRulesToFindings, resolveRules } from '../config/resolve';
+import type { SafegresConfig } from '../config/types';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
+import { computeScore } from '../score/score';
 import type { Finding, Report } from '../types';
 import { summarize } from '../types';
-
 import { version as PKG_VERSION } from '../version';
 
 export interface AuditOptions extends IntrospectOptions {
@@ -38,6 +40,13 @@ export interface AuditOptions extends IntrospectOptions {
    * that only want grants + RLS-flag + coverage findings.
    */
   skipAstChecks?: boolean;
+  /**
+   * Merged safegres configuration (rules, overrides, scoring). Rule settings
+   * filter and retune findings; scoring settings drive the report score.
+   * Connection-independent option fields (`schemas`, `roles`, …) present on
+   * the config are used as fallbacks for the corresponding AuditOptions.
+   */
+  config?: SafegresConfig;
 }
 
 export async function audit(
@@ -45,18 +54,25 @@ export async function audit(
   options: AuditOptions = {}
 ): Promise<Report> {
   const exec = asExecutor(client);
+  const config = options.config ?? {};
+  const resolved = resolveRules(config);
+  const skipAst = options.skipAstChecks || allAstRulesDisabled(resolved);
 
   // Resolve role set.
   const allRoles = await listAuditableRoles(exec);
-  const resolution = resolveRoles(allRoles, options.includeRoles, options.excludeRoles);
+  const resolution = resolveRoles(
+    allRoles,
+    options.includeRoles ?? config.roles,
+    options.excludeRoles ?? config.excludeRoles
+  );
 
   const snapshot = await introspectTables(exec, {
-    schemas: options.schemas,
-    excludeSchemas: options.excludeSchemas,
+    schemas: options.schemas ?? config.schemas,
+    excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
     roles: resolution.roles
   });
 
-  const findings: Finding[] = [];
+  let findings: Finding[] = [];
 
   for (const table of snapshot) {
     // --- RLS flags (structural) ---
@@ -74,18 +90,20 @@ export async function audit(
     findings.push(...checkUpdateWithCheckCoverage(table));
 
     // --- AST-level anti-patterns ---
-    if (!options.skipAstChecks) {
+    if (!skipAst) {
       findings.push(...(await auditTableAst(exec, table)));
     }
   }
 
+  findings = applyRulesToFindings(resolved, findings);
   findings.sort(compareFindings);
 
   return {
     version: PKG_VERSION,
     generatedAt: new Date().toISOString(),
     summary: summarize(findings),
-    findings
+    findings,
+    score: computeScore(findings, config.scoring)
   };
 }
 

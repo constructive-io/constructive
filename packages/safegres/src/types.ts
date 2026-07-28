@@ -49,6 +49,8 @@ export interface Report {
   generatedAt: string;
   summary: Summary;
   findings: Finding[];
+  /** Config-driven audit score (weighted deductions, 0-100 + grade). */
+  score?: import('./score/score').Score;
 }
 
 export function newSummary(): Summary {

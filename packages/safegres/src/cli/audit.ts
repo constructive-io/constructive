@@ -1,13 +1,15 @@
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
-import { Client } from 'pg';
-import { getPgEnvOptions, type PgConfig } from 'pg-env';
 
 import { audit } from '../commands/audit';
+import { loadConfig } from '../config/loader';
+import type { Grade } from '../config/types';
 import { renderJson } from '../report/json';
 import { renderPretty } from '../report/pretty';
+import { meetsGrade } from '../score/score';
 import type { Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER } from '../types';
+import { buildClient, configParamsFromArgv, csvList } from './shared';
 
 const log = new Logger('safegres');
 
@@ -24,6 +26,12 @@ Connection (priority order, top wins):
   --password <pw>          PostgreSQL password    (else PGPASSWORD,default password)
   --database <db>          PostgreSQL database    (else PGDATABASE,default postgres)
 
+Configuration:
+  --config <path>          Explicit config file (else discovered: safegres.config.{ts,js,mjs,cjs},
+                           .safegresrc{,.json,.yaml,.yml,.js}, safegres.json, package.json "safegres")
+  --preset <name>          Apply a built-in preset (recommended|strict|multi-tenant|minimal)
+  --rule <CODE=SETTING>    Retune a rule (repeatable), e.g. --rule A3=off --rule A5=high
+
 Audit options:
   --schemas <csv>          Limit to these schemas (default: all non-system)
   --exclude-schemas <csv>  Skip these schemas
@@ -32,31 +40,12 @@ Audit options:
   --format <fmt>           "pretty" (default) | "json" | "json-pretty"
   --fail-on <severity>     Exit non-zero if any finding >= severity
                            (critical|high|medium|low|info; default: none)
+  --fail-on-score <n>      Exit non-zero if the score is below n (0-100)
+  --fail-on-grade <g>      Exit non-zero if the grade is below g (A+|A|B|C|D)
   --skip-ast               Skip AST-level anti-pattern checks (faster)
   --no-color               Disable ANSI colors in pretty output
   --help, -h               Show this help message
 `;
-
-function csvList(value: unknown): string[] | undefined {
-  if (typeof value !== 'string' || value.length === 0) return undefined;
-  return value
-    .split(',')
-    .map((p) => p.trim())
-    .filter(Boolean);
-}
-
-function buildClient(argv: ParsedArgs): Client {
-  if (typeof argv.connection === 'string' && argv.connection.length > 0) {
-    return new Client({ connectionString: argv.connection });
-  }
-  const overrides: Partial<PgConfig> = {};
-  if (typeof argv.host === 'string') overrides.host = argv.host;
-  if (typeof argv.port === 'number') overrides.port = argv.port;
-  if (typeof argv.user === 'string') overrides.user = argv.user;
-  if (typeof argv.password === 'string') overrides.password = argv.password;
-  if (typeof argv.database === 'string') overrides.database = argv.database;
-  return new Client(getPgEnvOptions(overrides));
-}
 
 export default async (
   argv: ParsedArgs,
@@ -71,6 +60,8 @@ export default async (
   // minimist parses `--no-color` as `color: false`.
   const colorEnabled = argv.color !== false;
 
+  const { config } = loadConfig(configParamsFromArgv(argv));
+
   const client = buildClient(argv);
   await client.connect();
   try {
@@ -79,7 +70,8 @@ export default async (
       excludeSchemas: csvList(argv['exclude-schemas']),
       includeRoles: csvList(argv.roles),
       excludeRoles: csvList(argv['exclude-roles']),
-      skipAstChecks: argv['skip-ast'] === true
+      skipAstChecks: argv['skip-ast'] === true,
+      config
     });
 
     const fmt = typeof argv.format === 'string' ? argv.format : 'pretty';
@@ -101,15 +93,30 @@ export default async (
     process.stdout.write(output);
     process.stdout.write('\n');
 
-    const failOn = typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : undefined;
-    if (failOn) {
-      if (!(failOn in SEVERITY_ORDER)) {
-        log.error(`Unknown --fail-on severity: ${failOn}`);
+    const failOnSeverity =
+      typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : config.failOn?.severity;
+    if (failOnSeverity) {
+      if (!(failOnSeverity in SEVERITY_ORDER)) {
+        log.error(`Unknown --fail-on severity: ${failOnSeverity}`);
         process.exit(2);
       }
-      if (report.findings.some((f) => meetsThreshold(f.severity, failOn))) {
+      if (report.findings.some((f) => meetsThreshold(f.severity, failOnSeverity))) {
         process.exit(1);
       }
+    }
+
+    const failOnScore =
+      typeof argv['fail-on-score'] === 'number' ? argv['fail-on-score'] : config.failOn?.score;
+    if (failOnScore != null && report.score && report.score.value < failOnScore) {
+      log.error(`score ${report.score.value} is below --fail-on-score ${failOnScore}`);
+      process.exit(1);
+    }
+
+    const failOnGrade =
+      typeof argv['fail-on-grade'] === 'string' ? (argv['fail-on-grade'] as Grade) : config.failOn?.grade;
+    if (failOnGrade && report.score && !meetsGrade(report.score.grade, failOnGrade)) {
+      log.error(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
+      process.exit(1);
     }
   } finally {
     await client.end();

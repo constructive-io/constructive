@@ -45,6 +45,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgsql/traverse": "^18.1.0",
     "@pgsql/types": "^18.0.0",
+    "confstash": "^0.0.1",
     "inquirerer": "^4.9.1",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",

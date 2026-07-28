@@ -42,6 +42,62 @@ Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) a
 
 Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across every applicable permissive policy (FOR ALL + PUBLIC-role policies considered). Roles with `BYPASSRLS` are suppressed.
 
+## Configuration
+
+safegres is configurable like a linter. Config is discovered by walking up from the current directory: `safegres.config.{ts,js,mjs,cjs}`, `.safegresrc{,.json,.yaml,.yml,.js}`, `safegres.json`, or a `"safegres"` key in package.json (via [confstash](https://github.com/constructive-io/dev-utils/tree/main/packages/confstash)).
+
+```jsonc
+// .safegresrc.json
+{
+  "extends": "safegres:recommended",
+  "excludeSchemas": ["archive"],
+  "rules": {
+    "A3": "off",            // disable a rule
+    "A5": "high",           // retune a severity
+    "P*": "medium"          // prefix wildcards
+  },
+  "overrides": [
+    { "tables": ["public.audit_*"], "rules": { "A2": "off" } }
+  ],
+  "scoring": { "weights": { "medium": 2 } },
+  "failOn": { "severity": "high", "grade": "B" }
+}
+```
+
+Or typed:
+
+```ts
+// safegres.config.ts
+import { defineConfig } from 'confstash';
+
+export default defineConfig({
+  extends: 'safegres:multi-tenant',
+  rules: { A6: 'low' }
+});
+```
+
+### Presets
+
+| Preset | Behavior |
+| --- | --- |
+| `safegres:recommended` | Every rule at its default severity (the no-config behavior) |
+| `safegres:strict` | Coverage gaps escalated (A4 critical, A5 high), `failOn: high` |
+| `safegres:multi-tenant` | Cross-tenant leak surfaces (A2, A4, A7, P5) critical |
+| `safegres:minimal` | Structural flags only (A1–A3) — fast CI smoke check |
+
+CLI: `--config <path>`, `--preset <name>`, `--rule CODE=off|severity` (repeatable).
+
+### Scoring
+
+Every report includes a config-driven score (0–100 + grade): weighted deductions per finding severity (critical 25, high 10, medium 4, low 1, info 0 by default), capped per rule, with any critical finding flooring the grade at C. Tune via `scoring.weights`, `scoring.perRuleWeights`, `scoring.maxDeductionPerRule`, `scoring.gradeBands`, `scoring.floorOnCritical`. Gate CI with `--fail-on-score <n>` / `--fail-on-grade <g>` or `failOn` in config.
+
+### Other commands
+
+```bash
+safegres doctor        # diagnose config, parser, connection, catalog access, blind spots
+safegres print-config  # show the resolved effective config (--explain for per-key provenance)
+```
+
 ## Library use
 
 ```ts
