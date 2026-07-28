@@ -5,3 +5,7 @@ export * from './skills/manifest';
 export * from './skills/source';
 export * from './skills/overlay';
 export * from './skills/materialize';
+export * from './skills/registry';
+export * from './skills/integrity';
+export * from './skills/fetch';
+export * from './skills/update-check';
