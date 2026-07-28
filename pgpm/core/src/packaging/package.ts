@@ -161,7 +161,7 @@ export const writePackage = async ({
     );
 
     pkg.version = version;
-    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 
     const regex = new RegExp(`${extname}--[0-9.]+.sql`);
     writeFileSync(makePath, Makefile.replace(regex, sqlFileName));

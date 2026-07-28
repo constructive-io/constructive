@@ -24,6 +24,7 @@ import remove from './commands/remove';
 import renameCmd from './commands/rename';
 import revert from './commands/revert';
 import slice from './commands/slice';
+import syncVersions from './commands/sync-versions';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
 import tune from './commands/tune';
@@ -68,6 +69,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     analyze: pgt(analyze),
     rename: pgt(renameCmd),
     slice,
+    'sync-versions': syncVersions,
     'test-packages': pgt(testPackages),
     tune: pgt(tune),
     upgrade: pgt(upgrade),

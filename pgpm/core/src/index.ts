@@ -3,6 +3,7 @@ export * from './rebundle';
 export * from './extensions/extensions';
 export * from './modules/modules';
 export * from './packaging/package';
+export * from './packaging/sync-versions';
 export * from './packaging/transform';
 export * from './resolution/deps';
 export * from './resolution/resolve';
