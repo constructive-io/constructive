@@ -4,7 +4,7 @@
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
 </p>
 
-`agent` — a full coding agent, right in your shell. Skills, a backend harness, and offline-capable skill releases, batteries included.
+`agent` — a local, secure-by-default coding agent that builds your frontend and your backend. Skills, a backend harness, and offline-capable skill releases, batteries included.
 
 ```bash
 npm install -g @agentic-kit/cli
