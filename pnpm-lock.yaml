@@ -153,6 +153,13 @@ importers:
         version: link:../protocol/dist
     publishDirectory: dist
 
+  agentic/harness:
+    dependencies:
+      appstash:
+        specifier: ^0.7.0
+        version: 0.7.0
+    publishDirectory: dist
+
   agentic/ollama:
     dependencies:
       '@agentic-kit/protocol':
