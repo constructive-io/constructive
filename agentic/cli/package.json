@@ -1,0 +1,45 @@
+{
+  "name": "@agentic-kit/cli",
+  "version": "0.1.0",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "description": "agent — the pi coding agent with the Constructive harness baked in, purely a shell",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "agent": "index.js"
+  },
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@agentic-kit/harness": "workspace:*",
+    "@earendil-works/pi-coding-agent": "0.79.6",
+    "inquirerer": "^4.9.1"
+  },
+  "keywords": [
+    "agentic-kit",
+    "coding-agent",
+    "pi",
+    "harness"
+  ]
+}
