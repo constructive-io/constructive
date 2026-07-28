@@ -12,6 +12,8 @@ const log = new Logger('graphile-cache:create');
 interface GraphileInstanceOptions {
   preset: any;
   cacheKey: string;
+  /** Exact key used by the owning pg-cache manager. */
+  pgPoolKey?: string;
   /**
    * When true, a RealtimeManager is created and started alongside the
    * PostGraphile instance.  The pool is extracted from the preset's
@@ -39,7 +41,7 @@ interface GraphileInstanceOptions {
 export const createGraphileInstance = async (
   opts: GraphileInstanceOptions
 ): Promise<GraphileCacheEntry> => {
-  const { preset, cacheKey, enableRealtime = false } = opts;
+  const { preset, cacheKey, pgPoolKey, enableRealtime = false } = opts;
 
   const pgl = postgraphile(preset);
   const serv = pgl.createServ(grafserv);
@@ -55,12 +57,14 @@ export const createGraphileInstance = async (
     handler,
     httpServer,
     cacheKey,
+    ...(pgPoolKey ? { pgPoolKey } : {}),
     createdAt: Date.now(),
   };
 
   if (enableRealtime) {
     try {
-      const { RealtimeManager } = await import('graphile-realtime-subscriptions');
+      const { RealtimeManager } =
+        await import('graphile-realtime-subscriptions');
 
       // Extract PgSubscriber and pool from the resolved preset's pgServices.
       // The pool is the same instance managed by pg-cache (via getPgPool)
@@ -71,9 +75,13 @@ export const createGraphileInstance = async (
       const pool = pgService?.adaptorSettings?.pool ?? null;
 
       if (!pgSubscriber) {
-        log.warn(`PostGraphile[${cacheKey}] has no pgSubscriber — RealtimeManager will not be started`);
+        log.warn(
+          `PostGraphile[${cacheKey}] has no pgSubscriber — RealtimeManager will not be started`
+        );
       } else if (!pool) {
-        log.warn(`PostGraphile[${cacheKey}] has no pool in pgService — RealtimeManager will not be started`);
+        log.warn(
+          `PostGraphile[${cacheKey}] has no pool in pgService — RealtimeManager will not be started`
+        );
       } else {
         const manager = new RealtimeManager({
           pgSubscriber,
@@ -87,7 +95,10 @@ export const createGraphileInstance = async (
         log.info(`RealtimeManager started for PostGraphile[${cacheKey}]`);
       }
     } catch (err) {
-      log.error(`Failed to start RealtimeManager for PostGraphile[${cacheKey}]:`, err);
+      log.error(
+        `Failed to start RealtimeManager for PostGraphile[${cacheKey}]:`,
+        err
+      );
     }
   }
 

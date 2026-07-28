@@ -2,22 +2,24 @@
 export {
   getActivePgPoolFactory,
   hasPgPoolFactory,
-  registerPgPoolFactory
+  registerPgPoolFactory,
 } from './driver';
-export { 
+export {
   close,
   getPgCacheConfig,
-  pgCache, 
-  PgPoolCacheManager, 
-  teardownPgPools
+  pgCache,
+  PgPoolCacheManager,
+  teardownPgPools,
 } from './lru';
 export {
   buildConnectionString,
   defaultPgPoolFactory,
   getPgPool,
-  getPgPoolConfig
+  getPgPoolCacheKey,
+  getPgPoolConfig,
 } from './pg';
 
 // Re-export types
 export type { PgPoolFactory, QueryableClient, QueryablePool } from './driver';
-export type { PgCacheConfig, PoolCleanupCallback } from './lru';
+export type { PgCacheConfig, PgPoolKey, PoolCleanupCallback } from './lru';
+export type { PgPoolRuntimeOptions } from './pg';

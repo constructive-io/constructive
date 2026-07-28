@@ -10,23 +10,42 @@ import {
   defaultPgPoolFactory,
   getActivePgPoolFactory,
   getPgPool,
+  getPgPoolCacheKey,
   hasPgPoolFactory,
+  PgPoolCacheManager,
   PgPoolFactory,
-  registerPgPoolFactory
+  registerPgPoolFactory,
 } from '../index';
-import { pgCache } from '../lru';
 
 const createMockPool = (): pg.Pool =>
-  ({ query: jest.fn(), connect: jest.fn(), end: jest.fn(async () => {}) } as unknown as pg.Pool);
+  ({
+    query: jest.fn(),
+    connect: jest.fn(),
+    end: jest.fn(async () => {}),
+  }) as unknown as pg.Pool;
 
 const freshConfig = () => {
   const database = `seam_${randomUUID()}`;
-  return { database, host: 'localhost', port: 5432, user: 'postgres', password: 'x' };
+  return {
+    database,
+    host: 'localhost',
+    port: 5432,
+    user: 'postgres',
+    password: 'x',
+  };
 };
 
 describe('pg-cache pool-factory seam', () => {
-  afterEach(() => {
+  const ownedCaches: PgPoolCacheManager[] = [];
+  const createCache = (): PgPoolCacheManager => {
+    const cache = new PgPoolCacheManager(undefined, {});
+    ownedCaches.push(cache);
+    return cache;
+  };
+
+  afterEach(async () => {
     registerPgPoolFactory(undefined);
+    await Promise.all(ownedCaches.splice(0).map((cache) => cache.close()));
   });
 
   it('defaults to no registered factory', () => {
@@ -48,37 +67,56 @@ describe('pg-cache pool-factory seam', () => {
     const cfg = freshConfig();
     const mock = createMockPool();
     const factory = jest.fn<pg.Pool, [any]>(() => mock);
+    const cache = createCache();
     registerPgPoolFactory(factory);
 
-    const pool = getPgPool(cfg);
+    const pool = getPgPool(cfg, { cache, environment: {} });
 
     expect(factory).toHaveBeenCalledTimes(1);
     expect(pool).toBe(mock);
-
-    pgCache.delete(cfg.database);
   });
 
-  it('caches by database: a second call reuses the pool and does not re-invoke the factory', () => {
+  it('caches by complete connection identity', () => {
     const cfg = freshConfig();
     const factory = jest.fn<pg.Pool, [any]>(() => createMockPool());
+    const cache = createCache();
     registerPgPoolFactory(factory);
 
-    const first = getPgPool(cfg);
-    const second = getPgPool(cfg);
+    const first = getPgPool(cfg, { cache, environment: {} });
+    const second = getPgPool(cfg, { cache, environment: {} });
 
     expect(first).toBe(second);
     expect(factory).toHaveBeenCalledTimes(1);
+  });
 
-    pgCache.delete(cfg.database);
+  it('does not collide when database names match but credentials differ', () => {
+    const cfg = freshConfig();
+    const factory = jest.fn<pg.Pool, [any]>(() => createMockPool());
+    const cache = createCache();
+    registerPgPoolFactory(factory);
+
+    const first = getPgPool(cfg, { cache, environment: {} });
+    const second = getPgPool(
+      { ...cfg, host: 'db.internal', password: 'different-secret' },
+      { cache, environment: {} }
+    );
+
+    expect(first).not.toBe(second);
+    expect(factory).toHaveBeenCalledTimes(2);
+    expect([...cache.keys()]).toHaveLength(2);
+    expect([...cache.keys()].join(' ')).not.toContain('different-secret');
+    expect(getPgPoolCacheKey(cfg, { environment: {} })).not.toContain(
+      cfg.password
+    );
   });
 
   it('falls back to defaultPgPoolFactory when nothing is registered', () => {
     const cfg = freshConfig();
+    const cache = createCache();
     // defaultPgPoolFactory builds a real pg.Pool but does NOT connect until a
     // query runs, so this is safe without a live server.
-    const pool = getPgPool(cfg);
+    const pool = getPgPool(cfg, { cache, environment: {} });
     expect(pool).toBeInstanceOf(pg.Pool);
-    pgCache.delete(cfg.database);
   });
 
   it('defaultPgPoolFactory returns a pg.Pool', () => {
