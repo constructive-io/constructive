@@ -1,0 +1,57 @@
+{
+  "name": "@constructive-io/cli-runtime",
+  "version": "0.1.0",
+  "description": "Typed, machine-readable command runtime for Constructive CLIs",
+  "author": "Constructive <developers@constructive.io>",
+  "license": "MIT",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./index.js"
+    }
+  },
+  "files": [
+    "**/*"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build && node ./scripts/finalize-esm.js",
+    "build:dev": "makage build --dev && node ./scripts/finalize-esm.js",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.49",
+    "ajv": "^8.20.0"
+  },
+  "devDependencies": {
+    "makage": "^0.3.0"
+  },
+  "keywords": [
+    "cli",
+    "agent",
+    "json-schema",
+    "constructive"
+  ]
+}
