@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.1.0...@agentic-kit/harness@0.2.0) (2026-07-28)
+
+### Features
+
+- **harness:** git-repo skill source — fetch releases from GitHub tags (pgpm/appstash pattern) ([ad99e62](https://github.com/constructive-io/constructive/commit/ad99e62b60dd85cb4af5bd2d2f9a616e6ac7ece4))
+- **harness:** skill dependency tree via frontmatter requires: ([42f8318](https://github.com/constructive-io/constructive/commit/42f8318725f842f2f4476f0a59adbb4800025714))
+
 # 0.1.0 (2026-07-28)
 
 ### Features
