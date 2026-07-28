@@ -29,7 +29,9 @@
     "build:dev": "makage build --dev && chmod +x dist/cli.js",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "eval": "jest evals",
+    "eval:update": "UPDATE_GOLDENS=1 jest evals"
   },
   "keywords": [
     "postgres",

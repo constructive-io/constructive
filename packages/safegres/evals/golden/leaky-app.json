@@ -1,0 +1,50 @@
+{
+  "safegres:recommended": {
+    "score": 13,
+    "grade": "F",
+    "byCode": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 2,
+      "A4": 1,
+      "A5": 1,
+      "A6": 1,
+      "A7": 3
+    }
+  },
+  "safegres:strict": {
+    "score": 0,
+    "grade": "F",
+    "byCode": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 2,
+      "A4": 1,
+      "A5": 1,
+      "A6": 1,
+      "A7": 3
+    }
+  },
+  "safegres:constructive": {
+    "score": 0,
+    "grade": "F",
+    "byCode": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 2,
+      "A4": 1,
+      "A5": 1,
+      "A6": 1,
+      "A7": 3
+    }
+  },
+  "safegres:minimal": {
+    "score": 57,
+    "grade": "D",
+    "byCode": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 2
+    }
+  }
+}

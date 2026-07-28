@@ -111,6 +111,18 @@ describe('audit — Script A', () => {
     expect(p5?.severity).toBe('high');
   });
 
+  it('R3: flags PUBLIC grant on an RLS table through the resolved role filter', async () => {
+    await applyFixture('r3-public-grant-rls.sql');
+    // Default audit path resolves a concrete named-role set for introspection;
+    // PUBLIC must still be retained so R3 can fire.
+    const report = await audit(pg.client as never, { schemas: ['fx_r3'] });
+    const found = findingsFor(report.findings, 'fx_r3');
+    const r3 = found.find((f) => f.code === 'R3');
+    expect(r3).toBeDefined();
+    expect(r3?.role).toBe('PUBLIC');
+    expect(r3?.severity).toBe('medium');
+  });
+
   it('clean table produces no findings', async () => {
     await applyFixture('clean-table.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_clean'] });

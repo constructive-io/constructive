@@ -1,0 +1,22 @@
+{
+  "safegres:recommended": {
+    "score": 100,
+    "grade": "A+",
+    "byCode": {}
+  },
+  "safegres:strict": {
+    "score": 100,
+    "grade": "A+",
+    "byCode": {}
+  },
+  "safegres:constructive": {
+    "score": 100,
+    "grade": "A+",
+    "byCode": {}
+  },
+  "safegres:minimal": {
+    "score": 100,
+    "grade": "A+",
+    "byCode": {}
+  }
+}

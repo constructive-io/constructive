@@ -105,8 +105,13 @@ export async function introspectTables(
 ): Promise<TableSnapshot[]> {
   const excludes = [...DEFAULT_EXCLUDES, ...(options.excludeSchemas ?? [])];
 
+  // PUBLIC (grantee_oid = 0) is always retained: a grant TO PUBLIC applies to
+  // every current and future role, so it is relevant regardless of which named
+  // roles are being audited. Filtering it out would blind PUBLIC-grant checks
+  // (R3) whenever a role list is in effect — which, since audit always resolves
+  // a concrete role set, is effectively always.
   const roleFilter = options.roles && options.roles.length > 0
-    ? `AND (CASE WHEN g.grantee_oid = 0 THEN 'PUBLIC' ELSE rol.rolname END) = ANY($3::text[])`
+    ? `AND (g.grantee_oid = 0 OR rol.rolname = ANY($3::text[]))`
     : '';
   const schemaFilter = options.schemas && options.schemas.length > 0
     ? `AND n.nspname = ANY($1::text[])`
