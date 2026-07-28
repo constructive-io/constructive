@@ -14,7 +14,7 @@ import {
   _cachedTablesMeta,
   _pgTypeToGqlType,
   MetaSchemaPlugin
-} from '../src/plugins/meta-schema';
+} from '../src';
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -1,29 +1,15 @@
 /**
  * PostGraphile v5 Meta Schema Plugin
  *
- * Exposes a `_meta` GraphQL query that provides metadata about tables, fields,
- * constraints, indexes, and relations for code generation tooling.
+ * Re-exported from the `graphile-meta` package for backward compatibility.
  */
 
-import type { GraphileConfig } from 'graphile-config';
-import { cachedTablesMeta } from './meta-schema/cache';
-import { buildScalarEncoding } from './meta-schema/encoding-meta-builders';
-import { MetaSchemaPlugin } from './meta-schema/plugin';
-import { buildFieldMeta, pgTypeToGqlType } from './meta-schema/type-mappings';
-
-export { MetaSchemaPlugin };
-
-export const MetaSchemaPreset: GraphileConfig.Preset = {
-  plugins: [MetaSchemaPlugin],
-};
-
-/** @internal Exported for testing only */
-export { pgTypeToGqlType as _pgTypeToGqlType };
-/** @internal Exported for testing only */
-export { buildFieldMeta as _buildFieldMeta };
-/** @internal Exported for testing only */
-export { cachedTablesMeta as _cachedTablesMeta };
-/** @internal Exported for testing only */
-export { buildScalarEncoding as _buildScalarEncoding };
-
-export default MetaSchemaPlugin;
+export {
+  _buildFieldMeta,
+  _buildScalarEncoding,
+  _cachedTablesMeta,
+  _pgTypeToGqlType,
+  MetaSchemaPlugin,
+  MetaSchemaPreset,
+} from 'graphile-meta';
+export { MetaSchemaPlugin as default } from 'graphile-meta';

@@ -67,7 +67,7 @@ export type {
   ManyToManyRelation,
   InflectionMeta,
   QueryMeta,
-} from './meta-schema/types';
+} from 'graphile-meta';
 
 // PG type mappings for custom PostgreSQL types (email, url, etc.)
 export {
