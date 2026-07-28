@@ -20,7 +20,13 @@ import {
   checkRlsEnabledNoPolicies,
   checkRlsNotForced
 } from '../checks/rls-flags';
-import { allAstRulesDisabled, applyRulesToFindings, resolveRules } from '../config/resolve';
+import {
+  checkPublicGrants,
+  checkUntrustedRolePolicies,
+  checkUntrustedRoleWrites,
+  type RoleTrustOptions
+} from '../checks/role-trust';
+import { allAstRulesDisabled, applyRulesToFindings, resolveRules, rulesForTable } from '../config/resolve';
 import type { SafegresConfig } from '../config/types';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
@@ -88,6 +94,16 @@ export async function audit(
     // --- Grant-vs-policy coverage ---
     findings.push(...checkCoverageGaps(table));
     findings.push(...checkUpdateWithCheckCoverage(table));
+
+    // --- Role-trust (options-driven; per-table overrides can retune roles) ---
+    const tableRules = rulesForTable(resolved, table.schema, table.name);
+    findings.push(
+      ...checkUntrustedRoleWrites(table, tableRules.get('R1')?.options as RoleTrustOptions)
+    );
+    findings.push(
+      ...checkUntrustedRolePolicies(table, tableRules.get('R2')?.options as RoleTrustOptions)
+    );
+    findings.push(...checkPublicGrants(table));
 
     // --- AST-level anti-patterns ---
     if (!skipAst) {

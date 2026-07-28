@@ -88,6 +88,27 @@ export const RULES: RuleMeta[] = [
     defaultSeverity: 'high',
     title: 'Policy body references session_user / current_user / pg_has_role',
     scope: 'policy-ast'
+  },
+  {
+    code: 'R1',
+    category: 'anti-pattern',
+    defaultSeverity: 'critical',
+    title: 'Untrusted role holds a write privilege (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'R2',
+    category: 'anti-pattern',
+    defaultSeverity: 'high',
+    title: 'Permissive write policy applies to an untrusted role or PUBLIC (options: { roles: [...] })',
+    scope: 'table'
+  },
+  {
+    code: 'R3',
+    category: 'anti-pattern',
+    defaultSeverity: 'medium',
+    title: 'RLS table has grants TO PUBLIC (includes all current and future roles)',
+    scope: 'table'
   }
 ];
 

@@ -29,7 +29,7 @@ Connection (priority order, top wins):
 Configuration:
   --config <path>          Explicit config file (else discovered: safegres.config.{ts,js,mjs,cjs},
                            .safegresrc{,.json,.yaml,.yml,.js}, safegres.json, package.json "safegres")
-  --preset <name>          Apply a built-in preset (recommended|strict|multi-tenant|minimal)
+  --preset <name>          Apply a built-in preset (recommended|strict|constructive|minimal)
   --rule <CODE=SETTING>    Retune a rule (repeatable), e.g. --rule A3=off --rule A5=high
 
 Audit options:

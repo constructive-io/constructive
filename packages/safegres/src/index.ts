@@ -11,13 +11,19 @@ export {
   type PgAstNode,
   type PolicyExpression,
   PolicyParseError} from './ast/parse';
+export type { RoleTrustOptions } from './checks/role-trust';
+export {
+  checkPublicGrants,
+  checkUntrustedRolePolicies,
+  checkUntrustedRoleWrites
+} from './checks/role-trust';
 export type { AuditOptions } from './commands/audit';
 export { audit } from './commands/audit';
 export type { DoctorCheck, DoctorOptions, DoctorReport, DoctorStatus } from './commands/doctor';
 export { doctor } from './commands/doctor';
 export type { LoadConfigParams } from './config/loader';
 export { loadConfig, safegresConfigLoader } from './config/loader';
-export { minimal, multiTenant, PRESETS, recommended, strict } from './config/presets';
+export { constructive, minimal, PRESETS, recommended, strict } from './config/presets';
 export type { ResolvedRule, ResolvedRules } from './config/resolve';
 export {
   allAstRulesDisabled,
