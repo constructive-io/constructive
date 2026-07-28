@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { loadConfig } from './config';
 import { init, skillsList, skillsUpdate, usage } from './commands';
+import { materializeDbTools } from './db-tools';
 import { assembleSkills } from './skills';
 
 export { assembleSkills } from './skills';
 export { AgentCliConfig, loadConfig } from './config';
+export { HOST_ENV_VARS, materializeDbTools } from './db-tools';
 
 async function run(args: string[]): Promise<void> {
   const config = loadConfig(process.env.AGENT_HOME);
@@ -27,8 +29,16 @@ async function run(args: string[]): Promise<void> {
     return;
   }
 
-  await assembleSkills(config, (msg) => console.log(`[agent] ${msg}`));
-  const { main } = await import('@earendil-works/pi-coding-agent');
+  const log = (msg: string) => console.log(`[agent] ${msg}`);
+  await assembleSkills(config, log);
+  materializeDbTools(config, log);
+  // pi is ESM-only; tsc's CJS output would downlevel a plain `await import()`
+  // into `require()`, which cannot load it. Indirect the import so it survives
+  // transpilation in the CJS build.
+  const dynamicImport = new Function('specifier', 'return import(specifier)') as (
+    specifier: string
+  ) => Promise<{ main: (args: string[]) => Promise<void> }>;
+  const { main } = await dynamicImport('@earendil-works/pi-coding-agent');
   await main(args);
 }
 

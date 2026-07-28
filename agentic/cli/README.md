@@ -18,6 +18,7 @@ On startup, `agent` assembles the harness skill tree and drops you into an inter
 
 1. **Base layer** — a pinned release of [`constructive-io/constructive-skills`](https://github.com/constructive-io/constructive-skills), fetched as a git tag/branch/SHA tarball into `~/.constructive/data/skills/<version>/` (offline fallback: newest cached release).
 2. **Local overlay** — `~/.constructive/config/skills-overlay/<skill-name>/SKILL.md` (agentskills.io layout), highest precedence: a same-name skill replaces the base skill wholesale.
+3. **Typed db tools** — the [`@agentic-kit/pi`](https://www.npmjs.com/package/@agentic-kit/pi) extension (provision_database, provision_blueprint, describe_schema, add_records, run_codegen, … with confirm gating on pi's built-in y/n dialog) is materialized into the agent dir and loaded by pi automatically.
 
 The merged tree is materialized into the appstash-owned agent dir, so the session picks the skills up natively. All harness state lives in the [appstash](https://github.com/constructive-io/appstash) `~/.constructive/` layout; project directories are untouched.
 
@@ -51,9 +52,12 @@ The merged tree is materialized into the appstash-owned agent dir, so the sessio
 
 Env overrides: `AGENT_SKILLS_REPO`, `AGENT_SKILLS_PIN`, `AGENT_HOME` (appstash base dir), `GITHUB_TOKEN` (private skills repos).
 
+Db-tool credentials (read per tool call; without them the tools respond "not signed in"):
+`CONSTRUCTIVE_USER_ID`, `CONSTRUCTIVE_ACCESS_TOKEN`, `CONSTRUCTIVE_API_KEY` (optional), `CONSTRUCTIVE_API_ENDPOINT`, `CONSTRUCTIVE_MODULES_ENDPOINT` (default to the local backend).
+
 ## Roadmap
 
-- Typed Constructive db tools + confirm gating (`@agentic-kit/harness` gating wired to the terminal confirm UI) once the tools are extracted from constructive-desktop against `HarnessContext`.
+- `agent login` — sign in to a Constructive backend and persist credentials in appstash instead of env vars.
 - Harness system-prompt section + templates/prompts materialization, shared with constructive-desktop via a common adapter package.
 
 ## Credits
