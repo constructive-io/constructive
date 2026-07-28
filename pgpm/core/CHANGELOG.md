@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.8.0...@pgpmjs/core@7.9.0) (2026-07-28)
+
+### Bug Fixes
+
+- **core:** keep trailing newline when writePackage rewrites package.json ([57fa525](https://github.com/constructive-io/constructive/commit/57fa525dd653a9d1386145c2d0a2a9d33f7b05f5))
+
+### Features
+
+- **pgpm:** add sync-versions command to realign extension metadata with package.json versions ([20ae504](https://github.com/constructive-io/constructive/commit/20ae504efc79e165cb4f619104641c1b42eafcaa))
+
 # [7.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.7.0...@pgpmjs/core@7.8.0) (2026-07-27)
 
 **Note:** Version bump only for package @pgpmjs/core

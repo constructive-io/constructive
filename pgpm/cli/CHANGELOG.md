@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.8.0](https://github.com/constructive-io/constructive/compare/pgpm@5.7.0...pgpm@5.8.0) (2026-07-28)
+
+### Features
+
+- **pgpm:** add sync-versions command to realign extension metadata with package.json versions ([20ae504](https://github.com/constructive-io/constructive/commit/20ae504efc79e165cb4f619104641c1b42eafcaa))
+
 # [5.7.0](https://github.com/constructive-io/constructive/compare/pgpm@5.6.0...pgpm@5.7.0) (2026-07-27)
 
 **Note:** Version bump only for package pgpm
