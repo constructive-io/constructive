@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.8.1](https://github.com/constructive-io/constructive/compare/pgpm@5.8.0...pgpm@5.8.1) (2026-07-28)
+
+### Bug Fixes
+
+- **pgpm:** cascade --no-tty through init template scaffolding ([1bb17f9](https://github.com/constructive-io/constructive/commit/1bb17f94ea103575b593a1ca44049842798f3835))
+
 # [5.8.0](https://github.com/constructive-io/constructive/compare/pgpm@5.7.0...pgpm@5.8.0) (2026-07-28)
 
 ### Features
