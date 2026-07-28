@@ -22,12 +22,13 @@
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "build": "makage build && npm run generate:json",
+    "build:dev": "makage build --dev && npm run generate:json",
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "generate:types": "ts-node src/codegen/generate-types.ts"
+    "generate:types": "ts-node src/codegen/generate-types.ts",
+    "generate:json": "ts-node src/codegen/generate-json.ts --outdir dist"
   },
   "dependencies": {
     "@babel/generator": "^7.29.0",

@@ -82,3 +82,20 @@ cd graphql/node-type-registry && pnpm generate:types
 ```
 
 This produces `src/blueprint-types.generated.ts` from the TS node type source of truth.
+
+## JSON artifacts (data distribution)
+
+The build also emits the registry as pure-data JSON alongside the JS, so it can be consumed **as data** rather than as executable code:
+
+- `presets.json` — `{ registryVersion, presets }` (the module presets)
+- `node-types.json` — `{ registryVersion, nodeTypes }`
+
+```typescript
+import presets from 'node-type-registry/presets.json';
+```
+
+**Why two tiers.** Trusted, first-party consumers (the dashboard, `@agentic-kit/pi`) import this package over npm — a pinned, reviewed dependency; drift is controlled by the version bump. Untrusted or distributed consumers (appstash, third-party agents) should **not** install and execute a package just to get a preset — they fetch these JSON files from a pinned + verified source instead. Same content, no code path, no lifecycle scripts.
+
+`registryVersion` lets a consumer range-check the data against the tool code it was built for (mirrors the skills manifest's `compatibleSkillsRange`) and refuse data that runs ahead of its code. The backend's provision resolver remains the final gate on any module set.
+
+Regenerated automatically by `pnpm build`; run standalone with `pnpm generate:json`.
