@@ -30,6 +30,7 @@ Common issues and solutions for pgpm, PostgreSQL, and testing.
 ### 🧪 Testing
 
 * [pgsql-test](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-test): **📊 Isolated testing environments** with per-test transaction rollbacks—ideal for integration tests, complex migrations, and RLS simulation.
+* [pglite-test](https://github.com/constructive-io/constructive/tree/main/postgres/pglite-test): **🪶 Drop-in pgsql-test replacement backed by PGlite** — in-process Postgres, no server required, instance-per-suite isolation.
 * [pgsql-seed](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-seed): **🌱 PostgreSQL seeding utilities** for CSV, JSON, SQL data loading, and pgpm deployment.
 * [supabase-test](https://github.com/constructive-io/constructive/tree/main/postgres/supabase-test): **🧪 Supabase-native test harness** preconfigured for the local Supabase stack—per-test rollbacks, JWT/role context helpers, and CI/GitHub Actions ready.
 * [graphile-test](https://github.com/constructive-io/constructive/tree/main/graphile/graphile-test): **🔐 Authentication mocking** for Graphile-focused test helpers and emulating row-level security contexts.
