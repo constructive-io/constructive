@@ -2,6 +2,7 @@
 import { CLI, CLIOptions, getPackageJson } from 'inquirerer';
 
 import { commands, createPgpmCommandMap } from './commands';
+import { detectNoTtyFromProcess } from './utils';
 export { createInitUsageText } from './commands/init';
 
 export { createPgpmCommandMap };
@@ -55,7 +56,7 @@ if (require.main === module) {
     process.exit(0);
   }
 
-  const app = new CLI(commands, options);
+  const app = new CLI(commands, { ...options, noTty: detectNoTtyFromProcess() });
 
   app.run().then(() => {
   }).catch(error => {

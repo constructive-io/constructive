@@ -6,3 +6,4 @@ export * from './driver';
 export * from './module-utils';
 export * from './npm-version';
 export * from './package-alias';
+export * from './tty';

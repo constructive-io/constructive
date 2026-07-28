@@ -224,7 +224,11 @@ export async function scaffoldTemplate(
     fromPath: effectiveFromPath,
     answers,
     noTty,
-    prompter,
+    // In noTty mode, never reuse a caller prompter: it may have been created
+    // in interactive mode (or already closed), which would route template
+    // questions through the TTY prompt path. Letting the templatizer build
+    // its own prompter guarantees the noTty flag cascades.
+    prompter: noTty ? undefined : prompter,
     // When dir is specified, bypass .boilerplates.json resolution entirely
     useBoilerplatesConfig: !dir,
   });

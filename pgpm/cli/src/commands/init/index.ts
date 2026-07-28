@@ -18,6 +18,7 @@ import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
 
+import { isNoTtyRequested } from '../../utils';
 import {
   persistBoilerplateSource,
   readBoilerplateSource,
@@ -100,7 +101,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     pglite: Boolean(argv.pglite),
   });
   const branch = argv.fromBranch as string | undefined;
-  const noTty = Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true');
+  const noTty = isNoTtyRequested(argv);
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
   const createWorkspace = Boolean(argv.createWorkspace || argv['create-workspace'] || argv.w);
   const useNpxSkills = Boolean(argv.useSkills || argv['use-skills']);
@@ -565,7 +566,7 @@ async function handleModuleInit(
     }
 
     if (!resolvedWorkspacePath) {
-      const noTty = Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true');
+      const noTty = isNoTtyRequested(argv);
 
       // Handle --create-workspace flag: create workspace first, then module
       if (ctx.createWorkspace && (workspaceType === 'pgpm' || workspaceType === 'pnpm')) {

@@ -48,7 +48,9 @@ pgpm init workspace --dir pnpm
 
 ## Non-Interactive Mode
 
-For CI/CD pipelines and automation, use `--no-tty` or set `CI=true`:
+For CI/CD pipelines and automation, use `--no-tty` or set `CI=true`. In this
+mode nothing prompts: every required template question must be answered by a
+CLI flag or a resolvable default, otherwise the command errors out.
 
 ```bash
 pgpm init workspace --no-tty \
@@ -56,8 +58,24 @@ pgpm init workspace --no-tty \
   --fullName "Your Name" \
   --email "you@example.com" \
   --username your-github-username \
+  --repoName my-workspace \
   --license MIT
 ```
+
+### Required Parameters for Non-Interactive Workspace
+
+| Parameter | Description | Default when omitted |
+|-----------|-------------|----------------------|
+| `--name` | Workspace name (directory to create) | none — always required |
+| `--fullName` | Author's full name | `git config user.name` |
+| `--email` | Author's email | `git config user.email` |
+| `--repoName` | Repository name | workspace directory name |
+| `--username` | GitHub username | `npm whoami` |
+| `--license` | License (e.g., MIT) | none — always required |
+
+Defaults come from resolvers (git config, npm login, workspace dir name). On a
+machine without a git identity or npm login, pass `--fullName`, `--email`, and
+`--username` explicitly.
 
 ### Required Parameters for Non-Interactive Module
 
