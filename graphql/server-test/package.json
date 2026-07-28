@@ -33,6 +33,7 @@
     "@agentic-kit/ollama": "workspace:*",
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
+    "@constructive-io/oauth": "workspace:^",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",

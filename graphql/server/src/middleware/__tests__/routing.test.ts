@@ -15,7 +15,12 @@ import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
 import { getApiConfig } from '../api';
-import { ResolvedRoute, resolveRoute, routeToApiStructure } from '../routing';
+import type { ResolvedRoute } from '../routing';
+import {
+  resolveApiHost,
+  resolveRoute,
+  routeToApiStructure
+} from '../routing';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 
@@ -120,6 +125,48 @@ describe('routeToApiStructure', () => {
 
   it('returns null when resolved_config lacks api essentials', () => {
     expect(routeToApiStructure(matchedRoute({ resolved_config: {} }), opts)).toBeNull();
+  });
+});
+
+describe('resolveApiHost', () => {
+  const opts: ApiOptions = {
+    pg: { database: 'constructive' },
+    api: {
+      isPublic: true,
+      routingSchema: 'tenant_routing_public'
+    }
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('uses the cached configured routing pool and schema', async () => {
+    const query = jest.fn().mockResolvedValue({ rows: [matchedRoute()] });
+    mockGetPgPool.mockReturnValue(createPool(query) as never);
+
+    const result = await resolveApiHost(opts, 'api.example.com:8443');
+
+    expect(mockGetPgPool).toHaveBeenCalledWith(opts.pg);
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining('"tenant_routing_public".resolve_route'),
+      ['api.example.com:8443']
+    );
+    expect(result).toEqual(
+      expect.objectContaining({ apiId: 'api-1', databaseId: 'db-1' })
+    );
+  });
+
+  it('returns null rather than using a legacy fallback for an unknown host', async () => {
+    const query = jest.fn().mockResolvedValue({ rows: [noMatchRoute()] });
+    mockGetPgPool.mockReturnValue(createPool(query) as never);
+
+    await expect(resolveApiHost(opts, 'unknown.example.com')).resolves.toBeNull();
+    expect(
+      query.mock.calls.some(([sql]) =>
+        String(sql).includes('services_public')
+      )
+    ).toBe(false);
   });
 });
 

@@ -2159,6 +2159,9 @@ importers:
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../query/dist
+      '@constructive-io/oauth':
+        specifier: workspace:^
+        version: link:../../packages/oauth/dist
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6

@@ -3,18 +3,24 @@ import {
   deriveCodeChallenge,
   verifySignedState
 } from '@constructive-io/oauth';
+import { getNodeEnv } from '@pgpmjs/env';
 import express from 'express';
 import http from 'http';
 import type { AddressInfo } from 'net';
+import { getPgPool } from 'pg-cache';
 
 import { errorHandler } from '../error-handler';
 import { createOAuthRoutes } from '../oauth';
+import type { ResolvedRoute } from '../routing';
 
 const OAUTH_STATE_SECRET = 'test-oauth-state-secret';
 const DATABASE_ID = '00000000-0000-4000-8000-000000000001';
 const API_ID = '00000000-0000-4000-8000-000000000002';
+const TARGET_API_ID = '00000000-0000-4000-8000-000000000003';
+const OTHER_DATABASE_ID = '00000000-0000-4000-8000-000000000099';
 const originalFetch = global.fetch;
 const authQueryMock = jest.fn();
+const routingQueryMock = jest.fn();
 
 jest.mock('@pgpmjs/env', () => ({
   getNodeEnv: jest.fn(() => 'test')
@@ -28,6 +34,13 @@ jest.mock('@pgpmjs/logger', () => ({
   }))
 }));
 
+jest.mock('pg-cache', () => ({
+  getPgPool: jest.fn()
+}));
+
+const mockGetNodeEnv = getNodeEnv as jest.MockedFunction<typeof getNodeEnv>;
+const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+
 interface TestHttpResponse {
   statusCode: number;
   headers: http.IncomingHttpHeaders;
@@ -40,6 +53,9 @@ interface OAuthStatePayload {
   database_id: string;
   api_id: string | null;
   origin: string;
+  redirect_target_database_id: string;
+  redirect_target_api_id: string | null;
+  redirect_target_origin: string;
 }
 
 interface OAuthPkcePayload {
@@ -68,9 +84,17 @@ const providerConfig = {
 afterEach(() => {
   global.fetch = originalFetch;
   authQueryMock.mockReset();
+  routingQueryMock.mockReset();
+  mockGetNodeEnv.mockReturnValue('test');
 });
 
-function createConstructiveContext() {
+beforeEach(() => {
+  mockGetPgPool.mockReturnValue({ query: routingQueryMock } as never);
+});
+
+function createConstructiveContext(
+  authSettingsOverrides: Record<string, unknown> = {}
+) {
   return {
     api: {
       apiId: API_ID
@@ -99,7 +123,8 @@ function createConstructiveContext() {
         return {
           cookieHttponly: true,
           cookieSecure: false,
-          cookieSamesite: 'lax'
+          cookieSamesite: 'lax',
+          ...authSettingsOverrides
         };
       }
       if (name === 'connectedAccountsModule') {
@@ -194,7 +219,56 @@ function createStatePayload(
     database_id: DATABASE_ID,
     api_id: API_ID,
     origin: baseUrl,
+    redirect_target_database_id: DATABASE_ID,
+    redirect_target_api_id: API_ID,
+    redirect_target_origin: baseUrl,
     ...overrides
+  };
+}
+
+function createResolvedApiRoute({
+  databaseId = DATABASE_ID,
+  apiId = TARGET_API_ID,
+  targetModule = 'apis',
+  includeDatabaseId = true
+}: {
+  databaseId?: string;
+  apiId?: string;
+  targetModule?: string;
+  includeDatabaseId?: boolean;
+} = {}): ResolvedRoute {
+  return {
+    route_binding_id: '00000000-0000-4000-8000-000000000010',
+    hostname: 'api1.tenanta.test',
+    matched_wildcard: false,
+    matched_path: '/',
+    method: null,
+    priority: 0,
+    domain_id: '00000000-0000-4000-8000-000000000011',
+    target_catalog_id: '00000000-0000-4000-8000-000000000012',
+    target_module: targetModule,
+    target_source_id: apiId,
+    target_owner_scope: 'database',
+    target_owner_key: databaseId,
+    resolved_config: {
+      api_id: apiId,
+      ...(includeDatabaseId ? { database_id: databaseId } : {}),
+      dbname: 'tenant_a',
+      role_name: 'authenticated',
+      anon_role: 'anonymous',
+      is_public: true,
+      schemas: ['tenant_a_public']
+    },
+    verification_status: 'verified',
+    tls_status: 'ready',
+    tls_secret_name: null
+  };
+}
+
+function noMatchingRoute(): ResolvedRoute {
+  return {
+    ...createResolvedApiRoute(),
+    route_binding_id: null
   };
 }
 
@@ -248,7 +322,10 @@ describe('OAuth routes', () => {
         provider: 'github',
         database_id: DATABASE_ID,
         api_id: API_ID,
-        origin: baseUrl
+        origin: baseUrl,
+        redirect_target_database_id: DATABASE_ID,
+        redirect_target_api_id: API_ID,
+        redirect_target_origin: baseUrl
       });
 
       const pkcePayload = verifySignedState<OAuthPkcePayload>(pkceCookie, {
@@ -278,6 +355,152 @@ describe('OAuth routes', () => {
       expect(
         setCookies.find((value) => value.startsWith('oauth_pkce='))
       ).not.toContain('Domain=');
+    });
+  });
+
+  it('normalizes an absolute same-origin redirect to the compatible relative form', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const target = `${baseUrl}/dashboard?tab=profile#security`;
+      const response = await request(
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(target)}`
+      );
+
+      expect(response.statusCode).toBe(302);
+      const state = readCookie(
+        getSetCookieValues(response.headers),
+        'oauth_state'
+      );
+      expect(
+        verifySignedState<OAuthStatePayload>(state, {
+          secret: OAUTH_STATE_SECRET
+        })
+      ).toMatchObject({
+        redirect_uri: '/dashboard?tab=profile#security',
+        redirect_target_database_id: DATABASE_ID,
+        redirect_target_api_id: API_ID,
+        redirect_target_origin: baseUrl
+      });
+      expect(routingQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('allows a registered cross-origin API in the same database and binds its scope in state', async () => {
+    routingQueryMock.mockResolvedValue({ rows: [createResolvedApiRoute()] });
+
+    await withOAuthServer(async (baseUrl) => {
+      const target =
+        'http://api1.tenanta.test/dashboard?tab=profile#security';
+      const response = await request(
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(target)}`
+      );
+
+      expect(response.statusCode).toBe(302);
+      const state = readCookie(
+        getSetCookieValues(response.headers),
+        'oauth_state'
+      );
+      expect(
+        verifySignedState<OAuthStatePayload>(state, {
+          secret: OAUTH_STATE_SECRET
+        })
+      ).toMatchObject({
+        redirect_uri: target,
+        database_id: DATABASE_ID,
+        api_id: API_ID,
+        origin: baseUrl,
+        redirect_target_database_id: DATABASE_ID,
+        redirect_target_api_id: TARGET_API_ID,
+        redirect_target_origin: 'http://api1.tenanta.test'
+      });
+      expect(routingQueryMock).toHaveBeenCalledWith(
+        expect.stringContaining('"routing_public".resolve_route'),
+        ['api1.tenanta.test']
+      );
+    });
+  });
+
+  it.each([
+    {
+      name: 'another database',
+      target: 'http://api1.tenanta.test/dashboard',
+      route: createResolvedApiRoute({ databaseId: OTHER_DATABASE_ID })
+    },
+    {
+      name: 'an unregistered hostname',
+      target: 'http://unregistered.tenanta.test/dashboard',
+      route: noMatchingRoute()
+    },
+    {
+      name: 'a non-API route',
+      target: 'http://api1.tenanta.test/dashboard',
+      route: createResolvedApiRoute({ targetModule: 'sites' })
+    },
+    {
+      name: 'an API route without databaseId',
+      target: 'http://api1.tenanta.test/dashboard',
+      route: createResolvedApiRoute({ includeDatabaseId: false })
+    },
+    {
+      name: 'a similar but unregistered hostname',
+      target: 'http://api1.tenanta.test.attacker.test/dashboard',
+      route: noMatchingRoute()
+    }
+  ])('rejects a cross-origin redirect resolved to $name', async ({ target, route }) => {
+    routingQueryMock.mockResolvedValue({ rows: [route] });
+
+    await withOAuthServer(async (baseUrl) => {
+      const response = await request(
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(target)}`
+      );
+
+      expect(response.statusCode).toBe(302);
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.origin).toBe(baseUrl);
+      expect(redirect.pathname).toBe('/auth/error');
+      expect(redirect.searchParams.get('error')).toBe(
+        'INVALID_REDIRECT_URI'
+      );
+      expect(getSetCookieValues(response.headers)).toHaveLength(0);
+    });
+  });
+
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,hello',
+    'file:///tmp/session',
+    '//api1.tenanta.test/dashboard',
+    'http://user:password@api1.tenanta.test/dashboard',
+    'http://[invalid'
+  ])('rejects unsafe redirect URI %s before routing', async (target) => {
+    await withOAuthServer(async (baseUrl) => {
+      const response = await request(
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(target)}`
+      );
+
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.origin).toBe(baseUrl);
+      expect(redirect.searchParams.get('error')).toBe(
+        'INVALID_REDIRECT_URI'
+      );
+      expect(routingQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('rejects an HTTP cross-origin target in production', async () => {
+    mockGetNodeEnv.mockReturnValueOnce('production');
+
+    await withOAuthServer(async (baseUrl) => {
+      const response = await request(
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(
+          'http://api1.tenanta.test/dashboard'
+        )}`
+      );
+
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.searchParams.get('error')).toBe(
+        'INVALID_REDIRECT_URI'
+      );
+      expect(routingQueryMock).not.toHaveBeenCalled();
     });
   });
 
@@ -335,6 +558,32 @@ describe('OAuth routes', () => {
       expect(redirect.pathname).toBe('/auth/error');
       expect(redirect.searchParams.get('error')).toBe('OAUTH_INVALID_STATE');
       expect(redirect.searchParams.get('provider')).toBe('google');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(authQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('rejects a state value that was modified after signing', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const fetchMock = jest
+        .spyOn(global, 'fetch')
+        .mockRejectedValue(new Error('fetch must not be called'));
+      const signedState = createSignedState<OAuthStatePayload>(
+        createStatePayload(baseUrl),
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 }
+      );
+      const replacement = signedState.endsWith('a') ? 'b' : 'a';
+      const tamperedState = `${signedState.slice(0, -1)}${replacement}`;
+      const callbackUrl = new URL('/auth/github/callback', baseUrl);
+      callbackUrl.searchParams.set('code', 'callback-code');
+      callbackUrl.searchParams.set('state', tamperedState);
+
+      const response = await request(callbackUrl.toString(), {
+        Cookie: `oauth_state=${encodeURIComponent(tamperedState)}`
+      });
+
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
       expect(fetchMock).not.toHaveBeenCalled();
       expect(authQueryMock).not.toHaveBeenCalled();
     });
@@ -460,9 +709,14 @@ describe('OAuth routes', () => {
   });
 
   it('uses the identity function schema for successful sign-up callbacks', async () => {
+    routingQueryMock.mockResolvedValue({ rows: [createResolvedApiRoute()] });
+
     await withOAuthServer(async (baseUrl) => {
+      const redirectTarget = 'http://api1.tenanta.test/dashboard';
       const beginResponse = await request(
-        `${baseUrl}/auth/github?redirect_uri=%2Fdashboard`
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(
+          redirectTarget
+        )}`
       );
       const setCookies = getSetCookieValues(beginResponse.headers);
       const stateCookie = readCookie(setCookies, 'oauth_state');
@@ -537,16 +791,56 @@ describe('OAuth routes', () => {
       });
 
       expect(callbackResponse.statusCode).toBe(302);
-      expect(callbackResponse.headers.location).toBe('/dashboard');
+      expect(callbackResponse.headers.location).toBe(redirectTarget);
       expect(authQueryMock).toHaveBeenCalledTimes(1);
       expect(authQueryMock.mock.calls[0][0]).toContain(
         'constructive_auth_private.sign_up_identity'
       );
-      expect(
-        getSetCookieValues(callbackResponse.headers).some((cookie) =>
-          cookie.startsWith('constructive_session=')
-        )
-      ).toBe(true);
+      const sessionCookie = getSetCookieValues(callbackResponse.headers).find(
+        (cookie) => cookie.startsWith('constructive_session=')
+      );
+      expect(sessionCookie).toContain('Domain=tenanta.test');
+      expect(sessionCookie).toContain('Path=/');
+      expect(sessionCookie).toContain('HttpOnly');
+      expect(sessionCookie).toContain('SameSite=Lax');
+      expect(routingQueryMock).toHaveBeenCalledTimes(2);
+    }, OAUTH_STATE_SECRET, () =>
+      createConstructiveContext({ cookieDomain: 'tenanta.test' })
+    );
+  });
+
+  it('rejects callback when the redirect route changes database after initiation', async () => {
+    const fetchMock = jest
+      .spyOn(global, 'fetch')
+      .mockRejectedValue(new Error('fetch must not be called'));
+    routingQueryMock
+      .mockResolvedValueOnce({ rows: [createResolvedApiRoute()] })
+      .mockResolvedValueOnce({
+        rows: [createResolvedApiRoute({ databaseId: OTHER_DATABASE_ID })]
+      });
+
+    await withOAuthServer(async (baseUrl) => {
+      const target = 'http://api1.tenanta.test/dashboard';
+      const beginResponse = await request(
+        `${baseUrl}/auth/github?redirect_uri=${encodeURIComponent(target)}`
+      );
+      const stateCookie = readCookie(
+        getSetCookieValues(beginResponse.headers),
+        'oauth_state'
+      );
+      const callbackUrl = new URL('/auth/github/callback', baseUrl);
+      callbackUrl.searchParams.set('code', 'unused-code');
+      callbackUrl.searchParams.set('state', stateCookie);
+
+      const response = await request(callbackUrl.toString(), {
+        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`
+      });
+
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.origin).toBe(baseUrl);
+      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(authQueryMock).not.toHaveBeenCalled();
     });
   });
 });

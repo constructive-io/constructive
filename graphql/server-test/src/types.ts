@@ -23,6 +23,8 @@ export interface ServerOptions {
    *   schemas directly. For local/static suites only.
    */
   useRouting?: boolean;
+  /** Explicit auth mode for production-server integration tests. */
+  strictAuth?: boolean;
   /**
    * API configuration options for the GraphQL server.
    * These options control how the server handles requests and which features are enabled.
