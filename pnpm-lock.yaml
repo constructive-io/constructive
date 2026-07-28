@@ -2394,19 +2394,6 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
-  packages/errors:
-    devDependencies:
-      '@types/node':
-        specifier: ^22.19.11
-        version: 22.19.11
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
-    publishDirectory: dist
-
   packages/csrf:
     devDependencies:
       '@types/node':
@@ -2450,6 +2437,19 @@ importers:
       pgsql-parser:
         specifier: ^18.1.1
         version: 18.1.1
+    publishDirectory: dist
+
+  packages/errors:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.11
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/express-context:

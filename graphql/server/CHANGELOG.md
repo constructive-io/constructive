@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.7.5...@constructive-io/graphql-server@5.8.0) (2026-07-28)
+
+### Features
+
+- **errors:** add @constructive-io/errors + server code normalization ([896ab3b](https://github.com/constructive-io/constructive/commit/896ab3b3d359731aafaaafeff1617e0e18ce205f))
+- **errors:** client adapter + registry-based server masking ([ab48163](https://github.com/constructive-io/constructive/commit/ab48163f5430c3cc92374a4a9d3e05776b4928d2))
+
 ## [5.7.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.7.4...@constructive-io/graphql-server@5.7.5) (2026-07-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

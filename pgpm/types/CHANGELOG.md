@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.41.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.40.0...@pgpmjs/types@2.41.0) (2026-07-28)
+
+### Features
+
+- **errors:** add @constructive-io/errors + server code normalization ([896ab3b](https://github.com/constructive-io/constructive/commit/896ab3b3d359731aafaaafeff1617e0e18ce205f))
+
 # [2.40.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.39.0...@pgpmjs/types@2.40.0) (2026-07-27)
 
 **Note:** Version bump only for package @pgpmjs/types

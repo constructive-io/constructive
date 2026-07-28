@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.5.5...@constructive-io/graphql-query@4.6.0) (2026-07-28)
+
+### Features
+
+- **errors:** client adapter + registry-based server masking ([ab48163](https://github.com/constructive-io/constructive/commit/ab48163f5430c3cc92374a4a9d3e05776b4928d2))
+
 ## [4.5.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.5.4...@constructive-io/graphql-query@4.5.5) (2026-07-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-query
