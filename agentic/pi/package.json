@@ -1,6 +1,6 @@
 {
   "name": "@agentic-kit/pi",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "description": "Pi adapter for agentic-kit — the Constructive typed db tools (provision, blueprint, codegen, records, policies, templates) and confirm gate as a pi coding-agent extension",
   "main": "index.js",
