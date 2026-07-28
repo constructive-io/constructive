@@ -10,14 +10,21 @@ export {
 } from './typed-document';
 
 export {
-  DataError,
-  DataErrorType,
-  PG_ERROR_CODES,
+  ConstructiveError,
+  classify,
   createError,
+  format,
+  isConstructiveError,
+  isPublicCode,
+  isPublicError,
+  isRetryable,
+  parse,
   parseGraphQLError,
-  isDataError,
-  type DataErrorOptions,
+  toError,
+  type ErrorClass,
+  type ErrorContext,
   type GraphQLError,
+  type ParsedError,
 } from './error';
 
 export {

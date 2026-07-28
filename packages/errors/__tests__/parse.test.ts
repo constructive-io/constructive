@@ -1,4 +1,4 @@
-import { allCodes, classify, ConstructiveError, errors, format, parse, registerCatalog } from '../src';
+import { allCodes, classify, ConstructiveError, errors, format, parse, registerCatalog, toError } from '../src';
 import {
   GENERATED_CODE_COUNT,
   GENERATED_CODE_META,
@@ -64,6 +64,77 @@ describe('parse', () => {
     const result = parse(err);
     expect(result.code).toBe('ACCOUNT_EXISTS');
     expect(result.class).toBe('public');
+  });
+
+  it('trusts an explicit DETAIL.class over the registry (unregistered code)', () => {
+    // A brand-new code the registry has never seen, marked public by the DB.
+    const result = parse({
+      message: 'SHINY_NEW_CODE',
+      code: 'P0001',
+      detail: '{"code":"SHINY_NEW_CODE","context":{},"class":"public"}'
+    });
+    expect(result.code).toBe('SHINY_NEW_CODE');
+    expect(result.known).toBe(false);
+    // registry alone would fail-safe to internal; the DB's class wins.
+    expect(result.class).toBe('public');
+  });
+
+  it('trusts DETAIL.class=internal even for a registry-public code', () => {
+    const result = parse({
+      message: 'ACCOUNT_EXISTS',
+      code: 'P0001',
+      detail: '{"code":"ACCOUNT_EXISTS","context":{},"class":"internal"}'
+    });
+    expect(result.code).toBe('ACCOUNT_EXISTS');
+    expect(result.class).toBe('internal');
+  });
+
+  it('trusts GraphQL extensions.class when present', () => {
+    const result = parse({
+      message: 'nope',
+      extensions: { code: 'SOME_UNKNOWN_CODE', class: 'public' }
+    });
+    expect(result.code).toBe('SOME_UNKNOWN_CODE');
+    expect(result.class).toBe('public');
+  });
+
+  it('ignores an invalid class value and falls back to the registry', () => {
+    const result = parse({
+      message: 'ACCOUNT_EXISTS',
+      code: 'P0001',
+      detail: '{"code":"ACCOUNT_EXISTS","context":{},"class":"bogus"}'
+    });
+    expect(result.class).toBe('public');
+  });
+});
+
+describe('toError', () => {
+  it('normalizes a DB error into a ConstructiveError with formatted copy', () => {
+    const err = toError({
+      message: 'ACCOUNT_EXISTS',
+      code: 'P0001',
+      detail: '{"code":"ACCOUNT_EXISTS","context":{"email":"a@b.com"}}'
+    });
+    expect(err).toBeInstanceOf(ConstructiveError);
+    expect(err.code).toBe('ACCOUNT_EXISTS');
+    expect(err.errorClass).toBe('public');
+    expect(err.http).toBe(409);
+    expect(err.context).toEqual({ email: 'a@b.com' });
+    expect(err.message).toBe(
+      'An account with this email already exists. Please sign in or use a different email.'
+    );
+  });
+
+  it('falls back to UNKNOWN_ERROR and the raw message for unresolved errors', () => {
+    const err = toError(new Error('totally opaque failure'));
+    expect(err.code).toBe('UNKNOWN_ERROR');
+    expect(err.errorClass).toBe('internal');
+    expect(err.message).toBe('totally opaque failure');
+  });
+
+  it('returns a ConstructiveError unchanged', () => {
+    const original = errors.ACCOUNT_EXISTS();
+    expect(toError(original)).toBe(original);
   });
 });
 

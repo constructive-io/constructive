@@ -86,6 +86,122 @@ export const registry = {
   }),
 
   // ===========================================================================
+  // Auth / account (public) — migrated from the server graphile SAFE_ERROR_CODES
+  // allowlist so the registry (not a hand-maintained set) is the source of truth
+  // for what is user-facing.
+  // ===========================================================================
+  USER_NOT_AUTHENTICATED: defineError({
+    code: 'USER_NOT_AUTHENTICATED',
+    class: 'public',
+    http: 401,
+    message: 'You must be signed in to do that.'
+  }),
+  ACCOUNT_LOCKED: defineError({
+    code: 'ACCOUNT_LOCKED',
+    class: 'public',
+    http: 423,
+    message: 'Your account is locked. Please try again later or reset your password.'
+  }),
+  USER_NOT_FOUND: defineError({
+    code: 'USER_NOT_FOUND',
+    class: 'public',
+    http: 404,
+    message: 'No matching user was found.'
+  }),
+  NO_PRIMARY_EMAIL: defineError({
+    code: 'NO_PRIMARY_EMAIL',
+    class: 'public',
+    http: 400,
+    message: 'No primary email address is set for this account.'
+  }),
+  NO_CREDENTIALS: defineError({
+    code: 'NO_CREDENTIALS',
+    class: 'public',
+    http: 400,
+    message: 'No credentials were provided.'
+  }),
+  BAD_SIGNIN: defineError({
+    code: 'BAD_SIGNIN',
+    class: 'public',
+    http: 401,
+    message: 'Sign in failed. Please check your credentials and try again.'
+  }),
+
+  // ===========================================================================
+  // Auth method toggles (public) — app-level allow_* settings
+  // ===========================================================================
+  SSO_SIGN_IN_DISABLED: defineError({
+    code: 'SSO_SIGN_IN_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Single sign-on is not enabled for sign in.'
+  }),
+  SSO_SIGN_UP_DISABLED: defineError({
+    code: 'SSO_SIGN_UP_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Single sign-on is not enabled for sign up.'
+  }),
+  SSO_ACCOUNT_NOT_FOUND: defineError({
+    code: 'SSO_ACCOUNT_NOT_FOUND',
+    class: 'public',
+    http: 404,
+    message: 'No single sign-on account was found.'
+  }),
+  MAGIC_LINK_SIGN_IN_DISABLED: defineError({
+    code: 'MAGIC_LINK_SIGN_IN_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Magic link sign in is disabled.'
+  }),
+  MAGIC_LINK_SIGN_UP_DISABLED: defineError({
+    code: 'MAGIC_LINK_SIGN_UP_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Magic link sign up is disabled.'
+  }),
+  EMAIL_OTP_SIGN_IN_DISABLED: defineError({
+    code: 'EMAIL_OTP_SIGN_IN_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Email one-time-code sign in is disabled.'
+  }),
+
+  // ===========================================================================
+  // PublicKeySignature / uploads / misc (public) — migrated from the allowlist
+  // ===========================================================================
+  INVALID_PUBLIC_KEY: defineError({
+    code: 'INVALID_PUBLIC_KEY',
+    class: 'public',
+    http: 400,
+    message: 'The public key is invalid.'
+  }),
+  INVALID_MESSAGE: defineError({
+    code: 'INVALID_MESSAGE',
+    class: 'public',
+    http: 400,
+    message: 'The message is invalid.'
+  }),
+  INVALID_SIGNATURE: defineError({
+    code: 'INVALID_SIGNATURE',
+    class: 'public',
+    http: 401,
+    message: 'The signature is invalid.'
+  }),
+  UPLOAD_MIMETYPE: defineError({
+    code: 'UPLOAD_MIMETYPE',
+    class: 'public',
+    http: 415,
+    message: 'This file type is not allowed.'
+  }),
+  SINGLETON_TABLE: defineError({
+    code: 'SINGLETON_TABLE',
+    class: 'public',
+    http: 409,
+    message: 'Only one record is allowed for this resource.'
+  }),
+
+  // ===========================================================================
   // Invites (public)
   // ===========================================================================
   INVITE_NOT_FOUND: defineError({
@@ -158,6 +274,41 @@ export const registry = {
     class: 'public',
     http: 429,
     message: 'Too many requests. Please slow down and try again shortly.'
+  }),
+
+  // ===========================================================================
+  // Client / transport (public) — synthesized client-side by the GraphQL client
+  // for network, timeout, and HTTP-level failures (no DB/server origin).
+  // ===========================================================================
+  NETWORK_ERROR: defineError({
+    code: 'NETWORK_ERROR',
+    class: 'public',
+    http: 0,
+    message: 'Network error. Please check your connection and try again.'
+  }),
+  TIMEOUT_ERROR: defineError({
+    code: 'TIMEOUT_ERROR',
+    class: 'public',
+    http: 408,
+    message: 'The request timed out. Please try again.'
+  }),
+  BAD_USER_INPUT: defineError({
+    code: 'BAD_USER_INPUT',
+    class: 'public',
+    http: 400,
+    message: 'The request was invalid. Please check your input and try again.'
+  }),
+  VALIDATION_FAILED: defineError({
+    code: 'VALIDATION_FAILED',
+    class: 'public',
+    http: 400,
+    message: 'Validation failed. Please check your input and try again.'
+  }),
+  UNKNOWN_ERROR: defineError({
+    code: 'UNKNOWN_ERROR',
+    class: 'internal',
+    http: 500,
+    message: 'An unexpected error occurred.'
   }),
 
   // ===========================================================================

@@ -1651,6 +1651,9 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
         version: 1.2.0(graphql@16.13.0)
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       '@constructive-io/fetch':
         specifier: ^1.1.1
         version: 1.1.1

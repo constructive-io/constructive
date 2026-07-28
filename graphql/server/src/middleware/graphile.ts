@@ -24,123 +24,24 @@ import { observeGraphileBuild } from './observability/graphile-build-stats';
 const maskErrorLog = new Logger('graphile:maskError');
 
 /**
- * Transitional allowlist of transport/framework codes that are safe to surface
- * but are not yet in the `@constructive-io/errors` registry (GraphQL protocol
- * errors, plus auth codes pending registry generation in a later phase). A code
- * is treated as public when it is classified `public` by the registry OR listed
- * here. Once the registry is generated from constructive-db these entries move
- * into the registry and this set shrinks to just the GraphQL protocol codes.
+ * GraphQL framework protocol codes. These originate in the GraphQL/grafast
+ * transport layer (not in constructive-db), so they are not Constructive domain
+ * codes in the `@constructive-io/errors` registry. They are always safe to
+ * surface — they carry no sensitive detail. Everything else (auth, account,
+ * resource, constraint, and every constructive-db code) is classified by the
+ * registry, which is the single source of truth for public vs. internal.
  */
-const SAFE_ERROR_CODES = new Set([
-  // GraphQL standard
+const GRAPHQL_PROTOCOL_CODES = new Set([
   'GRAPHQL_VALIDATION_FAILED',
   'GRAPHQL_PARSE_FAILED',
   'PERSISTED_QUERY_NOT_FOUND',
-  'PERSISTED_QUERY_NOT_SUPPORTED',
-  // Auth
-  'UNAUTHENTICATED',
-  'NOT_AUTHENTICATED',
-  'USER_NOT_AUTHENTICATED',
-  'FORBIDDEN',
-  'BAD_USER_INPUT',
-  'INCORRECT_PASSWORD',
-  'PASSWORD_INSECURE',
-  'ACCOUNT_LOCKED',
-  'ACCOUNT_LOCKED_EXCEED_ATTEMPTS',
-  'ACCOUNT_DISABLED',
-  'ACCOUNT_EXISTS',
-  'ACCOUNT_NOT_FOUND',
-  'USER_NOT_FOUND',
-  'INVALID_USER',
-  'INVALID_TOKEN',
-  'INVALID_CODE',
-  'NO_PRIMARY_EMAIL',
-  'NO_CREDENTIALS',
-  'PASSWORD_LEN',
-  'INVITE_NOT_FOUND',
-  'INVITE_LIMIT',
-  'INVITE_EMAIL_NOT_FOUND',
-  'EMAIL_NOT_VERIFIED',
-  'PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE',
-  'ASSIGN_PROFILES_PERMISSION_REQUIRED',
-  'PROFILE_NOT_FOUND',
-  'PROFILE_EXCEEDS_PERMISSIONS',
-  'MEMBERSHIP_NOT_FOUND',
-  'INVALID_CREDENTIALS',
-  // Auth method toggles (app-level allow_* settings)
-  'SIGN_UP_DISABLED',
-  'PASSWORD_SIGN_IN_DISABLED',
-  'PASSWORD_SIGN_UP_DISABLED',
-  'SSO_SIGN_IN_DISABLED',
-  'SSO_SIGN_UP_DISABLED',
-  'SSO_ACCOUNT_NOT_FOUND',
-  'CONNECTED_ACCOUNT_NOT_FOUND',
-  'MAGIC_LINK_SIGN_IN_DISABLED',
-  'MAGIC_LINK_SIGN_UP_DISABLED',
-  'EMAIL_OTP_SIGN_IN_DISABLED',
-  'SMS_SIGN_IN_DISABLED',
-  'SMS_SIGN_UP_DISABLED',
-  // CSRF
-  'CSRF_TOKEN_REQUIRED',
-  'INVALID_CSRF_TOKEN',
-  // Rate limiting / throttling
-  'TOO_MANY_REQUESTS',
-  'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS',
-  // TOTP / MFA / step-up
-  'TOTP_NOT_ENABLED',
-  'TOTP_ALREADY_ENABLED',
-  'TOTP_SETUP_NOT_INITIATED',
-  'MFA_REQUIRED',
-  'MFA_CHALLENGE_EXPIRED',
-  'INVALID_MFA_CHALLENGE',
-  'STEP_UP_REQUIRED',
-  'STEP_UP_REQUIRED_PASSWORD',
-  'STEP_UP_REQUIRED_PASSWORD_OR_MFA',
-  // Sessions / API keys
-  'SESSION_NOT_FOUND',
-  'API_KEY_NOT_FOUND',
-  'CANNOT_DISCONNECT_LAST_AUTH_METHOD',
-  'CANNOT_REVOKE_CURRENT_SESSION',
-  // Account / resource operations
-  'NOT_FOUND',
-  'NULL_VALUES_DISALLOWED',
-  'OBJECT_NOT_FOUND',
-  'OBJECT_NO_UPDATE',
-  'LIMIT_REACHED',
-  'REQUIRES_ONE_OWNER',
-  'DELETE_FIRST',
-  'REF_NOT_FOUND',
-  'CROSS_DATABASE_REF',
-  'GROUPS_REQ_ENTITIES',
-  'ALREADY_SCHEDULED',
-  'SINGLETON_TABLE',
-  // Entity/field immutability
-  'IMMUTABLE_FIELD',
-  'IMMUTABLE_PROPS',
-  'IMMUTABLE_PEOPLESTAMPS',
-  'IMMUTABLE_TIMESTAMPS',
-  'CONST_TYPE_FIELDS_IMMUTABLE',
-  // PublicKeySignature
-  'FEATURE_DISABLED',
-  'INVALID_PUBLIC_KEY',
-  'INVALID_MESSAGE',
-  'INVALID_SIGNATURE',
-  'NO_ACCOUNT_EXISTS',
-  'BAD_SIGNIN',
-  // Upload
-  'UPLOAD_MIMETYPE',
-  // PostgreSQL constraint violations (surfaced by PostGraphile)
-  '23505', // unique_violation
-  '23503', // foreign_key_violation
-  '23502', // not_null_violation
-  '23514', // check_violation
-  '23P01' // exclusion_violation
+  'PERSISTED_QUERY_NOT_SUPPORTED'
 ]);
 
-/** A code is safe to surface when the registry classifies it public, or it is
- * on the transitional transport allowlist. */
+/** A code is safe to surface when the registry classifies it public, or it is a
+ * GraphQL framework protocol code. */
 const isPublicCode = (code: string | null | undefined): boolean =>
-  Boolean(code) && (classify(code) === 'public' || SAFE_ERROR_CODES.has(code as string));
+  Boolean(code) && (classify(code) === 'public' || GRAPHQL_PROTOCOL_CODES.has(code as string));
 
 /**
  * Normalize any GraphQL/database error into a canonical Constructive shape.

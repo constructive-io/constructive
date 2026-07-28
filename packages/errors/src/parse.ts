@@ -1,16 +1,23 @@
 import { classify } from './classify';
 import { ConstructiveError } from './error';
+import { format } from './format';
 import { extractPgErrorFields, RAISE_EXCEPTION_SQLSTATE, SQLSTATE_TO_CODE } from './pg';
 import { getDefinition } from './registry';
-import type { ContextValue, ErrorContext, ParsedError } from './types';
+import type { ContextValue, ErrorClass, ErrorContext, ParsedError } from './types';
 
 /** Leading ALL_CAPS token, optionally followed by `(arg, arg)` positional args. */
 const CODE_TOKEN = /^([A-Z][A-Z0-9_]+)(?:\s*\((.*)\))?\s*$/;
+
+/** Narrow an arbitrary value to a valid {@link ErrorClass}, else `null`. */
+function toErrorClass(value: unknown): ErrorClass | null {
+  return value === 'public' || value === 'internal' ? value : null;
+}
 
 interface GraphqlLike {
   message?: string;
   extensionsCode?: string;
   extensionsContext?: ErrorContext;
+  extensionsClass?: ErrorClass;
 }
 
 function getMessage(error: unknown): string {
@@ -36,6 +43,10 @@ function extractGraphqlLike(error: unknown): GraphqlLike | null {
     if (extensions && extensions.context && typeof extensions.context === 'object') {
       out.extensionsContext = extensions.context as ErrorContext;
     }
+    if (extensions) {
+      const cls = toErrorClass(extensions.class);
+      if (cls) out.extensionsClass = cls;
+    }
     return out.message || out.extensionsCode ? out : null;
   };
 
@@ -46,15 +57,17 @@ function extractGraphqlLike(error: unknown): GraphqlLike | null {
   return fromNode(e);
 }
 
-function parseDetailJson(detail?: string): { code: string; context: ErrorContext } | null {
+function parseDetailJson(
+  detail?: string
+): { code: string; context: ErrorContext; class: ErrorClass | null } | null {
   if (!detail) return null;
   const trimmed = detail.trim();
   if (!trimmed.startsWith('{')) return null;
   try {
-    const obj = JSON.parse(trimmed) as { code?: unknown; context?: unknown };
+    const obj = JSON.parse(trimmed) as { code?: unknown; context?: unknown; class?: unknown };
     if (obj && typeof obj.code === 'string') {
       const context = obj.context && typeof obj.context === 'object' ? (obj.context as ErrorContext) : {};
-      return { code: obj.code, context };
+      return { code: obj.code, context, class: toErrorClass(obj.class) };
     }
   } catch {
     // not structured json — fall through
@@ -99,6 +112,12 @@ function parseMessageCode(message: string): { code: string; args: string[] } | n
  * 3. a leading ALL_CAPS token in the message (legacy DB `RAISE`), with any
  *    `(arg, arg)` positional args mapped onto named context via the registry
  * 4. native SQLSTATE constraint mapping (23505 → `UNIQUE_VIOLATION`, …)
+ *
+ * Classification trusts an explicit `class` provided by the producer — the
+ * database transport's `DETAIL.class` or the server's `extensions.class` — when
+ * present, since that source is authoritative for the raise site (and correctly
+ * classifies codes not yet in the registry). It falls back to `classify(code)`
+ * (registry lookup, unknown ⇒ `internal`) only when no explicit class is given.
  */
 export function parse(error: unknown): ParsedError {
   if (error instanceof ConstructiveError) {
@@ -119,16 +138,19 @@ export function parse(error: unknown): ParsedError {
 
   let code: string | null = null;
   let context: ErrorContext = {};
+  let explicitClass: ErrorClass | null = null;
 
   const detail = parseDetailJson(pg?.detail);
   if (detail) {
     code = detail.code;
     context = { ...detail.context };
+    explicitClass = detail.class;
   }
 
   if (!code && gql?.extensionsCode) {
     code = gql.extensionsCode;
     if (gql.extensionsContext) context = { ...gql.extensionsContext };
+    if (gql.extensionsClass) explicitClass = gql.extensionsClass;
   }
 
   if (!code) {
@@ -151,10 +173,37 @@ export function parse(error: unknown): ParsedError {
   return {
     code,
     context,
-    class: classify(code),
+    class: explicitClass ?? classify(code),
     known: Boolean(code && getDefinition(code)),
     rawMessage,
     sqlState,
     originalError: error
   };
+}
+
+/**
+ * Normalize any error into a throwable {@link ConstructiveError}.
+ *
+ * Delegates to {@link parse} for code/context/class recovery, then resolves a
+ * localized message from the registry catalogs (falling back to the source
+ * error's raw message when the code is unknown) and the registry's HTTP hint.
+ * Codes that could not be resolved become `UNKNOWN_ERROR` (internal).
+ */
+export function toError(error: unknown, locale?: string): ConstructiveError {
+  if (error instanceof ConstructiveError) return error;
+
+  const parsed = parse(error);
+  const code = parsed.code ?? 'UNKNOWN_ERROR';
+  const def = getDefinition(code);
+  const message = parsed.known
+    ? format(code, parsed.context, locale)
+    : parsed.rawMessage || format(code, parsed.context, locale);
+
+  return new ConstructiveError({
+    code,
+    message,
+    errorClass: parsed.class,
+    http: def?.http ?? 500,
+    context: parsed.context
+  });
 }
