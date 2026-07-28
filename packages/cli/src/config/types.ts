@@ -45,7 +45,28 @@ export interface ContextCredentials {
   refreshToken?: string;
 }
 
+/** Current on-disk state format. */
+export const CURRENT_STATE_VERSION = 1 as const;
+
+/**
+ * Canonical CNC state. Keeping contexts, credentials, and the active selection
+ * in one file lets mutations such as context deletion commit atomically.
+ */
+export interface CncState {
+  stateVersion: typeof CURRENT_STATE_VERSION;
+  settings: GlobalSettings;
+  contexts: Record<string, ContextConfig>;
+  credentials: Credentials;
+}
+
 /**
  * Default global settings
  */
 export const DEFAULT_SETTINGS: GlobalSettings = {};
+
+export const DEFAULT_STATE: CncState = {
+  stateVersion: CURRENT_STATE_VERSION,
+  settings: DEFAULT_SETTINGS,
+  contexts: {},
+  credentials: { tokens: {} },
+};
