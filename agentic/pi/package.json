@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "@agentic-kit/harness": "workspace:^",
-    "@constructive-io/graphql-query": "^4.5.3",
-    "@constructive-io/sdk": "^1.5.3",
+    "@constructive-io/graphql-query": "workspace:^",
+    "@constructive-io/sdk": "workspace:^",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
