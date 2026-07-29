@@ -192,10 +192,10 @@ describe('format / i18n', () => {
 
 describe('generated registry (full constructive-db audit)', () => {
   it('collects every audited constructive-db code', () => {
-    expect(GENERATED_CODE_COUNT).toBe(289);
-    expect(Object.keys(generatedRegistry)).toHaveLength(289);
+    expect(GENERATED_CODE_COUNT).toBe(520);
+    expect(Object.keys(generatedRegistry)).toHaveLength(520);
     // curated + generated codes are all reachable
-    expect(allCodes().length).toBeGreaterThanOrEqual(289);
+    expect(allCodes().length).toBeGreaterThanOrEqual(520);
   });
 
   it('classifies a generator-only auth code as public', () => {

@@ -59,7 +59,12 @@ python3 scripts/generate-registry.py
 
 `audit-db-errors.py` scans every `EXCEPTION`/`THROW` across constructive-db deploy
 sources and generated output and writes `scripts/db-error-inventory.json` (the
-committed audit snapshot). `generate-registry.py` reads that snapshot and, when a
+committed audit snapshot). It also captures the authoritative `public`/`internal`
+class from each canonical `errors.raise_error('CODE', context, 'class')` call — the
+database is the source of truth for classification, so an explicit class is trusted
+directly; codes without one (e.g. single-arg calls relying on the helper default, or
+legacy `RAISE EXCEPTION`) fall back to a name-based heuristic.
+`generate-registry.py` reads that snapshot and, when a
 `constructive-io/dashboard` checkout is found (via `DASHBOARD_DIR` or a sibling
 `../dashboard`), seeds public copy from its error catalogs. Re-run both whenever
 constructive-db error codes change. Never hand-edit the generated file.

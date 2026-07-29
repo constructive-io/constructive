@@ -27,6 +27,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SOURCE_GLOBS = [
     f'{BASE}/packages/*/deploy/**/*.sql',
     f'{BASE}/packages/*/src/**/*.ts',
+    f'{BASE}/application/app/deploy/**/*.sql',
     f'{BASE}/services/**/deploy/**/*.sql',
 ]
 GENERATED_GLOBS = [
@@ -41,6 +42,7 @@ GENERATED_GLOBS = [
 # raise_exception('...'), if_not_found_raise('...'), throw('...'),
 # plpgsql_stmt_raise(..., v_message := '...'), RAISE EXCEPTION '...'
 CALL_RES = [
+    re.compile(r"raise_error\s*\(\s*'((?:''|[^'])*)'", re.I),
     re.compile(r"raise_exception\s*\(\s*'((?:''|[^'])*)'", re.I),
     re.compile(r"if_not_found_raise\s*\(\s*'((?:''|[^'])*)'", re.I),
     re.compile(r"\bthrow\s*\(\s*'((?:''|[^'])*)'", re.I),
@@ -53,6 +55,52 @@ CALL_RES = [
 
 CODE_RE = re.compile(r'^([A-Z][A-Z0-9_]{2,})')
 
+# Canonical transport: errors.raise_error('CODE', <context>, 'class'). The class
+# is authoritative (the DB is the source of truth for public/internal), so we
+# capture it directly rather than re-deriving it from a prefix heuristic.
+RAISE_ERROR_CODE_RE = re.compile(r"raise_error\s*\(\s*'([A-Z][A-Z0-9_]{2,})'", re.I)
+CLASS_LITERAL_RE = re.compile(r"'(public|internal)'")
+
+
+def scan_classes(text, classes):
+    """Capture the authoritative class from each errors.raise_error(...) call.
+
+    Walks from each call's opening paren to its matching close (tracking depth so
+    nested jsonb_build_object(...) is handled), then reads the trailing
+    'public'/'internal' literal. Only an EXPLICIT class literal is recorded — a
+    single-arg call like errors.raise_error('CODE') relies on the helper's
+    DEFAULT ('internal'), which is an unspecified default rather than a
+    deliberate classification, so it is left unknown and later resolved by the
+    heuristic. When a code is raised with mixed explicit classes, 'public' wins
+    (the more exposed contract).
+    """
+    for m in RAISE_ERROR_CODE_RE.finditer(text):
+        code = m.group(1)
+        # Advance to the call's opening paren, then find its matching close.
+        open_idx = text.find('(', m.start())
+        if open_idx == -1:
+            continue
+        depth = 0
+        end_idx = -1
+        for i in range(open_idx, min(len(text), open_idx + 4000)):
+            c = text[i]
+            if c == '(':
+                depth += 1
+            elif c == ')':
+                depth -= 1
+                if depth == 0:
+                    end_idx = i
+                    break
+        if end_idx == -1:
+            continue
+        call = text[open_idx:end_idx + 1]
+        found = CLASS_LITERAL_RE.findall(call)
+        if not found:
+            continue  # defaulted class — leave unknown for the heuristic
+        klass = found[-1]
+        prev = classes.get(code)
+        classes[code] = 'public' if (prev == 'public' or klass == 'public') else klass
+
 
 def iter_files(globs):
     seen = set()
@@ -64,14 +112,16 @@ def iter_files(globs):
 
 
 def scan(globs):
-    """Return { code: {count, dynamic, sample, files:set} } and phrase list."""
+    """Return { code: {count, dynamic, sample, files:set} }, classes, phrases."""
     codes = {}
+    classes = {}
     phrases = []
     for path in iter_files(globs):
         try:
             text = open(path, errors='replace').read()
         except OSError:
             continue
+        scan_classes(text, classes)
         for rex in CALL_RES:
             for m in rex.finditer(text):
                 msg = m.group(1).replace("''", "'")
@@ -92,11 +142,11 @@ def scan(globs):
                     e['sample'] = msg
                 rel = os.path.relpath(path, BASE)
                 e['files'].add(rel)
-    return codes, phrases
+    return codes, classes, phrases
 
 
-src_codes, src_phrases = scan(SOURCE_GLOBS)
-gen_codes, gen_phrases = scan(GENERATED_GLOBS)
+src_codes, src_classes, src_phrases = scan(SOURCE_GLOBS)
+gen_codes, gen_classes, gen_phrases = scan(GENERATED_GLOBS)
 
 all_codes = sorted(set(src_codes) | set(gen_codes))
 inv = {}
@@ -107,7 +157,16 @@ for code in all_codes:
     sample = (s or g)['sample']
     n_source = len(s['files']) if s else 0
     n_generated = len(g['files']) if g else 0
-    inv[code] = {
+    # Authoritative class from the DB's errors.raise_error(...) calls; source
+    # wins over generated, public wins over internal when both appear.
+    klass = None
+    for m in (src_classes.get(code), gen_classes.get(code)):
+        if m == 'public':
+            klass = 'public'
+            break
+        if m and klass is None:
+            klass = m
+    entry = {
         'count': (s['count'] if s else 0) + (g['count'] if g else 0),
         'dynamic': bool(dynamic),
         'sample': sample,
@@ -115,11 +174,20 @@ for code in all_codes:
         'n_generated': n_generated,
         'source_files': sorted(s['files'])[:5] if s else [],
     }
+    if klass is not None:
+        entry['class'] = klass
+    inv[code] = entry
 
 OUT = os.path.join(HERE, 'db-error-inventory.json')
 json.dump(inv, open(OUT, 'w'), indent=2)
 print(f'Wrote {OUT}')
 
+n_class_public = sum(1 for c in all_codes if inv[c].get('class') == 'public')
+n_class_internal = sum(1 for c in all_codes if inv[c].get('class') == 'internal')
+n_class_unknown = sum(1 for c in all_codes if 'class' not in inv[c])
+print(f'  class=public (DB):  {n_class_public}')
+print(f'  class=internal(DB): {n_class_internal}')
+print(f'  class unknown:      {n_class_unknown}')
 generated_only = [c for c in all_codes if inv[c]['n_source'] == 0]
 dynamic_codes = [c for c in all_codes if inv[c]['dynamic']]
 print(f'TOTAL distinct codes: {len(all_codes)}')
