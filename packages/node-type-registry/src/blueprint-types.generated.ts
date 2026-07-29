@@ -1124,10 +1124,8 @@ export interface ProcessImageVersionsParams {
 ;
 /** Allows all access. Generates TRUE expression. */
 export type AuthzAllowAllParams = {};
-/** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the current user must hold an app membership (hardcoded membership_type=1). App-level analog of AuthzMemberOwner for global scopes with no entity key — authorship never survives losing app membership. */
-export interface AuthzAppMemberOwnerParams {
-  /* Column name containing the owner user ID (e.g., actor_id) */
-  owner_field: string;
+/** App-level membership check (hardcoded membership_type=1). Verifies the user has app membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. For entity-scoped checks (org, channel, etc.), use AuthzEntityMembership instead. */
+export interface AuthzAppMembershipParams {
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check (ORed together into mask) */
@@ -1137,8 +1135,10 @@ export interface AuthzAppMemberOwnerParams {
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
-/** App-level membership check (hardcoded membership_type=1). Verifies the user has app membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. For entity-scoped checks (org, channel, etc.), use AuthzEntityMembership instead. */
-export interface AuthzAppMembershipParams {
+/** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the current user must hold an app membership (hardcoded membership_type=1). App-level analog of AuthzMemberOwner for global scopes with no entity key — authorship never survives losing app membership. */
+export interface AuthzAppMemberOwnerParams {
+  /* Column name containing the owner user ID (e.g., actor_id) */
+  owner_field: string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check (ORed together into mask) */
@@ -1193,6 +1193,32 @@ export interface AuthzCompositeParams {
 }
 /** Denies all access. Generates FALSE expression. */
 export type AuthzDenyAllParams = {};
+/** Path-scoped file sharing via ltree containment. Grants access when a path_shares row matches the current user, bucket, and an ancestor path with the required permission. */
+export interface AuthzFilePathParams {
+  /* UUID of the path_shares table (alternative to shares_schema/shares_table) */
+  shares_table_id?: string;
+  /* Schema of the path_shares table (or use shares_table_id) */
+  shares_schema?: string;
+  /* Name of the path_shares table (or use shares_table_id) */
+  shares_table?: string;
+  /* UUID of the files table (alternative to files_schema/files_table) */
+  files_table_id?: string;
+  /* Schema of the files table (or use files_table_id) */
+  files_schema?: string;
+  /* Name of the files table (or use files_table_id) */
+  files_table?: string;
+  /* Boolean column on the path_shares table that grants the required permission (e.g. can_read, can_write) */
+  permission_field: string;
+  /* Column on the files table referencing the bucket */
+  bucket_field?: string;
+  /* Ltree column on the files table representing the file path */
+  path_field?: string;
+}
+/** Check if current user is in an array column on the same row. */
+export interface AuthzMemberListParams {
+  /* Column name containing the array of user IDs */
+  array_field: string;
+}
 /** Direct equality comparison between a table column and the current user ID. Simplest authorization pattern with no subqueries. */
 export interface AuthzDirectOwnerParams {
   /* Column name containing the owner user ID (e.g., owner_id) */
@@ -1222,49 +1248,6 @@ export interface AuthzEntityMembershipParams {
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
-/** Path-scoped file sharing via ltree containment. Grants access when a path_shares row matches the current user, bucket, and an ancestor path with the required permission. */
-export interface AuthzFilePathParams {
-  /* UUID of the path_shares table (alternative to shares_schema/shares_table) */
-  shares_table_id?: string;
-  /* Schema of the path_shares table (or use shares_table_id) */
-  shares_schema?: string;
-  /* Name of the path_shares table (or use shares_table_id) */
-  shares_table?: string;
-  /* UUID of the files table (alternative to files_schema/files_table) */
-  files_table_id?: string;
-  /* Schema of the files table (or use files_table_id) */
-  files_schema?: string;
-  /* Name of the files table (or use files_table_id) */
-  files_table?: string;
-  /* Boolean column on the path_shares table that grants the required permission (e.g. can_read, can_write) */
-  permission_field: string;
-  /* Column on the files table referencing the bucket */
-  bucket_field?: string;
-  /* Ltree column on the files table representing the file path */
-  path_field?: string;
-}
-/** Check if current user is in an array column on the same row. */
-export interface AuthzMemberListParams {
-  /* Column name containing the array of user IDs */
-  array_field: string;
-}
-/** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the current user must be a member of the entity referenced by entity_field. Combines direct ownership with entity membership — the actor can only access rows they own within entities they belong to. */
-export interface AuthzMemberOwnerParams {
-  /* Column name containing the owner user ID (e.g., owner_id) */
-  owner_field: string;
-  /* Column name referencing the entity (e.g., entity_id) */
-  entity_field: string;
-  /* SPRT column to select for the entity match */
-  sel_field?: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. */
-  entity_type?: string;
-  /* Single permission name to check (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
-  permissions?: string[];
-}
 /** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
 export interface AuthzNotReadOnlyParams {
   /* Column name referencing the entity (e.g., entity_id, org_id) */
@@ -1282,6 +1265,23 @@ export interface AuthzOrgHierarchyParams {
   anchor_field: string;
   /* Optional max depth to limit visibility */
   max_depth?: number;
+}
+/** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the current user must be a member of the entity referenced by entity_field. Combines direct ownership with entity membership — the actor can only access rows they own within entities they belong to. */
+export interface AuthzMemberOwnerParams {
+  /* Column name containing the owner user ID (e.g., owner_id) */
+  owner_field: string;
+  /* Column name referencing the entity (e.g., entity_id) */
+  entity_field: string;
+  /* SPRT column to select for the entity match */
+  sel_field?: string;
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types */
+  membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. */
+  entity_type?: string;
+  /* Single permission name to check (resolved to bitstring mask) */
+  permission?: string;
+  /* Multiple permission names to check (ORed together into mask) */
+  permissions?: string[];
 }
 /** Peer visibility through shared entity membership. Authorizes access to user-owned rows when the owner and current user are both members of the same entity. Self-joins the SPRT table to find peers. */
 export interface AuthzPeerOwnershipParams {
@@ -1340,21 +1340,6 @@ export interface AuthzRelatedEntityMembershipParams {
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
-/** Array membership check in a related table. */
-export interface AuthzRelatedMemberListParams {
-  /* UUID of the related table (alternative to owned_schema/owned_table) */
-  owned_table_id?: string;
-  /* Schema of the related table (or use owned_table_id) */
-  owned_schema?: string;
-  /* Name of the related table (or use owned_table_id) */
-  owned_table?: string;
-  /* Array column in related table */
-  owned_table_key: string;
-  /* FK column in related table */
-  owned_table_ref_key: string;
-  /* PK column in protected table */
-  this_object_key: string;
-}
 /** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the row must belong to a related entity the current user is a member of (SPRT joined through the related table, as in AuthzRelatedEntityMembership). Related-entity analog of AuthzMemberOwner — authorship never survives losing membership. */
 export interface AuthzRelatedMemberOwnerParams {
   /* Column name containing the owner user ID (e.g., actor_id) */
@@ -1387,6 +1372,21 @@ export interface AuthzRelatedMemberOwnerParams {
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
+}
+/** Array membership check in a related table. */
+export interface AuthzRelatedMemberListParams {
+  /* UUID of the related table (alternative to owned_schema/owned_table) */
+  owned_table_id?: string;
+  /* Schema of the related table (or use owned_table_id) */
+  owned_schema?: string;
+  /* Name of the related table (or use owned_table_id) */
+  owned_table?: string;
+  /* Array column in related table */
+  owned_table_key: string;
+  /* FK column in related table */
+  owned_table_ref_key: string;
+  /* PK column in protected table */
+  this_object_key: string;
 }
 /** Peer visibility through shared entity membership via a related table. Like AuthzPeerOwnership but the owning user is resolved through a FK JOIN to a related table. Combines SPRT self-join with object table JOIN. */
 export interface AuthzRelatedPeerOwnershipParams {
@@ -1671,7 +1671,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
+  $type: 'AuthzAllowAll' | 'AuthzAppMembership' | 'AuthzAppMemberOwner' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzMemberOwner' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedMemberList' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -1989,17 +1989,17 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMembership' | 'AuthzAppMemberOwner' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzMemberOwner' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedMemberList' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
   data?: Record<string, never>;
 } | {
-  $type: 'AuthzAppMemberOwner';
-  data: AuthzAppMemberOwnerParams;
-} | {
   $type: 'AuthzAppMembership';
   data: AuthzAppMembershipParams;
+} | {
+  $type: 'AuthzAppMemberOwner';
+  data: AuthzAppMemberOwnerParams;
 } | {
   $type: 'AuthzColumnSecurity';
   data: AuthzColumnSecurityParams;
@@ -2010,6 +2010,12 @@ export type BlueprintNodeObject = {
   $type: 'AuthzDenyAll';
   data?: Record<string, never>;
 } | {
+  $type: 'AuthzFilePath';
+  data: AuthzFilePathParams;
+} | {
+  $type: 'AuthzMemberList';
+  data: AuthzMemberListParams;
+} | {
   $type: 'AuthzDirectOwner';
   data: AuthzDirectOwnerParams;
 } | {
@@ -2019,20 +2025,14 @@ export type BlueprintNodeObject = {
   $type: 'AuthzEntityMembership';
   data: AuthzEntityMembershipParams;
 } | {
-  $type: 'AuthzFilePath';
-  data: AuthzFilePathParams;
-} | {
-  $type: 'AuthzMemberList';
-  data: AuthzMemberListParams;
-} | {
-  $type: 'AuthzMemberOwner';
-  data: AuthzMemberOwnerParams;
-} | {
   $type: 'AuthzNotReadOnly';
   data: AuthzNotReadOnlyParams;
 } | {
   $type: 'AuthzOrgHierarchy';
   data: AuthzOrgHierarchyParams;
+} | {
+  $type: 'AuthzMemberOwner';
+  data: AuthzMemberOwnerParams;
 } | {
   $type: 'AuthzPeerOwnership';
   data: AuthzPeerOwnershipParams;
@@ -2043,11 +2043,11 @@ export type BlueprintNodeObject = {
   $type: 'AuthzRelatedEntityMembership';
   data: AuthzRelatedEntityMembershipParams;
 } | {
-  $type: 'AuthzRelatedMemberList';
-  data: AuthzRelatedMemberListParams;
-} | {
   $type: 'AuthzRelatedMemberOwner';
   data: AuthzRelatedMemberOwnerParams;
+} | {
+  $type: 'AuthzRelatedMemberList';
+  data: AuthzRelatedMemberListParams;
 } | {
   $type: 'AuthzRelatedPeerOwnership';
   data: AuthzRelatedPeerOwnershipParams;
