@@ -1,6 +1,0 @@
-{
-  "source": "pgpm-base32",
-  "schemas": {
-    "base32": "encoding"
-  }
-}

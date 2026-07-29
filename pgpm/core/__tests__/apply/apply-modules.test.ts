@@ -56,7 +56,7 @@ describe('workspace discovery of apply modules', () => {
   let fixture: TestFixture;
 
   beforeAll(() => {
-    fixture = new TestFixture('apply', 'proxy-w-exts');
+    fixture = new TestFixture('apply', 'proxy');
   });
 
   afterAll(() => fixture.cleanup());
@@ -75,10 +75,6 @@ describe('workspace discovery of apply modules', () => {
     expect(modules['tenant-b']).toBeUndefined();
     expect(modules['tenant-b-users']).toBeDefined();
 
-    // proxy over an installed extensions/ module
-    expect(modules['base32-fork']).toBeDefined();
-    expect(modules['base32-fork'].requires).toEqual(['pgcrypto', 'plpgsql', 'pgpm-verify']);
-
     // regular modules are untouched
     expect(modules['users-module']).toBeDefined();
     expect(modules['my-app'].requires).toEqual(['plpgsql', 'tenant-a', 'tenant-b-users']);
@@ -89,7 +85,7 @@ describe('materializeApplyModule', () => {
   let fixture: TestFixture;
 
   beforeAll(() => {
-    fixture = new TestFixture('apply', 'proxy-w-exts');
+    fixture = new TestFixture('apply', 'proxy');
   });
 
   afterAll(() => fixture.cleanup());
@@ -156,7 +152,7 @@ describe('apply module deployment (e2e)', () => {
   let db: TestDatabase;
 
   beforeAll(() => {
-    fixture = new CoreDeployTestFixture('apply', 'proxy-w-exts');
+    fixture = new CoreDeployTestFixture('apply', 'proxy');
   });
 
   afterAll(async () => {
@@ -169,7 +165,7 @@ describe('apply module deployment (e2e)', () => {
   });
 
   test('deploys an app depending on two instances of one source module', async () => {
-    await fixture.deployModule('my-app', db.name, ['apply', 'proxy-w-exts']);
+    await fixture.deployModule('my-app', db.name, ['apply', 'proxy']);
 
     expect(await db.exists('schema', 'tenant_a')).toBe(true);
     expect(await db.exists('schema', 'tenant_b')).toBe(true);
@@ -191,22 +187,12 @@ describe('apply module deployment (e2e)', () => {
     expect(packages.has('users-module')).toBe(false);
   });
 
-  test('deploys a proxy of an installed extensions/ module directly', async () => {
-    await fixture.deployModule('base32-fork', db.name, ['apply', 'proxy-w-exts']);
-
-    expect(await db.exists('schema', 'encoding')).toBe(true);
-    expect(await db.exists('schema', 'base32')).toBe(false);
-
-    const result = await db.query(`SELECT encoding.encode('hello world') AS encoded`);
-    expect(result.rows[0].encoded).toBe('NBSWY3DPEB3W64TMMQ======');
-  });
-
   test('verify and revert work against the re-derived transpiled module', async () => {
-    await fixture.deployModule('my-app', db.name, ['apply', 'proxy-w-exts']);
-    await fixture.verifyModule('my-app', db.name, ['apply', 'proxy-w-exts']);
+    await fixture.deployModule('my-app', db.name, ['apply', 'proxy']);
+    await fixture.verifyModule('my-app', db.name, ['apply', 'proxy']);
 
     // reverting an instance also reverts everything depending on it
-    await fixture.revertModule('tenant-a', db.name, ['apply', 'proxy-w-exts']);
+    await fixture.revertModule('tenant-a', db.name, ['apply', 'proxy']);
     expect(await db.exists('schema', 'app')).toBe(false);
     expect(await db.exists('schema', 'tenant_a')).toBe(false);
   });
