@@ -122,17 +122,14 @@ schemas/catalog/functions/product_slug [schemas/catalog/schema] 2024-01-04T00:00
       'schemas/catalog/tables/products',
       'CREATE TABLE catalog.products (id serial PRIMARY KEY, name text);'
     );
-    // reads the tenant table AND calls the pure helper. Written as plpgsql so
-    // reference extraction works on the currently published @pgsql/transform;
-    // LANGUAGE sql bodies gain the same coverage once the classifier bump
-    // (constructive-io/pgsql-parser#320) is published and consumed here.
+    // reads the tenant table AND calls the pure helper. LANGUAGE sql: the
+    // classifier sees references inside the string body (@pgsql/transform
+    // >= 18.5.0), so this function is correctly pulled per-tenant.
     writeDeploy(
       'schemas/catalog/functions/product_slug',
       `CREATE FUNCTION catalog.product_slug() RETURNS text AS $$
-BEGIN
-  RETURN (SELECT catalog.slugify(name) FROM catalog.products LIMIT 1);
-END;
-$$ LANGUAGE plpgsql STABLE;`
+  SELECT catalog.slugify(name) FROM catalog.products LIMIT 1;
+$$ LANGUAGE sql STABLE;`
     );
   };
 

@@ -3025,8 +3025,8 @@ importers:
   pgpm/transform:
     dependencies:
       '@pgsql/transform':
-        specifier: ^18.4.1
-        version: 18.4.1
+        specifier: ^18.5.0
+        version: 18.5.0
       plpgsql-parser:
         specifier: ^18.2.1
         version: 18.2.1
@@ -5399,8 +5399,8 @@ packages:
   '@pgsql/quotes@18.1.0':
     resolution: {integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==}
 
-  '@pgsql/transform@18.4.1':
-    resolution: {integrity: sha512-9j7BhbyX9WKzZ7mxJR9L32YxfbvabUxZxz+ZeGjLKdDCt9ynY0cwPepC9PmUiYeTVdnA8Lrk6DSPW7Z5rUr70g==}
+  '@pgsql/transform@18.5.0':
+    resolution: {integrity: sha512-u4ShSgU2oB30SKotHbF/Gw2pjQaAbKU+L9MaLvz0nlZGld7P8nGlnW+BIBChuNvXXrsRfCpzVCvJoom8LSvDcg==}
 
   '@pgsql/traverse@18.1.0':
     resolution: {integrity: sha512-B+jIX6BvWrHO6DKlJ7p6Wvhbu1s7IhksLwwC3tvV+epKiuU4v8gJLd/OVQ5xeRSwhhLWmrctRfuAKHecbCaNjw==}
@@ -13036,7 +13036,7 @@ snapshots:
 
   '@pgsql/quotes@18.1.0': {}
 
-  '@pgsql/transform@18.4.1':
+  '@pgsql/transform@18.5.0':
     dependencies:
       '@pgsql/quotes': 18.1.0
       '@pgsql/traverse': 18.3.0
