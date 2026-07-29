@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/constructive-io/constructive/compare/safegres@1.8.0...safegres@1.9.0) (2026-07-29)
+
+### Features
+
+- **safegres:** call-graph audit — trust boundaries reachable from the exposed surface (--call-graph) ([0c37ecd](https://github.com/constructive-io/constructive/commit/0c37ecd878343620f534effdc465224813bcb7b1))
+- **safegres:** output verbosity — --summary/-q, --verbose, collapse internal advisories by default ([890f0cf](https://github.com/constructive-io/constructive/commit/890f0cf4dd1253d9bf92bb08bbdaeae5ccd8b357))
+
 # [1.8.0](https://github.com/constructive-io/constructive/compare/safegres@1.7.0...safegres@1.8.0) (2026-07-29)
 
 ### Features

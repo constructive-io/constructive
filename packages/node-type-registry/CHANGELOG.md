@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.7.1...node-type-registry@1.9.0) (2026-07-29)
+
+### Bug Fixes
+
+- **node-type-registry:** preserve registry documentation ([f8e049a](https://github.com/constructive-io/constructive/commit/f8e049ab4499599f68289de241c70af226e45884))
+
+### Features
+
+- **node-type-registry:** align node types and module presets ([a702967](https://github.com/constructive-io/constructive/commit/a7029678c6f2d7488509a222a9e8085a00b6563d))
+
 ## [1.7.1](https://github.com/constructive-io/constructive/compare/node-type-registry@1.7.0...node-type-registry@1.7.1) (2026-07-29)
 
 ### Bug Fixes
