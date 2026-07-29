@@ -38,7 +38,9 @@ describe('audit — Script A', () => {
     const report = await audit(pg.client as never, { schemas: ['fx_a1'] });
     const found = findingsFor(report.findings, 'fx_a1');
     expect(codes(found)).toEqual(expect.arrayContaining(['A1']));
-    expect(found.find((f) => f.code === 'A1')?.severity).toBe('critical');
+    const a1 = found.find((f) => f.code === 'A1');
+    expect(a1?.severity).toBe('low');
+    expect(a1?.direction).toBe('fail-closed');
   });
 
   it('A2: flags grants on table with RLS disabled', async () => {
@@ -81,15 +83,28 @@ describe('audit — Script A', () => {
     expect(a6?.privilege).toBe('UPDATE');
   });
 
-  it('A7: flags permissive policy with body = literal true (fail-open)', async () => {
+  it('A8: flags SELECT-only permissive policy with body = literal true (public read)', async () => {
     await applyFixture('a7-trivially-permissive.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_a7'] });
     const found = findingsFor(report.findings, 'fx_a7');
+    const a8 = found.find((f) => f.code === 'A8');
+    expect(a8).toBeDefined();
+    expect(a8?.severity).toBe('low');
+    expect(a8?.policy).toBe('fx_a7_open');
+    expect((a8?.context as { clauses?: string[] } | undefined)?.clauses).toEqual(['USING']);
+    // SELECT-only literal-true is A8, never A7
+    expect(found.find((f) => f.code === 'A7')).toBeUndefined();
+  });
+
+  it('A7: flags trivially-permissive WRITE policy as critical (fail-open)', async () => {
+    await applyFixture('a7-write-permissive.sql');
+    const report = await audit(pg.client as never, { schemas: ['fx_a7w'] });
+    const found = findingsFor(report.findings, 'fx_a7w');
     const a7 = found.find((f) => f.code === 'A7');
     expect(a7).toBeDefined();
-    expect(a7?.severity).toBe('high');
-    expect(a7?.policy).toBe('fx_a7_open');
-    expect((a7?.context as { clauses?: string[] } | undefined)?.clauses).toEqual(['USING']);
+    expect(a7?.severity).toBe('critical');
+    expect(a7?.direction).toBe('fail-open');
+    expect(a7?.policy).toBe('fx_a7w_open_write');
   });
 
   it('P1: flags policy using VOLATILE function', async () => {

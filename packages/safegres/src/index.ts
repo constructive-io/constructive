@@ -35,6 +35,7 @@ export {
   rulesForTable
 } from './config/resolve';
 export type {
+  ExposureConfig,
   FailOnConfig,
   Grade,
   OverrideEntry,
@@ -43,6 +44,8 @@ export type {
   SafegresConfig,
   ScoringConfig
 } from './config/types';
+export type { ResolvedExposure } from './pg/exposure';
+export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
 export {
   type IntrospectOptions,
   introspectTables,
@@ -57,6 +60,6 @@ export { renderJson } from './report/json';
 export { renderPretty } from './report/pretty';
 export type { RuleMeta } from './rules/registry';
 export { expandRuleSelector, isKnownRule, RULES, RULES_BY_CODE } from './rules/registry';
-export type { Score, ScoreDeduction } from './score/score';
+export type { Score, ScoreContext, ScoreDeduction } from './score/score';
 export { computeScore, DEFAULT_GRADE_BANDS, DEFAULT_WEIGHTS, meetsGrade } from './score/score';
 export * from './types';

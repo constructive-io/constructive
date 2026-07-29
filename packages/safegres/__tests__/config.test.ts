@@ -41,7 +41,8 @@ describe('rule registry', () => {
 describe('resolveRules', () => {
   it('defaults every rule to enabled at its registry severity', () => {
     const { rules } = resolveRules({});
-    expect(rules.get('A1')).toEqual({ enabled: true, severity: 'critical' });
+    expect(rules.get('A1')).toEqual({ enabled: true, severity: 'low' });
+    expect(rules.get('A7')).toEqual({ enabled: true, severity: 'critical' });
     expect(rules.get('A6')).toEqual({ enabled: true, severity: 'info' });
   });
 
@@ -121,12 +122,12 @@ describe('table overrides', () => {
 describe('allAstRulesDisabled', () => {
   it('detects fully-disabled AST rules', () => {
     expect(allAstRulesDisabled(resolveRules({}))).toBe(false);
-    expect(allAstRulesDisabled(resolveRules({ rules: { 'P*': 'off', A7: 'off' } }))).toBe(true);
+    expect(allAstRulesDisabled(resolveRules({ rules: { 'P*': 'off', A7: 'off', A8: 'off' } }))).toBe(true);
   });
 
   it('stays enabled when an override re-enables an AST rule', () => {
     const resolved = resolveRules({
-      rules: { 'P*': 'off', A7: 'off' },
+      rules: { 'P*': 'off', A7: 'off', A8: 'off' },
       overrides: [{ tables: ['public.payments'], rules: { P5: 'critical' } }]
     });
     expect(allAstRulesDisabled(resolved)).toBe(false);
@@ -178,7 +179,7 @@ describe('loadConfig', () => {
     const { config, filepath } = loadConfig({ cwd });
     expect(filepath).toBe(path.join(cwd, 'safegres.json'));
     const { rules } = resolveRules(config);
-    expect(rules.get('A4')!.severity).toBe('critical'); // from strict
+    expect(rules.get('A4')!.severity).toBe('high'); // from strict
     expect(rules.get('A6')!.enabled).toBe(false); // file wins
     expect(config.failOn?.severity).toBe('high');
   });
@@ -192,7 +193,7 @@ describe('loadConfig', () => {
     });
     const { rules } = resolveRules(config);
     expect(rules.get('A4')!.enabled).toBe(false); // CLI override wins
-    expect(rules.get('A5')!.severity).toBe('high'); // from strict
+    expect(rules.get('A5')!.severity).toBe('medium'); // from strict
   });
 
   it('rejects unknown presets', () => {
@@ -208,31 +209,85 @@ describe('computeScore', () => {
     expect(score.deductions).toEqual([]);
   });
 
-  it('deducts by severity weight and floors the grade on criticals', () => {
-    const score = computeScore([
-      finding({ code: 'A1', severity: 'critical' }),
-      finding({ code: 'A5', severity: 'medium' })
-    ]);
+  it('weighted model: deducts by severity weight and floors the grade on criticals', () => {
+    const score = computeScore(
+      [finding({ code: 'A1', severity: 'critical' }), finding({ code: 'A5', severity: 'medium' })],
+      { model: 'weighted' }
+    );
     expect(score.value).toBe(100 - 25 - 4);
     expect(score.grade).toBe('C'); // 71 would be C anyway; floor also caps at C
     expect(score.deductions[0]).toEqual({ code: 'A1', count: 1, points: 25 });
   });
 
-  it('caps per-rule deductions', () => {
+  it('weighted model: caps per-rule deductions', () => {
     const findings = Array.from({ length: 20 }, () => finding({ code: 'A5', severity: 'medium' }));
-    const score = computeScore(findings, { floorOnCritical: false });
+    const score = computeScore(findings, { model: 'weighted', floorOnCritical: false });
     expect(score.value).toBe(60); // 20*4=80 capped at 40
     expect(score.deductions[0].points).toBe(40);
   });
 
   it('is config-driven: weights, per-rule weights, bands, floor', () => {
     const findings = [finding({ code: 'A3', severity: 'medium' })];
-    expect(computeScore(findings, { weights: { medium: 0 } }).value).toBe(100);
+    expect(computeScore(findings, { model: 'weighted', weights: { medium: 0 } }).value).toBe(100);
     expect(
-      computeScore(findings, { perRuleWeights: { A3: 50 }, maxDeductionPerRule: 100 }).value
+      computeScore(findings, {
+        model: 'weighted',
+        perRuleWeights: { A3: 50 },
+        maxDeductionPerRule: 100
+      }).value
     ).toBe(50);
-    const relaxed = computeScore(findings, { gradeBands: { 'A+': 50 } });
+    const relaxed = computeScore(findings, { model: 'weighted', gradeBands: { 'A+': 50 } });
     expect(relaxed.grade).toBe('A+');
+  });
+
+  it('density model: normalizes by exposed-table count instead of saturating', () => {
+    const findings = Array.from({ length: 20 }, () => finding({ code: 'A2', severity: 'high' }));
+    const small = computeScore(findings, {}, { exposedTables: 20, exposureKnown: true });
+    const large = computeScore(findings, {}, { exposedTables: 400, exposureKnown: true });
+    expect(small.model).toBe('density');
+    expect(large.value).toBeGreaterThan(small.value);
+    expect(small.value).toBeGreaterThan(0); // no 0/F saturation
+    expect(large.exposedTables).toBe(400);
+  });
+
+  it('density model: fail-closed findings contribute nothing by default', () => {
+    const failClosed = Array.from({ length: 50 }, () =>
+      finding({ code: 'A4', severity: 'high', direction: 'fail-closed' })
+    );
+    const score = computeScore(failClosed, {}, { exposedTables: 10, exposureKnown: true });
+    expect(score.value).toBe(100);
+    expect(score.deductions).toEqual([]);
+
+    const strictish = computeScore(
+      failClosed,
+      { failClosedWeight: 0.25 },
+      { exposedTables: 10, exposureKnown: true }
+    );
+    expect(strictish.value).toBeLessThan(100);
+  });
+
+  it('density model: non-exposed findings are excluded from the score', () => {
+    const findings = [
+      finding({ code: 'A7', severity: 'critical', exposed: false }),
+      finding({ code: 'A2', severity: 'high', exposed: true })
+    ];
+    const score = computeScore(findings, {}, { exposedTables: 10, exposureKnown: true });
+    expect(score.deductions).toEqual([{ code: 'A2', count: 1, points: 10 }]);
+    // the internal critical must not floor the grade either
+    expect(score.grade).not.toBe('C');
+  });
+
+  it('density model: caps the score when exposure is unknown', () => {
+    const capped = computeScore([], {}, { exposureKnown: false });
+    expect(capped.value).toBe(80);
+    expect(capped.cappedByUnknownExposure).toBe(true);
+
+    const uncapped = computeScore([], { unknownExposureCap: false }, { exposureKnown: false });
+    expect(uncapped.value).toBe(100);
+
+    const known = computeScore([], {}, { exposureKnown: true });
+    expect(known.value).toBe(100);
+    expect(known.cappedByUnknownExposure).toBeUndefined();
   });
 
   it('compares grades', () => {

@@ -28,24 +28,48 @@ Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) a
 
 ## What it checks
 
-| Code | Severity | Category | Check |
-| --- | --- | --- | --- |
-| A1 | critical | flags | RLS enabled but **0 policies** (effectively deny-all) |
-| A2 | high | flags | Grants exist on a table with **RLS disabled** |
-| A3 | medium | flags | RLS enabled but **`FORCE ROW LEVEL SECURITY` not set** (table owner bypass) |
-| A4 | high | coverage | INSERT / UPDATE / DELETE grant with **no covering policy** for that verb |
-| A5 | medium | coverage | SELECT grant with **no policy** (silent empty result) |
-| A6 | info | coverage | UPDATE has `USING` but **no `WITH CHECK`** (row-smuggling surface) |
-| A7 | high | anti-pattern | Trivially-permissive policy (`USING (true)` / `WITH CHECK (true)`) |
-| P1 | high | anti-pattern | Policy body calls a **VOLATILE function** (per-row evaluation) |
-| P5 | high | anti-pattern | Policy body references **`session_user`** / `current_user` / `pg_has_role(...)` |
-| R1 | critical | anti-pattern | An **untrusted role** (options: `{ roles: [...] }`) holds a write privilege |
-| R2 | high | anti-pattern | A permissive write policy applies to an untrusted role or PUBLIC |
-| R3 | medium | anti-pattern | An RLS table has grants **TO PUBLIC** (includes all current/future roles) |
+| Code | Severity | Direction | Category | Check |
+| --- | --- | --- | --- | --- |
+| A1 | low | fail-closed | flags | RLS enabled but **0 policies** (deny-all — confirm the lock is intended) |
+| A2 | high | fail-open | flags | Grants exist on a table with **RLS disabled** |
+| A3 | low | fail-open | flags | RLS enabled but **`FORCE ROW LEVEL SECURITY` not set** (table owner bypass) |
+| A4 | low | fail-closed | coverage | INSERT / UPDATE / DELETE grant with **no covering policy** — writes are denied at runtime |
+| A5 | low | fail-closed | coverage | SELECT grant with **no policy** — queries silently return 0 rows |
+| A6 | info | fail-closed | coverage | UPDATE has `USING` but **no `WITH CHECK`** (row-smuggling surface) |
+| A7 | critical | fail-open | anti-pattern | Trivially-permissive **WRITE** policy (INSERT/UPDATE/DELETE/ALL with literal `true`) |
+| A8 | low | fail-open | anti-pattern | Trivially-permissive **SELECT** policy (`USING (true)` — confirm public-read is intended) |
+| P1 | high | neutral | anti-pattern | Policy body calls a **VOLATILE function** (per-row evaluation) |
+| P5 | high | fail-open | anti-pattern | Policy body references **`session_user`** / `current_user` / `pg_has_role(...)` |
+| R1 | critical | fail-open | anti-pattern | An **untrusted role** (options: `{ roles: [...] }`) holds a write privilege |
+| R2 | high | fail-open | anti-pattern | A permissive write policy applies to an untrusted role or PUBLIC |
+| R3 | medium | fail-open | anti-pattern | An RLS table has grants **TO PUBLIC** (includes all current/future roles) |
+| W1 | medium | — | meta | No exposure surface configured — whole database assumed reachable, score capped |
+
+**Direction matters**: `fail-open` findings are actual exposure (the untrusted side can reach more than intended). `fail-closed` findings are denied at runtime — an availability/hygiene concern, not a leak — and contribute **nothing to the score** by default (tune with `scoring.failClosedWeight`).
 
 Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across every applicable permissive policy (FOR ALL + PUBLIC-role policies considered). Roles with `BYPASSRLS` are suppressed.
 
 R1/R2 are no-ops until a role list is configured — e.g. `"R1": ["critical", { "roles": ["anonymous"] }]` — so they cost nothing on databases without an untrusted-role model. The `safegres:constructive` preset configures them for `anonymous`.
+
+## Exposure surface
+
+A database-wide score is meaningless if most of the database isn't reachable through the app's APIs. Declare (or auto-resolve) the **exposure surface** and safegres partitions findings:
+
+- **Exposed** findings (on API-reachable schemas) drive the score.
+- **Internal** findings are reported as unscored *internal advisories* (hide entirely with `--exposed-only`).
+- **No exposure configured** → a `W1` warning is emitted and the score is capped at 80/B (`scoring.unknownExposureCap`).
+
+```jsonc
+{
+  "exposure": {
+    "schemas": ["app_public", "app_hidden"]      // static surface
+    // or, on a Constructive database:
+    // "resolver": "constructive"                 // introspects routing_public.apis → api_schemas
+  }
+}
+```
+
+CLI: `--exposure-schemas <csv>`, `--exposed-only`. The `safegres:constructive` preset sets `exposure.resolver: "constructive"` so the surface is discovered automatically from the routing plane (including API roles from `role_name`/`anon_role`).
 
 ## Configuration
 
@@ -86,15 +110,21 @@ export default defineConfig({
 | Preset | Behavior |
 | --- | --- |
 | `safegres:recommended` | Every rule at its default severity (the no-config behavior) |
-| `safegres:strict` | Coverage gaps escalated (A4 critical, A5 high), `failOn: high` |
-| `safegres:constructive` | Constructive's role model: R1/R2 watch `anonymous`, leak surfaces (A2, A4, A7, P5) critical |
+| `safegres:strict` | Everything escalated; fail-closed findings count 25% toward the score, `failOn: high` |
+| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; leak surfaces (A2, P5) critical; A3 off (API roles never own tables) |
 | `safegres:minimal` | Structural flags only (A1–A3) — fast CI smoke check |
 
 CLI: `--config <path>`, `--preset <name>`, `--rule CODE=off|severity` (repeatable).
 
 ### Scoring
 
-Every report includes a config-driven score (0–100 + grade): weighted deductions per finding severity (critical 25, high 10, medium 4, low 1, info 0 by default), capped per rule, with any critical finding flooring the grade at C. Tune via `scoring.weights`, `scoring.perRuleWeights`, `scoring.maxDeductionPerRule`, `scoring.gradeBands`, `scoring.floorOnCritical`. Gate CI with `--fail-on-score <n>` / `--fail-on-grade <g>` or `failOn` in config.
+Every report includes a config-driven score (0–100 + grade). The default **density** model normalizes by the exposed surface so large schemas don't saturate to 0/F:
+
+```
+score = 100 · exp(−k · riskPoints / exposedTables)
+```
+
+where `riskPoints` is the severity-weighted sum (critical 25, high 10, medium 4, low 1, info 0) of *exposed, fail-open* findings, and `k` defaults to 0.17 (≈ one critical per 10 exposed tables lands at a C). Non-exposed findings score 0; fail-closed findings score 0 unless `scoring.failClosedWeight` is raised; unknown exposure caps the score (`scoring.unknownExposureCap`, default 80). Any exposed critical floors the grade at C (`scoring.floorOnCritical`). The legacy flat-deduction model is available via `scoring.model: "weighted"`. Tune via `scoring.weights`, `scoring.perRuleWeights`, `scoring.densityK`, `scoring.gradeBands`. Gate CI with `--fail-on-score <n>` / `--fail-on-grade <g>` or `failOn` in config.
 
 ### Other commands
 

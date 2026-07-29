@@ -25,11 +25,28 @@ export function renderPretty(report: Report, options: { color?: boolean } = {}):
   const colorEnabled = options.color ?? process.stdout.isTTY === true;
   const paint = (sev: Severity, s: string) => (colorEnabled ? SEV_PAINT[sev](s) : noop(s));
 
-  const { summary: s, findings, score } = report;
+  const { summary: s, findings, score, exposure } = report;
   const lines: string[] = [
     `safegres ${report.version}  (${report.generatedAt})`,
     ''
   ];
+
+  if (exposure) {
+    if (exposure.known) {
+      lines.push(
+        `exposure: ${exposure.schemas.length} schema(s) via ${exposure.source}`
+          + `  — ${exposure.exposedTables}/${exposure.totalTables} tables exposed`
+      );
+      if (exposure.roles && exposure.roles.length > 0) {
+        lines.push(`  api roles: ${exposure.roles.join(', ')}`);
+      }
+    } else {
+      lines.push(
+        paint('medium', 'exposure: unknown — entire database assumed reachable (score capped)')
+      );
+    }
+    lines.push('');
+  }
 
   if (score) {
     const gradePaint: (s: string) => string = colorEnabled
@@ -39,7 +56,8 @@ export function renderPretty(report: Report, options: { color?: boolean } = {}):
           ? yanse.yellow
           : yanse.red
       : noop;
-    lines.push(`score: ${gradePaint(`${score.value} (${score.grade})`)}  — model: ${score.model}`);
+    const capNote = score.cappedByUnknownExposure ? '  (capped: exposure unknown)' : '';
+    lines.push(`score: ${gradePaint(`${score.value} (${score.grade})`)}  — model: ${score.model}${capNote}`);
     const top = score.deductions.slice(0, 3);
     if (top.length > 0) {
       lines.push(
@@ -58,8 +76,22 @@ export function renderPretty(report: Report, options: { color?: boolean } = {}):
     ''
   );
 
-  for (const f of findings) {
+  const exposed = findings.filter((f) => f.exposed !== false);
+  const internal = findings.filter((f) => f.exposed === false);
+
+  for (const f of exposed) {
     lines.push(renderFinding(f, paint));
+  }
+
+  if (internal.length > 0) {
+    lines.push(
+      '',
+      `internal advisories (${internal.length}) — not exposed via any API, excluded from the score:`,
+      ''
+    );
+    for (const f of internal) {
+      lines.push(renderFinding(f, paint));
+    }
   }
 
   if (findings.length === 0) {

@@ -7,6 +7,8 @@
 import { parsePolicyExpression } from '../ast/parse';
 import { loadConfig, type LoadConfigParams } from '../config/loader';
 import { resolveRules } from '../config/resolve';
+import type { ExposureConfig } from '../config/types';
+import { resolveExposure } from '../pg/exposure';
 import { asExecutor, type QueryExecutor } from '../pg/introspect';
 
 export type DoctorStatus = 'ok' | 'warn' | 'fail';
@@ -29,10 +31,12 @@ export async function doctor(
   options: DoctorOptions = {}
 ): Promise<DoctorReport> {
   const checks: DoctorCheck[] = [];
+  let exposureConfig: ExposureConfig | undefined;
 
   // --- configuration ---
   try {
     const loaded = loadConfig(options);
+    exposureConfig = loaded.config.exposure;
     if (loaded.isEmpty) {
       checks.push({
         name: 'config',
@@ -150,6 +154,29 @@ export async function doctor(
     });
   } catch (err) {
     checks.push({ name: 'rls', status: 'warn', detail: (err as Error).message });
+  }
+
+  // --- exposure surface ---
+  try {
+    const exposure = await resolveExposure(exec, exposureConfig);
+    if (exposure.known) {
+      checks.push({
+        name: 'exposure',
+        status: 'ok',
+        detail: `${exposure.schemas.length} exposed schema(s) via ${exposure.source}${
+          exposure.roles && exposure.roles.length > 0 ? ` (api roles: ${exposure.roles.join(', ')})` : ''
+        }`
+      });
+    } else {
+      checks.push({
+        name: 'exposure',
+        status: 'warn',
+        detail:
+          'no exposure surface configured — the audit assumes the whole database is reachable and caps the score. Declare `exposure.schemas` or use `exposure.resolver: "constructive"`.'
+      });
+    }
+  } catch (err) {
+    checks.push({ name: 'exposure', status: 'warn', detail: (err as Error).message });
   }
 
   return finish(checks);

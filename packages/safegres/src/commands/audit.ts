@@ -27,12 +27,14 @@ import {
   type RoleTrustOptions
 } from '../checks/role-trust';
 import { allAstRulesDisabled, applyRulesToFindings, resolveRules, rulesForTable } from '../config/resolve';
-import type { SafegresConfig } from '../config/types';
+import type { ExposureConfig, SafegresConfig } from '../config/types';
+import { resolveExposure } from '../pg/exposure';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
+import { RULES_BY_CODE } from '../rules/registry';
 import { computeScore } from '../score/score';
-import type { Finding, Report } from '../types';
+import type { ExposureReport, Finding, Report } from '../types';
 import { summarize } from '../types';
 import { version as PKG_VERSION } from '../version';
 
@@ -46,6 +48,11 @@ export interface AuditOptions extends IntrospectOptions {
    * that only want grants + RLS-flag + coverage findings.
    */
   skipAstChecks?: boolean;
+  /**
+   * The exposed API surface. Overrides `config.exposure` when provided.
+   * Findings on non-exposed schemas contribute nothing to the score.
+   */
+  exposure?: ExposureConfig;
   /**
    * Merged safegres configuration (rules, overrides, scoring). Rule settings
    * filter and retune findings; scoring settings drive the report score.
@@ -72,11 +79,18 @@ export async function audit(
     options.excludeRoles ?? config.excludeRoles
   );
 
+  const exposure = await resolveExposure(exec, options.exposure ?? config.exposure);
+  const exposedSchemas = new Set(exposure.schemas);
+
   const snapshot = await introspectTables(exec, {
     schemas: options.schemas ?? config.schemas,
     excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
     roles: resolution.roles
   });
+
+  const exposedTables = exposure.known
+    ? snapshot.filter((t) => exposedSchemas.has(t.schema)).length
+    : snapshot.length;
 
   let findings: Finding[] = [];
 
@@ -112,14 +126,49 @@ export async function audit(
   }
 
   findings = applyRulesToFindings(resolved, findings);
+
+  // Stamp direction (from the registry) and exposure on every finding.
+  for (const f of findings) {
+    const meta = RULES_BY_CODE.get(f.code);
+    if (meta && f.direction === undefined) f.direction = meta.direction;
+    if (exposure.known && f.schema) f.exposed = exposedSchemas.has(f.schema);
+  }
+
+  // W1: no exposure surface — the whole database is assumed reachable.
+  if (!exposure.known && resolved.rules.get('W1')?.enabled !== false) {
+    findings.push({
+      code: 'W1',
+      severity: resolved.rules.get('W1')?.severity ?? 'medium',
+      category: 'meta',
+      direction: 'neutral',
+      message:
+        'No exposure surface configured — the audit assumes the entire database is reachable and the score is capped',
+      hint:
+        'Declare `exposure.schemas` (or use `exposure.resolver: "constructive"` on a Constructive database) so the score reflects what the exposed APIs can actually reach.'
+    });
+  }
+
   findings.sort(compareFindings);
+
+  const exposureReport: ExposureReport = {
+    known: exposure.known,
+    source: exposure.source,
+    schemas: exposure.schemas,
+    ...(exposure.roles ? { roles: exposure.roles } : {}),
+    exposedTables,
+    totalTables: snapshot.length
+  };
 
   return {
     version: PKG_VERSION,
     generatedAt: new Date().toISOString(),
     summary: summarize(findings),
     findings,
-    score: computeScore(findings, config.scoring)
+    score: computeScore(findings, config.scoring, {
+      exposedTables,
+      exposureKnown: exposure.known
+    }),
+    exposure: exposureReport
   };
 }
 

@@ -1,4 +1,4 @@
-import type { Finding, Severity } from '../types';
+import type { Direction, Finding, Severity } from '../types';
 
 /**
  * Static metadata for every rule safegres can emit. Severity here is the
@@ -10,6 +10,12 @@ export interface RuleMeta {
   code: string;
   category: Finding['category'];
   defaultSeverity: Severity;
+  /**
+   * Leak vs deny vs directionless. `fail-closed` findings are hygiene
+   * concerns — the operation is *denied* at runtime — and contribute nothing
+   * to the score by default. `fail-open` findings are actual exposure.
+   */
+  direction: Direction;
   title: string;
   /**
    * Rules with `scope: 'policy-ast'` require parsing policy expressions.
@@ -22,56 +28,72 @@ export const RULES: RuleMeta[] = [
   {
     code: 'A1',
     category: 'flags',
-    defaultSeverity: 'critical',
-    title: 'RLS enabled but no policies (effectively deny-all)',
+    defaultSeverity: 'low',
+    direction: 'fail-closed',
+    title: 'RLS enabled but no policies (deny-all — confirm the lock is intended)',
     scope: 'table'
   },
   {
     code: 'A2',
     category: 'flags',
     defaultSeverity: 'high',
+    direction: 'fail-open',
     title: 'Grants exist on a table with RLS disabled',
     scope: 'table'
   },
   {
     code: 'A3',
     category: 'flags',
-    defaultSeverity: 'medium',
+    defaultSeverity: 'low',
+    direction: 'fail-open',
     title: 'RLS enabled but FORCE ROW LEVEL SECURITY not set (owner bypass)',
     scope: 'table'
   },
   {
     code: 'A4',
     category: 'coverage',
-    defaultSeverity: 'high',
-    title: 'INSERT/UPDATE/DELETE grant with no covering policy for that verb',
+    defaultSeverity: 'low',
+    direction: 'fail-closed',
+    title: 'INSERT/UPDATE/DELETE grant with no covering policy — writes are denied at runtime',
     scope: 'table'
   },
   {
     code: 'A5',
     category: 'coverage',
-    defaultSeverity: 'medium',
-    title: 'SELECT grant with no covering policy (silent empty result)',
+    defaultSeverity: 'low',
+    direction: 'fail-closed',
+    title: 'SELECT grant with no covering policy — queries silently return 0 rows',
     scope: 'table'
   },
   {
     code: 'A6',
     category: 'coverage',
     defaultSeverity: 'info',
+    direction: 'fail-closed',
     title: 'UPDATE has USING but no WITH CHECK (row-smuggling surface)',
     scope: 'table'
   },
   {
     code: 'A7',
     category: 'anti-pattern',
-    defaultSeverity: 'high',
-    title: 'Trivially-permissive policy (USING (true) / WITH CHECK (true))',
+    defaultSeverity: 'critical',
+    direction: 'fail-open',
+    title: 'Trivially-permissive WRITE policy (INSERT/UPDATE/DELETE/ALL with literal true)',
+    scope: 'policy-ast'
+  },
+  {
+    code: 'A8',
+    category: 'anti-pattern',
+    defaultSeverity: 'low',
+    direction: 'fail-open',
+    title: 'Trivially-permissive SELECT policy (USING (true) — confirm public-read is intended)',
     scope: 'policy-ast'
   },
   {
     code: 'P1',
     category: 'anti-pattern',
     defaultSeverity: 'high',
+    direction: 'neutral',
     title: 'Policy body calls a VOLATILE function (per-row evaluation)',
     scope: 'policy-ast'
   },
@@ -79,6 +101,7 @@ export const RULES: RuleMeta[] = [
     code: 'P1b',
     category: 'anti-pattern',
     defaultSeverity: 'medium',
+    direction: 'neutral',
     title: 'Policy body calls a SECURITY DEFINER wrapper (cannot be inlined)',
     scope: 'policy-ast'
   },
@@ -86,6 +109,7 @@ export const RULES: RuleMeta[] = [
     code: 'P5',
     category: 'anti-pattern',
     defaultSeverity: 'high',
+    direction: 'fail-open',
     title: 'Policy body references session_user / current_user / pg_has_role',
     scope: 'policy-ast'
   },
@@ -93,6 +117,7 @@ export const RULES: RuleMeta[] = [
     code: 'R1',
     category: 'anti-pattern',
     defaultSeverity: 'critical',
+    direction: 'fail-open',
     title: 'Untrusted role holds a write privilege (options: { roles: [...] })',
     scope: 'table'
   },
@@ -100,6 +125,7 @@ export const RULES: RuleMeta[] = [
     code: 'R2',
     category: 'anti-pattern',
     defaultSeverity: 'high',
+    direction: 'fail-open',
     title: 'Permissive write policy applies to an untrusted role or PUBLIC (options: { roles: [...] })',
     scope: 'table'
   },
@@ -107,7 +133,16 @@ export const RULES: RuleMeta[] = [
     code: 'R3',
     category: 'anti-pattern',
     defaultSeverity: 'medium',
+    direction: 'fail-open',
     title: 'RLS table has grants TO PUBLIC (includes all current and future roles)',
+    scope: 'table'
+  },
+  {
+    code: 'W1',
+    category: 'meta',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    title: 'No exposure surface configured — the whole database is assumed reachable and the score is capped',
     scope: 'table'
   }
 ];
