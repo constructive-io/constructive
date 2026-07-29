@@ -92,6 +92,11 @@ export interface Report {
   score?: import('./score/score').Score;
   /** The exposure surface the score was computed against. */
   exposure?: ExposureReport;
+  /**
+   * Unscored call-graph audit (`--call-graph`): trust boundaries reachable
+   * from the exposed entry points, for human review.
+   */
+  callGraph?: import('./callgraph/graph').CallGraphReport;
 }
 
 export function newSummary(): Summary {

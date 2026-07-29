@@ -2607,6 +2607,9 @@ importers:
       inquirerer:
         specifier: ^4.9.1
         version: 4.9.1
+      libpg-query:
+        specifier: ^18.1.2
+        version: 18.1.2
       pg:
         specifier: ^8.21.0
         version: 8.21.0
