@@ -1,5 +1,7 @@
 import yanse from 'yanse';
 
+import type { CallGraphDiff } from '../callgraph/baseline';
+import { boundaryKey } from '../callgraph/baseline';
 import type { CallGraphReport, ChecklistCode, ChecklistItem } from '../callgraph/graph';
 
 type Painter = (s: string) => string;
@@ -49,6 +51,36 @@ export function renderCallGraph(cg: CallGraphReport, options: RenderCallGraphOpt
     }
   }
 
+  return lines.join('\n');
+}
+
+export function renderCallGraphDiff(diff: CallGraphDiff, options: RenderCallGraphOptions = {}): string {
+  const color = options.color === true;
+  const paint = (p: Painter, s: string) => (color ? p(s) : s);
+
+  if (diff.added.length === 0 && diff.removed.length === 0) {
+    return paint(yanse.green, 'baseline: no new trust boundaries.');
+  }
+
+  const lines: string[] = [];
+  if (diff.added.length > 0) {
+    lines.push(
+      paint(yanse.red, `baseline: ${diff.added.length} NEW trust boundar${diff.added.length === 1 ? 'y' : 'ies'} — review and re-baseline to accept:`)
+    );
+    for (const item of diff.added) {
+      lines.push(`  + [${item.code}] ${item.table ? `${item.fn} → ${item.table}` : item.fn}`);
+      lines.push(`        ${item.message}`);
+      if (item.path.length > 1) lines.push(`        via: ${item.path.join(' → ')}`);
+    }
+  }
+  if (diff.removed.length > 0) {
+    lines.push(
+      paint(yanse.green, `baseline: ${diff.removed.length} boundar${diff.removed.length === 1 ? 'y' : 'ies'} resolved (no longer present) — re-baseline to prune:`)
+    );
+    for (const b of diff.removed) {
+      lines.push(`  - ${boundaryKey(b)}`);
+    }
+  }
   return lines.join('\n');
 }
 
