@@ -171,4 +171,38 @@ console.log(renderPretty(report));
 console.log(`${report.findings.length} findings`);
 ```
 
+## pgpm projects
+
+For pgpm workspaces, safegres can deploy the workspace into an ephemeral test
+database and audit it — no running database or connection flags required
+(needs the optional peer dependency `pgsql-test`):
+
+```bash
+safegres audit --pgpm            # nearest pgpm module/workspace from cwd
+safegres audit --pgpm ./packages/my-db
+```
+
+Or as a jest test via the `safegres/pgpm-test` entrypoint:
+
+```ts
+import { auditPgpmWorkspace } from 'safegres/pgpm-test';
+
+it('passes the security audit', async () => {
+  const report = await auditPgpmWorkspace();
+  expect(report.score.grade).toBe('A+');
+});
+```
+
+Both discover the project's safegres config (`safegres.config.js`,
+`.safegresrc*`, …) by walking up from the workspace directory. pgpm projects
+usually don't have Constructive routing metadata, so declare the exposed
+surface statically:
+
+```json
+{
+  "extends": "safegres:recommended",
+  "exposure": { "schemas": ["app_public"] }
+}
+```
+
 
