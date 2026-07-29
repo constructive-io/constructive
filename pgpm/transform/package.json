@@ -43,7 +43,7 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
-    "@pgsql/transform": "^18.3.1",
+    "@pgsql/transform": "^18.4.1",
     "plpgsql-parser": "^18.2.1"
   }
 }

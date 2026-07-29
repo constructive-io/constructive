@@ -1,0 +1,15 @@
+{
+  "source": "catalog-module",
+  "schemas": {
+    "catalog": "shop_b",
+    "reporting": "analytics_b"
+  },
+  "route": [
+    {
+      "fromSchema": "catalog",
+      "kind": "function",
+      "name": "product_count",
+      "toSchema": "analytics_b"
+    }
+  ]
+}

@@ -41,16 +41,51 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
     );
   }
 
-  if (
-    !parsed.schemas ||
-    typeof parsed.schemas !== 'object' ||
-    Array.isArray(parsed.schemas) ||
-    Object.keys(parsed.schemas).length === 0 ||
-    Object.entries(parsed.schemas).some(
-      ([from, to]) => typeof from !== 'string' || typeof to !== 'string' || !from || !to
-    )
-  ) {
-    throw new Error(`${specPath}: "schemas" must be a non-empty string → string map`);
+  const hasSchemas = parsed.schemas !== undefined;
+  if (hasSchemas) {
+    if (
+      typeof parsed.schemas !== 'object' ||
+      Array.isArray(parsed.schemas) ||
+      Object.keys(parsed.schemas).length === 0 ||
+      Object.entries(parsed.schemas).some(
+        ([from, to]) => typeof from !== 'string' || typeof to !== 'string' || !from || !to
+      )
+    ) {
+      throw new Error(`${specPath}: "schemas" must be a non-empty string → string map`);
+    }
+  }
+
+  const ROUTE_KINDS = ['table', 'view', 'function', 'procedure', 'type'];
+  const hasRoute = parsed.route !== undefined;
+  if (hasRoute) {
+    if (!Array.isArray(parsed.route) || parsed.route.length === 0) {
+      throw new Error(`${specPath}: "route" must be a non-empty array of route entries`);
+    }
+    for (const entry of parsed.route) {
+      if (
+        !entry ||
+        typeof entry !== 'object' ||
+        typeof entry.fromSchema !== 'string' ||
+        !entry.fromSchema ||
+        typeof entry.name !== 'string' ||
+        !entry.name ||
+        typeof entry.toSchema !== 'string' ||
+        !entry.toSchema ||
+        !ROUTE_KINDS.includes(entry.kind)
+      ) {
+        throw new Error(
+          `${specPath}: each "route" entry needs { fromSchema, kind (${ROUTE_KINDS.join(
+            '|'
+          )}), name, toSchema } as non-empty strings`
+        );
+      }
+    }
+  }
+
+  if (!hasSchemas && !hasRoute) {
+    throw new Error(
+      `${specPath}: at least one of "schemas" (string → string map) or "route" (object routes) is required`
+    );
   }
 
   const name = parsed.name ?? basename(dirname(specPath));

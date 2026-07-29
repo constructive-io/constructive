@@ -78,9 +78,24 @@ export async function materializeApplyModule(
     );
   }
 
+  // Every distinct target schema is treated as "may already exist": apply
+  // deploys into consumer-chosen namespaces that can pre-exist (a shared schema,
+  // another tenant), so `CREATE SCHEMA` is emitted idempotently. This is what
+  // lets the same source apply cleanly whether or not the destination exists.
+  const targetSchemas = [
+    ...new Set([
+      ...Object.values(spec.schemas ?? {}),
+      ...(spec.route ?? []).map(r => r.toSchema)
+    ])
+  ];
+
   const { renameChange, transformScript, result } = makeSchemaTranspiler({
     schemaMap: spec.schemas,
-    transform: { prePasses: [schemaNameLiteralPass] }
+    routes: spec.route,
+    transform: {
+      prePasses: [schemaNameLiteralPass],
+      assumeSchemasExist: targetSchemas
+    }
   });
 
   const transpiled = transpileBundle(source, {

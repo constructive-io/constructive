@@ -3,10 +3,12 @@ export { loadModule } from 'plpgsql-parser';
 export type {
   BundleScriptContext,
   NamespaceValidatorOptions,
+  SchemaObjectRoute,
   SchemaTranspiler,
   SchemaTranspilerOptions,
 } from './bundle-driver';
 export {
+  buildSchemaRouter,
   makeNamespaceValidator,
   makeSchemaTranspiler,
 } from './bundle-driver';
