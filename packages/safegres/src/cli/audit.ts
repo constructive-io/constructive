@@ -1,6 +1,8 @@
 import { Logger } from '@pgpmjs/logger';
+import * as fs from 'fs';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 
+import { diffCallGraph, parseBaseline, serializeBaseline, toBaseline } from '../callgraph/baseline';
 import { audit, type AuditOptions } from '../commands/audit';
 import { loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
@@ -62,6 +64,11 @@ Call graph (unscored; human review):
                            points and list trust boundaries: SECURITY DEFINER hops,
                            RLS-bypass paths, auth-context mutations, internal-table
                            reach, and opaque (dynamic SQL) nodes
+  --write-baseline <file>  Snapshot the call-graph boundaries to <file>
+                           (implies --call-graph)
+  --baseline <file>        Diff the call graph against a committed snapshot and
+                           report NEW trust boundaries (implies --call-graph)
+  --fail-on-new-boundaries Exit non-zero when --baseline finds new boundaries
 
 Audit options:
   --schemas <csv>          Limit to these schemas (default: all non-system)
@@ -103,7 +110,10 @@ export default async (
     includeRoles: csvList(argv.roles),
     excludeRoles: csvList(argv['exclude-roles']),
     skipAstChecks: argv['skip-ast'] === true,
-    callGraph: argv['call-graph'] === true,
+    callGraph:
+      argv['call-graph'] === true
+      || typeof argv.baseline === 'string'
+      || typeof argv['write-baseline'] === 'string',
     exposure: exposureSchemas
       ? { ...config.exposure, schemas: exposureSchemas }
       : undefined,
@@ -122,6 +132,22 @@ export default async (
     } finally {
       await client.end();
     }
+  }
+
+  if (typeof argv['write-baseline'] === 'string' && report.callGraph) {
+    fs.writeFileSync(argv['write-baseline'], serializeBaseline(toBaseline(report.callGraph)));
+    log.info(`wrote call-graph baseline: ${argv['write-baseline']}`);
+  }
+
+  if (typeof argv.baseline === 'string' && report.callGraph) {
+    let raw: string;
+    try {
+      raw = fs.readFileSync(argv.baseline, 'utf8');
+    } catch {
+      log.error(`cannot read --baseline file: ${argv.baseline} (create one with --write-baseline)`);
+      process.exit(2);
+    }
+    report.callGraphDiff = diffCallGraph(report.callGraph, parseBaseline(raw));
   }
 
   if (argv['exposed-only'] === true) {
@@ -175,6 +201,17 @@ export default async (
     typeof argv['fail-on-grade'] === 'string' ? (argv['fail-on-grade'] as Grade) : config.failOn?.grade;
   if (failOnGrade && report.score && !meetsGrade(report.score.grade, failOnGrade)) {
     log.error(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
+    process.exit(1);
+  }
+
+  if (
+    argv['fail-on-new-boundaries'] === true
+    && report.callGraphDiff
+    && report.callGraphDiff.added.length > 0
+  ) {
+    log.error(
+      `${report.callGraphDiff.added.length} new trust boundar${report.callGraphDiff.added.length === 1 ? 'y' : 'ies'} since the baseline — review and re-baseline to accept`
+    );
     process.exit(1);
   }
 };

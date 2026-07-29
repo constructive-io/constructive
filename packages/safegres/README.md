@@ -130,6 +130,24 @@ CG2 — RLS-bypass paths (RLS does not protect the table on this path) (1)
 
 Bodies are analyzed for `sql` and `plpgsql` functions (via the PL/pgSQL parser); overloads collapse into one node per `schema.name`; unqualified calls resolve to every user function with that name (a conservative over-approximation). JSON output (`--format json`) carries the full graph — nodes, edges, and checklist — sorted stably so it can be snapshotted and diffed in CI.
 
+### Baseline diffing (CI gate for new trust boundaries)
+
+Snapshot the checklist once, commit it, and let CI report anything **new**:
+
+```bash
+safegres audit --write-baseline .safegres-callgraph.json   # snapshot (implies --call-graph)
+safegres audit --baseline .safegres-callgraph.json         # diff: report new/resolved boundaries
+safegres audit --baseline .safegres-callgraph.json --fail-on-new-boundaries   # gate: exit 1 on new
+```
+
+```
+baseline: 1 NEW trust boundary — review and re-baseline to accept:
+  + [CF2] app_public.new_fn
+        SECURITY DEFINER executable by PUBLIC, anonymous — widest blast radius; confirm this is intended
+```
+
+The baseline stores only boundary *identity* (`code` + entry + function + table), so message rewording and path changes between safegres versions never invalidate it. A boundary that disappears is reported as resolved; re-run `--write-baseline` to accept either direction. The diff is also carried in JSON output (`callGraphDiff`).
+
 ## Configuration
 
 safegres is configurable like a linter. Config is discovered by walking up from the current directory: `safegres.config.{ts,js,mjs,cjs}`, `.safegresrc{,.json,.yaml,.yml,.js}`, `safegres.json`, or a `"safegres"` key in package.json (via [confstash](https://github.com/constructive-io/dev-utils/tree/main/packages/confstash)).

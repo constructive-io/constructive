@@ -97,6 +97,12 @@ export interface Report {
    * from the exposed entry points, for human review.
    */
   callGraph?: import('./callgraph/graph').CallGraphReport;
+  /**
+   * Diff against a committed call-graph baseline (`--baseline`): trust
+   * boundaries added since the snapshot (require sign-off) and boundaries
+   * that were resolved.
+   */
+  callGraphDiff?: import('./callgraph/baseline').CallGraphDiff;
 }
 
 export function newSummary(): Summary {

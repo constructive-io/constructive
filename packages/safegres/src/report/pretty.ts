@@ -1,7 +1,7 @@
 import yanse from 'yanse';
 
 import type { Finding, Report, Severity } from '../types';
-import { renderCallGraph } from './callgraph';
+import { renderCallGraph, renderCallGraphDiff } from './callgraph';
 
 const SEV_LABEL: Record<Severity, string> = {
   critical: 'CRIT',
@@ -89,6 +89,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
     if (report.callGraph) {
       lines.push('', renderCallGraph(report.callGraph, { color: colorEnabled, summary: true }));
     }
+    if (report.callGraphDiff) {
+      lines.push('', renderCallGraphDiff(report.callGraphDiff, { color: colorEnabled }));
+    }
     return lines.join('\n');
   }
   lines.push('');
@@ -129,6 +132,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 
   if (report.callGraph) {
     lines.push('', renderCallGraph(report.callGraph, { color: colorEnabled }));
+  }
+  if (report.callGraphDiff) {
+    lines.push('', renderCallGraphDiff(report.callGraphDiff, { color: colorEnabled }));
   }
 
   return lines.join('\n');

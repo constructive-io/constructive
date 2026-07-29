@@ -12,6 +12,12 @@ export {
   type PolicyExpression,
   PolicyParseError} from './ast/parse';
 export type {
+  BaselineBoundary,
+  CallGraphBaseline,
+  CallGraphDiff
+} from './callgraph/baseline';
+export { boundaryKey, diffCallGraph, parseBaseline, serializeBaseline, toBaseline } from './callgraph/baseline';
+export type {
   CallGraphEdge,
   CallGraphNode,
   CallGraphOptions,
@@ -67,7 +73,7 @@ export {
   type TableSnapshot
 } from './pg/introspect';
 export { listAuditableRoles, resolveRoles } from './pg/roles';
-export { renderCallGraph } from './report/callgraph';
+export { renderCallGraph, renderCallGraphDiff } from './report/callgraph';
 export { renderJson } from './report/json';
 export { renderPretty } from './report/pretty';
 export type { RuleMeta } from './rules/registry';
