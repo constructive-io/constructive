@@ -63,6 +63,8 @@ Audit options:
   --roles <csv>            Audit grants only for these roles (default: all)
   --exclude-roles <csv>    Skip grants for these roles
   --format <fmt>           "pretty" (default) | "json" | "json-pretty"
+  --summary, -q            Print only exposure, score, and severity counts (no findings)
+  --verbose                Expand internal (non-exposed) advisories (listed as a count otherwise)
   --fail-on <severity>     Exit non-zero if any finding >= severity
                            (critical|high|medium|low|info; default: none)
   --fail-on-score <n>      Exit non-zero if the score is below n (0-100)
@@ -130,7 +132,11 @@ export default async (
     output = renderJson(report, { pretty: true });
     break;
   case 'pretty':
-    output = renderPretty(report, { color: colorEnabled });
+    output = renderPretty(report, {
+      color: colorEnabled,
+      summary: argv.summary === true,
+      verbose: argv.verbose === true
+    });
     break;
   default:
     log.error(`Unknown --format: ${fmt}`);

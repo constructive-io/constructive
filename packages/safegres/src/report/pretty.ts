@@ -21,7 +21,15 @@ const SEV_PAINT: Record<Severity, Painter> = {
 
 const noop: Painter = (s) => s;
 
-export function renderPretty(report: Report, options: { color?: boolean } = {}): string {
+export interface RenderPrettyOptions {
+  color?: boolean;
+  /** Only render the exposure line, score, and severity summary — no per-finding lines. */
+  summary?: boolean;
+  /** Expand the internal (non-exposed) advisories instead of collapsing them to a count. */
+  verbose?: boolean;
+}
+
+export function renderPretty(report: Report, options: RenderPrettyOptions = {}): string {
   const colorEnabled = options.color ?? process.stdout.isTTY === true;
   const paint = (sev: Severity, s: string) => (colorEnabled ? SEV_PAINT[sev](s) : noop(s));
 
@@ -72,9 +80,14 @@ export function renderPretty(report: Report, options: { color?: boolean } = {}):
       + `${paint('high', String(s.high))} high  `
       + `${paint('medium', String(s.medium))} medium  `
       + `${paint('low', String(s.low))} low  `
-      + `${paint('info', String(s.info))} info`,
-    ''
+      + `${paint('info', String(s.info))} info`
   );
+
+  // --summary: score + counts only, no per-finding lines.
+  if (options.summary) {
+    return lines.join('\n');
+  }
+  lines.push('');
 
   const exposed = findings.filter((f) => f.exposed !== false);
   const internal = findings.filter((f) => f.exposed === false);
@@ -84,13 +97,25 @@ export function renderPretty(report: Report, options: { color?: boolean } = {}):
   }
 
   if (internal.length > 0) {
-    lines.push(
-      '',
-      `internal advisories (${internal.length}) — not exposed via any API, excluded from the score:`,
-      ''
-    );
-    for (const f of internal) {
-      lines.push(renderFinding(f, paint));
+    // Collapse internal advisories to a count by default; --verbose lists them.
+    if (options.verbose) {
+      lines.push(
+        '',
+        `internal advisories (${internal.length}) — not exposed via any API, excluded from the score:`,
+        ''
+      );
+      for (const f of internal) {
+        lines.push(renderFinding(f, paint));
+      }
+    } else {
+      lines.push(
+        '',
+        paint(
+          'info',
+          `internal advisories (${internal.length}) — not exposed via any API, `
+            + 'excluded from the score; run with --verbose to list.'
+        )
+      );
     }
   }
 
