@@ -86,8 +86,8 @@ export const PresetFull: ModulePreset = {
     // Storage (full features)
     ['storage_module', { scope: 'app', has_versioning: true, has_content_hash: true, has_custom_keys: true, has_audit_log: true }],
     // Infrastructure (functions, namespaces)
-    'namespace_module',
-    'function_module',
+    ['namespace_module', { scope: 'app' }],
+    ['function_module', { scope: 'app' }]
   ],
-  extends: ['b2b']
+  extends: ['b2b:storage']
 };

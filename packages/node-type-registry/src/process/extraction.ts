@@ -72,7 +72,7 @@ export const ProcessExtraction: NodeTypeDefinition = {
       task_identifier: {
         type: 'string',
         description: 'Job task identifier for the extraction worker',
-        default: 'extract_file_text'
+        default: 'document:extract_file_text'
       },
       events: {
         type: 'array',

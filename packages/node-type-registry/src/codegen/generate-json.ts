@@ -20,7 +20,7 @@ import { join } from 'path';
 import { allNodeTypes } from '../index';
 import { allModulePresets } from '../module-presets';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { version } = require('../../package.json') as { version: string };
 
 export interface JsonArtifacts {
@@ -32,7 +32,7 @@ export interface JsonArtifacts {
 export function buildJsonArtifacts(registryVersion: string = version): JsonArtifacts {
   return {
     'presets.json': { registryVersion, presets: allModulePresets },
-    'node-types.json': { registryVersion, nodeTypes: allNodeTypes },
+    'node-types.json': { registryVersion, nodeTypes: allNodeTypes }
   };
 }
 

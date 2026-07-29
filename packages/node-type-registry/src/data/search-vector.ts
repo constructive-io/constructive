@@ -74,8 +74,9 @@ export const SearchVector: NodeTypeDefinition = {
       },
       job_task_name: {
         type: 'string',
-        description: 'Task identifier for the job queue',
-        default: 'generate_embedding'
+        format: 'function-ref',
+        description: 'Task identifier for the job queue. Must match a registered function definition when function_module is installed.',
+        default: 'embedding:generate_embedding'
       },
       chunks: {
         type: 'object',
@@ -119,8 +120,9 @@ export const SearchVector: NodeTypeDefinition = {
           },
           chunking_task_name: {
             type: 'string',
-            description: 'Task identifier for the chunking job queue',
-            default: 'generate_chunks'
+            format: 'function-ref',
+            description: 'Task identifier for the chunking job queue. Must match a registered function definition when function_module is installed.',
+            default: 'embedding:generate_chunks'
           }
         }
       }

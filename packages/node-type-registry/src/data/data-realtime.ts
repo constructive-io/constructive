@@ -26,6 +26,16 @@ export const DataRealtime: NodeTypeDefinition = {
         type: 'string',
         description:
           'Custom name for the subscriber table (defaults to {source_table}_subscriber)'
+      },
+      ephemeral: {
+        type: 'boolean',
+        description:
+          'When true, events are delivered via pg_notify only without ' +
+          'writing to change_log. Ideal for high-frequency ephemeral ' +
+          'signals (e.g. cursor positions, live indicators) where ' +
+          'persistence is unnecessary. Subscriber table and RLS ' +
+          'policies are still created for access control.',
+        default: false
       }
     }
   },

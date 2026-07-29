@@ -1,5 +1,7 @@
 export { AuthzAllowAll } from './authz-allow-all';
+export { AuthzAppMemberOwner } from './authz-app-member-owner';
 export { AuthzAppMembership } from './authz-app-membership';
+export { AuthzColumnSecurity } from './authz-column-security';
 export { AuthzComposite } from './authz-composite';
 export { AuthzDenyAll } from './authz-deny-all';
 export { AuthzDirectOwner } from './authz-direct-owner';
@@ -14,5 +16,10 @@ export { AuthzPeerOwnership } from './authz-peer-ownership';
 export { AuthzPublishable } from './authz-publishable';
 export { AuthzRelatedEntityMembership } from './authz-related-entity-membership';
 export { AuthzRelatedMemberList } from './authz-related-member-list';
+export { AuthzRelatedMemberOwner } from './authz-related-member-owner';
 export { AuthzRelatedPeerOwnership } from './authz-related-peer-ownership';
+export { AuthzSystemOnly } from './authz-system-only';
 export { AuthzTemporal } from './authz-temporal';
+export { AuthzValueAllowed } from './authz-value-allowed';
+export { AuthzValueExists } from './authz-value-exists';
+export { AuthzValueMatch } from './authz-value-match';

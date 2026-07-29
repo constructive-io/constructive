@@ -9,13 +9,18 @@ export const AuthzRelatedMemberList: NodeTypeDefinition = {
   parameter_schema: {
     type: 'object',
     properties: {
+      owned_table_id: {
+        type: 'string',
+        format: 'uuid',
+        description: 'UUID of the related table (alternative to owned_schema/owned_table)'
+      },
       owned_schema: {
         type: 'string',
-        description: 'Schema of the related table'
+        description: 'Schema of the related table (or use owned_table_id)'
       },
       owned_table: {
         type: 'string',
-        description: 'Name of the related table'
+        description: 'Name of the related table (or use owned_table_id)'
       },
       owned_table_key: {
         type: 'string',
@@ -34,8 +39,6 @@ export const AuthzRelatedMemberList: NodeTypeDefinition = {
       }
     },
     required: [
-      'owned_schema',
-      'owned_table',
       'owned_table_key',
       'owned_table_ref_key',
       'this_object_key'

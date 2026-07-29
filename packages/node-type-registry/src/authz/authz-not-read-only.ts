@@ -15,10 +15,7 @@ export const AuthzNotReadOnly: NodeTypeDefinition = {
         description: 'Column name referencing the entity (e.g., entity_id, org_id)'
       },
       membership_type: {
-        type: [
-          'integer',
-          'string'
-        ],
+        type: ['integer', 'string'],
         description: 'Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped).'
       }
     },

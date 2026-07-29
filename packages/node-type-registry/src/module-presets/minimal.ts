@@ -1,17 +1,5 @@
 import type { ModulePreset } from './types';
 
-/**
- * `minimal` — users + sessions + RLS + API keys. No auth procedures, no
- * memberships, no orgs, no emails, no passwords.
- *
- * This is the barest foundation: a `users` table, a `sessions` table so
- * something upstream can mint tokens, `rls_module` so row-level security
- * is enforceable, and `user_state_module` so you can issue API keys. Nothing
- * else.
- *
- * You still write your own identity bridge on top (or rely on a header-based
- * user-id coming from an upstream proxy / JWT verifier).
- */
 export const PresetMinimal: ModulePreset = {
   name: 'minimal',
   display_name: 'Minimal (RLS only)',

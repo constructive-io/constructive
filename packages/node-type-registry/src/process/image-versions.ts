@@ -88,7 +88,7 @@ export const ProcessImageVersions: NodeTypeDefinition = {
       task_identifier: {
         type: 'string',
         description: 'Job task identifier for the image processing worker',
-        default: 'process_image_versions'
+        default: 'image:process_image_versions'
       },
       events: {
         type: 'array',

@@ -13,7 +13,8 @@ export const JobTrigger: NodeTypeDefinition = {
     properties: {
       task_identifier: {
         type: 'string',
-        description: 'Job task identifier passed to add_job (e.g., process_invoice, sync_to_stripe)'
+        format: 'function-ref',
+        description: 'Job task identifier passed to add_job (e.g., process_invoice, sync_to_stripe). Must match a registered function definition when function_module is installed.'
       },
       payload_strategy: {
         type: 'string',
