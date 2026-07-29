@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.11.0...@pgpmjs/export@1.12.0) (2026-07-29)
+
+**Note:** Version bump only for package @pgpmjs/export
+
 # [1.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.10.1...@pgpmjs/export@1.11.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/export

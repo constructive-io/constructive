@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/constructive-io/constructive/compare/safegres@1.10.0...safegres@1.11.0) (2026-07-29)
+
+### Features
+
+- **safegres:** call-graph baseline diffing — --write-baseline, --baseline, --fail-on-new-boundaries ([0035599](https://github.com/constructive-io/constructive/commit/00355992656f89cc2bd067f870d08bdf4173d269))
+
 # [1.10.0](https://github.com/constructive-io/constructive/compare/safegres@1.9.0...safegres@1.10.0) (2026-07-29)
 
 **Note:** Version bump only for package safegres
