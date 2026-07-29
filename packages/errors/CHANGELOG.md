@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.4.0...@constructive-io/errors@0.5.0) (2026-07-29)
+
+### Features
+
+- **errors:** regenerate registry from current constructive-db (class-aware audit) ([45f9a49](https://github.com/constructive-io/constructive/commit/45f9a49ceb7388521c889ebb40e0d79281fcdce8))
+
 # [0.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.3.0...@constructive-io/errors@0.4.0) (2026-07-28)
 
 **Note:** Version bump only for package @constructive-io/errors

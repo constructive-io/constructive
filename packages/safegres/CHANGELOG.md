@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/constructive-io/constructive/compare/safegres@1.7.0...safegres@1.8.0) (2026-07-29)
+
+### Features
+
+- **safegres:** declared public surface — public.read acknowledges intentional open reads ([3dc05f8](https://github.com/constructive-io/constructive/commit/3dc05f896e6a3d6b293f20f2cc19a12701fd2c30))
+- **safegres:** first-class exposure surface, direction-aware rules, density scoring ([612cdb8](https://github.com/constructive-io/constructive/commit/612cdb8cf2135ea7cf07612f9fe14ac691c2e0be))
+- **safegres:** pgpm autodetect audit — audit --pgpm + safegres/pgpm-test helper ([a696c75](https://github.com/constructive-io/constructive/commit/a696c75a6c2c9003ba02bef68628aa3d3cf02d0a))
+
 # [1.7.0](https://github.com/constructive-io/constructive/compare/safegres@1.6.0...safegres@1.7.0) (2026-07-28)
 
 **Note:** Version bump only for package safegres
