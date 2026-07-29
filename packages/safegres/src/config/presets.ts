@@ -11,29 +11,42 @@ export const recommended: SafegresConfig = {
   rules: {}
 };
 
-/** Everything on and escalated; coverage gaps are treated as critical. */
+/**
+ * Everything on and escalated. Fail-closed hygiene findings (dead grants,
+ * locked tables) are re-tuned upward and even contribute a fraction of
+ * their weight to the score.
+ */
 export const strict: SafegresConfig = {
   extends: 'safegres:recommended',
   rules: {
-    A4: 'critical',
-    A5: 'high',
+    A1: 'medium',
+    A3: 'medium',
+    A4: 'high',
+    A5: 'medium',
     A6: 'medium',
+    A8: 'medium',
     P1b: 'high'
   },
+  scoring: { failClosedWeight: 0.25 },
   failOn: { severity: 'high' }
 };
 
 /**
- * Tuned for Constructive's role model (RLS-first, anonymous/authenticated/
- * administrator): untrusted-role rules watch `anonymous`, and anything that
- * can leak rows across the role boundary is critical.
+ * Tuned for Constructive's architecture:
+ * - the exposure surface auto-resolves from the routing plane
+ *   (`routing_public.apis` → `api_schemas` → `metaschema_public.schema`),
+ *   so only what the exposed APIs can reach drives the score;
+ * - untrusted-role rules watch `anonymous`; anything that can leak rows
+ *   across the role boundary is critical;
+ * - A3 is off — API roles never own tables in the Constructive model, so
+ *   non-FORCEd RLS is not an exposure.
  */
 export const constructive: SafegresConfig = {
   extends: 'safegres:recommended',
+  exposure: { resolver: 'constructive' },
   rules: {
     A2: 'critical',
-    A4: 'critical',
-    A7: 'critical',
+    A3: 'off',
     P5: 'critical',
     R1: ['critical', { roles: ['anonymous'] }],
     R2: ['high', { roles: ['anonymous'] }],

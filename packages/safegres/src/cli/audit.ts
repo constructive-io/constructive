@@ -8,7 +8,7 @@ import { renderJson } from '../report/json';
 import { renderPretty } from '../report/pretty';
 import { meetsGrade } from '../score/score';
 import type { Severity } from '../types';
-import { meetsThreshold, SEVERITY_ORDER } from '../types';
+import { meetsThreshold, SEVERITY_ORDER, summarize } from '../types';
 import { buildClient, configParamsFromArgv, csvList } from './shared';
 
 const log = new Logger('safegres');
@@ -31,6 +31,11 @@ Configuration:
                            .safegresrc{,.json,.yaml,.yml,.js}, safegres.json, package.json "safegres")
   --preset <name>          Apply a built-in preset (recommended|strict|constructive|minimal)
   --rule <CODE=SETTING>    Retune a rule (repeatable), e.g. --rule A3=off --rule A5=high
+
+Exposure (what the score is computed against):
+  --exposure-schemas <csv> Declare the API-exposed schemas; findings outside
+                           them become unscored internal advisories
+  --exposed-only           Hide internal (non-exposed) findings from output
 
 Audit options:
   --schemas <csv>          Limit to these schemas (default: all non-system)
@@ -65,14 +70,23 @@ export default async (
   const client = buildClient(argv);
   await client.connect();
   try {
+    const exposureSchemas = csvList(argv['exposure-schemas']);
     const report = await audit(client, {
       schemas: csvList(argv.schemas),
       excludeSchemas: csvList(argv['exclude-schemas']),
       includeRoles: csvList(argv.roles),
       excludeRoles: csvList(argv['exclude-roles']),
       skipAstChecks: argv['skip-ast'] === true,
+      exposure: exposureSchemas
+        ? { ...config.exposure, schemas: exposureSchemas }
+        : undefined,
       config
     });
+
+    if (argv['exposed-only'] === true) {
+      report.findings = report.findings.filter((f) => f.exposed !== false);
+      report.summary = summarize(report.findings);
+    }
 
     const fmt = typeof argv.format === 'string' ? argv.format : 'pretty';
     let output: string;

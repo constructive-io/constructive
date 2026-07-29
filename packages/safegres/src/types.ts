@@ -8,6 +8,15 @@
 
 export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info';
 
+/**
+ * Which way a finding fails:
+ * - `fail-open`   — the untrusted side can read/write more than intended (a leak).
+ * - `fail-closed` — the operation is denied at runtime; an availability/hygiene
+ *                   concern, not an exposure. Excluded from the score by default.
+ * - `neutral`     — directionless (performance, meta).
+ */
+export type Direction = 'fail-open' | 'fail-closed' | 'neutral';
+
 export const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 4,
   high: 3,
@@ -22,6 +31,14 @@ export interface Finding {
   severity: Severity;
   /** High-level bucket — helps renderers group findings. */
   category: 'flags' | 'coverage' | 'anti-pattern' | 'sync' | 'match' | 'meta';
+  /** Leak vs deny vs directionless. Stamped from the rule registry. */
+  direction?: Direction;
+  /**
+   * Whether the finding's table is on the resolved exposure surface.
+   * `undefined` when no exposure surface is known (everything is assumed
+   * reachable).
+   */
+  exposed?: boolean;
   /** Schema-qualified location, where applicable. */
   schema?: string;
   table?: string;
@@ -44,6 +61,22 @@ export interface Summary {
   info: number;
 }
 
+/** The resolved exposure surface an audit was scored against. */
+export interface ExposureReport {
+  /** True when a surface was configured or auto-resolved. */
+  known: boolean;
+  /** Where the surface came from. */
+  source: 'config' | 'constructive' | 'none';
+  /** Schemas reachable from the exposed APIs. Empty when unknown. */
+  schemas: string[];
+  /** API-edge roles, when the resolver can discover them. */
+  roles?: string[];
+  /** Tables on the exposed surface (the score denominator). */
+  exposedTables: number;
+  /** All tables the audit introspected. */
+  totalTables: number;
+}
+
 export interface Report {
   version: string;
   generatedAt: string;
@@ -51,6 +84,8 @@ export interface Report {
   findings: Finding[];
   /** Config-driven audit score (weighted deductions, 0-100 + grade). */
   score?: import('./score/score').Score;
+  /** The exposure surface the score was computed against. */
+  exposure?: ExposureReport;
 }
 
 export function newSummary(): Summary {

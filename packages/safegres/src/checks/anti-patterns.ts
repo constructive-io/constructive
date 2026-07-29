@@ -160,16 +160,22 @@ export function checkSessionUserGating(
 }
 
 /**
- * Anti-pattern A7: trivially-permissive policy body.
+ * Anti-patterns A7 / A8: trivially-permissive policy body.
  *
- * A permissive policy whose body is the literal `true` (and has no tightening
- * `WITH CHECK` clause) adds zero security — it's equivalent to not having RLS
- * at all for the covered command. This is different from an intentional
- * *restrictive* `true` (which would require all rows to satisfy it). We only
- * flag `permissive = true` here because Postgres defaults to PERMISSIVE and
- * `USING (true)` is the most common accidental "fail-open" shape.
+ * A permissive policy whose body is the literal `true` adds zero security —
+ * it's equivalent to not having RLS at all for the covered command. This is
+ * different from an intentional *restrictive* `true` (which would require
+ * all rows to satisfy it). We only flag `permissive = true` here because
+ * Postgres defaults to PERMISSIVE and `USING (true)` is the most common
+ * accidental "fail-open" shape.
  *
- * Severity: HIGH — any auditor should see this as RLS-not-actually-enforced.
+ * The verb matters enormously:
+ *   - A7 (critical): a WRITE verb (INSERT/UPDATE/DELETE/ALL) with literal
+ *     `true` lets every applicable role mutate every row — and, because
+ *     permissive policies OR together, it silently defeats any carefully
+ *     scoped policies on the same table.
+ *   - A8 (low): a SELECT-only `USING (true)` is the standard public-read
+ *     reference-table pattern; flag it for confirmation, not alarm.
  *
  * Input: the parsed USING and WITH CHECK ASTs (may be null if empty).
  */
@@ -206,17 +212,30 @@ export function checkTriviallyPermissive(
   if (trivialClauses.length !== presentClauses.length) return null;
 
   const clauseList = trivialClauses.join(' and ');
-  return {
-    code: 'A7',
-    severity: 'high',
-    category: 'anti-pattern',
-    schema: table.schema,
-    table: table.name,
-    policy: policy.name,
-    message: `Policy "${policy.name}" on ${table.schema}.${table.name} is trivially permissive (${clauseList} = true)`,
-    hint: 'A permissive policy whose body is the literal `true` imposes no constraint. Either tighten the predicate (reference the authenticated user / membership) or drop the policy and use a GRANT REVOKE model.',
-    context: { cmd: policy.cmd, clauses: trivialClauses }
-  };
+  const isWrite = policy.cmd !== 'SELECT';
+  return isWrite
+    ? {
+      code: 'A7',
+      severity: 'critical',
+      category: 'anti-pattern',
+      schema: table.schema,
+      table: table.name,
+      policy: policy.name,
+      message: `Policy "${policy.name}" (FOR ${policy.cmd}) on ${table.schema}.${table.name} is trivially permissive (${clauseList} = true) — every applicable role can write every row`,
+      hint: 'Permissive policies OR together, so a literal-true write policy defeats every scoped policy on the table. Tighten the predicate or drop the policy.',
+      context: { cmd: policy.cmd, clauses: trivialClauses }
+    }
+    : {
+      code: 'A8',
+      severity: 'low',
+      category: 'anti-pattern',
+      schema: table.schema,
+      table: table.name,
+      policy: policy.name,
+      message: `Policy "${policy.name}" (FOR SELECT) on ${table.schema}.${table.name} is trivially permissive (${clauseList} = true) — all rows readable by applicable roles`,
+      hint: 'This is the standard public-read reference-table pattern. Confirm the table holds no per-tenant data; otherwise tighten the predicate.',
+      context: { cmd: policy.cmd, clauses: trivialClauses }
+    };
 }
 
 /**
