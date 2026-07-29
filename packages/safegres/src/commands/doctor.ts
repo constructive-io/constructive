@@ -6,7 +6,7 @@
 
 import { parsePolicyExpression } from '../ast/parse';
 import { loadConfig, type LoadConfigParams } from '../config/loader';
-import { resolveRules } from '../config/resolve';
+import { matchTablePattern, resolveRules } from '../config/resolve';
 import type { ExposureConfig } from '../config/types';
 import { resolveExposure } from '../pg/exposure';
 import { asExecutor, type QueryExecutor } from '../pg/introspect';
@@ -32,11 +32,13 @@ export async function doctor(
 ): Promise<DoctorReport> {
   const checks: DoctorCheck[] = [];
   let exposureConfig: ExposureConfig | undefined;
+  let publicRead: string[] = [];
 
   // --- configuration ---
   try {
     const loaded = loadConfig(options);
     exposureConfig = loaded.config.exposure;
+    publicRead = loaded.config.public?.read ?? [];
     if (loaded.isEmpty) {
       checks.push({
         name: 'config',
@@ -177,6 +179,31 @@ export async function doctor(
     }
   } catch (err) {
     checks.push({ name: 'exposure', status: 'warn', detail: (err as Error).message });
+  }
+
+  // --- declared public surface ---
+  if (publicRead.length > 0) {
+    try {
+      const { rows } = await exec.query<{ qualified: string }>(
+        `SELECT n.nspname || '.' || c.relname AS qualified
+         FROM pg_class c
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         WHERE c.relkind IN ('r','p')
+           AND n.nspname NOT IN ('pg_catalog','information_schema')`
+      );
+      const qualified = rows.map((r) => r.qualified);
+      const stale = publicRead.filter((p) => !qualified.some((q) => matchTablePattern(p, q)));
+      checks.push({
+        name: 'public',
+        status: stale.length > 0 ? 'warn' : 'ok',
+        detail:
+          stale.length > 0
+            ? `stale \`public.read\` pattern(s) match no table: ${stale.join(', ')}`
+            : `${publicRead.length} \`public.read\` pattern(s), all match at least one table`
+      });
+    } catch (err) {
+      checks.push({ name: 'public', status: 'warn', detail: (err as Error).message });
+    }
   }
 
   return finish(checks);

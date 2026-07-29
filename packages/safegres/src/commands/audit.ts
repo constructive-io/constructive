@@ -26,7 +26,7 @@ import {
   checkUntrustedRoleWrites,
   type RoleTrustOptions
 } from '../checks/role-trust';
-import { allAstRulesDisabled, applyRulesToFindings, resolveRules, rulesForTable } from '../config/resolve';
+import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolveExposure } from '../pg/exposure';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
@@ -128,10 +128,24 @@ export async function audit(
   findings = applyRulesToFindings(resolved, findings);
 
   // Stamp direction (from the registry) and exposure on every finding.
+  const publicRead = config.public?.read ?? [];
   for (const f of findings) {
     const meta = RULES_BY_CODE.get(f.code);
     if (meta && f.direction === undefined) f.direction = meta.direction;
     if (exposure.known && f.schema) f.exposed = exposedSchemas.has(f.schema);
+
+    // Declared-public reads: an open SELECT on a table listed in
+    // `public.read` is intent, not a finding — acknowledge it (info,
+    // excluded from the score). Undeclared open reads stay scored.
+    if (
+      f.code === 'A8' && f.schema && f.table
+      && publicRead.some((p) => matchTablePattern(p, `${f.schema}.${f.table}`))
+    ) {
+      f.acknowledged = true;
+      f.severity = 'info';
+      f.message += ' — declared public read (public.read)';
+      f.hint = 'This table is declared in `public.read`, so the open read is treated as intentional and does not affect the score.';
+    }
   }
 
   // W1: no exposure surface — the whole database is assumed reachable.

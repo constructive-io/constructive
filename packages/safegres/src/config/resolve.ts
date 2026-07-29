@@ -100,6 +100,12 @@ export function resolveRules(config: SafegresConfig): ResolvedRules {
     // Validate override rule settings eagerly.
     applyRulesConfig(rules, o.rules ?? {});
   }
+  const publicRead = config.public?.read;
+  if (publicRead !== undefined) {
+    if (!Array.isArray(publicRead) || publicRead.some((p) => typeof p !== 'string' || p.length === 0)) {
+      throw new ConfigValidationError('"public.read" must be an array of non-empty schema.table glob patterns.');
+    }
+  }
   return { rules, overrides };
 }
 

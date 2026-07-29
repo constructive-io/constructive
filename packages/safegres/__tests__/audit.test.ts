@@ -96,6 +96,30 @@ describe('audit — Script A', () => {
     expect(found.find((f) => f.code === 'A7')).toBeUndefined();
   });
 
+  it('public.read: declared open read is acknowledged (info) and unscored', async () => {
+    // fx_a7 fixture (open SELECT policy) was applied by the A8 test above.
+    const exposure = { schemas: ['fx_a7'] };
+    const undeclared = await audit(pg.client as never, {
+      schemas: ['fx_a7'],
+      config: { exposure }
+    });
+    const declared = await audit(pg.client as never, {
+      schemas: ['fx_a7'],
+      config: { exposure, public: { read: ['fx_a7.*'] } }
+    });
+
+    const a8 = declared.findings.find((f) => f.code === 'A8' && f.schema === 'fx_a7');
+    expect(a8).toBeDefined();
+    expect(a8?.acknowledged).toBe(true);
+    expect(a8?.severity).toBe('info');
+    expect(a8?.message).toContain('declared public read');
+
+    const undeclaredA8 = undeclared.findings.find((f) => f.code === 'A8' && f.schema === 'fx_a7');
+    expect(undeclaredA8?.acknowledged).toBeUndefined();
+    expect(undeclaredA8?.severity).toBe('low');
+    expect(declared.score!.value).toBeGreaterThan(undeclared.score!.value);
+  });
+
   it('A7: flags trivially-permissive WRITE policy as critical (fail-open)', async () => {
     await applyFixture('a7-write-permissive.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_a7w'] });

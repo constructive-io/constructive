@@ -75,6 +75,14 @@ describe('resolveRules', () => {
       ConfigValidationError
     );
   });
+
+  it('rejects malformed public.read declarations', () => {
+    expect(() => resolveRules({ public: { read: 'app.*' as never } })).toThrow(
+      ConfigValidationError
+    );
+    expect(() => resolveRules({ public: { read: [''] } })).toThrow(ConfigValidationError);
+    expect(() => resolveRules({ public: { read: ['app_public.*'] } })).not.toThrow();
+  });
 });
 
 describe('table overrides', () => {
