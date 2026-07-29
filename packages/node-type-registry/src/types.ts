@@ -1,31 +1,3 @@
-/**
- * JSON Schema type definition.
- *
- * Inline subset matching the shape used by schema-typescript in dev-utils.
- * We copy it here to avoid an external dependency.
- */
-export interface JSONSchema {
-  $schema?: string;
-  $ref?: string;
-  title?: string;
-  properties?: { [key: string]: JSONSchema };
-  required?: string[];
-  type?: string | string[];
-  const?: string;
-  enum?: (string | number | boolean)[];
-  items?: JSONSchema | JSONSchema[];
-  $defs?: { [key: string]: JSONSchema };
-  definitions?: { [key: string]: JSONSchema };
-  additionalProperties?: boolean | JSONSchema;
-  anyOf?: JSONSchema[];
-  allOf?: JSONSchema[];
-  oneOf?: JSONSchema[];
-  description?: string;
-  default?: unknown;
-  [key: string]: unknown;
-  format?: string;
-}
-
 // ─── FieldType / FieldDefault ─────────────────────────────────────
 
 /**
@@ -121,6 +93,36 @@ export interface FieldDefault {
   right?: FieldDefault;
   /** SQL keyword (e.g., "CURRENT_TIMESTAMP", "CURRENT_USER"). */
   sql_keyword?: string;
+}
+
+// ─── JSON Schema ──────────────────────────────────────────────────
+
+/**
+ * JSON Schema type definition.
+ *
+ * Inline subset matching the shape used by schema-typescript in dev-utils.
+ * We copy it here to avoid an external dependency.
+ */
+export interface JSONSchema {
+  $schema?: string;
+  $ref?: string;
+  title?: string;
+  properties?: { [key: string]: JSONSchema };
+  required?: string[];
+  type?: string | string[];
+  const?: string;
+  enum?: (string | number | boolean)[];
+  items?: JSONSchema | JSONSchema[];
+  $defs?: { [key: string]: JSONSchema };
+  definitions?: { [key: string]: JSONSchema };
+  additionalProperties?: boolean | JSONSchema;
+  anyOf?: JSONSchema[];
+  allOf?: JSONSchema[];
+  oneOf?: JSONSchema[];
+  description?: string;
+  default?: unknown;
+  [key: string]: unknown;
+  format?: string;
 }
 
 /**
