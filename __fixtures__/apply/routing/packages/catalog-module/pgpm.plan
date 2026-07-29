@@ -1,0 +1,8 @@
+%syntax-version=1.0.0
+%project=catalog-module
+%uri=catalog-module
+
+schemas/catalog/schema 2024-01-01T00:00:00Z Dev <dev@example.com> # add catalog schema
+schemas/reporting/schema 2024-01-01T00:00:01Z Dev <dev@example.com> # add reporting schema
+schemas/catalog/tables/products/table [schemas/catalog/schema] 2024-01-01T00:00:02Z Dev <dev@example.com> # add products table
+schemas/catalog/procedures/product_count [schemas/catalog/schema schemas/reporting/schema schemas/catalog/tables/products/table] 2024-01-01T00:00:03Z Dev <dev@example.com> # add product_count

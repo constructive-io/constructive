@@ -35,6 +35,24 @@ export interface ApplySpecSource {
   bundleDigest?: string;
 }
 
+/**
+ * An object-level route in a `pgpm.apply.json` spec: send one named object out
+ * of a source schema to a target schema, overriding the whole-schema default
+ * for that object only. Kinds are expressed as separate properties (no dotted
+ * identity strings), so a table and a function of the same name route
+ * independently.
+ */
+export interface ApplyRouteEntry {
+  /** Source schema the object is defined in (e.g. `users`). */
+  fromSchema: string;
+  /** Object namespace: `table`/`view` → relation, `procedure` → function. */
+  kind: 'table' | 'view' | 'function' | 'procedure' | 'type';
+  /** Unqualified object name (e.g. `accounts`). */
+  name: string;
+  /** Target schema the object is routed to (e.g. `reporting`). */
+  toSchema: string;
+}
+
 /** The parsed, normalized `pgpm.apply.json` spec. */
 export interface PgpmApplySpec {
   /**
@@ -44,8 +62,17 @@ export interface PgpmApplySpec {
   name?: string;
   /** Source module reference: a module name, or the expanded object form. */
   source: string | ApplySpecSource;
-  /** Source schema name → target schema name (drives the AST + plan rewrite). */
-  schemas: Record<string, string>;
+  /**
+   * Whole-schema default: source schema → target schema (drives the AST + plan
+   * rewrite). Optional when `route` fully covers the objects being moved.
+   */
+  schemas?: Record<string, string>;
+  /**
+   * Object-level routes. Each entry overrides the `schemas` default for its
+   * specific object, letting one source schema fan out per object (e.g. a
+   * table into a tenant schema and a function into a shared schema).
+   */
+  route?: ApplyRouteEntry[];
   /**
    * Runtime requires of the transpiled output (native extensions and other
    * modules). Defaults to the source module's own requires.
