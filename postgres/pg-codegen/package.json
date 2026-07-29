@@ -1,6 +1,6 @@
 {
   "name": "pg-codegen",
-  "version": "5.6.1",
+  "version": "5.7.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Codegen",
   "main": "index.js",

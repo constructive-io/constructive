@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/llm-env@0.9.0...@constructive-io/llm-env@0.10.0) (2026-07-29)
+
+**Note:** Version bump only for package @constructive-io/llm-env
+
 # [0.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/llm-env@0.8.0...@constructive-io/llm-env@0.9.0) (2026-07-28)
 
 **Note:** Version bump only for package @constructive-io/llm-env
