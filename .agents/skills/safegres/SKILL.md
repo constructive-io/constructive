@@ -1,6 +1,6 @@
 ---
 name: safegres
-description: Postgres Row-Level Security scanner. Audits a live PostgreSQL database for RLS gaps, grant/policy coverage, and risky policy patterns; produces a config-driven 0–100 score scoped to the exposed API surface. Use when asked to "audit RLS", "run safegres", "scan the database for security issues", "check row-level security", "score the schema's security", "set up the security audit in CI", "declare the exposure surface", "declare public-read tables", or when configuring `.safegresrc`/`safegres.config.*` or the safegres CI workflow. safegres is the scanner — it does NOT generate policies or manage security-node types.
+description: Postgres Row-Level Security scanner. Audits a live PostgreSQL database for RLS gaps, grant/policy coverage, and risky policy patterns; produces a config-driven 0–100 score scoped to the exposed API surface, plus an unscored function call-graph audit of trust boundaries (SECURITY DEFINER hops, RLS-bypass paths, auth-context mutations). Use when asked to "audit RLS", "run safegres", "scan the database for security issues", "check row-level security", "score the schema's security", "audit the function call graph", "find SECURITY DEFINER risks", "set up the security audit in CI", "declare the exposure surface", "declare public-read tables", or when configuring `.safegresrc`/`safegres.config.*` or the safegres CI workflow. safegres is the scanner — it does NOT generate policies or manage security-node types.
 compatibility: safegres CLI, PostgreSQL 14+, Node.js 22+, confstash, pgsql-test (optional, pgpm mode)
 metadata:
   author: constructive-io
@@ -23,6 +23,7 @@ Use this skill when asked to:
 - **Configure** the scanner: `.safegresrc*`, `safegres.config.*`, presets, rule tuning.
 - **Declare the exposure surface** — which schemas/roles the APIs actually reach.
 - **Declare intentional public reads** so deliberate open-read tables stop counting against the score.
+- **Audit the function call graph** — what exposed functions transitively reach: SECURITY DEFINER hops, RLS-bypass paths, auth-context mutations, dynamic SQL (`safegres audit --call-graph`).
 - **Wire safegres into CI** (per-push audit, grade gate) or a pgpm test.
 - **Diagnose** the environment/config (`safegres doctor`, `safegres print-config`).
 
@@ -138,6 +139,28 @@ Some open reads are deliberate. Declare them and they stop counting against the 
 
 Use this to take an intentionally-public schema to 100/A+ while keeping A8 visible for anything you haven't blessed (e.g. a `users` directory you may want to scope later).
 
+## Call-graph audit (`--call-graph`)
+
+RLS findings tell you what the *tables* allow; the call graph tells you what the *functions* reach. Starting from the **exposed entry points** (functions the API roles can `EXECUTE`), safegres statically walks each SQL/PL/pgSQL body and emits a deterministic checklist of **trust boundaries** — unscored, because a public `SECURITY DEFINER` calling private helpers is the intended pattern (that's how `sign_in` works). The checklist defines what a human audit should even cover:
+
+| Code | Boundary | Action |
+| --- | --- | --- |
+| CF1 | DEFINER without pinned `search_path` (CWE-426) | Provable misconfiguration — fix |
+| CF2 | DEFINER executable by `anonymous`/PUBLIC | Provable — confirm intent |
+| CG2 | RLS-bypass path — DEFINER's owner owns/bypasses RLS on a table it touches | Review: is RLS intentionally bypassed here? |
+| CG3 | Auth-context mutation — writes `jwt.claims.*` / `role` | Review: trust-critical node |
+| CG1 | Trust hop — execution crosses into a DEFINER | Review the boundary's authorization logic |
+| CG4 | Non-exposed table reached from a public entry via a DEFINER path | Review: intentional private reach? |
+| CG5 | Opaque node — dynamic SQL (`EXECUTE`) or unparseable body | Static analysis ends here — audit manually |
+
+```bash
+safegres audit --call-graph                  # checklist appended to the pretty report
+safegres audit --call-graph --summary        # stats line only
+safegres audit --call-graph --format json    # full graph: nodes, edges, checklist (stable sort — snapshot/diff-friendly)
+```
+
+Each item shows the reaching path (`via: entry → … → fn`). Semantics: it's a *static approximation* — dynamic SQL and unresolvable calls are flagged opaque rather than silently dropped, and a CG1/CG4 item is **not** a vulnerability, it's a boundary a human should sign off on.
+
 ## Scoring
 
 Default **density** model (doesn't saturate on large schemas):
@@ -188,4 +211,4 @@ Report-only first, gate after a week of stable scores. In this monorepo's DB rep
 ## References
 
 - Package README: `packages/safegres/README.md` (authoritative rule/scoring detail).
-- Planning: constructive-planning issues #1282 (config), #1286 (exposure + future call-graph), #1287 (safegres-everywhere / CI / pgpm autodetect).
+- Planning: constructive-planning issues #1282 (config), #1286 (exposure + call-graph), #1287 (safegres-everywhere / CI / pgpm autodetect).
