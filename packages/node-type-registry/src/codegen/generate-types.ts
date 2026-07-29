@@ -17,8 +17,9 @@
  *   npx ts-node src/codegen/generate-types.ts [--outdir <dir>] [--meta <path>]
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const generate = require('@babel/generator').default ?? require('@babel/generator');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const babelGenerator = require('@babel/generator');
+const generate = babelGenerator.default ?? babelGenerator;
 import * as t from '@babel/types';
 import { existsSync,mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -924,7 +925,7 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
         'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults.'
       )
     ]),
-    'Storage configuration with optional scope. When used at the top level of a blueprint, the scope field controls whether storage is app-level (\"app\", default) or org-level (\"org\"). Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions.'
+    'Storage configuration with optional scope. When used at the top level of a blueprint, the scope field controls whether storage is app-level ("app", default) or org-level ("org"). Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions.'
   );
 }
 

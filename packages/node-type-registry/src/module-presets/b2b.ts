@@ -15,7 +15,8 @@ import type { ModulePreset } from './types';
 export const PresetB2b: ModulePreset = {
   name: 'b2b',
   display_name: 'B2B SaaS (orgs + invites + permissions)',
-  summary: '`auth:hardened` + orgs, invites, fine-grained permissions, levels, profiles, hierarchy.',
+  summary:
+    '`auth:hardened` + orgs, invites, fine-grained permissions, levels, profiles, hierarchy.',
   description:
     'Everything in `auth:hardened`, plus the full org/team/permission stack at both app and ' +
     'org membership scopes. You get: memberships at org scope, permissions at app and org ' +

@@ -15,10 +15,7 @@ export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
         description: 'Column name on protected table referencing the related table (e.g., message_id)'
       },
       membership_type: {
-        type: [
-          'integer',
-          'string'
-        ],
+        type: ['integer', 'string'],
         description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
       },
       entity_type: {

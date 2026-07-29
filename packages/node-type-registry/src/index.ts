@@ -7,9 +7,16 @@ export * from './guard';
 export * from './job';
 export * from './limit';
 export * from './module-presets';
+export * from './module-types';
 export * from './process';
 export * from './relation';
-export type { FieldDefault, FieldDefaultArg, FieldType, JSONSchema, NodeTypeDefinition } from './types';
+export type {
+  FieldDefault,
+  FieldDefaultArg,
+  FieldType,
+  JSONSchema,
+  NodeTypeDefinition
+} from './types';
 export * from './view';
 
 import * as authz from './authz';

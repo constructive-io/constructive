@@ -9,21 +9,31 @@ export const AuthzFilePath: NodeTypeDefinition = {
   parameter_schema: {
     type: 'object',
     properties: {
+      shares_table_id: {
+        type: 'string',
+        format: 'uuid',
+        description: 'UUID of the path_shares table (alternative to shares_schema/shares_table)'
+      },
       shares_schema: {
         type: 'string',
-        description: 'Schema of the path_shares table'
+        description: 'Schema of the path_shares table (or use shares_table_id)'
       },
       shares_table: {
         type: 'string',
-        description: 'Name of the path_shares table'
+        description: 'Name of the path_shares table (or use shares_table_id)'
+      },
+      files_table_id: {
+        type: 'string',
+        format: 'uuid',
+        description: 'UUID of the files table (alternative to files_schema/files_table)'
       },
       files_schema: {
         type: 'string',
-        description: 'Schema of the files table (used to qualify column references inside the EXISTS subquery)'
+        description: 'Schema of the files table (or use files_table_id)'
       },
       files_table: {
         type: 'string',
-        description: 'Name of the files table (used to qualify column references inside the EXISTS subquery)'
+        description: 'Name of the files table (or use files_table_id)'
       },
       permission_field: {
         type: 'string',
@@ -44,9 +54,6 @@ export const AuthzFilePath: NodeTypeDefinition = {
       }
     },
     required: [
-      'shares_schema',
-      'shares_table',
-      'files_table',
       'permission_field'
     ]
   },

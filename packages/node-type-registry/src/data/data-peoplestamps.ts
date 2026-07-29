@@ -5,7 +5,7 @@ export const DataPeoplestamps: NodeTypeDefinition = {
   slug: 'data_peoplestamps',
   category: 'data',
   display_name: 'Peoplestamps',
-  description: 'Adds user tracking for creates/updates with created_by and updated_by columns.',
+  description: 'Adds human actor tracking for creates/updates: created_by/updated_by record the human user (jwt_public.current_user_id()).',
   parameter_schema: {
     type: 'object',
     properties: {

@@ -48,6 +48,16 @@ export const SearchFullText: NodeTypeDefinition = {
         },
         description: 'Source columns that feed the tsvector. Each has a field name, weight (A-D), and language config.'
       },
+      lang_column: {
+        type: 'string',
+        format: 'column-ref',
+        description:
+          'Column name whose value determines the text search configuration per row. ' +
+          'When set, the tsvector trigger uses NEW.<lang_column>::regconfig instead of ' +
+          'a static language, enabling dynamic per-row language stemming. The per-field ' +
+          'lang values in source_fields are used as fallback defaults for the langs ' +
+          'array but the trigger reads from this column at runtime.'
+      },
       search_score_weight: {
         type: 'number',
         description: 'Weight for this algorithm in composite searchScore',

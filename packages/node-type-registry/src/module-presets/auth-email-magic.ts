@@ -16,7 +16,8 @@ import type { ModulePreset } from './types';
 export const PresetAuthEmailMagic: ModulePreset = {
   name: 'auth:email+magic',
   display_name: 'Email + Magic Link / OTP',
-  summary: 'Everything in `auth:email` plus magic-link and email-OTP passwordless flows.',
+  summary:
+    'Everything in `auth:email` plus magic-link and email-OTP passwordless flows.',
   description:
     'Same password-based auth as `auth:email`, with `session_secrets_module` added so the ' +
     'generator emits the passwordless procedures: `sign_up_magic_link`, `sign_in_magic_link`, ' +

@@ -22,7 +22,8 @@ import type { ModulePreset } from './types';
 export const PresetAuthEmail: ModulePreset = {
   name: 'auth:email',
   display_name: 'Email + Password',
-  summary: 'Standard email/password auth flow with app-level permissions. No orgs, no SSO, no MFA.',
+  summary:
+    'Standard email/password auth flow with app-level permissions. No orgs, no SSO, no MFA.',
   description:
     'Installs `user_auth_module` with exactly the table dependencies its insert trigger ' +
     'hard-requires: users, app-scoped memberships (plus their permissions/limits/levels ' +

@@ -8,7 +8,7 @@ import type { JSONSchema } from '../types';
  * ProcessImageVersions, ProcessFileEmbedding, ProcessImageEmbedding.
  *
  * On the SQL side, these conditions are compiled to AST via
- * metaschema_generators.build_condition_ast().
+ * metaschema_generators.build_condition_expr().
  */
 export const triggerConditionSchema: JSONSchema = {
   type: 'object',

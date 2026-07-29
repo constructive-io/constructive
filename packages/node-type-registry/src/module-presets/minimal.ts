@@ -5,8 +5,8 @@ import type { ModulePreset } from './types';
  * memberships, no orgs, no emails, no passwords.
  *
  * This is the barest foundation: a `users` table, a `sessions` table so
- * something upstream can mint tokens, `rls_module` so row-level security
- * is enforceable, and `user_state_module` so you can issue API keys. Nothing
+ * something upstream can mint tokens, `rls_module` so row-level security is
+ * enforceable, and `user_state_module` so you can issue API keys. Nothing
  * else.
  *
  * You still write your own identity bridge on top (or rely on a header-based

@@ -41,6 +41,50 @@ export const DataI18n: NodeTypeDefinition = {
           'SELECT). Default true — translations should be editable by the ' +
           'same users who can edit the base row.',
         default: true
+      },
+      search: {
+        type: 'object',
+        description:
+          'SearchFullText configuration for the translations table. When ' +
+          'provided, creates a tsvector column on the translations table ' +
+          'with lang_column=lang_code for dynamic per-row language stemming.',
+        properties: {
+          field_name: {
+            type: 'string',
+            format: 'column-ref',
+            description: 'Name of the tsvector column on the translations table',
+            default: 'search'
+          },
+          source_fields: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                field: {
+                  type: 'string',
+                  format: 'column-ref',
+                  description: 'Name of the translatable source column'
+                },
+                weight: {
+                  type: 'string',
+                  enum: ['A', 'B', 'C', 'D'],
+                  description: 'tsvector weight class (A=highest, D=lowest)',
+                  default: 'D'
+                }
+              },
+              required: ['field']
+            },
+            description:
+              'Translatable columns that feed the tsvector. Language is ' +
+              'determined dynamically from the lang_code column of each row.'
+          },
+          search_score_weight: {
+            type: 'number',
+            description: 'Weight for this algorithm in composite searchScore',
+            default: 1
+          }
+        },
+        required: ['source_fields']
       }
     },
     required: ['fields']

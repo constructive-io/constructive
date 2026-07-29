@@ -7,7 +7,7 @@ import type { NodeTypeDefinition } from '../types';
  * At the SQL layer, data_image_embedding delegates entirely to
  * data_file_embedding, merging image-specific defaults before forwarding.
  * The parameter schema here is intentionally identical to ProcessFileEmbedding;
- * only the defaults differ (dimensions: 512, task: process_image_embedding,
+ * only the defaults differ (dimensions: 512, task: embedding:process_image_embedding,
  * mime_patterns: ['image/%']).
  *
  * Kept as a separate node type for backward compatibility — existing
@@ -21,7 +21,7 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
   description:
     'Image-specific preset of ProcessFileEmbedding. Delegates to ProcessFileEmbedding ' +
     'with image-oriented defaults: dimensions=512 (CLIP), mime_patterns=[\'image/%\'], ' +
-    'task_identifier=\'process_image_embedding\', direct mode (no extraction). ' +
+    'task_identifier=\'embedding:process_image_embedding\', direct mode (no extraction). ' +
     'Accepts all ProcessFileEmbedding parameters — any overrides are forwarded through.',
   parameter_schema: {
     type: 'object',
@@ -86,7 +86,7 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
       task_identifier: {
         type: 'string',
         description: 'Job task identifier for the image embedding worker',
-        default: 'process_image_embedding'
+        default: 'embedding:process_image_embedding'
       },
       events: {
         type: 'array',
@@ -167,7 +167,7 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
           },
           metadata_fields: { type: 'object' },
           enqueue_chunking_job: { type: 'boolean', default: true },
-          chunking_task_name: { type: 'string', default: 'generate_chunks' }
+          chunking_task_name: { type: 'string', default: 'embedding:generate_chunks' }
         }
       }
     }

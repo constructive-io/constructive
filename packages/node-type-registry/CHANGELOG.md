@@ -118,7 +118,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - add DataI18n node type definition for i18n translation tables ([185b2fc](https://github.com/constructive-io/constructive/commit/185b2fc7e6dac236891a2058878863b575b62047)), closes [constructive-planning#975](https://github.com/constructive-planning/issues/975)
-- rename config_secrets_user_module to user_credentials_module in presets ([71e026e](https://github.com/constructive-io/constructive/commit/71e026ed204d15371725afe27bec5aabf7b519fa)), closes [constructive-db#1418](https://github.com/constructive-db/issues/1418)
+- rename config_secrets_user_module to user_credentials_module in presets ([71e026e](https://github.com/constructive-io/constructive/commit/71e026ed204d15371725afe27bec5aabf7b519fa)), closes issue #1418
 
 # [0.44.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.43.1...node-type-registry@0.44.0) (2026-05-30)
 
@@ -133,20 +133,20 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - add FieldType/FieldDefault TS interfaces, remove SqlExpressionValidatorPreset from constructive-preset ([b79342c](https://github.com/constructive-io/constructive/commit/b79342cb1224fb74971abfa97c54cf2823d08d46))
-- sync entity_lookup + dynamic scope resolution from constructive-db ([05224f5](https://github.com/constructive-io/constructive/commit/05224f569459fd51428b9fb08a0df06cd5680553)), closes [#1361](https://github.com/constructive-io/constructive/issues/1361) [#1368](https://github.com/constructive-io/constructive/issues/1368)
+- sync entity_lookup + dynamic scope resolution ([05224f5](https://github.com/constructive-io/constructive/commit/05224f569459fd51428b9fb08a0df06cd5680553)), closes [#1361](https://github.com/constructive-io/constructive/issues/1361) [#1368](https://github.com/constructive-io/constructive/issues/1368)
 
 # [0.42.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.41.0...node-type-registry@0.42.0) (2026-05-26)
 
 ### Features
 
 - **node-type-registry:** add AuthzMemberOwner + DataMemberOwner types ([e778ec9](https://github.com/constructive-io/constructive/commit/e778ec9523e5e6fdcc2b65fb2c9ef692963764a0)), closes [#1327](https://github.com/constructive-io/constructive/issues/1327)
-- **node-type-registry:** upstream knowledge finish + blueprint types from constructive-db ([7899c15](https://github.com/constructive-io/constructive/commit/7899c15ca28e9e0c0404b9077640c4832e625959))
+- **node-type-registry:** finish blueprint knowledge and types ([7899c15](https://github.com/constructive-io/constructive/commit/7899c15ca28e9e0c0404b9077640c4832e625959))
 
 # [0.41.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.40.0...node-type-registry@0.41.0) (2026-05-21)
 
 ### Features
 
-- **node-type-registry:** sync latest from constructive-db ([0a457ba](https://github.com/constructive-io/constructive/commit/0a457bad52bfaa185ae77158d81e171860eeb9a5))
+- **node-type-registry:** sync latest registry definitions ([0a457ba](https://github.com/constructive-io/constructive/commit/0a457bad52bfaa185ae77158d81e171860eeb9a5))
 
 # [0.40.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.39.0...node-type-registry@0.40.0) (2026-05-20)
 
@@ -159,7 +159,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - add scope field to BlueprintStorageConfig — 'app' or 'org' only ([b00e134](https://github.com/constructive-io/constructive/commit/b00e134a2176dc5f8e08b056bffc12c555f3efc8))
-- make name optional on BlueprintEntityType for extend path ([ff59f11](https://github.com/constructive-io/constructive/commit/ff59f11f6b5184d3d48f01a919657adbf9ad16e4)), closes [constructive-db#1250](https://github.com/constructive-db/issues/1250)
+- make name optional on BlueprintEntityType for extend path ([ff59f11](https://github.com/constructive-io/constructive/commit/ff59f11f6b5184d3d48f01a919657adbf9ad16e4)), closes issue #1250
 
 # [0.38.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.37.0...node-type-registry@0.38.0) (2026-05-19)
 
@@ -187,7 +187,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - add has_invite_achievements property to BlueprintEntityType ([599c489](https://github.com/constructive-io/constructive/commit/599c489e25423476264af062e667437475c8b04a))
 - add LimitWarning\* node type definitions (Counter, Aggregate, Rate) ([5a0a6f0](https://github.com/constructive-io/constructive/commit/5a0a6f072d0e951ecdbf842b968ec6ac1974ce6f))
 - add MeterRateLimit node type to registry ([6678ba1](https://github.com/constructive-io/constructive/commit/6678ba1ed6a39fe8febb3f10148bfe52d12775aa))
-- add search_indexes parameter to ProcessChunks and ProcessFileEmbedding ([#856](https://github.com/constructive-io/constructive/issues/856)) ([cb91702](https://github.com/constructive-io/constructive/commit/cb9170296e2d55c574bf9ec6c92e06a0b22a28a9)), closes [constructive-io/constructive-db#1164](https://github.com/constructive-io/constructive-db/issues/1164)
+- add search_indexes parameter to ProcessChunks and ProcessFileEmbedding ([#856](https://github.com/constructive-io/constructive/issues/856)) ([cb91702](https://github.com/constructive-io/constructive/commit/cb9170296e2d55c574bf9ec6c92e06a0b22a28a9))
 - rename node types to LimitEnforce*/LimitTrack* naming convention ([41079d1](https://github.com/constructive-io/constructive/commit/41079d169a6e9fe211023cf704ae880fe79f3d0f))
 - shared condition infrastructure + EventTracker node type ([b924346](https://github.com/constructive-io/constructive/commit/b9243463503dcd04ab0a155447971e812aa5ceb2))
 

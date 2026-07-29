@@ -1,14 +1,20 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
-  name: 'AuthzRelatedEntityMembership',
-  slug: 'authz_related_entity_membership',
+export const AuthzRelatedMemberOwner: NodeTypeDefinition = {
+  name: 'AuthzRelatedMemberOwner',
+  slug: 'authz_related_member_owner',
   category: 'authz',
-  display_name: 'Related Entity Membership',
-  description: 'JOIN-based membership verification through related tables. Joins SPRT table with another table to verify membership.',
+  display_name: 'Related Member Owner',
+  description: 'Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the row must belong to a related entity the current user is a member of (SPRT joined through the related table, as in AuthzRelatedEntityMembership). Related-entity analog of AuthzMemberOwner — authorship never survives losing membership.',
   parameter_schema: {
     type: 'object',
     properties: {
+      owner_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name containing the owner user ID (e.g., actor_id)',
+        default: 'owner_id'
+      },
       entity_field: {
         type: 'string',
         format: 'column-ref',
@@ -25,12 +31,12 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
         default: 'entity_id'
       },
       membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
+        type: 'integer',
+        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types'
       },
       entity_type: {
         type: 'string',
-        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
+        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup."
       },
       obj_table_id: {
         type: 'string',
@@ -61,9 +67,7 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
       },
       permissions: {
         type: 'array',
-        items: {
-          type: 'string'
-        },
+        items: { type: 'string' },
         description: 'Multiple permission names to check (ORed together into mask)'
       },
       is_admin: {
@@ -75,12 +79,7 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
         description: 'If true, require is_owner flag'
       }
     },
-    required: [
-      'entity_field'
-    ]
+    required: ['owner_field', 'entity_field']
   },
-  tags: [
-    'membership',
-    'authz'
-  ]
+  tags: ['ownership', 'membership', 'authz']
 };

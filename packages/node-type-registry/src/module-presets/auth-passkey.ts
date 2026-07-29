@@ -15,7 +15,8 @@ import type { ModulePreset } from './types';
 export const PresetAuthPasskey: ModulePreset = {
   name: 'auth:passkey',
   display_name: 'Passkeys (WebAuthn)',
-  summary: '`auth:email` plus WebAuthn passkey registration and assertion.',
+  summary:
+    'Email/password auth plus WebAuthn passkey registration and assertion.',
   description:
     "Installs the three modules WebAuthn needs: `webauthn_credentials_module` for each user's " +
     'registered public keys, `webauthn_auth_module` for the runtime challenge/assertion flow, ' +

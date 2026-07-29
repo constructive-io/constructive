@@ -111,6 +111,15 @@ export interface CheckOneOfParams {
  * ===========================================================================
  */
 ;
+/** Adds user-reversible archive support with is_archived boolean and archived_at timestamp, plus a partial index for efficient active-row queries. */
+export interface DataArchivableParams {
+  /* Column name for the archive boolean flag */
+  is_archived_field?: string;
+  /* Column name for the archive timestamp */
+  archived_at_field?: string;
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
+}
 /** Enables bulk mutation smart tags on a table. When provisioned, adds @behavior tags for the selected bulk operations (insert, upsert, update, delete). Requires the graphile-bulk-mutations plugin. */
 export interface DataBulkParams {
   /* Enable bulk insert (+bulkInsert) */
@@ -130,6 +139,25 @@ export interface DataCompositeFieldParams {
   source_fields: string[];
   /* Output format: 'labeled' (field_name: value) or 'plain' (values only) */
   format?: 'labeled' | 'plain';
+}
+/** Creates INSERT and UPDATE triggers that copy field values from a referenced (parent) table into the current table whenever the FK changes. Used to denormalize frequently-read columns (e.g. database_id on junction tables) so that RLS and queries can filter locally without joining. */
+export interface DataDenormalizedParams {
+  /* FK field on this table that references the parent row (e.g. view_id) */
+  field: string;
+  /* Field names on this table to be populated from the parent (e.g. ["database_id"]) */
+  set_fields: string[];
+  /* Field on the parent table that is the FK target (e.g. id) */
+  ref_field: string;
+  /* Field names on the parent table to copy from (e.g. ["database_id"]) */
+  ref_fields: string[];
+  /* If true, also creates an UPDATE trigger so changes to the FK re-copy values */
+  use_updates?: boolean;
+  /* If true, sets the default value of set_fields to uuid_nil() so they are populated by the trigger */
+  update_defaults?: boolean;
+  /* Custom function name suffix (defaults to the FK field name) */
+  func_name?: string;
+  /* Trigger ordering (0-padded). Lower numbers fire first */
+  func_order?: number;
 }
 /** Adds ownership column for direct user ownership. Enables AuthzDirectOwner authorization. */
 export interface DataDirectOwnerParams {
@@ -158,6 +186,39 @@ export interface DataForceCurrentUserParams {
   /* Name of the field to force to current_user_id() */
   field_name?: string;
 }
+/** Creates a native PostgreSQL GENERATED ALWAYS AS (expr) column (STORED or VIRTUAL) from a source field expression, preset, or raw AST. The column is read-only for clients and computed automatically by PostgreSQL. */
+export interface DataGeneratedParams {
+  /* Name of the generated column to create */
+  target: string;
+  /* FieldType for the generated column (default: text) */
+  type?: {
+    [key: string]: unknown;
+  };
+  /* Preset for building the generation expression */
+  kind?: 'expression' | 'concat' | 'slug' | 'object_name' | 'hash';
+  /* Whether the column is STORED (persisted on write) or VIRTUAL (computed on read, PostgreSQL 18+) */
+  generation_type?: 'stored' | 'virtual';
+  /* Single source field for expression/slug/object_name presets */
+  source_field?: string;
+  /* Array of source field names for concat/hash presets */
+  source_fields?: string[];
+  /* Raw FieldGeneration DSL or AST (used when kind is expression) */
+  expression?: {
+    [key: string]: unknown;
+  };
+  /* Separator used by concat preset */
+  separator?: string;
+  /* Output format for concat preset: 'labeled' (field_name: value) or 'plain' (values only) */
+  format?: 'labeled' | 'plain';
+  /* Optional prefix for object_name preset */
+  prefix?: string;
+  /* Optional suffix for object_name preset */
+  suffix?: string;
+  /* Hash algorithm for hash preset (e.g. sha256, md5) */
+  algorithm?: string;
+  /* Whether the generated column is NOT NULL */
+  is_required?: boolean;
+}
 /** Creates a companion _translations table with lang_code + translatable fields. Copies SELECT policies and column-ref fields from the base table. Adds @i18n smart comment so the Graphile i18n plugin discovers it. Requires i18n_module to be provisioned for the database. */
 export interface DataI18nParams {
   /* Field names on the base table to make translatable. Each field is duplicated on the translation table with the same type. */
@@ -168,11 +229,42 @@ export interface DataI18nParams {
   lang_code_type?: 'citext' | 'text';
   /* Whether to also copy INSERT/UPDATE/DELETE policies (not just SELECT). Default true — translations should be editable by the same users who can edit the base row. */
   copy_mutation_policies?: boolean;
+  /* SearchFullText configuration for the translations table. When provided, creates a tsvector column on the translations table with lang_column=lang_code for dynamic per-row language stemming. */
+  search?: {
+    /* Name of the tsvector column on the translations table */field_name?: string;
+    /* Translatable columns that feed the tsvector. Language is determined dynamically from the lang_code column of each row. */source_fields: {
+      /* Name of the translatable source column */field: string;
+      /* tsvector weight class (A=highest, D=lowest) */weight?: 'A' | 'B' | 'C' | 'D';
+    }[];
+    /* Weight for this algorithm in composite searchScore */search_score_weight?: number;
+  };
 }
 /** Adds a UUID primary key column with auto-generation default (uuidv7). This is the standard primary key pattern for all tables. */
 export interface DataIdParams {
   /* Column name for the primary key */
   field_name?: string;
+}
+/** Creates a native PostgreSQL identity column (GENERATED ALWAYS / BY DEFAULT AS IDENTITY) backed by an implicit sequence. The database assigns values automatically; ALWAYS identity columns are not writable by clients. */
+export interface DataIdentityParams {
+  /* Name of the identity column to create */
+  target: string;
+  /* FieldType for the identity column (default: bigint) */
+  type?: {
+    [key: string]: unknown;
+  };
+  /* 'always' for GENERATED ALWAYS AS IDENTITY, 'by_default' for GENERATED BY DEFAULT AS IDENTITY */
+  generation?: 'always' | 'by_default';
+  /* Optional sequence tuning for the backing identity sequence */
+  sequence?: {
+    /* START WITH value */start?: number;
+    /* INCREMENT BY value */increment?: number;
+    /* MINVALUE (null uses the default) */min?: number | null;
+    /* MAXVALUE (null uses the default) */max?: number | null;
+    /* CACHE value */cache?: number;
+    /* Whether the sequence cycles (CYCLE / NO CYCLE) */cycle?: boolean;
+  };
+  /* Whether the identity column is NOT NULL (identity columns are implicitly NOT NULL) */
+  is_required?: boolean;
 }
 /** BEFORE UPDATE trigger that prevents changes to a list of specified fields after INSERT. Raises an exception if any of the listed fields have changed. Unlike FieldImmutable (single-field), this handles multiple fields in a single trigger for efficiency. */
 export interface DataImmutableFieldsParams {
@@ -243,7 +335,7 @@ export interface DataOwnershipInEntityParams {
   /* If true, creates B-tree indexes on the owner and entity columns */
   create_index?: boolean;
 }
-/** Adds user tracking for creates/updates with created_by and updated_by columns. */
+/** Adds human actor tracking for creates/updates: created_by/updated_by record the human user (jwt_public.current_user_id()). */
 export interface DataPeoplestampsParams {
   /* Column name for the creating user reference */
   created_by_field?: string;
@@ -254,6 +346,17 @@ export interface DataPeoplestampsParams {
   /* If true, adds foreign key constraints from created_by and updated_by to the users table */
   include_user_fk?: boolean;
   /* If true, creates B-tree indexes on the peoplestamp columns */
+  create_index?: boolean;
+}
+/** Adds acting-principal tracking for creates/updates: created_by_principal/updated_by_principal record the acting principal — agent, API key, service identity, or the user itself (jwt_public.current_principal_id()). */
+export interface DataPrincipalstampsParams {
+  /* Column name for the creating principal reference (agent, API key, or user) */
+  created_by_principal_field?: string;
+  /* Column name for the last-updating principal reference (agent, API key, or user) */
+  updated_by_principal_field?: string;
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
+  /* If true, creates B-tree indexes on the principalstamp columns */
   create_index?: boolean;
 }
 /** Adds publish state columns (is_published, published_at) for content visibility. Enables AuthzPublishable and AuthzTemporal authorization. */
@@ -271,6 +374,8 @@ export interface DataRealtimeParams {
   operations?: ('INSERT' | 'UPDATE' | 'DELETE')[];
   /* Custom name for the subscriber table (defaults to {source_table}_subscriber) */
   subscriber_table_name?: string;
+  /* When true, events are delivered via pg_notify only without writing to change_log. Ideal for high-frequency ephemeral signals (e.g. cursor positions, live indicators) where persistence is unnecessary. Subscriber table and RLS policies are still created for access control. */
+  ephemeral?: boolean;
 }
 /** Auto-generates URL-friendly slugs from field values on insert/update. Attaches BEFORE INSERT and BEFORE UPDATE triggers that call inflection.slugify() on the target field. References fields by name in data jsonb. */
 export interface DataSlugParams {
@@ -382,6 +487,27 @@ export interface EventTrackerParams {
   };
   /* Automatically register the event_name in event_types during provisioning */
   auto_register_type?: boolean;
+  /* Column name for conditional WHEN clause (fires only when field equals condition_value) */
+  condition_field?: string;
+  /* Value to compare against condition_field in WHEN clause */
+  condition_value?: string;
+  /* Compound conditions for the trigger WHEN clause. Accepts a single leaf condition, an array of conditions (implicitly AND), or a nested combinator tree ({AND: [...], OR: [...], NOT: {...}}). Each leaf is {field, op, value?, row?, ref?}. Column types are resolved automatically from the table schema. Cannot be combined with condition_field or watch_fields. */
+  conditions?: TriggerCondition | TriggerCondition[];
+  /* For UPDATE triggers, only fire when these fields change (uses DISTINCT FROM) */
+  watch_fields?: string[];
+}
+/**
+ * ===========================================================================
+ * Guard node type parameters
+ * ===========================================================================
+ */
+;
+/** Attaches a BEFORE trigger that calls require_step_up() to enforce recent password or MFA verification before allowing mutations. Requires a provisioned sessions_module (with app_settings_auth) for the target database. The step_up_window is read from app_settings_auth at runtime (default 30 minutes). Supports compound conditions (AND/OR/NOT), watch_fields (fire only when specific fields change), and simple condition_field/condition_value leaf conditions. */
+export interface GuardStepUpParams {
+  /* Which verification method satisfies the step-up requirement */
+  step_up_type?: 'password' | 'mfa' | 'password_or_mfa';
+  /* Which DML events require step-up verification */
+  events?: ('INSERT' | 'UPDATE' | 'DELETE')[];
   /* Column name for conditional WHEN clause (fires only when field equals condition_value) */
   condition_field?: string;
   /* Value to compare against condition_field in WHEN clause */
@@ -572,6 +698,8 @@ export interface SearchFullTextParams {
     /* tsvector weight class (A=highest, D=lowest) */weight?: 'A' | 'B' | 'C' | 'D';
     /* PostgreSQL text search configuration */lang?: string;
   }[];
+  /* Column name whose value determines the text search configuration per row. When set, the tsvector trigger uses NEW.<lang_column>::regconfig instead of a static language, enabling dynamic per-row language stemming. The per-field lang values in source_fields are used as fallback defaults for the langs array but the trigger reads from this column at runtime. */
+  lang_column?: string;
   /* Weight for this algorithm in composite searchScore */
   search_score_weight?: number;
 }
@@ -699,7 +827,7 @@ export interface SearchVectorParams {
   embedding_provider?: string;
   /* Auto-create trigger that enqueues embedding generation jobs */
   enqueue_job?: boolean;
-  /* Task identifier for the job queue */
+  /* Task identifier for the job queue. Must match a registered function definition when function_module is installed. */
   job_task_name?: string;
   /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
   chunks?: {
@@ -711,7 +839,7 @@ export interface SearchVectorParams {
       [key: string]: unknown;
     };
     /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
-    /* Task identifier for the chunking job queue */chunking_task_name?: string;
+    /* Task identifier for the chunking job queue. Must match a registered function definition when function_module is installed. */chunking_task_name?: string;
   };
 }
 /**
@@ -722,7 +850,7 @@ export interface SearchVectorParams {
 ;
 /** Dynamically creates PostgreSQL triggers that enqueue jobs via app_jobs.add_job() when table rows are inserted, updated, or deleted. Supports configurable payload strategies (full row, row ID, selected fields, or custom mapping), conditional firing via WHEN clauses, watched field changes, and extended job options (queue, priority, delay, max attempts). */
 export interface JobTriggerParams {
-  /* Job task identifier passed to add_job (e.g., process_invoice, sync_to_stripe) */
+  /* Job task identifier passed to add_job (e.g., process_invoice, sync_to_stripe). Must match a registered function definition when function_module is installed. */
   task_identifier: string;
   /* How to build the job payload: row (full NEW/OLD), row_id (just id), fields (selected columns), custom (mapped columns) */
   payload_strategy?: 'row' | 'row_id' | 'fields' | 'custom';
@@ -902,7 +1030,7 @@ export interface ProcessFileEmbeddingParams {
     /* Task identifier for the chunking job queue */chunking_task_name?: string;
   };
 }
-/** Image-specific preset of ProcessFileEmbedding. Delegates to ProcessFileEmbedding with image-oriented defaults: dimensions=512 (CLIP), mime_patterns=['image/%'], task_identifier='process_image_embedding', direct mode (no extraction). Accepts all ProcessFileEmbedding parameters — any overrides are forwarded through. */
+/** Image-specific preset of ProcessFileEmbedding. Delegates to ProcessFileEmbedding with image-oriented defaults: dimensions=512 (CLIP), mime_patterns=['image/%'], task_identifier='embedding:process_image_embedding', direct mode (no extraction). Accepts all ProcessFileEmbedding parameters — any overrides are forwarded through. */
 export interface ProcessImageEmbeddingParams {
   /* Name of the vector embedding column */
   field_name?: string;
@@ -1004,6 +1132,19 @@ export interface ProcessImageVersionsParams {
 ;
 /** Allows all access. Generates TRUE expression. */
 export type AuthzAllowAllParams = {};
+/** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the current user must hold an app membership (hardcoded membership_type=1). App-level analog of AuthzMemberOwner for global scopes with no entity key — authorship never survives losing app membership. */
+export interface AuthzAppMemberOwnerParams {
+  /* Column name containing the owner user ID (e.g., actor_id) */
+  owner_field: string;
+  /* Single permission name to check (resolved to bitstring mask) */
+  permission?: string;
+  /* Multiple permission names to check (ORed together into mask) */
+  permissions?: string[];
+  /* If true, require is_admin flag */
+  is_admin?: boolean;
+  /* If true, require is_owner flag */
+  is_owner?: boolean;
+}
 /** App-level membership check (hardcoded membership_type=1). Verifies the user has app membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. For entity-scoped checks (org, channel, etc.), use AuthzEntityMembership instead. */
 export interface AuthzAppMembershipParams {
   /* Single permission name to check (resolved to bitstring mask) */
@@ -1015,12 +1156,45 @@ export interface AuthzAppMembershipParams {
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
+/** Column-level write authorization. Generates BEFORE INSERT/UPDATE triggers that enforce an authorization node whenever a guarded column is written to a protected value or transitions. The write-time counterpart to RLS SELECT/WITH CHECK policies: any table can declare "only an actor satisfying <authz> may set column X". The nested authz value is a normal Authz node compiled by the standard RLS pipeline; row-referencing nodes have their protected-table column references rebound to NEW. The immutable rule delegates to the native DataImmutableFields generator. */
+export interface AuthzColumnSecurityParams {
+  /* Guarded columns that share the same rule and authorization (e.g. ["is_shared"]). */
+  columns: string[];
+  /* Write pattern that arms the guard: set_true/set_false (column set to that boolean), set_values (column set to one of values), writable_when (column written/changed at all), transition (OLD->NEW pairs in allowed), immutable (delegates to DataImmutableFields). */
+  rule: 'set_true' | 'set_false' | 'set_values' | 'writable_when' | 'transition' | 'immutable';
+  /* Any Authz node (AuthzAppMembership, AuthzComposite, AuthzValueExists, ...) that must be satisfied to perform the guarded write. Required for all rules except immutable. */
+  authz?: {
+    [key: string]: unknown;
+  };
+  /* For rule=set_values: the protected values that arm the guard. */
+  values?: string[];
+  /* For rule=transition: allowed guarded transitions expressed as "from->to" (e.g. ["member->admin"]). */
+  allowed?: string[];
+  /* When true, the system role (AuthzSystemOnly) bypasses the guard so provisioning/seed paths without a JWT principal can write freely. */
+  allow_system?: boolean;
+  /* Machine-readable code prefixed onto the raised error message (e.g. MANAGED_DOMAIN_PUBLISH_FORBIDDEN). */
+  error_code?: string;
+  /* Human-readable message raised when the guard denies the write. */
+  error_message?: string;
+}
 /** Composite authorization policy that combines multiple authorization nodes using boolean logic (AND/OR). The data field contains a JSONB AST with nested authorization nodes. */
 export interface AuthzCompositeParams {
-  /* Boolean expression combining multiple authorization nodes */
+  /* Array of authorization nodes combined with OR */
+  OR?: {
+    [key: string]: unknown;
+  }[];
+  /* Array of authorization nodes combined with AND */
+  AND?: {
+    [key: string]: unknown;
+  }[];
+  /* A single authorization node to negate */
+  NOT?: {
+    [key: string]: unknown;
+  };
+  /* Raw Postgres BoolExpr AST node (power-user / backwards-compatible) */
   BoolExpr?: {
     /* Boolean operator: AND_EXPR, OR_EXPR, or NOT_EXPR */boolop?: 'AND_EXPR' | 'OR_EXPR' | 'NOT_EXPR';
-    /* Array of authorization nodes to combine */args?: {
+    /* Array of authorization nodes or nested BoolExpr ASTs */args?: {
       [key: string]: unknown;
     }[];
   };
@@ -1058,14 +1232,18 @@ export interface AuthzEntityMembershipParams {
 }
 /** Path-scoped file sharing via ltree containment. Grants access when a path_shares row matches the current user, bucket, and an ancestor path with the required permission. */
 export interface AuthzFilePathParams {
-  /* Schema of the path_shares table */
-  shares_schema: string;
-  /* Name of the path_shares table */
-  shares_table: string;
-  /* Schema of the files table (used to qualify column references inside the EXISTS subquery) */
+  /* UUID of the path_shares table (alternative to shares_schema/shares_table) */
+  shares_table_id?: string;
+  /* Schema of the path_shares table (or use shares_table_id) */
+  shares_schema?: string;
+  /* Name of the path_shares table (or use shares_table_id) */
+  shares_table?: string;
+  /* UUID of the files table (alternative to files_schema/files_table) */
+  files_table_id?: string;
+  /* Schema of the files table (or use files_table_id) */
   files_schema?: string;
-  /* Name of the files table (used to qualify column references inside the EXISTS subquery) */
-  files_table: string;
+  /* Name of the files table (or use files_table_id) */
+  files_table?: string;
   /* Boolean column on the path_shares table that grants the required permission (e.g. can_read, can_write) */
   permission_field: string;
   /* Column on the files table referencing the bucket */
@@ -1172,16 +1350,51 @@ export interface AuthzRelatedEntityMembershipParams {
 }
 /** Array membership check in a related table. */
 export interface AuthzRelatedMemberListParams {
-  /* Schema of the related table */
-  owned_schema: string;
-  /* Name of the related table */
-  owned_table: string;
+  /* UUID of the related table (alternative to owned_schema/owned_table) */
+  owned_table_id?: string;
+  /* Schema of the related table (or use owned_table_id) */
+  owned_schema?: string;
+  /* Name of the related table (or use owned_table_id) */
+  owned_table?: string;
   /* Array column in related table */
   owned_table_key: string;
   /* FK column in related table */
   owned_table_ref_key: string;
   /* PK column in protected table */
   this_object_key: string;
+}
+/** Compound policy: the row must be owned by the current user (owner_field = current_user_id) AND the row must belong to a related entity the current user is a member of (SPRT joined through the related table, as in AuthzRelatedEntityMembership). Related-entity analog of AuthzMemberOwner — authorship never survives losing membership. */
+export interface AuthzRelatedMemberOwnerParams {
+  /* Column name containing the owner user ID (e.g., actor_id) */
+  owner_field: string;
+  /* Column name on protected table referencing the join table */
+  entity_field: string;
+  /* SPRT column to select for the entity match */
+  sel_field?: string;
+  /* SPRT column to join on with the related table */
+  sprt_join_field?: string;
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. */
+  entity_type?: string;
+  /* UUID of the join table (alternative to obj_schema/obj_table) */
+  obj_table_id?: string;
+  /* Schema of the join table (or use obj_table_id) */
+  obj_schema?: string;
+  /* Name of the join table (or use obj_table_id) */
+  obj_table?: string;
+  /* UUID of field on join table (alternative to obj_field) */
+  obj_field_id?: string;
+  /* Field name on join table to match against SPRT entity_id */
+  obj_field?: string;
+  /* Single permission name to check (resolved to bitstring mask) */
+  permission?: string;
+  /* Multiple permission names to check (ORed together into mask) */
+  permissions?: string[];
+  /* If true, require is_admin flag */
+  is_admin?: boolean;
+  /* If true, require is_owner flag */
+  is_owner?: boolean;
 }
 /** Peer visibility through shared entity membership via a related table. Like AuthzPeerOwnership but the owning user is resolved through a FK JOIN to a related table. Combines SPRT self-join with object table JOIN. */
 export interface AuthzRelatedPeerOwnershipParams {
@@ -1212,6 +1425,8 @@ export interface AuthzRelatedPeerOwnershipParams {
   /* If true, require is_owner flag on current user membership */
   is_owner?: boolean;
 }
+/** Restricts access to system-initiated operations (triggers, background jobs). Checks jwt.claims.role_type = "system". Normal API requests default to "user" and are denied. Use for INSERT policies on append-only event/audit/usage tables. */
+export type AuthzSystemOnlyParams = {};
 /** Time-window based access control. Restricts access based on valid_from and/or valid_until timestamps. At least one of valid_from_field or valid_until_field must be provided. */
 export interface AuthzTemporalParams {
   /* Column for start time (at least one of valid_from_field or valid_until_field required) */
@@ -1222,6 +1437,59 @@ export interface AuthzTemporalParams {
   valid_from_inclusive?: boolean;
   /* Include end boundary */
   valid_until_inclusive?: boolean;
+}
+/** Check the protected row's own column against an allowed set of values. */
+export interface AuthzValueAllowedParams {
+  /* Column on the protected table to check */
+  column: string;
+  /* Allowed values as a constant string array, or a local column name containing the allowed values */
+  allowed: string | (string | boolean | number)[];
+  /* Operator to use for the value check */
+  operator: 'in' | 'any' | 'overlap' | 'contains' | 'contained';
+}
+/** EXISTS check in a referenced table joined by a local column, with optional additional conditions. */
+export interface AuthzValueExistsParams {
+  /* UUID of the referenced table (alternative to ref_schema/ref_table) */
+  ref_table_id?: string;
+  /* Schema of the referenced table (or use ref_table_id) */
+  ref_schema?: string;
+  /* Name of the referenced table (or use ref_table_id) */
+  ref_table?: string;
+  /* Join conditions between the protected row and the referenced table */
+  join?: {
+    /* Column on the protected table */local_column: string;
+    /* Column on the referenced table */ref_column: string;
+    /* Join operator */operator?: '=' | '!=' | '>' | '<' | '>=' | '<=';
+  }[];
+  /* Optional higher-level condition JSON applied to the referenced table (row alias d) */
+  conditions?: {
+    [key: string]: unknown;
+  }[];
+}
+/** EXISTS check in a referenced table joined by a local column, with a value/array match on a referenced column and optional additional conditions. */
+export interface AuthzValueMatchParams {
+  /* UUID of the referenced table (alternative to ref_schema/ref_table) */
+  ref_table_id?: string;
+  /* Schema of the referenced table (or use ref_table_id) */
+  ref_schema?: string;
+  /* Name of the referenced table (or use ref_table_id) */
+  ref_table?: string;
+  /* Join conditions between the protected row and the referenced table */
+  join?: {
+    /* Column on the protected table */local_column: string;
+    /* Column on the referenced table */ref_column: string;
+    /* Join operator */operator?: '=' | '!=' | '>' | '<' | '>=' | '<=';
+  }[];
+  /* Value match on a referenced column */
+  match: {
+    /* Column on the referenced table to match */ref_column: string;
+    /* Allowed values as a constant string array, or a local column name containing the allowed values */allowed: string | string[];
+    /* Operator to use for the match */operator: 'in' | 'any' | 'overlap' | 'contains' | 'contained';
+  };
+  /* Optional higher-level condition JSON applied to the referenced table (row alias d) */
+  conditions?: {
+    [key: string]: unknown;
+  }[];
 }
 /**
  * ===========================================================================
@@ -1411,7 +1679,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: 'AuthzAllowAll' | 'AuthzAppMembership' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedPeerOwnership' | 'AuthzTemporal';
+  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -1729,14 +1997,20 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMembership' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedPeerOwnership' | 'AuthzTemporal' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataBulk' | 'DataCompositeField' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataI18n' | 'DataId' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
   data?: Record<string, never>;
 } | {
+  $type: 'AuthzAppMemberOwner';
+  data: AuthzAppMemberOwnerParams;
+} | {
   $type: 'AuthzAppMembership';
   data: AuthzAppMembershipParams;
+} | {
+  $type: 'AuthzColumnSecurity';
+  data: AuthzColumnSecurityParams;
 } | {
   $type: 'AuthzComposite';
   data: AuthzCompositeParams;
@@ -1780,11 +2054,26 @@ export type BlueprintNodeObject = {
   $type: 'AuthzRelatedMemberList';
   data: AuthzRelatedMemberListParams;
 } | {
+  $type: 'AuthzRelatedMemberOwner';
+  data: AuthzRelatedMemberOwnerParams;
+} | {
   $type: 'AuthzRelatedPeerOwnership';
   data: AuthzRelatedPeerOwnershipParams;
 } | {
+  $type: 'AuthzSystemOnly';
+  data?: Record<string, never>;
+} | {
   $type: 'AuthzTemporal';
   data: AuthzTemporalParams;
+} | {
+  $type: 'AuthzValueAllowed';
+  data: AuthzValueAllowedParams;
+} | {
+  $type: 'AuthzValueExists';
+  data: AuthzValueExistsParams;
+} | {
+  $type: 'AuthzValueMatch';
+  data: AuthzValueMatchParams;
 } | {
   $type: 'CheckGreaterThan';
   data: CheckGreaterThanParams;
@@ -1798,11 +2087,17 @@ export type BlueprintNodeObject = {
   $type: 'CheckOneOf';
   data: CheckOneOfParams;
 } | {
+  $type: 'DataArchivable';
+  data: DataArchivableParams;
+} | {
   $type: 'DataBulk';
   data: DataBulkParams;
 } | {
   $type: 'DataCompositeField';
   data: DataCompositeFieldParams;
+} | {
+  $type: 'DataDenormalized';
+  data: DataDenormalizedParams;
 } | {
   $type: 'DataDirectOwner';
   data: DataDirectOwnerParams;
@@ -1813,11 +2108,17 @@ export type BlueprintNodeObject = {
   $type: 'DataForceCurrentUser';
   data: DataForceCurrentUserParams;
 } | {
+  $type: 'DataGenerated';
+  data: DataGeneratedParams;
+} | {
   $type: 'DataI18n';
   data: DataI18nParams;
 } | {
   $type: 'DataId';
   data: DataIdParams;
+} | {
+  $type: 'DataIdentity';
+  data: DataIdentityParams;
 } | {
   $type: 'DataImmutableFields';
   data: DataImmutableFieldsParams;
@@ -1842,6 +2143,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'DataPeoplestamps';
   data: DataPeoplestampsParams;
+} | {
+  $type: 'DataPrincipalstamps';
+  data: DataPrincipalstampsParams;
 } | {
   $type: 'DataPublishable';
   data: DataPublishableParams;
@@ -1899,6 +2203,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'EventTracker';
   data: EventTrackerParams;
+} | {
+  $type: 'GuardStepUp';
+  data: GuardStepUpParams;
 } | {
   $type: 'JobTrigger';
   data: JobTriggerParams;
