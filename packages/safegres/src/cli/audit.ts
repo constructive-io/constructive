@@ -1,17 +1,34 @@
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 
-import { audit } from '../commands/audit';
+import { audit, type AuditOptions } from '../commands/audit';
 import { loadConfig } from '../config/loader';
 import type { Grade } from '../config/types';
 import { renderJson } from '../report/json';
 import { renderPretty } from '../report/pretty';
 import { meetsGrade } from '../score/score';
-import type { Severity } from '../types';
+import type { Report, Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER, summarize } from '../types';
 import { buildClient, configParamsFromArgv, csvList } from './shared';
 
 const log = new Logger('safegres');
+
+/**
+ * `--pgpm` mode needs the optional peer dependency `pgsql-test`, so the
+ * helper module is loaded lazily with a friendly error when it's missing.
+ */
+function importPgpmTest(): typeof import('../pgpm-test') {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require('../pgpm-test');
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'MODULE_NOT_FOUND') {
+      log.error('--pgpm requires the optional peer dependency "pgsql-test" — install it (e.g. `npm i -D pgsql-test`) and retry');
+      process.exit(2);
+    }
+    throw err;
+  }
+}
 
 const usage = `
 safegres audit — pure-PostgreSQL RLS auditor
@@ -19,6 +36,9 @@ safegres audit — pure-PostgreSQL RLS auditor
   safegres audit [OPTIONS]
 
 Connection (priority order, top wins):
+  --pgpm [dir]             No connection needed: deploy the pgpm workspace at
+                           [dir] (default: nearest from cwd) into an ephemeral
+                           test database and audit it (requires pgsql-test)
   --connection <url>       Full PostgreSQL connection string
   --host <host>            PostgreSQL host        (else PGHOST,    default localhost)
   --port <port>            PostgreSQL port        (else PGPORT,    default 5432)
@@ -65,74 +85,83 @@ export default async (
   // minimist parses `--no-color` as `color: false`.
   const colorEnabled = argv.color !== false;
 
-  const { config } = loadConfig(configParamsFromArgv(argv));
+  const pgpmCwd = typeof argv.pgpm === 'string' ? argv.pgpm : undefined;
+  const { config } = loadConfig({ cwd: pgpmCwd, ...configParamsFromArgv(argv) });
 
-  const client = buildClient(argv);
-  await client.connect();
-  try {
-    const exposureSchemas = csvList(argv['exposure-schemas']);
-    const report = await audit(client, {
-      schemas: csvList(argv.schemas),
-      excludeSchemas: csvList(argv['exclude-schemas']),
-      includeRoles: csvList(argv.roles),
-      excludeRoles: csvList(argv['exclude-roles']),
-      skipAstChecks: argv['skip-ast'] === true,
-      exposure: exposureSchemas
-        ? { ...config.exposure, schemas: exposureSchemas }
-        : undefined,
-      config
-    });
+  const exposureSchemas = csvList(argv['exposure-schemas']);
+  const auditOptions: AuditOptions = {
+    schemas: csvList(argv.schemas),
+    excludeSchemas: csvList(argv['exclude-schemas']),
+    includeRoles: csvList(argv.roles),
+    excludeRoles: csvList(argv['exclude-roles']),
+    skipAstChecks: argv['skip-ast'] === true,
+    exposure: exposureSchemas
+      ? { ...config.exposure, schemas: exposureSchemas }
+      : undefined,
+    config
+  };
 
-    if (argv['exposed-only'] === true) {
-      report.findings = report.findings.filter((f) => f.exposed !== false);
-      report.summary = summarize(report.findings);
+  let report: Report;
+  if (argv.pgpm) {
+    const { auditPgpmWorkspace } = importPgpmTest();
+    report = await auditPgpmWorkspace({ ...auditOptions, cwd: pgpmCwd });
+  } else {
+    const client = buildClient(argv);
+    await client.connect();
+    try {
+      report = await audit(client, auditOptions);
+    } finally {
+      await client.end();
     }
+  }
 
-    const fmt = typeof argv.format === 'string' ? argv.format : 'pretty';
-    let output: string;
-    switch (fmt) {
-    case 'json':
-      output = renderJson(report);
-      break;
-    case 'json-pretty':
-      output = renderJson(report, { pretty: true });
-      break;
-    case 'pretty':
-      output = renderPretty(report, { color: colorEnabled });
-      break;
-    default:
-      log.error(`Unknown --format: ${fmt}`);
+  if (argv['exposed-only'] === true) {
+    report.findings = report.findings.filter((f) => f.exposed !== false);
+    report.summary = summarize(report.findings);
+  }
+
+  const fmt = typeof argv.format === 'string' ? argv.format : 'pretty';
+  let output: string;
+  switch (fmt) {
+  case 'json':
+    output = renderJson(report);
+    break;
+  case 'json-pretty':
+    output = renderJson(report, { pretty: true });
+    break;
+  case 'pretty':
+    output = renderPretty(report, { color: colorEnabled });
+    break;
+  default:
+    log.error(`Unknown --format: ${fmt}`);
+    process.exit(2);
+  }
+  process.stdout.write(output);
+  process.stdout.write('\n');
+
+  const failOnSeverity =
+    typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : config.failOn?.severity;
+  if (failOnSeverity) {
+    if (!(failOnSeverity in SEVERITY_ORDER)) {
+      log.error(`Unknown --fail-on severity: ${failOnSeverity}`);
       process.exit(2);
     }
-    process.stdout.write(output);
-    process.stdout.write('\n');
-
-    const failOnSeverity =
-      typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : config.failOn?.severity;
-    if (failOnSeverity) {
-      if (!(failOnSeverity in SEVERITY_ORDER)) {
-        log.error(`Unknown --fail-on severity: ${failOnSeverity}`);
-        process.exit(2);
-      }
-      if (report.findings.some((f) => meetsThreshold(f.severity, failOnSeverity))) {
-        process.exit(1);
-      }
-    }
-
-    const failOnScore =
-      typeof argv['fail-on-score'] === 'number' ? argv['fail-on-score'] : config.failOn?.score;
-    if (failOnScore != null && report.score && report.score.value < failOnScore) {
-      log.error(`score ${report.score.value} is below --fail-on-score ${failOnScore}`);
+    if (report.findings.some((f) => meetsThreshold(f.severity, failOnSeverity))) {
       process.exit(1);
     }
+  }
 
-    const failOnGrade =
-      typeof argv['fail-on-grade'] === 'string' ? (argv['fail-on-grade'] as Grade) : config.failOn?.grade;
-    if (failOnGrade && report.score && !meetsGrade(report.score.grade, failOnGrade)) {
-      log.error(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
-      process.exit(1);
-    }
-  } finally {
-    await client.end();
+  const failOnScore =
+    typeof argv['fail-on-score'] === 'number' ? argv['fail-on-score'] : config.failOn?.score;
+  if (failOnScore != null && report.score && report.score.value < failOnScore) {
+    log.error(`score ${report.score.value} is below --fail-on-score ${failOnScore}`);
+    process.exit(1);
+  }
+
+  const failOnGrade =
+    typeof argv['fail-on-grade'] === 'string' ? (argv['fail-on-grade'] as Grade) : config.failOn?.grade;
+  if (failOnGrade && report.score && !meetsGrade(report.score.grade, failOnGrade)) {
+    log.error(`grade ${report.score.grade} is below --fail-on-grade ${failOnGrade}`);
+    process.exit(1);
   }
 };
