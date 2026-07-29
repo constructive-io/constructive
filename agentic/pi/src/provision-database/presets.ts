@@ -17,9 +17,9 @@ import {
 export type ProvisionModule = string | [string, Record<string, unknown>];
 
 // Default base preset. `b2b:storage` = the full multi-tenant B2B shape plus file
-// storage, matching Constructive's app shape. Crucially it already includes
-// `config_secrets_module` — the dependency the old hand-copied list dropped,
-// which made the backend reject provisioning with `REQUIRES (config_secrets_module:app)`.
+// storage, matching Constructive's app shape. It carries the app-scoped secret,
+// identity-provider, and storage modules the backend's provisioning requires —
+// the drift the old hand-copied list caused (a dropped, then bare/unscoped, set).
 export const DEFAULT_PROVISION_PRESET = PresetB2bStorage.name;
 
 export { allModulePresets, getModulePreset, type ModulePreset };
