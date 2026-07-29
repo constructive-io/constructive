@@ -134,7 +134,11 @@ INTERNAL_EXPLICIT = {
 }
 
 
-def classify(code):
+def classify(code, db_class=None):
+    # The database is authoritative for public/internal: when the audit captured
+    # a class from the code's errors.raise_error(...) call, trust it directly.
+    if db_class in ('public', 'internal'):
+        return db_class
     if code in INTERNAL_EXPLICIT:
         return 'internal'
     if code in PUBLIC_EXPLICIT or code in copy:
@@ -152,20 +156,26 @@ def classify(code):
 def http_for(code, klass):
     if klass == 'internal':
         return 500
+    # Match on underscore-delimited tokens so substrings like RATE in
+    # GENE(RATE)D or LIMIT/LOCKED inside larger words don't trigger.
+    tokens = set(code.split('_'))
     if code.endswith('_NOT_FOUND') or code == 'NOT_FOUND':
         return 404
-    if code.endswith('_EXISTS') or 'ALREADY' in code:
+    if code.endswith('_EXISTS') or 'ALREADY' in tokens:
         return 409
-    if 'LIMIT' in code or 'RATE' in code or 'TOO_MANY' in code:
+    if 'LIMIT' in tokens or 'RATE' in tokens or code.endswith('_TOO_MANY_REQUESTS') \
+            or code == 'TOO_MANY_REQUESTS' or 'RATE_LIMIT' in code:
         return 429
-    if 'LOCKED' in code:
+    if 'LOCKED' in tokens:
         return 423
-    if any(k in code for k in ('FORBIDDEN', 'DISABLED', 'NOT_ALLOWED', 'PERMISSION',
-                               'STEP_UP', 'MFA', 'REQUIRES', 'IMMUTABLE')):
+    if any(k in tokens for k in ('FORBIDDEN', 'DISABLED', 'PERMISSION', 'MFA',
+                                 'IMMUTABLE')) \
+            or 'NOT_ALLOWED' in code or 'STEP_UP' in code or 'REQUIRES' in tokens:
         return 403
-    if any(k in code for k in ('UNAUTHENTICATED', 'NOT_AUTHENTICATED', 'CREDENTIALS',
-                               'INCORRECT_PASSWORD', 'INVALID_TOKEN', 'INVALID_CODE',
-                               'INVALID_SIGNATURE', 'SIGNIN', 'CSRF')):
+    if any(k in tokens for k in ('UNAUTHENTICATED', 'CREDENTIALS', 'CSRF')) \
+            or 'NOT_AUTHENTICATED' in code or 'INCORRECT_PASSWORD' in code \
+            or 'INVALID_TOKEN' in code or 'INVALID_CODE' in code \
+            or 'INVALID_SIGNATURE' in code or 'SIGNIN' in code:
         return 401
     return 400
 
@@ -211,7 +221,7 @@ for code in codes:
     sample = info.get('sample', code)
     dynamic = bool(info.get('dynamic'))
     generated_only = info.get('n_source', 0) == 0
-    klass = classify(code)
+    klass = classify(code, info.get('class'))
     if klass == 'public':
         n_public += 1
     http = http_for(code, klass)
