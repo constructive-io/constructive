@@ -26,6 +26,15 @@ safegres audit
 
 Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) and a full `--connection <url>` flag are also supported. See `safegres audit --help`.
 
+### Output & verbosity
+
+Pretty output prints the exposure line, score, and the exposed findings. Internal (non-exposed) advisories are collapsed to a one-line count by default so a large database's report stays readable.
+
+- `--summary`, `-q` — print only the exposure line, score/grade, and severity counts (no per-finding lines). Ideal for CI job summaries.
+- `--verbose` — expand the internal advisories instead of collapsing them to a count.
+- `--exposed-only` — drop internal findings entirely.
+- `--format json` / `--format json-pretty` — machine-readable output (always carries every finding).
+
 ## What it checks
 
 | Code | Severity | Direction | Category | Check |
