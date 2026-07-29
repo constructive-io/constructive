@@ -591,20 +591,20 @@ create({ agentTableId: '<UUID>', agentTableName: '<String>', apiName: '<String>'
 ```typescript
 // List all apiSurfaceModules
 const { data, isLoading } = useApiSurfaceModulesQuery({
-  selection: { fields: { apiModulesTableId: true, apiModulesTableName: true, apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
 });
 
 // Get one apiSurfaceModule
 const { data: item } = useApiSurfaceModuleQuery({
   id: '<UUID>',
-  selection: { fields: { apiModulesTableId: true, apiModulesTableName: true, apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, apiSchemasTableId: true, apiSchemasTableName: true, apiSettingsTableId: true, apiSettingsTableName: true, apisTableId: true, apisTableName: true, catalogModuleId: true, corsSettingsTableId: true, corsSettingsTableName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
 });
 
 // Create a apiSurfaceModule
 const { mutate: create } = useCreateApiSurfaceModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ apiModulesTableId: '<UUID>', apiModulesTableName: '<String>', apiName: '<String>', apiSchemasTableId: '<UUID>', apiSchemasTableName: '<String>', apiSettingsTableId: '<UUID>', apiSettingsTableName: '<String>', apisTableId: '<UUID>', apisTableName: '<String>', catalogModuleId: '<UUID>', corsSettingsTableId: '<UUID>', corsSettingsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' });
+create({ apiName: '<String>', apiSchemasTableId: '<UUID>', apiSchemasTableName: '<String>', apiSettingsTableId: '<UUID>', apiSettingsTableName: '<String>', apisTableId: '<UUID>', apisTableName: '<String>', catalogModuleId: '<UUID>', corsSettingsTableId: '<UUID>', corsSettingsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' });
 ```
 
 ### AppModule
@@ -633,20 +633,20 @@ create({ apiName: '<String>', appComponentsTableId: '<UUID>', appComponentsTable
 ```typescript
 // List all billingModules
 const { data, isLoading } = useBillingModulesQuery({
-  selection: { fields: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultPermissions: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } },
+  selection: { fields: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultMeterCatalog: true, defaultPermissions: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } },
 });
 
 // Get one billingModule
 const { data: item } = useBillingModuleQuery({
   id: '<UUID>',
-  selection: { fields: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultPermissions: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } },
+  selection: { fields: { apiName: true, balancesTableId: true, balancesTableName: true, databaseId: true, defaultMeterCatalog: true, defaultPermissions: true, id: true, ledgerTableId: true, ledgerTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, recordUsageFunction: true, rollupUsageSummaryFunction: true, schemaId: true, sweepExpiredSubscriptionsFunction: true } },
 });
 
 // Create a billingModule
 const { mutate: create } = useCreateBillingModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ apiName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', meterDefaultsTableId: '<UUID>', meterDefaultsTableName: '<String>', meterSourcesTableId: '<UUID>', meterSourcesTableName: '<String>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', recordUsageFunction: '<String>', rollupUsageSummaryFunction: '<String>', schemaId: '<UUID>', sweepExpiredSubscriptionsFunction: '<String>' });
+create({ apiName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', databaseId: '<UUID>', defaultMeterCatalog: '<JSON>', defaultPermissions: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', meterDefaultsTableId: '<UUID>', meterDefaultsTableName: '<String>', meterSourcesTableId: '<UUID>', meterSourcesTableName: '<String>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', recordUsageFunction: '<String>', rollupUsageSummaryFunction: '<String>', schemaId: '<UUID>', sweepExpiredSubscriptionsFunction: '<String>' });
 ```
 
 ### BillingProviderModule

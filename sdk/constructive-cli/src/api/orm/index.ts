@@ -6,7 +6,6 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { ApiModel } from './models/api';
-import { ApiModuleModel } from './models/apiModule';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiSettingModel } from './models/apiSetting';
 import { AstMigrationModel } from './models/astMigration';
@@ -19,6 +18,7 @@ import { DatabaseTransferModel } from './models/databaseTransfer';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { DomainModel } from './models/domain';
 import { DomainEventModel } from './models/domainEvent';
+import { DomainTypeModel } from './models/domainType';
 import { DomainVerificationModel } from './models/domainVerification';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { EnumModel } from './models/enum';
@@ -34,7 +34,6 @@ import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { PartitionModel } from './models/partition';
 import { PlatformApiModel } from './models/platformApi';
-import { PlatformApiModuleModel } from './models/platformApiModule';
 import { PlatformApiSchemaModel } from './models/platformApiSchema';
 import { PlatformApiSettingModel } from './models/platformApiSetting';
 import { PlatformCorsSettingModel } from './models/platformCorsSetting';
@@ -106,7 +105,6 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     api: new ApiModel(client),
-    apiModule: new ApiModuleModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiSetting: new ApiSettingModel(client),
     astMigration: new AstMigrationModel(client),
@@ -119,6 +117,7 @@ export function createClient(config: OrmClientConfig) {
     defaultPrivilege: new DefaultPrivilegeModel(client),
     domain: new DomainModel(client),
     domainEvent: new DomainEventModel(client),
+    domainType: new DomainTypeModel(client),
     domainVerification: new DomainVerificationModel(client),
     embeddingChunk: new EmbeddingChunkModel(client),
     enum: new EnumModel(client),
@@ -134,7 +133,6 @@ export function createClient(config: OrmClientConfig) {
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     partition: new PartitionModel(client),
     platformApi: new PlatformApiModel(client),
-    platformApiModule: new PlatformApiModuleModel(client),
     platformApiSchema: new PlatformApiSchemaModel(client),
     platformApiSetting: new PlatformApiSettingModel(client),
     platformCorsSetting: new PlatformCorsSettingModel(client),

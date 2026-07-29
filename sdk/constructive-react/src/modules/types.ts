@@ -42,8 +42,6 @@ export interface AgentModule {
   threadTableName: string | null;
 }
 export interface ApiSurfaceModule {
-  apiModulesTableId: string | null;
-  apiModulesTableName: string | null;
   apiName: string | null;
   apiSchemasTableId: string | null;
   apiSchemasTableName: string | null;
@@ -94,6 +92,7 @@ export interface BillingModule {
   balancesTableId: string | null;
   balancesTableName: string | null;
   databaseId: string | null;
+  defaultMeterCatalog: unknown | null;
   defaultPermissions: string[] | null;
   id: string | null;
   ledgerTableId: string | null;

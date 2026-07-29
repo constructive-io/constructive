@@ -7,7 +7,7 @@ Execute the orgIsManagerOf query
 ## Usage
 
 ```bash
-csdk org-is-manager-of --pEntityId <UUID> --pManagerId <UUID> --pMaxDepth <Int> --pUserId <UUID>
+csdk org-is-manager-of --managerId <UUID> --maxDepth <Int> --targetEntityId <UUID> --userId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk org-is-manager-of --pEntityId <UUID> --pManagerId <UUID> --pMaxDepth <Int> 
 ### Run orgIsManagerOf
 
 ```bash
-csdk org-is-manager-of --pEntityId <UUID> --pManagerId <UUID> --pMaxDepth <Int> --pUserId <UUID>
+csdk org-is-manager-of --managerId <UUID> --maxDepth <Int> --targetEntityId <UUID> --userId <UUID>
 ```

@@ -453,6 +453,7 @@ export interface PlatformFunctionInvocation {
   channel: string | null;
   completedAt: string | null;
   createdAt: string | null;
+  databaseId: string | null;
   definitionScope: string | null;
   durationMs: number | null;
   error: string | null;
