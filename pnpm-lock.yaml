@@ -2869,6 +2869,9 @@ importers:
       '@pgpmjs/slice':
         specifier: workspace:^
         version: link:../slice/dist
+      '@pgpmjs/transform':
+        specifier: workspace:^
+        version: link:../transform/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist

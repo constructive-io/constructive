@@ -1,0 +1,6 @@
+{
+  "source": "users-module",
+  "schemas": {
+    "users": "tenant_a"
+  }
+}

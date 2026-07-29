@@ -1,0 +1,6 @@
+%syntax-version=1.0.0
+%project=my-app
+%uri=my-app
+
+schemas/app/schema 2024-01-01T00:00:00Z Dev <dev@example.com> # add app schema
+schemas/app/procedures/total_accounts [schemas/app/schema] 2024-01-01T00:00:01Z Dev <dev@example.com> # add total_accounts

@@ -42,6 +42,26 @@ export interface TranspileBundleOptions extends CreateBundleOptions {
    * opts in here.
    */
   transformControl?: (content: string, fileName: string) => string;
+  /**
+   * Give the transpiled bundle a new module identity: rewrites the manifest
+   * name, the plan `%project=`/`%uri=` headers, and the `.control` file name.
+   * Used to instance a source module under a consumer-chosen name (e.g.
+   * `users-module` applied as `tenant-users`), so registry attribution and
+   * dependency references land on the instance instead of the source.
+   */
+  renameModule?: string;
+}
+
+function renameProjectInPlan(plan: string, from: string, to: string): string {
+  return plan
+    .split('\n')
+    .map(line => {
+      const trimmed = line.trim();
+      if (trimmed === `%project=${from}`) return line.replace(`%project=${from}`, `%project=${to}`);
+      if (trimmed === `%uri=${from}`) return line.replace(`%uri=${from}`, `%uri=${to}`);
+      return line;
+    })
+    .join('\n');
 }
 
 /**
@@ -124,13 +144,24 @@ export function transpileBundle(
     return { name, dependencies, deploy, revert, verify, digest };
   });
 
-  const plan = renames.size > 0 ? renameInPlanContent(bundle.plan, renames) : bundle.plan;
+  let plan = renames.size > 0 ? renameInPlanContent(bundle.plan, renames) : bundle.plan;
+
+  const moduleName = options.renameModule ?? bundle.manifest.name;
+  if (options.renameModule && options.renameModule !== bundle.manifest.name) {
+    plan = renameProjectInPlan(plan, bundle.manifest.name, options.renameModule);
+  }
 
   let control = bundle.control;
   if (control && options.transformControl) {
     control = {
       fileName: control.fileName,
       content: options.transformControl(control.content, control.fileName)
+    };
+  }
+  if (control && options.renameModule && options.renameModule !== bundle.manifest.name) {
+    control = {
+      fileName: `${options.renameModule}.control`,
+      content: control.content
     };
   }
 
@@ -150,7 +181,7 @@ export function transpileBundle(
   return {
     manifest: {
       formatVersion: bundle.manifest.formatVersion,
-      name: bundle.manifest.name,
+      name: moduleName,
       createdWith: options.createdWith ?? '@pgpmjs/core',
       changeCount: changes.length,
       deployOrder,

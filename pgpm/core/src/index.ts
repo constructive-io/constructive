@@ -17,6 +17,7 @@ export * from './core/boilerplate-scanner';
 // Re-export the module AST layer (moved to the @pgpmjs/ast leaf package)
 export * from '@pgpmjs/ast/files';
 export * from '@pgpmjs/ast/module';
+export * from './apply';
 export * from './bundle';
 export * from './refactor';
 export { cleanSql } from './migrate/clean';

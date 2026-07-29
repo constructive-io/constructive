@@ -6,9 +6,12 @@ import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import {PgConfig } from 'pg-env';
 
+import { resolveEffectiveModulePath } from '../apply/materialize';
+import { hasApplySpec } from '../apply/apply-spec';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmMigrate } from '../migrate/client';
 import { packageModule } from '../packaging/package';
+import { resolveExtensionDependencies } from '../resolution/deps';
 
 interface Extensions {
   resolved: string[];
@@ -46,10 +49,13 @@ export const deployProject = async (
   }
 
   const modulePath = path.resolve(pkg.workspacePath!, modules[name].path);
-  const moduleProject = new PgpmPackage(modulePath, { extensionsDir: pkg.extensionsDir });
 
   log.info(`📦 Resolving dependencies for ${name}...`);
-  const extensions: Extensions = moduleProject.getModuleExtensions();
+  // Proxy (apply-spec) modules have no pgpm.plan, so resolve straight off the
+  // workspace module map instead of instantiating a module-rooted package.
+  const extensions: Extensions = hasApplySpec(modulePath)
+    ? resolveExtensionDependencies(name, modules)
+    : new PgpmPackage(modulePath, { extensionsDir: pkg.extensionsDir }).getModuleExtensions();
 
   const pgPool = getPgPool({ ...opts.pg, database });
 
@@ -63,9 +69,18 @@ export const deployProject = async (
         log.debug(`> ${msg}`);
         await pgPool.query(msg);
       } else {
-        const modulePath = resolve(pkg.workspacePath!, modules[extension].path);
+        const sourcePath = resolve(pkg.workspacePath!, modules[extension].path);
+        const modulePath = await resolveEffectiveModulePath(
+          extension,
+          sourcePath,
+          modules,
+          pkg.workspacePath!
+        );
         log.info(`📂 Deploying local module: ${extension}`);
         log.debug(`→ Path: ${modulePath}`);
+        if (modulePath !== sourcePath) {
+          log.info(`🔁 Applying transpiled module (spec in ${sourcePath})`);
+        }
 
         if (mergedOpts.deployment.fast) {
           // Use fast deployment strategy

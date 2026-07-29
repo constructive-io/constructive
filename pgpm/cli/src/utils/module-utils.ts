@@ -17,8 +17,9 @@ export async function selectPackage(
   log?: Logger
 ): Promise<string | undefined> {
   const pkg = new PgpmPackage(cwd);
-  const modules = await pkg.getModules();
-  const moduleNames = modules.map(mod => mod.getModuleName());
+  // The module map includes both control-file modules and apply-spec proxy
+  // modules (pgpm.apply.json), so all deployable names are offered.
+  const moduleNames = Object.keys(pkg.getModuleMap()).sort();
 
   // Check if any modules exist
   if (!moduleNames.length) {
