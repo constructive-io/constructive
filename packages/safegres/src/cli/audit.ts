@@ -57,6 +57,12 @@ Exposure (what the score is computed against):
                            them become unscored internal advisories
   --exposed-only           Hide internal (non-exposed) findings from output
 
+Call graph (unscored; human review):
+  --call-graph             Analyze the functions reachable from the exposed entry
+                           points and list trust boundaries: SECURITY DEFINER hops,
+                           RLS-bypass paths, auth-context mutations, internal-table
+                           reach, and opaque (dynamic SQL) nodes
+
 Audit options:
   --schemas <csv>          Limit to these schemas (default: all non-system)
   --exclude-schemas <csv>  Skip these schemas
@@ -97,6 +103,7 @@ export default async (
     includeRoles: csvList(argv.roles),
     excludeRoles: csvList(argv['exclude-roles']),
     skipAstChecks: argv['skip-ast'] === true,
+    callGraph: argv['call-graph'] === true,
     exposure: exposureSchemas
       ? { ...config.exposure, schemas: exposureSchemas }
       : undefined,

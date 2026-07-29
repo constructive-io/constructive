@@ -1,6 +1,7 @@
 import yanse from 'yanse';
 
 import type { Finding, Report, Severity } from '../types';
+import { renderCallGraph } from './callgraph';
 
 const SEV_LABEL: Record<Severity, string> = {
   critical: 'CRIT',
@@ -85,6 +86,9 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 
   // --summary: score + counts only, no per-finding lines.
   if (options.summary) {
+    if (report.callGraph) {
+      lines.push('', renderCallGraph(report.callGraph, { color: colorEnabled, summary: true }));
+    }
     return lines.join('\n');
   }
   lines.push('');
@@ -121,6 +125,10 @@ export function renderPretty(report: Report, options: RenderPrettyOptions = {}):
 
   if (findings.length === 0) {
     lines.push('no findings.');
+  }
+
+  if (report.callGraph) {
+    lines.push('', renderCallGraph(report.callGraph, { color: colorEnabled }));
   }
 
   return lines.join('\n');

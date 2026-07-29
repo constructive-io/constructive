@@ -11,6 +11,15 @@ export {
   type PgAstNode,
   type PolicyExpression,
   PolicyParseError} from './ast/parse';
+export type {
+  CallGraphEdge,
+  CallGraphNode,
+  CallGraphOptions,
+  CallGraphReport,
+  ChecklistCode,
+  ChecklistItem
+} from './callgraph/graph';
+export { buildCallGraph } from './callgraph/graph';
 export type { RoleTrustOptions } from './checks/role-trust';
 export {
   checkPublicGrants,
@@ -46,6 +55,8 @@ export type {
 } from './config/types';
 export type { ResolvedExposure } from './pg/exposure';
 export { resolveConstructiveExposure, resolveExposure, UNKNOWN_EXPOSURE } from './pg/exposure';
+export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from './pg/functions';
+export { introspectFunctions } from './pg/functions';
 export {
   type IntrospectOptions,
   introspectTables,
@@ -56,6 +67,7 @@ export {
   type TableSnapshot
 } from './pg/introspect';
 export { listAuditableRoles, resolveRoles } from './pg/roles';
+export { renderCallGraph } from './report/callgraph';
 export { renderJson } from './report/json';
 export { renderPretty } from './report/pretty';
 export type { RuleMeta } from './rules/registry';

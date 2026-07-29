@@ -4,6 +4,7 @@
  * Ingests a catalog snapshot, runs every check, and returns a structured report.
  */
 
+import { buildCallGraph } from '../callgraph/graph';
 import {
   checkSessionUserGating,
   checkTriviallyPermissive,
@@ -29,6 +30,7 @@ import {
 import { allAstRulesDisabled, applyRulesToFindings, matchTablePattern, resolveRules, rulesForTable } from '../config/resolve';
 import type { ExposureConfig, SafegresConfig } from '../config/types';
 import { resolveExposure } from '../pg/exposure';
+import { introspectFunctions } from '../pg/functions';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
@@ -53,6 +55,12 @@ export interface AuditOptions extends IntrospectOptions {
    * Findings on non-exposed schemas contribute nothing to the score.
    */
   exposure?: ExposureConfig;
+  /**
+   * Build the unscored call-graph audit: trust boundaries (SECURITY DEFINER
+   * hops, RLS-bypass paths, auth-context mutations) reachable from the
+   * exposed entry points. Adds `report.callGraph`.
+   */
+  callGraph?: boolean;
   /**
    * Merged safegres configuration (rules, overrides, scoring). Rule settings
    * filter and retune findings; scoring settings drive the report score.
@@ -173,7 +181,7 @@ export async function audit(
     totalTables: snapshot.length
   };
 
-  return {
+  const report: Report = {
     version: PKG_VERSION,
     generatedAt: new Date().toISOString(),
     summary: summarize(findings),
@@ -184,6 +192,23 @@ export async function audit(
     }),
     exposure: exposureReport
   };
+
+  if (options.callGraph) {
+    const functions = await introspectFunctions(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas
+    });
+    report.callGraph = await buildCallGraph({
+      functions,
+      tables: snapshot,
+      exposedSchemas: exposure.known ? exposure.schemas : undefined,
+      apiRoles: exposure.roles && exposure.roles.length > 0
+        ? exposure.roles
+        : ['anonymous', 'authenticated']
+    });
+  }
+
+  return report;
 }
 
 async function auditTableAst(
