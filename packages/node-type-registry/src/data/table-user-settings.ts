@@ -5,7 +5,15 @@ export const TableUserSettings: NodeTypeDefinition = {
   slug: 'table_user_settings',
   category: 'data',
   display_name: 'User Settings',
-  description: 'Creates a user settings table for user-specific configuration with owner-based access control.',
-  parameter_schema: { type: 'object', properties: {} },
-  tags: ['template', 'settings', 'ownership', 'schema']
+  description: 'Creates a user settings table for user-specific configuration. Uses AuthzDirectOwner for access control.',
+  parameter_schema: {
+    type: 'object',
+    properties: {}
+  },
+  tags: [
+    'template',
+    'settings',
+    'ownership',
+    'schema'
+  ]
 };

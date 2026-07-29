@@ -1,5 +1,17 @@
 import type { ModulePreset } from './types';
 
+/**
+ * `b2b` — `auth:hardened` plus orgs, invites, permissions, levels,
+ * profiles, and hierarchy. The full multi-tenant / B2B SaaS shape.
+ *
+ * Installs both app-scoped AND org-scoped instances of the membership,
+ * permission, limit, level, profile, and invite modules. `hierarchy_module`
+ * at the org scope enables nested org/team structures.
+ *
+ * This is a large install — every B2B concept Constructive ships. Don't
+ * reach for it until you actually need orgs; moving from `auth:hardened`
+ * to `b2b` later is a provisioning step, not a schema rewrite.
+ */
 export const PresetB2b: ModulePreset = {
   name: 'b2b',
   display_name: 'B2B SaaS (orgs + invites + permissions)',

@@ -1,5 +1,17 @@
 import type { ModulePreset } from './types';
 
+/**
+ * `auth:passkey` — `auth:email` plus WebAuthn / passkeys.
+ *
+ * Adds `webauthn_credentials_module` (stores each user's registered public
+ * keys and credential IDs), `webauthn_auth_module` (the auth-time challenge
+ * storage + flow), and `session_secrets_module` (where the one-time
+ * challenge nonces live). The generator then emits WebAuthn registration
+ * and assertion procedures.
+ *
+ * Password flows stay on by default as a recovery path; toggle them off in
+ * `app_settings_auth` if you want strictly-passkey.
+ */
 export const PresetAuthPasskey: ModulePreset = {
   name: 'auth:passkey',
   display_name: 'Passkeys (WebAuthn)',

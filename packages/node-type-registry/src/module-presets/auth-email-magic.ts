@@ -1,5 +1,18 @@
 import type { ModulePreset } from './types';
 
+/**
+ * `auth:email+magic` — `auth:email` plus passwordless email flows.
+ *
+ * Adds `session_secrets_module`, which is where one-time nonces for magic
+ * links and email OTPs are stored. Once installed, the `user_auth_module`
+ * emits `sign_up_magic_link`, `sign_in_magic_link`, and `sign_in_email_otp`
+ * procedures (gated on the equivalent `allow_*` toggles in
+ * `app_settings_auth`).
+ *
+ * Choose this over `auth:email` when you want users to be able to log in
+ * without ever setting a password — but still only over email (no SMS, no
+ * SSO).
+ */
 export const PresetAuthEmailMagic: ModulePreset = {
   name: 'auth:email+magic',
   display_name: 'Email + Magic Link / OTP',

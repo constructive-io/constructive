@@ -1,5 +1,23 @@
 import type { ModulePreset } from './types';
 
+/**
+ * `auth:sso` — `auth:email` plus OAuth / OpenID Connect sign-in.
+ *
+ * Adds `connected_accounts_module` (the junction table mapping a user to
+ * `(provider, external_id)`) and `identity_providers_module` (the provider
+ * config: URLs, client_id, encrypted client_secret, scopes, PKCE/nonce
+ * knobs). The generator then emits `sign_in_identity` / `sign_up_identity`
+ * procedures which rely on `internal_secrets_module` to decrypt the client
+ * secret at auth time.
+ *
+ * Password fallback stays on by default (break-glass for admins); flip the
+ * `allow_password_sign_*` toggles off in `app_settings_auth` for strictly
+ * SSO-only.
+ *
+ * Note: `emails_module` is still required — the `user_auth_module` insert
+ * trigger hard-requires it today. A pure SSO-only install without emails
+ * is a separate refactor.
+ */
 export const PresetAuthSso: ModulePreset = {
   name: 'auth:sso',
   display_name: 'OAuth / OpenID Connect',

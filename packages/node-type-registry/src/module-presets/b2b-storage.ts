@@ -1,8 +1,7 @@
 import type { ModulePreset } from './types';
 
 /**
- * `b2b:storage` — the full B2B SaaS stack (orgs + invites + permissions)
- * plus `storage_module` for file uploads.
+ * `b2b:storage` — everything in `b2b` plus `storage_module` for file uploads.
  *
  * This is the common shape for B2B SaaS apps that need file upload
  * infrastructure tied to their org/workspace structure. The storage module
@@ -15,10 +14,10 @@ import type { ModulePreset } from './types';
 export const PresetB2bStorage: ModulePreset = {
   name: 'b2b:storage',
   display_name: 'B2B SaaS + File Storage',
-  summary: 'Orgs + invites + permissions + file upload infrastructure (buckets, files, RLS).',
+  summary: '`b2b` + file upload infrastructure (buckets, files, RLS).',
   description:
-    'Everything in `auth:hardened`, plus orgs + invites + permissions + levels + profiles + ' +
-    'hierarchy, plus `storage_module` for file uploads. The storage module creates ' +
+    'Everything in `b2b` (auth:hardened + orgs + invites + permissions + levels + profiles + ' +
+    'hierarchy), plus `storage_module` for file uploads. The storage module creates ' +
     '`app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
     'AuthzAppMembership for member access, AuthzDirectOwner for uploader-only modify/delete. ' +
     'Entity-type provisioning with a non-empty `storage` array adds per-scope storage tables ' +
@@ -30,7 +29,8 @@ export const PresetB2bStorage: ModulePreset = {
     'Apps that need per-entity-type file storage (e.g., project files, team assets)'
   ],
   not_for: [
-    'Single-tenant consumer apps — use `auth:hardened` and add storage separately'
+    'Single-tenant consumer apps — use `auth:email` or `auth:hardened` and add storage separately',
+    'Apps without file upload needs — use `b2b` to avoid the storage table overhead'
   ],
   modules: [
     'users_module',

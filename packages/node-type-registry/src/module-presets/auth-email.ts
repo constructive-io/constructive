@@ -1,5 +1,24 @@
 import type { ModulePreset } from './types';
 
+/**
+ * `auth:email` — email + password sign_up/sign_in. No orgs, no SSO, no SMS,
+ * no passkeys, no rate limits.
+ *
+ * This is the "working consumer login in one step" preset. It installs the
+ * `user_auth_module` and all the tables its insert trigger hard-requires,
+ * giving you the standard procedures: `sign_up`, `sign_in`, `sign_out`,
+ * `set_password`, `reset_password`, `forgot_password`, `verify_email`,
+ * `delete_account`, `my_sessions`, API-key CRUD. Nothing more.
+ *
+ * Includes permissions, limits, and levels modules (app scope) because
+ * the app-scoped memberships module has NOT NULL foreign keys to the
+ * tables they create (grants, caps, levels).
+ *
+ * It deliberately excludes rate limits, connected accounts / identity
+ * providers (OAuth), WebAuthn (passkeys), phone numbers (SMS), invites,
+ * and org-scoped memberships. Bolt those on by moving to a richer preset
+ * (`auth:hardened`, `b2b`) when you actually need them.
+ */
 export const PresetAuthEmail: ModulePreset = {
   name: 'auth:email',
   display_name: 'Email + Password',
