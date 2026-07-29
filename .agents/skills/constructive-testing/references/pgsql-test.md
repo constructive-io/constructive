@@ -211,4 +211,4 @@ Related skills (separate from this skill):
 - **`constructive-testing`** — Framework selection guide: which testing framework to use (pgsql-test vs graphile-test vs graphql-test vs server-test) and anti-patterns to avoid
 - `pgpm` (`references/testing.md`) — General pgpm test setup and seed adapters
 - `drizzle-orm-test` — Testing with Drizzle ORM (uses pgsql-test utilities)
-- `constructive-security` — Safegres authorization policies that RLS tests validate
+- `constructive-security` — Constructive Authz authorization policies that RLS tests validate
