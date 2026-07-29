@@ -95,7 +95,7 @@ function computeDensityScore(
 
   // Meta findings (e.g. W1) are advisories about the audit itself — the
   // unknown-exposure cap is their penalty, not weighted points.
-  const scorable = findings.filter((f) => f.exposed !== false && f.category !== 'meta');
+  const scorable = findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
 
   const byRule = new Map<string, { count: number; points: number }>();
   for (const f of scorable) {
@@ -160,7 +160,7 @@ function computeWeightedScore(
   const bands = { ...DEFAULT_GRADE_BANDS, ...(config.gradeBands ?? {}) };
   const floor = config.floorOnCritical === undefined ? 'C' : config.floorOnCritical;
 
-  const scorable = findings.filter((f) => f.exposed !== false && f.category !== 'meta');
+  const scorable = findings.filter((f) => f.exposed !== false && !f.acknowledged && f.category !== 'meta');
 
   const byRule = new Map<string, { count: number; points: number }>();
   for (const f of scorable) {

@@ -46,6 +46,22 @@ export interface ExposureConfig {
   roles?: string[];
 }
 
+/**
+ * Declared-public surface: intent, stated in config. Open reads on declared
+ * tables are acknowledged — reported as info and excluded from the score.
+ * Open reads anywhere else stay findings, even in `*_public`-named schemas;
+ * naming is never treated as intent.
+ */
+export interface PublicConfig {
+  /**
+   * Glob patterns matched against the qualified `schema.table` name
+   * (`*` matches any run of characters) for tables whose open SELECT
+   * (`USING (true)`) policies are by design, e.g. reference/pricing tables
+   * or a deliberate public directory.
+   */
+  read?: string[];
+}
+
 export interface ScoringConfig {
   /**
    * Scoring model:
@@ -97,6 +113,8 @@ export interface SafegresConfig {
   extends?: string | string[];
   /** The exposed API surface — what the score is computed against. */
   exposure?: ExposureConfig;
+  /** Tables whose open reads are deliberate (declared public surface). */
+  public?: PublicConfig;
   schemas?: string[];
   excludeSchemas?: string[];
   roles?: string[];

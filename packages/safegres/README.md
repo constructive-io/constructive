@@ -71,6 +71,26 @@ A database-wide score is meaningless if most of the database isn't reachable thr
 
 CLI: `--exposure-schemas <csv>`, `--exposed-only`. The `safegres:constructive` preset sets `exposure.resolver: "constructive"` so the surface is discovered automatically from the routing plane (including API roles from `role_name`/`anon_role`).
 
+## Declared public surface
+
+Some open reads are deliberate — pricing tables, reference data, a public user directory. Declare them and safegres treats them as intent instead of findings:
+
+```jsonc
+{
+  "public": {
+    "read": [
+      "app_public.plans*",        // schema.table globs
+      "app_public.event_types",
+      "app_public.users"          // deliberate public directory
+    ]
+  }
+}
+```
+
+- An open SELECT policy (`USING (true)` — rule A8) on a declared table is **acknowledged**: reported as info, excluded from the score.
+- An open read on any *undeclared* table stays a scored finding — even in a `*_public`-named schema. Naming is never treated as intent; the config declaration is.
+- `safegres doctor` warns about stale `public.read` patterns that no longer match any table.
+
 ## Configuration
 
 safegres is configurable like a linter. Config is discovered by walking up from the current directory: `safegres.config.{ts,js,mjs,cjs}`, `.safegresrc{,.json,.yaml,.yml,.js}`, `safegres.json`, or a `"safegres"` key in package.json (via [confstash](https://github.com/constructive-io/dev-utils/tree/main/packages/confstash)).

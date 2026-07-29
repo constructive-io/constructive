@@ -39,6 +39,12 @@ export interface Finding {
    * reachable).
    */
   exposed?: boolean;
+  /**
+   * The finding is acknowledged by config as intentional (e.g. an open read
+   * on a table declared in `public.read`) — reported, but excluded from the
+   * score.
+   */
+  acknowledged?: boolean;
   /** Schema-qualified location, where applicable. */
   schema?: string;
   table?: string;
