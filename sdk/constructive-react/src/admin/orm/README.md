@@ -34,7 +34,11 @@ const db = createClient({
 | `appPermissionDefaultPermission` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
 | `orgAdminGrant` | findMany, findOne, create, update, delete |
+| `orgChartEdge` | findMany, findOne, create, update, delete |
+| `orgChartEdgeGrant` | findMany, findOne, create, update, delete |
 | `orgClaimedInvite` | findMany, findOne, create, update, delete |
+| `orgGetManagersRecord` | findMany, findOne, create, update, delete |
+| `orgGetSubordinatesRecord` | findMany, findOne, create, update, delete |
 | `orgGrant` | findMany, findOne, create, update, delete |
 | `orgInvite` | findMany, findOne, create, update, delete |
 | `orgMember` | findMany, findOne, create, update, delete |
@@ -507,6 +511,79 @@ const updated = await db.orgAdminGrant.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.orgAdminGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.orgChartEdge`
+
+CRUD operations for OrgChartEdge records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `childId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `entityId` | UUID | Yes |
+| `id` | UUID | No |
+| `parentId` | UUID | Yes |
+| `positionLevel` | Int | Yes |
+| `positionTitle` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all orgChartEdge records
+const items = await db.orgChartEdge.findMany({ select: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.orgChartEdge.findOne({ id: '<UUID>', select: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.orgChartEdge.create({ data: { childId: '<UUID>', entityId: '<UUID>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgChartEdge.update({ where: { id: '<UUID>' }, data: { childId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgChartEdge.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgChartEdgeGrant`
+
+CRUD operations for OrgChartEdgeGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `childId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `entityId` | UUID | Yes |
+| `grantorId` | UUID | Yes |
+| `id` | UUID | No |
+| `isGrant` | Boolean | Yes |
+| `parentId` | UUID | Yes |
+| `positionLevel` | Int | Yes |
+| `positionTitle` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all orgChartEdgeGrant records
+const items = await db.orgChartEdgeGrant.findMany({ select: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } }).execute();
+
+// Get one by id
+const item = await db.orgChartEdgeGrant.findOne({ id: '<UUID>', select: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } }).execute();
+
+// Create
+const created = await db.orgChartEdgeGrant.create({ data: { childId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgChartEdgeGrant.update({ where: { id: '<UUID>' }, data: { childId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgChartEdgeGrant.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.orgClaimedInvite`
 
 CRUD operations for OrgClaimedInvite records.
@@ -540,6 +617,66 @@ const updated = await db.orgClaimedInvite.update({ where: { id: '<UUID>' }, data
 
 // Delete
 const deleted = await db.orgClaimedInvite.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgGetManagersRecord`
+
+CRUD operations for OrgGetManagersRecord records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `depth` | Int | Yes |
+| `userId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all orgGetManagersRecord records
+const items = await db.orgGetManagersRecord.findMany({ select: { depth: true, userId: true } }).execute();
+
+// Get one by id
+const item = await db.orgGetManagersRecord.findOne({ id: '<UUID>', select: { depth: true, userId: true } }).execute();
+
+// Create
+const created = await db.orgGetManagersRecord.create({ data: { depth: '<Int>', userId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgGetManagersRecord.update({ where: { id: '<UUID>' }, data: { depth: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgGetManagersRecord.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgGetSubordinatesRecord`
+
+CRUD operations for OrgGetSubordinatesRecord records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `depth` | Int | Yes |
+| `userId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all orgGetSubordinatesRecord records
+const items = await db.orgGetSubordinatesRecord.findMany({ select: { depth: true, userId: true } }).execute();
+
+// Get one by id
+const item = await db.orgGetSubordinatesRecord.findOne({ id: '<UUID>', select: { depth: true, userId: true } }).execute();
+
+// Create
+const created = await db.orgGetSubordinatesRecord.create({ data: { depth: '<Int>', userId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgGetSubordinatesRecord.update({ where: { id: '<UUID>' }, data: { depth: '<Int>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgGetSubordinatesRecord.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.orgGrant`
@@ -1048,6 +1185,24 @@ appPermissionsGetPaddedMask
 
 ```typescript
 const result = await db.query.appPermissionsGetPaddedMask({ mask: '<BitString>' }).execute();
+```
+
+### `db.query.orgIsManagerOf`
+
+orgIsManagerOf
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `managerId` | UUID |
+  | `maxDepth` | Int |
+  | `targetEntityId` | UUID |
+  | `userId` | UUID |
+
+```typescript
+const result = await db.query.orgIsManagerOf({ managerId: '<UUID>', maxDepth: '<Int>', targetEntityId: '<UUID>', userId: '<UUID>' }).execute();
 ```
 
 ### `db.query.orgPermissionsGetByMask`

@@ -999,6 +999,8 @@ export type PlatformFunctionInvocationOrderBy =
   | 'COMPLETED_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DEFINITION_SCOPE_ASC'
   | 'DEFINITION_SCOPE_DESC'
   | 'DURATION_MS_ASC'
@@ -5616,6 +5618,8 @@ export interface PlatformFunctionInvocationFilter {
   completedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `definitionScope` field. */
   definitionScope?: StringFilter;
   /** Filter by the object’s `durationMs` field. */
@@ -5661,6 +5665,8 @@ export interface PlatformFunctionInvocationInput {
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Database this invocation is attributed to (usage/billing attribution) */
+  databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
@@ -5702,6 +5708,8 @@ export interface PlatformFunctionInvocationPatch {
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Database this invocation is attributed to (usage/billing attribution) */
+  databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */

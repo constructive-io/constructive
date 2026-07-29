@@ -18,7 +18,11 @@ import type {
   AppPermissionDefaultPermission,
   MembershipType,
   OrgAdminGrant,
+  OrgChartEdge,
+  OrgChartEdgeGrant,
   OrgClaimedInvite,
+  OrgGetManagersRecord,
+  OrgGetSubordinatesRecord,
   OrgGrant,
   OrgInvite,
   OrgMember,
@@ -298,6 +302,50 @@ export type OrgAdminGrantOrderBy =
   | 'IS_GRANT_ASC'
   | 'IS_GRANT_DESC'
   | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `OrgChartEdgeGrant`. */
+export type OrgChartEdgeGrantOrderBy =
+  | 'CHILD_ID_ASC'
+  | 'CHILD_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'GRANTOR_ID_ASC'
+  | 'GRANTOR_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'NATURAL'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'POSITION_LEVEL_ASC'
+  | 'POSITION_LEVEL_DESC'
+  | 'POSITION_TITLE_ASC'
+  | 'POSITION_TITLE_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `OrgChartEdge`. */
+export type OrgChartEdgeOrderBy =
+  | 'CHILD_ID_ASC'
+  | 'CHILD_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'POSITION_LEVEL_ASC'
+  | 'POSITION_LEVEL_DESC'
+  | 'POSITION_TITLE_ASC'
+  | 'POSITION_TITLE_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'UPDATED_AT_ASC'
@@ -1358,6 +1406,16 @@ export interface CreateOrgAdminGrantInput {
   /** The `OrgAdminGrant` to be created by this mutation. */
   orgAdminGrant: OrgAdminGrantInput;
 }
+export interface CreateOrgChartEdgeGrantInput {
+  clientMutationId?: string;
+  /** The `OrgChartEdgeGrant` to be created by this mutation. */
+  orgChartEdgeGrant: OrgChartEdgeGrantInput;
+}
+export interface CreateOrgChartEdgeInput {
+  clientMutationId?: string;
+  /** The `OrgChartEdge` to be created by this mutation. */
+  orgChartEdge: OrgChartEdgeInput;
+}
 export interface CreateOrgClaimedInviteInput {
   clientMutationId?: string;
   /** The `OrgClaimedInvite` to be created by this mutation. */
@@ -1473,6 +1531,14 @@ export interface DeleteMembershipTypeInput {
   id: number;
 }
 export interface DeleteOrgAdminGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgChartEdgeGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgChartEdgeInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1626,6 +1692,130 @@ export interface OrgAdminGrantPatch {
   id?: string;
   /** True to grant admin, false to revoke admin */
   isGrant?: boolean;
+  updatedAt?: string;
+}
+/** A filter to be used against `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgChartEdgeFilter {
+  /** Checks for all expressions in this list. */
+  and?: OrgChartEdgeFilter[];
+  /** Filter by the object’s `childId` field. */
+  childId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: OrgChartEdgeFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgChartEdgeFilter[];
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `positionLevel` field. */
+  positionLevel?: IntFilter;
+  /** Filter by the object’s `positionTitle` field. */
+  positionTitle?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgChartEdgeGrantFilter {
+  /** Checks for all expressions in this list. */
+  and?: OrgChartEdgeGrantFilter[];
+  /** Filter by the object’s `childId` field. */
+  childId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Negates the expression. */
+  not?: OrgChartEdgeGrantFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgChartEdgeGrantFilter[];
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `positionLevel` field. */
+  positionLevel?: IntFilter;
+  /** Filter by the object’s `positionTitle` field. */
+  positionTitle?: StringFilter;
+}
+/** An input for mutations affecting `OrgChartEdgeGrant` */
+export interface OrgChartEdgeGrantInput {
+  /** User ID of the subordinate being placed in the hierarchy */
+  childId: string;
+  /** Timestamp when this grant or revocation was recorded */
+  createdAt?: string;
+  /** Organization this grant applies to */
+  entityId: string;
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
+  grantorId?: string;
+  id?: string;
+  /** TRUE to add/update the edge, FALSE to remove it */
+  isGrant?: boolean;
+  /** User ID of the manager being assigned; NULL for top-level positions */
+  parentId?: string;
+  /** Numeric seniority level being assigned in this grant */
+  positionLevel?: number;
+  /** Job title or role name being assigned in this grant */
+  positionTitle?: string;
+}
+/** Represents an update to a `OrgChartEdgeGrant`. Fields that are set will be updated. */
+export interface OrgChartEdgeGrantPatch {
+  /** User ID of the subordinate being placed in the hierarchy */
+  childId?: string;
+  /** Timestamp when this grant or revocation was recorded */
+  createdAt?: string;
+  /** Organization this grant applies to */
+  entityId?: string;
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
+  grantorId?: string;
+  id?: string;
+  /** TRUE to add/update the edge, FALSE to remove it */
+  isGrant?: boolean;
+  /** User ID of the manager being assigned; NULL for top-level positions */
+  parentId?: string;
+  /** Numeric seniority level being assigned in this grant */
+  positionLevel?: number;
+  /** Job title or role name being assigned in this grant */
+  positionTitle?: string;
+}
+/** An input for mutations affecting `OrgChartEdge` */
+export interface OrgChartEdgeInput {
+  /** User ID of the subordinate (employee) in this reporting relationship */
+  childId: string;
+  createdAt?: string;
+  /** Organization this hierarchy edge belongs to */
+  entityId: string;
+  id?: string;
+  /** User ID of the manager; NULL indicates a top-level position with no direct report */
+  parentId?: string;
+  /** Numeric seniority level for this position (higher = more senior) */
+  positionLevel?: number;
+  /** Job title or role name for this position in the org chart */
+  positionTitle?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `OrgChartEdge`. Fields that are set will be updated. */
+export interface OrgChartEdgePatch {
+  /** User ID of the subordinate (employee) in this reporting relationship */
+  childId?: string;
+  createdAt?: string;
+  /** Organization this hierarchy edge belongs to */
+  entityId?: string;
+  id?: string;
+  /** User ID of the manager; NULL indicates a top-level position with no direct report */
+  parentId?: string;
+  /** Numeric seniority level for this position (higher = more senior) */
+  positionLevel?: number;
+  /** Job title or role name for this position in the org chart */
+  positionTitle?: string;
   updatedAt?: string;
 }
 /** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
@@ -2547,6 +2737,18 @@ export interface UpdateOrgAdminGrantInput {
   /** An object where the defined keys will be set on the `OrgAdminGrant` being updated. */
   orgAdminGrantPatch: OrgAdminGrantPatch;
 }
+export interface UpdateOrgChartEdgeGrantInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgChartEdgeGrant` being updated. */
+  orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch;
+}
+export interface UpdateOrgChartEdgeInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgChartEdge` being updated. */
+  orgChartEdgePatch: OrgChartEdgePatch;
+}
 export interface UpdateOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
@@ -2720,10 +2922,38 @@ export interface OrgAdminGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `OrgChartEdgeGrant` values. */
+export interface OrgChartEdgeGrantConnection {
+  edges: OrgChartEdgeGrantEdge[];
+  nodes: OrgChartEdgeGrant[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgChartEdge` values. */
+export interface OrgChartEdgeConnection {
+  edges: OrgChartEdgeEdge[];
+  nodes: OrgChartEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgClaimedInvite` values. */
 export interface OrgClaimedInviteConnection {
   edges: OrgClaimedInviteEdge[];
   nodes: OrgClaimedInvite[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgGetManagersRecord` values. */
+export interface OrgGetManagersConnection {
+  edges: OrgGetManagersEdge[];
+  nodes: OrgGetManagersRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgGetSubordinatesRecord` values. */
+export interface OrgGetSubordinatesConnection {
+  edges: OrgGetSubordinatesEdge[];
+  nodes: OrgGetSubordinatesRecord[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2889,6 +3119,18 @@ export interface CreateOrgAdminGrantPayload {
   orgAdminGrant?: OrgAdminGrant | null;
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
 }
+export interface CreateOrgChartEdgePayload {
+  clientMutationId?: string | null;
+  /** The `OrgChartEdge` that was created by this mutation. */
+  orgChartEdge?: OrgChartEdge | null;
+  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface CreateOrgChartEdgeGrantPayload {
+  clientMutationId?: string | null;
+  /** The `OrgChartEdgeGrant` that was created by this mutation. */
+  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
+  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
+}
 export interface CreateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was created by this mutation. */
@@ -3044,6 +3286,18 @@ export interface DeleteOrgAdminGrantPayload {
   /** The `OrgAdminGrant` that was deleted by this mutation. */
   orgAdminGrant?: OrgAdminGrant | null;
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
+}
+export interface DeleteOrgChartEdgePayload {
+  clientMutationId?: string | null;
+  /** The `OrgChartEdge` that was deleted by this mutation. */
+  orgChartEdge?: OrgChartEdge | null;
+  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface DeleteOrgChartEdgeGrantPayload {
+  clientMutationId?: string | null;
+  /** The `OrgChartEdgeGrant` that was deleted by this mutation. */
+  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
+  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
 }
 export interface DeleteOrgClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -3222,6 +3476,18 @@ export interface UpdateOrgAdminGrantPayload {
   /** The `OrgAdminGrant` that was updated by this mutation. */
   orgAdminGrant?: OrgAdminGrant | null;
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
+}
+export interface UpdateOrgChartEdgePayload {
+  clientMutationId?: string | null;
+  /** The `OrgChartEdge` that was updated by this mutation. */
+  orgChartEdge?: OrgChartEdge | null;
+  orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface UpdateOrgChartEdgeGrantPayload {
+  clientMutationId?: string | null;
+  /** The `OrgChartEdgeGrant` that was updated by this mutation. */
+  orgChartEdgeGrant?: OrgChartEdgeGrant | null;
+  orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
 }
 export interface UpdateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -3414,11 +3680,35 @@ export interface OrgAdminGrantEdge {
   /** The `OrgAdminGrant` at the end of the edge. */
   node?: OrgAdminGrant | null;
 }
+/** A `OrgChartEdgeGrant` edge in the connection. */
+export interface OrgChartEdgeGrantEdge {
+  cursor?: string | null;
+  /** The `OrgChartEdgeGrant` at the end of the edge. */
+  node?: OrgChartEdgeGrant | null;
+}
+/** A `OrgChartEdge` edge in the connection. */
+export interface OrgChartEdgeEdge {
+  cursor?: string | null;
+  /** The `OrgChartEdge` at the end of the edge. */
+  node?: OrgChartEdge | null;
+}
 /** A `OrgClaimedInvite` edge in the connection. */
 export interface OrgClaimedInviteEdge {
   cursor?: string | null;
   /** The `OrgClaimedInvite` at the end of the edge. */
   node?: OrgClaimedInvite | null;
+}
+/** A `OrgGetManagersRecord` edge in the connection. */
+export interface OrgGetManagersEdge {
+  cursor?: string | null;
+  /** The `OrgGetManagersRecord` at the end of the edge. */
+  node?: OrgGetManagersRecord | null;
+}
+/** A `OrgGetSubordinatesRecord` edge in the connection. */
+export interface OrgGetSubordinatesEdge {
+  cursor?: string | null;
+  /** The `OrgGetSubordinatesRecord` at the end of the edge. */
+  node?: OrgGetSubordinatesRecord | null;
 }
 /** A `OrgGrant` edge in the connection. */
 export interface OrgGrantEdge {

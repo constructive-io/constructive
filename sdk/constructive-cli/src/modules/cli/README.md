@@ -232,8 +232,6 @@ CRUD operations for ApiSurfaceModule records.
 
 | Field | Type |
 |-------|------|
-| `apiModulesTableId` | UUID |
-| `apiModulesTableName` | String |
 | `apiName` | String |
 | `apiSchemasTableId` | UUID |
 | `apiSchemasTableName` | String |
@@ -258,7 +256,7 @@ CRUD operations for ApiSurfaceModule records.
 | `scope` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiModulesTableId`, `apiModulesTableName`, `apiName`, `apiSchemasTableId`, `apiSchemasTableName`, `apiSettingsTableId`, `apiSettingsTableName`, `apisTableId`, `apisTableName`, `catalogModuleId`, `corsSettingsTableId`, `corsSettingsTableName`, `defaultPermissions`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `provisions`, `publicSchemaName`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `apiSchemasTableId`, `apiSchemasTableName`, `apiSettingsTableId`, `apiSettingsTableName`, `apisTableId`, `apisTableName`, `catalogModuleId`, `corsSettingsTableId`, `corsSettingsTableName`, `defaultPermissions`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `provisions`, `publicSchemaName`, `schemaId`
 
 ### `app-module`
 
@@ -322,6 +320,7 @@ CRUD operations for BillingModule records.
 | `balancesTableId` | UUID |
 | `balancesTableName` | String |
 | `databaseId` | UUID |
+| `defaultMeterCatalog` | JSON |
 | `defaultPermissions` | String |
 | `id` | UUID |
 | `ledgerTableId` | UUID |
@@ -347,7 +346,7 @@ CRUD operations for BillingModule records.
 | `sweepExpiredSubscriptionsFunction` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiName`, `balancesTableId`, `balancesTableName`, `defaultPermissions`, `ledgerTableId`, `ledgerTableName`, `meterCreditsTableId`, `meterCreditsTableName`, `meterDefaultsTableId`, `meterDefaultsTableName`, `meterSourcesTableId`, `meterSourcesTableName`, `metersTableId`, `metersTableName`, `planSubscriptionsTableId`, `planSubscriptionsTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `recordUsageFunction`, `rollupUsageSummaryFunction`, `schemaId`, `sweepExpiredSubscriptionsFunction`
+**Optional create fields (backend defaults):** `apiName`, `balancesTableId`, `balancesTableName`, `defaultMeterCatalog`, `defaultPermissions`, `ledgerTableId`, `ledgerTableName`, `meterCreditsTableId`, `meterCreditsTableName`, `meterDefaultsTableId`, `meterDefaultsTableName`, `meterSourcesTableId`, `meterSourcesTableName`, `metersTableId`, `metersTableName`, `planSubscriptionsTableId`, `planSubscriptionsTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `recordUsageFunction`, `rollupUsageSummaryFunction`, `schemaId`, `sweepExpiredSubscriptionsFunction`
 
 ### `billing-provider-module`
 

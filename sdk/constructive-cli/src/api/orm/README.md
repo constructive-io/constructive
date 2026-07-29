@@ -22,7 +22,6 @@ const db = createClient({
 | Model | Operations |
 |-------|------------|
 | `api` | findMany, findOne, create, update, delete |
-| `apiModule` | findMany, findOne, create, update, delete |
 | `apiSchema` | findMany, findOne, create, update, delete |
 | `apiSetting` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
@@ -35,6 +34,7 @@ const db = createClient({
 | `defaultPrivilege` | findMany, findOne, create, update, delete |
 | `domain` | findMany, findOne, create, update, delete |
 | `domainEvent` | findMany, findOne, create, update, delete |
+| `domainType` | findMany, findOne, create, update, delete |
 | `domainVerification` | findMany, findOne, create, update, delete |
 | `embeddingChunk` | findMany, findOne, create, update, delete |
 | `enum` | findMany, findOne, create, update, delete |
@@ -50,7 +50,6 @@ const db = createClient({
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `partition` | findMany, findOne, create, update, delete |
 | `platformApi` | findMany, findOne, create, update, delete |
-| `platformApiModule` | findMany, findOne, create, update, delete |
 | `platformApiSchema` | findMany, findOne, create, update, delete |
 | `platformApiSetting` | findMany, findOne, create, update, delete |
 | `platformCorsSetting` | findMany, findOne, create, update, delete |
@@ -125,41 +124,6 @@ const updated = await db.api.update({ where: { id: '<UUID>' }, data: { anonRole:
 
 // Delete
 const deleted = await db.api.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.apiModule`
-
-CRUD operations for ApiModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `apiId` | UUID | Yes |
-| `createdAt` | Datetime | No |
-| `data` | JSON | Yes |
-| `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all apiModule records
-const items = await db.apiModule.findMany({ select: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.apiModule.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, data: true, databaseId: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.apiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.apiModule.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.apiModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.apiSchema`
@@ -638,6 +602,47 @@ const updated = await db.domainEvent.update({ where: { id: '<UUID>' }, data: { a
 
 // Delete
 const deleted = await db.domainEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.domainType`
+
+CRUD operations for DomainType records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `baseType` | JSON | Yes |
+| `category` | ObjectCategory | Yes |
+| `checkExpr` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+| `defaultExpr` | JSON | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `label` | String | Yes |
+| `name` | String | Yes |
+| `notNull` | Boolean | Yes |
+| `schemaId` | UUID | Yes |
+| `smartTags` | JSON | Yes |
+| `tags` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all domainType records
+const items = await db.domainType.findMany({ select: { baseType: true, category: true, checkExpr: true, databaseId: true, defaultExpr: true, description: true, id: true, label: true, name: true, notNull: true, schemaId: true, smartTags: true, tags: true } }).execute();
+
+// Get one by id
+const item = await db.domainType.findOne({ id: '<UUID>', select: { baseType: true, category: true, checkExpr: true, databaseId: true, defaultExpr: true, description: true, id: true, label: true, name: true, notNull: true, schemaId: true, smartTags: true, tags: true } }).execute();
+
+// Create
+const created = await db.domainType.create({ data: { baseType: '<JSON>', category: '<ObjectCategory>', checkExpr: '<JSON>', databaseId: '<UUID>', defaultExpr: '<JSON>', description: '<String>', label: '<String>', name: '<String>', notNull: '<Boolean>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.domainType.update({ where: { id: '<UUID>' }, data: { baseType: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.domainType.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.domainVerification`
@@ -1261,40 +1266,6 @@ const updated = await db.platformApi.update({ where: { id: '<UUID>' }, data: { a
 
 // Delete
 const deleted = await db.platformApi.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.platformApiModule`
-
-CRUD operations for PlatformApiModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `apiId` | UUID | Yes |
-| `createdAt` | Datetime | No |
-| `data` | JSON | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all platformApiModule records
-const items = await db.platformApiModule.findMany({ select: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.platformApiModule.findOne({ id: '<UUID>', select: { apiId: true, createdAt: true, data: true, id: true, name: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.platformApiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', name: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformApiModule.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformApiModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformApiSchema`
@@ -2274,6 +2245,7 @@ CRUD operations for Table records.
 | `partitioned` | Boolean | Yes |
 | `peoplestamps` | Boolean | Yes |
 | `pluralName` | String | Yes |
+| `principalstamps` | Boolean | Yes |
 | `schemaId` | UUID | Yes |
 | `singularName` | String | Yes |
 | `smartTags` | JSON | Yes |
@@ -2287,13 +2259,13 @@ CRUD operations for Table records.
 
 ```typescript
 // List all table records
-const items = await db.table.findMany({ select: { category: true, createdAt: true, databaseId: true, description: true, id: true, inheritsId: true, label: true, name: true, partitionKeyNames: true, partitionKeyTypes: true, partitionStrategy: true, partitioned: true, peoplestamps: true, pluralName: true, schemaId: true, singularName: true, smartTags: true, stepUp: true, tags: true, timestamps: true, updatedAt: true, useRls: true } }).execute();
+const items = await db.table.findMany({ select: { category: true, createdAt: true, databaseId: true, description: true, id: true, inheritsId: true, label: true, name: true, partitionKeyNames: true, partitionKeyTypes: true, partitionStrategy: true, partitioned: true, peoplestamps: true, pluralName: true, principalstamps: true, schemaId: true, singularName: true, smartTags: true, stepUp: true, tags: true, timestamps: true, updatedAt: true, useRls: true } }).execute();
 
 // Get one by id
-const item = await db.table.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, description: true, id: true, inheritsId: true, label: true, name: true, partitionKeyNames: true, partitionKeyTypes: true, partitionStrategy: true, partitioned: true, peoplestamps: true, pluralName: true, schemaId: true, singularName: true, smartTags: true, stepUp: true, tags: true, timestamps: true, updatedAt: true, useRls: true } }).execute();
+const item = await db.table.findOne({ id: '<UUID>', select: { category: true, createdAt: true, databaseId: true, description: true, id: true, inheritsId: true, label: true, name: true, partitionKeyNames: true, partitionKeyTypes: true, partitionStrategy: true, partitioned: true, peoplestamps: true, pluralName: true, principalstamps: true, schemaId: true, singularName: true, smartTags: true, stepUp: true, tags: true, timestamps: true, updatedAt: true, useRls: true } }).execute();
 
 // Create
-const created = await db.table.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', inheritsId: '<UUID>', label: '<String>', name: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', partitionStrategy: '<String>', partitioned: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', schemaId: '<UUID>', singularName: '<String>', smartTags: '<JSON>', stepUp: '<JSON>', tags: '<String>', timestamps: '<Boolean>', useRls: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.table.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', inheritsId: '<UUID>', label: '<String>', name: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', partitionStrategy: '<String>', partitioned: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', principalstamps: '<Boolean>', schemaId: '<UUID>', singularName: '<String>', smartTags: '<JSON>', stepUp: '<JSON>', tags: '<String>', timestamps: '<Boolean>', useRls: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.table.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute();
