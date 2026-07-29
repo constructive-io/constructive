@@ -11,6 +11,9 @@ import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 import yanse from 'yanse';
 
+import { resolveEffectiveModulePath } from '../../apply/materialize';
+import { hasApplySpec, readApplySpec } from '../../apply/apply-spec';
+import { APPLY_SPEC_FILE, ResolvedApplySpec } from '../../apply/types';
 import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '@pgpmjs/ast/files';
 import {
@@ -354,11 +357,50 @@ export class PgpmPackage {
     });
 
     // Parse the selected control files
-    return Array.from(selectedFiles.entries()).reduce<ModuleMap>((acc: ModuleMap, [moduleName, file]) => {
+    const moduleMap = Array.from(selectedFiles.entries()).reduce<ModuleMap>((acc: ModuleMap, [moduleName, file]) => {
       const module = parseControlFile(file, this.workspacePath!);
       acc[moduleName] = module;
       return acc;
     }, {});
+
+    return this.addApplyModules(moduleMap, packageDirs);
+  }
+
+  /**
+   * Discover apply-spec proxy modules (`pgpm.apply.json`) and synthesize
+   * module-map entries for them so they participate in dependency resolution
+   * by name like any other module. A proxy needs no `.control` or `pgpm.plan`;
+   * its `requires` default to the source module's requires. Control-file
+   * modules win name collisions.
+   */
+  private addApplyModules(moduleMap: ModuleMap, packageDirs: string[]): ModuleMap {
+    const specFiles = [...new Set(
+      packageDirs.flatMap(dir => glob.sync(globPattern(dir, `**/${APPLY_SPEC_FILE}`)))
+    )].filter(
+      (file: string) => !/node_modules/.test(file)
+    ).sort((a, b) => a.localeCompare(b));
+
+    for (const file of specFiles) {
+      let spec: ResolvedApplySpec;
+      try {
+        spec = readApplySpec(path.dirname(file));
+      } catch (err) {
+        console.warn(`Skipping invalid apply spec ${file}: ${err instanceof Error ? err.message : err}`);
+        continue;
+      }
+      const name = spec.name!;
+      if (moduleMap[name]) continue;
+      const source = moduleMap[spec.source.module];
+      moduleMap[name] = {
+        path: path
+          .dirname(path.relative(this.workspacePath!, file))
+          .replace(/\\/g, '/'),
+        requires: spec.requires ?? source?.requires ?? [],
+        version: spec.version ?? source?.version ?? '0.0.1'
+      };
+    }
+
+    return moduleMap;
   }
 
   getModuleMap(): ModuleMap {
@@ -1540,6 +1582,40 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     };
   }
 
+  /**
+   * Dependency closure for a named module. Proxy (apply-spec) modules have no
+   * pgpm.plan, so they resolve straight off the workspace module map instead
+   * of instantiating a module-rooted package.
+   */
+  private getModuleExtensionsFor(name: string): { resolved: string[]; external: string[] } {
+    const modules = this.getModuleMap();
+    if (!modules[name]) {
+      throw errors.MODULE_NOT_FOUND({ name });
+    }
+    const modulePath = resolve(this.workspacePath!, modules[name].path);
+    if (hasApplySpec(modulePath)) {
+      return resolveExtensionDependencies(name, modules);
+    }
+    return this.getModuleProject(name).getModuleExtensions();
+  }
+
+  /**
+   * Directory the migration engine should run against for a named module:
+   * the module's own directory, or — for proxy (apply-spec) modules — the
+   * materialized transpiled instance.
+   */
+  private async getEffectiveModulePathFor(name: string): Promise<string | undefined> {
+    const modules = this.getModuleMap();
+    if (!modules[name]) {
+      throw errors.MODULE_NOT_FOUND({ name });
+    }
+    const modulePath = resolve(this.workspacePath!, modules[name].path);
+    if (hasApplySpec(modulePath)) {
+      return resolveEffectiveModulePath(name, modulePath, modules, this.workspacePath!);
+    }
+    return this.getModuleProject(name).getModulePath();
+  }
+
   private parsePackageTarget(target?: string): { name: string | null; toChange: string | undefined } {
     let name: string | null;
     let toChange: string | undefined;
@@ -1597,8 +1673,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         // When name is null, deploy ALL modules in the workspace
         extensions = await this.resolveWorkspaceExtensionDependencies();
       } else {
-        const moduleProject = this.getModuleProject(name);
-        extensions = moduleProject.getModuleExtensions();
+        extensions = this.getModuleExtensionsFor(name);
       }
 
       const pgPool = getPgPool(opts.pg);
@@ -1613,11 +1688,15 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
             log.info(`📥 Installing external extension: ${extension}`);
             await pgPool.query(msg);
           } else {
-            const modulePath = resolve(this.workspacePath!, modules[extension].path);
+            const modulePath = await resolveEffectiveModulePath(
+              extension,
+              resolve(this.workspacePath!, modules[extension].path),
+              modules,
+              this.workspacePath!
+            );
             log.info(`📂 Deploying local module: ${extension}`);
 
             if (opts.deployment.fast) {
-              const localProject = this.getModuleProject(extension);
               const cacheKey = getCacheKey(opts.pg as PgConfig, extension, opts.pg.database);
             
               if (opts.deployment.cache && deployFastCache[cacheKey]) {
@@ -1628,7 +1707,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
               let pkg;
               try {
-                pkg = await packageModule(localProject.modulePath, { 
+                pkg = await packageModule(modulePath, { 
                   usePlan: opts.deployment.usePlan, 
                   extension: false 
                 });
@@ -1697,8 +1776,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       if (name === null) {
         throw errors.WORKSPACE_OPERATION_ERROR({ operation: 'deployment' });
       }
-      const moduleProject = this.getModuleProject(name);
-      const modulePath = moduleProject.getModulePath();
+      const modulePath = await this.getEffectiveModulePathFor(name);
       if (!modulePath) {
         throw errors.PATH_NOT_FOUND({ path: name, type: 'module' });
       }
@@ -1777,7 +1855,12 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
               }
             }
           } else {
-            const modulePath = resolve(this.workspacePath!, modules[extension].path);
+            const modulePath = await resolveEffectiveModulePath(
+              extension,
+              resolve(this.workspacePath!, modules[extension].path),
+              modules,
+              this.workspacePath!
+            );
             log.info(`📂 Reverting local module: ${extension}`);
           
             try {
@@ -1811,8 +1894,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       if (name === null) {
         throw errors.WORKSPACE_OPERATION_ERROR({ operation: 'revert' });
       }
-      const moduleProject = this.getModuleProject(name);
-      const modulePath = moduleProject.getModulePath();
+      const modulePath = await this.getEffectiveModulePathFor(name);
       if (!modulePath) {
         throw errors.PATH_NOT_FOUND({ path: name, type: 'module' });
       }
@@ -1850,8 +1932,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         // When name is null, verify ALL modules in the workspace
         extensions = await this.resolveWorkspaceExtensionDependencies();
       } else {
-        const moduleProject = this.getModuleProject(name);
-        extensions = moduleProject.getModuleExtensions();
+        extensions = this.getModuleExtensionsFor(name);
       }
 
       const pgPool = getPgPool(opts.pg);
@@ -1866,7 +1947,12 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
             log.info(`🔍 Verifying external extension: ${extension}`);
             await pgPool.query(query, [extension]);
           } else {
-            const modulePath = resolve(this.workspacePath!, modules[extension].path);
+            const modulePath = await resolveEffectiveModulePath(
+              extension,
+              resolve(this.workspacePath!, modules[extension].path),
+              modules,
+              this.workspacePath!
+            );
             log.info(`📂 Verifying local module: ${extension}`);
 
             try {
@@ -1899,8 +1985,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       if (name === null) {
         throw errors.WORKSPACE_OPERATION_ERROR({ operation: 'verification' });
       }
-      const moduleProject = this.getModuleProject(name);
-      const modulePath = moduleProject.getModulePath();
+      const modulePath = await this.getEffectiveModulePathFor(name);
       if (!modulePath) {
         throw errors.PATH_NOT_FOUND({ path: name, type: 'module' });
       }

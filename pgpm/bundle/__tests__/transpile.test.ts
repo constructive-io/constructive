@@ -130,6 +130,40 @@ describe('transpileBundle', () => {
     }
   });
 
+  it('renameModule rewrites the manifest name, plan headers, and control file name', () => {
+    writeFileSync(
+      join(sourceDir, 'my-module.control'),
+      `# my-module extension\ncomment = 'my-module extension'\ndefault_version = '0.0.1'\nrequires = 'plpgsql'\nrelocatable = false\n`
+    );
+    const src = bundleFromModule(sourceDir);
+    const out = transpileBundle(src, { renameChange, transformScript, renameModule: 'tenant-users' });
+
+    expect(out.manifest.name).toBe('tenant-users');
+    expect(out.plan).toContain('%project=tenant-users');
+    expect(out.plan).toContain('%uri=tenant-users');
+    expect(out.plan).not.toContain('%project=my-module');
+    expect(out.control!.fileName).toBe('tenant-users.control');
+    expect(verifyBundle(out)).toEqual([]);
+
+    const outDir = mkdtempSync(join(tmpdir(), 'pgpm-transpile-rename-'));
+    try {
+      materializeBundle(out, outDir);
+      expect(readFileSync(join(outDir, 'pgpm.plan'), 'utf-8')).toContain('%project=tenant-users');
+    } finally {
+      rmSync(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it('two renameModule instances of the same source have distinct identities', () => {
+    const src = bundleFromModule(sourceDir);
+    const a = transpileBundle(src, { renameChange, transformScript, renameModule: 'tenant-a' });
+    const b = transpileBundle(src, { renameChange, transformScript, renameModule: 'tenant-b' });
+    expect(a.manifest.name).not.toBe(b.manifest.name);
+    expect(a.manifest.digest).not.toBe(b.manifest.digest);
+    expect(a.manifest.provenance!.sourceBundleDigest).toBe(src.manifest.digest);
+    expect(b.manifest.provenance!.sourceBundleDigest).toBe(src.manifest.digest);
+  });
+
   it('rejects a rename that collapses two changes onto one name', () => {
     const src = bundleFromModule(sourceDir);
     expect(() =>

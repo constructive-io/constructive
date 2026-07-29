@@ -1,0 +1,7 @@
+{
+  "name": "tenant-b-users",
+  "source": "users-module",
+  "schemas": {
+    "users": "tenant_b"
+  }
+}

@@ -1,0 +1,7 @@
+# my-app extension
+comment = 'my-app extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/my-app'
+requires = 'plpgsql,tenant-a,tenant-b-users'
+relocatable = false
+superuser = false

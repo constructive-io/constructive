@@ -1,4 +1,5 @@
 export * from '@pgsql/transform';
+export { loadModule } from 'plpgsql-parser';
 export type {
   BundleScriptContext,
   NamespaceValidatorOptions,

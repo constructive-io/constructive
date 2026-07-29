@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=users-module
+%uri=users-module
+
+schemas/users/schema 2024-01-01T00:00:00Z Dev <dev@example.com> # add users schema
+schemas/users/tables/accounts/table [schemas/users/schema] 2024-01-01T00:00:01Z Dev <dev@example.com> # add accounts table
+schemas/users/procedures/account_count [schemas/users/schema schemas/users/tables/accounts/table] 2024-01-01T00:00:02Z Dev <dev@example.com> # add account_count

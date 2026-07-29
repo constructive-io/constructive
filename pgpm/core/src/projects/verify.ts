@@ -5,8 +5,11 @@ import * as path from 'path';
 import { getPgPool } from 'pg-cache';
 import {PgConfig } from 'pg-env';
 
+import { resolveEffectiveModulePath } from '../apply/materialize';
+import { hasApplySpec } from '../apply/apply-spec';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmMigrate } from '../migrate/client';
+import { resolveExtensionDependencies } from '../resolution/deps';
 
 interface Extensions {
   resolved: string[];
@@ -32,10 +35,13 @@ export const verifyProject = async (
   }
 
   const modulePath = path.resolve(pkg.workspacePath!, modules[name].path);
-  const moduleProject = new PgpmPackage(modulePath, { extensionsDir: pkg.extensionsDir });
 
   log.info(`📦 Resolving dependencies for ${name}...`);
-  const extensions: Extensions = moduleProject.getModuleExtensions();
+  // Proxy (apply-spec) modules have no pgpm.plan, so resolve straight off the
+  // workspace module map instead of instantiating a module-rooted package.
+  const extensions: Extensions = hasApplySpec(modulePath)
+    ? resolveExtensionDependencies(name, modules)
+    : new PgpmPackage(modulePath, { extensionsDir: pkg.extensionsDir }).getModuleExtensions();
 
   const pgPool = getPgPool({
     ...opts.pg,
@@ -52,7 +58,13 @@ export const verifyProject = async (
         log.debug(`> ${query}`);
         await pgPool.query(query, [extension]);
       } else {
-        const modulePath = resolve(pkg.workspacePath!, modules[extension].path);
+        const sourcePath = resolve(pkg.workspacePath!, modules[extension].path);
+        const modulePath = await resolveEffectiveModulePath(
+          extension,
+          sourcePath,
+          modules,
+          pkg.workspacePath!
+        );
         log.info(`📂 Verifying local module: ${extension}`);
         log.debug(`→ Path: ${modulePath}`);
         log.debug(`→ Command: constructive migrate verify db:pg:${database}`);

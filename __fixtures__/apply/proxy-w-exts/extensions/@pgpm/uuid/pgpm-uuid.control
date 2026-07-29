@@ -1,0 +1,8 @@
+# pgpm-uuid extension
+comment = 'pgpm-uuid extension'
+default_version = '0.15.3'
+module_pathname = '$libdir/pgpm-uuid'
+requires = 'pgcrypto,plpgsql,uuid-ossp,hstore,pgpm-verify'
+relocatable = false
+superuser = false
+  
