@@ -17,8 +17,12 @@ describe('resolveProvisionModules', () => {
     expect(resolveProvisionModules([])).toEqual(base.modules);
   });
 
-  it('includes config_secrets_module (the dependency the old list dropped)', () => {
-    expect(names(resolveProvisionModules())).toContain('config_secrets_module');
+  it('includes internal_secrets_module at app scope (backend-required, replaces config_secrets_module)', () => {
+    const resolved = resolveProvisionModules();
+    expect(names(resolved)).toContain('internal_secrets_module');
+    expect(names(resolved)).not.toContain('config_secrets_module');
+    const secrets = resolved.find((m) => Array.isArray(m) && m[0] === 'internal_secrets_module');
+    expect(secrets).toEqual(['internal_secrets_module', { scope: 'app' }]);
   });
 
   it('selects a named preset via the last layer that sets one', () => {
@@ -31,11 +35,14 @@ describe('resolveProvisionModules', () => {
   });
 
   it('appends new modules and overrides same-key modules by options', () => {
+    // The base b2b:storage preset carries storage_module at app scope; an overlay
+    // that adds storage_module at the same scope (as the Desktop host does) must
+    // override in place — not create a second storage entry.
     const resolved = resolveProvisionModules([
       {
         add: [
           'my_custom_module',
-          ['storage_module', { api_name: 'api', prefix: 'app', buckets: [{ key: 'public' }] }],
+          ['storage_module', { scope: 'app', api_name: 'api', prefix: 'app', buckets: [{ key: 'public' }] }],
         ],
       },
     ]);
@@ -43,7 +50,7 @@ describe('resolveProvisionModules', () => {
     const storage = resolved.find((m) => Array.isArray(m) && m[0] === 'storage_module');
     expect(storage).toEqual([
       'storage_module',
-      { api_name: 'api', prefix: 'app', buckets: [{ key: 'public' }] },
+      { scope: 'app', api_name: 'api', prefix: 'app', buckets: [{ key: 'public' }] },
     ]);
     // Override replaces in place — no duplicate storage entry.
     expect(names(resolved).filter((n) => n === 'storage_module')).toHaveLength(1);

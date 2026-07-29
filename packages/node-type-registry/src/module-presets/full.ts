@@ -63,7 +63,7 @@ export const PresetFull: ModulePreset = {
     'rate_limits_module',
     'devices_module',
     'user_credentials_module',
-    'config_secrets_module',
+    ['internal_secrets_module', { scope: 'app' }],
     'rls_module',
     // Contact modules
     'emails_module',
@@ -75,7 +75,7 @@ export const PresetFull: ModulePreset = {
     'notifications_module',
     // Connected accounts
     'connected_accounts_module',
-    'identity_providers_module',
+    ['identity_providers_module', { scope: 'app' }],
     // Invites & Auth
     ['invites_module', { scope: 'app' }],
     ['invites_module', { scope: 'org' }],
@@ -84,7 +84,7 @@ export const PresetFull: ModulePreset = {
     // Internationalization
     'i18n_module',
     // Storage (full features)
-    ['storage_module', { has_versioning: true, has_content_hash: true, has_custom_keys: true, has_audit_log: true }],
+    ['storage_module', { scope: 'app', has_versioning: true, has_content_hash: true, has_custom_keys: true, has_audit_log: true }],
     // Infrastructure (functions, namespaces)
     'namespace_module',
     'function_module',

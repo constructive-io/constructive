@@ -50,12 +50,12 @@ export const PresetAuthSso: ModulePreset = {
     'sessions_module',
     'user_state_module',
     'user_credentials_module',
-    'config_secrets_module',
+    ['internal_secrets_module', { scope: 'app' }],
     'emails_module',
     'rls_module',
     'user_auth_module',
     'connected_accounts_module',
-    'identity_providers_module'
+    ['identity_providers_module', { scope: 'app' }]
   ],
   extends: ['auth:email']
 };
