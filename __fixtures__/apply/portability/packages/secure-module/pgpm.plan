@@ -1,0 +1,6 @@
+%syntax-version=1.0.0
+%project=secure-module
+%uri=secure-module
+
+schemas/vault/schema 2024-01-01T00:00:00Z Dev <dev@example.com> # add vault schema
+schemas/vault/functions/hash_pw [schemas/vault/schema] 2024-01-01T00:00:01Z Dev <dev@example.com> # add hash_pw

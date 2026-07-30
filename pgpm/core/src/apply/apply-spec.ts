@@ -139,9 +139,48 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
     }
   }
 
-  if (!hasSchemas && !hasRoute) {
+  const hasExtensions = parsed.extensions !== undefined;
+  if (hasExtensions) {
+    const ext = parsed.extensions;
+    if (typeof ext !== 'object' || ext === null || Array.isArray(ext)) {
+      throw new Error(`${specPath}: "extensions" must be an object`);
+    }
+    const isSchemaOrNull = (v: unknown): boolean => v === null || (typeof v === 'string' && !!v);
+    const hasRoutes = ext.routes !== undefined;
+    if (hasRoutes) {
+      if (typeof ext.routes !== 'object' || ext.routes === null || Array.isArray(ext.routes)) {
+        throw new Error(`${specPath}: "extensions.routes" must be an object keyed by extension name`);
+      }
+      for (const [name, route] of Object.entries<any>(ext.routes)) {
+        if (!route || typeof route !== 'object' || !isSchemaOrNull(route.to)) {
+          throw new Error(
+            `${specPath}: "extensions.routes.${name}" must be { to: schema | null, from?: (string|null)[] }`
+          );
+        }
+      }
+    } else if (!('toSchema' in ext)) {
+      throw new Error(
+        `${specPath}: "extensions" needs "toSchema" (schema | null) or "routes"`
+      );
+    } else if (!isSchemaOrNull(ext.toSchema)) {
+      throw new Error(`${specPath}: "extensions.toSchema" must be a non-empty string or null`);
+    }
+    if (ext.only !== undefined && (!Array.isArray(ext.only) || ext.only.some((e: any) => typeof e !== 'string' || !e))) {
+      throw new Error(`${specPath}: "extensions.only" must be an array of extension names`);
+    }
+    if (ext.serverVersion !== undefined && typeof ext.serverVersion !== 'number') {
+      throw new Error(`${specPath}: "extensions.serverVersion" must be a number`);
+    }
+  }
+
+  const hasRoles = parsed.roles !== undefined;
+  if (hasRoles && !isSchemaMap(parsed.roles)) {
+    throw new Error(`${specPath}: "roles" must be a non-empty string → string map`);
+  }
+
+  if (!hasSchemas && !hasRoute && !hasExtensions && !hasRoles) {
     throw new Error(
-      `${specPath}: at least one of "schemas" (string → string map) or "route" (object routes) is required`
+      `${specPath}: at least one of "schemas", "route", "extensions", or "roles" is required`
     );
   }
 

@@ -93,6 +93,40 @@ export interface ApplyReuseSpec {
   sharedName?: string;
 }
 
+/**
+ * Extension-routing declaration in a `pgpm.apply.json`: where the transpiled
+ * instance should install extensions and resolve the symbols they provide
+ * (e.g. isolate `pgcrypto` in a dedicated `extensions` schema, qualifying bare
+ * `crypt(...)` calls, or the reverse). A distinct dimension from schema
+ * routing — driven by a version-aware symbol inventory, not by the objects the
+ * SQL itself creates. Forwarded to `@pgpmjs/transform`'s extension router.
+ */
+export interface ApplyExtensionsSpec {
+  /**
+   * Install the matched extensions and route their provided symbols to this
+   * schema. `null` strips qualification (rely on `search_path`). Ignored when
+   * `routes` is given.
+   */
+  toSchema?: string | null;
+  /** With `toSchema`: limit to these extensions (default: every inventoried one). */
+  only?: string[];
+  /**
+   * With `toSchema`: which source qualifications to rewrite (a `null` entry
+   * also rewrites bare references). Defaults to `public` + bare.
+   */
+  from?: (string | null)[];
+  /**
+   * Advanced: explicit per-extension routes (`{ "<ext>": { "to": "<schema>|null",
+   * "from"?: [...] } }`). Overrides `toSchema`/`only`/`from`.
+   */
+  routes?: Record<string, { to: string | null; from?: (string | null)[] }>;
+  /** Target PostgreSQL major version, for core-graduation awareness. */
+  serverVersion?: number;
+}
+
+/** Role-name translation: source role name → target role name. */
+export type ApplyRolesSpec = Record<string, string>;
+
 /** The parsed, normalized `pgpm.apply.json` spec. */
 export interface PgpmApplySpec {
   /**
@@ -119,6 +153,16 @@ export interface PgpmApplySpec {
    * a shared module and a per-tenant module that `requires` it.
    */
   reuse?: ApplyReuseSpec;
+  /**
+   * Extension routing: where to install extensions and resolve their provided
+   * symbols in the transpiled instance (see {@link ApplyExtensionsSpec}).
+   */
+  extensions?: ApplyExtensionsSpec;
+  /**
+   * Role-name translation applied to the transpiled instance's SQL
+   * (see {@link ApplyRolesSpec}). Renames role identifiers only.
+   */
+  roles?: ApplyRolesSpec;
   /**
    * Runtime requires of the transpiled output (native extensions and other
    * modules). Defaults to the source module's own requires.

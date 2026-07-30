@@ -44,7 +44,7 @@ describe('apply spec parsing — object routes', () => {
   });
 
   it.each([
-    [{ source: 'x' }, /at least one of "schemas".*or "route"/],
+    [{ source: 'x' }, /at least one of "schemas", "route", "extensions", or "roles"/],
     [{ source: 'x', route: [] }, /"route" must be a non-empty array/],
     [{ source: 'x', route: [{ fromSchema: 'a', kind: 'widget', name: 'n', toSchema: 'b' }] }, /route" entry/],
     [{ source: 'x', route: [{ fromSchema: 'a', name: 'n', toSchema: 'b' }] }, /route" entry/],

@@ -2,12 +2,14 @@ export * from '@pgsql/transform';
 export { loadModule } from 'plpgsql-parser';
 export type {
   BundleScriptContext,
+  ExtensionRoutingInput,
   NamespaceValidatorOptions,
   SchemaObjectRoute,
   SchemaTranspiler,
   SchemaTranspilerOptions,
 } from './bundle-driver';
 export {
+  buildExtensionRouter,
   buildSchemaRouter,
   makeNamespaceValidator,
   makeSchemaTranspiler,
