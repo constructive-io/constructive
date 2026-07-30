@@ -10,7 +10,7 @@ import {
   verifyBundle
 } from '@pgpmjs/bundle';
 import { buildSchemaRouter, loadModule, makeSchemaTranspiler, SchemaTransformPass } from '@pgpmjs/transform';
-import { blankScriptSql, excludeSubsystem, stripSubsystemSql } from '@pgpmjs/slice';
+import { excludeSubsystem, stripSubsystemSql } from '@pgpmjs/slice';
 
 import { ModuleMap } from '../modules/modules';
 import { hasApplySpec, readApplySpec } from './apply-spec';
@@ -56,7 +56,7 @@ function makeSubsystemStripper(
   source: MigrationBundle,
   spec: ResolvedApplySpec,
   instanceName: string
-): { strip: (sql: string, change: string) => string; excludedChanges: Set<string> } {
+): { strip: (sql: string) => string; excludedChanges: Set<string> } {
   const selector = { schemas: spec.exclude!.schemas };
   const rebinds = buildSchemaRouter({ schemaMap: spec.schemas, routes: spec.route });
 
@@ -83,9 +83,11 @@ function makeSubsystemStripper(
   }
 
   // A change whose deploy consists entirely of subsystem statements (plus
-  // transaction control) is excluded *as a change*: its verify/revert scripts
-  // target dropped objects the classifier can't always see (bare DROPs,
-  // catalog probes), so all three scripts are blanked together.
+  // transaction control) is dropped *as a change* — removed from the plan and
+  // deploy order rather than emitted as an empty script (empty scripts collide
+  // on the deploy ledger's script-hash uniqueness). Its verify/revert scripts
+  // target dropped objects the classifier can't always see (bare DROPs, catalog
+  // probes), which is exactly why the whole change is dropped, not just blanked.
   const excludedChanges = new Set<string>();
   for (const change of source.changes) {
     if (!change.deploy) continue;
@@ -98,8 +100,10 @@ function makeSubsystemStripper(
     }
   }
 
-  const strip = (sql: string, change: string): string =>
-    excludedChanges.has(change) ? blankScriptSql(sql) : stripSubsystemSql(sql, selector).sql;
+  // Surviving changes may still contain stray subsystem statements (a change
+  // that both creates a survivor and touches the excluded subsystem); strip
+  // those in place. Fully-excluded changes are dropped via `excludedChanges`.
+  const strip = (sql: string): string => stripSubsystemSql(sql, selector).sql;
 
   return { strip, excludedChanges };
 }
@@ -169,14 +173,20 @@ export async function materializeApplyModule(
     }
   });
 
-  // Excluded changes keep their source identity (an emptied tombstone) —
-  // renaming them into the replacement provider's namespace would be a lie.
+  // Excluded changes are dropped from the artifact entirely (plan + deploy
+  // order + dependency refs); surviving changes get their stray subsystem
+  // statements stripped before the namespace transform.
   const transpiled = transpileBundle(source, {
+    excludeChange: stripSubsystem
+      ? (name: string) => stripSubsystem.excludedChanges.has(name)
+      : undefined,
+    // Excluded changes keep their source identity so the plan-prune (which
+    // matches source names) can find them; survivors route normally.
     renameChange: stripSubsystem
       ? (name: string) => (stripSubsystem.excludedChanges.has(name) ? name : renameChange(name))
       : renameChange,
     transformScript: stripSubsystem
-      ? (sql, ctx) => transformScript(stripSubsystem.strip(sql, ctx.change), ctx)
+      ? (sql, ctx) => transformScript(stripSubsystem.strip(sql), ctx)
       : transformScript,
     renameModule: instanceName,
     provenance: {
