@@ -60,8 +60,8 @@ export function resolveBundleArtifactPath(moduleDir: string): string | null {
 
 /**
  * Build the executable form of a module's bundle: the content-addressed AST
- * snapshot plus, per change, the deploy SQL with transaction / `CREATE
- * EXTENSION` statements stripped (`cleanSql`).
+ * snapshot plus, per change, the deploy SQL with transaction-control
+ * statements stripped (`cleanSql`).
  *
  * That pre-computation is the whole point of the artifact — the parse/deparse
  * work moves from every deploy to the one-time package step, while the digests
