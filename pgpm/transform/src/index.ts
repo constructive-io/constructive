@@ -31,3 +31,9 @@ export type {
   ResolveFixtureClosureOptions,
 } from './fixture-closure';
 export { resolveFixtureClosure } from './fixture-closure';
+export type {
+  SqlProgram,
+  SqlStatementAst,
+  SqlStatementSpan,
+} from './program';
+export { emitSqlProgram, parseSqlProgram } from './program';
