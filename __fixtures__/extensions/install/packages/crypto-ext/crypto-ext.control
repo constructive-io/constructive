@@ -1,0 +1,7 @@
+# crypto-ext extension
+comment = 'crypto-ext extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/crypto-ext'
+requires = 'pgcrypto'
+relocatable = false
+superuser = false

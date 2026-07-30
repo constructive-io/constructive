@@ -1,0 +1,10 @@
+{
+  "provides": {
+    "pgcrypto": {
+      "schema": "extensions",
+      "grants": [
+        { "privileges": "USAGE", "on": "schema", "to": ["authenticated", "administrator"] }
+      ]
+    }
+  }
+}
