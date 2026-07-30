@@ -127,13 +127,17 @@ export type FunctionApiBindingOrderBy =
   | 'API_ID_DESC'
   | 'CONFIG_ASC'
   | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
   | 'FUNCTION_DEFINITION_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `FunctionDefinition`. */
 export type FunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
@@ -771,13 +775,17 @@ export type PlatformFunctionApiBindingOrderBy =
   | 'API_ID_DESC'
   | 'CONFIG_ASC'
   | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
   | 'FUNCTION_DEFINITION_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `PlatformFunctionDefinition`. */
 export type PlatformFunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
@@ -999,6 +1007,8 @@ export type PlatformFunctionInvocationOrderBy =
   | 'COMPLETED_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DEFINITION_SCOPE_ASC'
   | 'DEFINITION_SCOPE_DESC'
   | 'DURATION_MS_ASC'
@@ -2838,6 +2848,8 @@ export interface FunctionApiBindingFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: FunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -2852,6 +2864,8 @@ export interface FunctionApiBindingFilter {
   not?: FunctionApiBindingFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionApiBindingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** An input for mutations affecting `FunctionApiBinding` */
 export interface FunctionApiBindingInput {
@@ -2861,9 +2875,11 @@ export interface FunctionApiBindingInput {
   apiId: string;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: unknown;
+  createdAt?: string;
   /** Function definition this binding belongs to */
   functionDefinitionId: string;
   id?: string;
+  updatedAt?: string;
 }
 /** Represents an update to a `FunctionApiBinding`. Fields that are set will be updated. */
 export interface FunctionApiBindingPatch {
@@ -2873,9 +2889,11 @@ export interface FunctionApiBindingPatch {
   apiId?: string;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: unknown;
+  createdAt?: string;
   /** Function definition this binding belongs to */
   functionDefinitionId?: string;
   id?: string;
+  updatedAt?: string;
 }
 /** A filter to be used against many `FunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionApiBindingToManyFunctionInvocationFilter {
@@ -4927,6 +4945,8 @@ export interface PlatformFunctionApiBindingFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: PlatformFunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -4941,6 +4961,8 @@ export interface PlatformFunctionApiBindingFilter {
   platformFunctionInvocationsByApiBindingId?: PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter;
   /** `platformFunctionInvocationsByApiBindingId` exist. */
   platformFunctionInvocationsByApiBindingIdExist?: boolean;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** An input for mutations affecting `PlatformFunctionApiBinding` */
 export interface PlatformFunctionApiBindingInput {
@@ -4950,9 +4972,11 @@ export interface PlatformFunctionApiBindingInput {
   apiId: string;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: unknown;
+  createdAt?: string;
   /** Function definition this binding belongs to */
   functionDefinitionId: string;
   id?: string;
+  updatedAt?: string;
 }
 /** Represents an update to a `PlatformFunctionApiBinding`. Fields that are set will be updated. */
 export interface PlatformFunctionApiBindingPatch {
@@ -4962,9 +4986,11 @@ export interface PlatformFunctionApiBindingPatch {
   apiId?: string;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: unknown;
+  createdAt?: string;
   /** Function definition this binding belongs to */
   functionDefinitionId?: string;
   id?: string;
+  updatedAt?: string;
 }
 /** A filter to be used against many `PlatformFunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter {
@@ -5616,6 +5642,8 @@ export interface PlatformFunctionInvocationFilter {
   completedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `definitionScope` field. */
   definitionScope?: StringFilter;
   /** Filter by the object’s `durationMs` field. */
@@ -5661,6 +5689,8 @@ export interface PlatformFunctionInvocationInput {
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Database this invocation is attributed to (usage/billing attribution) */
+  databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
@@ -5702,6 +5732,8 @@ export interface PlatformFunctionInvocationPatch {
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Database this invocation is attributed to (usage/billing attribution) */
+  databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */

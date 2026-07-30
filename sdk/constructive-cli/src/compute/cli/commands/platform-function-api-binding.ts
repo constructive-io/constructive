@@ -19,8 +19,10 @@ const fieldSchema: FieldSchema = {
   alias: 'string',
   apiId: 'uuid',
   config: 'json',
+  createdAt: 'string',
   functionDefinitionId: 'uuid',
   id: 'uuid',
+  updatedAt: 'string',
 };
 const usage =
   '\nplatform-function-api-binding <command>\n\nCommands:\n  list                  List platformFunctionApiBinding records\n  find-first            Find first matching platformFunctionApiBinding record\n  get                   Get a platformFunctionApiBinding by ID\n  create                Create a new platformFunctionApiBinding\n  update                Update an existing platformFunctionApiBinding\n  delete                Delete a platformFunctionApiBinding\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -76,8 +78,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       alias: true,
       apiId: true,
       config: true,
+      createdAt: true,
       functionDefinitionId: true,
       id: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -105,8 +109,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       alias: true,
       apiId: true,
       config: true,
+      createdAt: true,
       functionDefinitionId: true,
       id: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -146,8 +152,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           alias: true,
           apiId: true,
           config: true,
+          createdAt: true,
           functionDefinitionId: true,
           id: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -208,8 +216,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           alias: true,
           apiId: true,
           config: true,
+          createdAt: true,
           functionDefinitionId: true,
           id: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -276,8 +286,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           alias: true,
           apiId: true,
           config: true,
+          createdAt: true,
           functionDefinitionId: true,
           id: true,
+          updatedAt: true,
         },
       })
       .execute();

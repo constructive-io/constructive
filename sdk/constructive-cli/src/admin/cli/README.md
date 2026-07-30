@@ -39,7 +39,11 @@ csdk auth set-token <your-token>
 | `app-permission-default-permission` | appPermissionDefaultPermission CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `org-admin-grant` | orgAdminGrant CRUD operations |
+| `org-chart-edge` | orgChartEdge CRUD operations |
+| `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
+| `org-get-managers-record` | orgGetManagersRecord CRUD operations |
+| `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `org-grant` | orgGrant CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
 | `org-member` | orgMember CRUD operations |
@@ -56,6 +60,7 @@ csdk auth set-token <your-token>
 | `app-permissions-get-mask` | appPermissionsGetMask |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
+| `org-is-manager-of` | orgIsManagerOf |
 | `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `org-permissions-get-mask` | orgPermissionsGetMask |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
@@ -465,6 +470,65 @@ CRUD operations for OrgAdminGrant records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `actorId`, `grantorId`, `isGrant`
 
+### `org-chart-edge`
+
+CRUD operations for OrgChartEdge records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgChartEdge records |
+| `find-first` | Find first matching orgChartEdge record |
+| `get` | Get a orgChartEdge by id |
+| `create` | Create a new orgChartEdge |
+| `update` | Update an existing orgChartEdge |
+| `delete` | Delete a orgChartEdge |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `childId` | UUID |
+| `createdAt` | Datetime |
+| `entityId` | UUID |
+| `id` | UUID |
+| `parentId` | UUID |
+| `positionLevel` | Int |
+| `positionTitle` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `childId`, `entityId`
+**Optional create fields (backend defaults):** `parentId`, `positionLevel`, `positionTitle`
+
+### `org-chart-edge-grant`
+
+CRUD operations for OrgChartEdgeGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgChartEdgeGrant records |
+| `find-first` | Find first matching orgChartEdgeGrant record |
+| `get` | Get a orgChartEdgeGrant by id |
+| `create` | Create a new orgChartEdgeGrant |
+| `update` | Update an existing orgChartEdgeGrant |
+| `delete` | Delete a orgChartEdgeGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `childId` | UUID |
+| `createdAt` | Datetime |
+| `entityId` | UUID |
+| `grantorId` | UUID |
+| `id` | UUID |
+| `isGrant` | Boolean |
+| `parentId` | UUID |
+| `positionLevel` | Int |
+| `positionTitle` | String |
+
+**Required create fields:** `childId`, `entityId`
+**Optional create fields (backend defaults):** `grantorId`, `isGrant`, `parentId`, `positionLevel`, `positionTitle`
+
 ### `org-claimed-invite`
 
 CRUD operations for OrgClaimedInvite records.
@@ -492,6 +556,50 @@ CRUD operations for OrgClaimedInvite records.
 
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `data`, `receiverId`, `senderId`
+
+### `org-get-managers-record`
+
+CRUD operations for OrgGetManagersRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgGetManagersRecord records |
+| `find-first` | Find first matching orgGetManagersRecord record |
+| `get` | Get a orgGetManagersRecord by id |
+| `create` | Create a new orgGetManagersRecord |
+| `update` | Update an existing orgGetManagersRecord |
+| `delete` | Delete a orgGetManagersRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `depth` | Int |
+| `userId` | UUID |
+
+**Required create fields:** `depth`, `userId`
+
+### `org-get-subordinates-record`
+
+CRUD operations for OrgGetSubordinatesRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgGetSubordinatesRecord records |
+| `find-first` | Find first matching orgGetSubordinatesRecord record |
+| `get` | Get a orgGetSubordinatesRecord by id |
+| `create` | Create a new orgGetSubordinatesRecord |
+| `update` | Update an existing orgGetSubordinatesRecord |
+| `delete` | Delete a orgGetSubordinatesRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `depth` | Int |
+| `userId` | UUID |
+
+**Required create fields:** `depth`, `userId`
 
 ### `org-grant`
 
@@ -898,6 +1006,20 @@ appPermissionsGetPaddedMask
   | Argument | Type |
   |----------|------|
   | `--mask` | BitString |
+
+### `org-is-manager-of`
+
+orgIsManagerOf
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--managerId` | UUID |
+  | `--maxDepth` | Int |
+  | `--targetEntityId` | UUID |
+  | `--userId` | UUID |
 
 ### `org-permissions-get-by-mask`
 

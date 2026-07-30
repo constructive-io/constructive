@@ -7,8 +7,8 @@ Join table binding function definitions to API endpoints with per-binding alias 
 ## Usage
 
 ```typescript
-usePlatformFunctionApiBindingsQuery({ selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } } })
-usePlatformFunctionApiBindingQuery({ id: '<UUID>', selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } } })
+usePlatformFunctionApiBindingsQuery({ selection: { fields: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } } })
+usePlatformFunctionApiBindingQuery({ id: '<UUID>', selection: { fields: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } } })
 useCreatePlatformFunctionApiBindingMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformFunctionApiBindingMutation({ selection: { fields: { id: true } } })
 useDeletePlatformFunctionApiBindingMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformFunctionApiBindingMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformFunctionApiBindingsQuery({
-  selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } },
+  selection: { fields: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } },
 });
 ```
 

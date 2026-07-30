@@ -141,17 +141,19 @@ CRUD operations for FunctionApiBinding records.
 | `alias` | String | Yes |
 | `apiId` | UUID | Yes |
 | `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
 | `functionDefinitionId` | UUID | Yes |
 | `id` | UUID | No |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all functionApiBinding records
-const items = await db.functionApiBinding.findMany({ select: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } }).execute();
+const items = await db.functionApiBinding.findMany({ select: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.functionApiBinding.findOne({ id: '<UUID>', select: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } }).execute();
+const item = await db.functionApiBinding.findOne({ id: '<UUID>', select: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.functionApiBinding.create({ data: { alias: '<String>', apiId: '<UUID>', config: '<JSON>', functionDefinitionId: '<UUID>' }, select: { id: true } }).execute();
@@ -1084,17 +1086,19 @@ CRUD operations for PlatformFunctionApiBinding records.
 | `alias` | String | Yes |
 | `apiId` | UUID | Yes |
 | `config` | JSON | Yes |
+| `createdAt` | Datetime | No |
 | `functionDefinitionId` | UUID | Yes |
 | `id` | UUID | No |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all platformFunctionApiBinding records
-const items = await db.platformFunctionApiBinding.findMany({ select: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } }).execute();
+const items = await db.platformFunctionApiBinding.findMany({ select: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.platformFunctionApiBinding.findOne({ id: '<UUID>', select: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } }).execute();
+const item = await db.platformFunctionApiBinding.findOne({ id: '<UUID>', select: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.platformFunctionApiBinding.create({ data: { alias: '<String>', apiId: '<UUID>', config: '<JSON>', functionDefinitionId: '<UUID>' }, select: { id: true } }).execute();
@@ -1351,6 +1355,7 @@ CRUD operations for PlatformFunctionInvocation records.
 | `channel` | String | Yes |
 | `completedAt` | Datetime | Yes |
 | `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
 | `definitionScope` | String | Yes |
 | `durationMs` | Int | Yes |
 | `error` | String | Yes |
@@ -1370,13 +1375,13 @@ CRUD operations for PlatformFunctionInvocation records.
 
 ```typescript
 // List all platformFunctionInvocation records
-const items = await db.platformFunctionInvocation.findMany({ select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
+const items = await db.platformFunctionInvocation.findMany({ select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
 
 // Get one by id
-const item = await db.platformFunctionInvocation.findOne({ id: '<UUID>', select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
+const item = await db.platformFunctionInvocation.findOne({ id: '<UUID>', select: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, databaseId: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } }).execute();
 
 // Create
-const created = await db.platformFunctionInvocation.create({ data: { actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' }, select: { id: true } }).execute();
+const created = await db.platformFunctionInvocation.create({ data: { actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', databaseId: '<UUID>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformFunctionInvocation.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();

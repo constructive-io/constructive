@@ -7,8 +7,8 @@ Join table binding function definitions to API endpoints with per-binding alias 
 ## Usage
 
 ```typescript
-useFunctionApiBindingsQuery({ selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } } })
-useFunctionApiBindingQuery({ id: '<UUID>', selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } } })
+useFunctionApiBindingsQuery({ selection: { fields: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } } })
+useFunctionApiBindingQuery({ id: '<UUID>', selection: { fields: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } } })
 useCreateFunctionApiBindingMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionApiBindingMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionApiBindingMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionApiBindingMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionApiBindingsQuery({
-  selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } },
+  selection: { fields: { alias: true, apiId: true, config: true, createdAt: true, functionDefinitionId: true, id: true, updatedAt: true } },
 });
 ```
 

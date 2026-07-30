@@ -219,8 +219,10 @@ CRUD operations for FunctionApiBinding records.
 | `alias` | String |
 | `apiId` | UUID |
 | `config` | JSON |
+| `createdAt` | Datetime |
 | `functionDefinitionId` | UUID |
 | `id` | UUID |
+| `updatedAt` | Datetime |
 
 **Required create fields:** `apiId`, `functionDefinitionId`
 **Optional create fields (backend defaults):** `alias`, `config`
@@ -990,8 +992,10 @@ CRUD operations for PlatformFunctionApiBinding records.
 | `alias` | String |
 | `apiId` | UUID |
 | `config` | JSON |
+| `createdAt` | Datetime |
 | `functionDefinitionId` | UUID |
 | `id` | UUID |
+| `updatedAt` | Datetime |
 
 **Required create fields:** `apiId`, `functionDefinitionId`
 **Optional create fields (backend defaults):** `alias`, `config`
@@ -1215,6 +1219,7 @@ CRUD operations for PlatformFunctionInvocation records.
 | `channel` | String |
 | `completedAt` | Datetime |
 | `createdAt` | Datetime |
+| `databaseId` | UUID |
 | `definitionScope` | String |
 | `durationMs` | Int |
 | `error` | String |
@@ -1231,7 +1236,7 @@ CRUD operations for PlatformFunctionInvocation records.
 | `taskIdentifier` | String |
 
 **Required create fields:** `taskIdentifier`
-**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `channel`, `completedAt`, `definitionScope`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `provenance`, `result`, `startedAt`, `status`
+**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `channel`, `completedAt`, `databaseId`, `definitionScope`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `provenance`, `result`, `startedAt`, `status`
 
 ### `platform-infra-commit`
 

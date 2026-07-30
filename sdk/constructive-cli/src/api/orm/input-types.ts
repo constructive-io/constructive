@@ -256,20 +256,6 @@ export interface Api {
   roleName?: string | null;
   updatedAt?: string | null;
 }
-/** Server-side module configuration for an API surface; stores module name and JSON settings */
-export interface ApiModule {
-  /** API surface this module configuration belongs to */
-  apiId?: string | null;
-  createdAt?: string | null;
-  /** JSON configuration data for this module */
-  data?: Record<string, unknown> | null;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string | null;
-  id: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name?: string | null;
-  updatedAt?: string | null;
-}
 /** Join table linking API surfaces to the metaschema schemas they expose */
 export interface ApiSchema {
   /** API surface that exposes this schema */
@@ -498,6 +484,21 @@ export interface DomainEvent {
   /** Structured event metadata */
   metadata?: Record<string, unknown> | null;
   updatedAt?: string | null;
+}
+export interface DomainType {
+  baseType?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  checkExpr?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  defaultExpr?: Record<string, unknown> | null;
+  description?: string | null;
+  id: string;
+  label?: string | null;
+  name?: string | null;
+  notNull?: boolean | null;
+  schemaId?: string | null;
+  smartTags?: Record<string, unknown> | null;
+  tags?: string[] | null;
 }
 /** Ownership verification challenges issued for a domain */
 export interface DomainVerification {
@@ -781,18 +782,6 @@ export interface PlatformApi {
   name?: string | null;
   /** Authenticated role the API executes as */
   roleName?: string | null;
-  updatedAt?: string | null;
-}
-/** Server-side module configuration for an API surface; stores module name and JSON settings */
-export interface PlatformApiModule {
-  /** API surface this module configuration belongs to */
-  apiId?: string | null;
-  createdAt?: string | null;
-  /** JSON configuration data for this module */
-  data?: Record<string, unknown> | null;
-  id: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name?: string | null;
   updatedAt?: string | null;
 }
 /** Join table linking API surfaces to the metaschema schemas they expose */
@@ -1260,10 +1249,11 @@ export interface Table {
   partitioned?: boolean | null;
   peoplestamps?: boolean | null;
   pluralName?: string | null;
+  principalstamps?: boolean | null;
   schemaId?: string | null;
   singularName?: string | null;
   smartTags?: Record<string, unknown> | null;
-  /** Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr. */
+  /** Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default fresh_auth), a type string (password / mfa / fresh_auth; password_or_mfa is the legacy spelling), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr. */
   stepUp?: Record<string, unknown> | null;
   tags?: string[] | null;
   timestamps?: boolean | null;
@@ -1420,12 +1410,8 @@ export interface PageInfo {
 // ============ Entity Relation Types ============
 export interface ApiRelations {
   apiSetting?: ApiSetting | null;
-  apiModules?: ConnectionResult<ApiModule>;
   apiSchemas?: ConnectionResult<ApiSchema>;
   corsSettings?: ConnectionResult<CorsSetting>;
-}
-export interface ApiModuleRelations {
-  api?: Api | null;
 }
 export interface ApiSchemaRelations {
   api?: Api | null;
@@ -1451,6 +1437,7 @@ export interface DatabaseRelations {
   compositeTypes?: ConnectionResult<CompositeType>;
   databaseTransfers?: ConnectionResult<DatabaseTransfer>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
+  domainTypes?: ConnectionResult<DomainType>;
   embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   enums?: ConnectionResult<Enum>;
   exclusionConstraints?: ConnectionResult<ExclusionConstraint>;
@@ -1493,6 +1480,10 @@ export interface DomainEventRelations {
   domain?: Domain | null;
   domainVerification?: DomainVerification | null;
   managedDomain?: ManagedDomain | null;
+}
+export interface DomainTypeRelations {
+  database?: Database | null;
+  schema?: Schema | null;
 }
 export interface DomainVerificationRelations {
   domain?: Domain | null;
@@ -1553,11 +1544,7 @@ export interface PartitionRelations {
 export interface PlatformApiRelations {
   platformApiSettingByApiId?: PlatformApiSetting | null;
   platformCorsSettingByApiId?: PlatformCorsSetting | null;
-  platformApiModulesByApiId?: ConnectionResult<PlatformApiModule>;
   platformApiSchemasByApiId?: ConnectionResult<PlatformApiSchema>;
-}
-export interface PlatformApiModuleRelations {
-  api?: PlatformApi | null;
 }
 export interface PlatformApiSchemaRelations {
   api?: PlatformApi | null;
@@ -1634,6 +1621,7 @@ export interface SchemaRelations {
   apiSchemas?: ConnectionResult<ApiSchema>;
   compositeTypes?: ConnectionResult<CompositeType>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
+  domainTypes?: ConnectionResult<DomainType>;
   enums?: ConnectionResult<Enum>;
   functions?: ConnectionResult<Function>;
   platformApiSchemas?: ConnectionResult<PlatformApiSchema>;
@@ -1739,7 +1727,6 @@ export interface WebauthnSettingRelations {
 }
 // ============ Entity Types With Relations ============
 export type ApiWithRelations = Api & ApiRelations;
-export type ApiModuleWithRelations = ApiModule & ApiModuleRelations;
 export type ApiSchemaWithRelations = ApiSchema & ApiSchemaRelations;
 export type ApiSettingWithRelations = ApiSetting & ApiSettingRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
@@ -1752,6 +1739,7 @@ export type DatabaseTransferWithRelations = DatabaseTransfer & DatabaseTransferR
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
 export type DomainWithRelations = Domain & DomainRelations;
 export type DomainEventWithRelations = DomainEvent & DomainEventRelations;
+export type DomainTypeWithRelations = DomainType & DomainTypeRelations;
 export type DomainVerificationWithRelations = DomainVerification & DomainVerificationRelations;
 export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type EnumWithRelations = Enum & EnumRelations;
@@ -1768,7 +1756,6 @@ export type ManagedDomainWithRelations = ManagedDomain & ManagedDomainRelations;
 export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type PartitionWithRelations = Partition & PartitionRelations;
 export type PlatformApiWithRelations = PlatformApi & PlatformApiRelations;
-export type PlatformApiModuleWithRelations = PlatformApiModule & PlatformApiModuleRelations;
 export type PlatformApiSchemaWithRelations = PlatformApiSchema & PlatformApiSchemaRelations;
 export type PlatformApiSettingWithRelations = PlatformApiSetting & PlatformApiSettingRelations;
 export type PlatformCorsSettingWithRelations = PlatformCorsSetting & PlatformCorsSettingRelations;
@@ -1823,12 +1810,6 @@ export type ApiSelect = {
   apiSetting?: {
     select: ApiSettingSelect;
   };
-  apiModules?: {
-    select: ApiModuleSelect;
-    first?: number;
-    filter?: ApiModuleFilter;
-    orderBy?: ApiModuleOrderBy[];
-  };
   apiSchemas?: {
     select: ApiSchemaSelect;
     first?: number;
@@ -1840,18 +1821,6 @@ export type ApiSelect = {
     first?: number;
     filter?: CorsSettingFilter;
     orderBy?: CorsSettingOrderBy[];
-  };
-};
-export type ApiModuleSelect = {
-  apiId?: boolean;
-  createdAt?: boolean;
-  data?: boolean;
-  databaseId?: boolean;
-  id?: boolean;
-  name?: boolean;
-  updatedAt?: boolean;
-  api?: {
-    select: ApiSelect;
   };
 };
 export type ApiSchemaSelect = {
@@ -1990,6 +1959,12 @@ export type DatabaseSelect = {
     first?: number;
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
+  };
+  domainTypes?: {
+    select: DomainTypeSelect;
+    first?: number;
+    filter?: DomainTypeFilter;
+    orderBy?: DomainTypeOrderBy[];
   };
   embeddingChunks?: {
     select: EmbeddingChunkSelect;
@@ -2246,6 +2221,27 @@ export type DomainEventSelect = {
   };
   managedDomain?: {
     select: ManagedDomainSelect;
+  };
+};
+export type DomainTypeSelect = {
+  baseType?: boolean;
+  category?: boolean;
+  checkExpr?: boolean;
+  databaseId?: boolean;
+  defaultExpr?: boolean;
+  description?: boolean;
+  id?: boolean;
+  label?: boolean;
+  name?: boolean;
+  notNull?: boolean;
+  schemaId?: boolean;
+  smartTags?: boolean;
+  tags?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
   };
 };
 export type DomainVerificationSelect = {
@@ -2588,28 +2584,11 @@ export type PlatformApiSelect = {
   platformCorsSettingByApiId?: {
     select: PlatformCorsSettingSelect;
   };
-  platformApiModulesByApiId?: {
-    select: PlatformApiModuleSelect;
-    first?: number;
-    filter?: PlatformApiModuleFilter;
-    orderBy?: PlatformApiModuleOrderBy[];
-  };
   platformApiSchemasByApiId?: {
     select: PlatformApiSchemaSelect;
     first?: number;
     filter?: PlatformApiSchemaFilter;
     orderBy?: PlatformApiSchemaOrderBy[];
-  };
-};
-export type PlatformApiModuleSelect = {
-  apiId?: boolean;
-  createdAt?: boolean;
-  data?: boolean;
-  id?: boolean;
-  name?: boolean;
-  updatedAt?: boolean;
-  api?: {
-    select: PlatformApiSelect;
   };
 };
 export type PlatformApiSchemaSelect = {
@@ -2993,6 +2972,12 @@ export type SchemaSelect = {
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
   };
+  domainTypes?: {
+    select: DomainTypeSelect;
+    first?: number;
+    filter?: DomainTypeFilter;
+    orderBy?: DomainTypeOrderBy[];
+  };
   enums?: {
     select: EnumSelect;
     first?: number;
@@ -3169,6 +3154,7 @@ export type TableSelect = {
   partitioned?: boolean;
   peoplestamps?: boolean;
   pluralName?: boolean;
+  principalstamps?: boolean;
   schemaId?: boolean;
   singularName?: boolean;
   smartTags?: boolean;
@@ -3507,10 +3493,6 @@ export interface ApiFilter {
   and?: ApiFilter[];
   /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
-  /** Filter by the object’s `apiModules` relation. */
-  apiModules?: ApiToManyApiModuleFilter;
-  /** `apiModules` exist. */
-  apiModulesExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: ApiToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -3543,28 +3525,6 @@ export interface ApiFilter {
   or?: ApiFilter[];
   /** Filter by the object’s `roleName` field. */
   roleName?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-export interface ApiModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApiModuleFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: ApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: ApiModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApiModuleFilter[];
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
@@ -3789,6 +3749,10 @@ export interface DatabaseFilter {
   defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
   /** `defaultPrivileges` exist. */
   defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `domainTypes` relation. */
+  domainTypes?: DatabaseToManyDomainTypeFilter;
+  /** `domainTypes` exist. */
+  domainTypesExist?: boolean;
   /** Filter by the object’s `embeddingChunks` relation. */
   embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
   /** `embeddingChunks` exist. */
@@ -4107,6 +4071,44 @@ export interface DomainEventFilter {
   or?: DomainEventFilter[];
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+}
+export interface DomainTypeFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainTypeFilter[];
+  /** Filter by the object’s `baseType` field. */
+  baseType?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `checkExpr` field. */
+  checkExpr?: JSONFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultExpr` field. */
+  defaultExpr?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainTypeFilter;
+  /** Filter by the object’s `notNull` field. */
+  notNull?: BooleanFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainTypeFilter[];
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
 }
 export interface DomainVerificationFilter {
   /** Checks for all expressions in this list. */
@@ -4707,10 +4709,6 @@ export interface PlatformApiFilter {
   not?: PlatformApiFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformApiFilter[];
-  /** Filter by the object’s `platformApiModulesByApiId` relation. */
-  platformApiModulesByApiId?: PlatformApiToManyPlatformApiModuleFilter;
-  /** `platformApiModulesByApiId` exist. */
-  platformApiModulesByApiIdExist?: boolean;
   /** Filter by the object’s `platformApiSchemasByApiId` relation. */
   platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
   /** `platformApiSchemasByApiId` exist. */
@@ -4725,26 +4723,6 @@ export interface PlatformApiFilter {
   platformCorsSettingByApiIdExists?: boolean;
   /** Filter by the object’s `roleName` field. */
   roleName?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
-export interface PlatformApiModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformApiModuleFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: PlatformApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: PlatformApiModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformApiModuleFilter[];
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
@@ -5395,6 +5373,10 @@ export interface SchemaFilter {
   defaultPrivilegesExist?: boolean;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `domainTypes` relation. */
+  domainTypes?: SchemaToManyDomainTypeFilter;
+  /** `domainTypes` exist. */
+  domainTypesExist?: boolean;
   /** Filter by the object’s `enums` relation. */
   enums?: SchemaToManyEnumFilter;
   /** `enums` exist. */
@@ -5733,6 +5715,8 @@ export interface TableFilter {
   primaryKeyConstraints?: TableToManyPrimaryKeyConstraintFilter;
   /** `primaryKeyConstraints` exist. */
   primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `principalstamps` field. */
+  principalstamps?: BooleanFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
@@ -6151,24 +6135,6 @@ export type ApiOrderBy =
   | 'ROLE_NAME_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type ApiModuleOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 export type ApiSchemaOrderBy =
   | 'API_ID_ASC'
   | 'API_ID_DESC'
@@ -6499,6 +6465,36 @@ export type DomainEventOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type DomainTypeOrderBy =
+  | 'BASE_TYPE_ASC'
+  | 'BASE_TYPE_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CHECK_EXPR_ASC'
+  | 'CHECK_EXPR_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_EXPR_ASC'
+  | 'DEFAULT_EXPR_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'NOT_NULL_ASC'
+  | 'NOT_NULL_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SMART_TAGS_ASC'
+  | 'SMART_TAGS_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC';
 export type DomainVerificationOrderBy =
   | 'ATTEMPTS_ASC'
   | 'ATTEMPTS_DESC'
@@ -6963,22 +6959,6 @@ export type PlatformApiOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ROLE_NAME_ASC'
   | 'ROLE_NAME_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type PlatformApiModuleOrderBy =
-  | 'API_ID_ASC'
-  | 'API_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type PlatformApiSchemaOrderBy =
@@ -7621,6 +7601,8 @@ export type TableOrderBy =
   | 'PLURAL_NAME_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPALSTAMPS_ASC'
+  | 'PRINCIPALSTAMPS_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SINGULAR_NAME_ASC'
@@ -7891,30 +7873,6 @@ export interface UpdateApiInput {
   apiPatch: ApiPatch;
 }
 export interface DeleteApiInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateApiModuleInput {
-  clientMutationId?: string;
-  apiModule: {
-    apiId: string;
-    data: Record<string, unknown>;
-    databaseId: string;
-    name: string;
-  };
-}
-export interface ApiModulePatch {
-  apiId?: string | null;
-  data?: Record<string, unknown> | null;
-  databaseId?: string | null;
-  name?: string | null;
-}
-export interface UpdateApiModuleInput {
-  clientMutationId?: string;
-  id: string;
-  apiModulePatch: ApiModulePatch;
-}
-export interface DeleteApiModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -8329,6 +8287,46 @@ export interface UpdateDomainEventInput {
   domainEventPatch: DomainEventPatch;
 }
 export interface DeleteDomainEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDomainTypeInput {
+  clientMutationId?: string;
+  domainType: {
+    baseType: Record<string, unknown>;
+    category?: ObjectCategory;
+    checkExpr?: Record<string, unknown>;
+    databaseId: string;
+    defaultExpr?: Record<string, unknown>;
+    description?: string;
+    label?: string;
+    name: string;
+    notNull?: boolean;
+    schemaId: string;
+    smartTags?: Record<string, unknown>;
+    tags?: string[];
+  };
+}
+export interface DomainTypePatch {
+  baseType?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  checkExpr?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  defaultExpr?: Record<string, unknown> | null;
+  description?: string | null;
+  label?: string | null;
+  name?: string | null;
+  notNull?: boolean | null;
+  schemaId?: string | null;
+  smartTags?: Record<string, unknown> | null;
+  tags?: string[] | null;
+}
+export interface UpdateDomainTypeInput {
+  clientMutationId?: string;
+  id: string;
+  domainTypePatch: DomainTypePatch;
+}
+export interface DeleteDomainTypeInput {
   clientMutationId?: string;
   id: string;
 }
@@ -8901,28 +8899,6 @@ export interface UpdatePlatformApiInput {
   platformApiPatch: PlatformApiPatch;
 }
 export interface DeletePlatformApiInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePlatformApiModuleInput {
-  clientMutationId?: string;
-  platformApiModule: {
-    apiId: string;
-    data: Record<string, unknown>;
-    name: string;
-  };
-}
-export interface PlatformApiModulePatch {
-  apiId?: string | null;
-  data?: Record<string, unknown> | null;
-  name?: string | null;
-}
-export interface UpdatePlatformApiModuleInput {
-  clientMutationId?: string;
-  id: string;
-  platformApiModulePatch: PlatformApiModulePatch;
-}
-export interface DeletePlatformApiModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -9707,6 +9683,7 @@ export interface CreateTableInput {
     partitioned?: boolean;
     peoplestamps?: boolean;
     pluralName?: string;
+    principalstamps?: boolean;
     schemaId: string;
     singularName?: string;
     smartTags?: Record<string, unknown>;
@@ -9729,6 +9706,7 @@ export interface TablePatch {
   partitioned?: boolean | null;
   peoplestamps?: boolean | null;
   pluralName?: string | null;
+  principalstamps?: boolean | null;
   schemaId?: string | null;
   singularName?: string | null;
   smartTags?: Record<string, unknown> | null;
@@ -10045,7 +10023,6 @@ export interface DeleteWebauthnSettingInput {
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
   Api: {
-    apiModules: 'ApiModule',
     apiSchemas: 'ApiSchema',
     corsSettings: 'CorsSetting',
   },
@@ -10054,6 +10031,7 @@ export const connectionFieldsMap = {
     compositeTypes: 'CompositeType',
     databaseTransfers: 'DatabaseTransfer',
     defaultPrivileges: 'DefaultPrivilege',
+    domainTypes: 'DomainType',
     embeddingChunks: 'EmbeddingChunk',
     enums: 'Enum',
     exclusionConstraints: 'ExclusionConstraint',
@@ -10093,7 +10071,6 @@ export const connectionFieldsMap = {
     domainVerifications: 'DomainVerification',
   },
   PlatformApi: {
-    platformApiModulesByApiId: 'PlatformApiModule',
     platformApiSchemasByApiId: 'PlatformApiSchema',
   },
   PlatformDomain: {
@@ -10113,6 +10090,7 @@ export const connectionFieldsMap = {
     apiSchemas: 'ApiSchema',
     compositeTypes: 'CompositeType',
     defaultPrivileges: 'DefaultPrivilege',
+    domainTypes: 'DomainType',
     enums: 'Enum',
     functions: 'Function',
     platformApiSchemas: 'PlatformApiSchema',
@@ -10195,15 +10173,6 @@ export interface SetFieldOrderInput {
   clientMutationId?: string;
   fieldIds?: string[];
 }
-/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiToManyApiModuleFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: ApiModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ApiModuleFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: ApiModuleFilter;
-}
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiToManyApiSchemaFilter {
   /** Filters to entities where every related entity matches. */
@@ -10282,6 +10251,15 @@ export interface DatabaseToManyDefaultPrivilegeFilter {
   none?: DefaultPrivilegeFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: DefaultPrivilegeFilter;
+}
+/** A filter to be used against many `DomainType` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDomainTypeFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainTypeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainTypeFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainTypeFilter;
 }
 /** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyEmbeddingChunkFilter {
@@ -10553,15 +10531,6 @@ export interface ManagedDomainToManyDomainVerificationFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: DomainVerificationFilter;
 }
-/** A filter to be used against many `PlatformApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApiToManyPlatformApiModuleFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: PlatformApiModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: PlatformApiModuleFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: PlatformApiModuleFilter;
-}
 /** A filter to be used against many `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiToManyPlatformApiSchemaFilter {
   /** Filters to entities where every related entity matches. */
@@ -10720,6 +10689,15 @@ export interface SchemaToManyDefaultPrivilegeFilter {
   none?: DefaultPrivilegeFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: DefaultPrivilegeFilter;
+}
+/** A filter to be used against many `DomainType` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyDomainTypeFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: DomainTypeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainTypeFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainTypeFilter;
 }
 /** A filter to be used against many `Enum` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManyEnumFilter {
@@ -10984,20 +10962,6 @@ export interface ApiInput {
   roleName?: string;
   updatedAt?: string;
 }
-/** An input for mutations affecting `ApiModule` */
-export interface ApiModuleInput {
-  /** API surface this module configuration belongs to */
-  apiId: string;
-  createdAt?: string;
-  /** JSON configuration data for this module */
-  data: Record<string, unknown>;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  id?: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name: string;
-  updatedAt?: string;
-}
 /** An input for mutations affecting `ApiSchema` */
 export interface ApiSchemaInput {
   /** API surface that exposes this schema */
@@ -11216,6 +11180,22 @@ export interface DomainEventInput {
   /** Structured event metadata */
   metadata?: Record<string, unknown>;
   updatedAt?: string;
+}
+/** An input for mutations affecting `DomainType` */
+export interface DomainTypeInput {
+  baseType: Record<string, unknown>;
+  category?: ObjectCategory;
+  checkExpr?: Record<string, unknown>;
+  databaseId: string;
+  defaultExpr?: Record<string, unknown>;
+  description?: string;
+  id?: string;
+  label?: string;
+  name: string;
+  notNull?: boolean;
+  schemaId: string;
+  smartTags?: Record<string, unknown>;
+  tags?: string[];
 }
 /** An input for mutations affecting `DomainVerification` */
 export interface DomainVerificationInput {
@@ -11509,18 +11489,6 @@ export interface PlatformApiInput {
   name: string;
   /** Authenticated role the API executes as */
   roleName?: string;
-  updatedAt?: string;
-}
-/** An input for mutations affecting `PlatformApiModule` */
-export interface PlatformApiModuleInput {
-  /** API surface this module configuration belongs to */
-  apiId: string;
-  createdAt?: string;
-  /** JSON configuration data for this module */
-  data: Record<string, unknown>;
-  id?: string;
-  /** Module name (e.g. auth, uploads, webhooks) */
-  name: string;
   updatedAt?: string;
 }
 /** An input for mutations affecting `PlatformApiSchema` */
@@ -11979,10 +11947,11 @@ export interface TableInput {
   partitioned?: boolean;
   peoplestamps?: boolean;
   pluralName?: string;
+  principalstamps?: boolean;
   schemaId: string;
   singularName?: string;
   smartTags?: Record<string, unknown>;
-  /** Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr. */
+  /** Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default fresh_auth), a type string (password / mfa / fresh_auth; password_or_mfa is the legacy spelling), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr. */
   stepUp?: Record<string, unknown>;
   tags?: string[];
   timestamps?: boolean;
@@ -12129,29 +12098,6 @@ export interface WebauthnSettingInput {
   updatedAt?: string;
   /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
   userFieldId?: string;
-}
-/** A filter to be used against `ApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface ApiModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: ApiModuleFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: ApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: ApiModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: ApiModuleFilter[];
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiSchemaFilter {
@@ -12342,6 +12288,45 @@ export interface DefaultPrivilegeFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+}
+/** A filter to be used against `DomainType` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainTypeFilter {
+  /** Checks for all expressions in this list. */
+  and?: DomainTypeFilter[];
+  /** Filter by the object’s `baseType` field. */
+  baseType?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `checkExpr` field. */
+  checkExpr?: JSONFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultExpr` field. */
+  defaultExpr?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: DomainTypeFilter;
+  /** Filter by the object’s `notNull` field. */
+  notNull?: BooleanFilter;
+  /** Checks for any expressions in this list. */
+  or?: DomainTypeFilter[];
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
 }
 /** A filter to be used against `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface EmbeddingChunkFilter {
@@ -12893,6 +12878,10 @@ export interface SchemaFilter {
   defaultPrivilegesExist?: boolean;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `domainTypes` relation. */
+  domainTypes?: SchemaToManyDomainTypeFilter;
+  /** `domainTypes` exist. */
+  domainTypesExist?: boolean;
   /** Filter by the object’s `enums` relation. */
   enums?: SchemaToManyEnumFilter;
   /** `enums` exist. */
@@ -13100,6 +13089,8 @@ export interface TableFilter {
   primaryKeyConstraints?: TableToManyPrimaryKeyConstraintFilter;
   /** `primaryKeyConstraints` exist. */
   primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `principalstamps` field. */
+  principalstamps?: BooleanFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
@@ -13552,27 +13543,6 @@ export interface RouteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-/** A filter to be used against `PlatformApiModule` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformApiModuleFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformApiModuleFilter[];
-  /** Filter by the object’s `api` relation. */
-  api?: PlatformApiFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: PlatformApiModuleFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformApiModuleFilter[];
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-}
 /** A filter to be used against `PlatformApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiSchemaFilter {
   /** Checks for all expressions in this list. */
@@ -13830,10 +13800,6 @@ export interface ApiFilter {
   and?: ApiFilter[];
   /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
-  /** Filter by the object’s `apiModules` relation. */
-  apiModules?: ApiToManyApiModuleFilter;
-  /** `apiModules` exist. */
-  apiModulesExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: ApiToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -13919,83 +13885,6 @@ export interface DatetimeFilter {
   /** Not included in the specified list. */
   notIn?: string[];
 }
-/** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
-export interface StringFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: string;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: string;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: string;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: string[];
-  /** Contains the specified string (case-sensitive). */
-  includes?: string;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: string;
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: string;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: string;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: string;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: string;
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: string[];
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: string;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: string;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: string;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: string;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: string;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: string;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: string;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: string;
-}
 /** A filter to be used against String List fields. All fields are combined with a logical ‘and.’ */
 export interface StringListFilter {
   /** Any array item is equal to the specified value. */
@@ -14057,6 +13946,10 @@ export interface DatabaseFilter {
   defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
   /** `defaultPrivileges` exist. */
   defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `domainTypes` relation. */
+  domainTypes?: DatabaseToManyDomainTypeFilter;
+  /** `domainTypes` exist. */
+  domainTypesExist?: boolean;
   /** Filter by the object’s `embeddingChunks` relation. */
   embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
   /** `embeddingChunks` exist. */
@@ -14269,6 +14162,83 @@ export interface BooleanFilter {
   /** Not included in the specified list. */
   notIn?: boolean[];
 }
+/** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
+export interface StringFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+}
 /** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
 export interface IntFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -14439,10 +14409,6 @@ export interface PlatformApiFilter {
   not?: PlatformApiFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformApiFilter[];
-  /** Filter by the object’s `platformApiModulesByApiId` relation. */
-  platformApiModulesByApiId?: PlatformApiToManyPlatformApiModuleFilter;
-  /** `platformApiModulesByApiId` exist. */
-  platformApiModulesByApiIdExist?: boolean;
   /** Filter by the object’s `platformApiSchemasByApiId` relation. */
   platformApiSchemasByApiId?: PlatformApiToManyPlatformApiSchemaFilter;
   /** `platformApiSchemasByApiId` exist. */
@@ -14902,51 +14868,6 @@ export type DeleteApiPayloadSelect = {
   };
   apiEdge?: {
     select: ApiEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface CreateApiModulePayload {
-  /** The `ApiModule` that was created by this mutation. */
-  apiModule?: ApiModule | null;
-  apiModuleEdge?: ApiModuleEdge | null;
-  clientMutationId?: string | null;
-}
-export type CreateApiModulePayloadSelect = {
-  apiModule?: {
-    select: ApiModuleSelect;
-  };
-  apiModuleEdge?: {
-    select: ApiModuleEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface UpdateApiModulePayload {
-  /** The `ApiModule` that was updated by this mutation. */
-  apiModule?: ApiModule | null;
-  apiModuleEdge?: ApiModuleEdge | null;
-  clientMutationId?: string | null;
-}
-export type UpdateApiModulePayloadSelect = {
-  apiModule?: {
-    select: ApiModuleSelect;
-  };
-  apiModuleEdge?: {
-    select: ApiModuleEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface DeleteApiModulePayload {
-  /** The `ApiModule` that was deleted by this mutation. */
-  apiModule?: ApiModule | null;
-  apiModuleEdge?: ApiModuleEdge | null;
-  clientMutationId?: string | null;
-}
-export type DeleteApiModulePayloadSelect = {
-  apiModule?: {
-    select: ApiModuleSelect;
-  };
-  apiModuleEdge?: {
-    select: ApiModuleEdgeSelect;
   };
   clientMutationId?: boolean;
 };
@@ -15443,6 +15364,51 @@ export type DeleteDomainEventPayloadSelect = {
   };
   domainEventEdge?: {
     select: DomainEventEdgeSelect;
+  };
+};
+export interface CreateDomainTypePayload {
+  clientMutationId?: string | null;
+  /** The `DomainType` that was created by this mutation. */
+  domainType?: DomainType | null;
+  domainTypeEdge?: DomainTypeEdge | null;
+}
+export type CreateDomainTypePayloadSelect = {
+  clientMutationId?: boolean;
+  domainType?: {
+    select: DomainTypeSelect;
+  };
+  domainTypeEdge?: {
+    select: DomainTypeEdgeSelect;
+  };
+};
+export interface UpdateDomainTypePayload {
+  clientMutationId?: string | null;
+  /** The `DomainType` that was updated by this mutation. */
+  domainType?: DomainType | null;
+  domainTypeEdge?: DomainTypeEdge | null;
+}
+export type UpdateDomainTypePayloadSelect = {
+  clientMutationId?: boolean;
+  domainType?: {
+    select: DomainTypeSelect;
+  };
+  domainTypeEdge?: {
+    select: DomainTypeEdgeSelect;
+  };
+};
+export interface DeleteDomainTypePayload {
+  clientMutationId?: string | null;
+  /** The `DomainType` that was deleted by this mutation. */
+  domainType?: DomainType | null;
+  domainTypeEdge?: DomainTypeEdge | null;
+}
+export type DeleteDomainTypePayloadSelect = {
+  clientMutationId?: boolean;
+  domainType?: {
+    select: DomainTypeSelect;
+  };
+  domainTypeEdge?: {
+    select: DomainTypeEdgeSelect;
   };
 };
 export interface CreateDomainVerificationPayload {
@@ -16118,51 +16084,6 @@ export type DeletePlatformApiPayloadSelect = {
   };
   platformApiEdge?: {
     select: PlatformApiEdgeSelect;
-  };
-};
-export interface CreatePlatformApiModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApiModule` that was created by this mutation. */
-  platformApiModule?: PlatformApiModule | null;
-  platformApiModuleEdge?: PlatformApiModuleEdge | null;
-}
-export type CreatePlatformApiModulePayloadSelect = {
-  clientMutationId?: boolean;
-  platformApiModule?: {
-    select: PlatformApiModuleSelect;
-  };
-  platformApiModuleEdge?: {
-    select: PlatformApiModuleEdgeSelect;
-  };
-};
-export interface UpdatePlatformApiModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApiModule` that was updated by this mutation. */
-  platformApiModule?: PlatformApiModule | null;
-  platformApiModuleEdge?: PlatformApiModuleEdge | null;
-}
-export type UpdatePlatformApiModulePayloadSelect = {
-  clientMutationId?: boolean;
-  platformApiModule?: {
-    select: PlatformApiModuleSelect;
-  };
-  platformApiModuleEdge?: {
-    select: PlatformApiModuleEdgeSelect;
-  };
-};
-export interface DeletePlatformApiModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformApiModule` that was deleted by this mutation. */
-  platformApiModule?: PlatformApiModule | null;
-  platformApiModuleEdge?: PlatformApiModuleEdge | null;
-}
-export type DeletePlatformApiModulePayloadSelect = {
-  clientMutationId?: boolean;
-  platformApiModule?: {
-    select: PlatformApiModuleSelect;
-  };
-  platformApiModuleEdge?: {
-    select: PlatformApiModuleEdgeSelect;
   };
 };
 export interface CreatePlatformApiSchemaPayload {
@@ -17764,18 +17685,6 @@ export type ApiEdgeSelect = {
     select: ApiSelect;
   };
 };
-/** A `ApiModule` edge in the connection. */
-export interface ApiModuleEdge {
-  cursor?: string | null;
-  /** The `ApiModule` at the end of the edge. */
-  node?: ApiModule | null;
-}
-export type ApiModuleEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: ApiModuleSelect;
-  };
-};
 /** A `ApiSchema` edge in the connection. */
 export interface ApiSchemaEdge {
   cursor?: string | null;
@@ -17906,6 +17815,18 @@ export type DomainEventEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DomainEventSelect;
+  };
+};
+/** A `DomainType` edge in the connection. */
+export interface DomainTypeEdge {
+  cursor?: string | null;
+  /** The `DomainType` at the end of the edge. */
+  node?: DomainType | null;
+}
+export type DomainTypeEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DomainTypeSelect;
   };
 };
 /** A `DomainVerification` edge in the connection. */
@@ -18086,18 +18007,6 @@ export type PlatformApiEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformApiSelect;
-  };
-};
-/** A `PlatformApiModule` edge in the connection. */
-export interface PlatformApiModuleEdge {
-  cursor?: string | null;
-  /** The `PlatformApiModule` at the end of the edge. */
-  node?: PlatformApiModule | null;
-}
-export type PlatformApiModuleEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PlatformApiModuleSelect;
   };
 };
 /** A `PlatformApiSchema` edge in the connection. */

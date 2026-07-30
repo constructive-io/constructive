@@ -1,13 +1,13 @@
 ---
 name: cli-api
-description: CLI tool (csdk) for the api API — provides CRUD commands for 65 tables and 11 custom operations
+description: CLI tool (csdk) for the api API — provides CRUD commands for 64 tables and 11 custom operations
 ---
 
 # cli-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the api API — provides CRUD commands for 65 tables and 11 custom operations
+CLI tool (csdk) for the api API — provides CRUD commands for 64 tables and 11 custom operations
 
 ## Usage
 
@@ -57,7 +57,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [auth](references/auth.md)
 - [config](references/config.md)
 - [api](references/api.md)
-- [api-module](references/api-module.md)
 - [api-schema](references/api-schema.md)
 - [api-setting](references/api-setting.md)
 - [ast-migration](references/ast-migration.md)
@@ -70,6 +69,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [default-privilege](references/default-privilege.md)
 - [domain](references/domain.md)
 - [domain-event](references/domain-event.md)
+- [domain-type](references/domain-type.md)
 - [domain-verification](references/domain-verification.md)
 - [embedding-chunk](references/embedding-chunk.md)
 - [enum](references/enum.md)
@@ -85,7 +85,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [partition](references/partition.md)
 - [platform-api](references/platform-api.md)
-- [platform-api-module](references/platform-api-module.md)
 - [platform-api-schema](references/platform-api-schema.md)
 - [platform-api-setting](references/platform-api-setting.md)
 - [platform-cors-setting](references/platform-cors-setting.md)
