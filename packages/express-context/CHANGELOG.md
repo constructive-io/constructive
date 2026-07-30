@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.4](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.22.3...@constructive-io/express-context@0.22.4) (2026-07-30)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
 ## [0.22.3](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.22.2...@constructive-io/express-context@0.22.3) (2026-07-30)
 
 **Note:** Version bump only for package @constructive-io/express-context

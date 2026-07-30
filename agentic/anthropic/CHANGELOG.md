@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/anthropic@1.13.0...@agentic-kit/anthropic@1.13.1) (2026-07-30)
+
+**Note:** Version bump only for package @agentic-kit/anthropic
+
 # [1.13.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/anthropic@1.12.0...@agentic-kit/anthropic@1.13.0) (2026-07-29)
 
 **Note:** Version bump only for package @agentic-kit/anthropic
