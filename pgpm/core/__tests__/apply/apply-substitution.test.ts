@@ -97,22 +97,14 @@ describe('materializeApplyModule — subsystem substitution', () => {
     const spec = readApplySpec(fixture.fixturePath('packages', 'crm-app'));
     const { bundle, outDir } = await materializeApplyModule({ sourceDir, spec });
     try {
-      // excluded changes keep their identity as emptied tombstones
-      const identityUsers = bundle.changes.find(
-        c => c.name === 'schemas/identity/tables/users/table'
-      )!;
-      expect(identityUsers.deploy!.sql).not.toMatch(/CREATE TABLE/i);
-      expect(identityUsers.revert!.sql).not.toMatch(/DROP TABLE/i);
-      expect(identityUsers.verify!.sql).not.toMatch(/identity\.users/);
-
-      const identitySchema = bundle.changes.find(c => c.name === 'schemas/identity/schema')!;
-      expect(identitySchema.deploy!.sql).not.toMatch(/CREATE SCHEMA/i);
-      expect(identitySchema.verify!.sql).not.toMatch(/has_schema_privilege/i);
-
-      const actor = bundle.changes.find(
-        c => c.name === 'schemas/identity/procedures/current_actor'
-      )!;
-      expect(actor.deploy!.sql).not.toMatch(/CREATE FUNCTION/i);
+      // the excluded subsystem's changes are dropped from the artifact
+      // entirely — not emitted as empty tombstones (those collide on the
+      // deploy ledger's script-hash uniqueness)
+      expect(bundle.changes.find(c => c.name === 'schemas/identity/tables/users/table')).toBeUndefined();
+      expect(bundle.changes.find(c => c.name === 'schemas/identity/schema')).toBeUndefined();
+      expect(bundle.changes.find(c => c.name === 'schemas/identity/procedures/current_actor')).toBeUndefined();
+      // and their names never appear in a survivor's plan dependencies
+      expect(bundle.plan).not.toMatch(/schemas\/identity\//);
 
       // surviving app changes are transpiled and rebound onto the provider
       const notes = bundle.changes.find(c => c.name === 'schemas/crm/tables/notes/table')!;

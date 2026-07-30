@@ -1,7 +1,7 @@
 import { PgpmScriptKind } from '@pgpmjs/ast/module/types';
 import { parsePgpmHeader, renameInHeader, writePgpmScript } from '@pgpmjs/ast/files/sql/header';
 import { hashString } from '@pgpmjs/ast';
-import { renameInPlanContent } from '@pgpmjs/ast';
+import { generatePlanFileContent, parsePlanContent, renameInPlanContent } from '@pgpmjs/ast';
 import { mapScripts } from '@pgpmjs/traverse';
 import {
   computeBundleDigest,
@@ -50,6 +50,38 @@ export interface TranspileBundleOptions extends CreateBundleOptions {
    * dependency references land on the instance instead of the source.
    */
   renameModule?: string;
+  /**
+   * Select changes to drop from the transpiled bundle entirely (return `true`
+   * to exclude). Excluded changes are removed from the change list, deploy
+   * order, and plan, and their name is pruned from every surviving change's
+   * dependencies (plan brackets included).
+   *
+   * This is the mechanism behind subsystem exclusion in apply: an excluded
+   * subsystem is genuinely absent from the artifact rather than emitted as an
+   * empty script. Empty tombstones are indistinguishable by content, so they
+   * collide on the deploy ledger's `(package, script_hash)` uniqueness — a
+   * dropped change has no script to hash. Cascade safety (no survivor still
+   * references a dropped object) is the caller's responsibility.
+   */
+  excludeChange?: (name: string) => boolean;
+}
+
+/**
+ * Drop excluded changes from a plan's text and prune references to them from
+ * the surviving changes' dependency brackets, re-serializing the plan. Tags on
+ * excluded changes are dropped with them.
+ */
+function removeChangesFromPlan(plan: string, excluded: Set<string>): string {
+  const parsed = parsePlanContent(plan);
+  if (!parsed.data) return plan;
+  const changes = parsed.data.changes
+    .filter(change => !excluded.has(change.name))
+    .map(change => ({
+      ...change,
+      dependencies: change.dependencies.filter(dep => !excluded.has(dep))
+    }));
+  const tags = (parsed.data.tags ?? []).filter(tag => !excluded.has(tag.change));
+  return generatePlanFileContent({ ...parsed.data, changes, tags });
 }
 
 function renameProjectInPlan(plan: string, from: string, to: string): string {
@@ -128,23 +160,35 @@ export function transpileBundle(
   options: TranspileBundleOptions = {}
 ): MigrationBundle {
   const renameChange = options.renameChange ?? ((name: string) => name);
+  const excludeChange = options.excludeChange ?? (() => false);
   const renames = buildRenames(bundle.manifest.deployOrder, renameChange);
 
-  const changes: BundleChange[] = bundle.changes.map(change => {
-    const name = renames.get(change.name) ?? change.name;
-    const dependencies = change.dependencies.map(dep => renames.get(dep) ?? dep);
-    const { deploy, revert, verify } = mapScripts(change, script =>
-      transpileScriptSql(script, change.name, renames, options)
-    );
-    const digest = computeChangeDigest(name, {
-      deploy: deploy?.digest,
-      revert: revert?.digest,
-      verify: verify?.digest
+  const changes: BundleChange[] = bundle.changes
+    .filter(change => !excludeChange(change.name))
+    .map(change => {
+      const name = renames.get(change.name) ?? change.name;
+      const dependencies = change.dependencies
+        .filter(dep => !excludeChange(dep))
+        .map(dep => renames.get(dep) ?? dep);
+      const { deploy, revert, verify } = mapScripts(change, script =>
+        transpileScriptSql(script, change.name, renames, options)
+      );
+      const digest = computeChangeDigest(name, {
+        deploy: deploy?.digest,
+        revert: revert?.digest,
+        verify: verify?.digest
+      });
+      return { name, dependencies, deploy, revert, verify, digest };
     });
-    return { name, dependencies, deploy, revert, verify, digest };
-  });
 
   let plan = renames.size > 0 ? renameInPlanContent(bundle.plan, renames) : bundle.plan;
+  // Excluded changes are matched by source name; they are never renamed (the
+  // caller leaves excluded changes' identity intact), so prune the plan by the
+  // source names, after any survivor renames have been applied above.
+  const excluded = new Set(bundle.manifest.deployOrder.filter(excludeChange));
+  if (excluded.size > 0) {
+    plan = removeChangesFromPlan(plan, excluded);
+  }
 
   const moduleName = options.renameModule ?? bundle.manifest.name;
   if (options.renameModule && options.renameModule !== bundle.manifest.name) {
