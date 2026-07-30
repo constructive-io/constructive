@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.1](https://github.com/constructive-io/constructive/compare/node-type-registry@1.11.0...node-type-registry@1.11.1) (2026-07-30)
+
+### Bug Fixes
+
+- **errors:** propagate the step-up codes and fresh_auth posture from constructive-db ([8c821b9](https://github.com/constructive-io/constructive/commit/8c821b9f020e428be3fcd4c7508d0903d1cae052))
+
 # [1.11.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.10.0...node-type-registry@1.11.0) (2026-07-29)
 
 **Note:** Version bump only for package node-type-registry

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.14.0...@pgpmjs/core@7.15.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** bundle-backed deploy fast path with migration ledger ([dd06d6d](https://github.com/constructive-io/constructive/commit/dd06d6df903ef03beee13373f4a82328d39f6d49))
+- **pgpm:** expand a reuse proxy into shared + per-tenant modules ([9bca30e](https://github.com/constructive-io/constructive/commit/9bca30eaa1efaf6797c833ba1044accaa6d5c8d4))
+- **pgpm:** extension + role routing in apply (@pgsql/transform 18.6.0) ([aaae4d8](https://github.com/constructive-io/constructive/commit/aaae4d897379d5f6c51ef07c648c3d9ca44203ce))
+- **pgpm:** make fast deploy ledger-preserving; remove unledgered path ([d27fbfa](https://github.com/constructive-io/constructive/commit/d27fbfa369d6f9e1b39a5631512bf7b97b14aafd))
+
 # [7.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.13.0...@pgpmjs/core@7.14.0) (2026-07-30)
 
 ### Features

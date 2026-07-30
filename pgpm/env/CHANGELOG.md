@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.38.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.37.0...@pgpmjs/env@2.38.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** bundle-backed deploy fast path with migration ledger ([dd06d6d](https://github.com/constructive-io/constructive/commit/dd06d6df903ef03beee13373f4a82328d39f6d49))
+
 # [2.37.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.36.0...@pgpmjs/env@2.37.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/env

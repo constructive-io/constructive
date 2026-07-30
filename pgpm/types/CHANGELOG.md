@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.46.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.45.0...@pgpmjs/types@2.46.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** bundle-backed deploy fast path with migration ledger ([dd06d6d](https://github.com/constructive-io/constructive/commit/dd06d6df903ef03beee13373f4a82328d39f6d49))
+- **pgpm:** make fast deploy ledger-preserving; remove unledgered path ([d27fbfa](https://github.com/constructive-io/constructive/commit/d27fbfa369d6f9e1b39a5631512bf7b97b14aafd))
+
 # [2.45.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.44.0...@pgpmjs/types@2.45.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/types

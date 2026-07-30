@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.11.0...@pgpmjs/bundle@0.12.0) (2026-07-30)
+
+### Features
+
+- **bundle:** splitBundle — partition a bundle into shared + per-tenant modules ([9b1a6ca](https://github.com/constructive-io/constructive/commit/9b1a6ca7819caed75e9eb4cb27b27963ae77d72d))
+- **pgpm:** bundle-backed deploy fast path with migration ledger ([dd06d6d](https://github.com/constructive-io/constructive/commit/dd06d6df903ef03beee13373f4a82328d39f6d49))
+- **pgpm:** expand a reuse proxy into shared + per-tenant modules ([9bca30e](https://github.com/constructive-io/constructive/commit/9bca30eaa1efaf6797c833ba1044accaa6d5c8d4))
+
 # [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.10.0...@pgpmjs/bundle@0.11.0) (2026-07-30)
 
 ### Features

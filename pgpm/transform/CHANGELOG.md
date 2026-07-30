@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.10.0...@pgpmjs/transform@0.11.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** extension + role routing in apply (@pgsql/transform 18.6.0) ([aaae4d8](https://github.com/constructive-io/constructive/commit/aaae4d897379d5f6c51ef07c648c3d9ca44203ce))
+
 # [0.10.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.9.0...@pgpmjs/transform@0.10.0) (2026-07-30)
 
 ### Features
