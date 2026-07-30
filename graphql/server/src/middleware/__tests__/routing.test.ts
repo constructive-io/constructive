@@ -15,12 +15,7 @@ import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
 import { getApiConfig } from '../api';
-import type { ResolvedRoute } from '../routing';
-import {
-  resolveApiHost,
-  resolveRoute,
-  routeToApiStructure
-} from '../routing';
+import { resolveApiHost, ResolvedRoute, resolveRoute, routeToApiStructure } from '../routing';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 

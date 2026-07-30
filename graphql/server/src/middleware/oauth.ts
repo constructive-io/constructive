@@ -35,7 +35,7 @@ import {
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
-import { Request, Response, Router } from 'express';
+import { Request, Response,Router } from 'express';
 
 import { pgIntervalToMilliseconds } from '../utils/pg-interval';
 import {

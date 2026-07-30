@@ -94,9 +94,7 @@ afterAll(async () => {
 
 describe('OAuth routes over scoped routing', () => {
   it('resolves the API host and returns the database-scoped provider list', async () => {
-    const response = await request
-      .get('/auth/providers')
-      .set('Host', AUTH_HOST);
+    const response = await request.get('/auth/providers').set('Host', AUTH_HOST);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ providers: ['github'] });
