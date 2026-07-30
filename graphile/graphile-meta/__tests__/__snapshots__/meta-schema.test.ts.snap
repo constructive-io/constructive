@@ -16,6 +16,7 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "constraints.unique",
   "constraints.unique.name",
   "fields",
+  "fields.columnName",
   "fields.enumValues",
   "fields.enumValues.name",
   "fields.enumValues.values",
@@ -125,6 +126,7 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "storage",
   "storage.isBucketsTable",
   "storage.isFilesTable",
+  "tableName",
   "uniqueConstraints",
   "uniqueConstraints.name",
 ]
@@ -135,6 +137,7 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
   _meta {
     tables {
       name
+      tableName
       schemaName
       query {
         all
@@ -145,6 +148,7 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
       }
       fields {
         name
+        columnName
         type {
           pgType
           gqlType
@@ -319,6 +323,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "author_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -342,6 +347,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "comment_author_fkey",
           "refFields": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -373,6 +379,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "post_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -396,6 +403,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "comment_post_fkey",
           "refFields": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -428,6 +436,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -454,6 +463,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "columnName": "author_id",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -474,6 +484,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "body",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -492,6 +503,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "id",
         "description": null,
         "enumValues": null,
         "hasDefault": true,
@@ -512,6 +524,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "post_id",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -536,6 +549,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "author_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -559,6 +573,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "comment_author_fkey",
         "refFields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -590,6 +605,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "post_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -613,6 +629,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "comment_post_fkey",
         "refFields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -650,6 +667,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -694,6 +712,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -732,6 +751,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "author_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -762,6 +782,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "post_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -797,6 +818,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "scope": null,
     "search": null,
     "storage": null,
+    "tableName": "comment",
     "uniqueConstraints": [],
   },
   {
@@ -805,6 +827,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "author_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -828,6 +851,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "post_author_fkey",
           "refFields": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -860,6 +884,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -886,6 +911,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "columnName": "author_id",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -906,6 +932,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "id",
         "description": null,
         "enumValues": null,
         "hasDefault": true,
@@ -926,6 +953,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "metadata",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -944,6 +972,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "title",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -966,6 +995,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "author_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -989,6 +1019,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "post_author_fkey",
         "refFields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -1026,6 +1057,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -1070,6 +1102,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -1108,6 +1141,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "author_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1140,6 +1174,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1170,6 +1205,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1202,6 +1238,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1232,6 +1269,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1265,6 +1303,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionLeftConstraint": {
             "fields": [
               {
+                "columnName": "post_id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": false,
@@ -1288,6 +1327,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "post_post_tags",
             "refFields": [
               {
+                "columnName": "id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": true,
@@ -1318,6 +1358,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionLeftKeyAttributes": [
             {
+              "columnName": "post_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1341,6 +1382,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionRightConstraint": {
             "fields": [
               {
+                "columnName": "tag_id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": false,
@@ -1364,6 +1406,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "post_tag_tag_fkey",
             "refFields": [
               {
+                "columnName": "id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": true,
@@ -1394,6 +1437,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionRightKeyAttributes": [
             {
+              "columnName": "tag_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1419,6 +1463,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "leftKeyAttributes": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1441,6 +1486,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           ],
           "rightKeyAttributes": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1472,6 +1518,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "scope": null,
     "search": null,
     "storage": null,
+    "tableName": "post",
     "uniqueConstraints": [],
   },
   {
@@ -1480,6 +1527,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "post_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1503,6 +1551,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "post_tag_post_fkey",
           "refFields": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1534,6 +1583,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "tag_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1557,6 +1607,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "post_tag_tag_fkey",
           "refFields": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -1589,6 +1640,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "columnName": "post_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1609,6 +1661,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             },
           },
           {
+            "columnName": "tag_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1635,6 +1688,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "columnName": "post_id",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -1655,6 +1709,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "tag_id",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -1679,6 +1734,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "post_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1702,6 +1758,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "post_tag_post_fkey",
         "refFields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -1733,6 +1790,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "tag_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1756,6 +1814,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "post_tag_tag_fkey",
         "refFields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -1794,6 +1853,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "post_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1814,6 +1874,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             },
           },
           {
+            "columnName": "tag_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1858,6 +1919,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "post_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1878,6 +1940,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             },
           },
           {
+            "columnName": "tag_id",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -1916,6 +1979,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "post_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1946,6 +2010,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "tag_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -1981,6 +2046,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "scope": null,
     "search": null,
     "storage": null,
+    "tableName": "post_tag",
     "uniqueConstraints": [],
   },
   {
@@ -1989,6 +2055,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -2015,6 +2082,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "slug",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -2039,6 +2107,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "columnName": "id",
         "description": null,
         "enumValues": null,
         "hasDefault": true,
@@ -2059,6 +2128,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "slug",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -2086,6 +2156,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -2116,6 +2187,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "slug",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -2158,6 +2230,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -2197,6 +2270,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2229,6 +2303,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2262,6 +2337,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionLeftConstraint": {
             "fields": [
               {
+                "columnName": "tag_id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": false,
@@ -2285,6 +2361,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "tag_post_tags",
             "refFields": [
               {
+                "columnName": "id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": true,
@@ -2315,6 +2392,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionLeftKeyAttributes": [
             {
+              "columnName": "tag_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -2338,6 +2416,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionRightConstraint": {
             "fields": [
               {
+                "columnName": "post_id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": false,
@@ -2361,6 +2440,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "post_tag_post_fkey",
             "refFields": [
               {
+                "columnName": "id",
                 "description": null,
                 "enumValues": null,
                 "hasDefault": true,
@@ -2391,6 +2471,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionRightKeyAttributes": [
             {
+              "columnName": "post_id",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -2416,6 +2497,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "leftKeyAttributes": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2438,6 +2520,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           ],
           "rightKeyAttributes": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2469,10 +2552,12 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "scope": null,
     "search": null,
     "storage": null,
+    "tableName": "tag",
     "uniqueConstraints": [
       {
         "fields": [
           {
+            "columnName": "slug",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -2501,6 +2586,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -2527,6 +2613,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "columnName": "email_address",
               "description": null,
               "enumValues": null,
               "hasDefault": false,
@@ -2551,6 +2638,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "columnName": "display_name",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -2569,6 +2657,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "email_address",
         "description": null,
         "enumValues": null,
         "hasDefault": false,
@@ -2587,6 +2676,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "columnName": "id",
         "description": null,
         "enumValues": null,
         "hasDefault": true,
@@ -2616,6 +2706,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "email_address",
             "description": null,
             "enumValues": null,
             "hasDefault": false,
@@ -2644,6 +2735,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -2688,6 +2780,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "columnName": "id",
             "description": null,
             "enumValues": null,
             "hasDefault": true,
@@ -2727,6 +2820,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2757,6 +2851,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2789,6 +2884,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2819,6 +2915,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "columnName": "id",
               "description": null,
               "enumValues": null,
               "hasDefault": true,
@@ -2852,10 +2949,12 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "scope": null,
     "search": null,
     "storage": null,
+    "tableName": "user",
     "uniqueConstraints": [
       {
         "fields": [
           {
+            "columnName": "email_address",
             "description": null,
             "enumValues": null,
             "hasDefault": false,

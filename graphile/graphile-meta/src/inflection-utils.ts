@@ -12,6 +12,12 @@ export function createAttributeInflector(
   inflection: MetaInflection,
 ): (attrName: string, codec: PgCodec) => string {
   return (attrName: string, codec: PgCodec): string => {
+    const fieldName = safeInflection(
+      () => inflection.attribute?.({ attributeName: attrName, codec }),
+      null,
+    );
+    if (fieldName) return fieldName;
+
     const attributeName = safeInflection(
       () => inflection._attributeName?.({ attributeName: attrName, codec }),
       attrName,

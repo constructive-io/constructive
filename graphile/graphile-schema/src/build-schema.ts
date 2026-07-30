@@ -1,5 +1,5 @@
 import deepmerge from 'deepmerge'
-import { lexicographicSortSchema, printSchema } from 'graphql'
+import { graphql, lexicographicSortSchema, printSchema } from 'graphql'
 import { ConstructivePreset, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
 import { getPgPool } from 'pg-cache'
@@ -49,5 +49,19 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
   }
 
   const { schema } = await makeSchema(preset)
+
+  // MetaSchemaPlugin validates executable names lazily against the schema that
+  // will actually be executed. Trigger that resolver after every finalizer has
+  // run so legacy `_cachedTablesMeta` consumers receive the same final metadata.
+  if (schema.getQueryType()?.getFields()._meta) {
+    const result = await graphql({
+      schema,
+      source: '{ _meta { tables { name } } }',
+    })
+    if (result.errors?.length) {
+      throw new AggregateError(result.errors, 'Failed to build schema metadata')
+    }
+  }
+
   return printSchema(lexicographicSortSchema(schema))
 }

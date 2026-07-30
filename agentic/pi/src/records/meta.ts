@@ -71,7 +71,7 @@ type RawField = {
 type RawInflection = Partial<Record<keyof TableInflection, string | null>>;
 
 type RawQuery = {
-  all: string;
+  all: string | null;
   one?: string | null;
   create?: string | null;
   update?: string | null;

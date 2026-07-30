@@ -1,6 +1,9 @@
 import {
   graphql,
+  GraphQLInterfaceType,
+  GraphQLList,
   GraphQLObjectType,
+  GraphQLScalarType,
   GraphQLSchema,
   GraphQLString,
   Kind,
@@ -15,6 +18,7 @@ import {
   _pgTypeToGqlType,
   MetaSchemaPlugin
 } from '../src';
+import { collectTablesMeta } from '../src/table-meta-builder';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -38,7 +42,7 @@ function createMockCodec(
     name,
     attributes,
     isAnonymous: false,
-    extensions: { pg: { schemaName } }
+    extensions: { pg: { schemaName, name } }
   };
 }
 
@@ -86,8 +90,10 @@ function createMockBuild(
       patchType: (typeName: string) => typeName + 'Patch',
       createInputType: (resource: any) => 'Create' + (resource.codec?.name || '') + 'Input',
       createPayloadType: (resource: any) => 'Create' + (resource.codec?.name || '') + 'Payload',
-      updatePayloadType: (resource: any) => 'Update' + (resource.codec?.name || '') + 'Payload',
-      deletePayloadType: (resource: any) => 'Delete' + (resource.codec?.name || '') + 'Payload',
+      updatePayloadType: ({ resource }: any) =>
+        'Update' + (resource.codec?.name || '') + 'Payload',
+      deletePayloadType: ({ resource }: any) =>
+        'Delete' + (resource.codec?.name || '') + 'Payload',
       tableFieldName: (resource: any) => (resource.codec?.name || 'unknown').toLowerCase(),
       createField: (resource: any) => 'create' + (resource.codec?.name || ''),
       updateByKeys: (resource: any) => 'update' + (resource.codec?.name || ''),
@@ -110,15 +116,9 @@ function createMockBuild(
   };
 }
 
-/** Call the plugin's init hook with a mocked build, return cached table meta. */
+/** Build metadata directly for focused registry-unit tests. */
 function callInitHook(build: any): any[] {
-  const initHook = MetaSchemaPlugin.schema!.hooks!.init as (
-    _: any,
-    build: any,
-  ) => any;
-  initHook({}, build);
-  // The hook populates the module-level _cachedTablesMeta
-  return _cachedTablesMeta as any[];
+  return collectTablesMeta(build) as any[];
 }
 
 function callGraphQLObjectTypeFieldsHook(
@@ -132,6 +132,14 @@ function callGraphQLObjectTypeFieldsHook(
     context: { Self: { name: string } },
   ) => Record<string, any>;
   return fieldsHook(fields, build, { Self: { name: selfName } });
+}
+
+function callFinalizeHook(schema: GraphQLSchema, build: any): GraphQLSchema {
+  const finalizeHook = MetaSchemaPlugin.schema!.hooks!.finalize as (
+    schema: GraphQLSchema,
+    build: any,
+  ) => GraphQLSchema;
+  return finalizeHook(schema, build);
 }
 
 function deepClone<T>(value: T): T {
@@ -345,9 +353,10 @@ query MetaContract {
   _meta {
     tables {
       name
+      tableName
       schemaName
       query { all one create update delete }
-      fields { name type { pgType gqlType isArray subtype } enumValues { name values } }
+      fields { name columnName type { pgType gqlType isArray subtype } enumValues { name values } }
       indexes { name isUnique isPrimary columns fields { name } }
       constraints {
         primaryKey { name }
@@ -416,6 +425,7 @@ query MetaContract {
 
 const REQUIRED_META_QUERY_PATHS = [
   'name',
+  'tableName',
   'schemaName',
   'query.all',
   'query.one',
@@ -423,6 +433,7 @@ const REQUIRED_META_QUERY_PATHS = [
   'query.update',
   'query.delete',
   'fields.name',
+  'fields.columnName',
   'fields.type.pgType',
   'fields.type.gqlType',
   'fields.type.isArray',
@@ -839,10 +850,13 @@ describe('MetaSchemaPlugin', () => {
   describe('buildFieldMeta', () => {
     it('builds field meta with correct gqlType mapping', () => {
       const attr = createMockAttribute('timestamptz', { notNull: true, hasDefault: true });
-      const result = _buildFieldMeta('createdAt', attr);
+      const result = _buildFieldMeta('createdAt', attr, undefined, {
+        columnName: 'created_at'
+      });
 
       expect(result).toEqual({
         name: 'createdAt',
+        columnName: 'created_at',
         type: {
           pgType: 'timestamptz',
           gqlType: 'Datetime',
@@ -1115,7 +1129,9 @@ describe('MetaSchemaPlugin', () => {
 
       // FK field names should be inflected
       expect(fk.fields[0].name).toBe('authorId');
+      expect(fk.fields[0].columnName).toBe('author_id');
       expect(fk.referencedFields[0]).toBe('id');
+      expect(fk.refFields[0].columnName).toBe('id');
     });
 
     it('inflects relation key field names', () => {
@@ -1192,6 +1208,7 @@ describe('MetaSchemaPlugin', () => {
       const codec = createMockCodec('user', {
         id: createMockAttribute('uuid')
       });
+      codec.extensions.pg.name = 'app_user';
 
       const build = createMockBuild({
         user: { codec, uniques: [], relations: {} },
@@ -1201,6 +1218,7 @@ describe('MetaSchemaPlugin', () => {
       const tables = callInitHook(build);
       expect(tables).toHaveLength(1);
       expect(tables[0].name).toBe('User');
+      expect(tables[0].tableName).toBe('app_user');
     });
 
     it('includes distinct tables with different codecs', () => {
@@ -1220,6 +1238,35 @@ describe('MetaSchemaPlugin', () => {
       expect(tables).toHaveLength(2);
       const names = tables.map((t: any) => t.name).sort();
       expect(names).toEqual(['Post', 'User']);
+    });
+
+    it('includes a table represented by a final GraphQL interface', () => {
+      const codec = createMockCodec('user', {
+        id: createMockAttribute('text')
+      });
+      const build = createMockBuild({
+        user: { codec, uniques: [], relations: {} }
+      });
+      const schema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: { ping: { type: GraphQLString } }
+        }),
+        types: [
+          new GraphQLInterfaceType({
+            name: 'User',
+            fields: { id: { type: GraphQLString } }
+          })
+        ]
+      });
+
+      const tables = collectTablesMeta(build, schema);
+
+      expect(tables).toHaveLength(1);
+      expect(tables[0]).toMatchObject({
+        name: 'User',
+        fields: [{ name: 'id', columnName: 'id' }]
+      });
     });
 
     it('skips anonymous codecs', () => {
@@ -1595,6 +1642,144 @@ describe('MetaSchemaPlugin', () => {
       expect(user.relations.has).toHaveLength(2);
     });
 
+    it('uses the registry cardinality for final reverse relation fields', () => {
+      const userCodec = createMockCodec('user', {
+        id: createMockAttribute('text')
+      });
+      const profileCodec = createMockCodec('profile', {
+        user_id: createMockAttribute('text')
+      });
+      const profileResource = createMockResource({
+        codec: profileCodec,
+        uniques: [],
+        relations: {}
+      });
+      const build = createMockBuild(
+        {
+          user: {
+            codec: userCodec,
+            uniques: [],
+            relations: {
+              profile: {
+                isReferencee: true,
+                isUnique: true,
+                localAttributes: ['id'],
+                remoteAttributes: ['user_id'],
+                remoteResource: profileResource
+              }
+            }
+          },
+          profile: profileResource
+        },
+        ['app_public'],
+        {
+          inflection: {
+            singleRelationBackwards: () => 'profile'
+          }
+        }
+      );
+      const profileType = new GraphQLObjectType({
+        name: 'Profile',
+        fields: { userId: { type: GraphQLString } }
+      });
+      const userType = new GraphQLObjectType({
+        name: 'User',
+        fields: { id: { type: GraphQLString }, profile: { type: profileType } }
+      });
+      const schema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: { ping: { type: GraphQLString } }
+        }),
+        types: [userType, profileType]
+      });
+
+      const user = collectTablesMeta(build, schema).find(
+        (table) => table.name === 'User'
+      );
+
+      expect(user?.relations.hasOne).toEqual([
+        expect.objectContaining({
+          fieldName: 'profile',
+          isUnique: true,
+          type: 'Profile'
+        })
+      ]);
+      expect(user?.relations.hasMany).toEqual([]);
+    });
+
+    it('keeps a unique reverse relation exposed only as a list field', () => {
+      const userCodec = createMockCodec('user', {
+        id: createMockAttribute('text')
+      });
+      const profileCodec = createMockCodec('profile', {
+        user_id: createMockAttribute('text')
+      });
+      const profileResource = createMockResource({
+        codec: profileCodec,
+        uniques: [],
+        relations: {}
+      });
+      const build = createMockBuild(
+        {
+          user: {
+            codec: userCodec,
+            uniques: [],
+            relations: {
+              profile: {
+                isReferencee: true,
+                isUnique: true,
+                localAttributes: ['id'],
+                remoteAttributes: ['user_id'],
+                remoteResource: profileResource
+              }
+            }
+          },
+          profile: profileResource
+        },
+        ['app_public'],
+        {
+          inflection: {
+            singleRelationBackwards: () => 'profile',
+            manyRelationConnection: () => 'profilesConnection',
+            manyRelationList: () => 'profilesList',
+            tableConnectionType: () => 'ProfileConnection'
+          }
+        }
+      );
+      const profileType = new GraphQLObjectType({
+        name: 'Profile',
+        fields: { userId: { type: GraphQLString } }
+      });
+      const userType = new GraphQLObjectType({
+        name: 'User',
+        fields: {
+          id: { type: GraphQLString },
+          profilesList: { type: new GraphQLList(profileType) }
+        }
+      });
+      const schema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: { ping: { type: GraphQLString } }
+        }),
+        types: [userType, profileType]
+      });
+
+      const user = collectTablesMeta(build, schema).find(
+        (table) => table.name === 'User'
+      );
+
+      expect(user?.relations.hasOne).toEqual([
+        expect.objectContaining({
+          fieldName: 'profilesList',
+          isUnique: true,
+          type: 'Profile'
+        })
+      ]);
+      expect(user?.relations.hasMany).toEqual([]);
+    });
+
     it('marks belongsTo relation unique when local fk columns are uniquely constrained', () => {
       const userCodec = createMockCodec('user', {
         id: createMockAttribute('uuid', { notNull: true })
@@ -1962,7 +2147,6 @@ describe('MetaSchemaPlugin', () => {
         }
       });
 
-      const seededTables = callInitHook(build);
       const queryFields = callGraphQLObjectTypeFieldsHook(
         {
           ping: {
@@ -1974,12 +2158,27 @@ describe('MetaSchemaPlugin', () => {
         'Query'
       );
 
+      const GraphQLUUID = new GraphQLScalarType({
+        name: 'UUID',
+        serialize: (value) => value
+      });
+      const userType = new GraphQLObjectType({
+        name: 'User',
+        fields: {
+          id: { type: GraphQLUUID },
+          emailAddress: { type: GraphQLString }
+        }
+      });
+
       const schema = new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
           fields: () => queryFields
-        })
+        }),
+        types: [userType]
       });
+      callFinalizeHook(schema, build);
+      const seededTables = _cachedTablesMeta as any[];
 
       const result = await graphql({
         schema,
@@ -1989,8 +2188,9 @@ describe('MetaSchemaPlugin', () => {
             _meta {
               tables {
                 name
+                tableName
                 schemaName
-                fields { name type { pgType gqlType isArray } }
+                fields { name columnName type { pgType gqlType isArray } }
                 query { all one create update delete }
               }
             }
@@ -2003,44 +2203,157 @@ describe('MetaSchemaPlugin', () => {
       expect((result.data as any)?._meta?.tables).toHaveLength(seededTables.length);
       expect((result.data as any)?._meta?.tables?.[0]).toMatchObject({
         name: 'User',
+        tableName: 'user',
         schemaName: 'app_public',
         query: seededTables[0].query
       });
       expect((result.data as any)?._meta?.tables?.[0]?.fields).toEqual([
         {
           name: 'id',
+          columnName: 'id',
           type: { pgType: 'uuid', gqlType: 'UUID', isArray: false }
         },
         {
           name: 'emailAddress',
+          columnName: 'email_address',
           type: { pgType: 'text', gqlType: 'String', isArray: false }
         }
       ]);
     });
+
+    it('keeps resolver metadata scoped to its schema build', async () => {
+      const buildSchema = (resourceName: string, typeName: string) => {
+        const build = createMockBuild({
+          [resourceName]: {
+            codec: createMockCodec(resourceName, {
+              id: createMockAttribute('text')
+            }),
+            uniques: [],
+            relations: {}
+          }
+        });
+        const queryFields = callGraphQLObjectTypeFieldsHook(
+          {},
+          build,
+          'Query'
+        );
+        const schema = new GraphQLSchema({
+          query: new GraphQLObjectType({
+            name: 'Query',
+            fields: () => queryFields
+          }),
+          types: [
+            new GraphQLObjectType({
+              name: typeName,
+              fields: { id: { type: GraphQLString } }
+            })
+          ]
+        });
+        callFinalizeHook(schema, build);
+        return schema;
+      };
+
+      const userSchema = buildSchema('user', 'User');
+      const projectSchema = buildSchema('project', 'Project');
+      const source = '{ _meta { tables { name } } }';
+
+      const [userResult, projectResult] = await Promise.all([
+        graphql({ schema: userSchema, source }),
+        graphql({ schema: projectSchema, source })
+      ]);
+
+      expect(userResult.errors).toBeUndefined();
+      expect(projectResult.errors).toBeUndefined();
+      expect((userResult.data as any)._meta.tables).toEqual([{ name: 'User' }]);
+      expect((projectResult.data as any)._meta.tables).toEqual([
+        { name: 'Project' }
+      ]);
+    });
+
+    it('validates metadata against schema changes made by later finalizers', async () => {
+      const codec = createMockCodec('user', {
+        id: createMockAttribute('text')
+      });
+      const build = createMockBuild(
+        {
+          user: { codec, uniques: [], relations: {} }
+        },
+        ['app_public'],
+        {
+          inflection: {
+            allRowsList: () => 'users'
+          }
+        }
+      );
+      const userType = new GraphQLObjectType({
+        name: 'User',
+        fields: { id: { type: GraphQLString } }
+      });
+      const queryFields = callGraphQLObjectTypeFieldsHook(
+        {
+          users: { type: new GraphQLList(userType) }
+        },
+        build,
+        'Query'
+      );
+      const queryType = new GraphQLObjectType({
+        name: 'Query',
+        fields: queryFields
+      });
+      const schema = new GraphQLSchema({ query: queryType });
+
+      callFinalizeHook(schema, build);
+      expect(_cachedTablesMeta[0].query.all).toBe('users');
+
+      delete queryType.getFields().users;
+      const result = await graphql({
+        schema,
+        source: '{ _meta { tables { query { all } } } }'
+      });
+
+      expect(result.errors).toBeUndefined();
+      expect((result.data as any)._meta.tables[0].query.all).toBeNull();
+    });
   });
 
   describe('cache behavior', () => {
-    it('replaces cached metadata on each init run (no stale tables)', () => {
+    it('replaces the legacy cache on each finalized build', () => {
       const firstBuild = createMockBuild({
         user: {
-          codec: createMockCodec('user', { id: createMockAttribute('uuid') }),
+          codec: createMockCodec('user', { id: createMockAttribute('text') }),
           uniques: [],
           relations: {}
         }
       });
       const secondBuild = createMockBuild({
         project: {
-          codec: createMockCodec('project', { id: createMockAttribute('uuid') }),
+          codec: createMockCodec('project', { id: createMockAttribute('text') }),
           uniques: [],
           relations: {}
         }
       });
 
-      const first = callInitHook(firstBuild);
+      const schemaFor = (typeName: string) =>
+        new GraphQLSchema({
+          query: new GraphQLObjectType({
+            name: 'Query',
+            fields: { ping: { type: GraphQLString } }
+          }),
+          types: [
+            new GraphQLObjectType({
+              name: typeName,
+              fields: { id: { type: GraphQLString } }
+            })
+          ]
+        });
+
+      callFinalizeHook(schemaFor('User'), firstBuild);
+      const first = [..._cachedTablesMeta];
       expect(first).toHaveLength(1);
       expect(first[0].name).toBe('User');
 
-      const second = callInitHook(secondBuild);
+      callFinalizeHook(schemaFor('Project'), secondBuild);
+      const second = [..._cachedTablesMeta];
       expect(second).toHaveLength(1);
       expect(second[0].name).toBe('Project');
       expect(second.map((table: any) => table.name)).toEqual(['Project']);

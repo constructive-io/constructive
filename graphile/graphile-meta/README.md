@@ -12,13 +12,13 @@
    <a href="https://www.npmjs.com/package/graphile-meta"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphile%2Fgraphile-meta%2Fpackage.json"/></a>
 </p>
 
-PostGraphile v5 plugin exposing a single `_meta` root query that describes every table's fields, indexes, constraints, relations, inflection names, root query/mutation names, and smart-tag-derived metadata (storage, search, i18n, realtime).
+PostGraphile v5 plugin exposing a single `_meta` root query that describes each table exposed by the final GraphQL schema, including fields, indexes, constraints, relations, inflection names, root query/mutation names, and smart-tag-derived metadata (storage, search, i18n, realtime).
 
 ## Overview
 
-Standard GraphQL introspection tells you about the GraphQL schema — `_meta` tells you about the **database** behind it. `MetaSchemaPlugin` walks the PostGraphile registry once at schema build time and caches a `TableMeta` entry per table, covering:
+Standard GraphQL introspection tells you about the GraphQL schema — `_meta` adds the **database identities** behind its exposed objects. `MetaSchemaPlugin` compares the PostGraphile registry with the completed schema once at build time and caches a `TableMeta` entry per exposed table, covering:
 
-- **Fields** — Postgres type, GraphQL type, nullability, defaults, primary/foreign key flags, and scalar encoding hints (how to serialize bigints, datetimes, vectors, geojson, …)
+- **Tables and fields** — exact PostgreSQL names alongside final GraphQL names, plus Postgres type, GraphQL type, nullability, defaults, primary/foreign key flags, and scalar encoding hints (how to serialize bigints, datetimes, vectors, geojson, …)
 - **Indexes & constraints** — primary key, unique constraints, foreign keys with referenced tables
 - **Relations** — `belongsTo`, `hasOne`, `hasMany`, and `manyToMany` with the exact generated field names
 - **Inflection** — the type names and root field names PostGraphile generated (`tableType`, `allRows`, `connection`, `createInputType`, …)
@@ -50,9 +50,11 @@ query {
   _meta {
     tables {
       name
+      tableName
       schemaName
       fields {
         name
+        columnName
         type { pgType gqlType isArray }
         isNotNull
         hasDefault
@@ -88,11 +90,12 @@ Example response snippet:
   "_meta": {
     "tables": [
       {
-        "name": "users",
+        "name": "User",
+        "tableName": "users",
         "schemaName": "app_public",
         "fields": [
-          { "name": "id", "type": { "pgType": "uuid", "gqlType": "UUID", "isArray": false }, "isNotNull": true, "hasDefault": true, "isPrimaryKey": true, "isForeignKey": false },
-          { "name": "email", "type": { "pgType": "citext", "gqlType": "String", "isArray": false }, "isNotNull": true, "hasDefault": false, "isPrimaryKey": false, "isForeignKey": false }
+          { "name": "id", "columnName": "id", "type": { "pgType": "uuid", "gqlType": "UUID", "isArray": false }, "isNotNull": true, "hasDefault": true, "isPrimaryKey": true, "isForeignKey": false },
+          { "name": "displayName", "columnName": "display_name", "type": { "pgType": "text", "gqlType": "String", "isArray": false }, "isNotNull": true, "hasDefault": false, "isPrimaryKey": false, "isForeignKey": false }
         ],
         "inflection": { "tableType": "User", "allRows": "allUsers", "connection": "UsersConnection" },
         "query": { "all": "allUsers", "one": "userById", "create": "createUser", "update": "updateUserById", "delete": "deleteUserById" }
@@ -101,6 +104,11 @@ Example response snippet:
   }
 }
 ```
+
+`name` and `fields.name` are final GraphQL names. `tableName` and
+`fields.columnName` preserve the corresponding PostgreSQL identifiers. An
+operation under `query` is `null` when that field was not emitted in the final
+GraphQL schema.
 
 ### Pairing with @constructive-io/graphql-query
 

@@ -2,6 +2,11 @@ import { safeInflection } from './inflection-utils';
 import {
   buildForeignKeyConstraint,
 } from './constraint-meta-builders';
+import {
+  findExecutableField,
+  getFieldContainerType,
+} from './graphql-schema-utils';
+import { resolveTableType } from './name-meta-builders';
 import { buildFieldList, type BuildContext } from './table-meta-context';
 import {
   getRelation,
@@ -26,6 +31,71 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
+function resolveDirectRelationField(
+  relationName: string,
+  relation: PgRelation,
+  isUnique: boolean,
+  codec: PgCodec,
+  remoteCodec: PgCodec,
+  context: BuildContext,
+): { name: string; typeName: string } | null {
+  if (!context.schema) return null;
+
+  const build = context.build;
+  const details = {
+    registry: build.input.pgRegistry,
+    codec,
+    relationName,
+  };
+  const parentType = getFieldContainerType(
+    context.schema,
+    resolveTableType(build, codec),
+  );
+  const remoteTypeName = resolveTableType(build, remoteCodec);
+  const candidates = [];
+
+  if (!relation.isReferencee) {
+    candidates.push({
+      name: safeInflection(
+        () => build.inflection.singleRelation?.(details),
+        null,
+      ),
+      typeName: remoteTypeName,
+    });
+  } else if (isUnique) {
+    candidates.push({
+      name: safeInflection(
+        () => build.inflection.singleRelationBackwards?.(details),
+        null,
+      ),
+      typeName: remoteTypeName,
+    });
+  }
+
+  const connectionTypeName = safeInflection(
+    () => build.inflection.tableConnectionType?.(remoteCodec),
+    `${remoteTypeName}Connection`,
+  );
+  candidates.push(
+    {
+      name: safeInflection(
+        () => build.inflection.manyRelationConnection?.(details),
+        null,
+      ),
+      typeName: connectionTypeName,
+    },
+    {
+      name: safeInflection(
+        () => build.inflection.manyRelationList?.(details),
+        null,
+      ),
+      typeName: remoteTypeName,
+    },
+  );
+
+  return findExecutableField(parentType, candidates);
+}
+
 export function buildBelongsToRelations(
   codec: PgCodec,
   attributes: Record<string, PgAttribute>,
@@ -47,12 +117,32 @@ export function buildBelongsToRelations(
 
     const remoteCodec = relation.remoteResource?.codec;
 
+    if (context.schema && !remoteCodec) continue;
+    const executable = remoteCodec
+      ? resolveDirectRelationField(
+          relationName,
+          relation,
+          isUnique,
+          codec,
+          remoteCodec,
+          context,
+        )
+      : null;
+    if (context.schema && !executable) continue;
+    const remoteTypeName = remoteCodec
+      ? resolveTableType(context.build, remoteCodec)
+      : null;
+
     belongsTo.push({
-      fieldName: relationName,
+      fieldName: executable?.name ?? relationName,
       isUnique,
-      type: remoteCodec?.name || null,
+      type: executable?.typeName ?? remoteCodec?.name ?? null,
       keys: buildFieldList(localAttributes, codec, attributes, context),
-      references: { name: remoteCodec?.name || 'unknown' },
+      references: {
+        name: context.schema
+          ? remoteTypeName || 'unknown'
+          : remoteCodec?.name || 'unknown',
+      },
     });
   }
 
@@ -71,20 +161,40 @@ export function buildReverseRelations(
   for (const [relationName, relation] of Object.entries(relations)) {
     if (relation.isReferencee !== true) continue;
 
-    const remoteUniques = getUniques(relation.remoteResource || {});
-    const remoteAttributes = relation.remoteAttributes || [];
-    const isUnique = remoteUniques.some((unique) =>
-      sameAttributes(unique.attributes, remoteAttributes),
-    );
+    const isUnique =
+      relation.isUnique ??
+      getUniques(relation.remoteResource || {}).some((unique) =>
+        sameAttributes(unique.attributes, relation.remoteAttributes || []),
+      );
 
     const remoteCodec = relation.remoteResource?.codec;
 
+    if (context.schema && !remoteCodec) continue;
+    const executable = remoteCodec
+      ? resolveDirectRelationField(
+          relationName,
+          relation,
+          isUnique,
+          codec,
+          remoteCodec,
+          context,
+        )
+      : null;
+    if (context.schema && !executable) continue;
+    const remoteTypeName = remoteCodec
+      ? resolveTableType(context.build, remoteCodec)
+      : null;
+
     const meta: HasRelation = {
-      fieldName: relationName,
+      fieldName: executable?.name ?? relationName,
       isUnique,
-      type: remoteCodec?.name || null,
+      type: executable?.typeName ?? remoteCodec?.name ?? null,
       keys: buildFieldList(relation.localAttributes || [], codec, attributes, context),
-      referencedBy: { name: remoteCodec?.name || 'unknown' },
+      referencedBy: {
+        name: context.schema
+          ? remoteTypeName || 'unknown'
+          : remoteCodec?.name || 'unknown',
+      },
     };
 
     if (isUnique) {
@@ -144,6 +254,40 @@ function buildManyToManyRelation(
   const rightCodec = getResourceCodec(details.rightTable);
   if (!leftCodec || !junctionCodec || !rightCodec) return null;
 
+  const leftTypeName = resolveTableType(context.build, leftCodec);
+  const junctionTypeName = resolveTableType(context.build, junctionCodec);
+  const rightTypeName = resolveTableType(context.build, rightCodec);
+  const executable = context.schema
+    ? findExecutableField(getFieldContainerType(context.schema, leftTypeName), [
+        {
+          name: safeInflection(
+            () =>
+              context.build.inflection.manyToManyRelationConnectionField?.(
+                details
+              ),
+            null,
+          ),
+          typeName: safeInflection(
+            () =>
+              context.build.inflection.manyToManyRelationConnectionType?.({
+                ...details,
+                leftTableTypeName: leftTypeName,
+              }),
+            null,
+          ),
+        },
+        {
+          name: safeInflection(
+            () =>
+              context.build.inflection.manyToManyRelationListField?.(details),
+            null,
+          ),
+          typeName: rightTypeName,
+        },
+      ])
+    : null;
+  if (context.schema && !executable) return null;
+
   const leftRelation = getRelation(details.leftTable, details.leftRelationName);
   const junctionRightRelation = getRelation(details.junctionTable, details.rightRelationName);
   if (!leftRelation || !junctionRightRelation) return null;
@@ -153,10 +297,12 @@ function buildManyToManyRelation(
   const rightJunctionAttributes = junctionRightRelation.localAttributes || [];
   const rightTableAttributes = junctionRightRelation.remoteAttributes || [];
 
-  const relationFieldName = safeInflection(
-    () => context.build.inflection._manyToManyRelation?.(details),
-    details.rightRelationName || rightCodec.name || null,
-  );
+  const relationFieldName =
+    executable?.name ??
+    safeInflection(
+      () => context.build.inflection._manyToManyRelation?.(details),
+      details.rightRelationName || rightCodec.name || null,
+    );
 
   const junctionLeftConstraint = buildForeignKeyConstraint(
     details.leftRelationName || `${junctionCodec.name}_${leftCodec.name}_fkey`,
@@ -180,10 +326,19 @@ function buildManyToManyRelation(
     context,
   );
 
+  if (context.schema) {
+    junctionLeftConstraint.referencedTable = leftTypeName;
+    junctionLeftConstraint.refTable.name = leftTypeName;
+    junctionRightConstraint.referencedTable = rightTypeName;
+    junctionRightConstraint.refTable.name = rightTypeName;
+  }
+
   return {
     fieldName: relationFieldName,
-    type: rightCodec.name || null,
-    junctionTable: { name: junctionCodec.name || 'unknown' },
+    type: executable?.typeName ?? rightCodec.name ?? null,
+    junctionTable: {
+      name: context.schema ? junctionTypeName : junctionCodec.name || 'unknown',
+    },
     junctionLeftConstraint,
     junctionLeftKeyAttributes: buildFieldList(
       leftJunctionAttributes,
@@ -210,7 +365,9 @@ function buildManyToManyRelation(
       rightCodec.attributes,
       context,
     ),
-    rightTable: { name: rightCodec.name || 'unknown' },
+    rightTable: {
+      name: context.schema ? rightTypeName : rightCodec.name || 'unknown',
+    },
   };
 }
 

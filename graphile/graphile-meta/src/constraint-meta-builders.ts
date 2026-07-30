@@ -35,6 +35,7 @@ export function buildForeignKeyConstraint(
         remoteCodec ? context.inflectAttr(attrName, remoteCodec) : attrName,
         remoteAttributes[attrName],
         context.build,
+        { columnName: attrName },
       ),
     ),
     refTable: { name: referencedTable },

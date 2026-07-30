@@ -9,7 +9,7 @@ export type { BuildSchemaOptions as BuildIntrospectionOptions }
  * Build introspection metadata for all tables visible in the given schemas.
  *
  * Internally calls `buildSchemaSDL()` which triggers the MetaSchemaPlugin
- * gather hook, populating `_cachedTablesMeta` as a side-effect. The cached
+ * finalization hook, populating `_cachedTablesMeta` as a side-effect. The cached
  * metadata is then returned as a plain array of `TableMeta` objects.
  *
  * The result includes every table's fields, types, constraints, indexes,
