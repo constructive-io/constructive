@@ -5,7 +5,7 @@ import {
   PgpmDriverSession,
 } from '@pgpmjs/types';
 import { createRequire } from 'node:module';
-import { join } from 'node:path';
+import { resolve } from 'node:path';
 
 /** Package name of the built-in PGlite driver plugin (the `--pglite` alias). */
 export const PGLITE_DRIVER_PLUGIN = '@pgpmjs/pglite-adapter';
@@ -77,8 +77,9 @@ export async function activateDriver(
   if (!cfg) return undefined;
 
   // A require bound to the consumer's project directory. `createRequire` is the
-  // one primitive available and identical in both CJS and ESM runtimes.
-  const requireFrom = createRequire(join(cwd, 'package.json'));
+  // one primitive available and identical in both CJS and ESM runtimes; it
+  // requires an absolute path, and `cwd` may come from a relative `--cwd`.
+  const requireFrom = createRequire(resolve(cwd, 'package.json'));
 
   let mod: Record<string, unknown>;
   try {
