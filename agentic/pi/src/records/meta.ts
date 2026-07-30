@@ -89,10 +89,6 @@ export type MetaResponse = {
   _meta?: { tables?: (RawMetaTable | null)[] | null } | null;
 };
 
-function pgFieldToCamelCase(name: string): string {
-  return name.replace(/_([a-z0-9])/g, (_, c: string) => c.toUpperCase());
-}
-
 function convertInflection(inflection: RawInflection | null | undefined): TableInflection | undefined {
   if (!inflection) return undefined;
   const s = (key: keyof TableInflection): string => inflection[key] ?? '';
@@ -126,7 +122,7 @@ function convertInflection(inflection: RawInflection | null | undefined): TableI
 function convertQuery(query: RawQuery | null | undefined): TableQueryNames | undefined {
   if (!query) return undefined;
   return {
-    all: query.all,
+    all: query.all ?? '',
     one: query.one ?? null,
     create: query.create ?? '',
     update: query.update ?? null,
@@ -142,7 +138,7 @@ export function cleanTable(meta: RawMetaTable): Table {
     fields: (meta.fields ?? [])
       .filter((f): f is RawField => Boolean(f))
       .map((field) => ({
-        name: pgFieldToCamelCase(field.name),
+        name: field.name,
         type: {
           gqlType: field.type.gqlType,
           isArray: field.type.isArray,

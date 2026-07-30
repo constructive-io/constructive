@@ -129,9 +129,11 @@ function callGraphQLObjectTypeFieldsHook(
   const fieldsHook = MetaSchemaPlugin.schema!.hooks!.GraphQLObjectType_fields as (
     fields: Record<string, any>,
     build: any,
-    context: { Self: { name: string } },
+    context: { scope: { isRootQuery: boolean } },
   ) => Record<string, any>;
-  return fieldsHook(fields, build, { Self: { name: selfName } });
+  return fieldsHook(fields, build, {
+    scope: { isRootQuery: selfName === 'Query' }
+  });
 }
 
 function callFinalizeHook(schema: GraphQLSchema, build: any): GraphQLSchema {
@@ -1240,13 +1242,20 @@ describe('MetaSchemaPlugin', () => {
       expect(names).toEqual(['Post', 'User']);
     });
 
-    it('includes a table represented by a final GraphQL interface', () => {
+    it('includes a final GraphQL interface with an unregistered attribute codec', () => {
       const codec = createMockCodec('user', {
         id: createMockAttribute('text')
       });
-      const build = createMockBuild({
-        user: { codec, uniques: [], relations: {} }
-      });
+      const build = createMockBuild(
+        { user: { codec, uniques: [], relations: {} } },
+        ['app_public'],
+        {
+          hasGraphQLTypeForPgCodec: () => false,
+          getGraphQLTypeNameByPgCodec: () => {
+            throw new Error('unregistered codec lookup');
+          }
+        }
+      );
       const schema = new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
@@ -1594,7 +1603,7 @@ describe('MetaSchemaPlugin', () => {
   });
 
   describe('init hook — relation and naming behavior', () => {
-    it('classifies reverse relations into hasOne vs hasMany using remote unique constraints', () => {
+    it('classifies reverse relations using registry cardinality', () => {
       const userCodec = createMockCodec('user', {
         id: createMockAttribute('uuid', { notNull: true })
       });
@@ -1607,12 +1616,6 @@ describe('MetaSchemaPlugin', () => {
         author_id: createMockAttribute('uuid', { notNull: true })
       });
 
-      const profileUniques = [
-        { attributes: ['id'], isPrimary: true, tags: { name: 'profiles_pkey' } },
-        { attributes: ['user_id'], isPrimary: false, tags: { name: 'profiles_user_id_key' } }
-      ];
-      const postUniques = [{ attributes: ['id'], isPrimary: true, tags: { name: 'posts_pkey' } }];
-
       const build = createMockBuild({
         user: {
           codec: userCodec,
@@ -1620,15 +1623,17 @@ describe('MetaSchemaPlugin', () => {
           relations: {
             user_profile: {
               isReferencee: true,
+              isUnique: true,
               localAttributes: ['id'],
               remoteAttributes: ['user_id'],
-              remoteResource: { codec: profileCodec, uniques: profileUniques }
+              remoteResource: { codec: profileCodec }
             },
             user_posts: {
               isReferencee: true,
+              isUnique: false,
               localAttributes: ['id'],
               remoteAttributes: ['author_id'],
-              remoteResource: { codec: postCodec, uniques: postUniques }
+              remoteResource: { codec: postCodec }
             }
           }
         }
@@ -1642,143 +1647,87 @@ describe('MetaSchemaPlugin', () => {
       expect(user.relations.has).toHaveLength(2);
     });
 
-    it('uses the registry cardinality for final reverse relation fields', () => {
-      const userCodec = createMockCodec('user', {
-        id: createMockAttribute('text')
-      });
-      const profileCodec = createMockCodec('profile', {
-        user_id: createMockAttribute('text')
-      });
-      const profileResource = createMockResource({
-        codec: profileCodec,
-        uniques: [],
-        relations: {}
-      });
-      const build = createMockBuild(
-        {
-          user: {
-            codec: userCodec,
-            uniques: [],
-            relations: {
-              profile: {
-                isReferencee: true,
-                isUnique: true,
-                localAttributes: ['id'],
-                remoteAttributes: ['user_id'],
-                remoteResource: profileResource
+    it.each([
+      ['a singular field', 'profile', (type: GraphQLObjectType) => type],
+      [
+        'a list field',
+        'profilesList',
+        (type: GraphQLObjectType) => new GraphQLList(type)
+      ]
+    ])(
+      'uses registry cardinality when a unique reverse relation is exposed as %s',
+      (_label, fieldName, fieldType) => {
+        const userCodec = createMockCodec('user', {
+          id: createMockAttribute('text')
+        });
+        const profileCodec = createMockCodec('profile', {
+          user_id: createMockAttribute('text')
+        });
+        const profileResource = createMockResource({
+          codec: profileCodec,
+          uniques: [],
+          relations: {}
+        });
+        const build = createMockBuild(
+          {
+            user: {
+              codec: userCodec,
+              uniques: [],
+              relations: {
+                profile: {
+                  isReferencee: true,
+                  isUnique: true,
+                  localAttributes: ['id'],
+                  remoteAttributes: ['user_id'],
+                  remoteResource: profileResource
+                }
               }
+            },
+            profile: profileResource
+          },
+          ['app_public'],
+          {
+            inflection: {
+              singleRelationBackwards: () => 'profile',
+              manyRelationConnection: () => 'profilesConnection',
+              manyRelationList: () => 'profilesList',
+              tableConnectionType: () => 'ProfileConnection'
             }
           },
-          profile: profileResource
-        },
-        ['app_public'],
-        {
-          inflection: {
-            singleRelationBackwards: () => 'profile'
+        );
+        const profileType = new GraphQLObjectType({
+          name: 'Profile',
+          fields: { userId: { type: GraphQLString } }
+        });
+        const userType = new GraphQLObjectType({
+          name: 'User',
+          fields: {
+            id: { type: GraphQLString },
+            [fieldName]: { type: fieldType(profileType) }
           }
-        }
-      );
-      const profileType = new GraphQLObjectType({
-        name: 'Profile',
-        fields: { userId: { type: GraphQLString } }
-      });
-      const userType = new GraphQLObjectType({
-        name: 'User',
-        fields: { id: { type: GraphQLString }, profile: { type: profileType } }
-      });
-      const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
-          name: 'Query',
-          fields: { ping: { type: GraphQLString } }
-        }),
-        types: [userType, profileType]
-      });
+        });
+        const schema = new GraphQLSchema({
+          query: new GraphQLObjectType({
+            name: 'Query',
+            fields: { ping: { type: GraphQLString } }
+          }),
+          types: [userType, profileType]
+        });
 
-      const user = collectTablesMeta(build, schema).find(
-        (table) => table.name === 'User'
-      );
+        const user = collectTablesMeta(build, schema).find(
+          (table) => table.name === 'User'
+        );
 
-      expect(user?.relations.hasOne).toEqual([
-        expect.objectContaining({
-          fieldName: 'profile',
-          isUnique: true,
-          type: 'Profile'
-        })
-      ]);
-      expect(user?.relations.hasMany).toEqual([]);
-    });
-
-    it('keeps a unique reverse relation exposed only as a list field', () => {
-      const userCodec = createMockCodec('user', {
-        id: createMockAttribute('text')
-      });
-      const profileCodec = createMockCodec('profile', {
-        user_id: createMockAttribute('text')
-      });
-      const profileResource = createMockResource({
-        codec: profileCodec,
-        uniques: [],
-        relations: {}
-      });
-      const build = createMockBuild(
-        {
-          user: {
-            codec: userCodec,
-            uniques: [],
-            relations: {
-              profile: {
-                isReferencee: true,
-                isUnique: true,
-                localAttributes: ['id'],
-                remoteAttributes: ['user_id'],
-                remoteResource: profileResource
-              }
-            }
-          },
-          profile: profileResource
-        },
-        ['app_public'],
-        {
-          inflection: {
-            singleRelationBackwards: () => 'profile',
-            manyRelationConnection: () => 'profilesConnection',
-            manyRelationList: () => 'profilesList',
-            tableConnectionType: () => 'ProfileConnection'
-          }
-        }
-      );
-      const profileType = new GraphQLObjectType({
-        name: 'Profile',
-        fields: { userId: { type: GraphQLString } }
-      });
-      const userType = new GraphQLObjectType({
-        name: 'User',
-        fields: {
-          id: { type: GraphQLString },
-          profilesList: { type: new GraphQLList(profileType) }
-        }
-      });
-      const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
-          name: 'Query',
-          fields: { ping: { type: GraphQLString } }
-        }),
-        types: [userType, profileType]
-      });
-
-      const user = collectTablesMeta(build, schema).find(
-        (table) => table.name === 'User'
-      );
-
-      expect(user?.relations.hasOne).toEqual([
-        expect.objectContaining({
-          fieldName: 'profilesList',
-          isUnique: true,
-          type: 'Profile'
-        })
-      ]);
-      expect(user?.relations.hasMany).toEqual([]);
-    });
+        expect(user?.relations.hasOne).toEqual([
+          expect.objectContaining({
+            fieldName,
+            isUnique: true,
+            type: 'Profile'
+          })
+        ]);
+        expect(user?.relations.hasMany).toEqual([]);
+      }
+    );
 
     it('marks belongsTo relation unique when local fk columns are uniquely constrained', () => {
       const userCodec = createMockCodec('user', {
@@ -1956,106 +1905,6 @@ describe('MetaSchemaPlugin', () => {
       expect(post.relations.manyToMany[0].rightKeyAttributes.map((f: any) => f.name)).toEqual(['id']);
     });
 
-    it('falls back to codec matching when many-to-many map key is a different resource object', () => {
-      const postCodec = createMockCodec('post', {
-        id: createMockAttribute('uuid', { notNull: true })
-      });
-      const tagCodec = createMockCodec('tag', {
-        id: createMockAttribute('uuid', { notNull: true })
-      });
-      const postTagCodec = createMockCodec('post_tag', {
-        post_id: createMockAttribute('uuid', { notNull: true }),
-        tag_id: createMockAttribute('uuid', { notNull: true })
-      });
-
-      const postUniques = [{ attributes: ['id'], isPrimary: true }];
-      const tagUniques = [{ attributes: ['id'], isPrimary: true }];
-      const postTagUniques = [{ attributes: ['post_id', 'tag_id'], isPrimary: true }];
-
-      const postTagResource = createMockResource({
-        codec: postTagCodec,
-        uniques: postTagUniques,
-        relations: {
-          post_tag_post_fkey: {
-            isReferencee: false,
-            localAttributes: ['post_id'],
-            remoteAttributes: ['id'],
-            remoteResource: { codec: postCodec, uniques: postUniques }
-          },
-          post_tag_tag_fkey: {
-            isReferencee: false,
-            localAttributes: ['tag_id'],
-            remoteAttributes: ['id'],
-            remoteResource: { codec: tagCodec, uniques: tagUniques }
-          }
-        }
-      });
-      const postResourceInBuild = createMockResource({
-        codec: postCodec,
-        uniques: postUniques,
-        relations: {
-          post_post_tags: {
-            isReferencee: true,
-            localAttributes: ['id'],
-            remoteAttributes: ['post_id'],
-            remoteResource: { codec: postTagCodec, uniques: postTagUniques }
-          }
-        }
-      });
-      const postResourceInMap = createMockResource({
-        codec: postCodec,
-        uniques: postUniques,
-        relations: {
-          post_post_tags: {
-            isReferencee: true,
-            localAttributes: ['id'],
-            remoteAttributes: ['post_id'],
-            remoteResource: { codec: postTagCodec, uniques: postTagUniques }
-          }
-        }
-      });
-      const tagResource = createMockResource({
-        codec: tagCodec,
-        uniques: tagUniques,
-        relations: {}
-      });
-
-      const pgManyToManyRealtionshipsByResource = new Map<any, any[]>([
-        [
-          postResourceInMap,
-          [
-            {
-              leftTable: postResourceInMap,
-              leftRelationName: 'post_post_tags',
-              junctionTable: postTagResource,
-              rightRelationName: 'post_tag_tag_fkey',
-              rightTable: tagResource,
-              allowsMultipleEdgesToNode: false
-            }
-          ]
-        ]
-      ]);
-
-      const build = createMockBuild(
-        {
-          post: postResourceInBuild,
-          tag: tagResource,
-          post_tag: postTagResource
-        },
-        ['app_public'],
-        {
-          pgManyToManyRealtionshipsByResource,
-          inflection: {
-            _manyToManyRelation: () => 'tags'
-          }
-        }
-      );
-
-      const post = callInitHook(build).find((table: any) => table.name === 'Post');
-      expect(post.relations.manyToMany).toHaveLength(1);
-      expect(post.relations.manyToMany[0].fieldName).toBe('tags');
-    });
-
     it('skips malformed many-to-many relation details', () => {
       const postCodec = createMockCodec('post', {
         id: createMockAttribute('uuid', { notNull: true })
@@ -2221,7 +2070,7 @@ describe('MetaSchemaPlugin', () => {
       ]);
     });
 
-    it('keeps resolver metadata scoped to its schema build', async () => {
+    it('keeps resolver metadata scoped while replacing the legacy cache per build', async () => {
       const buildSchema = (resourceName: string, typeName: string) => {
         const build = createMockBuild({
           [resourceName]: {
@@ -2254,7 +2103,10 @@ describe('MetaSchemaPlugin', () => {
       };
 
       const userSchema = buildSchema('user', 'User');
+      expect(_cachedTablesMeta.map((table) => table.name)).toEqual(['User']);
+
       const projectSchema = buildSchema('project', 'Project');
+      expect(_cachedTablesMeta.map((table) => table.name)).toEqual(['Project']);
       const source = '{ _meta { tables { name } } }';
 
       const [userResult, projectResult] = await Promise.all([
@@ -2313,50 +2165,6 @@ describe('MetaSchemaPlugin', () => {
 
       expect(result.errors).toBeUndefined();
       expect((result.data as any)._meta.tables[0].query.all).toBeNull();
-    });
-  });
-
-  describe('cache behavior', () => {
-    it('replaces the legacy cache on each finalized build', () => {
-      const firstBuild = createMockBuild({
-        user: {
-          codec: createMockCodec('user', { id: createMockAttribute('text') }),
-          uniques: [],
-          relations: {}
-        }
-      });
-      const secondBuild = createMockBuild({
-        project: {
-          codec: createMockCodec('project', { id: createMockAttribute('text') }),
-          uniques: [],
-          relations: {}
-        }
-      });
-
-      const schemaFor = (typeName: string) =>
-        new GraphQLSchema({
-          query: new GraphQLObjectType({
-            name: 'Query',
-            fields: { ping: { type: GraphQLString } }
-          }),
-          types: [
-            new GraphQLObjectType({
-              name: typeName,
-              fields: { id: { type: GraphQLString } }
-            })
-          ]
-        });
-
-      callFinalizeHook(schemaFor('User'), firstBuild);
-      const first = [..._cachedTablesMeta];
-      expect(first).toHaveLength(1);
-      expect(first[0].name).toBe('User');
-
-      callFinalizeHook(schemaFor('Project'), secondBuild);
-      const second = [..._cachedTablesMeta];
-      expect(second).toHaveLength(1);
-      expect(second[0].name).toBe('Project');
-      expect(second.map((table: any) => table.name)).toEqual(['Project']);
     });
   });
 

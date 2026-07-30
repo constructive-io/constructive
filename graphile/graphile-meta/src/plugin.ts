@@ -9,36 +9,16 @@ import { extendQueryWithMetaField } from './graphql-meta-field';
 import { collectTablesMeta } from './table-meta-builder';
 import type { MetaBuild, TableMeta } from './types';
 
-interface QueryTypeContext {
-  Self?: {
-    name?: string;
-  };
-}
-
-interface MetaSchemaState {
-  runtimeTablesBySchema: WeakMap<GraphQLSchema, TableMeta[]>;
-}
-
-const stateByBuild = new WeakMap<object, MetaSchemaState>();
-
-function getState(build: MetaBuild): MetaSchemaState {
-  let state = stateByBuild.get(build as object);
-  if (!state) {
-    state = { runtimeTablesBySchema: new WeakMap() };
-    stateByBuild.set(build as object, state);
-  }
-  return state;
-}
+const runtimeTablesBySchema = new WeakMap<GraphQLSchema, TableMeta[]>();
 
 function getRuntimeTablesMeta(
   build: MetaBuild,
   schema: GraphQLSchema
 ): TableMeta[] {
-  const state = getState(build);
-  let tables = state.runtimeTablesBySchema.get(schema);
+  let tables = runtimeTablesBySchema.get(schema);
   if (!tables) {
     tables = collectTablesMeta(build, schema);
-    state.runtimeTablesBySchema.set(schema, tables);
+    runtimeTablesBySchema.set(schema, tables);
     setCachedTablesMeta(tables);
   }
   return tables;
@@ -51,8 +31,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLObjectType_fields(rawFields, rawBuild, rawContext) {
-        const context = rawContext as unknown as QueryTypeContext;
-        if (context.Self?.name !== 'Query') return rawFields;
+        if (!rawContext.scope.isRootQuery) return rawFields;
         const build = rawBuild as unknown as MetaBuild;
         return extendQueryWithMetaField(
           rawFields as unknown as Record<string, unknown>,
@@ -61,6 +40,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
       },
 
       finalize(schema, rawBuild) {
+        // Compatibility only; the resolver recomputes from its final info.schema.
         const build = rawBuild as unknown as MetaBuild;
         const tables = collectTablesMeta(build, schema);
         setCachedTablesMeta(tables);

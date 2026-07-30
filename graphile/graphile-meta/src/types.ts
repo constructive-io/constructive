@@ -396,7 +396,6 @@ export interface MetaBuild extends GqlTypeResolverBuild {
   input: {
     pgRegistry: {
       pgResources: Record<string, PgTableResource>;
-      [key: string]: unknown;
     };
   };
   inflection: MetaInflection;
@@ -410,13 +409,8 @@ export interface MetaBuild extends GqlTypeResolverBuild {
     pgSchemas?: string[];
     [key: string]: unknown;
   };
-  pgManyToManyRealtionshipsByResource?: Map<unknown, unknown>;
-}
-
-export interface PgCodecExtensions {
-  pg?: {
-    schemaName?: string;
-    name?: string;
-  };
-  tags?: Record<string, unknown>;
+  pgManyToManyRealtionshipsByResource?: Map<
+    PgTableResource,
+    PgManyToManyRelationDetails[]
+  >;
 }

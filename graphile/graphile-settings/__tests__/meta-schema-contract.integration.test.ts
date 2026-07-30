@@ -1,5 +1,14 @@
-import type { GraphQLQueryFnObj } from 'graphile-test';
-import { getConnectionsObject, seed } from 'graphile-test';
+import {
+  buildClientSchema,
+  getIntrospectionQuery,
+  getNamedType,
+  isInterfaceType,
+  isObjectType,
+  type GraphQLSchema,
+  type IntrospectionQuery
+} from 'graphql';
+import type { GraphQLQueryUnwrappedFnObj } from 'graphile-test';
+import { getConnectionsObjectUnwrapped, seed } from 'graphile-test';
 import { join } from 'path';
 
 import { ConstructivePreset } from '../src/presets/constructive-preset';
@@ -14,25 +23,9 @@ const blogSeed = join(
   'graphql/server-test/__fixtures__/seed/schema-snapshot/schema.sql'
 );
 
-type TypeRef = {
-  kind: string;
-  name: string | null;
-  ofType: TypeRef | null;
-};
-
-type IntrospectionField = {
-  name: string;
-  type: TypeRef;
-};
-
-type IntrospectionType = {
-  kind: string;
-  name: string;
-  fields: IntrospectionField[] | null;
-};
-
 type MetaField = {
   name: string;
+  columnName: string;
   type: {
     pgType: string;
     gqlType: string;
@@ -50,6 +43,7 @@ type MetaRelation = {
 
 type MetaTable = {
   name: string;
+  tableName: string;
   schemaName: string;
   query: {
     all: string | null;
@@ -72,13 +66,7 @@ type ContractProbe = {
   _meta: {
     tables: MetaTable[];
   };
-  __schema: {
-    queryType: { fields: { name: string }[] };
-    mutationType: { fields: { name: string }[] } | null;
-    types: IntrospectionType[];
-  };
-  metaTableType: { fields: { name: string }[] } | null;
-  metaFieldType: { fields: { name: string }[] } | null;
+  schema: GraphQLSchema;
 };
 
 const contractProbeQuery = `
@@ -86,9 +74,10 @@ const contractProbeQuery = `
     _meta {
       tables {
         name
+        tableName
         schemaName
         query { all one create update delete }
-        fields { name type { pgType gqlType } }
+        fields { name columnName type { pgType gqlType } }
         relations {
           belongsTo { fieldName type references { name } }
           has { fieldName type referencedBy { name } }
@@ -103,85 +92,47 @@ const contractProbeQuery = `
         }
       }
     }
-    __schema {
-      queryType { fields { name } }
-      mutationType { fields { name } }
-      types {
-        kind
-        name
-        fields {
-          name
-          type {
-            kind
-            name
-            ofType {
-              kind
-              name
-              ofType {
-                kind
-                name
-                ofType { kind name }
-              }
-            }
-          }
-        }
-      }
-    }
-    metaTableType: __type(name: "MetaTable") { fields { name } }
-    metaFieldType: __type(name: "MetaField") { fields { name } }
   }
 `;
 
-function namedType(type: TypeRef): string | null {
-  let current: TypeRef | null = type;
-  while (current) {
-    if (current.name) return current.name;
-    current = current.ofType;
-  }
-  return null;
-}
-
-async function runContractProbe(query: GraphQLQueryFnObj): Promise<ContractProbe> {
-  const result = await query<ContractProbe>({ query: contractProbeQuery });
-  if (result.errors?.length) {
-    throw new Error(JSON.stringify(result.errors, null, 2));
-  }
-  if (!result.data) {
-    throw new Error('Meta contract probe returned no data');
-  }
-  return result.data;
+async function runContractProbe(
+  query: GraphQLQueryUnwrappedFnObj
+): Promise<ContractProbe> {
+  const [meta, introspection] = await Promise.all([
+    query<Omit<ContractProbe, 'schema'>>({ query: contractProbeQuery }),
+    query<IntrospectionQuery>({ query: getIntrospectionQuery() })
+  ]);
+  return { ...meta, schema: buildClientSchema(introspection) };
 }
 
 function collectContractViolations(probe: ContractProbe): string[] {
-  const queryFields = new Set(probe.__schema.queryType.fields.map(({ name }) => name));
-  const mutationFields = new Set(
-    probe.__schema.mutationType?.fields.map(({ name }) => name) ?? []
+  const queryFields = new Set(
+    Object.keys(probe.schema.getQueryType()?.getFields() ?? {})
   );
-  const fieldContainerTypes = new Map(
-    probe.__schema.types
-      .filter((type) => type.kind === 'OBJECT' || type.kind === 'INTERFACE')
-      .map((type) => [type.name, type])
+  const mutationFields = new Set(
+    Object.keys(probe.schema.getMutationType()?.getFields() ?? {})
   );
   const violations: string[] = [];
 
   for (const table of probe._meta.tables) {
-    const fieldContainerType = fieldContainerTypes.get(table.name);
-    if (!fieldContainerType) {
+    const fieldContainerType = probe.schema.getType(table.name);
+    if (
+      !fieldContainerType ||
+      (!isObjectType(fieldContainerType) && !isInterfaceType(fieldContainerType))
+    ) {
       violations.push(`${table.name}: GraphQL output type is not executable`);
       continue;
     }
 
-    const fields = new Map(
-      (fieldContainerType.fields ?? []).map((field) => [field.name, field])
-    );
+    const fields = fieldContainerType.getFields();
 
     for (const field of table.fields) {
-      const executableField = fields.get(field.name);
+      const executableField = fields[field.name];
       if (!executableField) {
         violations.push(`${table.name}.${field.name}: field is not executable`);
         continue;
       }
-      const executableType = namedType(executableField.type);
+      const executableType = getNamedType(executableField.type).name;
       if (field.type.gqlType !== executableType) {
         violations.push(
           `${table.name}.${field.name}: _meta scalar ${field.type.gqlType} != GraphQL scalar ${executableType}`
@@ -207,13 +158,13 @@ function collectContractViolations(probe: ContractProbe): string[] {
       for (const relation of relations) {
         if (!relation.fieldName) {
           violations.push(`${table.name}.relations.${relationKind}: missing fieldName`);
-        } else if (!fields.has(relation.fieldName)) {
+        } else if (!fields[relation.fieldName]) {
           violations.push(
             `${table.name}.relations.${relationKind}: ${relation.fieldName} is not executable`
           );
         } else {
-          const executableField = fields.get(relation.fieldName)!;
-          const executableType = namedType(executableField.type);
+          const executableField = fields[relation.fieldName];
+          const executableType = getNamedType(executableField.type).name;
           if (relation.type !== executableType) {
             violations.push(
               `${table.name}.relations.${relationKind}.${relation.fieldName}: _meta type ${relation.type} != GraphQL type ${executableType}`
@@ -222,11 +173,18 @@ function collectContractViolations(probe: ContractProbe): string[] {
 
           const relatedType = (() => {
             if (!executableType) return null;
-            const executableObject = fieldContainerTypes.get(executableType);
-            const nodesField = executableObject?.fields?.find(
-              ({ name }) => name === 'nodes'
-            );
-            return nodesField ? namedType(nodesField.type) : executableType;
+            const executableObject = probe.schema.getType(executableType);
+            if (
+              !executableObject ||
+              (!isObjectType(executableObject) &&
+                !isInterfaceType(executableObject))
+            ) {
+              return executableType;
+            }
+            const nodesField = executableObject.getFields().nodes;
+            return nodesField
+              ? getNamedType(nodesField.type).name
+              : executableType;
           })();
           const referencedType =
             relation.references?.name ??
@@ -248,11 +206,11 @@ function collectContractViolations(probe: ContractProbe): string[] {
 describe('MetaSchemaPlugin final GraphQL contract', () => {
   describe('ConstructivePreset integration schema', () => {
     let teardown: () => Promise<void>;
-    let query: GraphQLQueryFnObj;
+    let query: GraphQLQueryUnwrappedFnObj;
     let probe: ContractProbe;
 
     beforeAll(async () => {
-      const connections = await getConnectionsObject(
+      const connections = await getConnectionsObjectUnwrapped(
         {
           schemas: ['integration_test'],
           preset: { extends: [ConstructivePreset] },
@@ -310,42 +268,11 @@ describe('MetaSchemaPlugin final GraphQL contract', () => {
       });
     });
 
-    it('exposes exact PostgreSQL table and column names additively', async () => {
-      const metaTableFields =
-        probe.metaTableType?.fields.map(({ name }) => name) ?? [];
-      const metaFieldFields =
-        probe.metaFieldType?.fields.map(({ name }) => name) ?? [];
-
-      expect(metaTableFields).toContain('tableName');
-      expect(metaFieldFields).toContain('columnName');
-
-      const result = await query<{
-        _meta: {
-          tables: {
-            name: string;
-            tableName: string;
-            fields: { name: string; columnName: string }[];
-          }[];
-        };
-      }>({
-        query: `
-          query MetaDatabaseNames {
-            _meta {
-              tables {
-                name
-                tableName
-                fields { name columnName }
-              }
-            }
-          }
-        `
-      });
-
-      expect(result.errors).toBeUndefined();
-      const fileEvent = result.data?._meta.tables.find(
+    it('exposes exact PostgreSQL table and column names additively', () => {
+      const fileEvent = probe._meta.tables.find(
         ({ name }) => name === 'FileEvent'
       );
-      const location = result.data?._meta.tables.find(
+      const location = probe._meta.tables.find(
         ({ name }) => name === 'Location'
       );
       expect(fileEvent?.tableName).toBe('file_events');
@@ -360,7 +287,7 @@ describe('MetaSchemaPlugin final GraphQL contract', () => {
     let probe: ContractProbe;
 
     beforeAll(async () => {
-      const connections = await getConnectionsObject(
+      const connections = await getConnectionsObjectUnwrapped(
         {
           schemas: ['snapshot_public'],
           preset: { extends: [ConstructivePreset] },
@@ -386,6 +313,7 @@ describe('MetaSchemaPlugin final GraphQL contract', () => {
 
       expect(postTag).toBeDefined();
       expect(postTag?.query.all).toBe('postTags');
+      expect(postTag?.query.one).toBeNull();
     });
 
     it('uses final field and type names for direct relations', () => {

@@ -89,21 +89,14 @@ function buildTableMeta(
 
       const finalTypeName = getNamedType(finalField.type).name;
       const codecForLookup = attr.codec?.arrayOfCodec || attr.codec;
-      let registeredTypeName: string | null | undefined;
-      try {
-        if (
-          codecForLookup &&
-          context.build.hasGraphQLTypeForPgCodec?.(codecForLookup, 'output')
-        ) {
-          registeredTypeName =
-            context.build.getGraphQLTypeNameByPgCodec?.(
+      const registeredTypeName =
+        codecForLookup &&
+        context.build.hasGraphQLTypeForPgCodec?.(codecForLookup, 'output')
+          ? context.build.getGraphQLTypeNameByPgCodec?.(
               codecForLookup,
               'output'
-            );
-        }
-      } catch {
-        registeredTypeName = null;
-      }
+            )
+          : null;
       if (registeredTypeName && registeredTypeName !== finalTypeName) {
         return [];
       }
@@ -131,7 +124,7 @@ function buildTableMeta(
 
   const belongsTo = buildBelongsToRelations(codec, attributes, uniques, relations, context);
   const { hasOne, hasMany } = buildReverseRelations(codec, attributes, relations, context);
-  const manyToMany = buildManyToManyRelations(resource, codec, context);
+  const manyToMany = buildManyToManyRelations(resource, context);
 
   const relationsMeta: RelationsMeta = {
     belongsTo,

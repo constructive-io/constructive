@@ -11,14 +11,12 @@ import { buildFieldList, type BuildContext } from './table-meta-context';
 import {
   getRelation,
   getResourceCodec,
-  getUniques,
   sameAttributes,
 } from './table-resource-utils';
 import type {
   BelongsToRelation,
   HasRelation,
   ManyToManyRelation,
-  MetaBuild,
   PgAttribute,
   PgCodec,
   PgManyToManyRelationDetails,
@@ -26,10 +24,6 @@ import type {
   PgTableResource,
   PgUnique,
 } from './types';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
 
 function resolveDirectRelationField(
   relationName: string,
@@ -62,36 +56,36 @@ function resolveDirectRelationField(
       ),
       typeName: remoteTypeName,
     });
-  } else if (isUnique) {
-    candidates.push({
-      name: safeInflection(
-        () => build.inflection.singleRelationBackwards?.(details),
-        null,
-      ),
-      typeName: remoteTypeName,
-    });
+  } else {
+    if (isUnique) {
+      candidates.push({
+        name: safeInflection(
+          () => build.inflection.singleRelationBackwards?.(details),
+          null,
+        ),
+        typeName: remoteTypeName,
+      });
+    }
+    candidates.push(
+      {
+        name: safeInflection(
+          () => build.inflection.manyRelationConnection?.(details),
+          null,
+        ),
+        typeName: safeInflection(
+          () => build.inflection.tableConnectionType?.(remoteCodec),
+          `${remoteTypeName}Connection`,
+        ),
+      },
+      {
+        name: safeInflection(
+          () => build.inflection.manyRelationList?.(details),
+          null,
+        ),
+        typeName: remoteTypeName,
+      },
+    );
   }
-
-  const connectionTypeName = safeInflection(
-    () => build.inflection.tableConnectionType?.(remoteCodec),
-    `${remoteTypeName}Connection`,
-  );
-  candidates.push(
-    {
-      name: safeInflection(
-        () => build.inflection.manyRelationConnection?.(details),
-        null,
-      ),
-      typeName: connectionTypeName,
-    },
-    {
-      name: safeInflection(
-        () => build.inflection.manyRelationList?.(details),
-        null,
-      ),
-      typeName: remoteTypeName,
-    },
-  );
 
   return findExecutableField(parentType, candidates);
 }
@@ -161,11 +155,7 @@ export function buildReverseRelations(
   for (const [relationName, relation] of Object.entries(relations)) {
     if (relation.isReferencee !== true) continue;
 
-    const isUnique =
-      relation.isUnique ??
-      getUniques(relation.remoteResource || {}).some((unique) =>
-        sameAttributes(unique.attributes, relation.remoteAttributes || []),
-      );
+    const isUnique = relation.isUnique ?? false;
 
     const remoteCodec = relation.remoteResource?.codec;
 
@@ -205,44 +195,6 @@ export function buildReverseRelations(
   }
 
   return { hasOne, hasMany };
-}
-
-function isManyToManyDetails(value: unknown): value is PgManyToManyRelationDetails {
-  if (!isRecord(value)) return false;
-  return (
-    isRecord(value.leftTable) &&
-    isRecord(value.junctionTable) &&
-    isRecord(value.rightTable) &&
-    typeof value.leftRelationName === 'string' &&
-    typeof value.rightRelationName === 'string'
-  );
-}
-
-function parseManyToManyRelationships(value: unknown): PgManyToManyRelationDetails[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter(isManyToManyDetails);
-}
-
-function getManyToManyRelationships(
-  build: MetaBuild,
-  tableResource: PgTableResource,
-  codec: PgCodec,
-): PgManyToManyRelationDetails[] {
-  const relationshipsByResource = build.pgManyToManyRealtionshipsByResource;
-  if (!(relationshipsByResource instanceof Map)) return [];
-
-  const direct = parseManyToManyRelationships(relationshipsByResource.get(tableResource));
-  if (direct.length > 0) return direct;
-
-  for (const [leftTable, relationships] of relationshipsByResource.entries()) {
-    const details = parseManyToManyRelationships(relationships);
-    if (details.length === 0 || !isRecord(leftTable)) continue;
-    if ((leftTable as PgTableResource).codec === codec) {
-      return details;
-    }
-  }
-
-  return [];
 }
 
 function buildManyToManyRelation(
@@ -373,10 +325,11 @@ function buildManyToManyRelation(
 
 export function buildManyToManyRelations(
   resource: PgTableResource,
-  codec: PgCodec,
   context: BuildContext,
 ): ManyToManyRelation[] {
-  return getManyToManyRelationships(context.build, resource, codec)
+  const relationships =
+    context.build.pgManyToManyRealtionshipsByResource?.get(resource) ?? [];
+  return relationships
     .map((details) => buildManyToManyRelation(details, context))
     .filter((relation): relation is ManyToManyRelation => relation !== null);
 }
