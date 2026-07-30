@@ -5,6 +5,11 @@ Scans source deploy SQL, TS/JS generators, and generated output. Extracts the
 leading ALL_CAPS code token from each raised message; records dynamic-arg flag,
 sample message, and source-vs-generated provenance.
 
+Provenance is recorded as counts only. This package is published, so the
+inventory must not carry constructive-db file paths — they would map out the
+private schema layout, and only `n_source > 0` is ever consumed (to mark a
+code generator-only).
+
 Writes the inventory to `scripts/db-error-inventory.json` (the committed snapshot
 consumed by generate-registry.py). Regenerate the registry afterwards:
 
@@ -172,7 +177,6 @@ for code in all_codes:
         'sample': sample,
         'n_source': n_source,
         'n_generated': n_generated,
-        'source_files': sorted(s['files'])[:5] if s else [],
     }
     if klass is not None:
         entry['class'] = klass
