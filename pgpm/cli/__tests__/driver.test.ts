@@ -1,3 +1,5 @@
+import { relative } from 'node:path';
+
 import {
   activateDriver,
   driverOverrideFromArgv,
@@ -83,6 +85,14 @@ describe('activateDriver', () => {
     await expect(
       activateDriver({ plugin: '@pgpmjs/pglite-adapter' }, undefined, '/nonexistent-project-root')
     ).rejects.toThrow(/is not installed in this project[\s\S]*@electric-sql\/pglite/);
+  });
+
+  it('resolves plugins from a relative cwd (as passed by --cwd)', async () => {
+    // Failure mode: createRequire rejects a relative path outright, so the
+    // plugin lookup errored before it could even be attempted.
+    await expect(
+      activateDriver({ plugin: 'pg-env' }, undefined, relative(process.cwd(), __dirname))
+    ).rejects.toThrow(/does not export createPgpmDriver/);
   });
 
   it('throws when the resolved module is not a driver plugin', async () => {

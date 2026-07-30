@@ -41,11 +41,32 @@ import {
 } from './utils';
 
 /**
- * Commands that never talk to a database and must not activate a driver.
- * `init` owns its own `--pglite` meaning (scaffold from the PGlite boilerplates),
- * and it runs before the plugin it would scaffold is even installed.
+ * Commands that never open a connection, so they must not activate a driver —
+ * a workspace-wide `engine` must not make plan/scaffolding commands depend on
+ * the driver plugin being installed. `init` additionally owns its own `--pglite`
+ * meaning (scaffold from the PGlite boilerplates), and runs before the plugin
+ * it scaffolds exists.
  */
-const ENGINE_EXEMPT_COMMANDS = new Set(['init']);
+const ENGINE_EXEMPT_COMMANDS = new Set([
+  'add',
+  'analyze',
+  'cache',
+  'doctor',
+  'env',
+  'extension',
+  'init',
+  'install',
+  'package',
+  'plan',
+  'remove',
+  'rename',
+  'slice',
+  'sync-versions',
+  'tag',
+  'up',
+  'update',
+  'upgrade'
+]);
 
 const withPgTeardown = (fn: Function, skipTeardown: boolean = false) => async (...args: any[]) => {
   try {

@@ -27,8 +27,8 @@ const NO_SERVER_ENV = {
 
 let workspace: string;
 
-const runCli = (args: string[]) =>
-  spawnSync('node', [CLI_ENTRY, ...args, '--no-tty', '--cwd', workspace], {
+const runCli = (args: string[], cwd: string = workspace) =>
+  spawnSync('node', [CLI_ENTRY, ...args, '--no-tty', '--cwd', cwd], {
     env: NO_SERVER_ENV,
     encoding: 'utf8',
   });
@@ -155,6 +155,14 @@ describe('pgpm CLI deploys through the pglite engine with no server', () => {
       /pgpm docker is not supported by the "pglite" engine/
     );
   }, 120000);
+
+  it('runs connectionless commands in a pglite workspace without the plugin installed', () => {
+    workspace = makeWorkspace({ engine: 'pglite' });
+    rmSync(join(workspace, 'node_modules'), { recursive: true, force: true });
+    const { status, stdout, stderr } = runCli(['plan'], join(workspace, 'packages', MODULE_NAME));
+    expect(`${stdout}${stderr}`).not.toMatch(/is not installed in this project/);
+    expect(status).toBe(0);
+  }, 60000);
 
   it('leaves the default pg engine on the server path', () => {
     workspace = makeWorkspace({});

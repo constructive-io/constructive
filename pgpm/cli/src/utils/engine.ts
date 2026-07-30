@@ -8,6 +8,7 @@ import {
   PgpmEngineConfig,
   PgpmOptions,
 } from '@pgpmjs/types';
+import { resolve } from 'node:path';
 
 import { activateDriver, driverOverrideFromArgv, PGLITE_DRIVER_PLUGIN } from './driver';
 
@@ -128,9 +129,10 @@ export const activateEngine = async (
   argv: EngineArgv,
   cwd: string = process.cwd()
 ): Promise<ActiveEngine> => {
-  const config = getEnvOptions({}, cwd);
+  const dir = resolve(cwd);
+  const config = getEnvOptions({}, dir);
   const engine = resolveEngine(argv, config);
-  const session = await activateDriver(engine.driver, undefined, cwd);
+  const session = await activateDriver(engine.driver, undefined, dir);
   active = { engine, session, capabilities: session?.capabilities ?? SERVER_CAPABILITIES };
   return active;
 };
