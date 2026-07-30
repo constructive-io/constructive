@@ -14,10 +14,7 @@ import { classifyStatements } from '@pgsql/transform';
 import { Deparser, parseSql } from 'plpgsql-parser';
 
 /** A statement's location in the source script (byte offsets). */
-export interface SqlStatementSpan {
-  start: number;
-  len: number;
-}
+export type SqlStatementSpan = StatementFacts['span'];
 
 /** One statement of a parsed SQL script. */
 export interface SqlStatementAst {
@@ -51,8 +48,7 @@ export function parseSqlProgram(source: string): SqlProgram {
   for (let i = 0; i < stmts.length; i++) {
     const rawStmt = stmts[i];
     if (!rawStmt?.stmt) continue;
-    const start = rawStmt.stmt_location ?? 0;
-    const len = rawStmt.stmt_len ?? Math.max(0, source.length - start);
+    const { start, len } = facts[i].span;
     statements.push({
       stmt: rawStmt.stmt,
       facts: facts[i],
