@@ -2,6 +2,7 @@ import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
 
 import { PgpmDriverConfig, PgpmEngineConfig } from './driver';
+import { PgpmRoutingProfile } from './routing';
 
 /**
  * Authentication options for test client sessions
@@ -235,6 +236,13 @@ export interface PgpmWorkspaceConfig {
     /** Template variant directory */
     dir?: string;
   };
+  /**
+   * Workspace-level routing profile: the default routing policy (schemas,
+   * object routes, extension routing, role translation) applied to every
+   * apply/transpile in the workspace. A proxy module's `pgpm.apply.json`
+   * overrides it per key (inner scope wins).
+   */
+  portability?: PgpmRoutingProfile;
 }
 
 /**

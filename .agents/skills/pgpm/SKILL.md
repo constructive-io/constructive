@@ -361,6 +361,7 @@ Consult these reference files for detailed documentation on specific topics:
 | [references/env.md](references/env.md) | Environment variable management | Loading env vars, profiles, Supabase local development |
 | [references/environment-configuration.md](references/environment-configuration.md) | @pgpmjs/env library API | Programmatic configuration, config hierarchy, utility functions |
 | [references/extensions.md](references/extensions.md) | PostgreSQL extensions & pgpm modules | Adding extensions, installing @pgpm/* modules, .control requires |
+| [references/routing-profile.md](references/routing-profile.md) | Routing profile & module self-description | `extensions.json` provides/consumes, `pgpm.apply.json`, workspace `portability` in `pgpm.json`, routing precedence |
 | [references/module-naming.md](references/module-naming.md) | npm names vs control file names | Confused about which identifier to use where |
 | [references/plan-format.md](references/plan-format.md) | pgpm.plan file format | Fixing `Invalid line format` errors, editing plan files manually |
 | [references/publishing.md](references/publishing.md) | Publishing modules to npm | Bundling, versioning with lerna, publishing @pgpm/* packages |

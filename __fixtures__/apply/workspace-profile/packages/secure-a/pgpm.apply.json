@@ -1,0 +1,6 @@
+{
+  "source": "secure-module",
+  "schemas": {
+    "vault": "vault_a"
+  }
+}

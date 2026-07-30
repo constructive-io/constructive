@@ -1,0 +1,7 @@
+# secure-module extension
+comment = 'secure-module extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/secure-module'
+requires = 'plpgsql'
+relocatable = false
+superuser = false

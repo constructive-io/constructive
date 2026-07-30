@@ -162,6 +162,10 @@ transpileBundle(bundle, {
 - `renameChange` is validated as a bijection over touched changes (no collisions, no
   rename onto an untouched existing change).
 - Records `provenance.sourceBundleDigest` for lineage.
+- In pgpm's apply path the transpiler options come from the unified routing profile
+  (`schemas`/`route`/`extensions`/`roles`), merged from the workspace `portability`
+  field in `pgpm.json` and the proxy's `pgpm.apply.json` (inner scope wins per key) —
+  see the `pgpm` skill's `references/routing-profile.md`.
 
 ### `createEnvelope` — the shippable artifact container (fn #3)
 
