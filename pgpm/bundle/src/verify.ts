@@ -9,6 +9,7 @@ import { MigrationBundle } from './types';
 export interface BundleIssue {
   kind:
     | 'script-digest'
+    | 'exec-digest'
     | 'change-digest'
     | 'bundle-digest'
     | 'order-mismatch'
@@ -55,10 +56,18 @@ export function verifyBundle(bundle: MigrationBundle): BundleIssue[] {
         });
       }
     });
+    if (change.exec && hashString(change.exec.sql) !== change.exec.digest) {
+      issues.push({
+        kind: 'exec-digest',
+        change: change.name,
+        message: 'executable deploy digest does not match its sql'
+      });
+    }
     const expected = computeChangeDigest(change.name, {
       deploy: change.deploy?.digest,
       revert: change.revert?.digest,
-      verify: change.verify?.digest
+      verify: change.verify?.digest,
+      exec: change.exec?.digest
     });
     if (expected !== change.digest) {
       issues.push({

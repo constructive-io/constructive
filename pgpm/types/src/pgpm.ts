@@ -245,6 +245,14 @@ export interface DeploymentOptions {
     useTx?: boolean;
     /** Use fast deployment strategy (skip migration system) */
     fast?: boolean;
+    /**
+     * Deploy from each module's pre-built bundle artifact
+     * (`sql/<name>--<version>.bundle.tar.gz`): verify its sha256 digests, execute
+     * the pending changes in one round-trip, and bulk-record the `pgpm_migrate`
+     * ledger. Falls back to the standard path when a module has no verifiable
+     * artifact.
+     */
+    bundled?: boolean;
     /** Whether to use Sqitch plan files for deployments */
     usePlan?: boolean;
     /** Enable caching of deployment packages */
@@ -352,6 +360,7 @@ export const pgpmDefaults: PgpmOptions = {
   deployment: {
     useTx: true,
     fast: false,
+    bundled: false,
     usePlan: true,
     cache: false,
     logOnly: false,

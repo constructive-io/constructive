@@ -8,6 +8,7 @@ exports[`cmds:package updates module with \`extension\` and \`package\` commands
   "Makefile",
   "verify/procedures/secretfunction.sql",
   "sql/secrets--0.0.1.sql",
+  "sql/secrets--0.0.1.bundle.tar.gz",
   "revert/procedures/secretfunction.sql",
   "deploy/procedures/secretfunction.sql",
 ]

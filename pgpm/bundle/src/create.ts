@@ -8,6 +8,9 @@ import {
   MigrationBundle
 } from './types';
 
+/** Executable deploy SQL per change name, as produced at package time. */
+export type ExecSqlByChange = Record<string, string>;
+
 /**
  * Digest for a single change: its name plus the digests of its scripts, in a
  * fixed deploy/revert/verify order. A missing script contributes an empty slot
@@ -15,11 +18,20 @@ import {
  */
 export function computeChangeDigest(
   name: string,
-  scripts: { deploy?: string | null; revert?: string | null; verify?: string | null }
+  scripts: {
+    deploy?: string | null;
+    revert?: string | null;
+    verify?: string | null;
+    /**
+     * Digest of the pre-computed executable deploy SQL. Only contributes when
+     * defined, so digests of bundles without an `exec` slot are unchanged.
+     */
+    exec?: string | null;
+  }
 ): string {
-  return hashString(
-    [name, scripts.deploy ?? '', scripts.revert ?? '', scripts.verify ?? ''].join('\n')
-  );
+  const parts = [name, scripts.deploy ?? '', scripts.revert ?? '', scripts.verify ?? ''];
+  if (scripts.exec != null) parts.push(scripts.exec);
+  return hashString(parts.join('\n'));
 }
 
 /**
@@ -96,6 +108,51 @@ export function createBundle(
     control: module.control
       ? { fileName: module.control.fileName, content: module.control.raw }
       : null,
+    changes
+  };
+}
+
+/**
+ * Attach pre-computed executable deploy SQL to a bundle, re-deriving the
+ * per-change and top-level digests so the artifact stays content-addressed.
+ *
+ * The `exec` SQL is the deploy script with transaction / `CREATE EXTENSION`
+ * statements stripped — the form the deploy engine actually executes. Computing
+ * it requires a SQL parser, which this layer deliberately does not depend on, so
+ * the caller (`@pgpmjs/core` at package time) supplies it.
+ *
+ * Changes with no entry in `execSql` are left untouched.
+ */
+export function withExecutableSql(
+  bundle: MigrationBundle,
+  execSql: ExecSqlByChange
+): MigrationBundle {
+  const changes: BundleChange[] = bundle.changes.map(change => {
+    const sql = execSql[change.name];
+    if (sql === undefined) return change;
+    const exec = { sql, digest: hashString(sql) };
+    return {
+      ...change,
+      exec,
+      digest: computeChangeDigest(change.name, {
+        deploy: change.deploy?.digest,
+        revert: change.revert?.digest,
+        verify: change.verify?.digest,
+        exec: exec.digest
+      })
+    };
+  });
+
+  return {
+    ...bundle,
+    manifest: {
+      ...bundle.manifest,
+      digest: computeBundleDigest(
+        bundle.plan,
+        bundle.control?.content ?? null,
+        changes.map(c => c.digest)
+      )
+    },
     changes
   };
 }

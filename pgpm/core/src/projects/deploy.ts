@@ -8,6 +8,7 @@ import {PgConfig } from 'pg-env';
 
 import { resolveEffectiveModulePath } from '../apply/materialize';
 import { hasApplySpec } from '../apply/apply-spec';
+import { deployModuleFromBundle, isBundledDeployResult } from '../bundle/deploy-bundled';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmMigrate } from '../migrate/client';
 import { packageModule } from '../packaging/package';
@@ -80,6 +81,23 @@ export const deployProject = async (
         log.debug(`→ Path: ${modulePath}`);
         if (modulePath !== sourcePath) {
           log.info(`🔁 Applying transpiled module (spec in ${sourcePath})`);
+        }
+
+        if (mergedOpts.deployment.bundled) {
+          // Fast path v2: execute the module's pre-built, verified bundle
+          // artifact in one shot AND record the migration ledger. Any reason the
+          // artifact cannot be trusted (missing, stale, unverified) degrades to
+          // the paths below rather than failing the deploy.
+          const outcome = await deployModuleFromBundle(modulePath, {
+            config: { ...(mergedOpts.pg as PgConfig), database },
+            logOnly: mergedOpts.deployment.logOnly,
+            useTransaction: mergedOpts.deployment.useTx,
+            hashMethod: mergedOpts.deployment.hashMethod
+          });
+          if (isBundledDeployResult(outcome)) {
+            continue;
+          }
+          log.info(`↩️ Bundled deploy unavailable for ${extension} (${outcome}); using standard path.`);
         }
 
         if (mergedOpts.deployment.fast) {
