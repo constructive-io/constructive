@@ -31,7 +31,21 @@ import tune from './commands/tune';
 import updateCmd from './commands/update';
 import upgrade from './commands/upgrade';
 import verify from './commands/verify';
-import { usageText } from './utils';
+import {
+  activateEngine,
+  deactivateEngine,
+  EngineArgv,
+  engineCommandBlocker,
+  getActiveEngine,
+  usageText
+} from './utils';
+
+/**
+ * Commands that never talk to a database and must not activate a driver.
+ * `init` owns its own `--pglite` meaning (scaffold from the PGlite boilerplates),
+ * and it runs before the plugin it would scaffold is even installed.
+ */
+const ENGINE_EXEMPT_COMMANDS = new Set(['init']);
 
 const withPgTeardown = (fn: Function, skipTeardown: boolean = false) => async (...args: any[]) => {
   try {
@@ -149,7 +163,27 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     await cliExitWithError(`Unknown command: ${command}`, { beforeExit: teardownPgPools });
   }
 
-  await commandFn(newArgv, prompter, options);
+  // Activate the selected migration backend (`--engine`/`--driver`/`--pglite` or
+  // pgpm.json) before the command runs: the driver plugin registers its
+  // pool/client factories, so the unmodified engine targets it. The built-in
+  // `pg` engine activates nothing and behaves exactly as before.
+  const engineArgv = newArgv as unknown as EngineArgv & { cwd?: string };
+  const { engine, capabilities } = ENGINE_EXEMPT_COMMANDS.has(command)
+    ? getActiveEngine()
+    : await activateEngine(engineArgv, engineArgv.cwd).catch(async (error: Error) => {
+      await cliExitWithError(error.message, { beforeExit: teardownPgPools });
+      throw error;
+    });
+  try {
+    const blocked = engineCommandBlocker(command, engine, capabilities);
+    if (blocked) {
+      await cliExitWithError(blocked, { beforeExit: teardownPgPools });
+    }
+
+    await commandFn(newArgv, prompter, options);
+  } finally {
+    await deactivateEngine();
+  }
   prompter.close();
 
   return argv;

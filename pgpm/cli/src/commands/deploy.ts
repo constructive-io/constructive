@@ -8,7 +8,7 @@ import {
   getSpawnEnvWithPg,
 } from 'pg-env';
 
-import { getTargetDatabase, resolvePackageAlias } from '../utils';
+import { getActiveEngine, getTargetDatabase, resolvePackageAlias } from '../utils';
 import { selectPackage } from '../utils/module-utils';
 
 const deployUsageText = `
@@ -21,6 +21,10 @@ Deploy Command:
 Options:
   --help, -h         Show this help message
   --createdb         Create database if it doesn't exist
+  --engine <name>    Migration backend to deploy to (default: pg).
+                     Built-in engines: pg (Postgres server), pglite (in-process WASM).
+  --driver <pkg>     Driver plugin package to deploy through (escape hatch for --engine)
+  --pglite[=dataDir] Sugar for --engine pglite; persists to <dataDir> when given
   --recursive        Deploy recursively through dependencies
   --package <name>   Target specific package
   --to <target>      Deploy to specific change or tag
@@ -40,6 +44,8 @@ Examples:
   pgpm deploy --package mypackage --to @v1.0.0  Deploy specific package to tag
   pgpm deploy --fast --no-tx              Fast deployment without transactions
   pgpm deploy --bundled                    Same as --fast
+  pgpm deploy --engine pglite              Deploy into in-process PGlite (no server)
+  pgpm deploy --pglite=./.pglite           Deploy into a persisted PGlite data directory
 `;
 
 export default async (
@@ -132,11 +138,19 @@ export default async (
 
   log.debug(`Using current directory: ${cwd}`);
 
+  const { engine, capabilities } = getActiveEngine();
+
   if (createdb) {
-    log.info(`Creating database ${database}...`);
-    execSync(`createdb ${database}`, {
-      env: getSpawnEnvWithPg(pgEnv)
-    });
+    if (capabilities.createdb) {
+      log.info(`Creating database ${database}...`);
+      execSync(`createdb ${database}`, {
+        env: getSpawnEnvWithPg(pgEnv)
+      });
+    } else {
+      log.info(
+        `Skipping createdb: the "${engine.name}" engine's instance is the database.`
+      );
+    }
   }
 
   let packageName: string | undefined;

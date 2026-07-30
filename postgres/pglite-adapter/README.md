@@ -60,6 +60,32 @@ await migrate.verify({ modulePath: './my-module' });
 await close(); // restores the previous factory and closes PGlite
 ```
 
+### As a pgpm CLI engine
+
+The package also exports the pgpm driver-plugin entrypoint (`createPgpmDriver`),
+so the `pgpm` CLI can deploy into PGlite with no server once this package is
+installed in the workspace being deployed:
+
+```sh
+pgpm deploy --engine pglite --package pets --database anything --yes
+pgpm deploy --pglite=./.pglite --package pets --database anything --yes  # persisted
+```
+
+Or make it the workspace default in `pgpm.json`:
+
+```json
+{
+  "packages": ["packages/*"],
+  "engine": "pglite",
+  "engines": { "pglite": { "options": { "dataDir": "./.pglite" } } }
+}
+```
+
+The options are the same `PgliteAdapterOptions` as `registerPglite`. The
+driver reports `createdb`/`dump`/`serverLifecycle`/`multiConnection` as false, so
+pgpm skips `deploy --createdb` and refuses `pgpm dump`, `pgpm docker`, `pgpm kill`,
+`pgpm tune` and `pgpm admin-users` on this engine.
+
 ### Extensions
 
 pgpm's `cleanSql` strips `CREATE EXTENSION` from migrations, so extensions are

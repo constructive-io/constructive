@@ -65,3 +65,28 @@ export interface PgpmDriverConfig {
 
 /** Named export a driver plugin module must expose. */
 export const PGPM_DRIVER_EXPORT = 'createPgpmDriver' as const;
+
+/**
+ * A named engine, in the sqitch sense: a short name (`pg`, `pglite`) that
+ * selects a backend, so users say `--engine pglite` instead of naming a plugin
+ * package. `plugin: undefined` marks the built-in server path.
+ */
+export interface PgpmEngineConfig {
+    /** Driver plugin backing the engine; undefined = built-in `pg` (server). */
+    plugin?: string;
+    /** Default options forwarded to the plugin's `createPgpmDriver(options)`. */
+    options?: Record<string, unknown>;
+}
+
+/** Engine used when nothing selects one: the built-in Postgres server path. */
+export const DEFAULT_ENGINE = 'pg';
+
+/**
+ * Engines pgpm knows by name. Anything else must be declared in the `engines`
+ * block of `pgpm.json` (the analogue of sqitch's `[engine "name"]` sections) or
+ * named directly with `--driver <package>`.
+ */
+export const BUILTIN_ENGINES: Record<string, PgpmEngineConfig> = {
+    [DEFAULT_ENGINE]: {},
+    pglite: { plugin: '@pgpmjs/pglite-adapter' }
+};

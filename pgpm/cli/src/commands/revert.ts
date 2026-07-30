@@ -24,6 +24,7 @@ Options:
   --to <target>      Revert to specific change or tag
   --to               Interactive selection of deployed changes
   --tx               Use transactions (default: true)
+  --engine <name>    Migration backend to revert in (default: pg; also pglite)
   --cwd <directory>  Working directory (default: current directory)
 
 Examples:

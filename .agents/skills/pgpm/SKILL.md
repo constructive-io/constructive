@@ -356,6 +356,7 @@ Consult these reference files for detailed documentation on specific topics:
 | [references/sql-conventions.md](references/sql-conventions.md) | SQL file format and conventions | Writing SQL files, naming conventions, header format |
 | [references/dependencies.md](references/dependencies.md) | Managing module dependencies | Within-module or cross-module dependency references |
 | [references/deploy-lifecycle.md](references/deploy-lifecycle.md) | Deploy/verify/revert lifecycle | Understanding deployment process, tagging, status checking |
+| [references/engines.md](references/engines.md) | Migration backends (`--engine`, drivers) | Deploying into PGlite without a server, configuring `engine`/`engines`, writing a driver plugin |
 | [references/docker.md](references/docker.md) | Docker container management | Starting/stopping PostgreSQL, custom container options |
 | [references/env.md](references/env.md) | Environment variable management | Loading env vars, profiles, Supabase local development |
 | [references/environment-configuration.md](references/environment-configuration.md) | @pgpmjs/env library API | Programmatic configuration, config hierarchy, utility functions |

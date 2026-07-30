@@ -22,6 +22,7 @@ Options:
   --package <name>   Verify specific package
   --to <target>      Verify up to specific change or tag
   --to               Interactive selection of deployed changes
+  --engine <name>    Migration backend to verify against (default: pg; also pglite)
   --cwd <directory>  Working directory (default: current directory)
 
 Examples:

@@ -1,4 +1,5 @@
 import { PGlite } from '@electric-sql/pglite';
+import type { PgpmDriverSession } from '@pgpmjs/types';
 import { getActivePgPoolFactory, registerPgPoolFactory } from 'pg-cache';
 
 import { createPglitePool } from './pool';
@@ -70,5 +71,31 @@ export const registerPglite = async (
       registerPgPoolFactory(previous);
       await db.close();
     }
+  };
+};
+
+/**
+ * The pgpm driver-plugin entrypoint (`createPgpmDriver`), which is how the pgpm
+ * CLI activates this backend for `--engine pglite` / `--driver
+ * @pgpmjs/pglite-adapter`. It registers the in-process PGlite instance as the
+ * pool factory — exactly what {@link registerPglite} does — and describes what
+ * PGlite cannot do so the CLI skips server-only steps generically.
+ *
+ * PGlite is one WASM instance with a single superuser session, so: the instance
+ * *is* the database (no `createdb`), there is no `pg_dump` binary and no server
+ * to manage, and a second concurrent connection is not available.
+ */
+export const createPgpmDriver = async (
+  options: PgliteAdapterOptions = {}
+): Promise<PgpmDriverSession> => {
+  const handle = await registerPglite(options);
+  return {
+    capabilities: {
+      createdb: false,
+      dump: false,
+      serverLifecycle: false,
+      multiConnection: false
+    },
+    teardown: () => handle.close()
   };
 };
