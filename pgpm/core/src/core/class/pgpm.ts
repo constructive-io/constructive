@@ -13,6 +13,7 @@ import yanse from 'yanse';
 
 import { resolveEffectiveModulePath } from '../../apply/materialize';
 import { hasApplySpec, readApplySpec } from '../../apply/apply-spec';
+import { isReuseSpec, resolveSharedModuleName } from '../../apply/reuse';
 import { APPLY_SPEC_FILE, ResolvedApplySpec } from '../../apply/types';
 import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '@pgpmjs/ast/files';
@@ -391,13 +392,30 @@ export class PgpmPackage {
       const name = spec.name!;
       if (moduleMap[name]) continue;
       const source = moduleMap[spec.source.module];
-      moduleMap[name] = {
-        path: path
-          .dirname(path.relative(this.workspacePath!, file))
-          .replace(/\\/g, '/'),
-        requires: spec.requires ?? source?.requires ?? [],
-        version: spec.version ?? source?.version ?? '0.0.1'
-      };
+      const relPath = path
+        .dirname(path.relative(this.workspacePath!, file))
+        .replace(/\\/g, '/');
+      const baseRequires = spec.requires ?? source?.requires ?? [];
+      const version = spec.version ?? source?.version ?? '0.0.1';
+
+      if (isReuseSpec(spec)) {
+        // A reuse proxy expands into two modules that both materialize from
+        // this one directory: a shared module (deployed once, reused across
+        // tenants) and the per-tenant module that `requires` it. Multiple
+        // tenant proxies over the same source/shared/seed config resolve to
+        // the same deterministic shared name, so it is added at most once.
+        const sharedName = resolveSharedModuleName(spec);
+        if (!moduleMap[sharedName]) {
+          moduleMap[sharedName] = { path: relPath, requires: baseRequires, version };
+        }
+        moduleMap[name] = {
+          path: relPath,
+          requires: [...baseRequires, sharedName],
+          version
+        };
+      } else {
+        moduleMap[name] = { path: relPath, requires: baseRequires, version };
+      }
     }
 
     return moduleMap;

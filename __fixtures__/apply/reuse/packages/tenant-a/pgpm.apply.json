@@ -1,0 +1,14 @@
+{
+  "source": "catalog",
+  "schemas": {
+    "catalog": "tenant_a"
+  },
+  "reuse": {
+    "sharedSchema": {
+      "catalog": "catalog_shared"
+    },
+    "perTenant": [
+      { "fromSchema": "catalog", "kind": "table", "name": "products" }
+    ]
+  }
+}

@@ -41,18 +41,18 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
     );
   }
 
+  const isSchemaMap = (value: unknown): boolean =>
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.keys(value as object).length > 0 &&
+    Object.entries(value as object).every(
+      ([from, to]) => typeof from === 'string' && typeof to === 'string' && !!from && !!to
+    );
+
   const hasSchemas = parsed.schemas !== undefined;
-  if (hasSchemas) {
-    if (
-      typeof parsed.schemas !== 'object' ||
-      Array.isArray(parsed.schemas) ||
-      Object.keys(parsed.schemas).length === 0 ||
-      Object.entries(parsed.schemas).some(
-        ([from, to]) => typeof from !== 'string' || typeof to !== 'string' || !from || !to
-      )
-    ) {
-      throw new Error(`${specPath}: "schemas" must be a non-empty string → string map`);
-    }
+  if (hasSchemas && !isSchemaMap(parsed.schemas)) {
+    throw new Error(`${specPath}: "schemas" must be a non-empty string → string map`);
   }
 
   const ROUTE_KINDS = ['table', 'view', 'function', 'procedure', 'type'];
@@ -77,6 +77,63 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
           `${specPath}: each "route" entry needs { fromSchema, kind (${ROUTE_KINDS.join(
             '|'
           )}), name, toSchema } as non-empty strings`
+        );
+      }
+    }
+  }
+
+  const hasReuse = parsed.reuse !== undefined;
+  if (hasReuse) {
+    const reuse = parsed.reuse;
+    if (typeof reuse !== 'object' || reuse === null || Array.isArray(reuse)) {
+      throw new Error(`${specPath}: "reuse" must be an object`);
+    }
+    if (!isSchemaMap(reuse.sharedSchema)) {
+      throw new Error(
+        `${specPath}: "reuse.sharedSchema" must be a non-empty string → string map`
+      );
+    }
+    if (!Array.isArray(reuse.perTenant) || reuse.perTenant.length === 0) {
+      throw new Error(
+        `${specPath}: "reuse.perTenant" must be a non-empty array of seed objects`
+      );
+    }
+    for (const seed of reuse.perTenant) {
+      if (
+        !seed ||
+        typeof seed !== 'object' ||
+        typeof seed.fromSchema !== 'string' ||
+        !seed.fromSchema ||
+        typeof seed.name !== 'string' ||
+        !seed.name ||
+        !ROUTE_KINDS.includes(seed.kind)
+      ) {
+        throw new Error(
+          `${specPath}: each "reuse.perTenant" seed needs { fromSchema, kind (${ROUTE_KINDS.join(
+            '|'
+          )}), name } as non-empty strings`
+        );
+      }
+    }
+    if (reuse.sharedName !== undefined && (typeof reuse.sharedName !== 'string' || !reuse.sharedName)) {
+      throw new Error(`${specPath}: "reuse.sharedName" must be a non-empty string`);
+    }
+    if (!hasSchemas) {
+      throw new Error(
+        `${specPath}: "reuse" requires "schemas" (the per-tenant source → target schema map)`
+      );
+    }
+    for (const seed of reuse.perTenant) {
+      if (!(seed.fromSchema in parsed.schemas)) {
+        throw new Error(
+          `${specPath}: "reuse.perTenant" seed schema "${seed.fromSchema}" has no per-tenant ` +
+            `target in "schemas"`
+        );
+      }
+      if (!(seed.fromSchema in reuse.sharedSchema)) {
+        throw new Error(
+          `${specPath}: "reuse.perTenant" seed schema "${seed.fromSchema}" has no shared ` +
+            `target in "reuse.sharedSchema"`
         );
       }
     }
