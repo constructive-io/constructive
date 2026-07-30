@@ -23,8 +23,10 @@ export interface FunctionApiBinding {
   alias: string | null;
   apiId: string | null;
   config: unknown | null;
+  createdAt: string | null;
   functionDefinitionId: string | null;
   id: string | null;
+  updatedAt: string | null;
 }
 export interface FunctionDefinition {
   accessChannels: string[] | null;
@@ -342,8 +344,10 @@ export interface PlatformFunctionApiBinding {
   alias: string | null;
   apiId: string | null;
   config: unknown | null;
+  createdAt: string | null;
   functionDefinitionId: string | null;
   id: string | null;
+  updatedAt: string | null;
 }
 export interface PlatformFunctionDefinition {
   accessChannels: string[] | null;
@@ -453,6 +457,7 @@ export interface PlatformFunctionInvocation {
   channel: string | null;
   completedAt: string | null;
   createdAt: string | null;
+  databaseId: string | null;
   definitionScope: string | null;
   durationMs: number | null;
   error: string | null;

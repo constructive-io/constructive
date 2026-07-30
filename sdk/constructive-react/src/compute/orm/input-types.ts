@@ -268,9 +268,11 @@ export interface FunctionApiBinding {
   apiId?: string | null;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: Record<string, unknown> | null;
+  createdAt?: string | null;
   /** Function definition this binding belongs to */
   functionDefinitionId?: string | null;
   id: string;
+  updatedAt?: string | null;
 }
 /** Function definitions — registered cloud functions with routing, queue, and retry configuration */
 export interface FunctionDefinition {
@@ -863,9 +865,11 @@ export interface PlatformFunctionApiBinding {
   apiId?: string | null;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: Record<string, unknown> | null;
+  createdAt?: string | null;
   /** Function definition this binding belongs to */
   functionDefinitionId?: string | null;
   id: string;
+  updatedAt?: string | null;
 }
 /** Function definitions — registered cloud functions with routing, queue, and retry configuration */
 export interface PlatformFunctionDefinition {
@@ -1072,6 +1076,8 @@ export interface PlatformFunctionInvocation {
   completedAt?: string | null;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string | null;
+  /** Database this invocation is attributed to (usage/billing attribution) */
+  databaseId?: string | null;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string | null;
   /** Wall-clock execution time in milliseconds */
@@ -2154,8 +2160,10 @@ export type FunctionApiBindingSelect = {
   alias?: boolean;
   apiId?: boolean;
   config?: boolean;
+  createdAt?: boolean;
   functionDefinitionId?: boolean;
   id?: boolean;
+  updatedAt?: boolean;
   functionDefinition?: {
     select: FunctionDefinitionSelect;
   };
@@ -2545,8 +2553,10 @@ export type PlatformFunctionApiBindingSelect = {
   alias?: boolean;
   apiId?: boolean;
   config?: boolean;
+  createdAt?: boolean;
   functionDefinitionId?: boolean;
   id?: boolean;
+  updatedAt?: boolean;
   functionDefinition?: {
     select: PlatformFunctionDefinitionSelect;
   };
@@ -2683,6 +2693,7 @@ export type PlatformFunctionInvocationSelect = {
   channel?: boolean;
   completedAt?: boolean;
   createdAt?: boolean;
+  databaseId?: boolean;
   definitionScope?: boolean;
   durationMs?: boolean;
   error?: boolean;
@@ -3389,6 +3400,8 @@ export interface FunctionApiBindingFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: FunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -3403,6 +3416,8 @@ export interface FunctionApiBindingFilter {
   not?: FunctionApiBindingFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionApiBindingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface FunctionDefinitionFilter {
   /** Filter by the object’s `accessChannels` field. */
@@ -4155,6 +4170,8 @@ export interface PlatformFunctionApiBindingFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: PlatformFunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -4169,6 +4186,8 @@ export interface PlatformFunctionApiBindingFilter {
   platformFunctionInvocationsByApiBindingId?: PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter;
   /** `platformFunctionInvocationsByApiBindingId` exist. */
   platformFunctionInvocationsByApiBindingIdExist?: boolean;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 export interface PlatformFunctionDefinitionFilter {
   /** Filter by the object’s `accessChannels` field. */
@@ -4421,6 +4440,8 @@ export interface PlatformFunctionInvocationFilter {
   completedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `definitionScope` field. */
   definitionScope?: StringFilter;
   /** Filter by the object’s `durationMs` field. */
@@ -5727,13 +5748,17 @@ export type FunctionApiBindingOrderBy =
   | 'API_ID_DESC'
   | 'CONFIG_ASC'
   | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
   | 'FUNCTION_DEFINITION_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type FunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
   | 'ACCESS_CHANNELS_DESC'
@@ -6365,13 +6390,17 @@ export type PlatformFunctionApiBindingOrderBy =
   | 'API_ID_DESC'
   | 'CONFIG_ASC'
   | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'FUNCTION_DEFINITION_ID_ASC'
   | 'FUNCTION_DEFINITION_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC';
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type PlatformFunctionDefinitionOrderBy =
   | 'ACCESS_CHANNELS_ASC'
   | 'ACCESS_CHANNELS_DESC'
@@ -6587,6 +6616,8 @@ export type PlatformFunctionInvocationOrderBy =
   | 'COMPLETED_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DEFINITION_SCOPE_ASC'
   | 'DEFINITION_SCOPE_DESC'
   | 'DURATION_MS_ASC'
@@ -8755,6 +8786,7 @@ export interface CreatePlatformFunctionInvocationInput {
     apiBindingId?: string;
     channel?: string;
     completedAt?: string;
+    databaseId?: string;
     definitionScope?: string;
     durationMs?: number;
     error?: string;
@@ -8775,6 +8807,7 @@ export interface PlatformFunctionInvocationPatch {
   apiBindingId?: string | null;
   channel?: string | null;
   completedAt?: string | null;
+  databaseId?: string | null;
   definitionScope?: string | null;
   durationMs?: number | null;
   error?: string | null;
@@ -10712,9 +10745,11 @@ export interface FunctionApiBindingInput {
   apiId: string;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: Record<string, unknown>;
+  createdAt?: string;
   /** Function definition this binding belongs to */
   functionDefinitionId: string;
   id?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `FunctionDefinition` */
 export interface FunctionDefinitionInput {
@@ -11268,9 +11303,11 @@ export interface PlatformFunctionApiBindingInput {
   apiId: string;
   /** Per-binding configuration (overrides, routing rules, etc.) */
   config?: Record<string, unknown>;
+  createdAt?: string;
   /** Function definition this binding belongs to */
   functionDefinitionId: string;
   id?: string;
+  updatedAt?: string;
 }
 /** An input for mutations affecting `PlatformFunctionDefinition` */
 export interface PlatformFunctionDefinitionInput {
@@ -11467,6 +11504,8 @@ export interface PlatformFunctionInvocationInput {
   completedAt?: string;
   /** Invocation creation timestamp (partition key) */
   createdAt?: string;
+  /** Database this invocation is attributed to (usage/billing attribution) */
+  databaseId?: string;
   /** Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected */
   definitionScope?: string;
   /** Wall-clock execution time in milliseconds */
@@ -12143,6 +12182,8 @@ export interface FunctionApiBindingFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: FunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -12157,6 +12198,8 @@ export interface FunctionApiBindingFilter {
   not?: FunctionApiBindingFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionApiBindingFilter[];
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface WebhookEndpointFilter {
@@ -12625,6 +12668,8 @@ export interface PlatformFunctionInvocationFilter {
   completedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `definitionScope` field. */
   definitionScope?: StringFilter;
   /** Filter by the object’s `durationMs` field. */
@@ -12668,6 +12713,8 @@ export interface PlatformFunctionApiBindingFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `config` field. */
   config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: PlatformFunctionDefinitionFilter;
   /** Filter by the object’s `functionDefinitionId` field. */
@@ -12682,6 +12729,8 @@ export interface PlatformFunctionApiBindingFilter {
   platformFunctionInvocationsByApiBindingId?: PlatformFunctionApiBindingToManyPlatformFunctionInvocationFilter;
   /** `platformFunctionInvocationsByApiBindingId` exist. */
   platformFunctionInvocationsByApiBindingIdExist?: boolean;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
 }
 /** A filter to be used against `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformWebhookEndpointFilter {

@@ -28,7 +28,11 @@ import {
   appPermissionDefaultPermissionKeys,
   membershipTypeKeys,
   orgAdminGrantKeys,
+  orgChartEdgeKeys,
+  orgChartEdgeGrantKeys,
   orgClaimedInviteKeys,
+  orgGetManagersRecordKeys,
+  orgGetSubordinatesRecordKeys,
   orgGrantKeys,
   orgInviteKeys,
   orgMemberKeys,
@@ -282,6 +286,40 @@ export const invalidate = {
         queryKey: orgAdminGrantKeys.detail(id),
       }),
   },
+  /** Invalidate orgChartEdge queries */ orgChartEdge: {
+    /** Invalidate all orgChartEdge queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgChartEdgeKeys.all,
+      }),
+    /** Invalidate orgChartEdge list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgChartEdgeKeys.lists(),
+      }),
+    /** Invalidate a specific orgChartEdge */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgChartEdgeKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgChartEdgeGrant queries */ orgChartEdgeGrant: {
+    /** Invalidate all orgChartEdgeGrant queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgChartEdgeGrantKeys.all,
+      }),
+    /** Invalidate orgChartEdgeGrant list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgChartEdgeGrantKeys.lists(),
+      }),
+    /** Invalidate a specific orgChartEdgeGrant */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgChartEdgeGrantKeys.detail(id),
+      }),
+  },
   /** Invalidate orgClaimedInvite queries */ orgClaimedInvite: {
     /** Invalidate all orgClaimedInvite queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -297,6 +335,40 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgClaimedInviteKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgGetManagersRecord queries */ orgGetManagersRecord: {
+    /** Invalidate all orgGetManagersRecord queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgGetManagersRecordKeys.all,
+      }),
+    /** Invalidate orgGetManagersRecord list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgGetManagersRecordKeys.lists(),
+      }),
+    /** Invalidate a specific orgGetManagersRecord */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgGetManagersRecordKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgGetSubordinatesRecord queries */ orgGetSubordinatesRecord: {
+    /** Invalidate all orgGetSubordinatesRecord queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgGetSubordinatesRecordKeys.all,
+      }),
+    /** Invalidate orgGetSubordinatesRecord list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgGetSubordinatesRecordKeys.lists(),
+      }),
+    /** Invalidate a specific orgGetSubordinatesRecord */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgGetSubordinatesRecordKeys.detail(id),
       }),
   },
   /** Invalidate orgGrant queries */ orgGrant: {
@@ -613,12 +685,44 @@ export const remove = {
       queryKey: orgAdminGrantKeys.detail(id),
     });
   },
+  /** Remove orgChartEdge from cache */ orgChartEdge: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgChartEdgeKeys.detail(id),
+    });
+  },
+  /** Remove orgChartEdgeGrant from cache */ orgChartEdgeGrant: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgChartEdgeGrantKeys.detail(id),
+    });
+  },
   /** Remove orgClaimedInvite from cache */ orgClaimedInvite: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: orgClaimedInviteKeys.detail(id),
+    });
+  },
+  /** Remove orgGetManagersRecord from cache */ orgGetManagersRecord: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgGetManagersRecordKeys.detail(id),
+    });
+  },
+  /** Remove orgGetSubordinatesRecord from cache */ orgGetSubordinatesRecord: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgGetSubordinatesRecordKeys.detail(id),
     });
   },
   /** Remove orgGrant from cache */ orgGrant: (queryClient: QueryClient, id: string | number) => {

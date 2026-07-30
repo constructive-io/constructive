@@ -4597,6 +4597,7 @@ type FunctionApiBinding {
 
   """Per-binding configuration (overrides, routing rules, etc.)"""
   config: JSON!
+  createdAt: Datetime
 
   """
   Reads a single `FunctionDefinition` that is related to this `FunctionApiBinding`.
@@ -4635,6 +4636,7 @@ type FunctionApiBinding {
     where: FunctionInvocationFilter
   ): FunctionInvocationConnection!
   id: UUID!
+  updatedAt: Datetime
 }
 
 """A connection to a list of `FunctionApiBinding` values."""
@@ -4681,6 +4683,9 @@ input FunctionApiBindingFilter {
   """Filter by the object’s `config` field."""
   config: JSONFilter
 
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
   """Filter by the object’s `functionDefinition` relation."""
   functionDefinition: FunctionDefinitionFilter
 
@@ -4701,6 +4706,9 @@ input FunctionApiBindingFilter {
 
   """Checks for any expressions in this list."""
   or: [FunctionApiBindingFilter!]
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
 }
 
 """An input for mutations affecting `FunctionApiBinding`"""
@@ -4713,10 +4721,12 @@ input FunctionApiBindingInput {
 
   """Per-binding configuration (overrides, routing rules, etc.)"""
   config: JSON
+  createdAt: Datetime
 
   """Function definition this binding belongs to"""
   functionDefinitionId: UUID!
   id: UUID
+  updatedAt: Datetime
 }
 
 """Methods to use when ordering `FunctionApiBinding`."""
@@ -4727,6 +4737,8 @@ enum FunctionApiBindingOrderBy {
   API_ID_DESC
   CONFIG_ASC
   CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
   FUNCTION_DEFINITION_ID_ASC
   FUNCTION_DEFINITION_ID_DESC
   ID_ASC
@@ -4734,6 +4746,8 @@ enum FunctionApiBindingOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """
@@ -4748,10 +4762,12 @@ input FunctionApiBindingPatch {
 
   """Per-binding configuration (overrides, routing rules, etc.)"""
   config: JSON
+  createdAt: Datetime
 
   """Function definition this binding belongs to"""
   functionDefinitionId: UUID
   id: UUID
+  updatedAt: Datetime
 }
 
 """
@@ -12726,6 +12742,7 @@ type PlatformFunctionApiBinding {
 
   """Per-binding configuration (overrides, routing rules, etc.)"""
   config: JSON!
+  createdAt: Datetime
 
   """
   Reads a single `PlatformFunctionDefinition` that is related to this `PlatformFunctionApiBinding`.
@@ -12766,6 +12783,7 @@ type PlatformFunctionApiBinding {
     """
     where: PlatformFunctionInvocationFilter
   ): PlatformFunctionInvocationConnection!
+  updatedAt: Datetime
 }
 
 """A connection to a list of `PlatformFunctionApiBinding` values."""
@@ -12812,6 +12830,9 @@ input PlatformFunctionApiBindingFilter {
   """Filter by the object’s `config` field."""
   config: JSONFilter
 
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
   """Filter by the object’s `functionDefinition` relation."""
   functionDefinition: PlatformFunctionDefinitionFilter
 
@@ -12834,6 +12855,9 @@ input PlatformFunctionApiBindingFilter {
 
   """`platformFunctionInvocationsByApiBindingId` exist."""
   platformFunctionInvocationsByApiBindingIdExist: Boolean
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
 }
 
 """An input for mutations affecting `PlatformFunctionApiBinding`"""
@@ -12846,10 +12870,12 @@ input PlatformFunctionApiBindingInput {
 
   """Per-binding configuration (overrides, routing rules, etc.)"""
   config: JSON
+  createdAt: Datetime
 
   """Function definition this binding belongs to"""
   functionDefinitionId: UUID!
   id: UUID
+  updatedAt: Datetime
 }
 
 """Methods to use when ordering `PlatformFunctionApiBinding`."""
@@ -12860,6 +12886,8 @@ enum PlatformFunctionApiBindingOrderBy {
   API_ID_DESC
   CONFIG_ASC
   CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
   FUNCTION_DEFINITION_ID_ASC
   FUNCTION_DEFINITION_ID_DESC
   ID_ASC
@@ -12867,6 +12895,8 @@ enum PlatformFunctionApiBindingOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """
@@ -12881,10 +12911,12 @@ input PlatformFunctionApiBindingPatch {
 
   """Per-binding configuration (overrides, routing rules, etc.)"""
   config: JSON
+  createdAt: Datetime
 
   """Function definition this binding belongs to"""
   functionDefinitionId: UUID
   id: UUID
+  updatedAt: Datetime
 }
 
 """
@@ -14566,6 +14598,9 @@ type PlatformFunctionInvocation {
   """Invocation creation timestamp (partition key)"""
   createdAt: Datetime!
 
+  """Database this invocation is attributed to (usage/billing attribution)"""
+  databaseId: UUID!
+
   """
   Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected
   """
@@ -14919,6 +14954,9 @@ input PlatformFunctionInvocationFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
   """Filter by the object’s `definitionScope` field."""
   definitionScope: StringFilter
 
@@ -14987,6 +15025,9 @@ input PlatformFunctionInvocationInput {
   """Invocation creation timestamp (partition key)"""
   createdAt: Datetime
 
+  """Database this invocation is attributed to (usage/billing attribution)"""
+  databaseId: UUID
+
   """
   Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected
   """
@@ -15054,6 +15095,8 @@ enum PlatformFunctionInvocationOrderBy {
   COMPLETED_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   DEFINITION_SCOPE_ASC
   DEFINITION_SCOPE_DESC
   DURATION_MS_ASC
@@ -15107,6 +15150,9 @@ input PlatformFunctionInvocationPatch {
 
   """Invocation creation timestamp (partition key)"""
   createdAt: Datetime
+
+  """Database this invocation is attributed to (usage/billing attribution)"""
+  databaseId: UUID
 
   """
   Scope that owns function_definition_id (e.g. app/org/database/platform) — the per-scope definitions table the resolver selected

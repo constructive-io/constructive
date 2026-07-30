@@ -4,7 +4,6 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { ApiModel } from './api';
-export { ApiModuleModel } from './apiModule';
 export { ApiSchemaModel } from './apiSchema';
 export { ApiSettingModel } from './apiSetting';
 export { AstMigrationModel } from './astMigration';
@@ -17,6 +16,7 @@ export { DatabaseTransferModel } from './databaseTransfer';
 export { DefaultPrivilegeModel } from './defaultPrivilege';
 export { DomainModel } from './domain';
 export { DomainEventModel } from './domainEvent';
+export { DomainTypeModel } from './domainType';
 export { DomainVerificationModel } from './domainVerification';
 export { EmbeddingChunkModel } from './embeddingChunk';
 export { EnumModel } from './enum';
@@ -32,7 +32,6 @@ export { ManagedDomainModel } from './managedDomain';
 export { NodeTypeRegistryModel } from './nodeTypeRegistry';
 export { PartitionModel } from './partition';
 export { PlatformApiModel } from './platformApi';
-export { PlatformApiModuleModel } from './platformApiModule';
 export { PlatformApiSchemaModel } from './platformApiSchema';
 export { PlatformApiSettingModel } from './platformApiSetting';
 export { PlatformCorsSettingModel } from './platformCorsSetting';

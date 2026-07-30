@@ -27,7 +27,6 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `api` | api CRUD operations |
-| `api-module` | apiModule CRUD operations |
 | `api-schema` | apiSchema CRUD operations |
 | `api-setting` | apiSetting CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
@@ -40,6 +39,7 @@ csdk auth set-token <your-token>
 | `default-privilege` | defaultPrivilege CRUD operations |
 | `domain` | domain CRUD operations |
 | `domain-event` | domainEvent CRUD operations |
+| `domain-type` | domainType CRUD operations |
 | `domain-verification` | domainVerification CRUD operations |
 | `embedding-chunk` | embeddingChunk CRUD operations |
 | `enum` | enum CRUD operations |
@@ -55,7 +55,6 @@ csdk auth set-token <your-token>
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `partition` | partition CRUD operations |
 | `platform-api` | platformApi CRUD operations |
-| `platform-api-module` | platformApiModule CRUD operations |
 | `platform-api-schema` | platformApiSchema CRUD operations |
 | `platform-api-setting` | platformApiSetting CRUD operations |
 | `platform-cors-setting` | platformCorsSetting CRUD operations |
@@ -183,33 +182,6 @@ CRUD operations for Api records.
 
 **Required create fields:** `databaseId`, `name`
 **Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
-
-### `api-module`
-
-CRUD operations for ApiModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all apiModule records |
-| `find-first` | Find first matching apiModule record |
-| `get` | Get a apiModule by id |
-| `create` | Create a new apiModule |
-| `update` | Update an existing apiModule |
-| `delete` | Delete a apiModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `apiId` | UUID |
-| `createdAt` | Datetime |
-| `data` | JSON |
-| `databaseId` | UUID |
-| `id` | UUID |
-| `name` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `apiId`, `data`, `databaseId`, `name`
 
 ### `api-schema`
 
@@ -601,6 +573,40 @@ CRUD operations for DomainEvent records.
 
 **Required create fields:** `databaseId`, `eventType`
 **Optional create fields (backend defaults):** `actorId`, `domainId`, `domainVerificationId`, `managedDomainId`, `message`, `metadata`
+
+### `domain-type`
+
+CRUD operations for DomainType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all domainType records |
+| `find-first` | Find first matching domainType record |
+| `get` | Get a domainType by id |
+| `create` | Create a new domainType |
+| `update` | Update an existing domainType |
+| `delete` | Delete a domainType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `baseType` | JSON |
+| `category` | ObjectCategory |
+| `checkExpr` | JSON |
+| `databaseId` | UUID |
+| `defaultExpr` | JSON |
+| `description` | String |
+| `id` | UUID |
+| `label` | String |
+| `name` | String |
+| `notNull` | Boolean |
+| `schemaId` | UUID |
+| `smartTags` | JSON |
+| `tags` | String |
+
+**Required create fields:** `baseType`, `databaseId`, `name`, `schemaId`
+**Optional create fields (backend defaults):** `category`, `checkExpr`, `defaultExpr`, `description`, `label`, `notNull`, `smartTags`, `tags`
 
 ### `domain-verification`
 
@@ -1118,32 +1124,6 @@ CRUD operations for PlatformApi records.
 
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
-
-### `platform-api-module`
-
-CRUD operations for PlatformApiModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformApiModule records |
-| `find-first` | Find first matching platformApiModule record |
-| `get` | Get a platformApiModule by id |
-| `create` | Create a new platformApiModule |
-| `update` | Update an existing platformApiModule |
-| `delete` | Delete a platformApiModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `apiId` | UUID |
-| `createdAt` | Datetime |
-| `data` | JSON |
-| `id` | UUID |
-| `name` | String |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `apiId`, `data`, `name`
 
 ### `platform-api-schema`
 
@@ -1949,6 +1929,7 @@ CRUD operations for Table records.
 | `partitioned` | Boolean |
 | `peoplestamps` | Boolean |
 | `pluralName` | String |
+| `principalstamps` | Boolean |
 | `schemaId` | UUID |
 | `singularName` | String |
 | `smartTags` | JSON |
@@ -1959,7 +1940,7 @@ CRUD operations for Table records.
 | `useRls` | Boolean |
 
 **Required create fields:** `name`, `schemaId`
-**Optional create fields (backend defaults):** `category`, `databaseId`, `description`, `inheritsId`, `label`, `partitionKeyNames`, `partitionKeyTypes`, `partitionStrategy`, `partitioned`, `peoplestamps`, `pluralName`, `singularName`, `smartTags`, `stepUp`, `tags`, `timestamps`, `useRls`
+**Optional create fields (backend defaults):** `category`, `databaseId`, `description`, `inheritsId`, `label`, `partitionKeyNames`, `partitionKeyTypes`, `partitionStrategy`, `partitioned`, `peoplestamps`, `pluralName`, `principalstamps`, `singularName`, `smartTags`, `stepUp`, `tags`, `timestamps`, `useRls`
 
 ### `table-grant`
 

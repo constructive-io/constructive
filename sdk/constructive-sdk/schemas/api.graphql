@@ -30,35 +30,6 @@ type Api {
   """Anonymous role the API executes as"""
   anonRole: String
 
-  """Reads and enables pagination through a set of `ApiModule`."""
-  apiModules(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `ApiModule`."""
-    orderBy: [ApiModuleOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ApiModuleFilter
-  ): ApiModuleConnection!
-
   """Reads and enables pagination through a set of `ApiSchema`."""
   apiSchemas(
     """Read all values in the set after (below) this cursor."""
@@ -226,12 +197,6 @@ input ApiFilter {
   """Filter by the object’s `anonRole` field."""
   anonRole: StringFilter
 
-  """Filter by the object’s `apiModules` relation."""
-  apiModules: ApiToManyApiModuleFilter
-
-  """`apiModules` exist."""
-  apiModulesExist: Boolean
-
   """Filter by the object’s `apiSchemas` relation."""
   apiSchemas: ApiToManyApiSchemaFilter
 
@@ -308,149 +273,6 @@ input ApiInput {
 
   """Authenticated role the API executes as"""
   roleName: String
-  updatedAt: Datetime
-}
-
-"""
-Server-side module configuration for an API surface; stores module name and JSON settings
-"""
-type ApiModule {
-  """Reads a single `Api` that is related to this `ApiModule`."""
-  api: Api
-
-  """API surface this module configuration belongs to"""
-  apiId: UUID!
-  createdAt: Datetime
-
-  """JSON configuration data for this module"""
-  data: JSON!
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-  id: UUID!
-
-  """Module name (e.g. auth, uploads, webhooks)"""
-  name: String!
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `ApiModule` values."""
-type ApiModuleConnection {
-  """
-  A list of edges which contains the `ApiModule` and cursor to aid in pagination.
-  """
-  edges: [ApiModuleEdge]!
-
-  """A list of `ApiModule` objects."""
-  nodes: [ApiModule]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `ApiModule` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `ApiModule` edge in the connection."""
-type ApiModuleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ApiModule` at the end of the edge."""
-  node: ApiModule
-}
-
-"""
-A filter to be used against `ApiModule` object types. All fields are combined with a logical ‘and.’
-"""
-input ApiModuleFilter {
-  """Checks for all expressions in this list."""
-  and: [ApiModuleFilter!]
-
-  """Filter by the object’s `api` relation."""
-  api: ApiFilter
-
-  """Filter by the object’s `apiId` field."""
-  apiId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: ApiModuleFilter
-
-  """Checks for any expressions in this list."""
-  or: [ApiModuleFilter!]
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `ApiModule`"""
-input ApiModuleInput {
-  """API surface this module configuration belongs to"""
-  apiId: UUID!
-  createdAt: Datetime
-
-  """JSON configuration data for this module"""
-  data: JSON!
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-  id: UUID
-
-  """Module name (e.g. auth, uploads, webhooks)"""
-  name: String!
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `ApiModule`."""
-enum ApiModuleOrderBy {
-  API_ID_ASC
-  API_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  DATA_ASC
-  DATA_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""
-Represents an update to a `ApiModule`. Fields that are set will be updated.
-"""
-input ApiModulePatch {
-  """API surface this module configuration belongs to"""
-  apiId: UUID
-  createdAt: Datetime
-
-  """JSON configuration data for this module"""
-  data: JSON
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-  id: UUID
-
-  """Module name (e.g. auth, uploads, webhooks)"""
-  name: String
   updatedAt: Datetime
 }
 
@@ -1020,20 +842,6 @@ input ApiSettingPatch {
   """
   options: JSON
   updatedAt: Datetime
-}
-
-"""
-A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’
-"""
-input ApiToManyApiModuleFilter {
-  """Filters to entities where every related entity matches."""
-  every: ApiModuleFilter
-
-  """Filters to entities where no related entity matches."""
-  none: ApiModuleFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: ApiModuleFilter
 }
 
 """
@@ -1886,41 +1694,6 @@ input CreateApiInput {
   clientMutationId: String
 }
 
-"""All input for the create `ApiModule` mutation."""
-input CreateApiModuleInput {
-  """The `ApiModule` to be created by this mutation."""
-  apiModule: ApiModuleInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `ApiModule` mutation."""
-type CreateApiModulePayload {
-  """The `ApiModule` that was created by this mutation."""
-  apiModule: ApiModule
-
-  """An edge for our `ApiModule`. May be used by Relay 1."""
-  apiModuleEdge(
-    """The method to use when ordering `ApiModule`."""
-    orderBy: [ApiModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiModuleEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """The output of our create `Api` mutation."""
 type CreateApiPayload {
   """The `Api` that was created by this mutation."""
@@ -2322,6 +2095,41 @@ type CreateDomainPayload {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `DomainType` mutation."""
+input CreateDomainTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DomainType` to be created by this mutation."""
+  domainType: DomainTypeInput!
+}
+
+"""The output of our create `DomainType` mutation."""
+type CreateDomainTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainType` that was created by this mutation."""
+  domainType: DomainType
+
+  """An edge for our `DomainType`. May be used by Relay 1."""
+  domainTypeEdge(
+    """The method to use when ordering `DomainType`."""
+    orderBy: [DomainTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainTypeEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2829,41 +2637,6 @@ input CreatePlatformApiInput {
 
   """The `PlatformApi` to be created by this mutation."""
   platformApi: PlatformApiInput!
-}
-
-"""All input for the create `PlatformApiModule` mutation."""
-input CreatePlatformApiModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformApiModule` to be created by this mutation."""
-  platformApiModule: PlatformApiModuleInput!
-}
-
-"""The output of our create `PlatformApiModule` mutation."""
-type CreatePlatformApiModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApiModule` that was created by this mutation."""
-  platformApiModule: PlatformApiModule
-
-  """An edge for our `PlatformApiModule`. May be used by Relay 1."""
-  platformApiModuleEdge(
-    """The method to use when ordering `PlatformApiModule`."""
-    orderBy: [PlatformApiModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApiModuleEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
 """The output of our create `PlatformApi` mutation."""
@@ -4200,6 +3973,35 @@ type Database {
     where: DefaultPrivilegeFilter
   ): DefaultPrivilegeConnection!
 
+  """Reads and enables pagination through a set of `DomainType`."""
+  domainTypes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainType`."""
+    orderBy: [DomainTypeOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainTypeFilter
+  ): DomainTypeConnection!
+
   """Reads and enables pagination through a set of `EmbeddingChunk`."""
   embeddingChunks(
     """Read all values in the set after (below) this cursor."""
@@ -4936,6 +4738,12 @@ input DatabaseFilter {
   """`defaultPrivileges` exist."""
   defaultPrivilegesExist: Boolean
 
+  """Filter by the object’s `domainTypes` relation."""
+  domainTypes: DatabaseToManyDomainTypeFilter
+
+  """`domainTypes` exist."""
+  domainTypesExist: Boolean
+
   """Filter by the object’s `embeddingChunks` relation."""
   embeddingChunks: DatabaseToManyEmbeddingChunkFilter
 
@@ -5618,6 +5426,20 @@ input DatabaseToManyDefaultPrivilegeFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: DefaultPrivilegeFilter
+}
+
+"""
+A filter to be used against many `DomainType` object types. All fields are combined with a logical ‘and.’
+"""
+input DatabaseToManyDomainTypeFilter {
+  """Filters to entities where every related entity matches."""
+  every: DomainTypeFilter
+
+  """Filters to entities where no related entity matches."""
+  none: DomainTypeFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: DomainTypeFilter
 }
 
 """
@@ -6312,39 +6134,6 @@ input DeleteApiInput {
   id: UUID!
 }
 
-"""All input for the `deleteApiModule` mutation."""
-input DeleteApiModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `ApiModule` mutation."""
-type DeleteApiModulePayload {
-  """The `ApiModule` that was deleted by this mutation."""
-  apiModule: ApiModule
-
-  """An edge for our `ApiModule`. May be used by Relay 1."""
-  apiModuleEdge(
-    """The method to use when ordering `ApiModule`."""
-    orderBy: [ApiModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiModuleEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """The output of our delete `Api` mutation."""
 type DeleteApiPayload {
   """The `Api` that was deleted by this mutation."""
@@ -6724,6 +6513,39 @@ type DeleteDomainPayload {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteDomainType` mutation."""
+input DeleteDomainTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `DomainType` mutation."""
+type DeleteDomainTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainType` that was deleted by this mutation."""
+  domainType: DomainType
+
+  """An edge for our `DomainType`. May be used by Relay 1."""
+  domainTypeEdge(
+    """The method to use when ordering `DomainType`."""
+    orderBy: [DomainTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainTypeEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -7201,39 +7023,6 @@ input DeletePlatformApiInput {
   """
   clientMutationId: String
   id: UUID!
-}
-
-"""All input for the `deletePlatformApiModule` mutation."""
-input DeletePlatformApiModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `PlatformApiModule` mutation."""
-type DeletePlatformApiModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApiModule` that was deleted by this mutation."""
-  platformApiModule: PlatformApiModule
-
-  """An edge for our `PlatformApiModule`. May be used by Relay 1."""
-  platformApiModuleEdge(
-    """The method to use when ordering `PlatformApiModule`."""
-    orderBy: [PlatformApiModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApiModuleEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
 """The output of our delete `PlatformApi` mutation."""
@@ -9062,6 +8851,182 @@ input DomainToManyRouteFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: RouteFilter
+}
+
+type DomainType {
+  baseType: JSON!
+  category: ObjectCategory!
+  checkExpr: JSON
+
+  """Reads a single `Database` that is related to this `DomainType`."""
+  database: Database
+  databaseId: UUID!
+  defaultExpr: JSON
+  description: String
+  id: UUID!
+  label: String
+  name: String!
+  notNull: Boolean!
+
+  """Reads a single `Schema` that is related to this `DomainType`."""
+  schema: Schema
+  schemaId: UUID!
+  smartTags: JSON
+  tags: [String]!
+}
+
+"""A connection to a list of `DomainType` values."""
+type DomainTypeConnection {
+  """
+  A list of edges which contains the `DomainType` and cursor to aid in pagination.
+  """
+  edges: [DomainTypeEdge]!
+
+  """A list of `DomainType` objects."""
+  nodes: [DomainType]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `DomainType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `DomainType` edge in the connection."""
+type DomainTypeEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DomainType` at the end of the edge."""
+  node: DomainType
+}
+
+"""
+A filter to be used against `DomainType` object types. All fields are combined with a logical ‘and.’
+"""
+input DomainTypeFilter {
+  """Checks for all expressions in this list."""
+  and: [DomainTypeFilter!]
+
+  """Filter by the object’s `baseType` field."""
+  baseType: JSONFilter
+
+  """Filter by the object’s `category` field."""
+  category: ObjectCategoryFilter
+
+  """Filter by the object’s `checkExpr` field."""
+  checkExpr: JSONFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultExpr` field."""
+  defaultExpr: JSONFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `label` field."""
+  label: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Negates the expression."""
+  not: DomainTypeFilter
+
+  """Filter by the object’s `notNull` field."""
+  notNull: BooleanFilter
+
+  """Checks for any expressions in this list."""
+  or: [DomainTypeFilter!]
+
+  """Filter by the object’s `schema` relation."""
+  schema: SchemaFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `smartTags` field."""
+  smartTags: JSONFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+}
+
+"""An input for mutations affecting `DomainType`"""
+input DomainTypeInput {
+  baseType: JSON!
+  category: ObjectCategory
+  checkExpr: JSON
+  databaseId: UUID!
+  defaultExpr: JSON
+  description: String
+  id: UUID
+  label: String
+  name: String!
+  notNull: Boolean
+  schemaId: UUID!
+  smartTags: JSON
+  tags: [String]
+}
+
+"""Methods to use when ordering `DomainType`."""
+enum DomainTypeOrderBy {
+  BASE_TYPE_ASC
+  BASE_TYPE_DESC
+  CATEGORY_ASC
+  CATEGORY_DESC
+  CHECK_EXPR_ASC
+  CHECK_EXPR_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_EXPR_ASC
+  DEFAULT_EXPR_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LABEL_ASC
+  LABEL_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  NOT_NULL_ASC
+  NOT_NULL_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SMART_TAGS_ASC
+  SMART_TAGS_DESC
+  TAGS_ASC
+  TAGS_DESC
+}
+
+"""
+Represents an update to a `DomainType`. Fields that are set will be updated.
+"""
+input DomainTypePatch {
+  baseType: JSON
+  category: ObjectCategory
+  checkExpr: JSON
+  databaseId: UUID
+  defaultExpr: JSON
+  description: String
+  id: UUID
+  label: String
+  name: String
+  notNull: Boolean
+  schemaId: UUID
+  smartTags: JSON
+  tags: [String]
 }
 
 """Ownership verification challenges issued for a domain"""
@@ -12250,14 +12215,6 @@ type Mutation {
     input: CreateApiInput!
   ): CreateApiPayload
 
-  """Creates a single `ApiModule`."""
-  createApiModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateApiModuleInput!
-  ): CreateApiModulePayload
-
   """Creates a single `ApiSchema`."""
   createApiSchema(
     """
@@ -12345,6 +12302,14 @@ type Mutation {
     """
     input: CreateDomainEventInput!
   ): CreateDomainEventPayload
+
+  """Creates a single `DomainType`."""
+  createDomainType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDomainTypeInput!
+  ): CreateDomainTypePayload
 
   """Creates a single `DomainVerification`."""
   createDomainVerification(
@@ -12465,14 +12430,6 @@ type Mutation {
     """
     input: CreatePlatformApiInput!
   ): CreatePlatformApiPayload
-
-  """Creates a single `PlatformApiModule`."""
-  createPlatformApiModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformApiModuleInput!
-  ): CreatePlatformApiModulePayload
 
   """Creates a single `PlatformApiSchema`."""
   createPlatformApiSchema(
@@ -12754,14 +12711,6 @@ type Mutation {
     input: DeleteApiInput!
   ): DeleteApiPayload
 
-  """Deletes a single `ApiModule` using a unique key."""
-  deleteApiModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteApiModuleInput!
-  ): DeleteApiModulePayload
-
   """Deletes a single `ApiSchema` using a unique key."""
   deleteApiSchema(
     """
@@ -12849,6 +12798,14 @@ type Mutation {
     """
     input: DeleteDomainEventInput!
   ): DeleteDomainEventPayload
+
+  """Deletes a single `DomainType` using a unique key."""
+  deleteDomainType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDomainTypeInput!
+  ): DeleteDomainTypePayload
 
   """Deletes a single `DomainVerification` using a unique key."""
   deleteDomainVerification(
@@ -12969,14 +12926,6 @@ type Mutation {
     """
     input: DeletePlatformApiInput!
   ): DeletePlatformApiPayload
-
-  """Deletes a single `PlatformApiModule` using a unique key."""
-  deletePlatformApiModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePlatformApiModuleInput!
-  ): DeletePlatformApiModulePayload
 
   """Deletes a single `PlatformApiSchema` using a unique key."""
   deletePlatformApiSchema(
@@ -13299,14 +13248,6 @@ type Mutation {
     input: UpdateApiInput!
   ): UpdateApiPayload
 
-  """Updates a single `ApiModule` using a unique key and a patch."""
-  updateApiModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateApiModuleInput!
-  ): UpdateApiModulePayload
-
   """Updates a single `ApiSchema` using a unique key and a patch."""
   updateApiSchema(
     """
@@ -13394,6 +13335,14 @@ type Mutation {
     """
     input: UpdateDomainEventInput!
   ): UpdateDomainEventPayload
+
+  """Updates a single `DomainType` using a unique key and a patch."""
+  updateDomainType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDomainTypeInput!
+  ): UpdateDomainTypePayload
 
   """Updates a single `DomainVerification` using a unique key and a patch."""
   updateDomainVerification(
@@ -13516,14 +13465,6 @@ type Mutation {
     """
     input: UpdatePlatformApiInput!
   ): UpdatePlatformApiPayload
-
-  """Updates a single `PlatformApiModule` using a unique key and a patch."""
-  updatePlatformApiModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePlatformApiModuleInput!
-  ): UpdatePlatformApiModulePayload
 
   """Updates a single `PlatformApiSchema` using a unique key and a patch."""
   updatePlatformApiSchema(
@@ -14193,35 +14134,6 @@ type PlatformApi {
   """Owner-local API surface name"""
   name: String!
 
-  """Reads and enables pagination through a set of `PlatformApiModule`."""
-  platformApiModulesByApiId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PlatformApiModule`."""
-    orderBy: [PlatformApiModuleOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformApiModuleFilter
-  ): PlatformApiModuleConnection!
-
   """Reads and enables pagination through a set of `PlatformApiSchema`."""
   platformApiSchemasByApiId(
     """Read all values in the set after (below) this cursor."""
@@ -14326,12 +14238,6 @@ input PlatformApiFilter {
   """Checks for any expressions in this list."""
   or: [PlatformApiFilter!]
 
-  """Filter by the object’s `platformApiModulesByApiId` relation."""
-  platformApiModulesByApiId: PlatformApiToManyPlatformApiModuleFilter
-
-  """`platformApiModulesByApiId` exist."""
-  platformApiModulesByApiIdExist: Boolean
-
   """Filter by the object’s `platformApiSchemasByApiId` relation."""
   platformApiSchemasByApiId: PlatformApiToManyPlatformApiSchemaFilter
 
@@ -14378,139 +14284,6 @@ input PlatformApiInput {
 
   """Authenticated role the API executes as"""
   roleName: String
-  updatedAt: Datetime
-}
-
-"""
-Server-side module configuration for an API surface; stores module name and JSON settings
-"""
-type PlatformApiModule {
-  """
-  Reads a single `PlatformApi` that is related to this `PlatformApiModule`.
-  """
-  api: PlatformApi
-
-  """API surface this module configuration belongs to"""
-  apiId: UUID!
-  createdAt: Datetime
-
-  """JSON configuration data for this module"""
-  data: JSON!
-  id: UUID!
-
-  """Module name (e.g. auth, uploads, webhooks)"""
-  name: String!
-  updatedAt: Datetime
-}
-
-"""A connection to a list of `PlatformApiModule` values."""
-type PlatformApiModuleConnection {
-  """
-  A list of edges which contains the `PlatformApiModule` and cursor to aid in pagination.
-  """
-  edges: [PlatformApiModuleEdge]!
-
-  """A list of `PlatformApiModule` objects."""
-  nodes: [PlatformApiModule]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `PlatformApiModule` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `PlatformApiModule` edge in the connection."""
-type PlatformApiModuleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `PlatformApiModule` at the end of the edge."""
-  node: PlatformApiModule
-}
-
-"""
-A filter to be used against `PlatformApiModule` object types. All fields are combined with a logical ‘and.’
-"""
-input PlatformApiModuleFilter {
-  """Checks for all expressions in this list."""
-  and: [PlatformApiModuleFilter!]
-
-  """Filter by the object’s `api` relation."""
-  api: PlatformApiFilter
-
-  """Filter by the object’s `apiId` field."""
-  apiId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Negates the expression."""
-  not: PlatformApiModuleFilter
-
-  """Checks for any expressions in this list."""
-  or: [PlatformApiModuleFilter!]
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `PlatformApiModule`"""
-input PlatformApiModuleInput {
-  """API surface this module configuration belongs to"""
-  apiId: UUID!
-  createdAt: Datetime
-
-  """JSON configuration data for this module"""
-  data: JSON!
-  id: UUID
-
-  """Module name (e.g. auth, uploads, webhooks)"""
-  name: String!
-  updatedAt: Datetime
-}
-
-"""Methods to use when ordering `PlatformApiModule`."""
-enum PlatformApiModuleOrderBy {
-  API_ID_ASC
-  API_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  DATA_ASC
-  DATA_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""
-Represents an update to a `PlatformApiModule`. Fields that are set will be updated.
-"""
-input PlatformApiModulePatch {
-  """API surface this module configuration belongs to"""
-  apiId: UUID
-  createdAt: Datetime
-
-  """JSON configuration data for this module"""
-  data: JSON
-  id: UUID
-
-  """Module name (e.g. auth, uploads, webhooks)"""
-  name: String
   updatedAt: Datetime
 }
 
@@ -15057,20 +14830,6 @@ input PlatformApiSettingPatch {
   """
   options: JSON
   updatedAt: Datetime
-}
-
-"""
-A filter to be used against many `PlatformApiModule` object types. All fields are combined with a logical ‘and.’
-"""
-input PlatformApiToManyPlatformApiModuleFilter {
-  """Filters to entities where every related entity matches."""
-  every: PlatformApiModuleFilter
-
-  """Filters to entities where no related entity matches."""
-  none: PlatformApiModuleFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: PlatformApiModuleFilter
 }
 
 """
@@ -17806,35 +17565,6 @@ type Query {
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
   _meta: MetaSchema
-
-  """Reads and enables pagination through a set of `ApiModule`."""
-  apiModules(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `ApiModule`."""
-    orderBy: [ApiModuleOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ApiModuleFilter
-  ): ApiModuleConnection
   apiSchemaNames(targetApiId: UUID): JSON
 
   """Reads and enables pagination through a set of `ApiSchema`."""
@@ -18185,6 +17915,35 @@ type Query {
     """
     where: DomainEventFilter
   ): DomainEventConnection
+
+  """Reads and enables pagination through a set of `DomainType`."""
+  domainTypes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainType`."""
+    orderBy: [DomainTypeOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainTypeFilter
+  ): DomainTypeConnection
 
   """Reads and enables pagination through a set of `DomainVerification`."""
   domainVerifications(
@@ -18620,35 +18379,6 @@ type Query {
     """
     where: PartitionFilter
   ): PartitionConnection
-
-  """Reads and enables pagination through a set of `PlatformApiModule`."""
-  platformApiModules(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PlatformApiModule`."""
-    orderBy: [PlatformApiModuleOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformApiModuleFilter
-  ): PlatformApiModuleConnection
 
   """Reads and enables pagination through a set of `PlatformApiSchema`."""
   platformApiSchemas(
@@ -20662,6 +20392,35 @@ type Schema {
   ): DefaultPrivilegeConnection!
   description: String
 
+  """Reads and enables pagination through a set of `DomainType`."""
+  domainTypes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DomainType`."""
+    orderBy: [DomainTypeOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainTypeFilter
+  ): DomainTypeConnection!
+
   """Reads and enables pagination through a set of `Enum`."""
   enums(
     """Read all values in the set after (below) this cursor."""
@@ -20913,6 +20672,12 @@ input SchemaFilter {
 
   """Filter by the object’s `description` field."""
   description: StringFilter
+
+  """Filter by the object’s `domainTypes` relation."""
+  domainTypes: SchemaToManyDomainTypeFilter
+
+  """`domainTypes` exist."""
+  domainTypesExist: Boolean
 
   """Filter by the object’s `enums` relation."""
   enums: SchemaToManyEnumFilter
@@ -21210,6 +20975,20 @@ input SchemaToManyDefaultPrivilegeFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: DefaultPrivilegeFilter
+}
+
+"""
+A filter to be used against many `DomainType` object types. All fields are combined with a logical ‘and.’
+"""
+input SchemaToManyDomainTypeFilter {
+  """Filters to entities where every related entity matches."""
+  every: DomainTypeFilter
+
+  """Filters to entities where no related entity matches."""
+  none: DomainTypeFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: DomainTypeFilter
 }
 
 """
@@ -22904,6 +22683,7 @@ type Table {
     """
     where: PrimaryKeyConstraintFilter
   ): PrimaryKeyConstraintConnection!
+  principalstamps: Boolean!
 
   """Reads a single `Schema` that is related to this `Table`."""
   schema: Schema
@@ -22970,7 +22750,7 @@ type Table {
   ): SpatialRelationConnection!
 
   """
-  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
+  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default fresh_auth), a type string (password / mfa / fresh_auth; password_or_mfa is the legacy spelling), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
   """
   stepUp: JSON
 
@@ -23280,6 +23060,9 @@ input TableFilter {
   """`primaryKeyConstraints` exist."""
   primaryKeyConstraintsExist: Boolean
 
+  """Filter by the object’s `principalstamps` field."""
+  principalstamps: BooleanFilter
+
   """Filter by the object’s `schema` relation."""
   schema: SchemaFilter
 
@@ -23510,12 +23293,13 @@ input TableInput {
   partitioned: Boolean
   peoplestamps: Boolean
   pluralName: String
+  principalstamps: Boolean
   schemaId: UUID!
   singularName: String
   smartTags: JSON
 
   """
-  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
+  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default fresh_auth), a type string (password / mfa / fresh_auth; password_or_mfa is the legacy spelling), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
   """
   stepUp: JSON
   tags: [String]
@@ -23557,6 +23341,8 @@ enum TableOrderBy {
   PLURAL_NAME_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  PRINCIPALSTAMPS_ASC
+  PRINCIPALSTAMPS_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
   SINGULAR_NAME_ASC
@@ -23593,12 +23379,13 @@ input TablePatch {
   partitioned: Boolean
   peoplestamps: Boolean
   pluralName: String
+  principalstamps: Boolean
   schemaId: UUID
   singularName: String
   smartTags: JSON
 
   """
-  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
+  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default fresh_auth), a type string (password / mfa / fresh_auth; password_or_mfa is the legacy spelling), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
   """
   stepUp: JSON
   tags: [String]
@@ -24412,44 +24199,6 @@ input UpdateApiInput {
   id: UUID!
 }
 
-"""All input for the `updateApiModule` mutation."""
-input UpdateApiModuleInput {
-  """
-  An object where the defined keys will be set on the `ApiModule` being updated.
-  """
-  apiModulePatch: ApiModulePatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our update `ApiModule` mutation."""
-type UpdateApiModulePayload {
-  """The `ApiModule` that was updated by this mutation."""
-  apiModule: ApiModule
-
-  """An edge for our `ApiModule`. May be used by Relay 1."""
-  apiModuleEdge(
-    """The method to use when ordering `ApiModule`."""
-    orderBy: [ApiModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiModuleEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """The output of our update `Api` mutation."""
 type UpdateApiPayload {
   """The `Api` that was updated by this mutation."""
@@ -24884,6 +24633,44 @@ type UpdateDomainPayload {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateDomainType` mutation."""
+input UpdateDomainTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DomainType` being updated.
+  """
+  domainTypePatch: DomainTypePatch!
+  id: UUID!
+}
+
+"""The output of our update `DomainType` mutation."""
+type UpdateDomainTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DomainType` that was updated by this mutation."""
+  domainType: DomainType
+
+  """An edge for our `DomainType`. May be used by Relay 1."""
+  domainTypeEdge(
+    """The method to use when ordering `DomainType`."""
+    orderBy: [DomainTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainTypeEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -25436,44 +25223,6 @@ input UpdatePlatformApiInput {
   An object where the defined keys will be set on the `PlatformApi` being updated.
   """
   platformApiPatch: PlatformApiPatch!
-}
-
-"""All input for the `updatePlatformApiModule` mutation."""
-input UpdatePlatformApiModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `PlatformApiModule` being updated.
-  """
-  platformApiModulePatch: PlatformApiModulePatch!
-}
-
-"""The output of our update `PlatformApiModule` mutation."""
-type UpdatePlatformApiModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformApiModule` that was updated by this mutation."""
-  platformApiModule: PlatformApiModule
-
-  """An edge for our `PlatformApiModule`. May be used by Relay 1."""
-  platformApiModuleEdge(
-    """The method to use when ordering `PlatformApiModule`."""
-    orderBy: [PlatformApiModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformApiModuleEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
 """The output of our update `PlatformApi` mutation."""
