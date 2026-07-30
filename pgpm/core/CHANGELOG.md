@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.15.0...@pgpmjs/core@7.16.0) (2026-07-30)
+
+### Bug Fixes
+
+- **pgpm:** stop stripping CREATE EXTENSION on deploy (only strip transactions) ([06a4aea](https://github.com/constructive-io/constructive/commit/06a4aeae45944bb31a02dea8cdcd04655daea849))
+
+### Features
+
+- **pgpm:** declarative per-module extensions.json install (provides) ([4fa9e3e](https://github.com/constructive-io/constructive/commit/4fa9e3eec55b2413147f5858dd9e28180b01db59))
+
 # [7.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.14.0...@pgpmjs/core@7.15.0) (2026-07-30)
 
 ### Features

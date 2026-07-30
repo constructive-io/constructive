@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.47.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.46.0...@pgpmjs/types@2.47.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** named migration engines (--engine), default pg, wire driver activation ([1a7f7d9](https://github.com/constructive-io/constructive/commit/1a7f7d94d748f2a9152b76384ba2a4f7a046492b))
+
 # [2.46.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.45.0...@pgpmjs/types@2.46.0) (2026-07-30)
 
 ### Features

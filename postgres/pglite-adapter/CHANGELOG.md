@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.8.2...@pgpmjs/pglite-adapter@1.9.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** named migration engines (--engine), default pg, wire driver activation ([1a7f7d9](https://github.com/constructive-io/constructive/commit/1a7f7d94d748f2a9152b76384ba2a4f7a046492b))
+
 ## [1.8.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.8.1...@pgpmjs/pglite-adapter@1.8.2) (2026-07-30)
 
 **Note:** Version bump only for package @pgpmjs/pglite-adapter
