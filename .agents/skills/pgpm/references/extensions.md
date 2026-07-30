@@ -77,6 +77,14 @@ The `requires` field uses **control file names**, not npm package names:
 
 See `references/module-naming.md` for the full naming convention.
 
+### Beyond `requires`: where an extension lands
+
+`.control` `requires` only orders dependencies. To declare *where* an extension installs
+(schema + grants) or which of its symbols a module consumes, use the per-module
+`extensions.json` manifest; to route those symbols in a consumer, use the routing profile
+(`portability` in `pgpm.json` or a proxy's `pgpm.apply.json`). See
+`references/routing-profile.md`.
+
 ## Adding Dependencies
 
 > New modules scaffold with **no** extensions (no `requires` line). Add them explicitly, either up front at init (`pgpm init --extensions a,b` / `--with-extensions`) or afterward with `pgpm extension` (below).

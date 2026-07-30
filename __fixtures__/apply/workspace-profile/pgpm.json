@@ -1,0 +1,14 @@
+{
+    "packages": [
+        "packages/*"
+    ],
+    "portability": {
+        "extensions": {
+            "toSchema": "extensions"
+        },
+        "roles": {
+            "anonymous": "anon",
+            "administrator": "service_role"
+        }
+    }
+}

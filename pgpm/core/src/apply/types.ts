@@ -11,6 +11,13 @@
  * transpiled code is never committed.
  */
 
+import {
+  PgpmExtensionsRouting,
+  PgpmRolesRouting,
+  PgpmRouteEntry,
+  PgpmRoutingProfile
+} from '@pgpmjs/types';
+
 /** File name of the apply spec inside a proxy module directory. */
 export const APPLY_SPEC_FILE = 'pgpm.apply.json';
 
@@ -36,22 +43,11 @@ export interface ApplySpecSource {
 }
 
 /**
- * An object-level route in a `pgpm.apply.json` spec: send one named object out
- * of a source schema to a target schema, overriding the whole-schema default
- * for that object only. Kinds are expressed as separate properties (no dotted
- * identity strings), so a table and a function of the same name route
- * independently.
+ * An object-level route in a `pgpm.apply.json` spec. The shared
+ * routing-profile shape ({@link PgpmRouteEntry} from `@pgpmjs/types`), usable
+ * at both the workspace and per-import scopes.
  */
-export interface ApplyRouteEntry {
-  /** Source schema the object is defined in (e.g. `users`). */
-  fromSchema: string;
-  /** Object namespace: `table`/`view` → relation, `procedure` → function. */
-  kind: 'table' | 'view' | 'function' | 'procedure' | 'type';
-  /** Unqualified object name (e.g. `accounts`). */
-  name: string;
-  /** Target schema the object is routed to (e.g. `reporting`). */
-  toSchema: string;
-}
+export type ApplyRouteEntry = PgpmRouteEntry;
 
 /**
  * A per-tenant seed object in a reuse spec: the objects that must be
@@ -95,40 +91,22 @@ export interface ApplyReuseSpec {
 
 /**
  * Extension-routing declaration in a `pgpm.apply.json`: where the transpiled
- * instance should install extensions and resolve the symbols they provide
- * (e.g. isolate `pgcrypto` in a dedicated `extensions` schema, qualifying bare
- * `crypt(...)` calls, or the reverse). A distinct dimension from schema
- * routing — driven by a version-aware symbol inventory, not by the objects the
- * SQL itself creates. Forwarded to `@pgpmjs/transform`'s extension router.
+ * instance should resolve the symbols extensions provide. The shared
+ * routing-profile shape ({@link PgpmExtensionsRouting} from `@pgpmjs/types`);
+ * forwarded to `@pgpmjs/transform`'s extension router.
  */
-export interface ApplyExtensionsSpec {
-  /**
-   * Install the matched extensions and route their provided symbols to this
-   * schema. `null` strips qualification (rely on `search_path`). Ignored when
-   * `routes` is given.
-   */
-  toSchema?: string | null;
-  /** With `toSchema`: limit to these extensions (default: every inventoried one). */
-  only?: string[];
-  /**
-   * With `toSchema`: which source qualifications to rewrite (a `null` entry
-   * also rewrites bare references). Defaults to `public` + bare.
-   */
-  from?: (string | null)[];
-  /**
-   * Advanced: explicit per-extension routes (`{ "<ext>": { "to": "<schema>|null",
-   * "from"?: [...] } }`). Overrides `toSchema`/`only`/`from`.
-   */
-  routes?: Record<string, { to: string | null; from?: (string | null)[] }>;
-  /** Target PostgreSQL major version, for core-graduation awareness. */
-  serverVersion?: number;
-}
+export type ApplyExtensionsSpec = PgpmExtensionsRouting;
 
 /** Role-name translation: source role name → target role name. */
-export type ApplyRolesSpec = Record<string, string>;
+export type ApplyRolesSpec = PgpmRolesRouting;
 
-/** The parsed, normalized `pgpm.apply.json` spec. */
-export interface PgpmApplySpec {
+/**
+ * The parsed, normalized `pgpm.apply.json` spec: a source-module reference
+ * plus a per-import routing profile ({@link PgpmRoutingProfile}). The routing
+ * keys override the workspace `portability` profile per key (inner scope
+ * wins).
+ */
+export interface PgpmApplySpec extends PgpmRoutingProfile {
   /**
    * Module name this instance is deployed as. Defaults to the proxy
    * directory's name.
@@ -137,32 +115,11 @@ export interface PgpmApplySpec {
   /** Source module reference: a module name, or the expanded object form. */
   source: string | ApplySpecSource;
   /**
-   * Whole-schema default: source schema → target schema (drives the AST + plan
-   * rewrite). Optional when `route` fully covers the objects being moved.
-   */
-  schemas?: Record<string, string>;
-  /**
-   * Object-level routes. Each entry overrides the `schemas` default for its
-   * specific object, letting one source schema fan out per object (e.g. a
-   * table into a tenant schema and a function into a shared schema).
-   */
-  route?: ApplyRouteEntry[];
-  /**
    * Reuse declaration: split shared vs per-tenant objects (see
    * {@link ApplyReuseSpec}). When present, this proxy expands into two modules —
    * a shared module and a per-tenant module that `requires` it.
    */
   reuse?: ApplyReuseSpec;
-  /**
-   * Extension routing: where to install extensions and resolve their provided
-   * symbols in the transpiled instance (see {@link ApplyExtensionsSpec}).
-   */
-  extensions?: ApplyExtensionsSpec;
-  /**
-   * Role-name translation applied to the transpiled instance's SQL
-   * (see {@link ApplyRolesSpec}). Renames role identifiers only.
-   */
-  roles?: ApplyRolesSpec;
   /**
    * Runtime requires of the transpiled output (native extensions and other
    * modules). Defaults to the source module's own requires.

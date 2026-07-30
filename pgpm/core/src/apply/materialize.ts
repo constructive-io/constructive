@@ -13,6 +13,7 @@ import { loadModule, makeSchemaTranspiler, SchemaTransformPass } from '@pgpmjs/t
 
 import { ModuleMap } from '../modules/modules';
 import { hasApplySpec, readApplySpec } from './apply-spec';
+import { loadWorkspaceRoutingProfile, resolveEffectiveApplySpec } from './profile';
 import { isReuseSpec, materializeReuseModule, resolveSharedModuleName } from './reuse';
 import { ResolvedApplySpec } from './types';
 
@@ -160,7 +161,10 @@ export async function resolveEffectiveModulePath(
   const cached = materializedCache.get(cacheKey);
   if (cached) return cached;
 
-  const spec = readApplySpec(modulePath);
+  const spec = resolveEffectiveApplySpec(
+    readApplySpec(modulePath),
+    loadWorkspaceRoutingProfile(workspacePath)
+  );
   const sourceModule = moduleMap[spec.source.module];
   if (!sourceModule) {
     throw new Error(

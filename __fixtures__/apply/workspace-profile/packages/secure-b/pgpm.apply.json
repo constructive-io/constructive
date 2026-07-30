@@ -1,0 +1,10 @@
+{
+  "source": "secure-module",
+  "schemas": {
+    "vault": "vault_b"
+  },
+  "roles": {
+    "anonymous": "anon_b",
+    "administrator": "service_role_b"
+  }
+}
