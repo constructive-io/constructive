@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
 
-import { PgpmDriverConfig } from './driver';
+import { PgpmDriverConfig, PgpmEngineConfig } from './driver';
 
 /**
  * Authentication options for test client sessions
@@ -297,9 +297,21 @@ export interface PgpmOptions {
      */
     extensionsDir?: string;
     /**
-     * Pluggable migration backend. Undefined = built-in `pg` (server) path.
-     * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved
-     * from the consumer's `node_modules`.
+     * Name of the migration backend to target, like sqitch's `core.engine`.
+     * Defaults to `pg` (the built-in server path); `pglite` is also built in,
+     * and any other name must be declared in {@link engines}.
+     */
+    engine?: string;
+    /**
+     * Engine definitions, the analogue of sqitch's `[engine "name"]` sections.
+     * Entries override/extend {@link BUILTIN_ENGINES}, mapping an engine name to
+     * the driver plugin backing it plus that engine's default options.
+     */
+    engines?: Record<string, PgpmEngineConfig>;
+    /**
+     * Pluggable migration backend, named by plugin package rather than by engine
+     * name — the low-level escape hatch behind {@link engine}. Undefined = the
+     * built-in `pg` (server) path. Resolved from the consumer's `node_modules`.
      */
     driver?: PgpmDriverConfig;
 }

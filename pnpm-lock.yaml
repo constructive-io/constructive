@@ -3296,12 +3296,18 @@ importers:
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../../pgpm/types/dist
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
       makage:
         specifier: ^0.3.0
         version: 0.3.0
+      pgpm:
+        specifier: workspace:^
+        version: link:../../pgpm/cli/dist
     publishDirectory: dist
 
   postgres/pglite-test:

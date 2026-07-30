@@ -50,6 +50,11 @@ export const usageText = `
     -h, --help         Display this help information
     -v, --version      Display version information
     --cwd <directory>  Working directory (default: current directory)
+    --engine <name>    Migration backend: pg (default, Postgres server) or
+                       pglite (in-process WASM Postgres, no server). Also set by
+                       the "engine" key of pgpm.json or PGPM_ENGINE.
+    --driver <pkg>     Driver plugin package backing the engine (escape hatch)
+    --pglite[=dataDir] Sugar for --engine pglite, persisted to <dataDir> if given
 
   Individual Command Help:
     pgpm <command> --help    Display detailed help for specific command
