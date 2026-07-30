@@ -49,6 +49,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "useLocksForRoles": false,
   },
   "deployment": {
+    "bundled": false,
     "cache": false,
     "fast": false,
     "hashMethod": "content",
