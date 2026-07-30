@@ -1,0 +1,13 @@
+{
+    "packages": [
+        "packages/*"
+    ],
+    "db": {
+        "roles": {
+            "anonymous": "anon",
+            "authenticated": "authenticated",
+            "administrator": "service_role",
+            "default": "anon"
+        }
+    }
+}

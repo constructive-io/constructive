@@ -10,6 +10,7 @@ import { resolveEffectiveModulePath } from '../apply/materialize';
 import { hasApplySpec } from '../apply/apply-spec';
 import { deployModuleFast, isBundledDeployResult } from '../bundle/deploy-bundled';
 import { PgpmPackage } from '../core/class/pgpm';
+import { findExtensionInstall, roleMapFromRoles } from '../extensions';
 import { PgpmMigrate } from '../migrate/client';
 import { resolveExtensionDependencies } from '../resolution/deps';
 
@@ -47,15 +48,35 @@ export const deployProject = async (
 
   const pgPool = getPgPool({ ...opts.pg, database });
 
+  // Local modules (in resolve order) that may carry an `extensions.json`
+  // declaring how an external extension should be installed (schema + grants).
+  const localModules = extensions.resolved.filter((m) => !extensions.external.includes(m));
+  const roleMap = roleMapFromRoles(mergedOpts.db?.roles);
+
   log.success(`🚀 Starting deployment to database ${database}...`);
 
   for (const extension of extensions.resolved) {
     try {
       if (extensions.external.includes(extension)) {
-        const msg = `CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;`;
-        log.info(`📥 Installing external extension: ${extension}`);
-        log.debug(`> ${msg}`);
-        await pgPool.query(msg);
+        const install = findExtensionInstall(
+          extension,
+          localModules,
+          modules,
+          pkg.workspacePath!,
+          { roleMap }
+        );
+        if (install) {
+          log.info(`📥 Installing external extension (declarative): ${extension}`);
+          for (const stmt of install.deploy) {
+            log.debug(`> ${stmt}`);
+            await pgPool.query(stmt);
+          }
+        } else {
+          const msg = `CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;`;
+          log.info(`📥 Installing external extension: ${extension}`);
+          log.debug(`> ${msg}`);
+          await pgPool.query(msg);
+        }
       } else {
         const sourcePath = resolve(pkg.workspacePath!, modules[extension].path);
         const modulePath = await resolveEffectiveModulePath(

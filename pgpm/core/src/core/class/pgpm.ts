@@ -41,6 +41,7 @@ import {
 } from '../../modules/modules';
 import { deployModuleFast, isBundledDeployResult } from '../../bundle/deploy-bundled';
 import { syncModuleVersions, SyncVersionsOptions, SyncVersionsResult } from '../../packaging/sync-versions';
+import { findExtensionInstall, roleMapFromRoles } from '../../extensions/resolve-install';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { movePath } from '../../utils/fs';
 import { globPaths, globPattern, toPosixPath } from '../../utils/glob';
@@ -1684,15 +1685,32 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
       const pgPool = getPgPool(opts.pg);
 
+      const localModules = extensions.resolved.filter((m) => !extensions.external.includes(m));
+      const roleMap = roleMapFromRoles(opts.db?.roles);
+
       const targetDescription = name === null ? 'all modules' : name;
       log.success(`🚀 Starting deployment to database ${opts.pg.database}...`);
 
       for (const extension of extensions.resolved) {
         try {
           if (extensions.external.includes(extension)) {
-            const msg = `CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;`;
-            log.info(`📥 Installing external extension: ${extension}`);
-            await pgPool.query(msg);
+            const install = findExtensionInstall(
+              extension,
+              localModules,
+              modules,
+              this.workspacePath!,
+              { roleMap }
+            );
+            if (install) {
+              log.info(`📥 Installing external extension (declarative): ${extension}`);
+              for (const stmt of install.deploy) {
+                await pgPool.query(stmt);
+              }
+            } else {
+              const msg = `CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;`;
+              log.info(`📥 Installing external extension: ${extension}`);
+              await pgPool.query(msg);
+            }
           } else {
             const modulePath = await resolveEffectiveModulePath(
               extension,
