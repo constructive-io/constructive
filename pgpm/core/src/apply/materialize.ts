@@ -9,7 +9,8 @@ import {
   transpileBundle,
   verifyBundle
 } from '@pgpmjs/bundle';
-import { loadModule, makeSchemaTranspiler, SchemaTransformPass } from '@pgpmjs/transform';
+import { buildSchemaRouter, loadModule, makeSchemaTranspiler, SchemaTransformPass } from '@pgpmjs/transform';
+import { blankScriptSql, excludeSubsystem, stripSubsystemSql } from '@pgpmjs/slice';
 
 import { ModuleMap } from '../modules/modules';
 import { hasApplySpec, readApplySpec } from './apply-spec';
@@ -42,6 +43,66 @@ const schemaNameLiteralPass: SchemaTransformPass = (content, schemaMapping) => {
     return mapped ? match.replace(`'${schema}'`, `'${mapped}'`) : match;
   });
 };
+
+/**
+ * Build the per-script subsystem stripper for an `exclude` spec, verifying
+ * cascade safety across the *whole* source bundle first: every deploy-script
+ * reference into an excluded schema (FKs, calls, policy predicates) must have
+ * a rebind route, or materialization refuses with each unsatisfied reference
+ * named. Checking bundle-wide (not per script) is what catches cross-change
+ * dependencies on the excluded subsystem.
+ */
+function makeSubsystemStripper(
+  source: MigrationBundle,
+  spec: ResolvedApplySpec,
+  instanceName: string
+): { strip: (sql: string, change: string) => string; excludedChanges: Set<string> } {
+  const selector = { schemas: spec.exclude!.schemas };
+  const rebinds = buildSchemaRouter({ schemaMap: spec.schemas, routes: spec.route });
+
+  const fullDeploySql = source.changes
+    .map(c => c.deploy?.sql ?? '')
+    .filter(Boolean)
+    .join('\n');
+  const analysis = excludeSubsystem(fullDeploySql, selector, { rebinds });
+
+  if (analysis.unsatisfied.length > 0) {
+    const detail = [
+      ...new Set(
+        analysis.unsatisfied.map(
+          u => `${u.object.schema}.${u.object.name}${u.fk ? ' (foreign key target)' : ''}`
+        )
+      )
+    ].join(', ');
+    throw new Error(
+      `Cannot exclude schema(s) ${spec.exclude!.schemas.join(', ')} from ` +
+        `"${spec.source.module}" as "${instanceName}": surviving statements still reference ` +
+        `${detail} with no route/rebind target. Add "route" entries substituting each ` +
+        `referenced object, or keep the subsystem.`
+    );
+  }
+
+  // A change whose deploy consists entirely of subsystem statements (plus
+  // transaction control) is excluded *as a change*: its verify/revert scripts
+  // target dropped objects the classifier can't always see (bare DROPs,
+  // catalog probes), so all three scripts are blanked together.
+  const excludedChanges = new Set<string>();
+  for (const change of source.changes) {
+    if (!change.deploy) continue;
+    const stripped = stripSubsystemSql(change.deploy.sql, selector);
+    const survivors = stripped.result.kept.filter(
+      i => !stripped.dropped.includes(i) && stripped.result.statements[i].nodeTag !== 'TransactionStmt'
+    );
+    if (stripped.dropped.length > 0 && survivors.length === 0) {
+      excludedChanges.add(change.name);
+    }
+  }
+
+  const strip = (sql: string, change: string): string =>
+    excludedChanges.has(change) ? blankScriptSql(sql) : stripSubsystemSql(sql, selector).sql;
+
+  return { strip, excludedChanges };
+}
 
 export interface MaterializeApplyResult {
   /** The transpiled, content-addressed bundle that was materialized. */
@@ -87,9 +148,15 @@ export async function materializeApplyModule(
   const targetSchemas = [
     ...new Set([
       ...Object.values(spec.schemas ?? {}),
-      ...(spec.route ?? []).map(r => r.toSchema)
+      ...(spec.route ?? [])
+        .map(r => r.toSchema)
+        .filter((s): s is string => typeof s === 'string')
     ])
   ];
+
+  const stripSubsystem = spec.exclude
+    ? makeSubsystemStripper(source, spec, instanceName)
+    : undefined;
 
   const { renameChange, transformScript, result } = makeSchemaTranspiler({
     schemaMap: spec.schemas,
@@ -102,9 +169,15 @@ export async function materializeApplyModule(
     }
   });
 
+  // Excluded changes keep their source identity (an emptied tombstone) —
+  // renaming them into the replacement provider's namespace would be a lie.
   const transpiled = transpileBundle(source, {
-    renameChange,
-    transformScript,
+    renameChange: stripSubsystem
+      ? (name: string) => (stripSubsystem.excludedChanges.has(name) ? name : renameChange(name))
+      : renameChange,
+    transformScript: stripSubsystem
+      ? (sql, ctx) => transformScript(stripSubsystem.strip(sql, ctx.change), ctx)
+      : transformScript,
     renameModule: instanceName,
     provenance: {
       appliedFrom: spec.source.module,

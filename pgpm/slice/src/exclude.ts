@@ -1,4 +1,5 @@
 import { classifyStatements, SchemaRouter, StatementFacts } from '@pgpmjs/transform';
+import { parseSql } from 'plpgsql-parser';
 
 import { SqlObjectRef } from './refs';
 
@@ -246,5 +247,119 @@ export function excludeSubsystem(
     unsatisfied,
     warnings,
     statements
+  };
+}
+
+/**
+ * Blank a script: keep its leading text (pgpm header) and transaction
+ * statements, drop everything else. Used for the scripts of a change whose
+ * deploy is entirely inside an excluded subsystem — its verify/revert bodies
+ * target dropped objects, so they must go with it.
+ */
+export function blankScriptSql(sql: string): string {
+  const parsed = parseSql(sql) as {
+    stmts: Array<{ stmt: Record<string, unknown>; stmt_location?: number; stmt_len?: number }>;
+  };
+  const prefix =
+    parsed.stmts.length > 0 ? sql.slice(0, parsed.stmts[0].stmt_location ?? 0) : sql;
+  const pieces: string[] = [];
+  for (const s of parsed.stmts) {
+    if (!('TransactionStmt' in s.stmt)) continue;
+    const start = s.stmt_location ?? 0;
+    const len = s.stmt_len ?? sql.length - start;
+    pieces.push(sql.slice(start, start + len).trim() + ';');
+  }
+  return prefix + pieces.join('\n\n') + (pieces.length > 0 ? '\n' : '');
+}
+
+export interface StripSubsystemResult {
+  /** The surviving SQL, with subsystem statements removed. */
+  sql: string;
+  /** The analysis behind the removal (contract, unsatisfied, warnings). */
+  result: ExcludeResult;
+  /** Every removed statement index (excluded + opaque subsystem-targeted). */
+  dropped: number[];
+}
+
+/** Qualified name (`[schema, name]` items) from a raw parse-tree name list. */
+function qualifiedName(node: unknown): SqlObjectRef | undefined {
+  const items = (node as { List?: { items?: Array<{ String?: { sval?: string } }> } })?.List
+    ?.items;
+  if (!items) return undefined;
+  const parts = items.map(x => x.String?.sval).filter((s): s is string => typeof s === 'string');
+  if (parts.length === 2) return { schema: parts[0], name: parts[1] };
+  if (parts.length === 1) return { schema: null, name: parts[0] };
+  return undefined;
+}
+
+/**
+ * Whether an opaque statement (invisible to classification) provably targets
+ * only subsystem objects, so it can be removed along with them: bare `DROP`
+ * of subsystem objects, `COMMENT ON` a subsystem object.
+ */
+function opaqueTargetsSubsystem(stmt: Record<string, any>, schemas: Set<string>): boolean {
+  if (stmt.DropStmt?.objects) {
+    const objects: unknown[] = stmt.DropStmt.objects;
+    const refs = objects.map(qualifiedName);
+    return refs.length > 0 && refs.every(r => r !== undefined && inSubsystem(r, schemas));
+  }
+  if (stmt.CommentStmt?.object) {
+    const ref = qualifiedName(stmt.CommentStmt.object);
+    return ref !== undefined && inSubsystem(ref, schemas);
+  }
+  return false;
+}
+
+/**
+ * Remove a subsystem's statements from a SQL script, preserving the original
+ * text of every survivor (no reformat — statements are sliced out of the
+ * source by parser-reported location). Also removes opaque statements that
+ * provably target only subsystem objects (`DROP`/`COMMENT ON` them), which
+ * membership classification alone keeps.
+ *
+ * Requires `await loadModule()` first (same as every other sync API here).
+ * This performs no safety check by itself — callers decide what to do with
+ * `result.unsatisfied` (typically: refuse before ever writing output).
+ */
+export function stripSubsystemSql(
+  sql: string,
+  selector: SubsystemSelector,
+  options: { rebinds?: SchemaRouter } = {}
+): StripSubsystemResult {
+  const result = excludeSubsystem(sql, selector, options);
+  const schemas = new Set(selector.schemas);
+
+  const parsed = parseSql(sql) as {
+    stmts: Array<{ stmt: Record<string, any>; stmt_location?: number; stmt_len?: number }>;
+  };
+  if (parsed.stmts.length !== result.statements.length) {
+    throw new Error(
+      `stripSubsystemSql: parser saw ${parsed.stmts.length} statements but the classifier saw ` +
+        `${result.statements.length}; refusing to slice by index`
+    );
+  }
+
+  const drop = new Set(result.excluded);
+  for (const i of result.kept) {
+    if (opaqueTargetsSubsystem(parsed.stmts[i].stmt, schemas)) drop.add(i);
+  }
+
+  // Text before the first statement (pgpm headers, leading comments) is
+  // preserved verbatim so script identity headers survive the strip.
+  const prefix =
+    parsed.stmts.length > 0 ? sql.slice(0, parsed.stmts[0].stmt_location ?? 0) : sql;
+
+  const pieces: string[] = [];
+  parsed.stmts.forEach((s, i) => {
+    if (drop.has(i)) return;
+    const start = s.stmt_location ?? 0;
+    const len = s.stmt_len ?? sql.length - start;
+    pieces.push(sql.slice(start, start + len).trim() + ';');
+  });
+
+  return {
+    sql: prefix + pieces.join('\n\n') + (pieces.length > 0 ? '\n' : ''),
+    result,
+    dropped: [...drop].sort((a, b) => a - b)
   };
 }

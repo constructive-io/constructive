@@ -1,0 +1,25 @@
+{
+  "source": "crm-module",
+  "schemas": {
+    "app": "crm"
+  },
+  "exclude": {
+    "schemas": ["identity"]
+  },
+  "route": [
+    {
+      "fromSchema": "identity",
+      "kind": "table",
+      "name": "users",
+      "toSchema": "app_auth"
+    },
+    {
+      "fromSchema": "identity",
+      "kind": "function",
+      "name": "current_actor",
+      "toSchema": "app_auth",
+      "toName": "current_user_id"
+    }
+  ],
+  "requires": ["auth-provider"]
+}
