@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/ast@0.9.0...@pgpmjs/ast@0.9.1) (2026-07-30)
+
+### Performance Improvements
+
+- **ast:** make renameInPlanContent linear instead of O(lines × renames) ([3d99649](https://github.com/constructive-io/constructive/commit/3d99649d438fe73ba56cd710f11208587913ccb5))
+
 # [0.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/ast@0.8.0...@pgpmjs/ast@0.9.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/ast

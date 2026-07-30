@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.13.0...@pgpmjs/core@7.14.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** apply modules — proxy packages that transpile another module into new schemas ([b56c189](https://github.com/constructive-io/constructive/commit/b56c18913a075b9b48abd98eff1210f5315028a5))
+- **pgpm:** object-level apply routing (route table→schema B, function→schema C) ([6e8d284](https://github.com/constructive-io/constructive/commit/6e8d2842c915928e5239c882f6d508aeb2513e25))
+
 # [7.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.12.0...@pgpmjs/core@7.13.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/core

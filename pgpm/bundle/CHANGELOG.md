@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.10.0...@pgpmjs/bundle@0.11.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** apply modules — proxy packages that transpile another module into new schemas ([b56c189](https://github.com/constructive-io/constructive/commit/b56c18913a075b9b48abd98eff1210f5315028a5))
+
 # [0.10.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.9.0...@pgpmjs/bundle@0.10.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/bundle

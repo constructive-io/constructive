@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.9.0...@pgpmjs/transform@0.10.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** apply modules — proxy packages that transpile another module into new schemas ([b56c189](https://github.com/constructive-io/constructive/commit/b56c18913a075b9b48abd98eff1210f5315028a5))
+- **pgpm:** object-level apply routing (route table→schema B, function→schema C) ([6e8d284](https://github.com/constructive-io/constructive/commit/6e8d2842c915928e5239c882f6d508aeb2513e25))
+- **slice:** bump @pgsql/transform to ^18.5.0 and cover LANGUAGE sql partition ([4c03ae9](https://github.com/constructive-io/constructive/commit/4c03ae94e1188023d98a4e9eedaa4db0fff7c767))
+
 # [0.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.8.0...@pgpmjs/transform@0.9.0) (2026-07-29)
 
 **Note:** Version bump only for package @pgpmjs/transform
