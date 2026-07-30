@@ -1,0 +1,7 @@
+# catalog extension
+comment = 'catalog extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/catalog'
+requires = 'plpgsql'
+relocatable = false
+superuser = false

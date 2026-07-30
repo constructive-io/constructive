@@ -21,6 +21,46 @@ export interface SplitBundleOptions {
   sharedName: string;
   /** Module name for the per-tenant bundle. */
   perTenantName: string;
+  /**
+   * Extra changes to weave into the per-tenant bundle only, deployed before its
+   * own changes. Used for infrastructure the shared module owns in *its* schema
+   * but each tenant must also provision in *its* schema — canonically the
+   * `CREATE SCHEMA` of the per-tenant target, which a single source
+   * schema-creation change cannot express (it lands in the shared module).
+   *
+   * When a bootstrap declares `replacesShared`, per-tenant dependencies on that
+   * shared change are re-pointed at the bootstrap (a local dependency) instead
+   * of becoming a cross-module reference — so a per-tenant object depends on
+   * *its own* schema, not the shared one.
+   */
+  perTenantBootstrap?: PerTenantBootstrapChange[];
+}
+
+/**
+ * A caller-supplied change woven into the per-tenant bundle by
+ * {@link splitBundle} (see {@link SplitBundleOptions.perTenantBootstrap}).
+ * The caller owns the SQL (e.g. a `CREATE SCHEMA IF NOT EXISTS` transpiled to
+ * the per-tenant target); `splitBundle` owns the bundle mechanics (digests,
+ * plan entry, deploy order, dependency re-pointing).
+ */
+export interface PerTenantBootstrapChange {
+  /** Change name/path (e.g. `schemas/tenant_a/schema`). */
+  name: string;
+  /** Local dependencies of the bootstrap change (default: none). */
+  dependencies?: string[];
+  /** Raw deploy SQL (or null). */
+  deploy: string | null;
+  /** Raw revert SQL (or null). */
+  revert: string | null;
+  /** Raw verify SQL (or null). */
+  verify: string | null;
+  /**
+   * A shared change (unprefixed name) that per-tenant changes currently depend
+   * on but should instead depend on this bootstrap. Every per-tenant reference
+   * to it — dependency arrays, plan deps, and `-- requires:` headers — is
+   * rewritten to this bootstrap's local name.
+   */
+  replacesShared?: string;
 }
 
 /**
@@ -42,6 +82,8 @@ export interface SplitBundleResult {
 interface CrossModuleRefs {
   sharedName: string;
   isShared: (change: string) => boolean;
+  /** Bootstrap changes to prepend to the per-tenant side. */
+  bootstrap: PerTenantBootstrapChange[];
 }
 
 /**
@@ -86,15 +128,50 @@ export function splitBundle(
     }
   }
 
+  const bootstrap = options.perTenantBootstrap ?? [];
+  for (const b of bootstrap) {
+    if (names.has(b.name)) {
+      throw new Error(
+        `splitBundle: bootstrap change "${b.name}" collides with an existing bundle change`
+      );
+    }
+    if (b.replacesShared !== undefined && !isShared(b.replacesShared)) {
+      throw new Error(
+        `splitBundle: bootstrap "${b.name}" replaces "${b.replacesShared}", which is not a shared change`
+      );
+    }
+  }
+
   const shared = buildSubBundle(bundle, isShared, options.sharedName, null);
   const perTenantBundle = buildSubBundle(
     bundle,
     name => perTenant.has(name),
     options.perTenantName,
-    { sharedName: options.sharedName, isShared }
+    { sharedName: options.sharedName, isShared, bootstrap }
   );
 
   return { shared, perTenant: perTenantBundle };
+}
+
+/** Build a {@link BundleChange} from raw bootstrap SQL, computing digests. */
+function bootstrapToChange(b: PerTenantBootstrapChange): BundleChange {
+  const toScript = (kind: BundleScript['kind'], sql: string | null): BundleScript | null =>
+    sql === null ? null : { kind, sql, digest: hashString(sql) };
+  const deploy = toScript('deploy', b.deploy);
+  const revert = toScript('revert', b.revert);
+  const verify = toScript('verify', b.verify);
+  return {
+    name: b.name,
+    dependencies: b.dependencies ?? [],
+    deploy,
+    revert,
+    verify,
+    digest: computeChangeDigest(b.name, {
+      deploy: deploy?.digest,
+      revert: revert?.digest,
+      verify: verify?.digest
+    })
+  };
 }
 
 /** Build one side of the split: the changes matching `include`, as a module. */
@@ -104,33 +181,28 @@ function buildSubBundle(
   moduleName: string,
   cross: CrossModuleRefs | null
 ): MigrationBundle {
-  // Rename map applied to per-tenant scripts: a bare reference to a shared
-  // change becomes a cross-module reference `<sharedName>:<change>`.
-  const crossRename = cross
-    ? new Map(
-        bundle.changes
-          .filter(c => cross.isShared(c.name))
-          .map(c => [c.name, `${cross.sharedName}:${c.name}`])
-      )
-    : null;
+  // One rename map for both dependency arrays and `-- requires:` headers on the
+  // per-tenant side: a reference to a shared change becomes a cross-module
+  // reference `<sharedName>:<change>`, except a change a bootstrap replaces,
+  // which is re-pointed at the (local) bootstrap instead.
+  const renameMap = cross ? buildRenameMap(bundle, cross) : null;
+
+  const rewriteScript = (script: BundleScript | null): BundleScript | null => {
+    if (!script) return null;
+    if (!renameMap || renameMap.size === 0) return script;
+    const parsed = parsePgpmHeader(script.sql);
+    if (renameInHeader(parsed, renameMap) === 0) return script;
+    const sql = writePgpmScript(parsed);
+    return { kind: script.kind, sql, digest: hashString(sql) };
+  };
 
   const changes: BundleChange[] = bundle.changes
     .filter(c => include(c.name))
     .map(change => {
-      const dependencies = change.dependencies.map(dep =>
-        cross && cross.isShared(dep) ? `${cross.sharedName}:${dep}` : dep
-      );
-      const rewrite = (script: BundleScript | null): BundleScript | null => {
-        if (!script) return null;
-        if (!crossRename || crossRename.size === 0) return script;
-        const parsed = parsePgpmHeader(script.sql);
-        if (renameInHeader(parsed, crossRename) === 0) return script;
-        const sql = writePgpmScript(parsed);
-        return { kind: script.kind, sql, digest: hashString(sql) };
-      };
-      const deploy = rewrite(change.deploy);
-      const revert = rewrite(change.revert);
-      const verify = rewrite(change.verify);
+      const dependencies = change.dependencies.map(dep => renameMap?.get(dep) ?? dep);
+      const deploy = rewriteScript(change.deploy);
+      const revert = rewriteScript(change.revert);
+      const verify = rewriteScript(change.verify);
       const digest = computeChangeDigest(change.name, {
         deploy: deploy?.digest,
         revert: revert?.digest,
@@ -139,7 +211,11 @@ function buildSubBundle(
       return { name: change.name, dependencies, deploy, revert, verify, digest };
     });
 
-  const plan = buildPlan(bundle.plan, moduleName, include, cross);
+  // Bootstrap changes deploy before the tenant's own changes.
+  const bootstrapChanges = (cross?.bootstrap ?? []).map(bootstrapToChange);
+  const allChanges = [...bootstrapChanges, ...changes];
+
+  const plan = buildPlan(bundle.plan, moduleName, include, renameMap, bootstrapChanges);
 
   let control = bundle.control
     ? { fileName: `${moduleName}.control`, content: bundle.control.content }
@@ -151,7 +227,7 @@ function buildSubBundle(
   const digest = computeBundleDigest(
     plan,
     control?.content ?? null,
-    changes.map(c => c.digest)
+    allChanges.map(c => c.digest)
   );
 
   return {
@@ -159,8 +235,8 @@ function buildSubBundle(
       formatVersion: bundle.manifest.formatVersion,
       name: moduleName,
       createdWith: bundle.manifest.createdWith,
-      changeCount: changes.length,
-      deployOrder: changes.map(c => c.name),
+      changeCount: allChanges.length,
+      deployOrder: allChanges.map(c => c.name),
       digest,
       provenance: {
         ...(bundle.manifest.provenance ?? {}),
@@ -169,8 +245,24 @@ function buildSubBundle(
     },
     plan,
     control,
-    changes
+    changes: allChanges
   };
+}
+
+/**
+ * Build the per-tenant reference-rewrite map: every shared change → its
+ * cross-module reference, then bootstrap `replacesShared` overrides → the
+ * bootstrap's local name (so a per-tenant object depends on its own schema).
+ */
+function buildRenameMap(bundle: MigrationBundle, cross: CrossModuleRefs): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const c of bundle.changes) {
+    if (cross.isShared(c.name)) map.set(c.name, `${cross.sharedName}:${c.name}`);
+  }
+  for (const b of cross.bootstrap) {
+    if (b.replacesShared !== undefined) map.set(b.replacesShared, b.name);
+  }
+  return map;
 }
 
 /**
@@ -182,7 +274,8 @@ function buildPlan(
   planContent: string,
   moduleName: string,
   include: (name: string) => boolean,
-  cross: CrossModuleRefs | null
+  renameMap: Map<string, string> | null,
+  bootstrapChanges: BundleChange[]
 ): string {
   const parsed = parsePlanContent(planContent);
   if (!parsed.data) {
@@ -191,23 +284,27 @@ function buildPlan(
   }
   const source = parsed.data;
 
+  const bootstrapPlan: Change[] = bootstrapChanges.map(b => ({
+    name: b.name,
+    dependencies: b.dependencies
+  }));
+
   const changes: Change[] = source.changes
     .filter(c => include(c.name))
     .map(c => ({
       ...c,
-      dependencies: (c.dependencies ?? []).map(dep =>
-        cross && cross.isShared(dep) ? `${cross.sharedName}:${dep}` : dep
-      )
+      dependencies: (c.dependencies ?? []).map(dep => renameMap?.get(dep) ?? dep)
     }));
 
-  const kept = new Set(changes.map(c => c.name));
+  const allChanges = [...bootstrapPlan, ...changes];
+  const kept = new Set(allChanges.map(c => c.name));
   const tags = source.tags.filter(t => kept.has(t.change));
 
   const plan: ExtendedPlanFile = {
     ...source,
     package: moduleName,
     uri: moduleName,
-    changes,
+    changes: allChanges,
     tags
   };
 

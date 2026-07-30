@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { bundleFromModule, splitBundle, verifyBundle } from '../src';
+import { bundleFromModule, PerTenantBootstrapChange, splitBundle, verifyBundle } from '../src';
 
 let sourceDir: string;
 
@@ -179,5 +179,80 @@ describe('splitBundle', () => {
         perTenantName: 'catalog-tenant'
       })
     ).toThrow(/not in the bundle/);
+  });
+
+  describe('perTenantBootstrap', () => {
+    const BOOTSTRAP: PerTenantBootstrapChange = {
+      name: 'schemas/tenant/schema',
+      deploy: '-- Deploy schemas/tenant/schema\nBEGIN;\nCREATE SCHEMA IF NOT EXISTS tenant;\nCOMMIT;\n',
+      revert: '-- Revert schemas/tenant/schema\nBEGIN;\nDROP SCHEMA IF EXISTS tenant;\nCOMMIT;\n',
+      verify: null,
+      replacesShared: 'schemas/catalog/schema'
+    };
+
+    it('prepends the bootstrap change and re-points the replaced dependency to it', () => {
+      const src = bundleFromModule(sourceDir);
+      const { shared, perTenant } = splitBundle(src, {
+        perTenantChanges: PER_TENANT,
+        sharedName: 'catalog-shared',
+        perTenantName: 'catalog-tenant',
+        perTenantBootstrap: [BOOTSTRAP]
+      });
+
+      // deploys first, before the tenant's own changes
+      expect(perTenant.manifest.deployOrder).toEqual(['schemas/tenant/schema', ...PER_TENANT]);
+
+      // products no longer depends on the shared schema — it depends on its own
+      const products = perTenant.changes.find(
+        c => c.name === 'schemas/catalog/tables/products'
+      )!;
+      expect(products.dependencies).toEqual(['schemas/tenant/schema']);
+
+      // product_slug: schema dep re-pointed local; slugify stays cross-module
+      const productSlug = perTenant.changes.find(
+        c => c.name === 'schemas/catalog/functions/product_slug'
+      )!;
+      expect(productSlug.dependencies).toEqual([
+        'schemas/tenant/schema',
+        'catalog-shared:schemas/catalog/functions/slugify',
+        'schemas/catalog/tables/products'
+      ]);
+      expect(productSlug.deploy!.sql).toContain('-- requires: schemas/tenant/schema');
+      expect(productSlug.deploy!.sql).not.toContain(
+        '-- requires: catalog-shared:schemas/catalog/schema'
+      );
+
+      // plan carries the bootstrap change + re-pointed deps
+      expect(perTenant.plan).toContain('schemas/tenant/schema');
+
+      // the shared module is unchanged — it still owns the source schema
+      expect(shared.manifest.deployOrder).toContain('schemas/catalog/schema');
+      expect(verifyBundle(shared)).toEqual([]);
+      expect(verifyBundle(perTenant)).toEqual([]);
+    });
+
+    it('rejects a bootstrap that collides with an existing change', () => {
+      const src = bundleFromModule(sourceDir);
+      expect(() =>
+        splitBundle(src, {
+          perTenantChanges: PER_TENANT,
+          sharedName: 'catalog-shared',
+          perTenantName: 'catalog-tenant',
+          perTenantBootstrap: [{ ...BOOTSTRAP, name: 'schemas/catalog/tables/products' }]
+        })
+      ).toThrow(/collides with an existing bundle change/);
+    });
+
+    it('rejects a bootstrap that replaces a non-shared change', () => {
+      const src = bundleFromModule(sourceDir);
+      expect(() =>
+        splitBundle(src, {
+          perTenantChanges: PER_TENANT,
+          sharedName: 'catalog-shared',
+          perTenantName: 'catalog-tenant',
+          perTenantBootstrap: [{ ...BOOTSTRAP, replacesShared: 'schemas/catalog/tables/products' }]
+        })
+      ).toThrow(/not a shared change/);
+    });
   });
 });

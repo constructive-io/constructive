@@ -53,6 +53,46 @@ export interface ApplyRouteEntry {
   toSchema: string;
 }
 
+/**
+ * A per-tenant seed object in a reuse spec: the objects that must be
+ * materialized once *per tenant*. `@pgpmjs/slice`'s `partitionModule` starts
+ * from these seeds and marks every change that transitively reaches one as
+ * per-tenant; everything else is proven shared and emitted once. Expressed as
+ * separate properties (no dotted identity strings), matching {@link ApplyRouteEntry}.
+ */
+export interface ApplyReuseSeed {
+  /** Source schema the seed object is defined in (e.g. `catalog`). */
+  fromSchema: string;
+  /** Object namespace: `table`/`view` → relation, `procedure` → function. */
+  kind: 'table' | 'view' | 'function' | 'procedure' | 'type';
+  /** Unqualified object name (e.g. `products`). */
+  name: string;
+}
+
+/**
+ * Reuse declaration: split the source into a *shared* module (deployed once,
+ * reused by every tenant via ordinary `requires`) and a *per-tenant* module
+ * (materialized per instance). The classifier proves the split from the
+ * `perTenant` seeds; a shared object that would depend on a per-tenant one is
+ * rejected as unsound rather than silently deployed.
+ */
+export interface ApplyReuseSpec {
+  /**
+   * Source schema → *shared* target schema. Shared objects land here; this
+   * mapping must be stable across tenant instances so the shared module has a
+   * deterministic identity and deploys exactly once.
+   */
+  sharedSchema: Record<string, string>;
+  /** Per-tenant seed objects (non-empty). */
+  perTenant: ApplyReuseSeed[];
+  /**
+   * Optional explicit shared-module name. Defaults to a deterministic name
+   * derived from the source module and the shared-schema mapping, so two tenant
+   * proxies over the same source + shared mapping resolve to one shared module.
+   */
+  sharedName?: string;
+}
+
 /** The parsed, normalized `pgpm.apply.json` spec. */
 export interface PgpmApplySpec {
   /**
@@ -73,6 +113,12 @@ export interface PgpmApplySpec {
    * table into a tenant schema and a function into a shared schema).
    */
   route?: ApplyRouteEntry[];
+  /**
+   * Reuse declaration: split shared vs per-tenant objects (see
+   * {@link ApplyReuseSpec}). When present, this proxy expands into two modules —
+   * a shared module and a per-tenant module that `requires` it.
+   */
+  reuse?: ApplyReuseSpec;
   /**
    * Runtime requires of the transpiled output (native extensions and other
    * modules). Defaults to the source module's own requires.

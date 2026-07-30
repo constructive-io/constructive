@@ -13,6 +13,7 @@ import { loadModule, makeSchemaTranspiler, SchemaTransformPass } from '@pgpmjs/t
 
 import { ModuleMap } from '../modules/modules';
 import { hasApplySpec, readApplySpec } from './apply-spec';
+import { isReuseSpec, materializeReuseModule, resolveSharedModuleName } from './reuse';
 import { ResolvedApplySpec } from './types';
 
 export interface MaterializeApplyOptions {
@@ -151,7 +152,10 @@ export async function resolveEffectiveModulePath(
 ): Promise<string> {
   if (!hasApplySpec(modulePath)) return modulePath;
 
-  const cached = materializedCache.get(modulePath);
+  // A reuse proxy resolves under two names (shared + per-tenant) from one
+  // directory, so the cache is keyed by the requested module name too.
+  const cacheKey = `${modulePath}::${moduleName}`;
+  const cached = materializedCache.get(cacheKey);
   if (cached) return cached;
 
   const spec = readApplySpec(modulePath);
@@ -166,9 +170,18 @@ export async function resolveEffectiveModulePath(
   }
 
   const sourceDir = resolve(workspacePath, sourceModule.path);
-  const { outDir } = await materializeApplyModule({ sourceDir, spec });
 
-  materializedCache.set(modulePath, outDir);
+  if (isReuseSpec(spec)) {
+    const result = await materializeReuseModule({ sourceDir, spec });
+    materializedCache.set(`${modulePath}::${result.sharedName}`, result.shared.outDir);
+    materializedCache.set(`${modulePath}::${result.perTenantName}`, result.perTenant.outDir);
+    const outDir =
+      moduleName === resolveSharedModuleName(spec) ? result.shared.outDir : result.perTenant.outDir;
+    return outDir;
+  }
+
+  const { outDir } = await materializeApplyModule({ sourceDir, spec });
+  materializedCache.set(cacheKey, outDir);
   return outDir;
 }
 
