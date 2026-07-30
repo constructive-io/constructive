@@ -62,6 +62,26 @@ def add_copy(code, msg):
 
 pair_re = re.compile(r"\b([A-Z][A-Z0-9_]+)\s*:\s*(['\"])((?:\\.|(?!\2).)*)\2")
 
+# Copy that must not depend on a dashboard checkout being present. The step-up
+# codes tell the client which re-verification to prompt for, so humanizing the
+# code ("Step up required mfa.") would ship the wrong instruction to users.
+# The dashboard still wins where it has its own wording.
+BASE_COPY = {
+    'STEP_UP_REQUIRED_PASSWORD':
+        'Please re-enter your password to continue.',
+    'STEP_UP_REQUIRED_MFA':
+        'Please enter a code from your authenticator app to continue.',
+    'STEP_UP_REQUIRED_FRESH_AUTH':
+        'Please verify your identity to continue.',
+    'STEP_UP_REQUIRED_PASSWORD_OR_MFA':
+        'Please verify your identity to continue.',
+    'STEP_UP_INVALID_TYPE':
+        'This action requires verification that is not configured correctly. '
+        'Please contact support.',
+}
+for base_code, base_msg in BASE_COPY.items():
+    copy[base_code] = base_msg
+
 dashboard = find_dashboard()
 if dashboard:
     globs = (

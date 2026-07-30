@@ -502,10 +502,10 @@ export interface EventTrackerParams {
  * ===========================================================================
  */
 ;
-/** Attaches a BEFORE trigger that calls require_step_up() to enforce recent password or MFA verification before allowing mutations. Requires a provisioned sessions_module (with app_settings_auth) for the target database. The step_up_window is read from app_settings_auth at runtime (default 30 minutes). Supports compound conditions (AND/OR/NOT), watch_fields (fire only when specific fields change), and simple condition_field/condition_value leaf conditions. */
+/** Attaches a BEFORE trigger that calls require_step_up() to enforce recent strong verification (password, MFA, or identity-provider assertion) before allowing mutations. Requires a provisioned sessions_module (with app_settings_auth) for the target database. The step_up_window is read from app_settings_auth at runtime (default 30 minutes). Supports compound conditions (AND/OR/NOT), watch_fields (fire only when specific fields change), and simple condition_field/condition_value leaf conditions. */
 export interface GuardStepUpParams {
-  /* Which verification method satisfies the step-up requirement */
-  step_up_type?: 'password' | 'mfa' | 'password_or_mfa';
+  /* Which verification method satisfies the step-up requirement (password_or_mfa is the legacy spelling of fresh_auth) */
+  step_up_type?: 'password' | 'mfa' | 'fresh_auth' | 'password_or_mfa';
   /* Which DML events require step-up verification */
   events?: ('INSERT' | 'UPDATE' | 'DELETE')[];
   /* Column name for conditional WHEN clause (fires only when field equals condition_value) */

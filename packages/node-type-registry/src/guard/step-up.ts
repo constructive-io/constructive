@@ -8,7 +8,8 @@ export const GuardStepUp: NodeTypeDefinition = {
   display_name: 'Guard Step-Up',
   description:
     'Attaches a BEFORE trigger that calls require_step_up() to enforce recent ' +
-    'password or MFA verification before allowing mutations. Requires a ' +
+    'strong verification (password, MFA, or identity-provider assertion) before ' +
+    'allowing mutations. Requires a ' +
     'provisioned sessions_module (with app_settings_auth) for the target database. ' +
     'The step_up_window is read from app_settings_auth at runtime (default 30 minutes). ' +
     'Supports compound conditions (AND/OR/NOT), watch_fields (fire only when specific ' +
@@ -19,10 +20,11 @@ export const GuardStepUp: NodeTypeDefinition = {
     properties: {
       step_up_type: {
         type: 'string',
-        enum: ['password', 'mfa', 'password_or_mfa'],
+        enum: ['password', 'mfa', 'fresh_auth', 'password_or_mfa'],
         description:
-          'Which verification method satisfies the step-up requirement',
-        default: 'password_or_mfa'
+          'Which verification method satisfies the step-up requirement ' +
+          '(password_or_mfa is the legacy spelling of fresh_auth)',
+        default: 'fresh_auth'
       },
       events: {
         type: 'array',
