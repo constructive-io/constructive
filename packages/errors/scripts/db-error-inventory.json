@@ -7,10 +7,11 @@
     "n_generated": 10,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/utils.sql"
-    ]
+    ],
+    "class": "public"
   },
   "ACCOUNT_EXISTS": {
-    "count": 35,
+    "count": 37,
     "dynamic": false,
     "sample": "ACCOUNT_EXISTS",
     "n_source": 9,
@@ -21,7 +22,8 @@
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/challenge/sign_up_unique_key.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/new-challenge/sign_up_owned_object.sql"
-    ]
+    ],
+    "class": "public"
   },
   "ACCOUNT_LOCKED_EXCEED_ATTEMPTS": {
     "count": 26,
@@ -33,7 +35,8 @@
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/challenge/sign_in_request_challenge.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/new-challenge/sign_in_owned_object_request_challenge.sql"
-    ]
+    ],
+    "class": "public"
   },
   "ACCOUNT_NOT_FOUND": {
     "count": 11,
@@ -46,7 +49,8 @@
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_email_otp.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_magic_link.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_sms_otp.sql"
-    ]
+    ],
+    "class": "public"
   },
   "ALREADY_SCHEDULED": {
     "count": 4,
@@ -73,7 +77,8 @@
     "sample": "API_KEYS_DISABLED",
     "n_source": 0,
     "n_generated": 5,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "API_KEY_LIMIT_REACHED": {
     "count": 10,
@@ -84,7 +89,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "API_KEY_NOT_FOUND": {
     "count": 5,
@@ -94,7 +100,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "APPLY_RLS": {
     "count": 4,
@@ -236,7 +243,8 @@
     "n_generated": 14,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
-    ]
+    ],
+    "class": "public"
   },
   "BAD_CASING_FUNC": {
     "count": 2,
@@ -576,7 +584,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/disconnect_account.sql"
-    ]
+    ],
+    "class": "public"
   },
   "CANNOT_REVOKE_CURRENT_SESSION": {
     "count": 5,
@@ -586,7 +595,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_session.sql"
-    ]
+    ],
+    "class": "public"
   },
   "CAP_CHECK_TRIGGER_ARGS": {
     "count": 12,
@@ -657,7 +667,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/disconnect_account.sql"
-    ]
+    ],
+    "class": "public"
   },
   "CONSTRUCT_BLUEPRINT_ACHIEVEMENT_ENTITY_ID_REQUIRED": {
     "count": 2,
@@ -899,7 +910,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_up.sql"
-    ]
+    ],
+    "class": "public"
   },
   "DATABASE_FIELD_RESERVED_WORD": {
     "count": 2,
@@ -2396,6 +2408,16 @@
     ],
     "class": "public"
   },
+  "EXECUTION_NOT_FOUND": {
+    "count": 8,
+    "dynamic": false,
+    "sample": "EXECUTION_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/graph/graph_bodies.sql"
+    ]
+  },
   "EXPIRED_TOKEN": {
     "count": 2,
     "dynamic": false,
@@ -2436,6 +2458,16 @@
       "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/denormalized_table_field.sql"
     ],
     "class": "public"
+  },
+  "FUNCTION_GRAPH_NOT_FOUND": {
+    "count": 16,
+    "dynamic": false,
+    "sample": "FUNCTION_GRAPH_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/graph/graph_bodies.sql"
+    ]
   },
   "FUNCTION_SCHEDULES": {
     "count": 10,
@@ -2520,6 +2552,16 @@
       "packages/metaschema-generators/deploy/schemas/metaschema_generators/procedures/graph_module.sql"
     ],
     "class": "internal"
+  },
+  "GRAPH_TREE_NOT_FOUND": {
+    "count": 8,
+    "dynamic": false,
+    "sample": "GRAPH_TREE_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/graph/graph_bodies.sql"
+    ]
   },
   "GRAPH_VALIDATION_FAILED": {
     "count": 2,
@@ -2784,11 +2826,11 @@
     "class": "public"
   },
   "HIERARCHY_CYCLE_DETECTED": {
-    "count": 4,
+    "count": 5,
     "dynamic": true,
     "sample": "HIERARCHY_CYCLE_DETECTED: Setting % as parent of % would create a cycle",
     "n_source": 1,
-    "n_generated": 3,
+    "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/hierarchy/hierarchy_triggers.sql"
     ]
@@ -2804,21 +2846,21 @@
     ]
   },
   "HIERARCHY_INACTIVE_MEMBER": {
-    "count": 8,
+    "count": 10,
     "dynamic": true,
     "sample": "HIERARCHY_INACTIVE_MEMBER: Cannot add user % to hierarchy - user must be an active member of the organization first",
     "n_source": 1,
-    "n_generated": 3,
+    "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/hierarchy/hierarchy_triggers.sql"
     ]
   },
   "HIERARCHY_MEMBER_IN_USE": {
-    "count": 4,
+    "count": 5,
     "dynamic": true,
     "sample": "HIERARCHY_MEMBER_IN_USE: Cannot deactivate user % - user must be removed from the organization hierarchy first",
     "n_source": 1,
-    "n_generated": 3,
+    "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/hierarchy/hierarchy_triggers.sql"
     ]
@@ -2854,14 +2896,16 @@
     ]
   },
   "IDENTITY_ACCOUNT_NOT_FOUND": {
-    "count": 7,
+    "count": 11,
     "dynamic": false,
     "sample": "IDENTITY_ACCOUNT_NOT_FOUND",
-    "n_source": 1,
-    "n_generated": 4,
+    "n_source": 2,
+    "n_generated": 6,
     "source_files": [
-      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql"
-    ]
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql",
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/verify_idp.sql"
+    ],
+    "class": "public"
   },
   "IDENTITY_ALREADY_LINKED": {
     "count": 5,
@@ -2871,7 +2915,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/link_identity.sql"
-    ]
+    ],
+    "class": "public"
   },
   "IDENTITY_LINK_AVAILABLE": {
     "count": 5,
@@ -2881,7 +2926,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql"
-    ]
+    ],
+    "class": "public"
   },
   "IDENTITY_PROVIDER_NOT_CONFIGURED": {
     "count": 10,
@@ -2892,7 +2938,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/link_identity.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_identity.sql"
-    ]
+    ],
+    "class": "public"
   },
   "IDENTITY_PROVIDER_NOT_FOUND": {
     "count": 5,
@@ -2902,7 +2949,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/rotate_identity_provider_secret.sql"
-    ]
+    ],
+    "class": "public"
   },
   "IDENTITY_SIGN_IN_DISABLED": {
     "count": 3,
@@ -2910,7 +2958,8 @@
     "sample": "IDENTITY_SIGN_IN_DISABLED",
     "n_source": 0,
     "n_generated": 3,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "IDENTITY_SIGN_UP_DISABLED": {
     "count": 3,
@@ -2918,7 +2967,8 @@
     "sample": "IDENTITY_SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 3,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "IMMUTABLE_FIELD": {
     "count": 2,
@@ -2991,7 +3041,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/set_password.sql"
-    ]
+    ],
+    "class": "public"
   },
   "INFRA_API_NOT_PROVISIONED": {
     "count": 2,
@@ -3039,7 +3090,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "INVALID_CHECK_OPTION": {
     "count": 2,
@@ -3060,7 +3112,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in_email_otp.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_up_sms.sql"
-    ]
+    ],
+    "class": "public"
   },
   "INVALID_COMPOSITE_TYPE_ATTRIBUTE": {
     "count": 2,
@@ -3082,7 +3135,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_in.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/sign_up.sql"
-    ]
+    ],
+    "class": "public"
   },
   "INVALID_DEFAULT_LIMIT_ID": {
     "count": 6,
@@ -3145,7 +3199,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "INVALID_ORGANIZATION": {
     "count": 5,
@@ -3155,7 +3210,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql"
-    ]
+    ],
+    "class": "public"
   },
   "INVALID_TOKEN": {
     "count": 6,
@@ -3993,18 +4049,19 @@
     "class": "public"
   },
   "NOT_AUTHENTICATED": {
-    "count": 76,
+    "count": 80,
     "dynamic": false,
     "sample": "NOT_AUTHENTICATED",
-    "n_source": 20,
-    "n_generated": 26,
+    "n_source": 21,
+    "n_generated": 28,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/confirm_totp_setup.sql"
-    ]
+    ],
+    "class": "public"
   },
   "NOT_FOUND": {
     "count": 68,
@@ -4030,7 +4087,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql"
-    ]
+    ],
+    "class": "public"
   },
   "NOT_ORG_PRINCIPAL": {
     "count": 5,
@@ -4040,7 +4098,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql"
-    ]
+    ],
+    "class": "public"
   },
   "NOT_OWNER": {
     "count": 5,
@@ -4050,7 +4109,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql"
-    ]
+    ],
+    "class": "public"
   },
   "NO_PRIMARY_IDENTIFIER": {
     "count": 2,
@@ -4071,7 +4131,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/reset_password.sql"
-    ]
+    ],
+    "class": "public"
   },
   "OBJECT_NOT_FOUND": {
     "count": 24,
@@ -4107,7 +4168,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "OWNER_FIELD_NOT_FOUND": {
     "count": 2,
@@ -4141,6 +4203,16 @@
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/memberships/get_organization_id.sql"
     ]
   },
+  "PARENT_EXECUTION_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PARENT_EXECUTION_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/graph/graph_bodies.sql"
+    ]
+  },
   "PASSWORD_INSECURE": {
     "count": 7,
     "dynamic": false,
@@ -4149,7 +4221,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/password_check.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PASSWORD_LEN": {
     "count": 14,
@@ -4159,7 +4232,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/password_check.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS": {
     "count": 3,
@@ -4167,7 +4241,8 @@
     "sample": "PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS",
     "n_source": 0,
     "n_generated": 3,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "PASSWORD_SIGN_IN_DISABLED": {
     "count": 3,
@@ -4175,7 +4250,8 @@
     "sample": "PASSWORD_SIGN_IN_DISABLED",
     "n_source": 0,
     "n_generated": 3,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "PASSWORD_SIGN_UP_DISABLED": {
     "count": 3,
@@ -4183,7 +4259,8 @@
     "sample": "PASSWORD_SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 3,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "PLATFORM_FLAG_IMMUTABLE": {
     "count": 2,
@@ -4258,7 +4335,8 @@
     "n_generated": 8,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRIMARY_REQUIRES_VERIFIED": {
     "count": 23,
@@ -4279,7 +4357,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRINCIPAL_CANNOT_CREATE_PRINCIPAL": {
     "count": 10,
@@ -4290,7 +4369,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_org_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/create_principal.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRINCIPAL_CANNOT_DELETE_PRINCIPAL": {
     "count": 10,
@@ -4301,7 +4381,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRINCIPAL_CANNOT_REVOKE_API_KEY": {
     "count": 10,
@@ -4312,7 +4393,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_api_key.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRINCIPAL_NOT_FOUND": {
     "count": 15,
@@ -4324,7 +4406,8 @@
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_org_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/principals/delete_principal.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRINCIPAL_NOT_IN_ORG": {
     "count": 5,
@@ -4334,7 +4417,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_org_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PRINCIPAL_NOT_OWNED": {
     "count": 5,
@@ -4344,7 +4428,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/create_api_key.sql"
-    ]
+    ],
+    "class": "public"
   },
   "PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE": {
     "count": 14,
@@ -5026,6 +5111,46 @@
     ],
     "class": "public"
   },
+  "SEED_CAP_DEFAULTS_REQUIRED": {
+    "count": 7,
+    "dynamic": false,
+    "sample": "SEED_CAP_DEFAULTS_REQUIRED",
+    "n_source": 1,
+    "n_generated": 5,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/seed_cap_defaults_function.sql"
+    ]
+  },
+  "SEED_LIMIT_DEFAULTS_REQUIRED": {
+    "count": 7,
+    "dynamic": false,
+    "sample": "SEED_LIMIT_DEFAULTS_REQUIRED",
+    "n_source": 1,
+    "n_generated": 5,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/limits/seed_limit_defaults_function.sql"
+    ]
+  },
+  "SEED_METER_DEFAULTS_REQUIRED": {
+    "count": 5,
+    "dynamic": false,
+    "sample": "SEED_METER_DEFAULTS_REQUIRED",
+    "n_source": 1,
+    "n_generated": 3,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/billing/seed_meter_defaults_function.sql"
+    ]
+  },
+  "SEED_PLAN_PLAN_NAME_REQUIRED": {
+    "count": 7,
+    "dynamic": false,
+    "sample": "SEED_PLAN_PLAN_NAME_REQUIRED",
+    "n_source": 1,
+    "n_generated": 3,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/plans/seed_plan_function.sql"
+    ]
+  },
   "SESSION_NOT_FOUND": {
     "count": 5,
     "dynamic": false,
@@ -5034,7 +5159,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/revoke_session.sql"
-    ]
+    ],
+    "class": "public"
   },
   "SETTINGS_SURFACE_NOT_PROVISIONED": {
     "count": 6,
@@ -5055,7 +5181,8 @@
     "sample": "SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 5,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "SITE_NOT_PROVISIONED": {
     "count": 2,
@@ -5085,7 +5212,8 @@
     "sample": "SMS_SIGN_IN_DISABLED",
     "n_source": 0,
     "n_generated": 5,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "SMS_SIGN_UP_DISABLED": {
     "count": 3,
@@ -5093,7 +5221,18 @@
     "sample": "SMS_SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 3,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
+  },
+  "SOURCE_COMMIT_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "SOURCE_COMMIT_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/graph/graph_bodies.sql"
+    ]
   },
   "SOURCE_EMAILS_NOT_FOUND": {
     "count": 2,
@@ -5128,6 +5267,17 @@
     ],
     "class": "internal"
   },
+  "STEP_UP_INVALID_TYPE": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "STEP_UP_INVALID_TYPE",
+    "n_source": 1,
+    "n_generated": 3,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
+    ],
+    "class": "public"
+  },
   "STEP_UP_REQUIRED": {
     "count": 14,
     "dynamic": false,
@@ -5136,17 +5286,30 @@
     "n_generated": 8,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
-    ]
+    ],
+    "class": "public"
   },
-  "STEP_UP_REQUIRED_MFA": {
+  "STEP_UP_REQUIRED_FRESH_AUTH": {
     "count": 4,
     "dynamic": false,
-    "sample": "STEP_UP_REQUIRED_MFA",
+    "sample": "STEP_UP_REQUIRED_FRESH_AUTH",
     "n_source": 1,
     "n_generated": 3,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
-    ]
+    ],
+    "class": "public"
+  },
+  "STEP_UP_REQUIRED_MFA": {
+    "count": 5,
+    "dynamic": false,
+    "sample": "STEP_UP_REQUIRED_MFA",
+    "n_source": 1,
+    "n_generated": 4,
+    "source_files": [
+      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
+    ],
+    "class": "public"
   },
   "STEP_UP_REQUIRED_PASSWORD": {
     "count": 5,
@@ -5156,17 +5319,16 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
-    ]
+    ],
+    "class": "public"
   },
   "STEP_UP_REQUIRED_PASSWORD_OR_MFA": {
-    "count": 5,
+    "count": 1,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED_PASSWORD_OR_MFA",
-    "n_source": 1,
-    "n_generated": 4,
-    "source_files": [
-      "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/require_step_up.sql"
-    ]
+    "n_source": 0,
+    "n_generated": 1,
+    "source_files": []
   },
   "SUPER_CONSTRUCTIVE_REQUIRED": {
     "count": 2,
@@ -5275,7 +5437,8 @@
     "n_generated": 38,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/statements.sql"
-    ]
+    ],
+    "class": "public"
   },
   "TOTP_ALREADY_ENABLED": {
     "count": 2,
@@ -5296,7 +5459,8 @@
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/disable_totp.sql",
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/users/procedures/verify_totp.sql"
-    ]
+    ],
+    "class": "public"
   },
   "TOTP_SETUP_NOT_INITIATED": {
     "count": 2,
@@ -5546,7 +5710,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/webauthn_auth/finish_sign_in.sql"
-    ]
+    ],
+    "class": "public"
   },
   "WEBAUTHN_REGISTER_CHALLENGE_NOT_FOUND_OR_EXPIRED": {
     "count": 6,
@@ -5556,7 +5721,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/webauthn_auth/finish_registration.sql"
-    ]
+    ],
+    "class": "public"
   },
   "WEBAUTHN_SIGN_IN_CHALLENGE_NOT_FOUND_OR_EXPIRED": {
     "count": 5,
@@ -5566,7 +5732,8 @@
     "n_generated": 4,
     "source_files": [
       "packages/ast-plpgsql/deploy/schemas/ast_plpgsql_helpers/procedures/webauthn_auth/finish_sign_in.sql"
-    ]
+    ],
+    "class": "public"
   },
   "WEBAUTHN_SIGN_IN_DISABLED": {
     "count": 6,
@@ -5574,7 +5741,8 @@
     "sample": "WEBAUTHN_SIGN_IN_DISABLED",
     "n_source": 0,
     "n_generated": 5,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "WEBAUTHN_SIGN_UP_DISABLED": {
     "count": 6,
@@ -5582,7 +5750,8 @@
     "sample": "WEBAUTHN_SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 5,
-    "source_files": []
+    "source_files": [],
+    "class": "public"
   },
   "WITH_CHECK_NOT_ALLOWED": {
     "count": 4,
