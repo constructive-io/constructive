@@ -10,6 +10,7 @@ export { DataDirectOwner } from './data-direct-owner';
 export { DataEntityMembership } from './data-entity-membership';
 export { DataForceCurrentUser } from './data-force-current-user';
 export { DataGenerated } from './data-generated';
+export { DataHistory } from './data-history';
 export { DataI18n } from './data-i18n';
 export { DataId } from './data-id';
 export { DataIdentity } from './data-identity';

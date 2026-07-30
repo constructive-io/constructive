@@ -219,6 +219,27 @@ export interface DataGeneratedParams {
   /* Whether the generated column is NOT NULL */
   is_required?: boolean;
 }
+/** Creates a companion <table>_history table that records a new version row on every INSERT/UPDATE/DELETE via an AFTER trigger. The history table copies the source columns as plain nullable columns with NO keys or constraints, plus a recorded_at timestamp and a history_op column (NEW-append: INSERT/UPDATE store the new row, DELETE stores a tombstone). SELECT policies are cloned from the base table. Optionally range-partitions the history table by recorded_at (pg_partman) with a retention window so history is kept for a while but not forever. Adds an @history smart comment so the Graphile history plugin can expose version queries and restore mutations. */
+export interface DataHistoryParams {
+  /* Suffix for the history table name */
+  table_suffix?: string;
+  /* Column name for the version timestamp (also the partition key when partitioned) */
+  recorded_at_field?: string;
+  /* Column name recording the operation ('INSERT' | 'UPDATE' | 'DELETE') */
+  operation_field?: string;
+  /* Source columns to omit from the history table (e.g. large jsonb or vector columns). Excluded columns are never created on the history table and never written by the trigger. */
+  exclude_fields?: string[];
+  /* Whether to also clone INSERT/UPDATE/DELETE policies (not just SELECT). Default false — the history table is written only by the trigger and exposed read-only through GraphQL. */
+  copy_mutation_policies?: boolean;
+  /* When true, range-partition the history table by recorded_at via pg_partman so old partitions can be dropped per the retention window. */
+  partitioned?: boolean;
+  /* pg_partman partition interval (when partitioned) */
+  partition_interval?: string;
+  /* pg_partman retention window; partitions older than this are dropped by run_maintenance (when partitioned). Empty keeps forever. */
+  retention?: string;
+  /* Number of future partitions pg_partman pre-creates */
+  premake?: number;
+}
 /** Creates a companion _translations table with lang_code + translatable fields. Copies SELECT policies and column-ref fields from the base table. Adds @i18n smart comment so the Graphile i18n plugin discovers it. Requires i18n_module to be provisioned for the database. */
 export interface DataI18nParams {
   /* Field names on the base table to make translatable. Each field is duplicated on the translation table with the same type. */
@@ -1997,7 +2018,7 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'DataArchivable' | 'DataBulk' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
@@ -2110,6 +2131,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'DataGenerated';
   data: DataGeneratedParams;
+} | {
+  $type: 'DataHistory';
+  data: DataHistoryParams;
 } | {
   $type: 'DataI18n';
   data: DataI18nParams;
