@@ -199,6 +199,8 @@ export async function materializeReuseModule(
   const main = makeSchemaTranspiler({
     schemaMap: reuse.sharedSchema,
     routes,
+    extensions: spec.extensions,
+    roles: spec.roles,
     transform: { prePasses: [schemaNameLiteralPass], assumeSchemasExist }
   });
   const transpiled = transpileBundle(source, {

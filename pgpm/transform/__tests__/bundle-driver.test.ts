@@ -92,6 +92,70 @@ describe('makeSchemaTranspiler', () => {
       expect(t.result.errors).toEqual([]);
     });
   });
+
+  describe('extension routing', () => {
+    it('routes extension installs and provided-symbol references to a schema', () => {
+      const t = makeSchemaTranspiler({ extensions: { toSchema: 'extensions' } });
+      const out = t.transformScript(
+        [
+          'CREATE EXTENSION IF NOT EXISTS pgcrypto;',
+          "SELECT crypt('pw', gen_salt('bf'));"
+        ].join('\n'),
+        CTX
+      );
+      expect(out).toMatch(/SCHEMA extensions/i);
+      expect(out).toMatch(/extensions\.crypt/);
+      expect(out).toMatch(/extensions\.gen_salt/);
+      expect(t.extensionResult!.installsMoved.get('pgcrypto')).toBe('extensions');
+      expect(t.extensionResult!.symbolsRewritten.get('crypt')).toBe(1);
+    });
+
+    it('composes with schema routing in one transpiler', () => {
+      const t = makeSchemaTranspiler({
+        schemaMap: { auth: 'tenant_auth' },
+        extensions: { toSchema: 'extensions' }
+      });
+      const out = t.transformScript(
+        "CREATE TABLE auth.t (id uuid DEFAULT gen_random_bytes(16));",
+        CTX
+      );
+      expect(out).toContain('tenant_auth.t');
+      expect(out).toMatch(/extensions\.gen_random_bytes/);
+    });
+
+    it('leaves core-graduated symbols alone on modern PostgreSQL', () => {
+      const t = makeSchemaTranspiler({
+        extensions: { toSchema: 'extensions', serverVersion: 16 }
+      });
+      const out = t.transformScript('SELECT gen_random_uuid();', CTX);
+      expect(out).not.toMatch(/extensions\.gen_random_uuid/);
+    });
+  });
+
+  describe('role routing', () => {
+    it('renames role identifiers and reports counts', () => {
+      const t = makeSchemaTranspiler({
+        roles: { anonymous: 'anon', administrator: 'service_role' }
+      });
+      const out = t.transformScript(
+        [
+          'GRANT SELECT ON t TO anonymous, authenticated;',
+          'ALTER TABLE t OWNER TO administrator;'
+        ].join('\n'),
+        CTX
+      );
+      expect(out).toMatch(/TO anon, authenticated/);
+      expect(out).toMatch(/OWNER TO service_role/);
+      expect(t.roleResult!.rolesRenamed.get('anon')).toBe(1);
+      expect(t.roleResult!.rolesRenamed.get('service_role')).toBe(1);
+    });
+  });
+
+  it('exposes no extension/role result when not configured', () => {
+    const t = makeSchemaTranspiler({ schemaMap: { auth: 'tenant_auth' } });
+    expect(t.extensionResult).toBeUndefined();
+    expect(t.roleResult).toBeUndefined();
+  });
 });
 
 describe('makeNamespaceValidator', () => {

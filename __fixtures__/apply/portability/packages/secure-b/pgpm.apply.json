@@ -1,0 +1,13 @@
+{
+  "source": "secure-module",
+  "schemas": {
+    "vault": "vault_b"
+  },
+  "extensions": {
+    "toSchema": "extensions"
+  },
+  "roles": {
+    "anonymous": "anon",
+    "administrator": "service_role"
+  }
+}

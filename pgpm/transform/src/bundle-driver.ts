@@ -10,9 +10,20 @@
 
 import { classifyStatements } from '@pgsql/transform';
 import {
+  createExtensionResult,
+  createRoleResult,
+  ExtensionDefinition,
+  ExtensionRouteSpec,
+  ExtensionRouter,
+  ExtensionTransformResult,
+  RoleRouteSpec,
+  RoleRouter,
+  RoleTransformResult,
   RouteSpec,
   SchemaRouter,
   SchemaTransformResult,
+  transformExtensions,
+  transformRoles,
   transformSql,
   TransformSqlOptions
 } from '@pgsql/transform';
@@ -40,6 +51,54 @@ export interface SchemaObjectRoute {
   toSchema: string;
 }
 
+/**
+ * Extension routing for a transpile: where to install extensions and where the
+ * symbols they provide (functions/types/operators) should resolve. Distinct
+ * from schema routing — the objects are owned by an extension, not declared in
+ * the SQL — so it is driven by a version-aware symbol inventory. See the
+ * upstream `ExtensionRouter` for the full model. `toSchema: null` (or a `routes`
+ * entry with `to: null`) strips qualification — the "rely on search_path"
+ * direction — so the same mechanism moves symbols into a dedicated schema and
+ * back out again.
+ */
+export interface ExtensionRoutingInput {
+  /**
+   * Move the matched extensions and their provided symbols to this single
+   * schema (`null` strips qualification). Ignored when `routes` is given.
+   */
+  toSchema?: string | null;
+  /** With `toSchema`: limit to these extensions (default: every inventoried one). */
+  only?: string[];
+  /**
+   * With `toSchema`: which source qualifications to rewrite (a `null` entry
+   * also rewrites bare references). Defaults to `public` + bare.
+   */
+  from?: (string | null)[];
+  /** Advanced: explicit per-extension route spec. Overrides `toSchema`/`only`/`from`. */
+  routes?: ExtensionRouteSpec;
+  /** Target PostgreSQL major version, for core-graduation awareness (e.g. `gen_random_uuid`). */
+  serverVersion?: number;
+  /** Augmented or replacement symbol inventory (defaults to the curated common set). */
+  inventory?: ExtensionDefinition[];
+}
+
+/**
+ * Build an {@link ExtensionRouter} from the declarative {@link ExtensionRoutingInput}:
+ * an explicit `routes` spec when given, otherwise the "move everything matched
+ * to one schema" shortcut via `ExtensionRouter.toSchema`.
+ */
+export function buildExtensionRouter(input: ExtensionRoutingInput): ExtensionRouter {
+  const opts: { serverVersion?: number; inventory?: ExtensionDefinition[] } = {};
+  if (input.serverVersion !== undefined) opts.serverVersion = input.serverVersion;
+  if (input.inventory) opts.inventory = input.inventory;
+  if (input.routes) return new ExtensionRouter(input.routes, opts);
+  return ExtensionRouter.toSchema(input.toSchema ?? null, {
+    ...opts,
+    extensions: input.only,
+    from: input.from
+  });
+}
+
 export interface SchemaTranspilerOptions {
   /**
    * Whole-schema default: source schema → target schema. Optional when
@@ -51,6 +110,17 @@ export interface SchemaTranspilerOptions {
    * its specific object, letting a single source schema fan out per object.
    */
   routes?: SchemaObjectRoute[];
+  /**
+   * Route extension installs and provided-symbol references (a dimension
+   * orthogonal to schema routing). See {@link ExtensionRoutingInput}.
+   */
+  extensions?: ExtensionRoutingInput;
+  /**
+   * Rename role identifiers (source role name → target role name), for
+   * translating between databases that name equivalent roles differently.
+   * Renames identifiers only — never role attributes.
+   */
+  roles?: RoleRouteSpec | Map<string, string>;
   /** Forwarded to {@link transformSql} (round-trip validation, extra passes). */
   transform?: TransformSqlOptions;
 }
@@ -118,6 +188,16 @@ export interface SchemaTranspiler {
    * schemas found/transformed and any per-script errors.
    */
   result: SchemaTransformResult;
+  /**
+   * Accumulated extension-routing report (installs moved, symbols rewritten).
+   * Present only when `extensions` was configured.
+   */
+  extensionResult?: ExtensionTransformResult;
+  /**
+   * Accumulated role-routing report (role → rewrite count). Present only when
+   * `roles` was configured.
+   */
+  roleResult?: RoleTransformResult;
 }
 
 /**
@@ -164,13 +244,42 @@ export function makeSchemaTranspiler(options: SchemaTranspilerOptions): SchemaTr
     errors: []
   };
 
+  // Extension/role routing are additional, orthogonal AST dimensions applied
+  // after schema routing on each script. Each is a self-contained parse →
+  // rewrite → deparse pass, so they compose by threading the SQL through.
+  const extRouter = options.extensions ? buildExtensionRouter(options.extensions) : undefined;
+  const roleRouter = options.roles ? RoleRouter.from(options.roles) : undefined;
+  const extensionResult = extRouter ? createExtensionResult() : undefined;
+  const roleResult = roleRouter ? createRoleResult() : undefined;
+
   const renameChange = (name: string): string => renameChangePath(name, router);
 
   const transformScript = (sql: string, _ctx: BundleScriptContext): string => {
-    return transformSql(sql, router, options.transform, result).content;
+    let out = transformSql(sql, router, options.transform, result).content;
+    if (extRouter) {
+      const r = transformExtensions(out, extRouter);
+      out = r.sql;
+      for (const [name, schema] of r.result.installsMoved) {
+        extensionResult!.installsMoved.set(name, schema);
+      }
+      for (const [name, count] of r.result.symbolsRewritten) {
+        extensionResult!.symbolsRewritten.set(
+          name,
+          (extensionResult!.symbolsRewritten.get(name) ?? 0) + count
+        );
+      }
+    }
+    if (roleRouter) {
+      const r = transformRoles(out, roleRouter);
+      out = r.sql;
+      for (const [name, count] of r.result.rolesRenamed) {
+        roleResult!.rolesRenamed.set(name, (roleResult!.rolesRenamed.get(name) ?? 0) + count);
+      }
+    }
+    return out;
   };
 
-  return { renameChange, transformScript, result };
+  return { renameChange, transformScript, result, extensionResult, roleResult };
 }
 
 export interface NamespaceValidatorOptions {

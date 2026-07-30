@@ -93,6 +93,8 @@ export async function materializeApplyModule(
   const { renameChange, transformScript, result } = makeSchemaTranspiler({
     schemaMap: spec.schemas,
     routes: spec.route,
+    extensions: spec.extensions,
+    roles: spec.roles,
     transform: {
       prePasses: [schemaNameLiteralPass],
       assumeSchemasExist: targetSchemas
