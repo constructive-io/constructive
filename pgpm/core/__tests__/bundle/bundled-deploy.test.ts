@@ -16,11 +16,12 @@ import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 const MODULES = ['my-first', 'my-second', 'my-third'] as const;
 
 /**
- * The bundle-backed deploy path ("fast v2"): a pre-built, content-addressed
- * artifact is executed in one shot AND recorded in the `pgpm_migrate` ledger,
- * with graceful fallback whenever the artifact cannot be trusted.
+ * The fast deploy strategy: one-shot execution AND a `pgpm_migrate` ledger,
+ * reading the pre-built content-addressed artifact when it verifies and
+ * rebuilding from `deploy/` when it does not. Either way the executed SQL and
+ * the recorded hashes are identical — no deploy is ever left unledgered.
  */
-describe('bundled deployment', () => {
+describe('fast (bundle-backed) deployment', () => {
   let fixture: CoreDeployTestFixture;
   let db: TestDatabase;
 
@@ -127,7 +128,38 @@ describe('bundled deployment', () => {
     }
   });
 
-  it('falls back to the standard path when no artifact exists', async () => {
+  it('ledgers under the legacy `fast` flag, with and without an artifact', async () => {
+    // `fast` used to execute one-shot and record nothing; it must now produce
+    // the same ledger as every other path.
+    await fixture.deployModule('my-third', db.name, ['sqitch', 'simple-w-tags'], false, {
+      fast: true
+    });
+    expect(await db.exists('schema', 'myfirstapp')).toBe(true);
+    const withoutArtifact = await ledger();
+    expect(withoutArtifact.length).toBe(8);
+
+    const other = new CoreDeployTestFixture('sqitch', 'simple-w-tags');
+    const otherDb = await other.setupTestDatabase();
+    try {
+      for (const name of MODULES) {
+        const dir = other.fixturePath('packages', name);
+        await writeBundleArtifact(dir, require(join(dir, 'package.json')).version as string);
+      }
+      await other.deployModule('my-third', otherDb.name, ['sqitch', 'simple-w-tags'], false, {
+        fast: true
+      });
+      const withArtifact = (
+        await otherDb.query(
+          'SELECT package, change_name, script_hash FROM pgpm_migrate.changes ORDER BY package, change_name'
+        )
+      ).rows;
+      expect(withArtifact).toEqual(withoutArtifact);
+    } finally {
+      await other.cleanup();
+    }
+  });
+
+  it('still deploys and ledgers when no artifact exists', async () => {
     await fixture.deployModule('my-third', db.name, ['sqitch', 'simple-w-tags'], false, {
       bundled: true
     });
@@ -136,7 +168,7 @@ describe('bundled deployment', () => {
     expect((await ledger()).length).toBe(8);
   });
 
-  it('falls back when an artifact fails hash verification', async () => {
+  it('rebuilds from deploy/ when an artifact fails hash verification', async () => {
     await emitArtifacts();
 
     const artifactPath = resolveBundleArtifactPath(modulePath('my-first'))!;
@@ -153,7 +185,7 @@ describe('bundled deployment', () => {
     expect((await ledger()).length).toBe(8);
   });
 
-  it('falls back when the artifact archive is corrupt', async () => {
+  it('rebuilds from deploy/ when the artifact archive is corrupt', async () => {
     await emitArtifacts();
     writeFileSync(resolveBundleArtifactPath(modulePath('my-second'))!, 'not-an-archive');
 

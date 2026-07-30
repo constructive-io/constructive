@@ -25,10 +25,10 @@ Options:
   --package <name>   Target specific package
   --to <target>      Deploy to specific change or tag
   --tx               Use transactions (default: true)
-  --fast             Use fast deployment strategy (one-shot SQL, no ledger)
-  --bundled          Deploy from each module's sql/*.bundle.tar.gz artifact
-                     (verified one-shot SQL + migration ledger; falls back to
-                     the standard path when no artifact is available)
+  --fast             Fast strategy: one-shot SQL + bulk migration ledger,
+                     reading each module's verified sql/*.bundle.tar.gz artifact
+                     when present and building it from deploy/ when not
+  --bundled          Alias for --fast
   --logOnly          Log-only mode, skip script execution
   --usePlan          Use deployment plan
   --cache            Enable caching
@@ -39,7 +39,7 @@ Examples:
   pgpm deploy --createdb                   Deploy with database creation
   pgpm deploy --package mypackage --to @v1.0.0  Deploy specific package to tag
   pgpm deploy --fast --no-tx              Fast deployment without transactions
-  pgpm deploy --bundled                    Deploy from prebuilt bundle artifacts
+  pgpm deploy --bundled                    Same as --fast
 `;
 
 export default async (
@@ -108,7 +108,7 @@ export default async (
     {
       name: 'bundled',
       type: 'confirm',
-      message: 'Deploy from prebuilt bundle artifacts?',
+      message: 'Prefer prebuilt bundle artifacts (alias of fast)?',
       useDefault: true,
       default: false,
       required: false

@@ -1,23 +1,27 @@
 import { Logger } from '@pgpmjs/logger';
-import { MigrationBundle, verifyBundle } from '@pgpmjs/bundle';
+import { BundleChange, MigrationBundle, verifyBundle } from '@pgpmjs/bundle';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 
 import { PgpmMigrate } from '../migrate/client';
-import { readBundleArtifact } from './artifact';
+import { buildExecutableBundle, readBundleArtifact } from './artifact';
 
-const log = new Logger('deploy-bundled');
+const log = new Logger('deploy-fast');
 
-/** Why a bundled deploy could not be used, so the caller can fall back. */
-export type BundledDeploySkipReason =
-  | 'no-artifact'
-  | 'unverified'
-  | 'no-executable-sql'
-  | 'unsupported-hash-method';
+/**
+ * Why the one-shot path could not be used, so the caller falls back to the
+ * per-change migration path.
+ */
+export type BundledDeploySkipReason = 'no-executable-sql' | 'unsupported-hash-method';
+
+/** How the executable bundle for a module was obtained. */
+export type BundleSource = 'artifact' | 'packaged';
 
 export interface BundledDeployResult {
   /** Module (package) name from the bundle manifest. */
   name: string;
+  /** Where the executable bundle came from. */
+  source: BundleSource;
   /** Changes executed and recorded on this run, in deploy order. */
   deployed: string[];
   /** Changes already present in the ledger with a matching hash. */
@@ -35,8 +39,8 @@ export interface BundledDeployOptions {
   /**
    * Ledger hash scheme in force. The bundle's per-change digests are sha256 of
    * the deploy script's bytes, i.e. identical to `PgpmMigrate`'s `content`
-   * scheme; the `ast` scheme is not reconcilable from the artifact, so it is
-   * reported as a skip and the caller falls back.
+   * scheme; the `ast` scheme is not reproducible here, so it is reported as a
+   * skip and the caller falls back.
    */
   hashMethod?: 'content' | 'ast';
 }
@@ -51,38 +55,63 @@ export class BundledDeployConflictError extends Error {
   }
 }
 
-const isSkipped = (
-  value: BundledDeployResult | BundledDeploySkipReason
-): value is BundledDeploySkipReason => typeof value === 'string';
-
 /**
- * The ledger hash for a bundled change: the sha256 of the deploy script bytes.
+ * The ledger hash for a change: the sha256 of the deploy script bytes.
  *
  * This is deliberately the same value `PgpmMigrate.calculateScriptHash` derives
  * from `deploy/<change>.sql` under the default `content` hash method, so a
  * change hashed at package time and the hash recorded/compared at deploy time
- * agree — bundled and non-bundled deploys are interchangeable and idempotent
+ * agree — the one-shot and per-change paths are interchangeable and idempotent
  * against each other.
  */
-export function ledgerHashForChange(change: MigrationBundle['changes'][number]): string | null {
+export function ledgerHashForChange(change: BundleChange): string | null {
   return change.deploy?.digest ?? null;
 }
 
 /**
- * Deploy a module from its stored bundle artifact — the ledger-preserving "fast"
- * path.
+ * Load a module's executable bundle: its stored artifact when one verifies,
+ * otherwise built from `deploy/` on the fly.
  *
- * Reads `sql/<name>--<version>.bundle.tar.gz` (un-tarred in memory), gates on
- * `verifyBundle`, then executes the pending changes' pre-computed deploy SQL as a
- * single statement and records one `pgpm_migrate.changes` row per change with the
- * artifact's own digest as `script_hash` — bulk-inserted in one round-trip
- * instead of a `CALL pgpm_migrate.deploy` per change.
- *
- * Returns a {@link BundledDeploySkipReason} (rather than throwing) whenever the
- * artifact is missing, stale, or unverifiable, so the caller falls back to the
- * normal packaging/deploy path. Genuine SQL failures still throw.
+ * The artifact is purely an optimization — it removes the read+parse work, not
+ * a capability. Whatever the source, the resulting bundle is byte-identical in
+ * what it executes and in the hashes it records, so a module without an
+ * artifact deploys exactly the same way, just slower.
  */
-export async function deployModuleFromBundle(
+async function loadExecutableBundle(
+  moduleDir: string
+): Promise<{ bundle: MigrationBundle; source: BundleSource }> {
+  const stored = readBundleArtifact(moduleDir);
+  if (stored) {
+    const issues = verifyBundle(stored);
+    if (issues.length === 0) {
+      return { bundle: stored, source: 'artifact' };
+    }
+    log.warn(
+      `⚠️ Bundle artifact for ${stored.manifest.name} failed verification ` +
+        `(${issues.map(i => i.kind).join(', ')}); rebuilding from deploy/.`
+    );
+  }
+  return { bundle: await buildExecutableBundle(moduleDir), source: 'packaged' };
+}
+
+/**
+ * Deploy a module in one shot **and** record the migration ledger — the `fast`
+ * deploy strategy.
+ *
+ * Pending changes' deploy SQL is concatenated and executed as a single
+ * statement (the speed of the old fast path), then one `pgpm_migrate.changes`
+ * row per change is bulk-inserted with the deploy script's own sha256 as
+ * `script_hash` — one round-trip, instead of an `isDeployed` + `readScript` +
+ * `CALL pgpm_migrate.deploy` per change. Because the ledger is written, the
+ * path is idempotent and resumable: re-deploys skip changes whose stored hash
+ * matches, and a same-name/different-content change raises
+ * {@link BundledDeployConflictError} exactly as the per-change path does.
+ *
+ * Returns a {@link BundledDeploySkipReason} (rather than throwing) when it
+ * cannot honour the requested semantics, so the caller falls back to the
+ * per-change migration path. Genuine SQL failures still throw.
+ */
+export async function deployModuleFast(
   moduleDir: string,
   options: BundledDeployOptions
 ): Promise<BundledDeployResult | BundledDeploySkipReason> {
@@ -90,17 +119,7 @@ export async function deployModuleFromBundle(
     return 'unsupported-hash-method';
   }
 
-  const bundle = readBundleArtifact(moduleDir);
-  if (!bundle) return 'no-artifact';
-
-  const issues = verifyBundle(bundle);
-  if (issues.length > 0) {
-    log.warn(
-      `⚠️ Bundle artifact for ${bundle.manifest.name} failed verification ` +
-        `(${issues.map(i => i.kind).join(', ')}); falling back to packaging.`
-    );
-    return 'unverified';
-  }
+  const { bundle, source } = await loadExecutableBundle(moduleDir);
 
   const executable = bundle.changes.filter(change => change.deploy);
   if (executable.length === 0 || executable.some(change => !change.exec)) {
@@ -123,7 +142,7 @@ export async function deployModuleFromBundle(
   );
   const deployedHashes = new Map(existing.rows.map(row => [row.change_name, row.script_hash]));
 
-  const pending: typeof executable = [];
+  const pending: BundleChange[] = [];
   const skipped: string[] = [];
   for (const change of executable) {
     const hash = ledgerHashForChange(change)!;
@@ -140,7 +159,7 @@ export async function deployModuleFromBundle(
 
   if (pending.length === 0) {
     log.info(`⚡ ${packageName}: all ${skipped.length} change(s) already deployed.`);
-    return { name: packageName, deployed: [], skipped };
+    return { name: packageName, source, deployed: [], skipped };
   }
 
   const changeNames = pending.map(change => change.name);
@@ -205,15 +224,16 @@ export async function deployModuleFromBundle(
 
   log.success(
     `⚡ ${packageName}: ${changeNames.length} change(s) ${options.logOnly ? 'logged' : 'deployed'} ` +
-      `from bundle artifact (${skipped.length} already deployed).`
+      `from ${source === 'artifact' ? 'bundle artifact' : 'packaged deploy/'} ` +
+      `(${skipped.length} already deployed).`
   );
 
-  return { name: packageName, deployed: changeNames, skipped };
+  return { name: packageName, source, deployed: changeNames, skipped };
 }
 
-/** True when the value is a real bundled-deploy result rather than a skip. */
+/** True when the value is a real deploy result rather than a skip reason. */
 export function isBundledDeployResult(
   value: BundledDeployResult | BundledDeploySkipReason
 ): value is BundledDeployResult {
-  return !isSkipped(value);
+  return typeof value !== 'string';
 }

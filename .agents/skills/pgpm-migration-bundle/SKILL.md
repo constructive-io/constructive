@@ -128,7 +128,8 @@ bundleDigest  = H( plan ‖ control ‖ [changeDigest_1 … changeDigest_n] )   
 | `packSingleFileTarGz` / `unpackSingleFileTarGz` | Deterministic single-entry tar+gzip codec (no deps) |
 | `writeBundleArtifact(dir, version)` (`@pgpmjs/core`) | Emit a module's artifact (called by `pgpm package`) |
 | `resolveBundleArtifactPath` / `readBundleArtifact` (`@pgpmjs/core`) | Locate / load a module's artifact (never throws) |
-| `deployModuleFromBundle` (`@pgpmjs/core`) | The `--bundled` deploy: verify → one-shot execute → bulk ledger |
+| `buildExecutableBundle(dir)` (`@pgpmjs/core`) | Bundle + executable SQL built from `deploy/` (no artifact needed) |
+| `deployModuleFast` (`@pgpmjs/core`) | The `fast` deploy: verify → one-shot execute → bulk ledger |
 | `createEnvelope(opts)` | Wrap schema bundle + data/fixtures parts into a shippable envelope |
 | `verifyEnvelope(envelope)` | Recompute every envelope digest incl. the schema bundle chain |
 | `writeEnvelopeFile` / `readEnvelopeFile` | Single JSON envelope artifact |
@@ -225,20 +226,27 @@ materializeBundle(received, '/tmp/deployable-module');
 slot — its deploy SQL already stripped of transaction/`CREATE EXTENSION` statements — so
 deploys never re-parse SQL. Commit the `.tar.gz`; the loose JSON is gitignored.
 
-`pgpm deploy --bundled` (`deployment.bundled`) then, per module: read the artifact →
-`verifyBundle` (mandatory sha256 gate) → execute only the pending changes' `exec` SQL in a
-single statement → bulk-insert `pgpm_migrate` packages/changes/dependencies/events in one
-round-trip. Unlike `--fast`, it writes a correct ledger, so re-deploys skip changes whose
-stored hash matches and a same-name/different-content change still errors.
+`pgpm deploy --fast` (`deployment.fast`; `--bundled` is an alias) then, per module: load the
+executable bundle — the stored artifact when `verifyBundle` passes, otherwise rebuilt from
+`deploy/` via `buildExecutableBundle` — then execute only the pending changes' `exec` SQL in
+a single statement and bulk-insert `pgpm_migrate` packages/changes/dependencies/events in
+one round-trip.
+
+**The old unledgered `fast` path no longer exists.** `fast` used to run the packaged SQL and
+record nothing, which made it non-idempotent and unauditable; it now always writes the
+ledger, so re-deploys skip changes whose stored hash matches and a same-name/
+different-content change still errors. The artifact is purely a speed optimization on that
+path, never a correctness requirement.
 
 - **Ledger hash reconciliation:** the ledger's `script_hash` for a bundled change is
   `change.deploy.digest` = sha256 of the deploy file bytes — exactly what
   `PgpmMigrate.calculateScriptHash` computes under the default `content` method, so bundled
   and per-change deploys are interchangeable. The `ast` hash method is not derivable from
   the artifact, so it falls back.
-- **Graceful fallback:** missing artifact, unreadable archive, failed verification, no
-  `exec` SQL, or `hashMethod: 'ast'` → log and fall through to the existing `--fast` /
-  per-change paths. The bundle is opportunistic; it never fails a deploy on its own.
+- **Graceful degradation:** missing artifact, unreadable archive, or failed verification →
+  rebuild from `deploy/` (same SQL, same hashes, just slower). Only `hashMethod: 'ast'` or a
+  module with no executable deploy SQL falls through to the per-change path. The artifact
+  never fails a deploy on its own.
 
 ## Where this fits (cloud functions)
 
