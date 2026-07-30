@@ -8,27 +8,15 @@ import {PgConfig } from 'pg-env';
 
 import { resolveEffectiveModulePath } from '../apply/materialize';
 import { hasApplySpec } from '../apply/apply-spec';
+import { deployModuleFast, isBundledDeployResult } from '../bundle/deploy-bundled';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmMigrate } from '../migrate/client';
-import { packageModule } from '../packaging/package';
 import { resolveExtensionDependencies } from '../resolution/deps';
 
 interface Extensions {
   resolved: string[];
   external: string[];
 }
-
-// Cache for fast deployment
-const deployFastCache: Record<string, Awaited<ReturnType<typeof packageModule>>> = {};
-
-const getCacheKey = (
-  pg: PgConfig,
-  name: string,
-  database: string
-): string => {
-  const { host, port, user } = pg ?? {};
-  return `${host}:${port}:${user}:${database}:${name}`;
-};
 
 const log = new Logger('deploy');
 
@@ -82,60 +70,26 @@ export const deployProject = async (
           log.info(`🔁 Applying transpiled module (spec in ${sourcePath})`);
         }
 
-        if (mergedOpts.deployment.fast) {
-          // Use fast deployment strategy
-          const localProject = new PgpmPackage(modulePath, { extensionsDir: pkg.extensionsDir });
-          const cacheKey = getCacheKey(mergedOpts.pg as PgConfig, extension, database);
-          
-          if (mergedOpts.deployment.cache && deployFastCache[cacheKey]) {
-            log.warn(`⚡ Using cached package for ${extension}.`);
-            await pgPool.query(deployFastCache[cacheKey].sql);
+        // The fast strategy is opt-in; everything else uses the per-change path.
+        if (mergedOpts.deployment.fast || mergedOpts.deployment.bundled) {
+          // Fast strategy: execute the module in one shot AND record the
+          // migration ledger, from the pre-built bundle artifact when one
+          // verifies and from `deploy/` otherwise. If the semantics cannot be
+          // honoured, fall through to the per-change migration path rather than
+          // deploying without a ledger.
+          const outcome = await deployModuleFast(modulePath, {
+            config: { ...(mergedOpts.pg as PgConfig), database },
+            logOnly: mergedOpts.deployment.logOnly,
+            useTransaction: mergedOpts.deployment.useTx,
+            hashMethod: mergedOpts.deployment.hashMethod
+          });
+          if (isBundledDeployResult(outcome)) {
             continue;
           }
+          log.info(`↩️ Fast deploy unavailable for ${extension} (${outcome}); using per-change path.`);
+        }
 
-          let modulePackage;
-          try {
-            modulePackage = await packageModule(localProject.modulePath, { 
-              usePlan: mergedOpts.deployment.usePlan, 
-              extension: false 
-            });
-          } catch (err: any) {
-            // Build comprehensive error message
-            const errorLines = [];
-            errorLines.push(`❌ Failed to package module "${extension}" at path: ${modulePath}`);
-            errorLines.push(`   Module Path: ${modulePath}`);
-            errorLines.push(`   Workspace Path: ${pkg.workspacePath}`);
-            errorLines.push(`   Error Code: ${err.code || 'N/A'}`);
-            errorLines.push(`   Error Message: ${err.message || 'Unknown error'}`);
-            
-            // Provide debugging hints
-            if (err.code === 'ENOENT') {
-              errorLines.push('💡 Hint: File or directory not found. Check if the module path is correct.');
-            } else if (err.code === 'EACCES') {
-              errorLines.push('💡 Hint: Permission denied. Check file permissions.');
-            } else if (err.message && err.message.includes('pgpm.plan')) {
-              errorLines.push('💡 Hint: pgpm.plan file issue. Check if the plan file exists and is valid.');
-            }
-            
-            // Log the consolidated error message
-            log.error(errorLines.join('\n'));
-            
-            console.error(err); // Preserve full stack trace
-            throw errors.DEPLOYMENT_FAILED({ 
-              type: 'Deployment', 
-              module: extension
-            });
-          }
-
-          log.debug(`→ Command: sqitch deploy db:pg:${database}`);
-          log.debug(`> ${modulePackage.sql}`);
-
-          await pgPool.query(modulePackage.sql);
-
-          if (mergedOpts.deployment.cache) {
-            deployFastCache[cacheKey] = modulePackage;
-          }
-        } else {
+        {
           // Use new migration system
           log.debug(`→ Command: constructive migrate deploy db:pg:${database}`);
           

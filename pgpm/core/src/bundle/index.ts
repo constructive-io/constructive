@@ -15,3 +15,7 @@ export * from '@pgpmjs/bundle';
 export * from './apply';
 // applyEnvelope: schema apply + data/fixtures part replay for a BundleEnvelope.
 export * from './apply-envelope';
+// The stored `sql/<name>--<version>.bundle.tar.gz` artifact: emit + resolve.
+export * from './artifact';
+// The bundle-backed deploy fast path (one-shot execute + ledger).
+export * from './deploy-bundled';

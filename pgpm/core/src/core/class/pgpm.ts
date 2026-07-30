@@ -39,7 +39,7 @@ import {
   latestChangeAndVersion,
   ModuleMap
 } from '../../modules/modules';
-import { packageModule } from '../../packaging/package';
+import { deployModuleFast, isBundledDeployResult } from '../../bundle/deploy-bundled';
 import { syncModuleVersions, SyncVersionsOptions, SyncVersionsResult } from '../../packaging/sync-versions';
 import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { movePath } from '../../utils/fs';
@@ -1671,18 +1671,6 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     const { name, toChange } = this.parsePackageTarget(target);
 
     if (recursive) {
-      // Cache for fast deployment
-      const deployFastCache: Record<string, Awaited<ReturnType<typeof packageModule>>> = {};
-
-      const getCacheKey = (
-        pg: PgConfig,
-        name: string,
-        database: string
-      ): string => {
-        const { host, port, user } = pg ?? {};
-        return `${host}:${port}:${user}:${database}:${name}`;
-      };
-
       const modules = this.getModuleMap();
       
       let extensions: { resolved: string[]; external: string[] };
@@ -1714,51 +1702,23 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
             );
             log.info(`📂 Deploying local module: ${extension}`);
 
-            if (opts.deployment.fast) {
-              const cacheKey = getCacheKey(opts.pg as PgConfig, extension, opts.pg.database);
-            
-              if (opts.deployment.cache && deployFastCache[cacheKey]) {
-                log.warn(`⚡ Using cached pkg for ${extension}.`);
-                await pgPool.query(deployFastCache[cacheKey].sql);
+            if (opts.deployment.fast || opts.deployment.bundled) {
+              // Fast strategy: one-shot execution plus a bulk-written
+              // pgpm_migrate ledger, from the module's verified bundle artifact
+              // when it has one and from `deploy/` when it does not.
+              const outcome = await deployModuleFast(modulePath, {
+                config: opts.pg as PgConfig,
+                logOnly: opts.deployment.logOnly,
+                useTransaction: opts.deployment.useTx,
+                hashMethod: opts.deployment.hashMethod
+              });
+              if (isBundledDeployResult(outcome)) {
                 continue;
               }
+              log.info(`↩️ Fast deploy unavailable for ${extension} (${outcome}); using per-change path.`);
+            }
 
-              let pkg;
-              try {
-                pkg = await packageModule(modulePath, { 
-                  usePlan: opts.deployment.usePlan, 
-                  extension: false 
-                });
-              } catch (err: any) {
-                const errorLines = [];
-                errorLines.push(`❌ Failed to package module "${extension}" at path: ${modulePath}`);
-                errorLines.push(`   Module Path: ${modulePath}`);
-                errorLines.push(`   Workspace Path: ${this.workspacePath}`);
-                errorLines.push(`   Error Code: ${err.code || 'N/A'}`);
-                errorLines.push(`   Error Message: ${err.message || 'Unknown error'}`);
-              
-                if (err.code === 'ENOENT') {
-                  errorLines.push('💡 Hint: File or directory not found. Check if the module path is correct.');
-                } else if (err.code === 'EACCES') {
-                  errorLines.push('💡 Hint: Permission denied. Check file permissions.');
-                } else if (err.message && err.message.includes('pgpm.plan')) {
-                  errorLines.push('💡 Hint: pgpm.plan file issue. Check if the plan file exists and is valid.');
-                }
-              
-                log.error(errorLines.join('\n'));
-                console.error(err);
-                throw errors.DEPLOYMENT_FAILED({ 
-                  type: 'Deployment', 
-                  module: extension
-                });
-              }
-
-              await pgPool.query(pkg.sql);
-
-              if (opts.deployment.cache) {
-                deployFastCache[cacheKey] = pkg;
-              }
-            } else {
+            {
               try {
                 const client = new PgpmMigrate(opts.pg as PgConfig);
               

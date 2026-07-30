@@ -94,8 +94,9 @@ interface MigrationBundle {
 
 ```
 bundleDigest  = H( plan ‖ control ‖ [changeDigest_1 … changeDigest_n] )   (order-sensitive)
-  changeDigest = H( name ‖ deployDigest ‖ revertDigest ‖ verifyDigest )   (missing = empty slot)
-    scriptDigest = H( sql bytes )
+  changeDigest = H( name ‖ deployDigest ‖ revertDigest ‖ verifyDigest [‖ execDigest] )
+    scriptDigest = H( sql bytes )                          (missing script = empty slot)
+    execDigest   = H( executable deploy sql )               (only when `exec` is present)
 ```
 
 - Leaves are individual deploy/revert/verify SQL blobs; per-change nodes; root is the
@@ -121,6 +122,14 @@ bundleDigest  = H( plan ‖ control ‖ [changeDigest_1 … changeDigest_n] )   
 | `transpileBundle(bundle, opts?)` | Rewrite into a new namespace; fresh digests + lineage |
 | `computeChangeDigest` / `computeBundleDigest` | The digest primitives |
 | `BUNDLE_FORMAT_VERSION`, `BUNDLE_FILE_NAME` | Format constants |
+| `withExecutableSql(bundle, execSql)` | Attach pre-computed executable deploy SQL per change; re-derives digests |
+| `packBundle` / `unpackBundle` | Bundle ⇄ gzipped-tar artifact bytes (in memory) |
+| `writeBundleArchiveFile` / `readBundleArchiveFile` | The stored `sql/<name>--<version>.bundle.tar.gz` artifact |
+| `packSingleFileTarGz` / `unpackSingleFileTarGz` | Deterministic single-entry tar+gzip codec (no deps) |
+| `writeBundleArtifact(dir, version)` (`@pgpmjs/core`) | Emit a module's artifact (called by `pgpm package`) |
+| `resolveBundleArtifactPath` / `readBundleArtifact` (`@pgpmjs/core`) | Locate / load a module's artifact (never throws) |
+| `buildExecutableBundle(dir)` (`@pgpmjs/core`) | Bundle + executable SQL built from `deploy/` (no artifact needed) |
+| `deployModuleFast` (`@pgpmjs/core`) | The `fast` deploy: verify → one-shot execute → bulk ledger |
 | `createEnvelope(opts)` | Wrap schema bundle + data/fixtures parts into a shippable envelope |
 | `verifyEnvelope(envelope)` | Recompute every envelope digest incl. the schema bundle chain |
 | `writeEnvelopeFile` / `readEnvelopeFile` | Single JSON envelope artifact |
@@ -208,6 +217,36 @@ materializeBundle(received, '/tmp/deployable-module');
 - **Deploy order is part of the identity** — reordering changes changes the bundle digest.
 - Deterministic & pure: `createBundle` / `transpileBundle` / `verifyBundle` / `diff` do no
   I/O and no clock reads, so identical inputs always hash identically.
+
+## The stored artifact and the `--bundled` deploy path
+
+`pgpm package` writes `sql/<name>--<version>.bundle.tar.gz` next to the consolidated
+`sql/<name>--<version>.sql`: it *is* the JSON `MigrationBundle`, tarred + gzipped
+(deterministic bytes, single `pgpm-bundle.json` entry). Each change also carries an `exec`
+slot — its deploy SQL already stripped of transaction/`CREATE EXTENSION` statements — so
+deploys never re-parse SQL. Commit the `.tar.gz`; the loose JSON is gitignored.
+
+`pgpm deploy --fast` (`deployment.fast`; `--bundled` is an alias) then, per module: load the
+executable bundle — the stored artifact when `verifyBundle` passes, otherwise rebuilt from
+`deploy/` via `buildExecutableBundle` — then execute only the pending changes' `exec` SQL in
+a single statement and bulk-insert `pgpm_migrate` packages/changes/dependencies/events in
+one round-trip.
+
+**The old unledgered `fast` path no longer exists.** `fast` used to run the packaged SQL and
+record nothing, which made it non-idempotent and unauditable; it now always writes the
+ledger, so re-deploys skip changes whose stored hash matches and a same-name/
+different-content change still errors. The artifact is purely a speed optimization on that
+path, never a correctness requirement.
+
+- **Ledger hash reconciliation:** the ledger's `script_hash` for a bundled change is
+  `change.deploy.digest` = sha256 of the deploy file bytes — exactly what
+  `PgpmMigrate.calculateScriptHash` computes under the default `content` method, so bundled
+  and per-change deploys are interchangeable. The `ast` hash method is not derivable from
+  the artifact, so it falls back.
+- **Graceful degradation:** missing artifact, unreadable archive, or failed verification →
+  rebuild from `deploy/` (same SQL, same hashes, just slower). Only `hashMethod: 'ast'` or a
+  module with no executable deploy SQL falls through to the per-change path. The artifact
+  never fails a deploy on its own.
 
 ## Where this fits (cloud functions)
 

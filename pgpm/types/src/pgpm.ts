@@ -243,8 +243,17 @@ export interface PgpmWorkspaceConfig {
 export interface DeploymentOptions {
     /** Whether to wrap deployments in database transactions */
     useTx?: boolean;
-    /** Use fast deployment strategy (skip migration system) */
+    /**
+     * Use the fast deployment strategy: execute each module's pending changes in
+     * one round-trip and bulk-record the `pgpm_migrate` ledger, reading the
+     * pre-built bundle artifact (`sql/<name>--<version>.bundle.tar.gz`) when it
+     * verifies and building the same structure from `deploy/` when it does not.
+     * Falls back to the per-change migration path if those semantics cannot be
+     * honoured (e.g. `hashMethod: 'ast'`).
+     */
     fast?: boolean;
+    /** Alias for {@link fast}, naming the bundle artifact it prefers to read. */
+    bundled?: boolean;
     /** Whether to use Sqitch plan files for deployments */
     usePlan?: boolean;
     /** Enable caching of deployment packages */
@@ -352,6 +361,7 @@ export const pgpmDefaults: PgpmOptions = {
   deployment: {
     useTx: true,
     fast: false,
+    bundled: false,
     usePlan: true,
     cache: false,
     logOnly: false,

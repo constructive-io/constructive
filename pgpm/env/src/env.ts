@@ -50,6 +50,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
 
     DEPLOYMENT_USE_TX,
     DEPLOYMENT_FAST,
+    DEPLOYMENT_BUNDLED,
     DEPLOYMENT_USE_PLAN,
     DEPLOYMENT_CACHE,
     DEPLOYMENT_TO_CHANGE,
@@ -137,6 +138,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     deployment: {
       ...(DEPLOYMENT_USE_TX && { useTx: parseEnvBoolean(DEPLOYMENT_USE_TX) }),
       ...(DEPLOYMENT_FAST && { fast: parseEnvBoolean(DEPLOYMENT_FAST) }),
+      ...(DEPLOYMENT_BUNDLED && { bundled: parseEnvBoolean(DEPLOYMENT_BUNDLED) }),
       ...(DEPLOYMENT_USE_PLAN && { usePlan: parseEnvBoolean(DEPLOYMENT_USE_PLAN) }),
       ...(DEPLOYMENT_CACHE && { cache: parseEnvBoolean(DEPLOYMENT_CACHE) }),
       ...(DEPLOYMENT_TO_CHANGE && { toChange: DEPLOYMENT_TO_CHANGE }),

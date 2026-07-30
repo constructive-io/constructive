@@ -17,6 +17,7 @@ export * from './envelope';
 export * from './io';
 export * from './reconcile';
 export * from './split';
+export * from './tar';
 export * from './transpile';
 export * from './types';
 export * from './verify';

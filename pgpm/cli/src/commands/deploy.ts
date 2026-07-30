@@ -25,7 +25,10 @@ Options:
   --package <name>   Target specific package
   --to <target>      Deploy to specific change or tag
   --tx               Use transactions (default: true)
-  --fast             Use fast deployment strategy
+  --fast             Fast strategy: one-shot SQL + bulk migration ledger,
+                     reading each module's verified sql/*.bundle.tar.gz artifact
+                     when present and building it from deploy/ when not
+  --bundled          Alias for --fast
   --logOnly          Log-only mode, skip script execution
   --usePlan          Use deployment plan
   --cache            Enable caching
@@ -36,6 +39,7 @@ Examples:
   pgpm deploy --createdb                   Deploy with database creation
   pgpm deploy --package mypackage --to @v1.0.0  Deploy specific package to tag
   pgpm deploy --fast --no-tx              Fast deployment without transactions
+  pgpm deploy --bundled                    Same as --fast
 `;
 
 export default async (
@@ -102,6 +106,14 @@ export default async (
       required: false
     },
     {
+      name: 'bundled',
+      type: 'confirm',
+      message: 'Prefer prebuilt bundle artifacts (alias of fast)?',
+      useDefault: true,
+      default: false,
+      required: false
+    },
+    {
       name: 'logOnly',
       type: 'confirm',
       message: 'Log-only mode (skip script execution)?',
@@ -111,7 +123,7 @@ export default async (
     }
   ];
 
-  let { yes, recursive, createdb, cwd, tx, fast, logOnly } = await prompter.prompt(argv, questions);
+  let { yes, recursive, createdb, cwd, tx, fast, bundled, logOnly } = await prompter.prompt(argv, questions);
 
   if (!yes) {
     log.info('Operation cancelled.');
@@ -137,6 +149,7 @@ export default async (
     deployment: {
       useTx: tx !== false,
       fast: fast !== false,
+      bundled: bundled === true,
       usePlan: argv.usePlan !== false,
       cache: argv.cache !== false,
       logOnly: argv.logOnly !== false,

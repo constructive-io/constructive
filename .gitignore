@@ -18,3 +18,8 @@ graphql/server/*.heapsnapshot
 /extensions/
 # Alternate install dirs configured via `extensionsDir` / PGPM_EXTENSIONS_DIR
 /extensions-*/
+
+# Loose/expanded migration bundle JSON — the committed artifact is the
+# gzipped tarball (sql/<name>--<version>.bundle.tar.gz).
+*.bundle.json
+pgpm-bundle.json

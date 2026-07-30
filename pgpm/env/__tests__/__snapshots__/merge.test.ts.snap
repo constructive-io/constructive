@@ -35,6 +35,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "useLocksForRoles": false,
   },
   "deployment": {
+    "bundled": false,
     "cache": true,
     "fast": false,
     "hashMethod": "content",

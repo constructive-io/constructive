@@ -16,6 +16,20 @@ export interface BundleScript {
 }
 
 /**
+ * Pre-computed, directly executable deploy SQL for a change: the deploy script
+ * with its transaction/`CREATE EXTENSION` statements stripped, so many changes
+ * can be concatenated and run as one statement inside a caller-owned
+ * transaction. Produced at package time — this is the disk+parse work the
+ * bundled deploy path no longer has to redo on every deployment.
+ */
+export interface BundleExec {
+  /** Executable SQL text. */
+  sql: string;
+  /** sha256 of {@link sql}. */
+  digest: string;
+}
+
+/**
  * One change inside a bundle: identity + plan dependencies + its scripts.
  */
 export interface BundleChange {
@@ -24,6 +38,12 @@ export interface BundleChange {
   deploy: BundleScript | null;
   revert: BundleScript | null;
   verify: BundleScript | null;
+  /**
+   * Optional pre-computed executable deploy SQL (see {@link BundleExec}).
+   * Absent in bundles produced before the bundled-deploy fast path; when
+   * present it participates in {@link digest}.
+   */
+  exec?: BundleExec | null;
   /** sha256 over the change's identity + script digests (see `computeChangeDigest`). */
   digest: string;
 }

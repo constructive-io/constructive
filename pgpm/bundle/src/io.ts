@@ -15,10 +15,17 @@ import {
 import { writeModule } from '@pgpmjs/ast/module/writer';
 import { mapScripts } from '@pgpmjs/traverse';
 import { createBundle, CreateBundleOptions } from './create';
+import { packSingleFileTarGz, unpackSingleFileTarGz } from './tar';
 import { BundleScript, MigrationBundle } from './types';
 
 /** Default file name for a serialized bundle artifact. */
 export const BUNDLE_FILE_NAME = 'pgpm-bundle.json';
+
+/** The single entry name inside a `.bundle.tar.gz` archive. */
+export const BUNDLE_ARCHIVE_ENTRY = BUNDLE_FILE_NAME;
+
+/** Suffix of the stored bundle artifact: `sql/<name>--<version>.bundle.tar.gz`. */
+export const BUNDLE_ARCHIVE_EXTENSION = '.bundle.tar.gz';
 
 /**
  * Build a bundle straight from a module directory on disk (readModule → createBundle).
@@ -35,7 +42,12 @@ export function bundleFromModule(
  */
 export function writeBundleFile(bundle: MigrationBundle, filePath: string): void {
   mkdirSync(dirname(filePath), { recursive: true });
-  writeFileSync(filePath, JSON.stringify(bundle, null, 2) + '\n');
+  writeFileSync(filePath, serializeBundle(bundle));
+}
+
+/** Stable JSON serialization of a bundle (2-space formatting, trailing newline). */
+export function serializeBundle(bundle: MigrationBundle): string {
+  return JSON.stringify(bundle, null, 2) + '\n';
 }
 
 /**
@@ -43,6 +55,31 @@ export function writeBundleFile(bundle: MigrationBundle, filePath: string): void
  */
 export function readBundleFile(filePath: string): MigrationBundle {
   return JSON.parse(readFileSync(filePath, 'utf-8')) as MigrationBundle;
+}
+
+/** Serialize a bundle to the stored artifact form: gzipped tar of the JSON bundle. */
+export function packBundle(bundle: MigrationBundle): Buffer {
+  return packSingleFileTarGz(BUNDLE_ARCHIVE_ENTRY, serializeBundle(bundle));
+}
+
+/**
+ * Read a stored bundle artifact (gzipped tar) back into memory. Throws when the
+ * archive or its JSON payload is unreadable.
+ */
+export function unpackBundle(archive: Buffer): MigrationBundle {
+  const { content } = unpackSingleFileTarGz(archive);
+  return JSON.parse(content) as MigrationBundle;
+}
+
+/** Write the stored `.bundle.tar.gz` artifact for a bundle. */
+export function writeBundleArchiveFile(bundle: MigrationBundle, filePath: string): void {
+  mkdirSync(dirname(filePath), { recursive: true });
+  writeFileSync(filePath, packBundle(bundle));
+}
+
+/** Read a stored `.bundle.tar.gz` artifact from disk. */
+export function readBundleArchiveFile(filePath: string): MigrationBundle {
+  return unpackBundle(readFileSync(filePath));
 }
 
 function scriptAstFromBundleScript(script: BundleScript): PgpmScriptAst {

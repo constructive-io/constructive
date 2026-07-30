@@ -6,6 +6,7 @@ import { deparse } from 'pgsql-deparser';
 import { parse } from 'pgsql-parser';
 
 import { getExtensionName } from '@pgpmjs/ast/files';
+import { writeBundleArtifact } from '../bundle/artifact';
 import { resolve, resolveWithPlan } from '../resolution/resolve';
 import { transformProps } from './transform';
 
@@ -32,6 +33,12 @@ interface PackageModuleOptions {
 interface WritePackageOptions extends PackageModuleOptions {
   version: string;
   packageDir: string;
+  /**
+   * Also emit the content-addressed bundle artifact
+   * `sql/<name>--<version>.bundle.tar.gz` (default true). It is what
+   * `deploy --bundled` consumes.
+   */
+  bundle?: boolean;
 }
 
 const filterStatements = (stmts: RawStmt[], stripTransactions: boolean): RawStmt[] => {
@@ -129,6 +136,7 @@ export const writePackage = async ({
   usePlan = true,
   packageDir,
   outputDiff = false,
+  bundle = true,
 }: WritePackageOptions): Promise<void> => {
   const pkgPath = `${packageDir}/package.json`;
   const pkg = require(pkgPath);
@@ -180,4 +188,11 @@ export const writePackage = async ({
   const writePath = `${outPath}/${sqlFileName}`;
   writeFileSync(writePath, sql);
   log.success(`${relative(packageDir, writePath)} written`);
+
+  if (bundle) {
+    const bundlePath = await writeBundleArtifact(packageDir, version, {
+      createdWith: '@pgpmjs/core'
+    });
+    log.success(`${relative(packageDir, bundlePath)} written`);
+  }
 };
