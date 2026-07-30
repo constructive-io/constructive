@@ -2,14 +2,15 @@ import { BucketProvisionerPreset } from 'graphile-bucket-provisioner-plugin';
 import { BulkMutationPreset } from 'graphile-bulk-mutations';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
+import { HistoryPreset } from 'graphile-history';
 import { I18nPreset } from 'graphile-i18n';
+import { GraphileLlmPreset } from 'graphile-llm';
 import { createFolderOperatorFactory, GraphileLtreePreset } from 'graphile-ltree';
 import { PgAggregatesPreset } from 'graphile-pg-aggregates';
 import { createPostgisOperatorFactory,GraphilePostgisPreset } from 'graphile-postgis';
 import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
 import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
-import { GraphileLlmPreset } from 'graphile-llm';
 import { UploadPreset } from 'graphile-upload-plugin';
 
 import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
@@ -50,6 +51,7 @@ export interface ConstructivePresetOptions {
   enableRealtime?: boolean;
   enableBulk?: boolean;
   enableI18n?: boolean;
+  enableHistory?: boolean;
 }
 
 /**
@@ -82,7 +84,8 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableLlm: true,
   enableRealtime: false,
   enableBulk: false,
-  enableI18n: false
+  enableI18n: false,
+  enableHistory: false
 };
 
 /**
@@ -117,6 +120,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
  * - enableRealtime          -> RealtimeSubscriptionsPreset (off by default)
  * - enableBulk              -> BulkMutationPreset (off by default)
  * - enableI18n              -> I18nPreset (off by default)
+ * - enableHistory           -> HistoryPreset (off by default)
  * - enableLlm               -> GraphileLlmPreset (auto-embed unifiedSearch, vector text fields)
  *
  * RELATION FILTERS (when enableConnectionFilter is true):
@@ -221,6 +225,10 @@ export function createConstructivePreset(
 
   if (opts.enableI18n) {
     presets.push(I18nPreset());
+  }
+
+  if (opts.enableHistory) {
+    presets.push(HistoryPreset());
   }
 
   if (opts.enableLlm) {
