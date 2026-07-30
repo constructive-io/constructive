@@ -112,14 +112,19 @@ const buildLoaderContext = (
   routingPool: Pool,
   opts: ApiOptions,
   row: ApiRow
-): LoaderContext => ({
-  routingPool,
-  routingSchema: getRoutingSchema(opts),
-  tenantPool: getPgPool({ ...opts.pg, database: row.dbname }),
-  databaseId: row.database_id,
-  apiId: row.api_id,
-  dbname: row.dbname
-});
+): LoaderContext => {
+  // Scoped APIs leave dbname NULL when their schemas live in the serving
+  // database (pooled tenants); fall back to the server's own database.
+  const dbname = row.dbname || opts.pg?.database || '';
+  return {
+    routingPool,
+    routingSchema: getRoutingSchema(opts),
+    tenantPool: getPgPool({ ...opts.pg, database: dbname }),
+    databaseId: row.database_id,
+    apiId: row.api_id,
+    dbname
+  };
+};
 
 /**
  * Resolve all per-database module settings in parallel via the loader registry.

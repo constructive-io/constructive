@@ -268,6 +268,35 @@ const buildPreset = (
 
             return { pgSettings };
           }
+
+          // Private (in-cluster) surface: there is no token — identity
+          // arrives on the trusted internal X-* headers stamped by the
+          // dispatching worker/sync gateway (the same vocabulary as
+          // X-Database-Id above). Map it into per-request claims so writes
+          // made through this surface carry actor attribution. Never applied
+          // on the public surface, where client-supplied identity headers
+          // must not assert identity.
+          const headerActorId = req.get('X-Actor-Id');
+          if (req.api?.isPublic === false && headerActorId) {
+            const pgSettings: Record<string, string> = {
+              role: roleName,
+              'jwt.claims.user_id': headerActorId,
+              'jwt.claims.principal_id': headerActorId,
+              ...context
+            };
+            const headerEntityId = req.get('X-Entity-Id');
+            if (headerEntityId) {
+              pgSettings['jwt.claims.entity_id'] = headerEntityId;
+            }
+            const headerOrganizationId = req.get('X-Organization-Id');
+            if (headerOrganizationId) {
+              pgSettings['jwt.claims.organization_id'] = headerOrganizationId;
+            }
+            if (req.requestId) {
+              pgSettings['request.id'] = req.requestId;
+            }
+            return { pgSettings };
+          }
         }
 
         const anonSettings: Record<string, string> = {
