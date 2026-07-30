@@ -109,6 +109,47 @@ describe('graphile-history plugin', () => {
     expect(v.historyOp).toBe('UPDATE');
   });
 
+  it('returns versions within a time window, newest-first', async () => {
+    // Narrow window straddling only v2 (2024-02-01).
+    const narrow = await query<{ postByRowId: { versionsBetween: Version[] } }>(
+      `
+        query ($id: Int!, $from: Datetime!, $to: Datetime!) {
+          postByRowId(rowId: $id) {
+            versionsBetween(from: $from, to: $to) {
+              title
+              historyOp
+              recordedAt
+            }
+          }
+        }
+      `,
+      { id: 1, from: '2024-01-15T00:00:00Z', to: '2024-02-15T00:00:00Z' }
+    );
+    expect(narrow.errors).toBeUndefined();
+    const one = narrow.data!.postByRowId.versionsBetween;
+    expect(one).toHaveLength(1);
+    expect(one[0].title).toBe('Hello World v2');
+
+    // Wider window covering all three versions, newest-first.
+    const wide = await query<{ postByRowId: { versionsBetween: Version[] } }>(
+      `
+        query ($id: Int!, $from: Datetime!, $to: Datetime!) {
+          postByRowId(rowId: $id) {
+            versionsBetween(from: $from, to: $to) { title }
+          }
+        }
+      `,
+      { id: 1, from: '2024-01-01T00:00:00Z', to: '2024-03-01T00:00:00Z' }
+    );
+    expect(wide.errors).toBeUndefined();
+    const all = wide.data!.postByRowId.versionsBetween;
+    expect(all.map((v: Version) => v.title)).toEqual([
+      'Hello World v3',
+      'Hello World v2',
+      'Hello World'
+    ]);
+  });
+
   it('restores a live row to an earlier version and records the restore', async () => {
     const result = await query<{
       restorePostVersion: { version: Version; restored: Version };

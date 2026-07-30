@@ -518,6 +518,50 @@ export function createHistoryPlugin(options: HistoryPluginOptions = {}): Graphil
                     return mapVersionRow(info, row);
                   });
                 }
+              },
+              versionsBetween: {
+                type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(versionType))),
+                description: `Versions of this ${info.sourceTypeName} recorded within the given time window (inclusive), newest first.`,
+                args: {
+                  from: { type: new GraphQLNonNull(build.getTypeByName('Datetime') ?? GraphQLString) },
+                  to: { type: new GraphQLNonNull(build.getTypeByName('Datetime') ?? GraphQLString) }
+                },
+                plan($parent: any, fieldArgs: any) {
+                  const $from = fieldArgs.getRaw('from');
+                  const $to = fieldArgs.getRaw('to');
+                  const $withPgClient = (grafastContext() as any).get('withPgClient');
+                  const $pgSettings = (grafastContext() as any).get('pgSettings');
+                  const $combined = object({
+                    from: $from,
+                    to: $to,
+                    withPgClient: $withPgClient,
+                    pgSettings: $pgSettings,
+                    ...planParentPk($parent)
+                  });
+                  return lambda($combined, async (vals: any) => {
+                    const { from, to, withPgClient, pgSettings } = vals;
+                    if (!withPgClient) return [];
+                    const params: any[] = [];
+                    const preds = info.pkColumns.map((pk) => {
+                      params.push(vals[`pk_${pk.column}`]);
+                      return `${quoteIdent(pk.column)} = $${params.length}`;
+                    });
+                    params.push(from);
+                    const fromParam = `$${params.length}`;
+                    params.push(to);
+                    const toParam = `$${params.length}`;
+                    const sql = `SELECT ${selectColumnsSql(info)} FROM ${historyQualified}
+                      WHERE ${preds.join(' AND ')}
+                        AND ${quoteIdent(info.recordedAtColumn)} >= ${fromParam}
+                        AND ${quoteIdent(info.recordedAtColumn)} <= ${toParam}
+                      ${orderClause}`;
+                    const rows = await withPgClient(pgSettings, async (pgClient: any) => {
+                      const res = await pgClient.query({ text: sql, values: params });
+                      return res.rows;
+                    });
+                    return rows.map((row: any) => mapVersionRow(info, row));
+                  });
+                }
               }
             } as any,
             `Adding history fields to ${info.sourceTypeName}`

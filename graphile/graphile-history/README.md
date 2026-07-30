@@ -10,6 +10,8 @@ and augments the GraphQL schema with:
   newest first (`recorded_at DESC`);
 - a `versionAt(at: Datetime!)` field: the version that was current at a given
   instant;
+- a `versionsBetween(from: Datetime!, to: Datetime!)` field: every version
+  recorded within an inclusive time window, newest first;
 - a `restore<Table>Version(input: { <pk>, recordedAt, reinsert })` root
   mutation that rewrites the live row from a historical version (optionally
   re-inserting a deleted row).
@@ -48,6 +50,10 @@ query {
     title
     history { title historyOp recordedAt }
     versionAt(at: "2024-02-15T00:00:00Z") { title }
+    versionsBetween(from: "2024-01-01T00:00:00Z", to: "2024-03-01T00:00:00Z") {
+      title
+      recordedAt
+    }
   }
 }
 
