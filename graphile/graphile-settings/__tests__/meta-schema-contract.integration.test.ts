@@ -228,6 +228,14 @@ describe('MetaSchemaPlugin final GraphQL contract', () => {
                 id serial PRIMARY KEY,
                 target integration_test.url NOT NULL
               );
+              CREATE TABLE integration_test.raw_accounts (
+                id serial PRIMARY KEY,
+                external_identifier text
+              );
+              COMMENT ON TABLE integration_test.raw_accounts IS
+                E'@name CustomerAccount';
+              COMMENT ON COLUMN integration_test.raw_accounts.external_identifier IS
+                E'@name externalId';
             `);
           })
         ]
@@ -268,17 +276,26 @@ describe('MetaSchemaPlugin final GraphQL contract', () => {
       });
     });
 
-    it('exposes exact PostgreSQL table and column names additively', () => {
+    it('keeps PostgreSQL identities alongside final GraphQL casing', () => {
       const fileEvent = probe._meta.tables.find(
         ({ name }) => name === 'FileEvent'
       );
       const location = probe._meta.tables.find(
         ({ name }) => name === 'Location'
       );
+      const customerAccount = probe._meta.tables.find(
+        ({ name }) => name === 'CustomerAccount'
+      );
       expect(fileEvent?.tableName).toBe('file_events');
       expect(
         location?.fields.find(({ name }) => name === 'isActive')?.columnName
       ).toBe('is_active');
+      expect(customerAccount?.tableName).toBe('raw_accounts');
+      expect(customerAccount?.query.all).toBe('customerAccounts');
+      expect(
+        customerAccount?.fields.find(({ name }) => name === 'externalId')
+          ?.columnName
+      ).toBe('external_identifier');
     });
   });
 
