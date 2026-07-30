@@ -1,5 +1,6 @@
 import { parseSqlProgram, SchemaRouter, SqlProgram, StatementFacts } from '@pgpmjs/transform';
 
+import { buildObjectGraph, SqlObjectGraph } from './object-graph';
 import { SqlObjectRef } from './refs';
 
 /**
@@ -162,16 +163,52 @@ export function excludeSubsystem(
   selector: SubsystemSelector,
   options: { rebinds?: SchemaRouter } = {}
 ): ExcludeResult {
-  const schemas = new Set(selector.schemas);
   const program = parseSqlProgram(sql);
+  const analysis = analyzeProgram(program, new Set(selector.schemas), options.rebinds);
+
+  return {
+    excluded: analysis.excluded,
+    kept: analysis.kept,
+    contract: contractOf(analysis.provides, analysis.required),
+    unsatisfied: analysis.unsatisfied,
+    warnings: analysis.warnings,
+    statements: program.statements.map(s => s.facts),
+    program
+  };
+}
+
+/** Per-program exclusion analysis, shared by the single- and multi-program APIs. */
+interface ProgramAnalysis {
+  excluded: number[];
+  kept: number[];
+  warnings: ExcludeWarning[];
+  provides: SqlObjectRef[];
+  required: Map<string, SubsystemDependency>;
+  unsatisfied: UnsatisfiedReference[];
+}
+
+function contractOf(
+  provides: SqlObjectRef[],
+  required: Map<string, SubsystemDependency>
+): SubsystemContract {
+  const internal: SqlObjectRef[] = [];
+  for (const p of provides) {
+    if (!required.has(refKey(p))) pushUnique(internal, p);
+  }
+  return { provides, required: [...required.values()], internal };
+}
+
+function analyzeProgram(
+  program: SqlProgram,
+  schemas: Set<string>,
+  router: SchemaRouter | undefined
+): ProgramAnalysis {
   const statements = program.statements.map(s => s.facts);
-  const router = options.rebinds;
 
   const excluded: number[] = [];
   const kept: number[] = [];
   const warnings: ExcludeWarning[] = [];
   const provides: SqlObjectRef[] = [];
-  const internal: SqlObjectRef[] = [];
   const required = new Map<string, SubsystemDependency>();
   const unsatisfied: UnsatisfiedReference[] = [];
 
@@ -234,23 +271,113 @@ export function excludeSubsystem(
     }
   });
 
-  for (const p of provides) {
-    if (!required.has(refKey(p))) pushUnique(internal, p);
+  return { excluded, kept, warnings, provides, required, unsatisfied };
+}
+
+/** An `UnsatisfiedReference`/`ExcludeWarning` tagged with its owning program. */
+export type ProgramUnsatisfiedReference = UnsatisfiedReference & { program: string };
+export type ProgramExcludeWarning = ExcludeWarning & { program: string };
+
+/** Per-program exclusion decisions from {@link excludeSubsystemPrograms}. */
+export interface ProgramExclusion {
+  /** Statement indexes removed: subsystem members + opaque subsystem-targeted. */
+  dropped: number[];
+  /**
+   * The whole program consists of subsystem statements (plus transaction
+   * control): it should be removed as a unit rather than emptied in place.
+   */
+  fullyExcluded: boolean;
+  /** The surviving SQL with the dropped statements sliced out. */
+  sql: string;
+}
+
+export interface ExcludeProgramsResult {
+  /** The unified object graph over every analyzed program. */
+  graph: SqlObjectGraph;
+  /** The subsystem's external contract, measured across all programs. */
+  contract: SubsystemContract;
+  /** Unrebound references into the subsystem, tagged with their program. */
+  unsatisfied: ProgramUnsatisfiedReference[];
+  warnings: ProgramExcludeWarning[];
+  /** Per-program decisions, keyed by program name. */
+  programs: Map<string, ProgramExclusion>;
+}
+
+/**
+ * Analyze a subsystem exclusion across a set of already-parsed programs
+ * (typically one per pgpm change) in a single pass: the contract and cascade
+ * safety are measured over all programs together — which is what catches
+ * cross-change dependencies on the subsystem — while drop/strip/prune
+ * decisions are returned per program, derived from statement membership and
+ * ownership rather than survivor counting. The unified {@link SqlObjectGraph}
+ * over the same programs is returned for structural queries.
+ */
+export function excludeSubsystemPrograms(
+  programs: Map<string, SqlProgram> | Array<[string, SqlProgram]>,
+  selector: SubsystemSelector,
+  options: { rebinds?: SchemaRouter } = {}
+): ExcludeProgramsResult {
+  const entries = programs instanceof Map ? [...programs.entries()] : programs;
+  const schemas = new Set(selector.schemas);
+
+  const provides: SqlObjectRef[] = [];
+  const required = new Map<string, SubsystemDependency>();
+  const unsatisfied: ProgramUnsatisfiedReference[] = [];
+  const warnings: ProgramExcludeWarning[] = [];
+  const perProgram = new Map<string, ProgramExclusion>();
+
+  for (const [name, program] of entries) {
+    const analysis = analyzeProgram(program, schemas, options.rebinds);
+
+    for (const p of analysis.provides) pushUnique(provides, p);
+    for (const [key, dep] of analysis.required) {
+      const merged = required.get(key) ?? { object: dep.object, fk: false, dependents: [] };
+      merged.fk = merged.fk || dep.fk;
+      required.set(key, merged);
+    }
+    unsatisfied.push(...analysis.unsatisfied.map(u => ({ ...u, program: name })));
+    warnings.push(...analysis.warnings.map(w => ({ ...w, program: name })));
+
+    const dropped = new Set(analysis.excluded);
+    for (const i of analysis.kept) {
+      if (opaqueTargetsSubsystem(program.statements[i].stmt, schemas)) dropped.add(i);
+    }
+
+    const survivors = program.statements.filter(
+      (s, i) => !dropped.has(i) && !('TransactionStmt' in s.stmt)
+    );
+
+    perProgram.set(name, {
+      dropped: [...dropped].sort((a, b) => a - b),
+      fullyExcluded: dropped.size > 0 && survivors.length === 0,
+      sql: sliceSurvivors(program, dropped)
+    });
   }
 
   return {
-    excluded,
-    kept,
-    contract: {
-      provides,
-      required: [...required.values()],
-      internal
-    },
+    graph: buildObjectGraph(entries),
+    contract: contractOf(provides, required),
     unsatisfied,
     warnings,
-    statements,
-    program
+    programs: perProgram
   };
+}
+
+/**
+ * Slice the surviving statements out of a program's source, preserving the
+ * leading text (pgpm headers) and each survivor's original bytes.
+ */
+function sliceSurvivors(program: SqlProgram, dropped: Set<number>): string {
+  const { source, statements } = program;
+  const prefix = statements.length > 0 ? source.slice(0, statements[0].span.start) : source;
+
+  const pieces: string[] = [];
+  statements.forEach((s, i) => {
+    if (dropped.has(i)) return;
+    pieces.push(s.raw.trim() + ';');
+  });
+
+  return prefix + pieces.join('\n\n') + (pieces.length > 0 ? '\n' : '');
 }
 
 /**
@@ -333,19 +460,8 @@ export function stripSubsystemSql(
     if (opaqueTargetsSubsystem(statements[i].stmt, schemas)) drop.add(i);
   }
 
-  // Text before the first statement (pgpm headers, leading comments) is
-  // preserved verbatim so script identity headers survive the strip.
-  const prefix =
-    statements.length > 0 ? sql.slice(0, statements[0].span.start) : sql;
-
-  const pieces: string[] = [];
-  statements.forEach((s, i) => {
-    if (drop.has(i)) return;
-    pieces.push(s.raw.trim() + ';');
-  });
-
   return {
-    sql: prefix + pieces.join('\n\n') + (pieces.length > 0 ? '\n' : ''),
+    sql: sliceSurvivors(result.program, drop),
     result,
     dropped: [...drop].sort((a, b) => a - b)
   };

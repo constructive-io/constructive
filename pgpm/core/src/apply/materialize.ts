@@ -9,8 +9,8 @@ import {
   transpileBundle,
   verifyBundle
 } from '@pgpmjs/bundle';
-import { buildSchemaRouter, loadModule, makeSchemaTranspiler, SchemaTransformPass } from '@pgpmjs/transform';
-import { excludeSubsystem, stripSubsystemSql } from '@pgpmjs/slice';
+import { buildSchemaRouter, loadModule, makeSchemaTranspiler, parseSqlProgram, SchemaTransformPass, SqlProgram } from '@pgpmjs/transform';
+import { excludeSubsystemPrograms, stripSubsystemSql } from '@pgpmjs/slice';
 
 import { ModuleMap } from '../modules/modules';
 import { hasApplySpec, readApplySpec } from './apply-spec';
@@ -60,11 +60,13 @@ function makeSubsystemStripper(
   const selector = { schemas: spec.exclude!.schemas };
   const rebinds = buildSchemaRouter({ schemaMap: spec.schemas, routes: spec.route });
 
-  const fullDeploySql = source.changes
-    .map(c => c.deploy?.sql ?? '')
-    .filter(Boolean)
-    .join('\n');
-  const analysis = excludeSubsystem(fullDeploySql, selector, { rebinds });
+  // One parse per deploy script; the analysis runs over all programs together
+  // (cross-change references into the subsystem are caught by construction)
+  // and returns per-change drop/strip/prune decisions from the same pass.
+  const programs: Array<[string, SqlProgram]> = source.changes
+    .filter(c => c.deploy)
+    .map(c => [c.name, parseSqlProgram(c.deploy!.sql)]);
+  const analysis = excludeSubsystemPrograms(programs, selector, { rebinds });
 
   if (analysis.unsatisfied.length > 0) {
     const detail = [
@@ -82,28 +84,26 @@ function makeSubsystemStripper(
     );
   }
 
-  // A change whose deploy consists entirely of subsystem statements (plus
-  // transaction control) is dropped *as a change* — removed from the plan and
-  // deploy order rather than emitted as an empty script (empty scripts collide
-  // on the deploy ledger's script-hash uniqueness). Its verify/revert scripts
-  // target dropped objects the classifier can't always see (bare DROPs, catalog
-  // probes), which is exactly why the whole change is dropped, not just blanked.
+  // A fully-excluded change is dropped *as a change* — removed from the plan
+  // and deploy order rather than emitted as an empty script (empty scripts
+  // collide on the deploy ledger's script-hash uniqueness). Its verify/revert
+  // scripts target dropped objects the classifier can't always see (bare
+  // DROPs, catalog probes), which is exactly why the whole change is dropped,
+  // not just blanked.
   const excludedChanges = new Set<string>();
-  for (const change of source.changes) {
-    if (!change.deploy) continue;
-    const stripped = stripSubsystemSql(change.deploy.sql, selector);
-    const survivors = stripped.result.kept.filter(
-      i => !stripped.dropped.includes(i) && stripped.result.statements[i].nodeTag !== 'TransactionStmt'
-    );
-    if (stripped.dropped.length > 0 && survivors.length === 0) {
-      excludedChanges.add(change.name);
-    }
+  const strippedDeploys = new Map<string, string>();
+  for (const [name, program] of programs) {
+    const exclusion = analysis.programs.get(name)!;
+    if (exclusion.fullyExcluded) excludedChanges.add(name);
+    else strippedDeploys.set(program.source, exclusion.sql);
   }
 
   // Surviving changes may still contain stray subsystem statements (a change
   // that both creates a survivor and touches the excluded subsystem); strip
-  // those in place. Fully-excluded changes are dropped via `excludedChanges`.
-  const strip = (sql: string): string => stripSubsystemSql(sql, selector).sql;
+  // those in place. Verify/revert scripts are separate sources, stripped on
+  // demand with the same selector.
+  const strip = (sql: string): string =>
+    strippedDeploys.get(sql) ?? stripSubsystemSql(sql, selector).sql;
 
   return { strip, excludedChanges };
 }
