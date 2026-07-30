@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.10.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.9.4...graphile-settings@6.10.0) (2026-07-30)
+
+### Features
+
+- **graphile-history:** PostGraphile v5 history plugin ([ff18a03](https://github.com/constructive-io/constructive/commit/ff18a037256ec3c2c03b16d34610e31b23df8e70))
+
 ## [6.9.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.9.3...graphile-settings@6.9.4) (2026-07-30)
 
 **Note:** Version bump only for package graphile-settings

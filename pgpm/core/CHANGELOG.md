@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.17.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.17.0...@pgpmjs/core@7.17.1) (2026-07-30)
+
+### Bug Fixes
+
+- **apply:** drop excluded subsystem changes instead of emitting empty tombstones ([157c178](https://github.com/constructive-io/constructive/commit/157c1788b3cd906cc5827fdef2183fc7480cb4c5))
+
 # [7.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.16.0...@pgpmjs/core@7.17.0) (2026-07-30)
 
 ### Features

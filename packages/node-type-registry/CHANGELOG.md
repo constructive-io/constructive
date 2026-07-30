@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.11.1...node-type-registry@1.12.0) (2026-07-30)
+
+### Features
+
+- **node-type-registry:** sync DataHistory node type from constructive-db ([49a6b2b](https://github.com/constructive-io/constructive/commit/49a6b2b16dcfd92b56c99b151f49581be37d00fb))
+
 ## [1.11.1](https://github.com/constructive-io/constructive/compare/node-type-registry@1.11.0...node-type-registry@1.11.1) (2026-07-30)
 
 ### Bug Fixes

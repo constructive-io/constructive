@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.12.2...@pgpmjs/bundle@0.12.3) (2026-07-30)
+
+### Bug Fixes
+
+- **apply:** drop excluded subsystem changes instead of emitting empty tombstones ([157c178](https://github.com/constructive-io/constructive/commit/157c1788b3cd906cc5827fdef2183fc7480cb4c5))
+
 ## [0.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.12.1...@pgpmjs/bundle@0.12.2) (2026-07-30)
 
 **Note:** Version bump only for package @pgpmjs/bundle
