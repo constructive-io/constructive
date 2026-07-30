@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=auth-provider
+%uri=auth-provider
+
+schemas/app_auth/schema 2024-01-01T00:00:00Z Dev <dev@example.com> # add app_auth schema
+schemas/app_auth/tables/users/table [schemas/app_auth/schema] 2024-01-01T00:00:01Z Dev <dev@example.com> # add users table
+schemas/app_auth/procedures/current_user_id [schemas/app_auth/schema] 2024-01-01T00:00:02Z Dev <dev@example.com> # add current_user_id

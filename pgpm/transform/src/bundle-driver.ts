@@ -47,8 +47,18 @@ export interface SchemaObjectRoute {
   kind: 'table' | 'view' | 'function' | 'procedure' | 'type';
   /** Unqualified object name (e.g. `accounts`). */
   name: string;
-  /** Target schema this object is routed to (e.g. `reporting`). */
-  toSchema: string;
+  /**
+   * Target schema this object is routed to (e.g. `reporting`). `null` strips
+   * qualification (resolve via `search_path`); omitted with `toName` leaves
+   * the schema to the whole-schema default.
+   */
+  toSchema?: string | null;
+  /**
+   * Target object name — rebinds references to a *different* object (e.g.
+   * point `identity.current_actor()` at `current_user_id()`). At least one of
+   * `toSchema`/`toName` must be given.
+   */
+  toName?: string;
 }
 
 /**
@@ -159,9 +169,20 @@ export function buildSchemaRouter(options: SchemaTranspilerOptions): SchemaRoute
     ensure(from).schema = to;
   }
   for (const route of options.routes ?? []) {
+    if (route.toSchema === undefined && route.toName === undefined) {
+      throw new Error(
+        `Object route for ${route.fromSchema}.${route.name} needs "toSchema" and/or "toName"`
+      );
+    }
     const bucketKey = ROUTE_KIND_BUCKET[route.kind];
     const target = ensure(route.fromSchema);
-    (target[bucketKey] ??= {})[route.name] = route.toSchema;
+    (target[bucketKey] ??= {})[route.name] =
+      route.toName === undefined && typeof route.toSchema === 'string'
+        ? route.toSchema
+        : {
+            ...(route.toSchema !== undefined ? { schema: route.toSchema } : {}),
+            ...(route.toName !== undefined ? { name: route.toName } : {})
+          };
   }
   return new SchemaRouter(spec);
 }

@@ -34,7 +34,8 @@ export function resolveEffectiveApplySpec(
     schemas: spec.schemas,
     route: spec.route,
     extensions: spec.extensions,
-    roles: spec.roles
+    roles: spec.roles,
+    exclude: spec.exclude
   });
   return { ...spec, ...merged };
 }

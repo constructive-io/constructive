@@ -1,0 +1,10 @@
+%syntax-version=1.0.0
+%project=crm-module
+%uri=crm-module
+
+schemas/identity/schema 2024-01-01T00:00:00Z Dev <dev@example.com> # add identity schema
+schemas/identity/tables/users/table [schemas/identity/schema] 2024-01-01T00:00:01Z Dev <dev@example.com> # add identity users
+schemas/identity/procedures/current_actor [schemas/identity/schema] 2024-01-01T00:00:02Z Dev <dev@example.com> # add current_actor
+schemas/app/schema 2024-01-01T00:00:03Z Dev <dev@example.com> # add app schema
+schemas/app/tables/notes/table [schemas/app/schema schemas/identity/tables/users/table] 2024-01-01T00:00:04Z Dev <dev@example.com> # add notes table
+schemas/app/policies/notes_owner [schemas/app/tables/notes/table schemas/identity/procedures/current_actor] 2024-01-01T00:00:05Z Dev <dev@example.com> # add notes policy

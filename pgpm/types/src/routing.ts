@@ -29,8 +29,19 @@ export interface PgpmRouteEntry {
   kind: PgpmRouteKind;
   /** Unqualified object name (e.g. `accounts`). */
   name: string;
-  /** Target schema the object is routed to (e.g. `reporting`). */
-  toSchema: string;
+  /**
+   * Target schema the object is routed to (e.g. `reporting`). `null` strips
+   * the qualification entirely — the reference is emitted unqualified and
+   * resolves via `search_path`. May be omitted when `toName` is given (pure
+   * rename, schema untouched or governed by the whole-schema default).
+   */
+  toSchema?: string | null;
+  /**
+   * Target object name — *rebinds* references to a different object rather
+   * than moving the same object (e.g. point `identity.current_actor()` calls
+   * at `current_user_id()`). At least one of `toSchema`/`toName` is required.
+   */
+  toName?: string;
 }
 
 /**
@@ -66,6 +77,18 @@ export interface PgpmExtensionsRouting {
 /** Role-name translation: source role name → target role name. */
 export type PgpmRolesRouting = Record<string, string>;
 
+/**
+ * Subsystem exclusion: remove every object owned by these schemas from the
+ * transpiled output and substitute a replacement provider. Exclusion is only
+ * safe when every surviving reference into an excluded schema is rebound via
+ * `route` (or covered by a whole-schema `schemas` mapping); the engine
+ * refuses otherwise, naming each unsatisfied reference.
+ */
+export interface PgpmExcludeSpec {
+  /** Schemas whose objects form the excluded subsystem. */
+  schemas: string[];
+}
+
 /** The unified routing profile. Every key is optional and merges per key. */
 export interface PgpmRoutingProfile {
   /** Whole-schema default: source schema → target schema. */
@@ -76,10 +99,12 @@ export interface PgpmRoutingProfile {
   extensions?: PgpmExtensionsRouting;
   /** Role-name translation (see {@link PgpmRolesRouting}). */
   roles?: PgpmRolesRouting;
+  /** Subsystem exclusion + substitution (see {@link PgpmExcludeSpec}). */
+  exclude?: PgpmExcludeSpec;
 }
 
 /** The routing-profile keys, in a stable order. */
-export const ROUTING_PROFILE_KEYS = ['schemas', 'route', 'extensions', 'roles'] as const;
+export const ROUTING_PROFILE_KEYS = ['schemas', 'route', 'extensions', 'roles', 'exclude'] as const;
 
 /**
  * Merge routing profiles per key: for each of `schemas`/`route`/`extensions`/

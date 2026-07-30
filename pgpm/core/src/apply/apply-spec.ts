@@ -62,6 +62,12 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
       throw new Error(`${specPath}: "route" must be a non-empty array of route entries`);
     }
     for (const entry of parsed.route) {
+      const validToSchema =
+        entry?.toSchema === undefined ||
+        entry.toSchema === null ||
+        (typeof entry.toSchema === 'string' && !!entry.toSchema);
+      const validToName =
+        entry?.toName === undefined || (typeof entry.toName === 'string' && !!entry.toName);
       if (
         !entry ||
         typeof entry !== 'object' ||
@@ -69,14 +75,15 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
         !entry.fromSchema ||
         typeof entry.name !== 'string' ||
         !entry.name ||
-        typeof entry.toSchema !== 'string' ||
-        !entry.toSchema ||
+        !validToSchema ||
+        !validToName ||
+        (entry.toSchema === undefined && entry.toName === undefined) ||
         !ROUTE_KINDS.includes(entry.kind)
       ) {
         throw new Error(
           `${specPath}: each "route" entry needs { fromSchema, kind (${ROUTE_KINDS.join(
             '|'
-          )}), name, toSchema } as non-empty strings`
+          )}), name } plus "toSchema" (schema | null) and/or "toName"`
         );
       }
     }
@@ -178,9 +185,26 @@ export function parseApplySpec(content: string, specPath: string): ResolvedApply
     throw new Error(`${specPath}: "roles" must be a non-empty string → string map`);
   }
 
-  if (!hasSchemas && !hasRoute && !hasExtensions && !hasRoles) {
+  const hasExclude = parsed.exclude !== undefined;
+  if (hasExclude) {
+    const ex = parsed.exclude;
+    if (
+      typeof ex !== 'object' ||
+      ex === null ||
+      Array.isArray(ex) ||
+      !Array.isArray(ex.schemas) ||
+      ex.schemas.length === 0 ||
+      ex.schemas.some((s: any) => typeof s !== 'string' || !s)
+    ) {
+      throw new Error(
+        `${specPath}: "exclude" must be { schemas: [non-empty schema names] }`
+      );
+    }
+  }
+
+  if (!hasSchemas && !hasRoute && !hasExtensions && !hasRoles && !hasExclude) {
     throw new Error(
-      `${specPath}: at least one of "schemas", "route", "extensions", or "roles" is required`
+      `${specPath}: at least one of "schemas", "route", "extensions", "roles", or "exclude" is required`
     );
   }
 
