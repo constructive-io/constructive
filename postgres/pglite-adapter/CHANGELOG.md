@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.9.0...@pgpmjs/pglite-adapter@1.9.1) (2026-07-30)
+
+### Bug Fixes
+
+- **pgpm:** don't activate drivers for connectionless commands; accept relative --cwd ([bfbc5de](https://github.com/constructive-io/constructive/commit/bfbc5de30472f5ef6e63a3af84d8f0c320db22b4))
+
 # [1.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.8.2...@pgpmjs/pglite-adapter@1.9.0) (2026-07-30)
 
 ### Features

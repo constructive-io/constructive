@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.16.0...@pgpmjs/core@7.17.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** subsystem substitution in apply — exclude, rebind, cascade-safe materialization ([08c3063](https://github.com/constructive-io/constructive/commit/08c30635e2a1dbb9d8544d8b8fdb88be9e34669c))
+- **pgpm:** unified routing profile — shared type, workspace portability attach point, per-key merge ([ff74b95](https://github.com/constructive-io/constructive/commit/ff74b95b765394a90819f62c842a6ed8792ac196))
+
 # [7.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.15.0...@pgpmjs/core@7.16.0) (2026-07-30)
 
 ### Bug Fixes

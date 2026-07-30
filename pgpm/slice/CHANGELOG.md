@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.10.2...@pgpmjs/slice@0.11.0) (2026-07-30)
+
+### Features
+
+- **pgpm:** subsystem substitution in apply — exclude, rebind, cascade-safe materialization ([08c3063](https://github.com/constructive-io/constructive/commit/08c30635e2a1dbb9d8544d8b8fdb88be9e34669c))
+- **slice:** subsystem exclusion with cascade safety + contract extraction ([a44f08a](https://github.com/constructive-io/constructive/commit/a44f08ac05aa0cc96d8f4215a64927fd8a1ac811))
+
 ## [0.10.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.10.1...@pgpmjs/slice@0.10.2) (2026-07-30)
 
 **Note:** Version bump only for package @pgpmjs/slice

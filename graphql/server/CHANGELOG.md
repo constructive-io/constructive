@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.12.3...@constructive-io/graphql-server@5.13.0) (2026-07-30)
+
+### Bug Fixes
+
+- **server:** fall back to serving database for NULL apis.dbname in loader context ([98b5bb2](https://github.com/constructive-io/constructive/commit/98b5bb27c1e0197411d1f22bee2c0c28b09fa257))
+
+### Features
+
+- **server:** map trusted internal identity headers to claims on the private surface ([bedacc1](https://github.com/constructive-io/constructive/commit/bedacc1b1638482d8a90853ff864b7e0e416a9bc))
+
 ## [5.12.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.12.2...@constructive-io/graphql-server@5.12.3) (2026-07-30)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
