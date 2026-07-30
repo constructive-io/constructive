@@ -5,3 +5,4 @@ export * from './refs';
 export * from './closure';
 export * from './partition';
 export * from './exclude';
+export * from './object-graph';

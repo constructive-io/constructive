@@ -1,5 +1,4 @@
-import { classifyStatements, SchemaRouter, StatementFacts } from '@pgpmjs/transform';
-import { parseSql } from 'plpgsql-parser';
+import { parseSqlProgram, SchemaRouter, SqlProgram, StatementFacts } from '@pgpmjs/transform';
 
 import { SqlObjectRef } from './refs';
 
@@ -80,6 +79,8 @@ export interface ExcludeResult {
   warnings: ExcludeWarning[];
   /** The classified statements, for callers that need the facts. */
   statements: StatementFacts[];
+  /** The parsed program the analysis ran over (one parse, shared with strip). */
+  program: SqlProgram;
 }
 
 function inSubsystem(ref: SqlObjectRef, schemas: Set<string>): boolean {
@@ -162,7 +163,8 @@ export function excludeSubsystem(
   options: { rebinds?: SchemaRouter } = {}
 ): ExcludeResult {
   const schemas = new Set(selector.schemas);
-  const statements = classifyStatements(sql);
+  const program = parseSqlProgram(sql);
+  const statements = program.statements.map(s => s.facts);
   const router = options.rebinds;
 
   const excluded: number[] = [];
@@ -246,7 +248,8 @@ export function excludeSubsystem(
     },
     unsatisfied,
     warnings,
-    statements
+    statements,
+    program
   };
 }
 
@@ -257,17 +260,12 @@ export function excludeSubsystem(
  * target dropped objects, so they must go with it.
  */
 export function blankScriptSql(sql: string): string {
-  const parsed = parseSql(sql) as {
-    stmts: Array<{ stmt: Record<string, unknown>; stmt_location?: number; stmt_len?: number }>;
-  };
-  const prefix =
-    parsed.stmts.length > 0 ? sql.slice(0, parsed.stmts[0].stmt_location ?? 0) : sql;
+  const { statements } = parseSqlProgram(sql);
+  const prefix = statements.length > 0 ? sql.slice(0, statements[0].span.start) : sql;
   const pieces: string[] = [];
-  for (const s of parsed.stmts) {
+  for (const s of statements) {
     if (!('TransactionStmt' in s.stmt)) continue;
-    const start = s.stmt_location ?? 0;
-    const len = s.stmt_len ?? sql.length - start;
-    pieces.push(sql.slice(start, start + len).trim() + ';');
+    pieces.push(s.raw.trim() + ';');
   }
   return prefix + pieces.join('\n\n') + (pieces.length > 0 ? '\n' : '');
 }
@@ -328,33 +326,22 @@ export function stripSubsystemSql(
 ): StripSubsystemResult {
   const result = excludeSubsystem(sql, selector, options);
   const schemas = new Set(selector.schemas);
-
-  const parsed = parseSql(sql) as {
-    stmts: Array<{ stmt: Record<string, any>; stmt_location?: number; stmt_len?: number }>;
-  };
-  if (parsed.stmts.length !== result.statements.length) {
-    throw new Error(
-      `stripSubsystemSql: parser saw ${parsed.stmts.length} statements but the classifier saw ` +
-        `${result.statements.length}; refusing to slice by index`
-    );
-  }
+  const { statements } = result.program;
 
   const drop = new Set(result.excluded);
   for (const i of result.kept) {
-    if (opaqueTargetsSubsystem(parsed.stmts[i].stmt, schemas)) drop.add(i);
+    if (opaqueTargetsSubsystem(statements[i].stmt, schemas)) drop.add(i);
   }
 
   // Text before the first statement (pgpm headers, leading comments) is
   // preserved verbatim so script identity headers survive the strip.
   const prefix =
-    parsed.stmts.length > 0 ? sql.slice(0, parsed.stmts[0].stmt_location ?? 0) : sql;
+    statements.length > 0 ? sql.slice(0, statements[0].span.start) : sql;
 
   const pieces: string[] = [];
-  parsed.stmts.forEach((s, i) => {
+  statements.forEach((s, i) => {
     if (drop.has(i)) return;
-    const start = s.stmt_location ?? 0;
-    const len = s.stmt_len ?? sql.length - start;
-    pieces.push(sql.slice(start, start + len).trim() + ';');
+    pieces.push(s.raw.trim() + ';');
   });
 
   return {
