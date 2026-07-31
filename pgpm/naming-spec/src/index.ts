@@ -12,22 +12,37 @@
  * renders identities to paths; the `ObjectIdentity` shape below is
  * structurally identical to the upstream type, so either can be passed.
  *
- * Canonical templates (the conventions used across constructive-db deploy
- * trees):
+ * The reference implementation of these templates is constructive-db's
+ * `db_deps` SQL package (`db_deps.table_deps`, `db_deps.column_deps`,
+ * `db_deps.next_alteration`, ...); this package is the TypeScript rendering
+ * of the same spec, so paths derived in SQL and in TS agree byte-for-byte.
+ *
+ * Canonical templates (naming spec v1, `directory` style — matching
+ * `db_deps.*` and the generated `application/constructive` plan):
  *
  *   schema     schemas/{schema}/schema
  *   table      schemas/{schema}/tables/{table}/table
+ *   column     schemas/{schema}/tables/{table}/columns/{name}/column
+ *   constraint schemas/{schema}/tables/{table}/constraints/{name}/constraint
+ *   policy     schemas/{schema}/tables/{table}/policies/{name}/policy
+ *   rls        schemas/{schema}/tables/{table}/policies/enable_row_level_security
  *   trigger    schemas/{schema}/tables/{table}/triggers/{name}
- *   policy     schemas/{schema}/tables/{table}/policies/{name}
  *   index      schemas/{schema}/tables/{table}/indexes/{name}
- *   constraint schemas/{schema}/tables/{table}/constraints/{name}
  *   seed_dml   schemas/{schema}/tables/{table}/fixtures/{name}
- *   function   schemas/{schema}/procedures/{name}
- *   view       schemas/{schema}/views/{name}
+ *   function   schemas/{schema}/procedures/{name}/procedure
+ *   view       schemas/{schema}/views/{name}/view
  *   type       schemas/{schema}/types/{name}
  *   sequence   schemas/{schema}/sequences/{name}
  *   extension  extensions/{name}
  *   role       roles/{name}
+ *
+ * `flat` style drops the trailing kind token for functions/views/columns/
+ * constraints/policies (`schemas/{s}/procedures/{n}`) — the convention used
+ * by hand-authored constructive-db packages (`db_deps.fn_deps`).
+ *
+ * Conflicts/re-alterations: when the same object is altered again, the spec
+ * appends a monotonically numbered alteration segment (`db_deps.next_alteration`):
+ * `<parent>/alterations/alt0000000042` — see {@link alterationPathFor}.
  */
 
 /** Spec version, so bundles/modules can declare which scheme derived their paths. */
@@ -64,6 +79,21 @@ export interface ObjectIdentity {
   table?: string;
 }
 
+/**
+ * Rendering style.
+ *
+ * - `directory` — every object is a directory closed by a kind token
+ *   (`.../procedures/{n}/procedure`), as produced by `db_deps.*` and the
+ *   generated `application/constructive` plan. The default.
+ * - `flat` — schema-scoped objects are leaf files (`.../procedures/{n}`),
+ *   as used by hand-authored constructive-db packages.
+ */
+export type PathStyle = 'directory' | 'flat';
+
+export interface PathForOptions {
+  style?: PathStyle;
+}
+
 /** Kinds whose objects are scoped to (and only unique within) a table. */
 const TABLE_SCOPED = new Set<ObjectIdentityKind>([
   'trigger',
@@ -90,13 +120,23 @@ const TABLE_DIRS: Partial<Record<ObjectIdentityKind, string>> = {
   seed_dml: 'fixtures'
 };
 
+/** Trailing kind tokens in `directory` style (mirrors `db_deps.*_deps`). */
+const KIND_TOKENS: Partial<Record<ObjectIdentityKind, string>> = {
+  function: 'procedure',
+  view: 'view',
+  policy: 'policy',
+  constraint: 'constraint'
+};
+
 /**
  * Render an identity to its canonical pgpm change path (naming spec v1).
- * Total and deterministic: every identity gets exactly one path.
+ * Total and deterministic: every identity gets exactly one path per style.
  */
-export function pathFor(identity: ObjectIdentity): string {
+export function pathFor(identity: ObjectIdentity, options: PathForOptions = {}): string {
+  const style = options.style ?? 'directory';
   const { kind, name } = identity;
   const schema = identity.schema ?? 'public';
+  const token = style === 'directory' ? KIND_TOKENS[kind] : undefined;
 
   if (kind === 'schema') return `schemas/${name}/schema`;
   if (kind === 'extension') return `extensions/${name}`;
@@ -105,10 +145,26 @@ export function pathFor(identity: ObjectIdentity): string {
 
   if (TABLE_SCOPED.has(kind)) {
     const dir = TABLE_DIRS[kind]!;
-    return `schemas/${schema}/tables/${identity.table ?? name}/${dir}/${name}`;
+    const base = `schemas/${schema}/tables/${identity.table ?? name}/${dir}/${name}`;
+    return token ? `${base}/${token}` : base;
   }
 
   const dir = SCHEMA_DIRS[kind];
-  if (dir) return `schemas/${schema}/${dir}/${name}`;
+  if (dir) {
+    const base = `schemas/${schema}/${dir}/${name}`;
+    return token ? `${base}/${token}` : base;
+  }
   return `schemas/${schema}/objects/${name}`;
+}
+
+/**
+ * Path for the nth re-alteration of an object (the conflict convention):
+ * `<parent>/alterations/alt0000000042`, mirroring `db_deps.next_alteration`.
+ * Any existing alteration suffix on `parent` is stripped first, so the same
+ * parent can be renumbered. Sequencing (the counter) is the caller's state;
+ * this renders deterministically from `(parent, n)`.
+ */
+export function alterationPathFor(parent: string, n: number, prefix = 'alt'): string {
+  const stripped = parent.replace(new RegExp(`/alterations/${prefix}[0-9]+$`), '');
+  return `${stripped}/alterations/${prefix}${String(n).padStart(10, '0')}`;
 }
