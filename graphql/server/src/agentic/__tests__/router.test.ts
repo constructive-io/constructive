@@ -9,7 +9,7 @@
  * billing flow, and response structure without external dependencies.
  */
 
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction,Request, Response } from 'express';
 import http from 'http';
 import supertest from 'supertest';
 
@@ -30,14 +30,14 @@ jest.mock('@agentic-kit/ollama', () => {
         input: ['text', 'image'],
         reasoning: false,
         tools: false,
-        ...overrides,
+        ...overrides
       };
     }
 
     async embed(text: string, model = 'nomic-embed-text') {
       return {
         embedding: [0.1, 0.2, 0.3, 0.4, 0.5],
-        promptTokens: text.split(' ').length,
+        promptTokens: text.split(' ').length
       };
     }
 
@@ -80,10 +80,10 @@ jest.mock('@agentic-kit/ollama', () => {
               cacheRead: 0,
               cacheWrite: 0,
               totalTokens: 15,
-              cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+              cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 }
             },
             stopReason: 'stop' as const,
-            timestamp: Date.now(),
+            timestamp: Date.now()
           };
         }
       };
@@ -95,11 +95,11 @@ jest.mock('@agentic-kit/ollama', () => {
   return {
     OllamaAdapter: MockOllamaAdapter,
     OllamaClient: MockOllamaAdapter,
-    __esModule: true,
+    __esModule: true
   };
 });
 
-import { createAgenticRouter } from '../src';
+import { createAgenticRouter } from '../index';
 
 jest.setTimeout(15000);
 
@@ -117,7 +117,7 @@ function createMockConstructiveContext(overrides: any = {}) {
     userId: 'userId' in overrides ? overrides.userId : 'user-123',
     requestId: 'req-001',
     pool: {
-      query: jest.fn(async () => ({ rows: [] as any[] })),
+      query: jest.fn(async () => ({ rows: [] as any[] }))
     },
     useModule: jest.fn(async (name: string) => {
       if (name === 'agentChat') {
@@ -126,7 +126,7 @@ function createMockConstructiveContext(overrides: any = {}) {
           schemaName: 'agent_public',
           threadTableName: 'agent_thread',
           messageTableName: 'agent_message',
-          taskTableName: 'agent_task',
+          taskTableName: 'agent_task'
         };
       }
       if (name === 'billing') {
@@ -150,8 +150,8 @@ function createMockConstructiveContext(overrides: any = {}) {
                 mode: 'ask',
                 model: null as string | null,
                 system_prompt: null as string | null,
-                status: 'active',
-              }],
+                status: 'active'
+              }]
             };
           }
           // Message history
@@ -167,15 +167,15 @@ function createMockConstructiveContext(overrides: any = {}) {
                 model: null as string | null,
                 system_prompt: null as string | null,
                 status: 'active',
-                created_at: new Date().toISOString(),
-              }],
+                created_at: new Date().toISOString()
+              }]
             };
           }
           return { rows: [] };
-        }),
+        })
       };
       return fn(mockClient);
-    }),
+    })
   };
 }
 
@@ -213,7 +213,7 @@ describe('agentic-server router', () => {
 
     it('returns 404 when agent module not provisioned', async () => {
       const ctx = createMockConstructiveContext({
-        modules: { agentChat: null },
+        modules: { agentChat: null }
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -267,7 +267,7 @@ describe('agentic-server router', () => {
 
     it('returns 404 when thread not found', async () => {
       const ctx = createMockConstructiveContext({
-        queryResults: { threadLookup: { rows: [] } },
+        queryResults: { threadLookup: { rows: [] } }
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -289,7 +289,7 @@ describe('agentic-server router', () => {
         .post('/v1/threads/thread-001/messages')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          stream: false,
+          stream: false
         });
 
       expect(res.status).toBe(200);
@@ -315,8 +315,8 @@ describe('agentic-server router', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: [{ role: 'user', content: 'Hello' }],
-          }),
+            messages: [{ role: 'user', content: 'Hello' }]
+          })
         });
 
         expect(response.status).toBe(200);
@@ -334,11 +334,11 @@ describe('agentic-server router', () => {
       const mockBillingClient = {
         checkQuota: jest.fn(async () => false),
         recordUsage: jest.fn(async () => {}),
-        logInference: jest.fn(async () => {}),
+        logInference: jest.fn(async () => {})
       };
 
       const ctx = createMockConstructiveContext({
-        billingClient: mockBillingClient,
+        billingClient: mockBillingClient
       });
 
       const app = createTestApp(ctx);
@@ -348,7 +348,7 @@ describe('agentic-server router', () => {
         .post('/v1/threads/thread-001/messages')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          stream: false,
+          stream: false
         });
 
       expect(res.status).toBe(429);
@@ -415,11 +415,11 @@ describe('agentic-server router', () => {
       const mockBillingClient = {
         checkQuota: jest.fn(async () => true),
         recordUsage: jest.fn(async () => {}),
-        logInference: jest.fn(async () => {}),
+        logInference: jest.fn(async () => {})
       };
 
       const ctx = createMockConstructiveContext({
-        billingClient: mockBillingClient,
+        billingClient: mockBillingClient
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -428,7 +428,7 @@ describe('agentic-server router', () => {
         .post('/v1/threads/thread-001/messages')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          stream: false,
+          stream: false
         });
 
       expect(res.status).toBe(200);
@@ -445,7 +445,7 @@ describe('agentic-server router', () => {
         output_tokens: 5,
         model: expect.any(String),
         latency_ms: expect.any(Number),
-        stream: false,
+        stream: false
       });
 
       expect(mockBillingClient.logInference).toHaveBeenCalledTimes(1);
@@ -458,7 +458,7 @@ describe('agentic-server router', () => {
         totalTokens: 15,
         status: 'ok',
         provider: 'ollama',
-        latencyMs: expect.any(Number),
+        latencyMs: expect.any(Number)
       });
     });
 
@@ -466,11 +466,11 @@ describe('agentic-server router', () => {
       const mockBillingClient = {
         checkQuota: jest.fn(async () => true),
         recordUsage: jest.fn(async () => {}),
-        logInference: jest.fn(async () => {}),
+        logInference: jest.fn(async () => {})
       };
 
       const ctx = createMockConstructiveContext({
-        billingClient: mockBillingClient,
+        billingClient: mockBillingClient
       });
       const app = createTestApp(ctx);
 
@@ -484,8 +484,8 @@ describe('agentic-server router', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: [{ role: 'user', content: 'Hello' }],
-            stream: true,
-          }),
+            stream: true
+          })
         });
 
         expect(response.status).toBe(200);
@@ -500,7 +500,7 @@ describe('agentic-server router', () => {
         expect(metadata).toMatchObject({
           stream: true,
           input_tokens: 10,
-          output_tokens: 5,
+          output_tokens: 5
         });
 
         expect(mockBillingClient.logInference).toHaveBeenCalledTimes(1);
@@ -516,11 +516,11 @@ describe('agentic-server router', () => {
       const mockBillingClient = {
         checkQuota: jest.fn(async () => true),
         recordUsage: jest.fn(async () => {}),
-        logInference: jest.fn(async () => {}),
+        logInference: jest.fn(async () => {})
       };
 
       const ctx = createMockConstructiveContext({
-        billingClient: mockBillingClient,
+        billingClient: mockBillingClient
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -541,7 +541,7 @@ describe('agentic-server router', () => {
         input_tokens: expect.any(Number),
         model: expect.any(String),
         latency_ms: expect.any(Number),
-        batch_size: 1,
+        batch_size: 1
       });
 
       expect(mockBillingClient.logInference).toHaveBeenCalledTimes(1);
@@ -551,13 +551,13 @@ describe('agentic-server router', () => {
         operation: 'embed',
         outputTokens: 0,
         status: 'ok',
-        provider: 'ollama',
+        provider: 'ollama'
       });
     });
 
     it('skips billing when billingClient is null', async () => {
       const ctx = createMockConstructiveContext({
-        billingClient: null,
+        billingClient: null
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -566,7 +566,7 @@ describe('agentic-server router', () => {
         .post('/v1/threads/thread-001/messages')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          stream: false,
+          stream: false
         });
 
       expect(res.status).toBe(200);
@@ -577,11 +577,11 @@ describe('agentic-server router', () => {
       const mockBillingClient = {
         checkQuota: jest.fn(async () => true),
         recordUsage: jest.fn(async () => { throw new Error('billing db down'); }),
-        logInference: jest.fn(async () => { throw new Error('inference log db down'); }),
+        logInference: jest.fn(async () => { throw new Error('inference log db down'); })
       };
 
       const ctx = createMockConstructiveContext({
-        billingClient: mockBillingClient,
+        billingClient: mockBillingClient
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -590,7 +590,7 @@ describe('agentic-server router', () => {
         .post('/v1/threads/thread-001/messages')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          stream: false,
+          stream: false
         });
 
       // Response should still succeed despite billing failures
@@ -606,11 +606,11 @@ describe('agentic-server router', () => {
       const mockBillingClient = {
         checkQuota: jest.fn(async () => true),
         recordUsage: jest.fn(async () => {}),
-        logInference: jest.fn(async () => {}),
+        logInference: jest.fn(async () => {})
       };
 
       const ctx = createMockConstructiveContext({
-        billingClient: mockBillingClient,
+        billingClient: mockBillingClient
       });
       const app = createTestApp(ctx);
       const request = makeRequest(app);
@@ -619,7 +619,7 @@ describe('agentic-server router', () => {
         .post('/v1/threads/thread-001/messages')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          stream: false,
+          stream: false
         });
 
       await new Promise((r) => setTimeout(r, 50));

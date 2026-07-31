@@ -6,7 +6,6 @@ import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
-import { createAgenticRouter } from 'agentic-server';
 import cookieParser from 'cookie-parser';
 import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import { closeAllCaches,graphileCache } from 'graphile-cache';
@@ -16,6 +15,7 @@ import { Pool, PoolClient } from 'pg';
 import { getPgPool } from 'pg-cache';
 import requestIp from 'request-ip';
 
+import { createAgenticRouter } from './agentic';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
 import type { DebugSamplerHandle } from './diagnostics/debug-sampler';
 import { startDebugSampler } from './diagnostics/debug-sampler';

@@ -1,37 +1,36 @@
 /**
- * agentic-server — Standalone Express LLM service
+ * agentic-server — Standalone OpenAI-compatible LLM gateway
  *
- * Express-only equivalent of graphile-llm: agent threads, chat streaming,
- * billing metering, and inference logging. Uses @constructive-io/express-context
- * for tenant-scoped database access.
- *
- * LLM provider config is resolved per-database via `ctx.useLlm()` (from the
- * llm_module table), falling back to env vars from @constructive-io/llm-env when the module
- * is not provisioned. Discovery and billing are handled by the shared loaders
- * in express-context — no custom caching here.
+ * A stateless multi-provider proxy that:
+ *   1. Accepts OpenAI-compatible requests (`/v1/chat/completions`, `/v1/embeddings`)
+ *   2. Enforces tenant isolation via X-Database-Id / X-Entity-Id / X-Actor-Id headers
+ *   3. Routes to configured LLM provider(s) (OpenAI, Anthropic, Ollama)
+ *   4. Records inference usage through an injected {@link InferenceSink}
+ *      (fire-and-forget) — the gateway is backend-agnostic and never imports a
+ *      concrete metering implementation.
  *
  * @example
  * ```typescript
- * import express from 'express';
- * import { createContextMiddleware } from '@constructive-io/express-context';
- * import { createAgenticRouter } from 'agentic-server';
+ * import { createAgenticServer } from 'agentic-server';
  *
- * const app = express();
- * app.use(createContextMiddleware());
- * app.use(createAgenticRouter());
+ * const app = createAgenticServer({
+ *   providerType: 'ollama',
+ *   providerBaseUrl: 'http://localhost:11434',
+ *   inferenceSink: { logInference: (entry) => myBackend.record(entry) },
+ * });
  * app.listen(3001);
  * ```
  */
 
-export { createAgenticRouter } from './router';
-
-// Re-export types from express-context for convenience
+export { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
+export { createRouter } from './router';
+export type { AgenticServerStartOptions } from './server';
+export { createAgenticServer } from './server';
 export type {
-  BillingClient,
-  InferenceLogEntry,
-  LlmConfig,
-} from '@constructive-io/express-context';
-
-// Re-export LLM env options from @constructive-io/llm-env (single source of truth)
-export type { LlmEnvOptions, LlmProviderConfig, ResolvedLlmEnvOptions } from '@constructive-io/llm-env';
-export { getEnvVars as getLlmEnvVars, getEnvOptions as getLlmEnvOptions, llmDefaults } from '@constructive-io/llm-env';
+  AgenticServerOptions,
+  InferenceEntry,
+  InferenceSink,
+  ProviderConfig,
+  ResolvedProvider,
+  UsageResult
+} from './types';

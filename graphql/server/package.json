@@ -41,11 +41,13 @@
     "backend"
   ],
   "dependencies": {
+    "@agentic-kit/ollama": "workspace:*",
     "@constructive-io/csrf": "workspace:^",
     "@constructive-io/errors": "workspace:^",
     "@constructive-io/express-context": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/llm-env": "workspace:^",
     "@constructive-io/query-builder": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
@@ -54,7 +56,6 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "agentic-server": "workspace:*",
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
     "express": "^5.2.1",
@@ -87,10 +88,12 @@
     "@types/graphql-upload": "^8.0.12",
     "@types/pg": "^8.20.0",
     "@types/request-ip": "^0.0.41",
+    "@types/supertest": "^7.2.0",
     "cookie-parser": "^1.4.7",
     "graphile-test": "workspace:*",
     "makage": "^0.3.0",
     "nodemon": "^3.1.14",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2"
   }
 }
