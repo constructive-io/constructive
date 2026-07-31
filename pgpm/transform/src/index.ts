@@ -15,6 +15,15 @@ export {
   makeSchemaTranspiler,
 } from './bundle-driver';
 export type {
+  GranularityChange,
+  RestructureModuleOptions,
+  RestructureModuleResult,
+} from './granularity-driver';
+export {
+  defaultChangeName,
+  restructureChanges,
+} from './granularity-driver';
+export type {
   CategoryProfile,
   ChangeCategory,
 } from './categorize';

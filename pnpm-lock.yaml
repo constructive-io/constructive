@@ -3097,8 +3097,8 @@ importers:
   pgpm/transform:
     dependencies:
       '@pgsql/transform':
-        specifier: ^18.8.0
-        version: 18.8.0
+        specifier: ^18.9.0
+        version: 18.9.0
       plpgsql-parser:
         specifier: ^18.2.2
         version: 18.2.2
@@ -4168,20 +4168,6 @@ packages:
         integrity: sha512-sl4Bm6yiMNYrZKkqqDFWN0UfnWhlS8ivKxrYl+6t0gCLrqr8y3B2IqZZbFRkfaVVp7C/baApyh71P+LeE1A2sQ==,
       }
     engines: { node: '>=18.0.0' }
-
-  '@babel/code-frame@7.27.1':
-    resolution:
-      {
-        integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==,
-      }
-    engines: { node: '>=6.9.0' }
-
-  '@babel/code-frame@7.28.6':
-    resolution:
-      {
-        integrity: sha512-JYgintcMjRiCvS8mMECzaEn+m3PfoQiyqukOMCCVQtoJGYJw8j/8LBJEiqkHLkfwCcs74E3pbAUFNg7d9VNJ+Q==,
-      }
-    engines: { node: '>=6.9.0' }
 
   '@babel/code-frame@7.29.0':
     resolution:
@@ -6457,10 +6443,10 @@ packages:
         integrity: sha512-wZcMP1QHiQbWWKOw4nfvZ74xUSz/9jqeSUXVnoR1saI5M0D+iYbiuOlfNDyYmziLwgEkCuSJLZK1dZ+eQCwgAA==,
       }
 
-  '@pgsql/transform@18.8.0':
+  '@pgsql/transform@18.9.0':
     resolution:
       {
-        integrity: sha512-orYvqoD34XPwpp4KgJNiXZFOmze2dSZOd3gwHHyy2fICf+5XXN5IBX14tJxiwon2k8NpPfpjQ5xSQjDhK5uRzQ==,
+        integrity: sha512-VqkupUcHLvvUcc0Sqhwq7tevmnLjAree2k215z2kJJtmeALfLx6gFBu8pQaI6HedBo5aqy2ORlGp/HAYLW2h/w==,
       }
 
   '@pgsql/traverse@18.1.0':
@@ -15926,18 +15912,6 @@ snapshots:
 
   '@aws/lambda-invoke-store@0.3.0': {}
 
-  '@babel/code-frame@7.27.1':
-    dependencies:
-      '@babel/helper-validator-identifier': 7.28.5
-      js-tokens: 4.0.0
-      picocolors: 1.1.1
-
-  '@babel/code-frame@7.28.6':
-    dependencies:
-      '@babel/helper-validator-identifier': 7.28.5
-      js-tokens: 4.0.0
-      picocolors: 1.1.1
-
   '@babel/code-frame@7.29.0':
     dependencies:
       '@babel/helper-validator-identifier': 7.28.5
@@ -15948,7 +15922,7 @@ snapshots:
 
   '@babel/core@7.28.6':
     dependencies:
-      '@babel/code-frame': 7.28.6
+      '@babel/code-frame': 7.29.0
       '@babel/generator': 7.29.1
       '@babel/helper-compilation-targets': 7.28.6
       '@babel/helper-module-transforms': 7.28.6(@babel/core@7.28.6)
@@ -17763,7 +17737,7 @@ snapshots:
 
   '@pgsql/quotes@18.1.0': {}
 
-  '@pgsql/transform@18.8.0':
+  '@pgsql/transform@18.9.0':
     dependencies:
       '@pgsql/quotes': 18.1.0
       '@pgsql/traverse': 18.4.0
@@ -18431,7 +18405,7 @@ snapshots:
 
   '@testing-library/dom@7.31.2':
     dependencies:
-      '@babel/code-frame': 7.27.1
+      '@babel/code-frame': 7.29.0
       '@babel/runtime': 7.28.4
       '@types/aria-query': 4.2.2
       aria-query: 4.2.2
@@ -21157,7 +21131,7 @@ snapshots:
 
   jest-message-util@30.2.0:
     dependencies:
-      '@babel/code-frame': 7.28.6
+      '@babel/code-frame': 7.29.0
       '@jest/types': 30.2.0
       '@types/stack-utils': 2.0.3
       chalk: 4.1.2
