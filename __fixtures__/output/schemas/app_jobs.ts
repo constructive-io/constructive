@@ -1,4 +1,4 @@
-import { Timestamp, UUID } from "./_common";
+import { Timestamp, UUID } from './_common';
 export interface JobQueues {
   queue_name: string;
   job_count: number;

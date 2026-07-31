@@ -5,11 +5,10 @@
  * Each method uses function overloads for IDE autocompletion of select objects.
  */
 import * as t from '@babel/types';
-
 import { singularize } from 'inflekt';
 
 import type { Table, TypeRegistry } from '../../../types/schema';
-import { asConst, generateCode } from '../babel-ast';
+import { generateCode } from '../babel-ast';
 import {
   getCreateInputTypeName,
   getCreateMutationName,
@@ -26,7 +25,6 @@ import {
   lcFirst,
   ucFirst,
 } from '../utils';
-import type { ExtraInputKey } from '../utils';
 
 export interface GeneratedModelFile {
   fileName: string;
@@ -370,64 +368,64 @@ export function generateModelFile(
       ),
       t.objectProperty(
         t.identifier('orderBy'),
-          t.tsAsExpression(
-            t.optionalMemberExpression(
-              t.identifier('args'),
-              t.identifier('orderBy'),
-              false,
-              true,
-            ),
-            t.tsUnionType([
-              t.tsArrayType(t.tsStringKeyword()),
-              t.tsUndefinedKeyword(),
-            ]),
+        t.tsAsExpression(
+          t.optionalMemberExpression(
+            t.identifier('args'),
+            t.identifier('orderBy'),
+            false,
+            true,
           ),
+          t.tsUnionType([
+            t.tsArrayType(t.tsStringKeyword()),
+            t.tsUndefinedKeyword(),
+          ]),
         ),
-        t.objectProperty(
+      ),
+      t.objectProperty(
+        t.identifier('first'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
           t.identifier('first'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('first'),
-            false,
-            true,
-          ),
+          false,
+          true,
         ),
-        t.objectProperty(
+      ),
+      t.objectProperty(
+        t.identifier('last'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
           t.identifier('last'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('last'),
-            false,
-            true,
-          ),
+          false,
+          true,
         ),
-        t.objectProperty(
+      ),
+      t.objectProperty(
+        t.identifier('after'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
           t.identifier('after'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('after'),
-            false,
-            true,
-          ),
+          false,
+          true,
         ),
-        t.objectProperty(
+      ),
+      t.objectProperty(
+        t.identifier('before'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
           t.identifier('before'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('before'),
-            false,
-            true,
-          ),
+          false,
+          true,
         ),
-        t.objectProperty(
+      ),
+      t.objectProperty(
+        t.identifier('offset'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
           t.identifier('offset'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('offset'),
-            false,
-            true,
-          ),
+          false,
+          true,
         ),
+      ),
     ];
     const bodyArgs = [
       t.stringLiteral(typeName),
@@ -932,16 +930,16 @@ export function generateModelFile(
     // Build extraKeys object for partitioned table fields
     const extraKeysArg = updateExtraKeys.length > 0
       ? t.objectExpression(
-          updateExtraKeys.map((ek) =>
-            t.objectProperty(
+        updateExtraKeys.map((ek) =>
+          t.objectProperty(
+            t.identifier(ek.name),
+            t.memberExpression(
+              t.memberExpression(t.identifier('args'), t.identifier('where')),
               t.identifier(ek.name),
-              t.memberExpression(
-                t.memberExpression(t.identifier('args'), t.identifier('where')),
-                t.identifier(ek.name),
-              ),
             ),
           ),
-        )
+        ),
+      )
       : t.identifier('undefined');
     const bodyArgs = [
       t.stringLiteral(typeName),

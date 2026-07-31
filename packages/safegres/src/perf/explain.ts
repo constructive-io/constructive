@@ -18,8 +18,8 @@
  * know nothing about. That requires PostgreSQL 16+.
  */
 
-import type { QueryExecutor } from '../pg/introspect';
 import type { TableIndexSnapshot } from '../pg/indexes';
+import type { QueryExecutor } from '../pg/introspect';
 import type { Finding, FindingEvidence } from '../types';
 
 export interface ExplainOptions {
@@ -134,50 +134,50 @@ function buildProbe(finding: Finding, table: TableIndexSnapshot): Probe | null {
   const context = finding.context ?? {};
 
   switch (finding.code) {
-    case 'X1': {
-      const columns = asStringArray(context.columns);
-      if (columns.length === 0) return null;
-      const predicates = columns
-        .map((name, i) => equality(table, name, i + 1))
-        .filter((p): p is string => p !== null);
-      if (predicates.length !== columns.length) return null;
-      return { sql: `SELECT 1 FROM ${relation} WHERE ${predicates.join(' AND ')}`, expect: 'seq-scan' };
-    }
-    case 'X2': {
-      const predicate = typeof context.column === 'string'
-        ? equality(table, context.column, 1)
-        : null;
-      if (!predicate) return null;
-      return { sql: `SELECT 1 FROM ${relation} WHERE ${predicate}`, expect: 'seq-scan' };
-    }
-    case 'X7': {
-      const column = typeof context.column === 'string' ? context.column : null;
-      if (!column) return null;
-      const type = columnType(table, column);
-      if (!type) return null;
-      if (type === 'tsvector') {
-        return {
-          sql: `SELECT 1 FROM ${relation} WHERE ${quote(column)} @@ $1::tsquery`,
-          expect: 'seq-scan'
-        };
-      }
-      // Vector search is an ordering, not a filter: the index either serves
-      // the distance order or the plan sorts every row.
+  case 'X1': {
+    const columns = asStringArray(context.columns);
+    if (columns.length === 0) return null;
+    const predicates = columns
+      .map((name, i) => equality(table, name, i + 1))
+      .filter((p): p is string => p !== null);
+    if (predicates.length !== columns.length) return null;
+    return { sql: `SELECT 1 FROM ${relation} WHERE ${predicates.join(' AND ')}`, expect: 'seq-scan' };
+  }
+  case 'X2': {
+    const predicate = typeof context.column === 'string'
+      ? equality(table, context.column, 1)
+      : null;
+    if (!predicate) return null;
+    return { sql: `SELECT 1 FROM ${relation} WHERE ${predicate}`, expect: 'seq-scan' };
+  }
+  case 'X7': {
+    const column = typeof context.column === 'string' ? context.column : null;
+    if (!column) return null;
+    const type = columnType(table, column);
+    if (!type) return null;
+    if (type === 'tsvector') {
       return {
-        sql: `SELECT 1 FROM ${relation} ORDER BY ${quote(column)} <-> $1::${type} LIMIT 10`,
-        expect: 'sort'
+        sql: `SELECT 1 FROM ${relation} WHERE ${quote(column)} @@ $1::tsquery`,
+        expect: 'seq-scan'
       };
     }
-    case 'X8': {
-      const column = typeof context.column === 'string' ? context.column : null;
-      if (!column) return null;
-      return {
-        sql: `SELECT 1 FROM ${relation} ORDER BY ${quote(column)} DESC LIMIT 100`,
-        expect: 'sort'
-      };
-    }
-    default:
-      return null;
+    // Vector search is an ordering, not a filter: the index either serves
+    // the distance order or the plan sorts every row.
+    return {
+      sql: `SELECT 1 FROM ${relation} ORDER BY ${quote(column)} <-> $1::${type} LIMIT 10`,
+      expect: 'sort'
+    };
+  }
+  case 'X8': {
+    const column = typeof context.column === 'string' ? context.column : null;
+    if (!column) return null;
+    return {
+      sql: `SELECT 1 FROM ${relation} ORDER BY ${quote(column)} DESC LIMIT 100`,
+      expect: 'sort'
+    };
+  }
+  default:
+    return null;
   }
 }
 

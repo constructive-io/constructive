@@ -10,17 +10,18 @@
  *   - Sparse set filtering (ids argument) works
  */
 
+import { randomUUID } from 'crypto';
+import type { ExecutionResult } from 'graphql';
 import { join } from 'path';
 import { seed } from 'pgsql-test';
+
+import type { RealtimeTestContext } from '../src';
 import {
+  buildInvalidatePayload,
+  buildPayload,
   createRealtimeTestContext,
   waitForEvent,
-  buildPayload,
-  buildInvalidatePayload,
 } from '../src';
-import type { RealtimeTestContext } from '../src';
-import type { ExecutionResult } from 'graphql';
-import { randomUUID } from 'crypto';
 
 // ─── Schema Discovery Tests ──────────────────────────────────────────────────
 

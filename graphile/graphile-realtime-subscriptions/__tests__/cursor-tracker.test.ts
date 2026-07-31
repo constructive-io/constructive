@@ -21,12 +21,12 @@ jest.mock('@pgpmjs/logger', () => ({
 
 import {
   CursorTracker,
-  DEFAULT_POLL_INTERVAL_MS,
-  DEFAULT_HEARTBEAT_INTERVAL_MS,
   DEFAULT_BATCH_LIMIT,
+  DEFAULT_HEARTBEAT_INTERVAL_MS,
+  DEFAULT_POLL_INTERVAL_MS,
   DEFAULT_SCHEMA,
 } from '../src/cursor-tracker';
-import type { Queryable, ChangeLogEntry } from '../src/types';
+import type { ChangeLogEntry,Queryable } from '../src/types';
 
 // --- Test helpers ---
 

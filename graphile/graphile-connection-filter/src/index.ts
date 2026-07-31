@@ -60,35 +60,35 @@ export { ConnectionFilterPreset } from './preset';
 
 // Re-export all plugins for granular use
 export {
-  ConnectionFilterInflectionPlugin,
-  ConnectionFilterTypesPlugin,
   ConnectionFilterArgPlugin,
   ConnectionFilterAttributesPlugin,
-  ConnectionFilterOperatorsPlugin,
-  ConnectionFilterCustomOperatorsPlugin,
-  ConnectionFilterLogicalOperatorsPlugin,
-  ConnectionFilterComputedAttributesPlugin,
-  ConnectionFilterForwardRelationsPlugin,
   ConnectionFilterBackwardRelationsPlugin,
+  ConnectionFilterComputedAttributesPlugin,
+  ConnectionFilterCustomOperatorsPlugin,
+  ConnectionFilterForwardRelationsPlugin,
+  ConnectionFilterInflectionPlugin,
+  ConnectionFilterLogicalOperatorsPlugin,
+  ConnectionFilterOperatorsPlugin,
+  ConnectionFilterTypesPlugin,
   makeApplyFromOperatorSpec,
 } from './plugins';
 
 // Re-export types
 export type {
-  ConnectionFilterOperatorSpec,
-  ConnectionFilterOperatorRegistration,
   ConnectionFilterOperatorFactory,
-  ConnectionFilterOptions,
+  ConnectionFilterOperatorRegistration,
   ConnectionFilterOperatorsDigest,
+  ConnectionFilterOperatorSpec,
+  ConnectionFilterOptions,
   PgConnectionFilterOperatorsScope,
 } from './types';
 export { $$filters } from './types';
 
 // Re-export utilities
 export {
-  isEmpty,
-  makeAssertAllowed,
+  getComputedAttributeResources,
   getQueryBuilder,
   isComputedScalarAttributeResource,
-  getComputedAttributeResources,
+  isEmpty,
+  makeAssertAllowed,
 } from './utils';

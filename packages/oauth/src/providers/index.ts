@@ -1,7 +1,7 @@
 import { OAuthProviderConfig } from '../types';
-import { googleProvider } from './google';
-import { githubProvider, GITHUB_EMAILS_URL, extractPrimaryEmail } from './github';
 import { facebookProvider } from './facebook';
+import { extractPrimaryEmail,GITHUB_EMAILS_URL, githubProvider } from './github';
+import { googleProvider } from './google';
 import { linkedinProvider } from './linkedin';
 
 export const providers: Record<string, OAuthProviderConfig> = {
@@ -20,10 +20,10 @@ export function getProviderIds(): string[] {
 }
 
 export {
-  googleProvider,
-  githubProvider,
-  facebookProvider,
-  linkedinProvider,
-  GITHUB_EMAILS_URL,
   extractPrimaryEmail,
+  facebookProvider,
+  GITHUB_EMAILS_URL,
+  githubProvider,
+  googleProvider,
+  linkedinProvider,
 };

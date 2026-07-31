@@ -33,10 +33,10 @@ export async function runCodegenHandler(
 
   const schemaConfig = args.schemaEnabled
     ? {
-        enabled: true,
-        ...(args.schemaOutput ? { output: String(args.schemaOutput) } : {}),
-        ...(args.schemaFilename ? { filename: String(args.schemaFilename) } : {}),
-      }
+      enabled: true,
+      ...(args.schemaOutput ? { output: String(args.schemaOutput) } : {}),
+      ...(args.schemaFilename ? { filename: String(args.schemaFilename) } : {}),
+    }
     : undefined;
 
   const hasSourceFlags = Boolean(

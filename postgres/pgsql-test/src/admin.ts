@@ -1,6 +1,7 @@
-import { DbAdmin as BaseDbAdmin } from 'pgsql-client';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { PgConfig } from 'pg-env';
+import { DbAdmin as BaseDbAdmin } from 'pgsql-client';
+
 import { SeedAdapter } from './seed/types';
 
 // Extend DbAdmin from pgsql-client with test-specific methods

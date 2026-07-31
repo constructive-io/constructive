@@ -7,27 +7,26 @@
  * Per Dan's guidance: "I would NOT do branching in those existing files.
  * I would make the GraphQL flow its entire own flow at first."
  */
-import { Inquirerer } from 'inquirerer';
-
 import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { createClient } from '@pgpmjs/migrate-client';
-import { GraphQLClient } from './graphql-client';
+import { Inquirerer } from 'inquirerer';
+
 import { exportGraphQLMeta } from './export-graphql-meta';
-import { graphqlRowToPostgresRow } from './graphql-naming';
-import { ExportGranularity, restructureExportRows } from './restructure';
 import {
   DB_REQUIRED_EXTENSIONS,
-  SERVICE_REQUIRED_EXTENSIONS,
-  META_COMMON_HEADER,
-  META_COMMON_FOOTER,
-  META_TABLE_ORDER,
-  Schema,
   detectMissingModules,
   installMissingModules,
   makeReplacer,
+  META_COMMON_FOOTER,
+  META_COMMON_HEADER,
+  META_TABLE_ORDER,
+  normalizeOutdir,
   preparePackage,
-  normalizeOutdir
-} from './export-utils';
+  Schema,
+  SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
+import { GraphQLClient } from './graphql-client';
+import { graphqlRowToPostgresRow } from './graphql-naming';
+import { ExportGranularity, restructureExportRows } from './restructure';
 
 // =============================================================================
 // Public API

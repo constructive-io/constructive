@@ -18,20 +18,21 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
-import { createUnifiedSearchPlugin } from './plugin';
-import { createTsvectorAdapter } from './adapters/tsvector';
-import { createBm25Adapter } from './adapters/bm25';
-import { createTrgmAdapter } from './adapters/trgm';
-import { createPgvectorAdapter } from './adapters/pgvector';
-import { TsvectorCodecPlugin } from './codecs/tsvector-codec';
-import { Bm25CodecPlugin } from './codecs/bm25-codec';
-import { VectorCodecPlugin } from './codecs/vector-codec';
-import { createMatchesOperatorFactory, createTrgmOperatorFactories } from './codecs/operator-factories';
-import type { UnifiedSearchOptions } from './types';
-import type { TsvectorAdapterOptions } from './adapters/tsvector';
+
 import type { Bm25AdapterOptions } from './adapters/bm25';
-import type { TrgmAdapterOptions } from './adapters/trgm';
+import { createBm25Adapter } from './adapters/bm25';
 import type { PgvectorAdapterOptions } from './adapters/pgvector';
+import { createPgvectorAdapter } from './adapters/pgvector';
+import type { TrgmAdapterOptions } from './adapters/trgm';
+import { createTrgmAdapter } from './adapters/trgm';
+import type { TsvectorAdapterOptions } from './adapters/tsvector';
+import { createTsvectorAdapter } from './adapters/tsvector';
+import { Bm25CodecPlugin } from './codecs/bm25-codec';
+import { createMatchesOperatorFactory, createTrgmOperatorFactories } from './codecs/operator-factories';
+import { TsvectorCodecPlugin } from './codecs/tsvector-codec';
+import { VectorCodecPlugin } from './codecs/vector-codec';
+import { createUnifiedSearchPlugin } from './plugin';
+import type { UnifiedSearchOptions } from './types';
 
 /**
  * Options for configuring which adapters are enabled and their settings.

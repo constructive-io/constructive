@@ -6,9 +6,10 @@
  * Wraps the same SQL logic as graphile-pgvector but as a SearchAdapter.
  */
 
-import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
-import { getChunksInfo, type ChunksInfo } from './chunks';
+
+import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
+import { type ChunksInfo,getChunksInfo } from './chunks';
 
 /**
  * Build a distance expression for the given metric.
@@ -21,13 +22,13 @@ function buildDistanceExpr(
   metric: string,
 ): SQL {
   switch (metric) {
-    case 'L2':
-      return sql`(${columnExpr} <-> ${vectorExpr})`;
-    case 'IP':
-      return sql`(${columnExpr} <#> ${vectorExpr})`;
-    case 'COSINE':
-    default:
-      return sql`(${columnExpr} <=> ${vectorExpr})`;
+  case 'L2':
+    return sql`(${columnExpr} <-> ${vectorExpr})`;
+  case 'IP':
+    return sql`(${columnExpr} <#> ${vectorExpr})`;
+  case 'COSINE':
+  default:
+    return sql`(${columnExpr} <=> ${vectorExpr})`;
   }
 }
 

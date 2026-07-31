@@ -1,4 +1,4 @@
-import { UUID } from "./_common";
+import { UUID } from './_common';
 export interface InflectionRules {
   id: UUID;
   type: string | null;

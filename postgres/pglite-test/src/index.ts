@@ -102,9 +102,9 @@ export const getConnections = async (
   const roleMapping = getRoleMapping({ roles: cn.db?.roles });
   const roleSql = bootstrapRoles
     ? [
-        generateCreateBaseRolesSQL(roleMapping),
-        generateCreateClientRoleSQL(roleMapping)
-      ]
+      generateCreateBaseRolesSQL(roleMapping),
+      generateCreateClientRoleSQL(roleMapping)
+    ]
     : [];
 
   const handle = await registerPglite({

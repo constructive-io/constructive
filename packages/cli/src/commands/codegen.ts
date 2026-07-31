@@ -1,5 +1,5 @@
-import type { CLIOptions, Inquirerer } from 'inquirerer';
 import { runCodegenHandler } from '@constructive-io/graphql-codegen';
+import type { CLIOptions, Inquirerer } from 'inquirerer';
 
 const usage = `
 Constructive GraphQL Codegen:

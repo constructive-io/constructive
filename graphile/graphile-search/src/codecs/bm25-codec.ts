@@ -13,6 +13,7 @@
  */
 
 import 'graphile-build-pg';
+
 import type { GraphileConfig } from 'graphile-config';
 import sql from 'pg-sql2';
 

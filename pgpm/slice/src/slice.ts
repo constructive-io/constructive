@@ -1,21 +1,19 @@
-import { Change, Tag, ExtendedPlanFile } from '@pgpmjs/ast/files/types';
 import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { generateChangeLineContent, generateTagLineContent } from '@pgpmjs/ast/files/plan/writer';
+import { Change, ExtendedPlanFile,Tag } from '@pgpmjs/ast/files/types';
+import { minimatch } from 'minimatch';
+
 import { buildAstEdges, expandClosures } from './closure';
 import {
   ClosureReport,
+  CrossPackageDepMode,
+  DependencyGraph,
+  GroupingStrategy,
+  PackageOutput,
+  PatternStrategy,
   SliceConfig,
   SliceResult,
-  DependencyGraph,
-  PackageOutput,
-  WorkspaceManifest,
-  SliceWarning,
-  SliceStats,
-  GroupingStrategy,
-  PatternStrategy,
-  CrossPackageDepMode
-} from './types';
-import { minimatch } from 'minimatch';
+  SliceWarning} from './types';
 
 /**
  * Build a dependency graph from a parsed plan file
@@ -150,23 +148,23 @@ export function assignChangesToPackages(
     let packageName: string;
 
     switch (strategy.type) {
-      case 'folder': {
-        const depth = strategy.depth ?? 1;
-        const prefix = strategy.prefixToStrip ?? 'schemas';
-        packageName = extractPackageFromPath(changeName, depth, prefix);
-        break;
-      }
-      case 'pattern': {
-        const matched = findMatchingPattern(changeName, strategy);
-        packageName = matched || defaultPackage;
-        break;
-      }
-      case 'explicit': {
-        packageName = strategy.mapping[changeName] || defaultPackage;
-        break;
-      }
-      default:
-        packageName = defaultPackage;
+    case 'folder': {
+      const depth = strategy.depth ?? 1;
+      const prefix = strategy.prefixToStrip ?? 'schemas';
+      packageName = extractPackageFromPath(changeName, depth, prefix);
+      break;
+    }
+    case 'pattern': {
+      const matched = findMatchingPattern(changeName, strategy);
+      packageName = matched || defaultPackage;
+      break;
+    }
+    case 'explicit': {
+      packageName = strategy.mapping[changeName] || defaultPackage;
+      break;
+    }
+    default:
+      packageName = defaultPackage;
     }
 
     // Fallback to default package

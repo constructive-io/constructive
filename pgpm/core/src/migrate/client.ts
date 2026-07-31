@@ -1,3 +1,4 @@
+import { Change, parsePlanFile, parsePlanFileSimple, readScript } from '@pgpmjs/ast/files';
 import { Logger } from '@pgpmjs/logger';
 import { errors, extractPgErrorFields, formatPgError, formatPgErrorFields } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
@@ -6,7 +7,6 @@ import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 
-import { Change, parsePlanFile, parsePlanFileSimple, readScript } from '@pgpmjs/ast/files';
 import { resolveDependencies } from '../resolution/deps';
 import { resolveTagToChangeName } from '../resolution/resolve';
 import { cleanSql } from './clean';

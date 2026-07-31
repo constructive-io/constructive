@@ -11,8 +11,8 @@
  * types are blocked by default.
  */
 
-import { parse } from 'pgsql-parser';
 import { deparseSync } from 'pgsql-deparser';
+import { parse } from 'pgsql-parser';
 
 // ─── Types ────────────────────────────────────────────────────────
 

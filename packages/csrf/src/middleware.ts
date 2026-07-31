@@ -1,5 +1,5 @@
-import { CsrfConfig, CookieOptions, createCsrfError } from './types';
 import { generateToken, verifyToken } from './token';
+import { CookieOptions, createCsrfError,CsrfConfig } from './types';
 
 const DEFAULT_CONFIG: Required<CsrfConfig> = {
   cookieName: 'csrf_token',

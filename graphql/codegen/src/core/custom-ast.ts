@@ -5,12 +5,12 @@
  * (geometry, interval, etc.). The canonical implementations now live in graphql-query.
  */
 export {
+  geometryAst,
+  geometryCollectionAst,
+  geometryPointAst,
   getCustomAst,
   getCustomAstForCleanField,
-  requiresSubfieldSelection,
-  geometryPointAst,
-  geometryCollectionAst,
-  geometryAst,
   intervalAst,
   isIntervalType,
+  requiresSubfieldSelection,
 } from '@constructive-io/graphql-query';

@@ -1,7 +1,8 @@
 process.env.LOG_SCOPE = 'pgsql-test';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync,writeFileSync } from 'fs';
 import { tmpdir } from 'os';
+import { join } from 'path';
+
 import { seed } from '../src';
 import { getConnections } from '../src/connect';
 import { PgTestClient } from '../src/test-client';

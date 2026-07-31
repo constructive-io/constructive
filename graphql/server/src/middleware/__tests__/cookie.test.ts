@@ -1,18 +1,19 @@
 import type { Request, Response } from 'express';
-import {
-  SESSION_COOKIE_NAME,
-  DEVICE_TOKEN_COOKIE_NAME,
-  getSessionCookieConfig,
-  getDeviceTokenCookieConfig,
-  setSessionCookie,
-  clearSessionCookie,
-  setDeviceTokenCookie,
-  clearDeviceTokenCookie,
-  parseCookieValue,
-  getDeviceTokenFromRequest,
-  getSessionTokenFromRequest,
-} from '../cookie';
+
 import type { AuthSettings } from '../../types';
+import {
+  clearDeviceTokenCookie,
+  clearSessionCookie,
+  DEVICE_TOKEN_COOKIE_NAME,
+  getDeviceTokenCookieConfig,
+  getDeviceTokenFromRequest,
+  getSessionCookieConfig,
+  getSessionTokenFromRequest,
+  parseCookieValue,
+  SESSION_COOKIE_NAME,
+  setDeviceTokenCookie,
+  setSessionCookie,
+} from '../cookie';
 
 describe('cookie utilities', () => {
   describe('getSessionCookieConfig', () => {

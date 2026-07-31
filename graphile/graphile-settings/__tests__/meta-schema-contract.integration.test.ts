@@ -1,14 +1,13 @@
+import type { GraphQLQueryUnwrappedFnObj } from 'graphile-test';
+import { getConnectionsObjectUnwrapped, seed } from 'graphile-test';
 import {
   buildClientSchema,
   getIntrospectionQuery,
   getNamedType,
-  isInterfaceType,
-  isObjectType,
   type GraphQLSchema,
-  type IntrospectionQuery
-} from 'graphql';
-import type { GraphQLQueryUnwrappedFnObj } from 'graphile-test';
-import { getConnectionsObjectUnwrapped, seed } from 'graphile-test';
+  type IntrospectionQuery,
+  isInterfaceType,
+  isObjectType} from 'graphql';
 import { join } from 'path';
 
 import { ConstructivePreset } from '../src/presets/constructive-preset';

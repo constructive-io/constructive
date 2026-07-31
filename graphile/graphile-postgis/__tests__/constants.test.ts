@@ -1,9 +1,8 @@
 import {
-  GisSubtype,
-  SUBTYPE_STRING_BY_SUBTYPE,
+  CONCRETE_SUBTYPES,
   GIS_SUBTYPE_NAME,
-  CONCRETE_SUBTYPES
-} from '../src/constants';
+  GisSubtype,
+  SUBTYPE_STRING_BY_SUBTYPE} from '../src/constants';
 
 describe('GisSubtype enum', () => {
   it('should have correct numeric values', () => {

@@ -1,5 +1,5 @@
-import { randomUUID } from 'crypto';
 import { Logger } from '@pgpmjs/logger';
+import { randomUUID } from 'crypto';
 import type { RequestHandler } from 'express';
 
 const log = new Logger('server');

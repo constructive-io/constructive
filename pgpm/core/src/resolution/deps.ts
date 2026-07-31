@@ -1,13 +1,13 @@
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { scanDeployScript } from '@pgpmjs/ast/files/sql/header';
+import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
+import { errors } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { join,relative } from 'path';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { globPattern, toPosixPath } from '../utils/glob';
-import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
-import { scanDeployScript } from '@pgpmjs/ast/files/sql/header';
-import { ExtendedPlanFile } from '@pgpmjs/ast/files/types';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Represents a dependency graph where keys are module identifiers
@@ -312,12 +312,12 @@ export const resolveDependencies = (
     return null;
   };
   
-// Plan-mode branch: use plan.changes order directly; build graph from plan deps (no topo or resort).
-// - Loads the current package plan and throws if missing.
-// - For each change in plan, adds a node; edges come from change.dependencies.
-// - Tag handling per tagResolution: 'preserve' keeps tokens, 'internal' maps for traversal, 'resolve' replaces with change names.
-// - Cross-package refs "pkg:change" are recorded in external and kept as graph nodes for coordination by callers.
-// - Internal refs like "extname:change" are normalized to "change".
+  // Plan-mode branch: use plan.changes order directly; build graph from plan deps (no topo or resort).
+  // - Loads the current package plan and throws if missing.
+  // - For each change in plan, adds a node; edges come from change.dependencies.
+  // - Tag handling per tagResolution: 'preserve' keeps tokens, 'internal' maps for traversal, 'resolve' replaces with change names.
+  // - Cross-package refs "pkg:change" are recorded in external and kept as graph nodes for coordination by callers.
+  // - Internal refs like "extname:change" are normalized to "change".
   const resolveTagToChange = (projectName: string, tagName: string): string | null => {
     const plan = loadPlanFile(projectName);
     if (!plan) return null;
@@ -650,4 +650,4 @@ export const resolveDependencies = (
   resolved = [...extensions, ...normalSql];
 
   return { external, resolved, deps, resolvedTags: tagMappings };
-}
+};

@@ -6,10 +6,9 @@
  * Also returns _meta table metadata correlated to the same schema build
  * (via buildSchemaArtifacts).
  */
-import { buildSchema, introspectionFromSchema } from 'graphql';
-
-import { buildSchemaArtifacts } from 'graphile-schema';
 import type { TableMeta } from 'graphile-schema';
+import { buildSchemaArtifacts } from 'graphile-schema';
+import { buildSchema, introspectionFromSchema } from 'graphql';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {

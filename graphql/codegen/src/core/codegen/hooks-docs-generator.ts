@@ -1,35 +1,32 @@
 import { toKebabCase } from 'inflekt';
 
 import type { Operation, Table, TypeRegistry } from '../../types/schema';
-import {
-  buildSkillFile,
-  buildSkillReference,
-  formatArgType,
-  fieldPlaceholder,
-  pkPlaceholder,
-  argPlaceholder,
-  getReadmeHeader,
-  getReadmeFooter,
-  gqlTypeToJsonSchemaType,
-} from './docs-utils';
 import type { GeneratedDocFile } from './docs-utils';
 import {
-  getTableNames,
-  getScalarFields,
-  getPrimaryKeyInfo,
-  getListQueryHookName,
-  getSingleQueryHookName,
-  getCreateMutationHookName,
-  getUpdateMutationHookName,
-  getDeleteMutationHookName,
+  argPlaceholder,
+  buildSkillFile,
+  buildSkillReference,
+  fieldPlaceholder,
+  formatArgType,
+  getReadmeFooter,
+  getReadmeHeader,
+  pkPlaceholder,
+} from './docs-utils';
+import {
   getBulkCreateMutationHookName,
-  getBulkUpsertMutationHookName,
-  getBulkUpdateMutationHookName,
   getBulkDeleteMutationHookName,
+  getBulkUpdateMutationHookName,
+  getBulkUpsertMutationHookName,
+  getCreateMutationHookName,
+  getDeleteMutationHookName,
+  getListQueryHookName,
+  getPrimaryKeyInfo,
+  getScalarFields,
+  getSingleQueryHookName,
+  getTableNames,
+  getUpdateMutationHookName,
   hasValidPrimaryKey,
   ucFirst,
-  lcFirst,
-  fieldTypeToTs,
 } from './utils';
 
 function getCustomHookName(op: Operation): string {
@@ -311,15 +308,15 @@ export function generateHooksSkills(
           `${getListQueryHookName(table)}({ selection: { fields: { ${selectFields} } } })`,
           ...(hasValidPrimaryKey(table)
             ? [
-                `${getSingleQueryHookName(table)}({ ${pk.name}: ${pkPlaceholder(pk)}, selection: { fields: { ${selectFields} } } })`,
-              ]
+              `${getSingleQueryHookName(table)}({ ${pk.name}: ${pkPlaceholder(pk)}, selection: { fields: { ${selectFields} } } })`,
+            ]
             : []),
           `${getCreateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`,
           ...(hasValidPrimaryKey(table)
             ? [
-                `${getUpdateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`,
-                `${getDeleteMutationHookName(table)}({})`,
-              ]
+              `${getUpdateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`,
+              `${getDeleteMutationHookName(table)}({})`,
+            ]
             : []),
           ...(table.query?.bulkInsert ? [`${getBulkCreateMutationHookName(table)}() — bulk create with data array`] : []),
           ...(table.query?.bulkUpsert ? [`${getBulkUpsertMutationHookName(table)}() — bulk upsert with onConflict`] : []),
@@ -379,14 +376,14 @@ export function generateHooksSkills(
             code:
               op.kind === 'mutation'
                 ? [
-                    `const { mutate, isLoading } = ${hookName}();`,
-                    ...(callArgs
-                      ? [`mutate(${callArgs});`]
-                      : ['mutate();']),
-                  ]
+                  `const { mutate, isLoading } = ${hookName}();`,
+                  ...(callArgs
+                    ? [`mutate(${callArgs});`]
+                    : ['mutate();']),
+                ]
                 : [
-                    `const { data, isLoading } = ${hookName}(${callArgs});`,
-                  ],
+                  `const { data, isLoading } = ${hookName}(${callArgs});`,
+                ],
           },
         ],
       }),

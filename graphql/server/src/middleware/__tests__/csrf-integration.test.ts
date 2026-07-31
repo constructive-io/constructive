@@ -1,5 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
 import { createCsrfMiddleware } from '@constructive-io/csrf';
+import type {Request, Response } from 'express';
+
 import { parseCookieValue, SESSION_COOKIE_NAME } from '../cookie';
 
 describe('CSRF middleware integration', () => {

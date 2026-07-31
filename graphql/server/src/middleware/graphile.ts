@@ -1,7 +1,8 @@
 import './types'; // for Request type
 
 import crypto from 'node:crypto';
-import { classify, errors, type ErrorContext, parse } from '@constructive-io/errors';
+
+import { classify, type ErrorContext, errors, parse } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';

@@ -1,6 +1,8 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLNamedType } from 'graphql';
+
 import { isEmpty } from '../utils';
 
 const version = '1.0.0';
@@ -91,58 +93,58 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
               type: FilterType,
               ...(isPgFieldConnection
                 ? {
-                    applyPlan: EXPORTABLE(
-                      (
-                        PgCondition: any,
-                        isEmpty: any,
-                        attributeCodec: any
-                      ) =>
-                        function (_: any, $connection: any, fieldArg: any) {
-                          const $pgSelect = $connection.getSubplan();
-                          fieldArg.apply(
-                            $pgSelect,
-                            (queryBuilder: any, value: any) => {
-                              // If where is null/undefined or empty {}, treat as "no filter" — skip
-                              if (value == null || isEmpty(value)) return;
-                              const condition = new PgCondition(queryBuilder);
-                              if (attributeCodec) {
-                                condition.extensions.pgFilterAttribute = {
-                                  codec: attributeCodec,
-                                };
-                              }
-                              return condition;
+                  applyPlan: EXPORTABLE(
+                    (
+                      PgCondition: any,
+                      isEmpty: any,
+                      attributeCodec: any
+                    ) =>
+                      function (_: any, $connection: any, fieldArg: any) {
+                        const $pgSelect = $connection.getSubplan();
+                        fieldArg.apply(
+                          $pgSelect,
+                          (queryBuilder: any, value: any) => {
+                            // If where is null/undefined or empty {}, treat as "no filter" — skip
+                            if (value == null || isEmpty(value)) return;
+                            const condition = new PgCondition(queryBuilder);
+                            if (attributeCodec) {
+                              condition.extensions.pgFilterAttribute = {
+                                codec: attributeCodec,
+                              };
                             }
-                          );
-                        },
-                      [PgCondition, isEmpty, attributeCodec]
-                    ),
-                  }
+                            return condition;
+                          }
+                        );
+                      },
+                    [PgCondition, isEmpty, attributeCodec]
+                  ),
+                }
                 : {
-                    applyPlan: EXPORTABLE(
-                      (
-                        PgCondition: any,
-                        isEmpty: any,
-                        attributeCodec: any
-                      ) =>
-                        function (_: any, $pgSelect: any, fieldArg: any) {
-                          fieldArg.apply(
-                            $pgSelect,
-                            (queryBuilder: any, value: any) => {
-                              // If where is null/undefined or empty {}, treat as "no filter" — skip
-                              if (value == null || isEmpty(value)) return;
-                              const condition = new PgCondition(queryBuilder);
-                              if (attributeCodec) {
-                                condition.extensions.pgFilterAttribute = {
-                                  codec: attributeCodec,
-                                };
-                              }
-                              return condition;
+                  applyPlan: EXPORTABLE(
+                    (
+                      PgCondition: any,
+                      isEmpty: any,
+                      attributeCodec: any
+                    ) =>
+                      function (_: any, $pgSelect: any, fieldArg: any) {
+                        fieldArg.apply(
+                          $pgSelect,
+                          (queryBuilder: any, value: any) => {
+                            // If where is null/undefined or empty {}, treat as "no filter" — skip
+                            if (value == null || isEmpty(value)) return;
+                            const condition = new PgCondition(queryBuilder);
+                            if (attributeCodec) {
+                              condition.extensions.pgFilterAttribute = {
+                                codec: attributeCodec,
+                              };
                             }
-                          );
-                        },
-                      [PgCondition, isEmpty, attributeCodec]
-                    ),
-                  }),
+                            return condition;
+                          }
+                        );
+                      },
+                    [PgCondition, isEmpty, attributeCodec]
+                  ),
+                }),
             },
           },
           `Adding connection where arg '${argName}' to field '${fieldName}' of '${Self.name}'`

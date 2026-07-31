@@ -1,4 +1,4 @@
-import { OAuthProviderConfig, OAuthProfile } from '../types';
+import { OAuthProfile,OAuthProviderConfig } from '../types';
 
 interface FacebookProfile {
   id: string;

@@ -1,12 +1,11 @@
+import { hashString } from '@pgpmjs/ast';
+import { readBundleArchiveFile, writeBundleArchiveFile } from '@pgpmjs/bundle';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import { hashString } from '@pgpmjs/ast';
-import { readBundleArchiveFile, writeBundleArchiveFile } from '@pgpmjs/bundle';
-
 import {
-  bundleArtifactFileName,
   buildExecutableBundle,
+  bundleArtifactFileName,
   resolveBundleArtifactPath,
   writeBundleArtifact
 } from '../../src/bundle/artifact';

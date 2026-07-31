@@ -6,9 +6,10 @@
  *
  * Usage: tsx scripts/analyze-bundle.ts
  */
-import { build } from 'vite';
+import { brotliCompressSync,gzipSync } from 'node:zlib';
+
 import react from '@vitejs/plugin-react';
-import { gzipSync, brotliCompressSync } from 'node:zlib';
+import { build } from 'vite';
 
 interface ModuleInfo {
   originalLength: number;

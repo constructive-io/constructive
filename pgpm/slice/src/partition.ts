@@ -1,7 +1,6 @@
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-
-import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 
 import { AstEdges, buildAstEdges } from './closure';
 import { objectKey } from './object-graph';

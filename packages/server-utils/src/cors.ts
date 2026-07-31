@@ -14,10 +14,10 @@ export const cors = (app: Express, origin?: string) => {
   const corsOptions =
     origin && origin.trim() !== '*'
       ? {
-          origin,
-          credentials: true,
-          optionsSuccessStatus: 200,
-        }
+        origin,
+        credentials: true,
+        optionsSuccessStatus: 200,
+      }
       : undefined;
 
   if (corsOptions) {

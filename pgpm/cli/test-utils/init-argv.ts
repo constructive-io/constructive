@@ -1,5 +1,5 @@
-import { ParsedArgs } from 'inquirerer';
 import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
+import { ParsedArgs } from 'inquirerer';
 
 export const addInitDefaults = (argv: ParsedArgs): ParsedArgs => {
   const baseName = (argv.moduleName as string) || (argv.name as string) || 'module';

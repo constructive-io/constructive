@@ -2,7 +2,7 @@ import { parsePlanFile, PgpmPackage, readScript } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { isStubScript, loadModule, regenerateScripts } from '@pgpmjs/transform';
 import * as fs from 'fs';
-import { CLIOptions, cliExitWithError, Inquirerer, ParsedArgs } from 'inquirerer';
+import { cliExitWithError, CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
 const log = new Logger('regen');

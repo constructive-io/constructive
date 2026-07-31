@@ -1,4 +1,5 @@
-import { CLIOptions, Inquirerer, ParsedArgs, extractFirst } from 'inquirerer';
+import { CLIOptions, extractFirst,Inquirerer, ParsedArgs } from 'inquirerer';
+
 import add from './admin-users/add';
 import bootstrap from './admin-users/bootstrap';
 import remove from './admin-users/remove';

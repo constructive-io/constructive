@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import { teardownPgPools } from 'pg-cache';
 
 import { CLIDeployTestFixture } from '../test-utils';

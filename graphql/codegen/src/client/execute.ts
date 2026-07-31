@@ -2,10 +2,10 @@
  * Re-export GraphQL execution utilities from @constructive-io/graphql-query.
  */
 export {
-  execute,
   createGraphQLClient,
+  execute,
   type ExecuteOptions,
-  type GraphQLResponse,
-  type GraphQLClientOptions,
   type GraphQLClient,
+  type GraphQLClientOptions,
+  type GraphQLResponse,
 } from '@constructive-io/graphql-query';

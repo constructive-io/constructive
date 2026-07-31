@@ -1,22 +1,21 @@
+import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { PgpmOptions } from '@pgpmjs/types';
 import { Inquirerer } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
-import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { exportMeta } from './export-meta';
-import { ExportGranularity, restructureExportRows } from './restructure';
 import {
   DB_REQUIRED_EXTENSIONS,
-  SERVICE_REQUIRED_EXTENSIONS,
-  META_COMMON_HEADER,
-  META_COMMON_FOOTER,
-  META_TABLE_ORDER,
   detectMissingModules,
   installMissingModules,
   makeReplacer,
+  META_COMMON_FOOTER,
+  META_COMMON_HEADER,
+  META_TABLE_ORDER,
+  normalizeOutdir,
   preparePackage,
-  normalizeOutdir
-} from './export-utils';
+  SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
+import { ExportGranularity, restructureExportRows } from './restructure';
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;
@@ -175,16 +174,16 @@ const exportMigrationsToDisk = async ({
   // it was set on and therefore cannot be relied upon across connections.
   const results = excludeCategories && excludeCategories.length > 0
     ? await pgPool.query(
-        `select * from db_migrate.sql_actions
+      `select * from db_migrate.sql_actions
          where database_id = $1
            and (category is null or category != ALL($2::text[]))
          order by id`,
-        [databaseId, excludeCategories]
-      )
+      [databaseId, excludeCategories]
+    )
     : await pgPool.query(
-        `select * from db_migrate.sql_actions where database_id = $1 order by id`,
-        [databaseId]
-      );
+      `select * from db_migrate.sql_actions where database_id = $1 order by id`,
+      [databaseId]
+    );
 
   // Registry fixtures — meta_registration actions that insert into
   // metaschema_public.* (e.g. pg_partman partition registration) — FK-reference
@@ -289,10 +288,10 @@ const exportMigrationsToDisk = async ({
   const metaReplacer = makeReplacer({
     schemas: metaSchemasForReplacement,
     name: metaExtensionName,
-      // Use extensionName for schema prefix — the services metadata references
-      // schemas owned by the application package (e.g. agent_db_auth_public),
-      // not the services package (agent_db_services_auth_public)
-      schemaPrefix: name
+    // Use extensionName for schema prefix — the services metadata references
+    // schemas owned by the application package (e.g. agent_db_auth_public),
+    // not the services package (agent_db_services_auth_public)
+    schemaPrefix: name
   });
 
   // Create separate files for each table type

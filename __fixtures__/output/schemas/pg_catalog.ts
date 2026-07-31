@@ -1,4 +1,4 @@
-import { Timestamp } from "./_common";
+import { Timestamp } from './_common';
 export interface PgAggregate {
   aggfnoid: any;
   aggkind: any;

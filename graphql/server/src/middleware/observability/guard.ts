@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+
 import { isLoopbackAddress, isLoopbackHost } from '../../diagnostics/observability';
 
 export const localObservabilityOnly: RequestHandler = (req, res, next) => {

@@ -1,33 +1,30 @@
 import { toKebabCase } from 'inflekt';
 
-import type { Table, Operation, TypeRegistry } from '../../../types/schema';
-import {
-  flattenArgs,
-  flattenedArgsToFlags,
-  cleanTypeName,
-  fieldPlaceholder,
-  getEditableFields,
-  getSearchFields,
-  categorizeSpecialFields,
-  buildSpecialFieldsMarkdown,
-  buildSearchExamples,
-  buildSearchExamplesMarkdown,
-  getReadmeHeader,
-  getReadmeFooter,
-  gqlTypeToJsonSchemaType,
-  buildSkillFile,
-  buildSkillReference,
-} from '../docs-utils';
+import type { Operation, Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedDocFile } from '../docs-utils';
 import {
+  buildSearchExamples,
+  buildSearchExamplesMarkdown,
+  buildSkillFile,
+  buildSkillReference,
+  buildSpecialFieldsMarkdown,
+  categorizeSpecialFields,
+  cleanTypeName,
+  flattenArgs,
+  flattenedArgsToFlags,
+  getEditableFields,
+  getReadmeFooter,
+  getReadmeHeader,
+} from '../docs-utils';
+import {
+  getPrimaryKeyInfo,
   getScalarFields,
   getTableNames,
-  getPrimaryKeyInfo,
 } from '../utils';
 import { getFieldsWithDefaults } from './table-command-generator';
 
-export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile } from '../docs-utils';
+export { resolveDocsConfig } from '../docs-utils';
 
 export function generateReadme(
   tables: Table[],

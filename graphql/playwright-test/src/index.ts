@@ -1,13 +1,13 @@
 // Re-export types from graphql-test for convenience
 export {
-  type GraphQLQueryOptions,
-  type GraphQLTestContext,
   type GetConnectionsInput,
-  type GraphQLResponse,
   type GraphQLQueryFn,
   type GraphQLQueryFnObj,
+  type GraphQLQueryOptions,
   type GraphQLQueryUnwrappedFn,
   type GraphQLQueryUnwrappedFnObj,
+  type GraphQLResponse,
+  type GraphQLTestContext,
 } from '@constructive-io/graphql-test';
 
 // Export our types

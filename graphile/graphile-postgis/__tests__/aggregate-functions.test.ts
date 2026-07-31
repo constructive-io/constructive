@@ -15,10 +15,10 @@ function createMockBuild(schemaName = 'public', hasPostgis = true): MockBuild {
   return {
     pgGISExtensionInfo: hasPostgis
       ? {
-          schemaName,
-          geometryCodec: { name: 'geometry' },
-          geographyCodec: null
-        }
+        schemaName,
+        geometryCodec: { name: 'geometry' },
+        geographyCodec: null
+      }
       : undefined,
     extend(base: Record<string, unknown>, extra: Record<string, unknown>, _reason: string) {
       return { ...base, ...extra };

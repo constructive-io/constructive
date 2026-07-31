@@ -1,8 +1,10 @@
 import { createServer } from 'node:http';
+
 import { Logger } from '@pgpmjs/logger';
 import express from 'express';
-import { postgraphile } from 'postgraphile';
 import { grafserv } from 'grafserv/express/v4';
+import { postgraphile } from 'postgraphile';
+
 import type { GraphileCacheEntry } from './graphile-cache';
 
 const log = new Logger('graphile-cache:create');

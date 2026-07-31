@@ -1,9 +1,9 @@
+import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
+import { Change, Tag } from '@pgpmjs/ast/files/types';
 import { existsSync, readdirSync, readFileSync } from 'fs';
 import { basename, join } from 'path';
 
 import { DEFAULT_TEMPLATE_REPO, scaffoldTemplate } from '../core/template-scaffold';
-import { Change, Tag } from '@pgpmjs/ast/files/types';
-import { parsePlanFile } from '@pgpmjs/ast/files/plan/parser';
 import { mergeSqlStatements } from '../packaging/package';
 import { resolveWithPlan } from '../resolution/resolve';
 import { writeMinimalModule, writeMinimalWorkspace } from '../workspace/minimal';

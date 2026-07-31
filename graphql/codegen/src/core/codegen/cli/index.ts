@@ -3,10 +3,10 @@ import type { Operation, Table, TypeRegistry } from '../../../types/schema';
 import { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
 import { generateConfigCommand } from './config-command-generator';
 import { generateCustomCommand } from './custom-command-generator';
-import { generateExecutorFile, generateMultiTargetExecutorFile } from './executor-generator';
 import type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';
-import { generateHelpersFile } from './helpers-generator';
+import { generateExecutorFile, generateMultiTargetExecutorFile } from './executor-generator';
 import type { HelpersGeneratorInput } from './helpers-generator';
+import { generateHelpersFile } from './helpers-generator';
 import {
   generateAuthCommand,
   generateAuthCommandWithName,
@@ -14,7 +14,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile, generateEntryPointFile, generateEmbedderFile } from './utils-generator';
+import { generateEmbedderFile,generateEntryPointFile, generateUtilsFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: Table[];
@@ -274,29 +274,29 @@ export function generateMultiTargetCli(
   };
 }
 
-export { generateExecutorFile, generateMultiTargetExecutorFile } from './executor-generator';
-export { generateTableCommand } from './table-command-generator';
-export { generateCustomCommand } from './custom-command-generator';
+export type { GeneratedDocFile } from '../docs-utils';
+export { resolveDocsConfig } from '../docs-utils';
 export { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
 export { generateConfigCommand } from './config-command-generator';
-export { generateHelpersFile } from './helpers-generator';
-export type { HelpersGeneratorInput } from './helpers-generator';
-export {
-  generateContextCommand,
-  generateAuthCommand,
-  generateMultiTargetContextCommand,
-  generateAuthCommandWithName,
-} from './infra-generator';
-export {
-  generateReadme,
-  generateAgentsDocs,
-  generateSkills,
-  generateMultiTargetReadme,
-  generateMultiTargetAgentsDocs,
-  generateMultiTargetSkills,
-} from './docs-generator';
+export { generateCustomCommand } from './custom-command-generator';
 export type { MultiTargetDocsInput } from './docs-generator';
-export { resolveDocsConfig } from '../docs-utils';
-export type { GeneratedDocFile } from '../docs-utils';
-export { generateUtilsFile, generateEntryPointFile, generateEmbedderFile } from './utils-generator';
+export {
+  generateAgentsDocs,
+  generateMultiTargetAgentsDocs,
+  generateMultiTargetReadme,
+  generateMultiTargetSkills,
+  generateReadme,
+  generateSkills,
+} from './docs-generator';
 export type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';
+export { generateExecutorFile, generateMultiTargetExecutorFile } from './executor-generator';
+export type { HelpersGeneratorInput } from './helpers-generator';
+export { generateHelpersFile } from './helpers-generator';
+export {
+  generateAuthCommand,
+  generateAuthCommandWithName,
+  generateContextCommand,
+  generateMultiTargetContextCommand,
+} from './infra-generator';
+export { generateTableCommand } from './table-command-generator';
+export { generateEmbedderFile,generateEntryPointFile, generateUtilsFile } from './utils-generator';

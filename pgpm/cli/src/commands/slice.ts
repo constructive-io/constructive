@@ -1,9 +1,9 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { generateDryRunReport, PatternSlice, SliceConfig, slicePlan, writeSliceResult } from '@pgpmjs/slice';
 import { getGitConfigInfo } from '@pgpmjs/types';
+import { existsSync,readFileSync } from 'fs';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { resolve } from 'path';
-import { readFileSync, existsSync } from 'fs';
 
 const sliceUsageText = `
 Slice Command:
@@ -169,10 +169,10 @@ export default async (
     strategy: strategyType === 'pattern'
       ? { type: 'pattern', slices: patternSlices }
       : {
-          type: 'folder',
-          depth: argv.depth ?? depth ?? 1,
-          prefixToStrip: argv.prefix ?? prefix ?? 'schemas'
-        },
+        type: 'folder',
+        depth: argv.depth ?? depth ?? 1,
+        prefixToStrip: argv.prefix ?? prefix ?? 'schemas'
+      },
     defaultPackage: argv.default ?? defaultPackage ?? 'core',
     minChangesPerPackage: argv['min-changes'] ?? minChanges ?? 0,
     useTagsForCrossPackageDeps: argv['use-tags'] ?? useTags ?? false,

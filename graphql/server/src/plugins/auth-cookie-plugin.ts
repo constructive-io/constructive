@@ -1,14 +1,16 @@
-import type { Request } from 'express';
-import type { GraphileConfig, MiddlewareNext } from 'graphile-config';
-import type { Result, BufferResult } from 'grafserv';
-import { Logger } from '@pgpmjs/logger';
 import '../middleware/types';
+
+import { Logger } from '@pgpmjs/logger';
+import type { Request } from 'express';
+import type { BufferResult } from 'grafserv';
+import type { GraphileConfig } from 'graphile-config';
+
 import {
-  SESSION_COOKIE_NAME,
-  DEVICE_TOKEN_COOKIE_NAME,
-  getSessionCookieConfig,
-  getDeviceTokenCookieConfig,
   CookieConfig,
+  DEVICE_TOKEN_COOKIE_NAME,
+  getDeviceTokenCookieConfig,
+  getSessionCookieConfig,
+  SESSION_COOKIE_NAME,
 } from '../middleware/cookie';
 
 const log = new Logger('auth-cookie');

@@ -1,8 +1,8 @@
+import { readModule } from '@pgpmjs/ast/module';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
-import { readModule } from '@pgpmjs/ast/module';
 import {
   bundleFromModule,
   createBundle,

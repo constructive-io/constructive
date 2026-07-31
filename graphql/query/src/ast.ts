@@ -1,5 +1,4 @@
 import * as t from 'gql-ast';
-import { OperationTypeNode } from 'graphql';
 import type {
   ArgumentNode,
   DocumentNode,
@@ -8,7 +7,8 @@ import type {
   ValueNode,
   VariableDefinitionNode,
 } from 'graphql';
-import { toCamelCase, toPascalCase, singularize } from 'inflekt';
+import { OperationTypeNode } from 'graphql';
+import { singularize,toCamelCase } from 'inflekt';
 
 import { getCustomAst } from './custom-ast';
 import type {
@@ -54,28 +54,28 @@ const createGqlMutation = ({
 }: CreateGqlMutationParams): DocumentNode => {
   const opSel: FieldNode[] = !modelName
     ? [
-        t.field({
-          name: operationName,
-          args: selectArgs,
-          selectionSet: t.selectionSet({ selections }),
-        }),
-      ]
+      t.field({
+        name: operationName,
+        args: selectArgs,
+        selectionSet: t.selectionSet({ selections }),
+      }),
+    ]
     : [
-        t.field({
-          name: operationName,
-          args: selectArgs,
-          selectionSet: t.selectionSet({
-            selections: useModel
-              ? [
-                  t.field({
-                    name: modelName,
-                    selectionSet: t.selectionSet({ selections }),
-                  }),
-                ]
-              : selections,
-          }),
+      t.field({
+        name: operationName,
+        args: selectArgs,
+        selectionSet: t.selectionSet({
+          selections: useModel
+            ? [
+              t.field({
+                name: modelName,
+                selectionSet: t.selectionSet({ selections }),
+              }),
+            ]
+            : selections,
         }),
-      ];
+      }),
+    ];
 
   return t.document({
     definitions: [
@@ -254,21 +254,21 @@ export const getMany = ({
 
   const dataField: FieldNode = builder?._edges
     ? t.field({
-        name: 'edges',
-        selectionSet: t.selectionSet({
-          selections: [
-            t.field({ name: 'cursor' }),
-            t.field({
-              name: 'node',
-              selectionSet: t.selectionSet({ selections }),
-            }),
-          ],
-        }),
-      })
+      name: 'edges',
+      selectionSet: t.selectionSet({
+        selections: [
+          t.field({ name: 'cursor' }),
+          t.field({
+            name: 'node',
+            selectionSet: t.selectionSet({ selections }),
+          }),
+        ],
+      }),
+    })
     : t.field({
-        name: 'nodes',
-        selectionSet: t.selectionSet({ selections }),
-      });
+      name: 'nodes',
+      selectionSet: t.selectionSet({ selections }),
+    });
 
   const connectionFields: FieldNode[] = [
     t.field({ name: 'totalCount' }),
@@ -620,14 +620,14 @@ export function getSelections(
         const selectionSet = isBelongTo
           ? t.selectionSet({ selections: subSelections })
           : t.selectionSet({
-              selections: [
-                t.field({ name: 'totalCount' }),
-                t.field({
-                  name: 'nodes',
-                  selectionSet: t.selectionSet({ selections: subSelections }),
-                }),
-              ],
-            });
+            selections: [
+              t.field({ name: 'totalCount' }),
+              t.field({
+                name: 'nodes',
+                selectionSet: t.selectionSet({ selections: subSelections }),
+              }),
+            ],
+          });
 
         return t.field({
           name,

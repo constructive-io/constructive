@@ -1,4 +1,4 @@
-import { UUID, Timestamp } from "./_common";
+import { Timestamp,UUID } from './_common';
 export interface ApiModules {
   id: UUID;
   created_at: Timestamp | null;

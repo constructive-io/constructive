@@ -1,7 +1,7 @@
+import type { GetConnectionsInput, GraphQLQueryFn, GraphQLQueryFnObj } from '@constructive-io/graphql-test';
+import type { ApiOptions } from '@constructive-io/graphql-types';
 import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { ApiOptions } from '@constructive-io/graphql-types';
-import type { GetConnectionsInput, GraphQLQueryFn, GraphQLQueryFnObj } from '@constructive-io/graphql-test';
 
 /**
  * Options for creating a Playwright test server

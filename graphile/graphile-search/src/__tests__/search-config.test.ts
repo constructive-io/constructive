@@ -8,10 +8,10 @@
 // We need to test the internal helpers. Since they're not exported,
 // we test them indirectly through the adapter/plugin behavior using mocked codecs.
 
-import { createPgvectorAdapter } from '../adapters/pgvector';
-import { createUnifiedSearchPlugin } from '../plugin';
-import { createTsvectorAdapter } from '../adapters/tsvector';
 import { createBm25Adapter } from '../adapters/bm25';
+import { createPgvectorAdapter } from '../adapters/pgvector';
+import { createTsvectorAdapter } from '../adapters/tsvector';
+import { createUnifiedSearchPlugin } from '../plugin';
 
 // ─── pgvector adapter: chunk detection ────────────────────────────────────────
 

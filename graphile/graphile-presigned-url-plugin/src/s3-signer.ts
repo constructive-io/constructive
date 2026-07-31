@@ -1,12 +1,12 @@
 import {
-  S3Client,
-  PutObjectCommand,
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
-  DeleteObjectCommand,
+  PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Logger } from '@pgpmjs/logger';
+
 import type { S3Config } from './types';
 
 const log = new Logger('graphile-presigned-url:s3');

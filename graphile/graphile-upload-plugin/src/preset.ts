@@ -5,8 +5,9 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
-import type { UploadPluginOptions } from './types';
+
 import { createUploadPlugin } from './plugin';
+import type { UploadPluginOptions } from './types';
 
 /**
  * Creates a preset that includes the upload plugin with the given options.

@@ -1,10 +1,4 @@
 import {
-  createScriptedProvider,
-  makeFakeAssistantMessage,
-  makeFakeModel,
-  ZERO_USAGE,
-} from './helpers';
-import {
   type AssistantMessage,
   type Context,
   createAssistantMessageEventStream,
@@ -20,6 +14,12 @@ import {
   type AgentTool,
   DecisionValidationError,
 } from '../src';
+import {
+  createScriptedProvider,
+  makeFakeAssistantMessage,
+  makeFakeModel,
+  ZERO_USAGE,
+} from './helpers';
 
 describe('@agentic-kit/agent', () => {
   it('runs a minimal sequential tool loop', async () => {

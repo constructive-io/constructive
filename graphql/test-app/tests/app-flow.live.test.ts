@@ -12,28 +12,26 @@ import { after, before, describe, test } from 'node:test';
 import { act } from 'react-test-renderer';
 
 import {
-  configure,
-  useSignUpMutation,
-  useSignInMutation,
-  useSignOutMutation,
-  useCurrentUserQuery,
-  useCurrentUserIdQuery,
-  useUsersQuery,
+  useAuditLogsQuery,
   useCreateDatabaseMutation,
-  useDatabaseQuery,
-  useUpdateDatabaseMutation,
-  useDeleteDatabaseMutation,
-  useDatabasesQuery,
-  useSchemasQuery,
-  useTablesQuery,
-  useUpdateUserMutation,
   useCurrentIpAddressQuery,
   useCurrentUserAgentQuery,
-  useExtendTokenExpiresMutation,
-  useAuditLogsQuery,
+  useCurrentUserIdQuery,
+  useCurrentUserQuery,
+  useDatabaseQuery,
+  useDatabasesQuery,
+  useDeleteDatabaseMutation,
   useEmailsQuery,
+  useExtendTokenExpiresMutation,
+  useSchemasQuery,
+  useSignInMutation,
+  useSignOutMutation,
+  useSignUpMutation,
+  useTablesQuery,
+  useUpdateDatabaseMutation,
+  useUpdateUserMutation,
+  useUsersQuery,
 } from '../src/generated/hooks';
-
 import { renderHookWithClient } from './hook-test-utils';
 import {
   assertLiveEnvConfigured,
@@ -41,7 +39,6 @@ import {
   createTestQueryClient,
   getLiveEnvHelpMessage,
   getLiveTestEnv,
-  type AuthSession,
   signOut,
 } from './live-test-utils';
 

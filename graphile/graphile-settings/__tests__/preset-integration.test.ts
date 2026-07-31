@@ -11,9 +11,10 @@
  *
  * Requires postgres-plus:18 image with postgis, vector, pg_textsearch, pg_trgm extensions.
  */
-import { join } from 'path';
-import { getConnectionsObject, seed } from 'graphile-test';
 import type { GraphQLQueryFnObj } from 'graphile-test';
+import { getConnectionsObject, seed } from 'graphile-test';
+import { join } from 'path';
+
 import { ConstructivePreset } from '../src/presets/constructive-preset';
 
 const SCHEMA = 'integration_test';

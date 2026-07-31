@@ -18,24 +18,23 @@ import {
   useCurrentUserIdQuery,
   useCurrentUserQuery,
   useDatabasesQuery,
+  userQueryKey,
+  usersQueryKey,
   useSignInMutation,
   useSignOutMutation,
   useUpdateUserMutation,
   useUserQuery,
   useUsersQuery,
-  userQueryKey,
-  usersQueryKey,
 } from '../src/generated/hooks';
 import { buildListSelectionArgs } from '../src/generated/hooks/selection';
-
 import { renderHookWithClient } from './hook-test-utils';
 import {
   assertLiveEnvConfigured,
+  type AuthSession,
   configureHooks,
   createTestQueryClient,
   getLiveEnvHelpMessage,
   getLiveTestEnv,
-  type AuthSession,
   signIn,
   signOut,
 } from './live-test-utils';

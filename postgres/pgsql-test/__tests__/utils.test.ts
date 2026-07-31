@@ -1,13 +1,12 @@
 import {
-  snapshot,
+  IdHash,
   prune,
   pruneDates,
-  pruneIds,
-  pruneIdArrays,
-  pruneUUIDs,
   pruneHashes,
-  IdHash
-} from '../src/utils';
+  pruneIdArrays,
+  pruneIds,
+  pruneUUIDs,
+  snapshot} from '../src/utils';
 
 describe('snapshot utilities', () => {
   describe('pruneDates', () => {
@@ -196,7 +195,7 @@ describe('snapshot utilities', () => {
     });
 
     it('prune applies IdHash mapping when provided', () => {
-      const idHash: IdHash = { '1': 1, '2': 2 };
+      const idHash: IdHash = { 1: 1, 2: 2 };
       const row = { id: 1, user_id: 2, name: 'Alice' };
       expect(prune(row, idHash)).toEqual({
         id: '[ID-1]',

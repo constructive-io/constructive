@@ -7,13 +7,13 @@ const prefix = 'testing-db';
 export const getConnection = async () => {
   const options = process.env.FAST_TEST
     ? {
-        hot: true,
-        prefix
-      }
+      hot: true,
+      prefix
+    }
     : {
-        template: process.env.PGTEMPLATE_DATABASE,
-        prefix
-      };
+      template: process.env.PGTEMPLATE_DATABASE,
+      prefix
+    };
   return await testing.getConnection(options);
 };
 

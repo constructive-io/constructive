@@ -16,7 +16,6 @@ import {
   createFunctionParam,
   createImportDeclaration,
   createTypeReExport,
-  exportDeclareFunction,
   exportFunction,
   generateHookFileCode,
   objectProp,

@@ -1,14 +1,16 @@
 import 'graphile-build';
 import 'graphile-build-pg';
 import 'graphile-connection-filter';
+
 import type { PgCodec } from '@dataplan/pg';
 import type {
   ConnectionFilterOperatorFactory,
   ConnectionFilterOperatorRegistration,
   ConnectionFilterOperatorSpec,
 } from 'graphile-connection-filter';
-import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
+import sql from 'pg-sql2';
+
 import { CONCRETE_SUBTYPES } from '../constants';
 import type { PostgisExtensionInfo } from './detect-extension';
 
@@ -18,21 +20,21 @@ import type { PostgisExtensionInfo } from './detect-extension';
  */
 function buildOperatorExpr(op: string, i: SQL, v: SQL): SQL {
   switch (op) {
-    case '=':   return sql.fragment`${i} = ${v}`;
-    case '&&':  return sql.fragment`${i} && ${v}`;
-    case '&&&': return sql.fragment`${i} &&& ${v}`;
-    case '&<':  return sql.fragment`${i} &< ${v}`;
-    case '&<|': return sql.fragment`${i} &<| ${v}`;
-    case '&>':  return sql.fragment`${i} &> ${v}`;
-    case '|&>': return sql.fragment`${i} |&> ${v}`;
-    case '<<':  return sql.fragment`${i} << ${v}`;
-    case '<<|': return sql.fragment`${i} <<| ${v}`;
-    case '>>':  return sql.fragment`${i} >> ${v}`;
-    case '|>>': return sql.fragment`${i} |>> ${v}`;
-    case '~':   return sql.fragment`${i} ~ ${v}`;
-    case '~=':  return sql.fragment`${i} ~= ${v}`;
-    default:
-      throw new Error(`Unexpected PostGIS SQL operator: ${op}`);
+  case '=':   return sql.fragment`${i} = ${v}`;
+  case '&&':  return sql.fragment`${i} && ${v}`;
+  case '&&&': return sql.fragment`${i} &&& ${v}`;
+  case '&<':  return sql.fragment`${i} &< ${v}`;
+  case '&<|': return sql.fragment`${i} &<| ${v}`;
+  case '&>':  return sql.fragment`${i} &> ${v}`;
+  case '|&>': return sql.fragment`${i} |&> ${v}`;
+  case '<<':  return sql.fragment`${i} << ${v}`;
+  case '<<|': return sql.fragment`${i} <<| ${v}`;
+  case '>>':  return sql.fragment`${i} >> ${v}`;
+  case '|>>': return sql.fragment`${i} |>> ${v}`;
+  case '~':   return sql.fragment`${i} ~ ${v}`;
+  case '~=':  return sql.fragment`${i} ~= ${v}`;
+  default:
+    throw new Error(`Unexpected PostGIS SQL operator: ${op}`);
   }
 }
 

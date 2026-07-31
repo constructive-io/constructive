@@ -3,4 +3,4 @@ export * from './connect';
 export * from './manager';
 export * from './seed';
 export * from './test-client';
-export { snapshot, getErrorCode } from './utils';
+export { getErrorCode,snapshot } from './utils';

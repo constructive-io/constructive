@@ -1,3 +1,4 @@
+import { getExtensionName } from '@pgpmjs/ast/files';
 import { Logger } from '@pgpmjs/logger';
 import { RawStmt } from '@pgsql/types';
 import { mkdirSync, readFileSync, rmSync,writeFileSync } from 'fs';
@@ -5,7 +6,6 @@ import { relative } from 'path';
 import { deparse } from 'pgsql-deparser';
 import { parse } from 'pgsql-parser';
 
-import { getExtensionName } from '@pgpmjs/ast/files';
 import { writeBundleArtifact } from '../bundle/artifact';
 import { resolve, resolveWithPlan } from '../resolution/resolve';
 import { transformProps } from './transform';

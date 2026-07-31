@@ -1,5 +1,7 @@
 import '../augmentations';
+
 import type { GraphileConfig } from 'graphile-config';
+
 import { makeAssertAllowed } from '../utils';
 
 const version = '1.0.0';

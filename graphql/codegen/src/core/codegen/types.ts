@@ -4,8 +4,8 @@
 import * as t from '@babel/types';
 
 import type { Table } from '../../types/schema';
-import { SCALAR_NAMES } from './scalars';
 import { generateCode } from './babel-ast';
+import { SCALAR_NAMES } from './scalars';
 import {
   fieldTypeToTs,
   getGeneratedFileHeader,

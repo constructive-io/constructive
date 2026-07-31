@@ -1,6 +1,7 @@
-import { PgpmModuleAst, PgpmScriptAst } from '@pgpmjs/ast/module/types';
 import { hashString } from '@pgpmjs/ast';
+import { PgpmModuleAst, PgpmScriptAst } from '@pgpmjs/ast/module/types';
 import { mapScripts } from '@pgpmjs/traverse';
+
 import {
   BUNDLE_FORMAT_VERSION,
   BundleChange,

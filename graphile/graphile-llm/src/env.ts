@@ -5,15 +5,14 @@
  * modules import from './env'. The actual implementation lives in the
  * shared @constructive-io/llm-env package.
  */
-export {
-  getEnvVars,
-  getEnvOptions,
-  getLlmEnvOptions,
-  llmDefaults,
-} from '@constructive-io/llm-env';
-
 export type {
   LlmEnvOptions,
   LlmProviderConfig,
   ResolvedLlmEnvOptions,
+} from '@constructive-io/llm-env';
+export {
+  getEnvOptions,
+  getEnvVars,
+  getLlmEnvOptions,
+  llmDefaults,
 } from '@constructive-io/llm-env';

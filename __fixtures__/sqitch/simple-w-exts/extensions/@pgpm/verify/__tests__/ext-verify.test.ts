@@ -1,4 +1,4 @@
-import { getConnections, PgTestClient, snapshot } from 'pgsql-test';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
 let pg: PgTestClient;
 let teardown: () => Promise<void>;

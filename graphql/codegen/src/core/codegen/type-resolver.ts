@@ -115,42 +115,42 @@ export function typeRefToTsType(
   tracker?: TypeTracker,
 ): string {
   switch (typeRef.kind) {
-    case 'NON_NULL':
-      // Non-null wrapper - unwrap and return the inner type
-      if (typeRef.ofType) {
-        return typeRefToTsType(typeRef.ofType, tracker);
-      }
-      return 'unknown';
-
-    case 'LIST':
-      // List wrapper - wrap inner type in array
-      if (typeRef.ofType) {
-        const innerType = typeRefToTsType(typeRef.ofType, tracker);
-        return `${innerType}[]`;
-      }
-      return 'unknown[]';
-
-    case 'SCALAR':
-      // Scalar type - map to TS type
-      return scalarToTsType(typeRef.name ?? 'unknown');
-
-    case 'ENUM': {
-      // Enum type - use the GraphQL enum name and track it
-      const typeName = typeRef.name ?? 'string';
-      tracker?.track(typeName);
-      return typeName;
+  case 'NON_NULL':
+    // Non-null wrapper - unwrap and return the inner type
+    if (typeRef.ofType) {
+      return typeRefToTsType(typeRef.ofType, tracker);
     }
+    return 'unknown';
 
-    case 'OBJECT':
-    case 'INPUT_OBJECT': {
-      // Object types - use the GraphQL type name and track it
-      const typeName = typeRef.name ?? 'unknown';
-      tracker?.track(typeName);
-      return typeName;
+  case 'LIST':
+    // List wrapper - wrap inner type in array
+    if (typeRef.ofType) {
+      const innerType = typeRefToTsType(typeRef.ofType, tracker);
+      return `${innerType}[]`;
     }
+    return 'unknown[]';
 
-    default:
-      return 'unknown';
+  case 'SCALAR':
+    // Scalar type - map to TS type
+    return scalarToTsType(typeRef.name ?? 'unknown');
+
+  case 'ENUM': {
+    // Enum type - use the GraphQL enum name and track it
+    const typeName = typeRef.name ?? 'string';
+    tracker?.track(typeName);
+    return typeName;
+  }
+
+  case 'OBJECT':
+  case 'INPUT_OBJECT': {
+    // Object types - use the GraphQL type name and track it
+    const typeName = typeRef.name ?? 'unknown';
+    tracker?.track(typeName);
+    return typeName;
+  }
+
+  default:
+    return 'unknown';
   }
 }
 

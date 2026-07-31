@@ -2,7 +2,7 @@
  * Tests for lifecycle rule builders.
  */
 
-import { buildTempCleanupRule, buildAbortIncompleteMultipartRule } from '../src/lifecycle';
+import { buildAbortIncompleteMultipartRule,buildTempCleanupRule } from '../src/lifecycle';
 
 describe('buildTempCleanupRule', () => {
   it('builds rule with default 1-day expiration', () => {

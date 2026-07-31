@@ -1,5 +1,6 @@
 import { getEnvOptions } from '@pgpmjs/env';
 import { SmtpOptions } from '@pgpmjs/types';
+
 import { send } from '../src/index';
 import { createSmtpCatcher } from './smtp-catcher';
 
@@ -17,12 +18,12 @@ const main = async () => {
 
   const smtpOverrides: SmtpOptions = catcher
     ? {
-        host: catcher.host,
-        port: catcher.port,
-        secure: false,
-        tlsRejectUnauthorized: false,
-        from: smtpFromEnv.from ?? process.env.SMTP_TEST_FROM ?? 'no-reply@example.com'
-      }
+      host: catcher.host,
+      port: catcher.port,
+      secure: false,
+      tlsRejectUnauthorized: false,
+      from: smtpFromEnv.from ?? process.env.SMTP_TEST_FROM ?? 'no-reply@example.com'
+    }
     : {};
 
   const to =

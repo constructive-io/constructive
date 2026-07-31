@@ -3,10 +3,9 @@ import { print } from 'graphql';
 import supertest from 'supertest';
 
 import type {
-  ServerInfo,
+  GraphQLQueryFn,
   GraphQLResponse,
-  GraphQLQueryFn
-} from './types';
+  ServerInfo} from './types';
 
 /**
  * Create a SuperTest agent for the given server

@@ -13,13 +13,13 @@
  * and this class calls pool.query() directly for each operation.
  */
 
-import { randomUUID } from 'crypto';
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
+import { randomUUID } from 'crypto';
 
 import type {
-  CursorTrackerOptions,
   ChangeLogEntry,
+  CursorTrackerOptions,
   Queryable,
 } from './types';
 
@@ -153,8 +153,8 @@ export class CursorTracker {
 }
 
 export {
-  DEFAULT_POLL_INTERVAL_MS,
-  DEFAULT_HEARTBEAT_INTERVAL_MS,
   DEFAULT_BATCH_LIMIT,
+  DEFAULT_HEARTBEAT_INTERVAL_MS,
+  DEFAULT_POLL_INTERVAL_MS,
   DEFAULT_SCHEMA,
 };

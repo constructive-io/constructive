@@ -9,6 +9,7 @@
  */
 
 import { CLI, CLIOptions, getPackageJson } from 'inquirerer';
+
 import { commands } from './commands';
 
 if (process.argv.includes('--version') || process.argv.includes('-v')) {

@@ -1,4 +1,5 @@
 import path from 'path';
+
 import { generate } from '../../../graphql/codegen/src/core/generate';
 
 const root = path.resolve(__dirname, '..');

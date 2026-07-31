@@ -22,16 +22,17 @@
  * available; forbidden from defining a GraphQL resolver."
  */
 
-import type { GraphileConfig } from 'graphile-config';
 import 'graphile-build';
 import 'graphile-build-pg';
+
 import { sideEffect } from 'grafast';
-import {
-  parseAndValidateSqlExpression,
-  validateAst,
-  DEFAULT_ALLOWED_FUNCTIONS
-} from './validator';
+import type { GraphileConfig } from 'graphile-config';
+
 import type { SqlExpressionValidatorOptions } from './validator';
+import {
+  DEFAULT_ALLOWED_FUNCTIONS,
+  parseAndValidateSqlExpression,
+  validateAst} from './validator';
 
 // ─── Helpers ──────────────────────────────────────────────────────
 

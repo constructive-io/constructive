@@ -2,17 +2,18 @@
  * Authentication commands for the CNC execution engine
  */
 
-import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
+import { CLIOptions, extractFirst,Inquirerer } from 'inquirerer';
 import chalk from 'yanse';
+
 import {
-  getCurrentContext,
-  loadContext,
-  listContexts,
   getContextCredentials,
-  setContextCredentials,
-  removeContextCredentials,
+  getCurrentContext,
   hasValidCredentials,
+  listContexts,
+  loadContext,
   loadSettings,
+  removeContextCredentials,
+  setContextCredentials,
 } from '../config';
 
 const usage = `
@@ -71,16 +72,16 @@ async function handleSubcommand(
   prompter: Inquirerer
 ) {
   switch (subcommand) {
-    case 'set-token':
-      return handleSetToken(argv, prompter);
-    case 'status':
-      return handleStatus(argv);
-    case 'logout':
-      return handleLogout(argv, prompter);
-    default:
-      console.log(usage);
-      console.error(chalk.red(`Unknown subcommand: ${subcommand}`));
-      process.exit(1);
+  case 'set-token':
+    return handleSetToken(argv, prompter);
+  case 'status':
+    return handleStatus(argv);
+  case 'logout':
+    return handleLogout(argv, prompter);
+  default:
+    console.log(usage);
+    console.error(chalk.red(`Unknown subcommand: ${subcommand}`));
+    process.exit(1);
   }
 }
 

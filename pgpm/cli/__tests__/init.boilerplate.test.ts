@@ -1,8 +1,7 @@
+import { DEFAULT_TEMPLATE_REPO, TEMPLATE_REPOS } from '@pgpmjs/core';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-import { DEFAULT_TEMPLATE_REPO, TEMPLATE_REPOS } from '@pgpmjs/core';
 
 import {
   persistBoilerplateSource,

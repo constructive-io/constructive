@@ -10,20 +10,21 @@
  * - Invariants: searchScore always [0,1], SEARCH_SCORE_DESC correct ordering
  */
 
-import { join } from 'path';
-import { getConnections, seed } from 'graphile-test';
-import type { GraphQLResponse } from 'graphile-test';
-import type { PgTestClient } from 'pgsql-test';
-import { ConnectionFilterPreset } from 'graphile-connection-filter';
-import { Bm25CodecPlugin } from '../codecs/bm25-codec';
-import { VectorCodecPlugin } from '../codecs/vector-codec';
-import { TsvectorCodecPlugin } from '../codecs/tsvector-codec';
-import { createUnifiedSearchPlugin } from '../plugin';
-import { createTsvectorAdapter } from '../adapters/tsvector';
-import { createBm25Adapter } from '../adapters/bm25';
-import { createTrgmAdapter } from '../adapters/trgm';
-import { createPgvectorAdapter } from '../adapters/pgvector';
 import type { GraphileConfig } from 'graphile-config';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
+import type { GraphQLResponse } from 'graphile-test';
+import { getConnections, seed } from 'graphile-test';
+import { join } from 'path';
+import type { PgTestClient } from 'pgsql-test';
+
+import { createBm25Adapter } from '../adapters/bm25';
+import { createPgvectorAdapter } from '../adapters/pgvector';
+import { createTrgmAdapter } from '../adapters/trgm';
+import { createTsvectorAdapter } from '../adapters/tsvector';
+import { Bm25CodecPlugin } from '../codecs/bm25-codec';
+import { TsvectorCodecPlugin } from '../codecs/tsvector-codec';
+import { VectorCodecPlugin } from '../codecs/vector-codec';
+import { createUnifiedSearchPlugin } from '../plugin';
 
 // ─── Smart Tags Plugin ───────────────────────────────────────────────────────
 

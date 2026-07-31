@@ -6,7 +6,6 @@ import {
   parseApplySpec,
   readApplySpec
 } from '../../src/apply';
-import { PgpmPackage } from '../../src/core/class/pgpm';
 import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 import { TestDatabase } from '../../test-utils/TestDatabase';
 import { TestFixture } from '../../test-utils/TestFixture';

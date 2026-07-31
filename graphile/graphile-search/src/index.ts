@@ -34,46 +34,46 @@
 export { createUnifiedSearchPlugin } from './plugin';
 
 // Preset
-export { UnifiedSearchPreset } from './preset';
 export type { UnifiedSearchPresetOptions } from './preset';
+export { UnifiedSearchPreset } from './preset';
 
 // Types
 export type {
-  SearchAdapter,
-  SearchableColumn,
-  ScoreSemantics,
   FilterApplyResult,
+  ScoreSemantics,
+  SearchableColumn,
+  SearchAdapter,
   UnifiedSearchOptions,
 } from './types';
 
 // Adapters
-export {
-  createTsvectorAdapter,
-  createBm25Adapter,
-  createTrgmAdapter,
-  createPgvectorAdapter,
-} from './adapters';
 export type {
-  TsvectorAdapterOptions,
   Bm25AdapterOptions,
-  TrgmAdapterOptions,
   PgvectorAdapterOptions,
+  TrgmAdapterOptions,
+  TsvectorAdapterOptions,
+} from './adapters';
+export {
+  createBm25Adapter,
+  createPgvectorAdapter,
+  createTrgmAdapter,
+  createTsvectorAdapter,
 } from './adapters';
 
 // Codec plugins (tree-shakable — import only the codecs you need)
+export type {
+  Bm25IndexInfo,
+  TsvectorCodecPluginOptions,
+} from './codecs';
 export {
-  TsvectorCodecPlugin,
-  TsvectorCodecPreset,
-  createTsvectorCodecPlugin,
   Bm25CodecPlugin,
   Bm25CodecPreset,
   bm25IndexStore,
+  createTsvectorCodecPlugin,
+  TsvectorCodecPlugin,
+  TsvectorCodecPreset,
   VectorCodecPlugin,
   VectorCodecPreset,
-} from './codecs';
-export type {
-  TsvectorCodecPluginOptions,
-  Bm25IndexInfo,
 } from './codecs';
 
 // Operator factories for connection filter integration

@@ -1,4 +1,4 @@
-import { OAuthClient, createOAuthClient } from '../src/oauth-client';
+import { createOAuthClient } from '../src/oauth-client';
 import { getProvider, getProviderIds } from '../src/providers';
 import { generateState, verifyState } from '../src/utils/state';
 

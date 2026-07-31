@@ -1,10 +1,9 @@
 process.env.LOG_SCOPE = 'pgsql-test';
 
+import { PgpmMigrate } from '@pgpmjs/core';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-
-import { PgpmMigrate } from '@pgpmjs/core';
 
 import { getConnections } from '../src/connect';
 import { PgTestClient } from '../src/test-client';

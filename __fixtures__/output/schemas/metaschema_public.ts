@@ -1,4 +1,4 @@
-import { UUID, Timestamp } from "./_common";
+import { Timestamp,UUID } from './_common';
 export interface CheckConstraint {
   id: UUID;
   database_id: UUID;
