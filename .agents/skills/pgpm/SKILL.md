@@ -364,6 +364,7 @@ Consult these reference files for detailed documentation on specific topics:
 | [references/routing-profile.md](references/routing-profile.md) | Routing profile & module self-description | `extensions.json` provides/consumes, `pgpm.apply.json`, workspace `portability` in `pgpm.json`, routing precedence |
 | [references/module-naming.md](references/module-naming.md) | npm names vs control file names | Confused about which identifier to use where |
 | [references/plan-format.md](references/plan-format.md) | pgpm.plan file format | Fixing `Invalid line format` errors, editing plan files manually |
+| [references/packaging.md](references/packaging.md) | Package separation & restructuring | Splitting a database into multiple pgpm packages, cherry-picking objects into a package, change granularity, derived paths and requires |
 | [references/publishing.md](references/publishing.md) | Publishing modules to npm | Bundling, versioning with lerna, publishing @pgpm/* packages |
 | [references/testing.md](references/testing.md) | PostgreSQL integration tests | Setting up pgsql-test, seed adapters, test patterns |
 | [references/troubleshooting.md](references/troubleshooting.md) | Common issues and solutions | Debugging connection, deployment, testing, or Docker problems |
