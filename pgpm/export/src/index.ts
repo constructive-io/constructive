@@ -1,34 +1,42 @@
 export * from './export-data';
-export * from './export-graphql';
-export * from './export-graphql-meta';
 export * from './export-meta';
 export * from './export-migrations';
-export type {
-  FieldType,
-  MakeReplacerOptions,
-  MetaExportTableEntry,
-  MissingModulesResult,
-  PreparePackageOptions,
-  ReplacerResult,
-  Schema,
-  TableConfig} from './export-utils';
+export * from './export-graphql';
+export * from './export-graphql-meta';
+export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
+export type { ExportGranularity, RestructureExportRowsOptions, RestructureExportRowsResult } from './restructure';
+export { loadModuleSource, stripTransactionWrapper } from './module-source';
+export type { ModuleSource, ModuleSourceChange } from './module-source';
+export { parsePartitionConfig, partitionExportRows } from './partition';
+export type { PartitionConfig, PartitionedPackageRows, PartitionExportRowsResult } from './partition';
+export { diffCatalogSnapshots, snapshotCatalog } from './catalog-check';
+export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
+export { GraphQLClient } from './graphql-client';
+export { getGraphQLQueryName, getGraphQLTypeName, graphqlRowToPostgresRow, buildFieldsFragment, mapGraphQLTypeToFieldType, unwrapGraphQLType, GraphQLTypeInfo } from './graphql-naming';
 export {
   DB_REQUIRED_EXTENSIONS,
-  detectMissingModules,
-  installMissingModules,
-  makeReplacer,
-  mapPgTypeToFieldType,
-  META_COMMON_FOOTER,
+  SERVICE_REQUIRED_EXTENSIONS,
   META_COMMON_HEADER,
-  META_TABLE_CONFIG,
+  META_COMMON_FOOTER,
   META_TABLE_ORDER,
+  META_TABLE_CONFIG,
   META_TABLE_OVERRIDES,
-  normalizeOutdir,
+  mapPgTypeToFieldType,
+  makeReplacer,
   preparePackage,
-  SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
-export { GraphQLClient } from './graphql-client';
-export { buildFieldsFragment, getGraphQLQueryName, getGraphQLTypeName, graphqlRowToPostgresRow, GraphQLTypeInfo,mapGraphQLTypeToFieldType, unwrapGraphQLType } from './graphql-naming';
+  normalizeOutdir,
+  detectMissingModules,
+  installMissingModules
+} from './export-utils';
+export type {
+  FieldType,
+  TableConfig,
+  MetaExportTableEntry,
+  Schema,
+  MakeReplacerOptions,
+  ReplacerResult,
+  PreparePackageOptions,
+  MissingModulesResult
+} from './export-utils';
+export { PG_TYPE_MAP, TypeMapEntry, lookupByPgUdt, lookupByGqlType } from './type-map';
 export { intervalToPostgres, parsePgInterval, PgInterval } from './interval-utils';
-export type { ExportGranularity, RestructureExportRowsResult } from './restructure';
-export { EXPORT_GRANULARITIES, isExportGranularity, restructureExportRows } from './restructure';
-export { lookupByGqlType,lookupByPgUdt, PG_TYPE_MAP, TypeMapEntry } from './type-map';

@@ -1,21 +1,23 @@
-import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { PgpmOptions } from '@pgpmjs/types';
 import { Inquirerer } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
+import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { exportMeta } from './export-meta';
+import { PartitionConfig, partitionExportRows } from './partition';
+import { ExportGranularity, restructureExportRows } from './restructure';
 import {
   DB_REQUIRED_EXTENSIONS,
+  SERVICE_REQUIRED_EXTENSIONS,
+  META_COMMON_HEADER,
+  META_COMMON_FOOTER,
+  META_TABLE_ORDER,
   detectMissingModules,
   installMissingModules,
   makeReplacer,
-  META_COMMON_FOOTER,
-  META_COMMON_HEADER,
-  META_TABLE_ORDER,
-  normalizeOutdir,
   preparePackage,
-  SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
-import { ExportGranularity, restructureExportRows } from './restructure';
+  normalizeOutdir
+} from './export-utils';
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;
@@ -57,6 +59,13 @@ interface ExportMigrationsToDiskOptions {
    * When omitted, sql_actions rows are written through unchanged.
    */
   granularity?: ExportGranularity;
+  /**
+   * Partition dial: split the exported database module into multiple pgpm
+   * packages per the config's rules (`partitionUnits` in `@pgpmjs/transform`).
+   * Cross-package dependencies become `<pkg>:<path>` requires. Throws
+   * `PartitionCycleError` on an unshippable partition.
+   */
+  partition?: PartitionConfig;
 }
 
 interface ExportOptions {
@@ -101,6 +110,13 @@ interface ExportOptions {
    * When omitted, sql_actions rows are written through unchanged.
    */
   granularity?: ExportGranularity;
+  /**
+   * Partition dial: split the exported database module into multiple pgpm
+   * packages per the config's rules (`partitionUnits` in `@pgpmjs/transform`).
+   * Cross-package dependencies become `<pkg>:<path>` requires. Throws
+   * `PartitionCycleError` on an unshippable partition.
+   */
+  partition?: PartitionConfig;
 }
 
 const exportMigrationsToDisk = async ({
@@ -123,7 +139,8 @@ const exportMigrationsToDisk = async ({
   serviceOutdir,
   skipSchemaRenaming = false,
   excludeCategories,
-  granularity
+  granularity,
+  partition
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   const normalizedOutdir = normalizeOutdir(outdir);
   // Use serviceOutdir for service module, defaulting to outdir if not provided
@@ -174,16 +191,16 @@ const exportMigrationsToDisk = async ({
   // it was set on and therefore cannot be relied upon across connections.
   const results = excludeCategories && excludeCategories.length > 0
     ? await pgPool.query(
-      `select * from db_migrate.sql_actions
+        `select * from db_migrate.sql_actions
          where database_id = $1
            and (category is null or category != ALL($2::text[]))
          order by id`,
-      [databaseId, excludeCategories]
-    )
+        [databaseId, excludeCategories]
+      )
     : await pgPool.query(
-      `select * from db_migrate.sql_actions where database_id = $1 order by id`,
-      [databaseId]
-    );
+        `select * from db_migrate.sql_actions where database_id = $1 order by id`,
+        [databaseId]
+      );
 
   // Registry fixtures — meta_registration actions that insert into
   // metaschema_public.* (e.g. pg_partman partition registration) — FK-reference
@@ -209,24 +226,6 @@ const exportMigrationsToDisk = async ({
     // Detect missing modules at workspace level and prompt user
     const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter, argv);
 
-    // Create/prepare the module directory
-    const dbModuleDir = await preparePackage({
-      project,
-      author,
-      outdir: normalizedOutdir,
-      name,
-      description: dbExtensionDesc,
-      extensions: [...DB_REQUIRED_EXTENSIONS],
-      prompter,
-      repoName,
-      username
-    });
-
-    // Install missing modules if user confirmed (now that module exists)
-    if (dbMissingResult.shouldInstall) {
-      await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
-    }
-
     let dbRows = appRows;
     if (granularity) {
       const { rows, warnings } = await restructureExportRows(appRows, granularity);
@@ -234,8 +233,54 @@ const exportMigrationsToDisk = async ({
       warnings.forEach(warning => console.warn(`restructure (${granularity}): ${warning}`));
     }
 
-    writePgpmPlan(dbRows, opts);
-    writePgpmFiles(dbRows, opts);
+    if (partition) {
+      // Partition dial: split the database module into N packages. Each
+      // package requires its cross-package prerequisites as extensions so
+      // recursive deploys order them correctly.
+      const { packages, warnings } = await partitionExportRows(dbRows, partition);
+      warnings.forEach(warning => console.warn(`partition: ${warning}`));
+
+      for (const pkg of packages) {
+        const pkgDir = await preparePackage({
+          project,
+          author,
+          outdir: normalizedOutdir,
+          name: pkg.name,
+          description: `${pkg.name} (partitioned from ${name})`,
+          extensions: [...DB_REQUIRED_EXTENSIONS, ...pkg.requires],
+          prompter,
+          repoName,
+          username
+        });
+        if (dbMissingResult.shouldInstall) {
+          await installMissingModules(pkgDir, dbMissingResult.missingModules);
+        }
+        const pkgOpts: SqlWriteOptions = { ...opts, name: pkg.name };
+        writePgpmPlan(pkg.rows, pkgOpts);
+        writePgpmFiles(pkg.rows, pkgOpts);
+      }
+    } else {
+      // Create/prepare the module directory
+      const dbModuleDir = await preparePackage({
+        project,
+        author,
+        outdir: normalizedOutdir,
+        name,
+        description: dbExtensionDesc,
+        extensions: [...DB_REQUIRED_EXTENSIONS],
+        prompter,
+        repoName,
+        username
+      });
+
+      // Install missing modules if user confirmed (now that module exists)
+      if (dbMissingResult.shouldInstall) {
+        await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
+      }
+
+      writePgpmPlan(dbRows, opts);
+      writePgpmFiles(dbRows, opts);
+    }
   } else {
     console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');
   }
@@ -288,10 +333,10 @@ const exportMigrationsToDisk = async ({
   const metaReplacer = makeReplacer({
     schemas: metaSchemasForReplacement,
     name: metaExtensionName,
-    // Use extensionName for schema prefix — the services metadata references
-    // schemas owned by the application package (e.g. agent_db_auth_public),
-    // not the services package (agent_db_services_auth_public)
-    schemaPrefix: name
+      // Use extensionName for schema prefix — the services metadata references
+      // schemas owned by the application package (e.g. agent_db_auth_public),
+      // not the services package (agent_db_services_auth_public)
+      schemaPrefix: name
   });
 
   // Create separate files for each table type
@@ -374,7 +419,8 @@ export const exportMigrations = async ({
   serviceOutdir,
   skipSchemaRenaming,
   excludeCategories,
-  granularity
+  granularity,
+  partition
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -398,7 +444,8 @@ export const exportMigrations = async ({
       serviceOutdir,
       skipSchemaRenaming,
       excludeCategories,
-      granularity
+      granularity,
+      partition
     });
   }
 };

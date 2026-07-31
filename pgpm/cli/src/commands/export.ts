@@ -1,6 +1,6 @@
 import { PgpmPackage } from '@pgpmjs/core';
+import { exportMigrations, exportGraphQL, GraphQLClient, graphqlRowToPostgresRow, isExportGranularity, EXPORT_GRANULARITIES, parsePartitionConfig, PartitionConfig } from '@pgpmjs/export';
 import { getEnvOptions } from '@pgpmjs/env';
-import { EXPORT_GRANULARITIES,exportGraphQL, exportMigrations, GraphQLClient, graphqlRowToPostgresRow, isExportGranularity } from '@pgpmjs/export';
 import { getGitConfigInfo } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { resolve } from 'path';
@@ -30,12 +30,16 @@ Options:
                           Change paths are derived from the naming spec and
                           requires from the statement graph. When omitted,
                           sql_actions rows are exported unchanged.
+  --partition <file>      Partition config (JSON: rules/defaultPackage/splitRiders)
+                          splitting the exported database module into multiple
+                          pgpm packages with derived cross-package requires.
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
   pgpm export              Export migrations from selected database (SQL mode)
   pgpm export --exclude-categories security,permissions,auth,memberships
   pgpm export --granularity consolidated
+  pgpm export --granularity object --partition partition.json
   pgpm export --graphql-endpoint 'http://[::1]:3002/graphql' --migrate-endpoint 'http://[::1]:3000/graphql' --migrate-host db_migrate.localhost:3000
 `;
 
@@ -77,6 +81,18 @@ export default async (
     return;
   }
   const granularity = granularityRaw;
+
+  const partitionRaw = argv.partition;
+  let partition: PartitionConfig | undefined;
+  if (typeof partitionRaw === 'string' && partitionRaw) {
+    try {
+      partition = parsePartitionConfig(resolve(cwd, partitionRaw));
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : String(err));
+      prompter.close();
+      return;
+    }
+  }
 
   if (graphqlEndpoint) {
     // =========================================================================
@@ -195,7 +211,8 @@ export default async (
       argv,
       username,
       excludeCategories,
-      granularity
+      granularity,
+      partition
     });
   } else {
     // =========================================================================
@@ -334,7 +351,8 @@ export default async (
       argv,
       username,
       excludeCategories,
-      granularity
+      granularity,
+      partition
     });
   }
 

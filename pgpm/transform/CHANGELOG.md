@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.17.0...@pgpmjs/transform@0.18.0) (2026-07-31)
+
+### Features
+
+- **pgpm:** compose semantic-diff inverses/verifies at the AST level via @pgsql/scripts node API ([6bc851e](https://github.com/constructive-io/constructive/commit/6bc851e3eddc815f38fe8c0916e6932ffec3415a))
+
 # [0.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.16.0...@pgpmjs/transform@0.17.0) (2026-07-31)
 
 ### Features
