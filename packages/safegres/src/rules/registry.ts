@@ -27,7 +27,7 @@ export interface RuleMeta {
    * Rules with `scope: 'policy-ast'` require parsing policy expressions.
    * When every one of them is disabled the audit skips AST work entirely.
    */
-  scope: 'table' | 'policy-ast' | 'index';
+  scope: 'table' | 'policy-ast' | 'index' | 'stats';
 }
 
 /** The scoring axis a rule belongs to (`security` unless declared otherwise). */
@@ -229,6 +229,42 @@ export const RULES: RuleMeta[] = [
     dimension: 'perf',
     title: 'Sort-shaped column (timestamp/date) leads no index — heuristic advisory',
     scope: 'index'
+  },
+  {
+    code: 'S1',
+    category: 'index',
+    defaultSeverity: 'medium',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Sequential-scan-dominant table (runtime statistics)',
+    scope: 'stats'
+  },
+  {
+    code: 'S2',
+    category: 'index',
+    defaultSeverity: 'low',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Index the planner has never chosen (runtime statistics)',
+    scope: 'stats'
+  },
+  {
+    code: 'S3',
+    category: 'index',
+    defaultSeverity: 'low',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Dead-tuple bloat — autovacuum is not keeping up (runtime statistics)',
+    scope: 'stats'
+  },
+  {
+    code: 'S4',
+    category: 'index',
+    defaultSeverity: 'info',
+    direction: 'neutral',
+    dimension: 'perf',
+    title: 'Statement hotspot on a table in scope (pg_stat_statements)',
+    scope: 'stats'
   }
 ];
 

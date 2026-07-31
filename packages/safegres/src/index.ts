@@ -34,6 +34,15 @@ export {
   checkUnindexedSortColumns
 } from './checks/indexes';
 export type { PolicyClause, PredicateColumn } from './checks/policy-index';
+export type { StatsThresholds } from './checks/stats';
+export {
+  checkDeadTuples,
+  checkSeqScanDominant,
+  checkStats,
+  checkTopStatements,
+  checkUnusedIndexes,
+  DEFAULT_STATS_THRESHOLDS
+} from './checks/stats';
 export {
   checkNonLeakproofPolicyFunctions,
   checkPolicyColumnCasts,
@@ -81,6 +90,15 @@ export type { FunctionGrant, FunctionSnapshot, IntrospectFunctionOptions } from 
 export { introspectFunctions } from './pg/functions';
 export type { ColumnInfo, ForeignKeyInfo, IndexInfo, TableIndexSnapshot } from './pg/indexes';
 export { introspectIndexes } from './pg/indexes';
+export type {
+  IndexUsage,
+  StatementUsage,
+  StatsSnapshot,
+  TableUsage
+} from './pg/stats';
+export { introspectStats } from './pg/stats';
+export type { ExplainOptions, ExplainReport } from './perf/explain';
+export { proveFindings } from './perf/explain';
 export {
   type IntrospectOptions,
   introspectTables,

@@ -115,7 +115,51 @@ export interface PerfConfig {
    */
   ignore?: string[];
   /** Scoring settings for the perf axis (defaults mirror the security score). */
-  scoring?: ScoringConfig;
+  scoring?: PerfScoringConfig;
+  /** Runtime statistics (`--stats`, `S*`). Off unless enabled here or by flag. */
+  stats?: PerfStatsConfig;
+  /** Planner proof (`--explain`). Off unless enabled here or by flag. */
+  explain?: PerfExplainConfig;
+}
+
+export interface PerfScoringConfig extends ScoringConfig {
+  /**
+   * Whether runtime-statistics findings (`S*`) count toward the perf score.
+   * Default true — asking for `--stats` is the opt-in. Set false to keep the
+   * grade purely deterministic and read the `S*` findings as advisories.
+   */
+  includeStats?: boolean;
+}
+
+/**
+ * Thresholds for the runtime-statistics rules. Every one is a floor: below
+ * it the workload hasn't said enough for the finding to mean anything.
+ */
+export interface PerfStatsConfig {
+  /** Collect and check runtime statistics without passing `--stats`. */
+  enabled?: boolean;
+  /** Ignore tables with fewer live rows than this. Default 1000. */
+  minRows?: number;
+  /** S1 fires when sequential scans exceed index scans by this factor. Default 10. */
+  seqScanRatio?: number;
+  /** S2 ignores indexes smaller than this many bytes. Default 1048576 (1 MiB). */
+  minIndexBytes?: number;
+  /** S3 fires above this dead/live tuple ratio. Default 0.2. */
+  deadTupleRatio?: number;
+  /** S4 fires for statements at or above this share of total time. Default 0.05. */
+  minTimeShare?: number;
+  /** S4 reports at most this many statements. Default 5. */
+  topStatements?: number;
+}
+
+export interface PerfExplainConfig {
+  /** Probe findings with EXPLAIN without passing `--explain`. */
+  enabled?: boolean;
+  /**
+   * Below this planner row estimate a sequential scan is the right plan, so a
+   * probe can refute a finding but never confirm one. Default 1000.
+   */
+  minRows?: number;
 }
 
 export interface FailOnConfig {

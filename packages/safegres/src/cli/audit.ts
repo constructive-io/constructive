@@ -72,6 +72,15 @@ Performance dimension (optional; scored separately from security):
   --perf-baseline <file>   Diff perf findings against a committed baseline and
                            report only NEW debt (implies --perf)
   --fail-on-new-perf       Exit non-zero when --perf-baseline finds new debt
+  --stats                  Also run the runtime-statistics rules (S1-S4) from
+                           pg_stat_user_tables and, when installed,
+                           pg_stat_statements (implies --perf). Workload-
+                           dependent: only meaningful against a database that
+                           has served representative traffic
+  --explain                Prove each probeable perf finding with
+                           EXPLAIN (GENERIC_PLAN) and attach the plan as
+                           evidence; findings the planner refutes are reported
+                           but unscored (implies --perf, needs PostgreSQL 16+)
 
 Call graph (unscored; human review):
   --call-graph             Analyze the functions reachable from the exposed entry
@@ -130,6 +139,8 @@ export default async (
       || typeof argv['write-perf-baseline'] === 'string'
         ? true
         : undefined,
+    stats: argv.stats === true ? true : undefined,
+    explain: argv.explain === true ? true : undefined,
     callGraph:
       argv['call-graph'] === true
       || typeof argv.baseline === 'string'

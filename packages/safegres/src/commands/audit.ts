@@ -30,6 +30,7 @@ import {
   collectPredicateColumns,
   type PredicateColumn
 } from '../checks/policy-index';
+import { checkStats, DEFAULT_STATS_THRESHOLDS, type StatsThresholds } from '../checks/stats';
 import {
   checkGrantsWithoutRls,
   checkRlsEnabledNoPolicies,
@@ -47,11 +48,13 @@ import { resolveExposure } from '../pg/exposure';
 import { introspectFunctions } from '../pg/functions';
 import { introspectIndexes, type TableIndexSnapshot } from '../pg/indexes';
 import { asExecutor, type IntrospectOptions, introspectTables, type QueryExecutor, type TableSnapshot } from '../pg/introspect';
+import { type ExplainReport, proveFindings } from '../perf/explain';
 import { lookupVolatility, type ProcVolatility } from '../pg/proc';
 import { listAuditableRoles, resolveRoles } from '../pg/roles';
+import { introspectStats, type StatsSnapshot } from '../pg/stats';
 import { dimensionOf, RULES_BY_CODE } from '../rules/registry';
 import { computeScore } from '../score/score';
-import type { ExposureReport, Finding, PerfReport, Report } from '../types';
+import type { ExposureReport, Finding, PerfReport, PerfStatsReport, Report } from '../types';
 import { summarize } from '../types';
 import { version as PKG_VERSION } from '../version';
 
@@ -83,6 +86,17 @@ export interface AuditOptions extends IntrospectOptions {
    */
   perf?: boolean;
   /**
+   * Collect runtime statistics (`pg_stat_user_tables`, `pg_stat_statements`)
+   * and run the `S*` rules. Implies `perf`. Overrides `config.perf.stats.enabled`.
+   */
+  stats?: boolean;
+  /**
+   * Probe perf findings with `EXPLAIN (GENERIC_PLAN)` and attach the plan as
+   * evidence, acknowledging findings the planner refutes. Implies `perf`.
+   * Overrides `config.perf.explain.enabled`.
+   */
+  explain?: boolean;
+  /**
    * Merged safegres configuration (rules, overrides, scoring). Rule settings
    * filter and retune findings; scoring settings drive the report score.
    * Connection-independent option fields (`schemas`, `roles`, …) present on
@@ -98,7 +112,12 @@ export async function audit(
   const exec = asExecutor(client);
   const config = options.config ?? {};
   const resolved = resolveRules(config);
-  const perfEnabled = options.perf ?? config.perf?.enabled ?? false;
+  const statsEnabled = options.stats ?? config.perf?.stats?.enabled ?? false;
+  const explainEnabled = options.explain ?? config.perf?.explain?.enabled ?? false;
+  // Both tiers are refinements of the perf dimension: asking for either turns
+  // it on, but neither is reachable without opting into perf in the first place.
+  const perfEnabled =
+    (options.perf ?? config.perf?.enabled ?? false) || statsEnabled || explainEnabled;
   const skipAst =
     options.skipAstChecks || allAstRulesDisabled(resolved, { perf: perfEnabled });
 
@@ -173,6 +192,14 @@ export async function audit(
     }
   }
 
+  const statsSnapshot: StatsSnapshot | null = statsEnabled
+    ? await introspectStats(exec, {
+      schemas: options.schemas ?? config.schemas,
+      excludeSchemas: options.excludeSchemas ?? config.excludeSchemas,
+      statementLimit: config.perf?.stats?.topStatements
+    })
+    : null;
+
   if (perfEnabled) {
     for (const table of indexSnapshot) {
       findings.push(...checkUnindexedForeignKeys(table));
@@ -182,6 +209,10 @@ export async function audit(
       const x6 = checkMissingPrimaryKey(table);
       if (x6) findings.push(x6);
     }
+  }
+
+  if (statsSnapshot) {
+    findings.push(...checkStats(statsSnapshot, statsThresholds(config)));
   }
 
   findings = applyRulesToFindings(resolved, findings);
@@ -235,6 +266,18 @@ export async function audit(
     });
   }
 
+  // Planner proof runs last: it reads the findings the rules produced and
+  // acknowledges the ones the planner disagrees with, before scoring.
+  let explainReport: ExplainReport | undefined;
+  if (explainEnabled) {
+    explainReport = await proveFindings(
+      exec,
+      findings.filter((f) => f.dimension === 'perf' && !f.acknowledged),
+      indexesByTable,
+      { minRows: config.perf?.explain?.minRows }
+    );
+  }
+
   findings.sort(compareFindings);
 
   const exposureReport: ExposureReport = {
@@ -262,14 +305,36 @@ export async function audit(
   };
 
   if (perfEnabled) {
+    // `S*` findings are scored by default — opting into `--stats` is the
+    // opt-in — but can be demoted to advisories for a deterministic grade.
+    const includeStats = config.perf?.scoring?.includeStats ?? true;
+    const scorable = includeStats
+      ? perfFindings
+      : perfFindings.filter((f) => !f.code.startsWith('S'));
+
     const perf: PerfReport = {
       findings: perfFindings,
       summary: summarize(perfFindings),
-      score: computeScore(perfFindings, config.perf?.scoring, {
+      score: computeScore(scorable, config.perf?.scoring, {
         exposedTables,
         exposureKnown: exposure.known
       })
     };
+
+    if (statsSnapshot) {
+      const stats: PerfStatsReport = {
+        source: 'live',
+        tables: statsSnapshot.tables.length,
+        statsReset: statsSnapshot.statsReset,
+        scored: includeStats
+      };
+      if (statsSnapshot.statementsUnavailable) {
+        stats.notes = [statsSnapshot.statementsUnavailable];
+      }
+      perf.stats = stats;
+    }
+    if (explainReport) perf.explain = explainReport;
+
     report.perf = perf;
   }
 
@@ -289,6 +354,19 @@ export async function audit(
   }
 
   return report;
+}
+
+/** Stats floors, config over defaults. */
+function statsThresholds(config: SafegresConfig): StatsThresholds {
+  const stats = config.perf?.stats ?? {};
+  return {
+    minRows: stats.minRows ?? DEFAULT_STATS_THRESHOLDS.minRows,
+    seqScanRatio: stats.seqScanRatio ?? DEFAULT_STATS_THRESHOLDS.seqScanRatio,
+    minIndexBytes: stats.minIndexBytes ?? DEFAULT_STATS_THRESHOLDS.minIndexBytes,
+    deadTupleRatio: stats.deadTupleRatio ?? DEFAULT_STATS_THRESHOLDS.deadTupleRatio,
+    minTimeShare: stats.minTimeShare ?? DEFAULT_STATS_THRESHOLDS.minTimeShare,
+    topStatements: stats.topStatements ?? DEFAULT_STATS_THRESHOLDS.topStatements
+  };
 }
 
 async function auditTableAst(
