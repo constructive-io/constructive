@@ -1,0 +1,63 @@
+name: npm-publish
+
+# Publishes all workspace packages whose package.json version is not yet on
+# the npm registry, using npm Trusted Publishing (OIDC) — no NPM_TOKEN.
+#
+# Release flow:
+#   1. Version + tag locally:  pnpm lerna version
+#   2. Trigger this workflow (workflow_dispatch), approve the `npm-publish`
+#      environment gate, and it publishes everything not yet on the registry.
+#
+# npm side (per package): Settings -> Trusted Publisher ->
+#   GitHub Actions, repository `constructive-io/constructive`,
+#   workflow `npm-publish.yaml`, environment `npm-publish`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dist-tag:
+        description: npm dist-tag to publish under
+        required: false
+        default: latest
+      dry-run:
+        description: Dry run (no packages are published)
+        type: boolean
+        default: false
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      id-token: write # required for npm Trusted Publishing (OIDC)
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish
+        run: >
+          pnpm publish -r
+          --tag "${{ inputs.dist-tag || 'latest' }}"
+          --no-git-checks
+          ${{ inputs.dry-run == true && '--dry-run' || '' }}
