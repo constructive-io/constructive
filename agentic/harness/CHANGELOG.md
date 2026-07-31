@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.8.0...@agentic-kit/harness@0.8.1) (2026-07-31)
+
+**Note:** Version bump only for package @agentic-kit/harness
+
 # [0.8.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/harness@0.7.1...@agentic-kit/harness@0.8.0) (2026-07-31)
 
 **Note:** Version bump only for package @agentic-kit/harness
