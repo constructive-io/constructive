@@ -1,6 +1,6 @@
 {
   "name": "simple-smtp-server",
-  "version": "0.27.5",
+  "version": "0.28.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "SMTP email sender for Constructive",
   "main": "index.js",
